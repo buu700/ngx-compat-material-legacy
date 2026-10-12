@@ -1,0 +1,459 @@
+{
+  "method": "Read-only source excerpts; dependency code never executed. Crate bytes verified against Cargo.lock checksums; git members verified against immutable tree; npm/pnpm archive digests bound to tool catalog.",
+  "members": [
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/minimatch/dist/commonjs/index.js",
+      "member_sha256": "d224f71f20d7c206fcc5b7e9f747324c7698345a0b2c28d717dd9cf698306783",
+      "member_bytes": 45140,
+      "excerpts": [
+        {
+          "first_line": 149,
+          "last_line": 157,
+          "text": "const braceExpand = (pattern, options = {}) => {\n    (0, assert_valid_pattern_js_1.assertValidPattern)(pattern);\n    // Thanks to Yeting Li <https://github.com/yetingli> for\n    // improving this regexp to avoid a ReDOS vulnerability.\n    if (options.nobrace || !/\\{(?:(?!\\{).)*\\}/.test(pattern)) {\n        // shortcut. no need to expand.\n        return [pattern];\n    }\n    return (0, brace_expansion_1.expand)(pattern, { max: options.braceExpandMax });"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+      "member_sha256": "fcd3b0e6efee67b11249804cc64bf4d22c883395491f79bfb484869d61823600",
+      "member_bytes": 492,
+      "excerpts": [
+        {
+          "first_line": 1,
+          "last_line": 12,
+          "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.assertValidPattern = void 0;\nconst MAX_PATTERN_LENGTH = 1024 * 64;\nconst assertValidPattern = (pattern) => {\n    if (typeof pattern !== 'string') {\n        throw new TypeError('invalid pattern');\n    }\n    if (pattern.length > MAX_PATTERN_LENGTH) {\n        throw new TypeError('pattern is too long');\n    }\n};"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/brace-expansion/dist/commonjs/index.js",
+      "member_sha256": "2a8ecf6cc8bb8c93cdfd11e9a29b3e1413684e2f1a8af82454f59b2f1c95f527",
+      "member_bytes": 7583,
+      "excerpts": [
+        {
+          "first_line": 35,
+          "last_line": 80,
+          "text": "        .replace(escSlashPattern, '\\\\')\n        .replace(escOpenPattern, '{')\n        .replace(escClosePattern, '}')\n        .replace(escCommaPattern, ',')\n        .replace(escPeriodPattern, '.');\n}\n/**\n * Basically just str.split(\",\"), but handling cases\n * where we have nested braced sections, which should be\n * treated as individual members, like {a,{b,c},d}\n */\nfunction parseCommaParts(str) {\n    if (!str) {\n        return [''];\n    }\n    const parts = [];\n    const m = (0, balanced_match_1.balanced)('{', '}', str);\n    if (!m) {\n        return str.split(',');\n    }\n    const { pre, body, post } = m;\n    const p = pre.split(',');\n    p[p.length - 1] += '{' + body + '}';\n    const postParts = parseCommaParts(post);\n    if (post.length) {\n        ;\n        p[p.length - 1] += postParts.shift();\n        p.push.apply(p, postParts);\n    }\n    parts.push.apply(parts, p);\n    return parts;\n}\nfunction expand(str, options = {}) {\n    if (!str) {\n        return [];\n    }\n    const { max = exports.EXPANSION_MAX } = options;\n    // I don't know why Bash 4.3 does this, but it does.\n    // Anything starting with {} will have the first two bytes preserved\n    // but *only* at the top level, so {},a}b will not expand to anything,\n    // but a{},b}c will be expanded to [a}c,abc].\n    // One could argue that this is a bug in Bash, but since the goal of\n    // this module is to match Bash's rules, we escape a leading {}\n    if (str.slice(0, 2) === '{}') {\n        str = '\\\\{\\\\}' + str.slice(2);\n    }"
+        },
+        {
+          "first_line": 85,
+          "last_line": 130,
+          "text": "}\nfunction isPadded(el) {\n    return /^-?0\\d/.test(el);\n}\nfunction lte(i, y) {\n    return i <= y;\n}\nfunction gte(i, y) {\n    return i >= y;\n}\nfunction expand_(str, max, isTop) {\n    /** @type {string[]} */\n    const expansions = [];\n    // The `{a},b}` rewrite below restarts expansion on a rewritten string with\n    // the same `max` and `isTop = true`. Loop instead of recursing so a long run\n    // of non-expanding `{}` groups can't exhaust the call stack.\n    for (;;) {\n        const m = (0, balanced_match_1.balanced)('{', '}', str);\n        if (!m)\n            return [str];\n        // no need to expand pre, since it is guaranteed to be free of brace-sets\n        const pre = m.pre;\n        if (/\\$$/.test(m.pre)) {\n            const post = m.post.length ? expand_(m.post, max, false) : [''];\n            for (let k = 0; k < post.length && k < max; k++) {\n                const expansion = pre + '{' + m.body + '}' + post[k];\n                expansions.push(expansion);\n            }\n            return expansions;\n        }\n        const isNumericSequence = /^-?\\d+\\.\\.-?\\d+(?:\\.\\.-?\\d+)?$/.test(m.body);\n        const isAlphaSequence = /^[a-zA-Z]\\.\\.[a-zA-Z](?:\\.\\.-?\\d+)?$/.test(m.body);\n        const isSequence = isNumericSequence || isAlphaSequence;\n        const isOptions = m.body.indexOf(',') >= 0;\n        if (!isSequence && !isOptions) {\n            // {a},b}\n            if (m.post.match(/,(?!,).*\\}/)) {\n                str = m.pre + '{' + m.body + escClose + m.post;\n                isTop = true;\n                continue;\n            }\n            return [str];\n        }\n        // Only expand post once we know this brace set actually expands. Computing\n        // it before the early returns above expanded post a second time on every\n        // non-expanding `{}`, which is what made inputs like `a{},{},{}...` blow up"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/@npmcli/map-workspaces/lib/index.js",
+      "member_sha256": "1deb734fa3b190cfe235f2c3bbffbd269f85496feadbd2d3e495cd07850bb4dd",
+      "member_bytes": 6571,
+      "excerpts": [
+        {
+          "first_line": 8,
+          "last_line": 67,
+          "text": "function appendNegatedPatterns (allPatterns) {\n  const patterns = []\n  const negatedPatterns = []\n  for (let pattern of allPatterns) {\n    const excl = pattern.match(/^!+/)\n    if (excl) {\n      pattern = pattern.slice(excl[0].length)\n    }\n\n    // strip off any / or ./ from the start of the pattern.  /foo => foo\n    pattern = pattern.replace(/^\\.?\\/+/, '')\n\n    // an odd number of ! means a negated pattern.  !!foo ==> foo\n    const negate = excl && excl[0].length % 2 === 1\n    if (negate) {\n      negatedPatterns.push(pattern)\n    } else {\n      // remove negated patterns that appeared before this pattern to avoid\n      // ignoring paths that were matched afterwards\n      // e.g: ['packages/**', '!packages/b/**', 'packages/b/a']\n      // in the above list, the last pattern overrides the negated pattern\n      // right before it. In effect, the above list would become:\n      // ['packages/**', 'packages/b/a']\n      // The order matters here which is why we must do it inside the loop\n      // as opposed to doing it all together at the end.\n      for (let i = 0; i < negatedPatterns.length; ++i) {\n        const negatedPattern = negatedPatterns[i]\n        if (minimatch(pattern, negatedPattern)) {\n          negatedPatterns.splice(i, 1)\n        }\n      }\n      patterns.push(pattern)\n    }\n  }\n\n  // use the negated patterns to eagerly remove all the patterns that\n  // can be removed to avoid unnecessary crawling\n  for (const negated of negatedPatterns) {\n    for (const pattern of minimatch.match(patterns, negated)) {\n      patterns.splice(patterns.indexOf(pattern), 1)\n    }\n  }\n  return { patterns, negatedPatterns }\n}\n\nfunction getPatterns (workspaces) {\n  const workspacesDeclaration =\n    Array.isArray(workspaces.packages)\n      ? workspaces.packages\n      : workspaces\n\n  if (!Array.isArray(workspacesDeclaration)) {\n    throw getError({\n      message: 'workspaces config expects an Array',\n      code: 'EWORKSPACESCONFIG',\n    })\n  }\n\n  return appendNegatedPatterns(workspacesDeclaration)\n}"
+        },
+        {
+          "first_line": 89,
+          "last_line": 130,
+          "text": "async function mapWorkspaces (opts = {}) {\n  if (!opts || !opts.pkg) {\n    throw getError({\n      message: 'mapWorkspaces missing pkg info',\n      code: 'EMAPWORKSPACESPKG',\n    })\n  }\n  if (!opts.cwd) {\n    opts.cwd = process.cwd()\n  }\n\n  const { workspaces = [] } = opts.pkg\n  const { patterns, negatedPatterns } = getPatterns(workspaces)\n  const results = new Map()\n\n  if (!patterns.length && !negatedPatterns.length) {\n    return results\n  }\n\n  const seen = new Map()\n  const getGlobOpts = () => ({\n    ...opts,\n    ignore: [\n      ...opts.ignore || [],\n      '**/node_modules/**',\n      // just ignore the negated patterns to avoid unnecessary crawling\n      ...negatedPatterns,\n    ],\n  })\n\n  let matches = await glob(patterns.map((p) => getGlobPattern(p)), getGlobOpts())\n  // preserves glob@8 behavior\n  matches = matches.sort((a, b) => a.localeCompare(b, 'en'))\n\n  // we must preserve the order of results according to the given list of\n  // workspace patterns\n  const orderedMatches = []\n  for (const pattern of patterns) {\n    orderedMatches.push(...matches.filter((m) => {\n      return minimatch(m, pattern, { partial: true, windowsPathsNoEscape: true })\n    }))\n  }"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/ignore-walk/lib/index.js",
+      "member_sha256": "10610ac2fdc62669c21893f3ff772f2dc8b5831b54d80040629a121aae70c0d6",
+      "member_bytes": 8795,
+      "excerpts": [
+        {
+          "first_line": 97,
+          "last_line": 119,
+          "text": "  addIgnoreFile (file, then) {\n    const ig = path.resolve(this.path, file)\n    fs.readFile(ig, 'utf8', (er, data) =>\n      er ? this.emit('error', er) : this.onReadIgnoreFile(file, data, then))\n  }\n\n  onReadIgnoreFile (file, data, then) {\n    const mmopt = {\n      matchBase: true,\n      dot: true,\n      flipNegate: true,\n      nocase: true,\n    }\n    const rules = data.split(/\\r?\\n/)\n      .filter(line => !/^#|^$/.test(line.trim()))\n      .map(rule => {\n        return new Minimatch(rule.trim(), mmopt)\n      })\n\n    this.ignoreRules[file] = rules\n\n    then()\n  }"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/make-fetch-happen/lib/cache/policy.js",
+      "member_sha256": "2014cf549fceb8808cba81e8760315b9060f502b6c62b7cb79e1b024abde54c3",
+      "member_bytes": 4527,
+      "excerpts": [
+        {
+          "first_line": 1,
+          "last_line": 16,
+          "text": "const CacheSemantics = require('http-cache-semantics')\nconst Negotiator = require('negotiator')\nconst ssri = require('ssri')\n\n// options passed to http-cache-semantics constructor\nconst policyOptions = {\n  shared: false,\n  ignoreCargoCult: true,\n}\n\n// a fake empty response, used when only testing the\n// request for storability\nconst emptyResponse = { status: 200, headers: {} }\n\n// returns a plain object representation of the Request\nconst requestObject = (request) => {"
+        },
+        {
+          "first_line": 40,
+          "last_line": 60,
+          "text": "  })\n\n  return _obj\n}\n\nclass CachePolicy {\n  constructor ({ entry, request, response, options }) {\n    this.entry = entry\n    this.request = requestObject(request)\n    this.response = responseObject(response)\n    this.options = options\n    this.policy = new CacheSemantics(this.request, this.response, policyOptions)\n\n    if (this.entry) {\n      // if we have an entry, copy the timestamp to the _responseTime\n      // this is necessary because the CacheSemantics constructor forces\n      // the value to Date.now() which means a policy created from a\n      // cache entry is likely to always identify itself as stale\n      this.policy._responseTime = this.entry.metadata.time\n    }\n  }"
+        },
+        {
+          "first_line": 80,
+          "last_line": 115,
+          "text": "    // based on the request's headers\n    const policy = new CacheSemantics(requestObject(request), emptyResponse, policyOptions)\n    return policy.storable()\n  }\n\n  // returns true if the policy satisfies the request\n  satisfies (request) {\n    const _req = requestObject(request)\n    if (this.request.headers.host !== _req.headers.host) {\n      return false\n    }\n\n    if (this.request.compress !== _req.compress) {\n      return false\n    }\n\n    const negotiatorA = new Negotiator(this.request)\n    const negotiatorB = new Negotiator(_req)\n\n    if (JSON.stringify(negotiatorA.mediaTypes()) !== JSON.stringify(negotiatorB.mediaTypes())) {\n      return false\n    }\n\n    if (JSON.stringify(negotiatorA.languages()) !== JSON.stringify(negotiatorB.languages())) {\n      return false\n    }\n\n    if (JSON.stringify(negotiatorA.encodings()) !== JSON.stringify(negotiatorB.encodings())) {\n      return false\n    }\n\n    if (this.options.integrity) {\n      return ssri.parse(this.options.integrity).match(this.entry.integrity)\n    }\n\n    return true"
+        },
+        {
+          "first_line": 125,
+          "last_line": 150,
+          "text": "  // cache-control contains must-revalidate\n  get mustRevalidate () {\n    return !!this.policy._rescc['must-revalidate']\n  }\n\n  // returns true if the cached response requires revalidation\n  // for the given request\n  needsRevalidation (request) {\n    const _req = requestObject(request)\n    // force method to GET because we only cache GETs\n    // but can serve a HEAD from a cached GET\n    _req.method = 'GET'\n    return !this.policy.satisfiesWithoutRevalidation(_req)\n  }\n\n  responseHeaders () {\n    return this.policy.responseHeaders()\n  }\n\n  // returns a new object containing the appropriate headers\n  // to send a revalidation request\n  revalidationHeaders (request) {\n    const _req = requestObject(request)\n    return this.policy.revalidationHeaders(_req)\n  }\n"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/lib/commands/query.js",
+      "member_sha256": "9b42ae6dea15ab017d2f4ae7fa424afc84cdf295ad9f67adfbb2750a2f1c393e",
+      "member_bytes": 5108,
+      "excerpts": [
+        {
+          "first_line": 70,
+          "last_line": 142,
+          "text": "    super(...args)\n    this.npm.config.set('json', true)\n  }\n\n  async exec (args) {\n    const packageLockOnly = this.npm.config.get('package-lock-only')\n    const Arborist = require('@npmcli/arborist')\n    const arb = new Arborist({\n      ...this.npm.flatOptions,\n      // one dir up from wherever node_modules lives\n      path: resolve(this.npm.dir, '..'),\n      forceActual: !packageLockOnly,\n    })\n    let tree\n    if (packageLockOnly) {\n      try {\n        tree = await arb.loadVirtual()\n      } catch (err) {\n        log.verbose('loadVirtual', err.stack)\n        throw this.usageError(\n          'A package lock or shrinkwrap file is required in package-lock-only mode'\n        )\n      }\n    } else {\n      tree = await arb.loadActual()\n    }\n    await this.#queryTree(tree, args[0])\n    this.#output()\n  }\n\n  async execWorkspaces (args) {\n    await this.setWorkspaces()\n    const packageLockOnly = this.npm.config.get('package-lock-only')\n    const Arborist = require('@npmcli/arborist')\n    const arb = new Arborist({\n      ...this.npm.flatOptions,\n      path: this.npm.prefix,\n      forceActual: !packageLockOnly,\n    })\n    let tree\n    if (packageLockOnly) {\n      try {\n        tree = await arb.loadVirtual()\n      } catch (err) {\n        log.verbose('loadVirtual', err.stack)\n        throw this.usageError(\n          'A package lock or shrinkwrap file is required in package-lock-only mode'\n        )\n      }\n    } else {\n      tree = await arb.loadActual()\n    }\n    for (const path of this.workspacePaths) {\n      const wsTree = path === tree.root.path\n        ? tree // --includes-workspace-root\n        : await tree.querySelectorAll(`.workspace:path(${path})`).then(r => r[0]?.target)\n      if (wsTree) {\n        await this.#queryTree(wsTree, args[0])\n      }\n    }\n    this.#output()\n  }\n\n  #output () {\n    this.checkExpected(this.#response.length)\n    output.buffer(this.#response)\n  }\n\n  // builds a normalized inventory\n  async #queryTree (tree, arg) {\n    const items = await tree.querySelectorAll(arg, this.npm.flatOptions)\n    for (const node of items) {\n      // Dedup by the target's physical location so multiple logical links to the same store node collapse to one result."
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/@npmcli/query/lib/index.js",
+      "member_sha256": "d05a0a8ca4c478113d7e8336c8da4fd38aea70e0dedda37b1d74bb63dae8c197",
+      "member_bytes": 8382,
+      "excerpts": [
+        {
+          "first_line": 241,
+          "last_line": 251,
+          "text": "const queryParser = (query) => {\n  // if query is an empty string or any falsy\n  // value, just returns an empty result\n  if (!query) {\n    return []\n  }\n\n  return parser(transformAst)\n    .astSync(escapeSlashes(query), { lossless: false })\n}\n"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/socks/build/common/helpers.js",
+      "member_sha256": "dcbb2f1bcb2e7450ae05a2cc911c925151ee0a03baa501823b4e8e82ada48393",
+      "member_bytes": 6933,
+      "excerpts": [
+        {
+          "first_line": 128,
+          "last_line": 167,
+          "text": "function isValidTimeoutValue(value) {\n    return typeof value === 'number' && value > 0;\n}\nfunction ipv4ToInt32(ip) {\n    const address = new ip_address_1.Address4(ip);\n    // Convert the IPv4 address parts to an integer\n    return address.toArray().reduce((acc, part) => (acc << 8) + part, 0) >>> 0;\n}\nexports.ipv4ToInt32 = ipv4ToInt32;\nfunction int32ToIpv4(int32) {\n    // Extract each byte (octet) from the 32-bit integer\n    const octet1 = (int32 >>> 24) & 0xff;\n    const octet2 = (int32 >>> 16) & 0xff;\n    const octet3 = (int32 >>> 8) & 0xff;\n    const octet4 = int32 & 0xff;\n    // Combine the octets into a string in IPv4 format\n    return [octet1, octet2, octet3, octet4].join('.');\n}\nexports.int32ToIpv4 = int32ToIpv4;\nfunction ipToBuffer(ip) {\n    if (net.isIPv4(ip)) {\n        // Handle IPv4 addresses\n        const address = new ip_address_1.Address4(ip);\n        return Buffer.from(address.toArray());\n    }\n    else if (net.isIPv6(ip)) {\n        // Handle IPv6 addresses\n        const address = new ip_address_1.Address6(ip);\n        return Buffer.from(address\n            .canonicalForm()\n            .split(':')\n            .map((segment) => segment.padStart(4, '0'))\n            .join(''), 'hex');\n    }\n    else {\n        throw new Error('Invalid IP address format');\n    }\n}\nexports.ipToBuffer = ipToBuffer;\n//# sourceMappingURL=helpers.js.map"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/socks/build/client/socksclient.js",
+      "member_sha256": "4b473feca4862b5c66ec0efa39ea2d40d07c845886b6081813b07d489fabd897",
+      "member_bytes": 35626,
+      "excerpts": [
+        {
+          "first_line": 160,
+          "last_line": 199,
+          "text": "        buff.writeUInt8(options.frameNumber || 0);\n        // IPv4/IPv6/Hostname\n        if (net.isIPv4(options.remoteHost.host)) {\n            buff.writeUInt8(constants_1.Socks5HostType.IPv4);\n            buff.writeUInt32BE((0, helpers_1.ipv4ToInt32)(options.remoteHost.host));\n        }\n        else if (net.isIPv6(options.remoteHost.host)) {\n            buff.writeUInt8(constants_1.Socks5HostType.IPv6);\n            buff.writeBuffer((0, helpers_1.ipToBuffer)(options.remoteHost.host));\n        }\n        else {\n            buff.writeUInt8(constants_1.Socks5HostType.Hostname);\n            buff.writeUInt8(Buffer.byteLength(options.remoteHost.host));\n            buff.writeString(options.remoteHost.host);\n        }\n        // Port\n        buff.writeUInt16BE(options.remoteHost.port);\n        // Data\n        buff.writeBuffer(options.data);\n        return buff.toBuffer();\n    }\n    /**\n     * Parses a SOCKS UDP frame.\n     * @param data\n     */\n    static parseUDPFrame(data) {\n        const buff = smart_buffer_1.SmartBuffer.fromBuffer(data);\n        buff.readOffset = 2;\n        const frameNumber = buff.readUInt8();\n        const hostType = buff.readUInt8();\n        let remoteHost;\n        if (hostType === constants_1.Socks5HostType.IPv4) {\n            remoteHost = (0, helpers_1.int32ToIpv4)(buff.readUInt32BE());\n        }\n        else if (hostType === constants_1.Socks5HostType.IPv6) {\n            remoteHost = ip_address_1.Address6.fromByteArray(Array.from(buff.readBuffer(16))).canonicalForm();\n        }\n        else {\n            remoteHost = buff.readString(buff.readUInt8());\n        }"
+        },
+        {
+          "first_line": 609,
+          "last_line": 622,
+          "text": "        buff.writeUInt8(0x00);\n        // ipv4, ipv6, domain?\n        if (net.isIPv4(this.options.destination.host)) {\n            buff.writeUInt8(constants_1.Socks5HostType.IPv4);\n            buff.writeBuffer((0, helpers_1.ipToBuffer)(this.options.destination.host));\n        }\n        else if (net.isIPv6(this.options.destination.host)) {\n            buff.writeUInt8(constants_1.Socks5HostType.IPv6);\n            buff.writeBuffer((0, helpers_1.ipToBuffer)(this.options.destination.host));\n        }\n        else {\n            buff.writeUInt8(constants_1.Socks5HostType.Hostname);\n            buff.writeUInt8(this.options.destination.host.length);\n            buff.writeString(this.options.destination.host);"
+        },
+        {
+          "first_line": 684,
+          "last_line": 692,
+          "text": "                    return;\n                }\n                buff = smart_buffer_1.SmartBuffer.fromBuffer(this.receiveBuffer.get(dataNeeded).slice(4));\n                remoteHost = {\n                    host: ip_address_1.Address6.fromByteArray(Array.from(buff.readBuffer(16))).canonicalForm(),\n                    port: buff.readUInt16BE(),\n                };\n            }\n            // We have everything we need"
+        },
+        {
+          "first_line": 775,
+          "last_line": 782,
+          "text": "                    return;\n                }\n                buff = smart_buffer_1.SmartBuffer.fromBuffer(this.receiveBuffer.get(dataNeeded).slice(4));\n                remoteHost = {\n                    host: ip_address_1.Address6.fromByteArray(Array.from(buff.readBuffer(16))).canonicalForm(),\n                    port: buff.readUInt16BE(),\n                };\n            }"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/node-gyp/lib/download.js",
+      "member_sha256": "e136afe6ae2828114abf0ddae296d1fdd0c8e418922f7f6f6363bc51761db5fe",
+      "member_bytes": 2504,
+      "excerpts": [
+        {
+          "first_line": 1,
+          "last_line": 74,
+          "text": "const { Readable } = require('stream')\nconst { Agent, EnvHttpProxyAgent, RetryAgent, fetch } = require('undici')\nconst { promises: fs } = require('graceful-fs')\nconst log = require('./log')\n\nasync function download (gyp, url) {\n  log.http('GET', url)\n\n  const requestOpts = {\n    headers: {\n      'User-Agent': `node-gyp v${gyp.version} (node ${process.version})`,\n      Connection: 'keep-alive'\n    },\n    dispatcher: await createDispatcher(gyp)\n  }\n\n  let res\n  try {\n    res = await fetch(url, requestOpts)\n  } catch (err) {\n    // Built-in fetch wraps low-level errors in \"TypeError: fetch failed\" with\n    // the underlying error on .cause. Callers inspect .code (e.g. ENOTFOUND).\n    if (err.cause) {\n      throw err.cause\n    }\n    throw err\n  }\n\n  log.http(res.status, res.url)\n\n  const body = res.body ? Readable.fromWeb(res.body) : Readable.from([])\n  return {\n    status: res.status,\n    url: res.url,\n    body,\n    text: async () => {\n      let data = ''\n      body.setEncoding('utf8')\n      for await (const chunk of body) {\n        data += chunk\n      }\n      return data\n    }\n  }\n}\n\nasync function createDispatcher (gyp) {\n  const env = process.env\n  const hasProxyEnv = env.http_proxy || env.HTTP_PROXY || env.https_proxy || env.HTTPS_PROXY\n  if (!gyp.opts.proxy && !gyp.opts.cafile && !hasProxyEnv) {\n    return new RetryAgent(new Agent(), { maxRetries: 3 })\n  }\n\n  const opts = {}\n  if (gyp.opts.cafile) {\n    const ca = await readCAFile(gyp.opts.cafile)\n    // EnvHttpProxyAgent forwards opts to both its internal Agent (direct) and\n    // ProxyAgent (proxied). Agent reads TLS config from `connect`; ProxyAgent\n    // reads it from `requestTls` (origin) / `proxyTls` (proxy). Set all three\n    // so the custom CA is applied regardless of which path a request takes.\n    opts.connect = { ca }\n    opts.requestTls = { ca }\n    opts.proxyTls = { ca }\n  }\n  if (gyp.opts.proxy) {\n    opts.httpProxy = gyp.opts.proxy\n    opts.httpsProxy = gyp.opts.proxy\n  }\n  if (gyp.opts.noproxy) {\n    opts.noProxy = gyp.opts.noproxy\n  }\n  return new RetryAgent(new EnvHttpProxyAgent(opts), { maxRetries: 3 })\n}\n"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/tar/dist/commonjs/list.js",
+      "member_sha256": "0bd50fcdbe43d28c6cb65bc76a77bbd3edc5c9fd8840d04e611eb2aac9ea2817",
+      "member_bytes": 5342,
+      "excerpts": [
+        {
+          "first_line": 57,
+          "last_line": 78,
+          "text": "// construct a filter that limits the file entries listed\n// include child entries if a dir is included\nconst filesFilter = (opt, files) => {\n    const map = new Map(files.map(f => [(0, strip_trailing_slashes_js_1.stripTrailingSlashes)(f), true]));\n    const filter = opt.filter;\n    const mapHas = (file, r = '') => {\n        const root = r || (0, path_1.parse)(file).root || '.';\n        let ret;\n        if (file === root)\n            ret = false;\n        else {\n            const m = map.get(file);\n            ret = m !== undefined ? m : mapHas((0, path_1.dirname)(file), root);\n        }\n        map.set(file, ret);\n        return ret;\n    };\n    opt.filter =\n        filter ?\n            (file, entry) => filter(file, entry) && mapHas((0, strip_trailing_slashes_js_1.stripTrailingSlashes)(file))\n            : file => mapHas((0, strip_trailing_slashes_js_1.stripTrailingSlashes)(file));\n};"
+        },
+        {
+          "first_line": 139,
+          "last_line": 144,
+          "text": "exports.list = (0, make_command_js_1.makeCommand)(listFileSync, listFile, opt => new parse_js_1.Parser(opt), opt => new parse_js_1.Parser(opt), (opt, files) => {\n    if (files?.length)\n        (0, exports.filesFilter)(opt, files);\n    if (!opt.noResume)\n        onReadEntryFunction(opt);\n});"
+        }
+      ]
+    },
+    {
+      "archive": "npm-11.19.0.tgz",
+      "archive_sha256": "31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75",
+      "member": "package/node_modules/pacote/lib/fetcher.js",
+      "member_sha256": "97dbf9a402ad3329c517aa35928da4c115a2e3a77b51f513729a8e253ee1144a",
+      "member_bytes": 17791,
+      "excerpts": [
+        {
+          "first_line": 378,
+          "last_line": 389,
+          "text": "  async tarballFile (dest) {\n    const dir = dirname(dest)\n    await mkdir(dir, { recursive: true })\n    return this.#toFile(dest)\n  }\n\n  #extract (dest, tarball) {\n    const extractor = tar.x(this.#tarxOptions({ cwd: dest }))\n    const p = new Promise((resolve, reject) => {\n      extractor.on('end', () => {\n        resolve({\n          resolved: this.resolved,"
+        }
+      ]
+    },
+    {
+      "archive": "pnpm-12.4.2.tgz",
+      "archive_sha256": "3bb1683c7bff8bf8a810284d8b38af46ac22e2a732fca88de299fdc6b88af814",
+      "member": "package/dist/node_modules/node-gyp/lib/download.js",
+      "member_sha256": "d6d9f6adf3e73ca72e6879620eb37ab5603e431796d0375adcfad10ac2e826a3",
+      "member_bytes": 2406,
+      "excerpts": [
+        {
+          "first_line": 1,
+          "last_line": 74,
+          "text": "const { Readable } = require('stream')\nconst { EnvHttpProxyAgent } = require('undici')\nconst { promises: fs } = require('graceful-fs')\nconst log = require('./log')\n\nasync function download (gyp, url) {\n  log.http('GET', url)\n\n  const requestOpts = {\n    headers: {\n      'User-Agent': `node-gyp v${gyp.version} (node ${process.version})`,\n      Connection: 'keep-alive'\n    },\n    dispatcher: await createDispatcher(gyp)\n  }\n\n  let res\n  try {\n    res = await fetch(url, requestOpts)\n  } catch (err) {\n    // Built-in fetch wraps low-level errors in \"TypeError: fetch failed\" with\n    // the underlying error on .cause. Callers inspect .code (e.g. ENOTFOUND).\n    if (err.cause) {\n      throw err.cause\n    }\n    throw err\n  }\n\n  log.http(res.status, res.url)\n\n  const body = res.body ? Readable.fromWeb(res.body) : Readable.from([])\n  return {\n    status: res.status,\n    url: res.url,\n    body,\n    text: async () => {\n      let data = ''\n      body.setEncoding('utf8')\n      for await (const chunk of body) {\n        data += chunk\n      }\n      return data\n    }\n  }\n}\n\nasync function createDispatcher (gyp) {\n  const env = process.env\n  const hasProxyEnv = env.http_proxy || env.HTTP_PROXY || env.https_proxy || env.HTTPS_PROXY\n  if (!gyp.opts.proxy && !gyp.opts.cafile && !hasProxyEnv) {\n    return undefined\n  }\n\n  const opts = {}\n  if (gyp.opts.cafile) {\n    const ca = await readCAFile(gyp.opts.cafile)\n    // EnvHttpProxyAgent forwards opts to both its internal Agent (direct) and\n    // ProxyAgent (proxied). Agent reads TLS config from `connect`; ProxyAgent\n    // reads it from `requestTls` (origin) / `proxyTls` (proxy). Set all three\n    // so the custom CA is applied regardless of which path a request takes.\n    opts.connect = { ca }\n    opts.requestTls = { ca }\n    opts.proxyTls = { ca }\n  }\n  if (gyp.opts.proxy) {\n    opts.httpProxy = gyp.opts.proxy\n    opts.httpsProxy = gyp.opts.proxy\n  }\n  if (gyp.opts.noproxy) {\n    opts.noProxy = gyp.opts.noproxy\n  }\n  return new EnvHttpProxyAgent(opts)\n}\n"
+        }
+      ]
+    },
+    {
+      "crate": "ambient-id@0.0.11",
+      "crate_sha256": "c1daa54020e05aa0b163ee10434fff35a0f18d28a1cafa142bd1290e1abe630e",
+      "member": "ambient-id-0.0.11/src/lib.rs",
+      "member_sha256": "735ed03dc46df2bd2775e08e35f031ab4fd0583b43084955d1e8b7f4bb8bdbb1",
+      "member_bytes": 6779,
+      "excerpts": [
+        {
+          "first_line": 71,
+          "last_line": 74,
+          "text": "#[derive(Default)]\nstruct DetectionState {\n    client: ClientWithMiddleware,\n}"
+        },
+        {
+          "first_line": 92,
+          "last_line": 106,
+          "text": "impl Detector {\n    /// Creates a new detector with default settings.\n    pub fn new() -> Self {\n        Detector {\n            state: Default::default(),\n        }\n    }\n\n    /// Creates a new detector with the given HTTP client middleware stack.\n    pub fn new_with_client(client: impl Into<ClientWithMiddleware>) -> Self {\n        Detector {\n            state: DetectionState {\n                client: client.into(),\n            },\n        }"
+        }
+      ]
+    },
+    {
+      "crate": "ambient-id@0.0.11",
+      "crate_sha256": "c1daa54020e05aa0b163ee10434fff35a0f18d28a1cafa142bd1290e1abe630e",
+      "member": "ambient-id-0.0.11/src/github.rs",
+      "member_sha256": "242c3d16e6cc1e952577d093df4518c5909a0d86bcf58e446eb7b4ea1f079f0a",
+      "member_bytes": 8251,
+      "excerpts": [
+        {
+          "first_line": 48,
+          "last_line": 78,
+          "text": "    /// environment variable to authenticate the request.\n    ///\n    /// The absence of either variable indicates insufficient permissions.\n    async fn detect(&self, audience: &str) -> Result<crate::IdToken, Self::Error> {\n        let url = std::env::var(\"ACTIONS_ID_TOKEN_REQUEST_URL\")\n            .map_err(|_| Error::InsufficientPermissions(\"missing ACTIONS_ID_TOKEN_REQUEST_URL\"))?;\n        let token = std::env::var(\"ACTIONS_ID_TOKEN_REQUEST_TOKEN\").map_err(|_| {\n            Error::InsufficientPermissions(\"missing ACTIONS_ID_TOKEN_REQUEST_TOKEN\")\n        })?;\n\n        let resp = self\n            .client\n            .get(&url)\n            .bearer_auth(token)\n            .query(&[(\"audience\", audience)])\n            .send()\n            .await?\n            .error_for_status()\n            .map_err(reqwest_middleware::Error::Reqwest)?\n            .json::<TokenRequestResponse>()\n            .await\n            .map_err(reqwest_middleware::Error::Reqwest)?;\n\n        Ok(crate::IdToken(resp.value.into()))\n    }\n}\n\n#[cfg(test)]\nmod tests {\n    use wiremock::{\n        Mock, MockServer,"
+        }
+      ]
+    },
+    {
+      "crate": "astral-reqwest-middleware@0.5.1",
+      "crate_sha256": "98e1c6be25cfbf1bb4fea1a9da51bc05d3259a9062df4e53f54e5607895e33c9",
+      "member": "astral-reqwest-middleware-0.5.1/src/client.rs",
+      "member_sha256": "944ac2f49923411ef88d66f7b79f61c56fed73a7a90374c036c5e47c7778aba3",
+      "member_bytes": 20093,
+      "excerpts": [
+        {
+          "first_line": 93,
+          "last_line": 100,
+          "text": "/// `ClientWithMiddleware` is a wrapper around [`reqwest::Client`] which runs middleware on every\n/// request.\n#[derive(Clone, Default)]\npub struct ClientWithMiddleware {\n    inner: reqwest::Client,\n    middleware_stack: Box<[Arc<dyn Middleware>]>,\n    initialiser_stack: Box<[Arc<dyn RequestInitialiser>]>,\n}"
+        },
+        {
+          "first_line": 218,
+          "last_line": 237,
+          "text": "    /// redirect loop was detected or redirect limit was exhausted.\n    pub async fn execute_with_extensions(\n        &self,\n        req: Request,\n        ext: &mut Extensions,\n    ) -> Result<Response> {\n        let next = Next::new(&self.inner, &self.middleware_stack);\n        next.run(req, ext).await\n    }\n}\n\n/// Create a `ClientWithMiddleware` without any middleware.\nimpl From<Client> for ClientWithMiddleware {\n    fn from(client: Client) -> Self {\n        ClientWithMiddleware {\n            inner: client,\n            middleware_stack: Box::new([]),\n            initialiser_stack: Box::new([]),\n        }\n    }"
+        }
+      ]
+    },
+    {
+      "crate": "astral-reqwest-middleware@0.5.1",
+      "crate_sha256": "98e1c6be25cfbf1bb4fea1a9da51bc05d3259a9062df4e53f54e5607895e33c9",
+      "member": "astral-reqwest-middleware-0.5.1/src/middleware.rs",
+      "member_sha256": "db424fd88a75dc8f82abdbcd0993b6a1b32781eb4fff4c6e7acd5b9b4fc1fcbb",
+      "member_bytes": 3244,
+      "excerpts": [
+        {
+          "first_line": 92,
+          "last_line": 106,
+          "text": "    }\n\n    pub fn run(\n        mut self,\n        req: Request,\n        extensions: &'a mut Extensions,\n    ) -> BoxFuture<'a, Result<Response>> {\n        if let Some((current, rest)) = self.middlewares.split_first() {\n            self.middlewares = rest;\n            current.handle(req, extensions, self)\n        } else {\n            Box::pin(async move { self.client.execute(req).await.map_err(Error::from) })\n        }\n    }\n}"
+        }
+      ]
+    },
+    {
+      "crate": "astral-reqwest-middleware@0.5.1",
+      "crate_sha256": "98e1c6be25cfbf1bb4fea1a9da51bc05d3259a9062df4e53f54e5607895e33c9",
+      "member": "astral-reqwest-middleware-0.5.1/src/error.rs",
+      "member_sha256": "87267962f76ae89a73ebc9ae11ab94614cd739ccc9370e6918d5d67889676b7f",
+      "member_bytes": 4113,
+      "excerpts": [
+        {
+          "first_line": 1,
+          "last_line": 22,
+          "text": "use reqwest::{StatusCode, Url};\nuse thiserror::Error;\n\npub type Result<T> = std::result::Result<T, Error>;\n\n#[derive(Error, Debug)]\npub enum Error {\n    /// There was an error running some middleware\n    #[error(transparent)]\n    Middleware(#[from] anyhow::Error),\n    /// Error from the underlying reqwest client\n    #[error(transparent)]\n    Reqwest(#[from] reqwest::Error),\n}\n\nimpl Error {\n    pub fn middleware<E>(err: E) -> Self\n    where\n        E: 'static + Send + Sync + std::error::Error,\n    {\n        Error::Middleware(err.into())\n    }"
+        }
+      ]
+    },
+    {
+      "crate": "sigstore-oidc@0.11.0",
+      "crate_sha256": "0fdb57c6e3af8a17d535a06084353d8e0bd32bb70f4807262f51b6cd009c9b4f",
+      "member": "sigstore-oidc-0.11.0/src/token.rs",
+      "member_sha256": "ff925a01ac7acfd8d7e8f39e5c5638a23d59fbf92c838e9f2281e06b7debd5bb",
+      "member_bytes": 6260,
+      "excerpts": [
+        {
+          "first_line": 99,
+          "last_line": 112,
+          "text": "    /// Detect and retrieve an ambient identity token from the current environment\n    ///\n    /// This attempts to find OIDC credentials in environments like GitHub Actions,\n    /// GitLab CI, Buildkite, etc. using the `ambient-id` crate.\n    pub async fn detect_ambient() -> Result<Option<Self>> {\n        match Detector::new().detect(\"sigstore\").await {\n            Ok(Some(token)) => Self::from_jwt(token.reveal()).map(Some),\n            Ok(None) => Ok(None),\n            Err(e) => Err(Error::Token(format!(\n                \"failed to detect ambient credentials: {}\",\n                e\n            ))),\n        }\n    }"
+        }
+      ]
+    },
+    {
+      "crate": "pgp@0.20.0",
+      "crate_sha256": "1cfa4743b28656065ff4c0ba09e46b357a65e8c00fc2341e89084b82f87cbdf1",
+      "member": "pgp-0.20.0/src/composed/signature.rs",
+      "member_sha256": "74257a4f55e1cbb09779d811220a05dbd94b1b24fb5d0299fb7c60d521614d33",
+      "member_bytes": 12968,
+      "excerpts": [
+        {
+          "first_line": 174,
+          "last_line": 178,
+          "text": "\n    /// Verify this signature.\n    pub fn verify(&self, key: &impl VerifyingKey, content: &[u8]) -> Result<()> {\n        self.signature.verify(key, content)\n    }"
+        }
+      ]
+    },
+    {
+      "crate": "pgp@0.20.0",
+      "crate_sha256": "1cfa4743b28656065ff4c0ba09e46b357a65e8c00fc2341e89084b82f87cbdf1",
+      "member": "pgp-0.20.0/src/crypto/rsa.rs",
+      "member_sha256": "cd7307b6d2c2d327489f19b6c64781f6e5d185c026d177107e7728f4387015ac",
+      "member_bytes": 8495,
+      "excerpts": [
+        {
+          "first_line": 195,
+          "last_line": 202,
+          "text": "fn verify_int<D>(key: &RsaPublicKey, hashed: &[u8], signature: &RsaSignature) -> Result<()>\nwhere\n    D: Digest + AssociatedOid,\n{\n    VerifyingKey::<D>::new(key.clone())\n        .verify_prehash(hashed, signature)\n        .map_err(Into::into)\n}"
+        },
+        {
+          "first_line": 213,
+          "last_line": 245,
+          "text": "/// Verify a RSA, PKCS1v15 padded signature.\npub fn verify(\n    key: &rsa::RsaPublicKey,\n    hash: HashAlgorithm,\n    hashed: &[u8],\n    signature: &[u8],\n) -> Result<()> {\n    let signature = if signature.len() < key.size() {\n        // RSA short signatures are allowed by PGP, but not by the RSA crate.\n        // So we pad out the signature if we encounter a short one.\n        let mut signature_padded = vec![0u8; key.size()];\n        let diff = key.size() - signature.len();\n        signature_padded[diff..].copy_from_slice(signature);\n        RsaSignature::try_from(&signature_padded[..])?\n    } else {\n        RsaSignature::try_from(signature)?\n    };\n\n    match hash {\n        HashAlgorithm::None => Err(format_err!(\"none\")),\n        HashAlgorithm::Md5 => verify_int::<Md5>(key, hashed, &signature),\n        HashAlgorithm::Ripemd160 => verify_int::<Ripemd160>(key, hashed, &signature),\n        HashAlgorithm::Sha1 => verify_int::<Sha1>(key, hashed, &signature),\n        HashAlgorithm::Sha224 => verify_int::<Sha224>(key, hashed, &signature),\n        HashAlgorithm::Sha256 => verify_int::<Sha256>(key, hashed, &signature),\n        HashAlgorithm::Sha384 => verify_int::<Sha384>(key, hashed, &signature),\n        HashAlgorithm::Sha512 => verify_int::<Sha512>(key, hashed, &signature),\n        HashAlgorithm::Sha3_256 => verify_int::<Sha3_256>(key, hashed, &signature),\n        HashAlgorithm::Sha3_512 => verify_int::<Sha3_512>(key, hashed, &signature),\n        HashAlgorithm::Private10 => unsupported_err!(\"Private10 should not be used\"),\n        HashAlgorithm::Other(o) => unsupported_err!(\"Hash algorithm {} is unsupported\", o),\n    }\n}"
+        }
+      ]
+    },
+    {
+      "crate": "pgp@0.20.0",
+      "crate_sha256": "1cfa4743b28656065ff4c0ba09e46b357a65e8c00fc2341e89084b82f87cbdf1",
+      "member": "pgp-0.20.0/src/types/params/public/rsa.rs",
+      "member_sha256": "7808ef17edc8ff2bb004774bc4729c2a536fa0caa0dfbb58d977c976b7b35750",
+      "member_bytes": 2445,
+      "excerpts": [
+        {
+          "first_line": 8,
+          "last_line": 31,
+          "text": "#[derive(Debug, PartialEq, Eq, Clone)]\n#[cfg_attr(test, derive(proptest_derive::Arbitrary))]\npub struct RsaPublicParams {\n    #[cfg_attr(test, proptest(strategy = \"tests::rsa_pub_gen()\"))]\n    pub key: rsa::RsaPublicKey,\n}\n\nimpl RsaPublicParams {\n    pub fn try_from_reader<B: BufRead>(mut i: B) -> Result<Self> {\n        let n = Mpi::try_from_reader(&mut i)?;\n        let e = Mpi::try_from_reader(&mut i)?;\n\n        let params = RsaPublicParams::try_from_mpi(n, e)?;\n        Ok(params)\n    }\n\n    fn try_from_mpi(n: Mpi, e: Mpi) -> Result<Self> {\n        let key = rsa::RsaPublicKey::new_with_max_size(\n            n.into(),\n            e.into(),\n            crate::crypto::rsa::MAX_KEY_SIZE,\n        )?;\n\n        Ok(RsaPublicParams { key })"
+        }
+      ]
+    },
+    {
+      "crate": "ssri@9.2.0",
+      "crate_sha256": "da7a2b3c2bc9693bcb40870c4e9b5bf0d79f9cb46273321bf855ec513e919082",
+      "member": "ssri-9.2.0/src/opts.rs",
+      "member_sha256": "40b157587086dfcfec0df99ea4de79441a9b785ed646cbc9203b4fa6201cb77d",
+      "member_bytes": 5991,
+      "excerpts": [
+        {
+          "first_line": 13,
+          "last_line": 23,
+          "text": "#[derive(Clone)]\nenum Hasher {\n    Sha1(sha1::Sha1),\n    Sha256(sha2::Sha256),\n    Sha384(sha2::Sha384),\n    Sha512(sha2::Sha512),\n    Xxh3(Box<xxhash_rust::xxh3::Xxh3>),\n}\n\nimpl Debug for Hasher {\n    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {"
+        },
+        {
+          "first_line": 62,
+          "last_line": 81,
+          "text": "        }\n    }\n\n    /// Generate a hash for this algorithm. Can be called multiple times to generate an `Integrity` string with multiple entries.\n    pub fn algorithm(mut self, algo: Algorithm) -> Self {\n        if self.disturbed {\n            panic!(\"Can't add new algorithms if IntegrityOpts::input() has already been called\");\n        }\n        self.hashers.push(match algo {\n            Algorithm::Sha1 => Hasher::Sha1(sha1::Sha1::new()),\n            Algorithm::Sha256 => Hasher::Sha256(sha2::Sha256::new()),\n            Algorithm::Sha384 => Hasher::Sha384(sha2::Sha384::new()),\n            Algorithm::Sha512 => Hasher::Sha512(sha2::Sha512::new()),\n            Algorithm::Xxh3 => Hasher::Xxh3(Box::new(xxhash_rust::xxh3::Xxh3::new())),\n        });\n        self\n    }\n\n    /// Add some data to this IntegrityOpts. All internal hashers will be updated for all configured `Algorithm`s.\n    pub fn input<B: AsRef<[u8]>>(&mut self, input: B) {"
+        }
+      ]
+    },
+    {
+      "crate": "reqwest@0.13.4",
+      "crate_sha256": "219c5811de6525e5416c7d5d53bb656d3afdbc6c5af816e0802bcfa42dbdc1c3",
+      "member": "reqwest-0.13.4/Cargo.toml",
+      "member_sha256": "e8b4f877a9c0e7c7c22d95671e97b4b8ed84c793d218b65c5503505f9789e6a4",
+      "member_bytes": 13129,
+      "excerpts": [
+        {
+          "first_line": 55,
+          "last_line": 165,
+          "text": "    \"x86_64-unknown-linux-gnu\",\n    \"wasm32-unknown-unknown\",\n]\n\n[package.metadata.playground]\nfeatures = [\n    \"blocking\",\n    \"cookies\",\n    \"query\",\n    \"form\",\n    \"json\",\n    \"multipart\",\n]\n\n[features]\n__native-tls = [\n    \"dep:hyper-tls\",\n    \"dep:native-tls-crate\",\n    \"__tls\",\n    \"dep:tokio-native-tls\",\n]\n__native-tls-alpn = [\n    \"native-tls-crate?/alpn\",\n    \"hyper-tls?/alpn\",\n]\n__rustls = [\n    \"dep:hyper-rustls\",\n    \"dep:tokio-rustls\",\n    \"dep:rustls\",\n    \"__tls\",\n]\n__rustls-aws-lc-rs = [\n    \"hyper-rustls?/aws-lc-rs\",\n    \"tokio-rustls?/aws-lc-rs\",\n    \"rustls?/aws-lc-rs\",\n    \"quinn?/rustls-aws-lc-rs\",\n]\n__tls = [\n    \"dep:rustls-pki-types\",\n    \"tokio/io-util\",\n]\nblocking = [\n    \"dep:futures-channel\",\n    \"futures-channel?/sink\",\n    \"dep:futures-util\",\n    \"futures-util?/io\",\n    \"futures-util?/sink\",\n    \"tokio/sync\",\n]\nbrotli = [\"tower-http/decompression-br\"]\ncharset = [\n    \"dep:encoding_rs\",\n    \"dep:mime\",\n]\ncookies = [\n    \"dep:cookie_crate\",\n    \"dep:cookie_store\",\n]\ndefault = [\n    \"default-tls\",\n    \"charset\",\n    \"http2\",\n    \"system-proxy\",\n]\ndefault-tls = [\"rustls\"]\ndeflate = [\"tower-http/decompression-deflate\"]\nform = [\n    \"dep:serde\",\n    \"dep:serde_urlencoded\",\n]\ngzip = [\"tower-http/decompression-gzip\"]\nhickory-dns = [\n    \"dep:hickory-resolver\",\n    \"dep:once_cell\",\n]\nhttp2 = [\n    \"dep:h2\",\n    \"hyper/http2\",\n    \"hyper-util/http2\",\n    \"hyper-rustls?/http2\",\n]\nhttp3 = [\n    \"rustls\",\n    \"dep:h3\",\n    \"dep:h3-quinn\",\n    \"dep:quinn\",\n    \"tokio/macros\",\n]\njson = [\n    \"dep:serde\",\n    \"dep:serde_json\",\n]\nmultipart = [\n    \"dep:mime_guess\",\n    \"dep:futures-util\",\n]\nnative-tls = [\n    \"__native-tls\",\n    \"__native-tls-alpn\",\n]\nnative-tls-no-alpn = [\"__native-tls\"]\nnative-tls-vendored = [\n    \"__native-tls\",\n    \"native-tls-crate?/vendored\",\n    \"__native-tls-alpn\",\n]\nnative-tls-vendored-no-alpn = [\n    \"__native-tls\",\n    \"native-tls-crate?/vendored\",\n]\nquery = ["
+        }
+      ]
+    },
+    {
+      "git_commit": "9502f3c457717dae3a4ddbf4315a8c4aee16fdb4",
+      "path": "Cargo.toml",
+      "sha256": "ba2222c216b03535eac5531759086a4e9a9f054961131514776cf1ec4de9f59f",
+      "bytes": 18444,
+      "excerpts": [
+        {
+          "first_line": 245,
+          "last_line": 265,
+          "text": "# node-semver 2.2.0 parses a partial version after `<=` as an exact patch\n# bound, so `<=16` becomes `<=16.0.0-0` and rejects every 16.x. The fork\n# expands it as the X-Range npm's semver does, and fixes `Ord for Bound`\n# reporting both an inclusive and an exclusive bound on one version as the\n# lesser, which made `Range::intersect` depend on argument order. Upstream\n# has not released since 2.2.0 (February 2025); drop this once it does.\n[patch.crates-io]\nnode-semver = { git = \"https://github.com/pnpm/node-semver-rs\", rev = \"1ae976a0023b4dec80b1a5411ccee8343f91320e\" }\n\n[workspace.metadata.workspaces]\nallow_branch = \"main\"\n\n# Declares the `dylint_lib = \"perfectionist\"` cfg used by the\n# `cfg_attr(dylint_lib = \"perfectionist\", feature(register_tool))` /\n# `register_tool(perfectionist)` lines at each pacquet crate's root.\n# Those `cfg_attr`s register the perfectionist tool name under dylint's\n# nightly toolchain (so `#[expect(perfectionist::lint, reason = \"...\")]`\n# at use sites compiles cleanly without a wrapper); this `check-cfg`\n# entry tells stable `cargo check` that the cfg name is expected even\n# though it's never set off-dylint.\n[workspace.lints.rust]"
+        }
+      ]
+    },
+    {
+      "git_commit": "9502f3c457717dae3a4ddbf4315a8c4aee16fdb4",
+      "path": ".github/workflows/release.yml",
+      "sha256": "148b30db1ca5f2350b670b8a3ec02cbfe3b1c75e9ba27c6c7128ec525db3c2b0",
+      "bytes": 73088,
+      "excerpts": [
+        {
+          "first_line": 658,
+          "last_line": 666,
+          "text": "        with:\n          container-build: 'true'\n\n      - name: Build with cross\n        shell: bash\n        env:\n          TARGET: ${{ matrix.target }}\n        run: .github/scripts/cross-build.sh --locked -p pnpm-cli --bin pnpm --release --target=\"$TARGET\"\n"
+        }
+      ]
+    },
+    {
+      "git_commit": "9502f3c457717dae3a4ddbf4315a8c4aee16fdb4",
+      "path": "pnpm/crates/crypto-shasums-file/src/signatures.rs",
+      "sha256": "12a07bf86dce9537389c390de5ca329b90c1383d7940786da864572ca8f16bf0",
+      "bytes": 1866,
+      "excerpts": [
+        {
+          "first_line": 1,
+          "last_line": 54,
+          "text": "use super::{\n    FetchVerifiedNodeShasumsError,\n    node_release_keys::{NODE_RELEASE_KEYS, NodeReleaseKey},\n};\nuse pgp::{\n    composed::{Deserializable, DetachedSignature, SignedPublicKey},\n    types::KeyDetails,\n};\nuse std::{io::Cursor, sync::Arc};\npub(super) fn is_signed_by_trusted_node_release_key(\n    content: &[u8],\n    signature_bytes: &[u8],\n) -> Result<bool, FetchVerifiedNodeShasumsError> {\n    let signature =\n        DetachedSignature::from_bytes(Cursor::new(signature_bytes)).map_err(signature_unreadable)?;\n    for key in trusted_node_release_keys()? {\n        if signature.verify(&key.primary_key, content).is_ok() {\n            return Ok(true);\n        }\n        for subkey in &key.public_subkeys {\n            if signature.verify(subkey, content).is_ok() {\n                return Ok(true);\n            }\n        }\n    }\n    Ok(false)\n}\n\nfn trusted_node_release_keys() -> Result<Vec<SignedPublicKey>, FetchVerifiedNodeShasumsError> {\n    NODE_RELEASE_KEYS\n        .iter()\n        .map(read_node_release_key)\n        .collect()\n}\n\nfn read_node_release_key(\n    trusted_key: &NodeReleaseKey,\n) -> Result<SignedPublicKey, FetchVerifiedNodeShasumsError> {\n    let (key, _headers) = SignedPublicKey::from_armor_single(trusted_key.armored_key.as_bytes())\n        .map_err(signature_unreadable)?;\n    let actual_fingerprint = key.fingerprint().to_string();\n    let fingerprint_matches = actual_fingerprint.eq_ignore_ascii_case(trusted_key.fingerprint);\n    if !fingerprint_matches {\n        return Err(FetchVerifiedNodeShasumsError::EmbeddedKeyFingerprintMismatch {\n            expected: trusted_key.fingerprint,\n            actual: actual_fingerprint,\n        });\n    }\n    Ok(key)\n}\n\nfn signature_unreadable(error: pgp::errors::Error) -> FetchVerifiedNodeShasumsError {\n    FetchVerifiedNodeShasumsError::SignatureUnreadable { error: Arc::new(error) }\n}"
+        }
+      ]
+    }
+  ]
+}

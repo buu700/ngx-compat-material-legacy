@@ -1,0 +1,2067 @@
+{
+  "schema_version": "triage-finding/v0",
+  "repository": {
+    "path": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+    "revision": "6b8dc16951fe346dfa4726028a1aa7135ba40c5e"
+  },
+  "findings": [
+    {
+      "triage_item_id": "triage-001",
+      "input_id": "RUSTSEC-2026-0190",
+      "source_type": "advisory",
+      "title": "Unsoundness in `Error::downcast_mut()`",
+      "normalized_input": {
+        "vulnerable_component": "crates.io/anyhow@1.0.102",
+        "claimed_source": "Error context followed by mutable downcast",
+        "claimed_sink": "anyhow::Error::downcast_mut borrow violation",
+        "claimed_control": "Presence of the required context\u2192mutable-downcast sequence",
+        "affected_version_or_path": "crates.io/anyhow@1.0.102",
+        "preconditions": [
+          "An actual supported compiled path must call context and then downcast_mut on that error."
+        ],
+        "impact": "Unsoundness in `Error::downcast_mut()`",
+        "references": [
+          "https://api.osv.dev/v1/vulns/RUSTSEC-2026-0190"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/crates.io/sigstore-oidc-0.11.0/src/token.rs",
+          "lines": "103-110",
+          "detail": "Selects default ambient detector and converts errors to a String."
+        },
+        {
+          "label": "static source",
+          "path": "external/crates.io/ambient-id-0.0.11/src/lib.rs",
+          "lines": "71-74,92-98",
+          "detail": "Default detector contains the default middleware client."
+        },
+        {
+          "label": "static source",
+          "path": "external/crates.io/astral-reqwest-middleware-0.5.1/src/client.rs",
+          "lines": "95-100,222-235",
+          "detail": "Default empty middleware stack; client is used for normal HTTP errors."
+        }
+      ],
+      "reachable_path": [
+        "pnpm CLI signing -> sigstore-oidc IdentityToken::detect_ambient -> ambient-id Detector::new -> default ClientWithMiddleware with an empty middleware stack",
+        "Empty-stack HTTP errors remain reqwest errors; sigstore converts the detector error to a token-error string. The reported anyhow context plus mutable-downcast sequence is not constructed or exported along this path."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-CLI-GRAPH: all local normal/build paths and the conservatively retained external lock edges exclude libsql and prost-derive from the declared CLI build.",
+        "E-ANYHOW: authenticated direct parents, ambient-id and sigstore-oidc source establish the exact default client/error path.",
+        "Immutable tool/catalog/policy inputs independently match 21.x; no separate 21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "The full static CLI dependency graph excludes the libsql and prost/prost-derive parents.",
+        "The sole remaining parent is astral-reqwest-middleware through ambient-id; the exact caller selects Detector::new and supplies no custom middleware.",
+        "ClientWithMiddleware derives Default with empty middleware/initialiser arrays; terminal HTTP execution maps failures to Error::Reqwest.",
+        "No source in the authenticated three direct-parent crates contains downcast_mut."
+      ],
+      "proof_gaps": [
+        "Static declared CLI scope only; no runtime or general anyhow version clearance."
+      ],
+      "recommended_next_step": "Retain the scoped CLI disposition for independent review; re-open if the signing detector gains custom middleware or any mutable anyhow downcast.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-002",
+      "input_id": "RUSTSEC-2025-0141",
+      "source_type": "advisory",
+      "title": "Bincode is unmaintained",
+      "normalized_input": {
+        "vulnerable_component": "crates.io/bincode@1.3.3",
+        "claimed_source": "unknown",
+        "claimed_sink": "No vulnerable operation is claimed by the informational advisory",
+        "claimed_control": "Maintenance status",
+        "affected_version_or_path": "crates.io/bincode@1.3.3",
+        "preconditions": [
+          "Package is unmaintained."
+        ],
+        "impact": "Maintenance concern; the supplied advisory establishes no vulnerability or supported boundary violation.",
+        "references": [
+          "https://api.osv.dev/v1/vulns/RUSTSEC-2025-0141"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "reference/toolchain/pnpm-12.4.2/Cargo.lock",
+          "lines": "unknown",
+          "detail": "Exact locked maintenance-advisory subject."
+        }
+      ],
+      "reachable_path": [],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-INFO: primary RustSec metadata classifies this input as informational unmaintained.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "No controlled input, exploit sink or vulnerability is supplied; do not turn maintenance status into a fabricated security defect."
+      ],
+      "proof_gaps": [
+        "Ongoing maintenance assessment remains separate from vulnerability triage."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-003",
+      "input_id": "RUSTSEC-2026-0221",
+      "source_type": "advisory",
+      "title": "`event-listener` allows `!Send` tags to cross thread boundaries via `StackSlot`",
+      "normalized_input": {
+        "vulnerable_component": "crates.io/event-listener@5.4.1",
+        "claimed_source": "Cross-thread non-Send event tag, hostile HTTP/2 frames, or invalid UTF-8 SQL bytes",
+        "claimed_sink": "`event-listener` allows `!Send` tags to cross thread boundaries via `StackSlot`",
+        "claimed_control": "Compiled component selection",
+        "affected_version_or_path": "crates.io/event-listener@5.4.1",
+        "preconditions": [
+          "The affected separate server dependency must be present in the supported tool binary."
+        ],
+        "impact": "`event-listener` allows `!Send` tags to cross thread boundaries via `StackSlot`",
+        "references": [
+          "https://api.osv.dev/v1/vulns/RUSTSEC-2026-0221"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4/.github/workflows/release.yml",
+          "lines": "665",
+          "detail": "Release builds pnpm-cli, not pnpr server."
+        },
+        {
+          "label": "static source",
+          "path": "external/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4/pnpm/crates/cli/Cargo.toml",
+          "lines": "18-94",
+          "detail": "Normal/build dependency graph is distinct from development dependencies."
+        }
+      ],
+      "reachable_path": [
+        "Full Cargo workspace \u2192 pnpr server/libsql/sqlx; excluded from local normal/build CLI dependency graph."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-CLI-GRAPH: all109 local Cargo manifests and all874 lock nodes were parsed; zero unresolved dependency edges.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Even the conservative graph retaining all targets/optional external edges excludes these affected versions after local development edges are removed. CLI uses the separate pnpr client; it does not ship the pnpr server."
+      ],
+      "proof_gaps": [
+        "Static declared-build scope; binary reproducibility/provenance-signature checks are separate release obligations."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-004",
+      "input_id": "RUSTSEC-2026-0258",
+      "source_type": "advisory",
+      "title": "h2 unbounded empty DATA frames",
+      "normalized_input": {
+        "vulnerable_component": "crates.io/h2@0.3.27",
+        "claimed_source": "Cross-thread non-Send event tag, hostile HTTP/2 frames, or invalid UTF-8 SQL bytes",
+        "claimed_sink": "h2 unbounded empty DATA frames",
+        "claimed_control": "Compiled component selection",
+        "affected_version_or_path": "crates.io/h2@0.3.27",
+        "preconditions": [
+          "The affected separate server dependency must be present in the supported tool binary."
+        ],
+        "impact": "h2 unbounded empty DATA frames",
+        "references": [
+          "https://api.osv.dev/v1/vulns/RUSTSEC-2026-0258"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4/.github/workflows/release.yml",
+          "lines": "665",
+          "detail": "Release builds pnpm-cli, not pnpr server."
+        },
+        {
+          "label": "static source",
+          "path": "external/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4/pnpm/crates/cli/Cargo.toml",
+          "lines": "18-94",
+          "detail": "Normal/build dependency graph is distinct from development dependencies."
+        }
+      ],
+      "reachable_path": [
+        "Full Cargo workspace \u2192 pnpr server/libsql/sqlx; excluded from local normal/build CLI dependency graph."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-CLI-GRAPH: all109 local Cargo manifests and all874 lock nodes were parsed; zero unresolved dependency edges.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Even the conservative graph retaining all targets/optional external edges excludes these affected versions after local development edges are removed. CLI uses the separate pnpr client; it does not ship the pnpr server."
+      ],
+      "proof_gaps": [
+        "Static declared-build scope; binary reproducibility/provenance-signature checks are separate release obligations."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-005",
+      "input_id": "GHSA-8m95-fffc-h4c5",
+      "source_type": "advisory",
+      "title": "libsql-sqlite3-parser crash due to invalid UTF-8 input",
+      "normalized_input": {
+        "vulnerable_component": "crates.io/libsql-sqlite3-parser@0.13.0",
+        "claimed_source": "Cross-thread non-Send event tag, hostile HTTP/2 frames, or invalid UTF-8 SQL bytes",
+        "claimed_sink": "libsql-sqlite3-parser crash due to invalid UTF-8 input",
+        "claimed_control": "Compiled component selection",
+        "affected_version_or_path": "crates.io/libsql-sqlite3-parser@0.13.0",
+        "preconditions": [
+          "The affected separate server dependency must be present in the supported tool binary."
+        ],
+        "impact": "libsql-sqlite3-parser crash due to invalid UTF-8 input",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-8m95-fffc-h4c5"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4/.github/workflows/release.yml",
+          "lines": "665",
+          "detail": "Release builds pnpm-cli, not pnpr server."
+        },
+        {
+          "label": "static source",
+          "path": "external/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4/pnpm/crates/cli/Cargo.toml",
+          "lines": "18-94",
+          "detail": "Normal/build dependency graph is distinct from development dependencies."
+        }
+      ],
+      "reachable_path": [
+        "Full Cargo workspace \u2192 pnpr server/libsql/sqlx; excluded from local normal/build CLI dependency graph."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-CLI-GRAPH: all109 local Cargo manifests and all874 lock nodes were parsed; zero unresolved dependency edges.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Even the conservative graph retaining all targets/optional external edges excludes these affected versions after local development edges are removed. CLI uses the separate pnpr client; it does not ship the pnpr server."
+      ],
+      "proof_gaps": [
+        "Static declared-build scope; binary reproducibility/provenance-signature checks are separate release obligations."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-006",
+      "input_id": "RUSTSEC-2026-0173",
+      "source_type": "advisory",
+      "title": "proc-macro-error2 is unmaintained",
+      "normalized_input": {
+        "vulnerable_component": "crates.io/proc-macro-error2@2.0.1",
+        "claimed_source": "unknown",
+        "claimed_sink": "No vulnerable operation is claimed by the informational advisory",
+        "claimed_control": "Maintenance status",
+        "affected_version_or_path": "crates.io/proc-macro-error2@2.0.1",
+        "preconditions": [
+          "Package is unmaintained."
+        ],
+        "impact": "Maintenance concern; the supplied advisory establishes no vulnerability or supported boundary violation.",
+        "references": [
+          "https://api.osv.dev/v1/vulns/RUSTSEC-2026-0173"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "reference/toolchain/pnpm-12.4.2/Cargo.lock",
+          "lines": "unknown",
+          "detail": "Exact locked maintenance-advisory subject."
+        }
+      ],
+      "reachable_path": [],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-INFO: primary RustSec metadata classifies this input as informational unmaintained.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "No controlled input, exploit sink or vulnerability is supplied; do not turn maintenance status into a fabricated security defect."
+      ],
+      "proof_gaps": [
+        "Ongoing maintenance assessment remains separate from vulnerability triage."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-007",
+      "input_id": "GHSA-4w2j-m93h-cj5j",
+      "source_type": "advisory",
+      "title": "Quinn: Remote memory exhaustion in quinn-proto from unbounded out-of-order stream reassembly",
+      "normalized_input": {
+        "vulnerable_component": "crates.io/quinn-proto@0.11.14",
+        "claimed_source": "Remote out-of-order QUIC stream frames",
+        "claimed_sink": "quinn-proto reassembly memory exhaustion",
+        "claimed_control": "HTTP/3 compile feature",
+        "affected_version_or_path": "crates.io/quinn-proto@0.11.14",
+        "preconditions": [
+          "QUIC/HTTP3 transport must be enabled."
+        ],
+        "impact": "Quinn: Remote memory exhaustion in quinn-proto from unbounded out-of-order stream reassembly",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-4w2j-m93h-cj5j"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4/Cargo.toml",
+          "lines": "unknown",
+          "detail": "Workspace reqwest disables defaults and selects gzip/json/rustls/socks/stream."
+        },
+        {
+          "label": "static source",
+          "path": "external/crates.io/reqwest-0.13.4/Cargo.toml",
+          "lines": "unknown",
+          "detail": "quinn is optional and enabled through http3."
+        }
+      ],
+      "reachable_path": [
+        "pnpm HTTP client \u2192 reqwest; QUIC transport is not enabled by reviewed feature configuration."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-HTTP3: all109 local manifests plus every one of the eight registry parents of reqwest0.13.4 were inspected; none enables or forwards http3.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Reqwest defaults also omit http3; release/cross-build selects the CLI without an extra HTTP3 feature. Both advisory IDs are retained separately."
+      ],
+      "proof_gaps": [
+        "Static declared-build scope only; no QUIC runtime experiment or binary reproducibility claim."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-008",
+      "input_id": "RUSTSEC-2026-0185",
+      "source_type": "advisory",
+      "title": " Remote memory exhaustion in quinn-proto from unbounded out-of-order stream reassembly",
+      "normalized_input": {
+        "vulnerable_component": "crates.io/quinn-proto@0.11.14",
+        "claimed_source": "Remote out-of-order QUIC stream frames",
+        "claimed_sink": "quinn-proto reassembly memory exhaustion",
+        "claimed_control": "HTTP/3 compile feature",
+        "affected_version_or_path": "crates.io/quinn-proto@0.11.14",
+        "preconditions": [
+          "QUIC/HTTP3 transport must be enabled."
+        ],
+        "impact": " Remote memory exhaustion in quinn-proto from unbounded out-of-order stream reassembly",
+        "references": [
+          "https://api.osv.dev/v1/vulns/RUSTSEC-2026-0185"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4/Cargo.toml",
+          "lines": "unknown",
+          "detail": "Workspace reqwest disables defaults and selects gzip/json/rustls/socks/stream."
+        },
+        {
+          "label": "static source",
+          "path": "external/crates.io/reqwest-0.13.4/Cargo.toml",
+          "lines": "unknown",
+          "detail": "quinn is optional and enabled through http3."
+        }
+      ],
+      "reachable_path": [
+        "pnpm HTTP client \u2192 reqwest; QUIC transport is not enabled by reviewed feature configuration."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-HTTP3: all109 local manifests plus every one of the eight registry parents of reqwest0.13.4 were inspected; none enables or forwards http3.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Reqwest defaults also omit http3; release/cross-build selects the CLI without an extra HTTP3 feature. Both advisory IDs are retained separately."
+      ],
+      "proof_gaps": [
+        "Static declared-build scope only; no QUIC runtime experiment or binary reproducibility claim."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-009",
+      "input_id": "RUSTSEC-2023-0071",
+      "source_type": "advisory",
+      "title": "Marvin Attack: potential key recovery through timing sidechannels",
+      "normalized_input": {
+        "vulnerable_component": "crates.io/rsa@0.9.10",
+        "claimed_source": "Chosen RSA ciphertexts and timing observations",
+        "claimed_sink": "Private RSA key operation exposed as an oracle",
+        "claimed_control": "Whether private operations are invoked, with appropriate blinding/mitigation",
+        "affected_version_or_path": "crates.io/rsa@0.9.10",
+        "preconditions": [
+          "A supported caller must operate on a private RSA key with attacker-controlled samples and measurable timing."
+        ],
+        "impact": "Marvin Attack: potential key recovery through timing sidechannels",
+        "references": [
+          "https://api.osv.dev/v1/vulns/RUSTSEC-2023-0071"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/pnpm@9502f3c457717dae3a4ddbf4315a8c4aee16fdb4/pnpm/crates/crypto-shasums-file/src/signatures.rs",
+          "lines": "1-24",
+          "detail": "Observed Node release flow verifies using public keys."
+        },
+        {
+          "label": "static source",
+          "path": "external/crates.io/pgp-0.20.0/src/composed/signature.rs",
+          "lines": "175-177",
+          "detail": "Detached signature verify requires VerifyingKey."
+        },
+        {
+          "label": "static source",
+          "path": "external/crates.io/pgp-0.20.0/src/crypto/rsa.rs",
+          "lines": "195-201,213-244",
+          "detail": "RSA verify consumes only RsaPublicKey."
+        }
+      ],
+      "reachable_path": [
+        "pnpm CLI Node runtime download -> pnpm-crypto-shasums-file -> DetachedSignature::from_bytes -> verify using embedded SignedPublicKey primary/subkeys",
+        "PGP RSA verification receives RsaPublicKey and performs verify_prehash; no private-key operation or private-key timing oracle is exposed by this caller."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-CLI-GRAPH: conservative complete declared CLI closure excludes openidconnect and sqlx-mysql.",
+        "E-RSA: all three direct-parent archives are checksum-authenticated; only pgp is present in the CLI closure. Complete crypto-shasums-file caller source and the pgp verification implementation establish the public-key path.",
+        "Immutable tool/catalog/policy inputs independently match 21.x; no separate 21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "The full static CLI dependency graph excludes the openidconnect and sqlx-mysql direct rsa parents.",
+        "The only remaining direct parent, pgp, is imported only by the completely inspected crypto-shasums-file crate.",
+        "That caller loads SignedPublicKey values from embedded Node release public keys, checks their fingerprints, and verifies detached signatures.",
+        "PGP signature verification uses an RSA public key; private decryption/signing implementations in pgp are separate APIs with no CLI caller."
+      ],
+      "proof_gaps": [
+        "Static declared CLI scope only; no runtime or general rsa version clearance."
+      ],
+      "recommended_next_step": "Retain the scoped public-key verification disposition for independent review; re-open if the tool starts loading RSA private keys or offering a private-key operation.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-010",
+      "input_id": "GHSA-6g2r-675j-hx59",
+      "source_type": "advisory",
+      "title": "xxhash-rust: Safe xxh3 custom-secret API accepts too-short secret in release",
+      "normalized_input": {
+        "vulnerable_component": "crates.io/xxhash-rust@0.8.15",
+        "claimed_source": "Too-short custom XXH3 secret",
+        "claimed_sink": "Safe custom-secret API performing out-of-bounds reads",
+        "claimed_control": "Custom-secret API selection",
+        "affected_version_or_path": "crates.io/xxhash-rust@0.8.15",
+        "preconditions": [
+          "Caller must supply a secret shorter than the internal minimum."
+        ],
+        "impact": "xxhash-rust: Safe xxh3 custom-secret API accepts too-short secret in release",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-6g2r-675j-hx59"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/crates.io/ssri-9.2.0/src/opts.rs",
+          "lines": "19,75",
+          "detail": "Only lock parent of xxhash-rust constructs Xxh3::new()."
+        }
+      ],
+      "reachable_path": [
+        "pnpm integrity hashing \u2192 ssri \u2192 Xxh3::new default hasher."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-XXHASH: complete authenticated ssri crate source was inspected; it supplies no custom secret.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Default hasher selection cannot reach the supplied too-short custom-secret condition."
+      ],
+      "proof_gaps": [
+        "No runtime reproduction; no general xxhash-rust version clearance."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-011",
+      "input_id": "GHSA-6j4f-fj2g-mc7p",
+      "source_type": "advisory",
+      "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-6j4f-fj2g-mc7p"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/index.js",
+          "lines": "149-157,207-268,897-898",
+          "detail": "Pattern is validated, then passed to brace-expansion with optional max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+          "lines": "4-10",
+          "detail": "64KiB limit exists; it is not proof against recursive or multiplicative patterns."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/map-workspaces/lib/index.js",
+          "lines": "8-66,100-128",
+          "detail": "Workspace patterns reach direct minimatch calls before/alongside glob; those calls supply no brace expansion max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/ignore-walk/lib/index.js",
+          "lines": "97-114",
+          "detail": "Reads ignore file content and constructs Minimatch without a brace limit."
+        }
+      ],
+      "reachable_path": [
+        "Package/workspace or operator pattern \u2192 glob/minimatch \u2192 brace-expansion."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": null,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 1,
+        "rationale": "Potentially direct parser route with weak size-only bounds; actor/configuration proof remains missing.",
+        "drivers": [
+          "pattern control",
+          "recursion/expansion before sufficient bound",
+          "lower-trust manifest route unresolved"
+        ]
+      },
+      "evidence": [
+        "E-BRACE: expansion remains reachable, including recursive comma/group handling; each of the five reported mechanisms is retained separately.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Inputs are partly operator/developer configuration; repository workflows intentionally execute candidate source code. No stronger privilege boundary has yet been established for a particular malicious manifest route.",
+        "Glob supplies braceExpandMax=10000, but direct map-workspaces and ignore-walk Minimatch calls do not; a glob-only limit does not close the claim."
+      ],
+      "proof_gaps": [
+        "Manifest/ignore-file pattern paths are established, including direct unbounded callers. Establish the supported lower-trust actor/availability boundary and its effective safeguards before confirming or excluding this exact claim.",
+        "No runtime witness for this exact pattern/caller combination was run."
+      ],
+      "recommended_next_step": "Complete the named static proof gap; perform any authorized runtime validation in a separate phase.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-012",
+      "input_id": "GHSA-mh99-v99m-4gvg",
+      "source_type": "advisory",
+      "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-mh99-v99m-4gvg"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/index.js",
+          "lines": "149-157,207-268,897-898",
+          "detail": "Pattern is validated, then passed to brace-expansion with optional max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+          "lines": "4-10",
+          "detail": "64KiB limit exists; it is not proof against recursive or multiplicative patterns."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/map-workspaces/lib/index.js",
+          "lines": "8-66,100-128",
+          "detail": "Workspace patterns reach direct minimatch calls before/alongside glob; those calls supply no brace expansion max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/ignore-walk/lib/index.js",
+          "lines": "97-114",
+          "detail": "Reads ignore file content and constructs Minimatch without a brace limit."
+        }
+      ],
+      "reachable_path": [
+        "Package/workspace or operator pattern \u2192 glob/minimatch \u2192 brace-expansion."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": null,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 3,
+        "rationale": "Potentially direct parser route with weak size-only bounds; actor/configuration proof remains missing.",
+        "drivers": [
+          "pattern control",
+          "recursion/expansion before sufficient bound",
+          "lower-trust manifest route unresolved"
+        ]
+      },
+      "evidence": [
+        "E-BRACE: expansion remains reachable, including recursive comma/group handling; each of the five reported mechanisms is retained separately.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Inputs are partly operator/developer configuration; repository workflows intentionally execute candidate source code. No stronger privilege boundary has yet been established for a particular malicious manifest route.",
+        "Glob supplies braceExpandMax=10000, but direct map-workspaces and ignore-walk Minimatch calls do not; a glob-only limit does not close the claim."
+      ],
+      "proof_gaps": [
+        "Manifest/ignore-file pattern paths are established, including direct unbounded callers. Establish the supported lower-trust actor/availability boundary and its effective safeguards before confirming or excluding this exact claim.",
+        "No runtime witness for this exact pattern/caller combination was run."
+      ],
+      "recommended_next_step": "Complete the named static proof gap; perform any authorized runtime validation in a separate phase.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-013",
+      "input_id": "GHSA-q2hr-2g5m-vwhr",
+      "source_type": "advisory",
+      "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-q2hr-2g5m-vwhr"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/index.js",
+          "lines": "149-157,207-268,897-898",
+          "detail": "Pattern is validated, then passed to brace-expansion with optional max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+          "lines": "4-10",
+          "detail": "64KiB limit exists; it is not proof against recursive or multiplicative patterns."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/map-workspaces/lib/index.js",
+          "lines": "8-66,100-128",
+          "detail": "Workspace patterns reach direct minimatch calls before/alongside glob; those calls supply no brace expansion max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/ignore-walk/lib/index.js",
+          "lines": "97-114",
+          "detail": "Reads ignore file content and constructs Minimatch without a brace limit."
+        }
+      ],
+      "reachable_path": [
+        "Package/workspace or operator pattern \u2192 glob/minimatch \u2192 brace-expansion."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": null,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 5,
+        "rationale": "Potentially direct parser route with weak size-only bounds; actor/configuration proof remains missing.",
+        "drivers": [
+          "pattern control",
+          "recursion/expansion before sufficient bound",
+          "lower-trust manifest route unresolved"
+        ]
+      },
+      "evidence": [
+        "E-BRACE: expansion remains reachable, including recursive comma/group handling; each of the five reported mechanisms is retained separately.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Inputs are partly operator/developer configuration; repository workflows intentionally execute candidate source code. No stronger privilege boundary has yet been established for a particular malicious manifest route.",
+        "Glob supplies braceExpandMax=10000, but direct map-workspaces and ignore-walk Minimatch calls do not; a glob-only limit does not close the claim."
+      ],
+      "proof_gaps": [
+        "Manifest/ignore-file pattern paths are established, including direct unbounded callers. Establish the supported lower-trust actor/availability boundary and its effective safeguards before confirming or excluding this exact claim.",
+        "No runtime witness for this exact pattern/caller combination was run."
+      ],
+      "recommended_next_step": "Complete the named static proof gap; perform any authorized runtime validation in a separate phase.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-014",
+      "input_id": "GHSA-qhr7-859c-m2p7",
+      "source_type": "advisory",
+      "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-qhr7-859c-m2p7"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/index.js",
+          "lines": "149-157,207-268,897-898",
+          "detail": "Pattern is validated, then passed to brace-expansion with optional max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+          "lines": "4-10",
+          "detail": "64KiB limit exists; it is not proof against recursive or multiplicative patterns."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/map-workspaces/lib/index.js",
+          "lines": "8-66,100-128",
+          "detail": "Workspace patterns reach direct minimatch calls before/alongside glob; those calls supply no brace expansion max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/ignore-walk/lib/index.js",
+          "lines": "97-114",
+          "detail": "Reads ignore file content and constructs Minimatch without a brace limit."
+        }
+      ],
+      "reachable_path": [
+        "Package/workspace or operator pattern \u2192 glob/minimatch \u2192 brace-expansion."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": null,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 2,
+        "rationale": "Potentially direct parser route with weak size-only bounds; actor/configuration proof remains missing.",
+        "drivers": [
+          "pattern control",
+          "recursion/expansion before sufficient bound",
+          "lower-trust manifest route unresolved"
+        ]
+      },
+      "evidence": [
+        "E-BRACE: expansion remains reachable, including recursive comma/group handling; each of the five reported mechanisms is retained separately.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Inputs are partly operator/developer configuration; repository workflows intentionally execute candidate source code. No stronger privilege boundary has yet been established for a particular malicious manifest route.",
+        "Glob supplies braceExpandMax=10000, but direct map-workspaces and ignore-walk Minimatch calls do not; a glob-only limit does not close the claim."
+      ],
+      "proof_gaps": [
+        "Manifest/ignore-file pattern paths are established, including direct unbounded callers. Establish the supported lower-trust actor/availability boundary and its effective safeguards before confirming or excluding this exact claim.",
+        "No runtime witness for this exact pattern/caller combination was run."
+      ],
+      "recommended_next_step": "Complete the named static proof gap; perform any authorized runtime validation in a separate phase.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-015",
+      "input_id": "GHSA-rgw5-rvv9-x895",
+      "source_type": "advisory",
+      "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-rgw5-rvv9-x895"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/index.js",
+          "lines": "149-157,207-268,897-898",
+          "detail": "Pattern is validated, then passed to brace-expansion with optional max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+          "lines": "4-10",
+          "detail": "64KiB limit exists; it is not proof against recursive or multiplicative patterns."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/map-workspaces/lib/index.js",
+          "lines": "8-66,100-128",
+          "detail": "Workspace patterns reach direct minimatch calls before/alongside glob; those calls supply no brace expansion max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/ignore-walk/lib/index.js",
+          "lines": "97-114",
+          "detail": "Reads ignore file content and constructs Minimatch without a brace limit."
+        }
+      ],
+      "reachable_path": [
+        "Package/workspace or operator pattern \u2192 glob/minimatch \u2192 brace-expansion."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": null,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 4,
+        "rationale": "Potentially direct parser route with weak size-only bounds; actor/configuration proof remains missing.",
+        "drivers": [
+          "pattern control",
+          "recursion/expansion before sufficient bound",
+          "lower-trust manifest route unresolved"
+        ]
+      },
+      "evidence": [
+        "E-BRACE: expansion remains reachable, including recursive comma/group handling; each of the five reported mechanisms is retained separately.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "Inputs are partly operator/developer configuration; repository workflows intentionally execute candidate source code. No stronger privilege boundary has yet been established for a particular malicious manifest route.",
+        "Glob supplies braceExpandMax=10000, but direct map-workspaces and ignore-walk Minimatch calls do not; a glob-only limit does not close the claim."
+      ],
+      "proof_gaps": [
+        "Manifest/ignore-file pattern paths are established, including direct unbounded callers. Establish the supported lower-trust actor/availability boundary and its effective safeguards before confirming or excluding this exact claim.",
+        "No runtime witness for this exact pattern/caller combination was run."
+      ],
+      "recommended_next_step": "Complete the named static proof gap; perform any authorized runtime validation in a separate phase.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-016",
+      "input_id": "GHSA-ch52-4w7c-c8xp",
+      "source_type": "advisory",
+      "title": "http-cache-semantics max-stale handling can disclose cross-user cached responses",
+      "normalized_input": {
+        "vulnerable_component": "npm/http-cache-semantics@4.2.0",
+        "claimed_source": "max-stale request against a security-zeroed cache entry",
+        "claimed_sink": "Cached authenticated body or Set-Cookie response returned to another identity",
+        "claimed_control": "Cache freshness/account partition",
+        "affected_version_or_path": "npm/http-cache-semantics@4.2.0",
+        "preconditions": [
+          "A shared or cross-identity cache must expose a zeroed response to a lower-trust requester."
+        ],
+        "impact": "http-cache-semantics max-stale handling can disclose cross-user cached responses",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-ch52-4w7c-c8xp"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/make-fetch-happen/lib/cache/policy.js",
+          "lines": "5-9,45-58,85-115,130-148",
+          "detail": "Actual CacheSemantics caller uses shared:false; host/content-negotiation/integrity checks do not establish account isolation."
+        }
+      ],
+      "reachable_path": [
+        "npm registry fetch \u2192 make-fetch-happen cache policy \u2192 http-cache-semantics."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": null,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 6,
+        "rationale": "Caching path exists, but the cross-identity service boundary required by the claim remains unresolved.",
+        "drivers": [
+          "cached sensitive response potential",
+          "requires cross-identity cache access",
+          "explicit private-cache counterevidence"
+        ]
+      },
+      "evidence": [
+        "E-CACHE: the actual vulnerable-version library is called for cached GET/HEAD requests.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "This is a private CLI cache, not a demonstrated shared HTTP response service; shared:false is explicit."
+      ],
+      "proof_gaps": [
+        "Establish cache isolation across npm identities/CI users and the lower-trust request path; no such operator/deployment fact is established by current policy.",
+        "No dynamic cache-disclosure reproduction was run."
+      ],
+      "recommended_next_step": "Complete the named static proof gap; perform any authorized runtime validation in a separate phase.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-017",
+      "input_id": "GHSA-22jq-vg5j-6vgg",
+      "source_type": "advisory",
+      "title": "ip-address: misclassification of IPv4-mapped/NAT64 IPv6 addresses can bypass SSRF and trust-boundary checks",
+      "normalized_input": {
+        "vulnerable_component": "npm/ip-address@10.2.0",
+        "claimed_source": "Proxy destination text or network-supplied SOCKS address",
+        "claimed_sink": "ip-address classifier or diagnostic constructor",
+        "claimed_control": "Required classifier misuse or unbounded invalid-input parsing",
+        "affected_version_or_path": "npm/ip-address@10.2.0",
+        "preconditions": [
+          "Affected IP API must enforce a security decision, or accept the long invalid address required by the diagnostic claim."
+        ],
+        "impact": "ip-address: misclassification of IPv4-mapped/NAT64 IPv6 addresses can bypass SSRF and trust-boundary checks",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-22jq-vg5j-6vgg"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/common/helpers.js",
+          "lines": "131-164",
+          "detail": "Authenticated archive member; converts IPs after native net validation."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/client/socksclient.js",
+          "lines": "160-198,609-618,686-689,777-780",
+          "detail": "Network addresses are native-validated or read as exactly16 bytes."
+        }
+      ],
+      "reachable_path": [
+        "npm HTTP agent \u2192 socks-proxy-agent \u2192 SocksClient \u2192 IP byte conversion",
+        "Native net.isIPv4/isIPv6 guards; IPv6 replies contain16 bytes."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-IP: complete authenticated archive import census identifies only socks helpers/client as external ip-address consumers.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "SOCKS consumers serialize addresses; the claimed special-use, link-local or subnet classifier is not used as an allowlist/SSRF control."
+      ],
+      "proof_gaps": [
+        "Static tool-caller scope only; no primitive reproduction or general ip-address safety claim."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-018",
+      "input_id": "GHSA-2vr4-cq9g-pvrc",
+      "source_type": "advisory",
+      "title": "ip-address: no classifier recognizes the NAT64 local-use range 64:ff9b:1::/48, allowing SSRF and trust-boundary bypass",
+      "normalized_input": {
+        "vulnerable_component": "npm/ip-address@10.2.0",
+        "claimed_source": "Proxy destination text or network-supplied SOCKS address",
+        "claimed_sink": "ip-address classifier or diagnostic constructor",
+        "claimed_control": "Required classifier misuse or unbounded invalid-input parsing",
+        "affected_version_or_path": "npm/ip-address@10.2.0",
+        "preconditions": [
+          "Affected IP API must enforce a security decision, or accept the long invalid address required by the diagnostic claim."
+        ],
+        "impact": "ip-address: no classifier recognizes the NAT64 local-use range 64:ff9b:1::/48, allowing SSRF and trust-boundary bypass",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-2vr4-cq9g-pvrc"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/common/helpers.js",
+          "lines": "131-164",
+          "detail": "Authenticated archive member; converts IPs after native net validation."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/client/socksclient.js",
+          "lines": "160-198,609-618,686-689,777-780",
+          "detail": "Network addresses are native-validated or read as exactly16 bytes."
+        }
+      ],
+      "reachable_path": [
+        "npm HTTP agent \u2192 socks-proxy-agent \u2192 SocksClient \u2192 IP byte conversion",
+        "Native net.isIPv4/isIPv6 guards; IPv6 replies contain16 bytes."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-IP: complete authenticated archive import census identifies only socks helpers/client as external ip-address consumers.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "SOCKS consumers serialize addresses; the claimed special-use, link-local or subnet classifier is not used as an allowlist/SSRF control."
+      ],
+      "proof_gaps": [
+        "Static tool-caller scope only; no primitive reproduction or general ip-address safety claim."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-019",
+      "input_id": "GHSA-4xrf-jv44-h6hh",
+      "source_type": "advisory",
+      "title": "ip-address: a CIDR suffix on the parsed address suppresses special-use classification and can bypass SSRF and trust-boundary checks",
+      "normalized_input": {
+        "vulnerable_component": "npm/ip-address@10.2.0",
+        "claimed_source": "Proxy destination text or network-supplied SOCKS address",
+        "claimed_sink": "ip-address classifier or diagnostic constructor",
+        "claimed_control": "Required classifier misuse or unbounded invalid-input parsing",
+        "affected_version_or_path": "npm/ip-address@10.2.0",
+        "preconditions": [
+          "Affected IP API must enforce a security decision, or accept the long invalid address required by the diagnostic claim."
+        ],
+        "impact": "ip-address: a CIDR suffix on the parsed address suppresses special-use classification and can bypass SSRF and trust-boundary checks",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-4xrf-jv44-h6hh"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/common/helpers.js",
+          "lines": "131-164",
+          "detail": "Authenticated archive member; converts IPs after native net validation."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/client/socksclient.js",
+          "lines": "160-198,609-618,686-689,777-780",
+          "detail": "Network addresses are native-validated or read as exactly16 bytes."
+        }
+      ],
+      "reachable_path": [
+        "npm HTTP agent \u2192 socks-proxy-agent \u2192 SocksClient \u2192 IP byte conversion",
+        "Native net.isIPv4/isIPv6 guards; IPv6 replies contain16 bytes."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-IP: complete authenticated archive import census identifies only socks helpers/client as external ip-address consumers.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "SOCKS consumers serialize addresses; the claimed special-use, link-local or subnet classifier is not used as an allowlist/SSRF control."
+      ],
+      "proof_gaps": [
+        "Static tool-caller scope only; no primitive reproduction or general ip-address safety claim."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-020",
+      "input_id": "GHSA-h3mg-xc3c-68pw",
+      "source_type": "advisory",
+      "title": "ip-address: Address6 builds a parse diagnostic proportional to the input with no length bound, allowing a single long string to stall or crash the process",
+      "normalized_input": {
+        "vulnerable_component": "npm/ip-address@10.2.0",
+        "claimed_source": "Proxy destination text or network-supplied SOCKS address",
+        "claimed_sink": "ip-address classifier or diagnostic constructor",
+        "claimed_control": "Required classifier misuse or unbounded invalid-input parsing",
+        "affected_version_or_path": "npm/ip-address@10.2.0",
+        "preconditions": [
+          "Affected IP API must enforce a security decision, or accept the long invalid address required by the diagnostic claim."
+        ],
+        "impact": "ip-address: Address6 builds a parse diagnostic proportional to the input with no length bound, allowing a single long string to stall or crash the process",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-h3mg-xc3c-68pw"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/common/helpers.js",
+          "lines": "131-164",
+          "detail": "Authenticated archive member; converts IPs after native net validation."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/client/socksclient.js",
+          "lines": "160-198,609-618,686-689,777-780",
+          "detail": "Network addresses are native-validated or read as exactly16 bytes."
+        }
+      ],
+      "reachable_path": [
+        "npm HTTP agent \u2192 socks-proxy-agent \u2192 SocksClient \u2192 IP byte conversion",
+        "Native net.isIPv4/isIPv6 guards; IPv6 replies contain16 bytes."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-IP: complete authenticated archive import census identifies only socks helpers/client as external ip-address consumers.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "The constructor path is reached with native-valid address text or a fixed-width byte array; the invalid long-text diagnostic condition is absent."
+      ],
+      "proof_gaps": [
+        "Static tool-caller scope only; no primitive reproduction or general ip-address safety claim."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-021",
+      "input_id": "GHSA-j6r3-76f7-8jcv",
+      "source_type": "advisory",
+      "title": "ip-address: isInSubnet() and isHostInSubnet() compare addresses of different families as if they shared an address space, allowing an allowlist check to admit an address outside its range",
+      "normalized_input": {
+        "vulnerable_component": "npm/ip-address@10.2.0",
+        "claimed_source": "Proxy destination text or network-supplied SOCKS address",
+        "claimed_sink": "ip-address classifier or diagnostic constructor",
+        "claimed_control": "Required classifier misuse or unbounded invalid-input parsing",
+        "affected_version_or_path": "npm/ip-address@10.2.0",
+        "preconditions": [
+          "Affected IP API must enforce a security decision, or accept the long invalid address required by the diagnostic claim."
+        ],
+        "impact": "ip-address: isInSubnet() and isHostInSubnet() compare addresses of different families as if they shared an address space, allowing an allowlist check to admit an address outside its range",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-j6r3-76f7-8jcv"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/common/helpers.js",
+          "lines": "131-164",
+          "detail": "Authenticated archive member; converts IPs after native net validation."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/client/socksclient.js",
+          "lines": "160-198,609-618,686-689,777-780",
+          "detail": "Network addresses are native-validated or read as exactly16 bytes."
+        }
+      ],
+      "reachable_path": [
+        "npm HTTP agent \u2192 socks-proxy-agent \u2192 SocksClient \u2192 IP byte conversion",
+        "Native net.isIPv4/isIPv6 guards; IPv6 replies contain16 bytes."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-IP: complete authenticated archive import census identifies only socks helpers/client as external ip-address consumers.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "SOCKS consumers serialize addresses; the claimed special-use, link-local or subnet classifier is not used as an allowlist/SSRF control."
+      ],
+      "proof_gaps": [
+        "Static tool-caller scope only; no primitive reproduction or general ip-address safety claim."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-022",
+      "input_id": "GHSA-mwp4-54f8-5fhr",
+      "source_type": "advisory",
+      "title": "ip-address: Address4 decodes leading-zero octets as decimal while resolvers decode them as octal, allowing SSRF and trust-boundary bypass",
+      "normalized_input": {
+        "vulnerable_component": "npm/ip-address@10.2.0",
+        "claimed_source": "Proxy destination text or network-supplied SOCKS address",
+        "claimed_sink": "ip-address classifier or diagnostic constructor",
+        "claimed_control": "Required classifier misuse or unbounded invalid-input parsing",
+        "affected_version_or_path": "npm/ip-address@10.2.0",
+        "preconditions": [
+          "Affected IP API must enforce a security decision, or accept the long invalid address required by the diagnostic claim."
+        ],
+        "impact": "ip-address: Address4 decodes leading-zero octets as decimal while resolvers decode them as octal, allowing SSRF and trust-boundary bypass",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-mwp4-54f8-5fhr"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/common/helpers.js",
+          "lines": "131-164",
+          "detail": "Authenticated archive member; converts IPs after native net validation."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/client/socksclient.js",
+          "lines": "160-198,609-618,686-689,777-780",
+          "detail": "Network addresses are native-validated or read as exactly16 bytes."
+        }
+      ],
+      "reachable_path": [
+        "npm HTTP agent \u2192 socks-proxy-agent \u2192 SocksClient \u2192 IP byte conversion",
+        "Native net.isIPv4/isIPv6 guards; IPv6 replies contain16 bytes."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-IP: complete authenticated archive import census identifies only socks helpers/client as external ip-address consumers.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "IPv4 conversion requires native net.isIPv4; the leading-zero parsing divergence is not used to decide access."
+      ],
+      "proof_gaps": [
+        "Static tool-caller scope only; no primitive reproduction or general ip-address safety claim."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-023",
+      "input_id": "GHSA-rpw4-54j3-4h4q",
+      "source_type": "advisory",
+      "title": "ip-address: Address6.isLinkLocal() recognizes fe80::/64 rather than fe80::/10, allowing SSRF and trust-boundary bypass to on-link hosts",
+      "normalized_input": {
+        "vulnerable_component": "npm/ip-address@10.2.0",
+        "claimed_source": "Proxy destination text or network-supplied SOCKS address",
+        "claimed_sink": "ip-address classifier or diagnostic constructor",
+        "claimed_control": "Required classifier misuse or unbounded invalid-input parsing",
+        "affected_version_or_path": "npm/ip-address@10.2.0",
+        "preconditions": [
+          "Affected IP API must enforce a security decision, or accept the long invalid address required by the diagnostic claim."
+        ],
+        "impact": "ip-address: Address6.isLinkLocal() recognizes fe80::/64 rather than fe80::/10, allowing SSRF and trust-boundary bypass to on-link hosts",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-rpw4-54j3-4h4q"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/common/helpers.js",
+          "lines": "131-164",
+          "detail": "Authenticated archive member; converts IPs after native net validation."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/socks/build/client/socksclient.js",
+          "lines": "160-198,609-618,686-689,777-780",
+          "detail": "Network addresses are native-validated or read as exactly16 bytes."
+        }
+      ],
+      "reachable_path": [
+        "npm HTTP agent \u2192 socks-proxy-agent \u2192 SocksClient \u2192 IP byte conversion",
+        "Native net.isIPv4/isIPv6 guards; IPv6 replies contain16 bytes."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-IP: complete authenticated archive import census identifies only socks helpers/client as external ip-address consumers.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "SOCKS consumers serialize addresses; the claimed special-use, link-local or subnet classifier is not used as an allowlist/SSRF control."
+      ],
+      "proof_gaps": [
+        "Static tool-caller scope only; no primitive reproduction or general ip-address safety claim."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-024",
+      "input_id": "GHSA-rj75-hqrm-r3gf",
+      "source_type": "advisory",
+      "title": "PostCSS: Quadratic complexity in flat selector parsing allows CPU exhaustion",
+      "normalized_input": {
+        "vulnerable_component": "npm/postcss-selector-parser@7.1.4",
+        "claimed_source": "Attacker-controlled flat CSS-like dependency selector",
+        "claimed_sink": "Synchronous postcss-selector-parser astSync",
+        "claimed_control": "Selector origin/length; nesting guard does not bound flat selector complexity",
+        "affected_version_or_path": "npm/postcss-selector-parser@7.1.4",
+        "preconditions": [
+          "A lower-trust selector must be parsed in a supported privileged/service path."
+        ],
+        "impact": "PostCSS: Quadratic complexity in flat selector parsing allows CPU exhaustion",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-rj75-hqrm-r3gf"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/lib/commands/query.js",
+          "lines": "74-96,100-140",
+          "detail": "CLI argument and workspace path construct selectors."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/query/lib/index.js",
+          "lines": "243-249",
+          "detail": "Selector reaches synchronous parser."
+        }
+      ],
+      "reachable_path": [
+        "npm query argument or generated workspace selector \u2192 Arborist query \u2192 parser.astSync."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "unknown",
+        "boundary_crossed": null,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 7,
+        "rationale": "The parse route exists; untrusted selector provenance at a distinct security boundary is not established.",
+        "drivers": [
+          "synchronous parser",
+          "CLI/generated selector control",
+          "no demonstrated request service"
+        ]
+      },
+      "evidence": [
+        "E-QUERY: synchronous parser is present and reachable from query commands.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "The primary advisory explicitly excludes ordinary trusted build-time use; no remote query gateway is present in this repository."
+      ],
+      "proof_gaps": [
+        "Complete selector-origin review: show either a supported lower-trust caller/boundary or effective constraints on every generated selector."
+      ],
+      "recommended_next_step": "Complete the named static proof gap; perform any authorized runtime validation in a separate phase.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-025",
+      "input_id": "GHSA-r292-9mhp-454m",
+      "source_type": "advisory",
+      "title": "node-tar: Uncontrolled recursion in mapHas/filesFilter allows uncatchable stack-overflow DoS via crafted long-path tar with member selection",
+      "normalized_input": {
+        "vulnerable_component": "npm/tar@7.5.19",
+        "claimed_source": "Crafted long archive member path",
+        "claimed_sink": "tar filesFilter/mapHas recursive selection",
+        "claimed_control": "Nonempty member-selection argument",
+        "affected_version_or_path": "npm/tar@7.5.19",
+        "preconditions": [
+          "List/extract call must pass a nonempty member-selection list."
+        ],
+        "impact": "node-tar: Uncontrolled recursion in mapHas/filesFilter allows uncatchable stack-overflow DoS via crafted long-path tar with member selection",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-r292-9mhp-454m"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/tar/dist/commonjs/list.js",
+          "lines": "59-78,137-141",
+          "detail": "Unbounded helper exists, but requires selected member list."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/fetcher.js",
+          "lines": "383-386",
+          "detail": "Actual extractor passes only an options object."
+        }
+      ],
+      "reachable_path": [
+        "npm pacote/node-gyp/stage/libnpmdiff \u2192 tar list/extract without member-selection list."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-TAR: every direct archive list/extract consumer in the authenticated npm/pnpm packages was inspected.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "All relevant list/extract calls omit the member list. tar.c creation lists do not use the affected list/extract helper. Custom filter callbacks do not themselves install filesFilter."
+      ],
+      "proof_gaps": [
+        "No dynamic tar primitive validation; the general npm tar7.5.19 implementation remains unpatched."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-026",
+      "input_id": "GHSA-3wwx-pv8p-q78v",
+      "source_type": "advisory",
+      "title": "undici vulnerable to Denial of Service via unhandled error in WebSocket permessage-deflate decompression",
+      "normalized_input": {
+        "vulnerable_component": "npm/undici@6.27.0",
+        "claimed_source": "Upstream HTTP response or a controlled WebSocket/cookie/blob input",
+        "claimed_sink": "undici vulnerable to Denial of Service via unhandled error in WebSocket permessage-deflate decompression",
+        "claimed_control": "Required API mode and downstream forwarding",
+        "affected_version_or_path": "npm/undici@6.27.0",
+        "preconditions": [
+          "The affected WebSocket, cookie or duck-typed blob API must be invoked, or a retried response must be forwarded downstream with its old framing headers."
+        ],
+        "impact": "undici vulnerable to Denial of Service via unhandled error in WebSocket permessage-deflate decompression",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-3wwx-pv8p-q78v"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44,49-72",
+          "detail": "Only authenticated external undici caller: GET downloader; returned object excludes response headers."
+        },
+        {
+          "label": "static source",
+          "path": "external/pnpm-12.4.2/package/dist/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44",
+          "detail": "pnpm wrapper uses GET fetch without a RetryAgent."
+        }
+      ],
+      "reachable_path": [
+        "Bundled node-gyp.download \u2192 fetch(GET) \u2192 local stream/text consumer."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-UNDICI: full archive census found only node-gyp download.js importing undici; npm enables RetryAgent, while pnpm does not.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "No WebSocket constructor, subprotocol selection or permessage-deflate path is invoked by either tool caller."
+      ],
+      "proof_gaps": [
+        "No dynamic validation; this does not call the vulnerable general Undici version patched."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-027",
+      "input_id": "GHSA-8xcm-r25x-g524",
+      "source_type": "advisory",
+      "title": "undici vulnerable to downstream response desynchronization via retry interceptor",
+      "normalized_input": {
+        "vulnerable_component": "npm/undici@6.27.0",
+        "claimed_source": "Upstream HTTP response or a controlled WebSocket/cookie/blob input",
+        "claimed_sink": "undici vulnerable to downstream response desynchronization via retry interceptor",
+        "claimed_control": "Required API mode and downstream forwarding",
+        "affected_version_or_path": "npm/undici@6.27.0",
+        "preconditions": [
+          "The affected WebSocket, cookie or duck-typed blob API must be invoked, or a retried response must be forwarded downstream with its old framing headers."
+        ],
+        "impact": "undici vulnerable to downstream response desynchronization via retry interceptor",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-8xcm-r25x-g524"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44,49-72",
+          "detail": "Only authenticated external undici caller: GET downloader; returned object excludes response headers."
+        },
+        {
+          "label": "static source",
+          "path": "external/pnpm-12.4.2/package/dist/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44",
+          "detail": "pnpm wrapper uses GET fetch without a RetryAgent."
+        }
+      ],
+      "reachable_path": [
+        "Bundled node-gyp.download \u2192 fetch(GET) \u2192 local stream/text consumer."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-UNDICI: full archive census found only node-gyp download.js importing undici; npm enables RetryAgent, while pnpm does not.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "npm retries are real, but download.js returns status/url/body/text without headers; no downstream HTTP response forwards the original Content-Length."
+      ],
+      "proof_gaps": [
+        "No dynamic validation; this does not call the vulnerable general Undici version patched."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-028",
+      "input_id": "GHSA-m8rv-5g2x-5cg5",
+      "source_type": "advisory",
+      "title": "undici vulnerable to CRLF Injection via blob-like body 'type' property",
+      "normalized_input": {
+        "vulnerable_component": "npm/undici@6.27.0",
+        "claimed_source": "Upstream HTTP response or a controlled WebSocket/cookie/blob input",
+        "claimed_sink": "undici vulnerable to CRLF Injection via blob-like body 'type' property",
+        "claimed_control": "Required API mode and downstream forwarding",
+        "affected_version_or_path": "npm/undici@6.27.0",
+        "preconditions": [
+          "The affected WebSocket, cookie or duck-typed blob API must be invoked, or a retried response must be forwarded downstream with its old framing headers."
+        ],
+        "impact": "undici vulnerable to CRLF Injection via blob-like body 'type' property",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-m8rv-5g2x-5cg5"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44,49-72",
+          "detail": "Only authenticated external undici caller: GET downloader; returned object excludes response headers."
+        },
+        {
+          "label": "static source",
+          "path": "external/pnpm-12.4.2/package/dist/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44",
+          "detail": "pnpm wrapper uses GET fetch without a RetryAgent."
+        }
+      ],
+      "reachable_path": [
+        "Bundled node-gyp.download \u2192 fetch(GET) \u2192 local stream/text consumer."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-UNDICI: full archive census found only node-gyp download.js importing undici; npm enables RetryAgent, while pnpm does not.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "The caller uses fetch GET with no body; the claimed duck-typed Blob dispatcher branch is absent."
+      ],
+      "proof_gaps": [
+        "No dynamic validation; this does not call the vulnerable general Undici version patched."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-029",
+      "input_id": "GHSA-r53p-7pc4-xj5r",
+      "source_type": "advisory",
+      "title": "undici vulnerable to downstream response splitting via retry interceptor",
+      "normalized_input": {
+        "vulnerable_component": "npm/undici@6.27.0",
+        "claimed_source": "Upstream HTTP response or a controlled WebSocket/cookie/blob input",
+        "claimed_sink": "undici vulnerable to downstream response splitting via retry interceptor",
+        "claimed_control": "Required API mode and downstream forwarding",
+        "affected_version_or_path": "npm/undici@6.27.0",
+        "preconditions": [
+          "The affected WebSocket, cookie or duck-typed blob API must be invoked, or a retried response must be forwarded downstream with its old framing headers."
+        ],
+        "impact": "undici vulnerable to downstream response splitting via retry interceptor",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-r53p-7pc4-xj5r"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44,49-72",
+          "detail": "Only authenticated external undici caller: GET downloader; returned object excludes response headers."
+        },
+        {
+          "label": "static source",
+          "path": "external/pnpm-12.4.2/package/dist/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44",
+          "detail": "pnpm wrapper uses GET fetch without a RetryAgent."
+        }
+      ],
+      "reachable_path": [
+        "Bundled node-gyp.download \u2192 fetch(GET) \u2192 local stream/text consumer."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-UNDICI: full archive census found only node-gyp download.js importing undici; npm enables RetryAgent, while pnpm does not.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "npm retries are real, but download.js returns status/url/body/text without headers; no downstream HTTP response forwards the original Content-Length."
+      ],
+      "proof_gaps": [
+        "No dynamic validation; this does not call the vulnerable general Undici version patched."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-030",
+      "input_id": "GHSA-rfgv-xxqx-mfg5",
+      "source_type": "advisory",
+      "title": "undici vulnerable to Denial of Service via unrequested WebSocket subprotocol",
+      "normalized_input": {
+        "vulnerable_component": "npm/undici@6.27.0",
+        "claimed_source": "Upstream HTTP response or a controlled WebSocket/cookie/blob input",
+        "claimed_sink": "undici vulnerable to Denial of Service via unrequested WebSocket subprotocol",
+        "claimed_control": "Required API mode and downstream forwarding",
+        "affected_version_or_path": "npm/undici@6.27.0",
+        "preconditions": [
+          "The affected WebSocket, cookie or duck-typed blob API must be invoked, or a retried response must be forwarded downstream with its old framing headers."
+        ],
+        "impact": "undici vulnerable to Denial of Service via unrequested WebSocket subprotocol",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-rfgv-xxqx-mfg5"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44,49-72",
+          "detail": "Only authenticated external undici caller: GET downloader; returned object excludes response headers."
+        },
+        {
+          "label": "static source",
+          "path": "external/pnpm-12.4.2/package/dist/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44",
+          "detail": "pnpm wrapper uses GET fetch without a RetryAgent."
+        }
+      ],
+      "reachable_path": [
+        "Bundled node-gyp.download \u2192 fetch(GET) \u2192 local stream/text consumer."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-UNDICI: full archive census found only node-gyp download.js importing undici; npm enables RetryAgent, while pnpm does not.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "No WebSocket constructor, subprotocol selection or permessage-deflate path is invoked by either tool caller."
+      ],
+      "proof_gaps": [
+        "No dynamic validation; this does not call the vulnerable general Undici version patched."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-031",
+      "input_id": "GHSA-v3r7-h72x-cjcm",
+      "source_type": "advisory",
+      "title": "undici vulnerable to cookie attribute injection via unsanitized domain and unparsed setCookie fields",
+      "normalized_input": {
+        "vulnerable_component": "npm/undici@6.27.0",
+        "claimed_source": "Upstream HTTP response or a controlled WebSocket/cookie/blob input",
+        "claimed_sink": "undici vulnerable to cookie attribute injection via unsanitized domain and unparsed setCookie fields",
+        "claimed_control": "Required API mode and downstream forwarding",
+        "affected_version_or_path": "npm/undici@6.27.0",
+        "preconditions": [
+          "The affected WebSocket, cookie or duck-typed blob API must be invoked, or a retried response must be forwarded downstream with its old framing headers."
+        ],
+        "impact": "undici vulnerable to cookie attribute injection via unsanitized domain and unparsed setCookie fields",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-v3r7-h72x-cjcm"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44,49-72",
+          "detail": "Only authenticated external undici caller: GET downloader; returned object excludes response headers."
+        },
+        {
+          "label": "static source",
+          "path": "external/pnpm-12.4.2/package/dist/node_modules/node-gyp/lib/download.js",
+          "lines": "2,6-44",
+          "detail": "pnpm wrapper uses GET fetch without a RetryAgent."
+        }
+      ],
+      "reachable_path": [
+        "Bundled node-gyp.download \u2192 fetch(GET) \u2192 local stream/text consumer."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "SECURITY.md requires reachable-path/impact evidence and separates build-tool findings from shipped library runtime; AGENTS.md treats scanner findings as unconfirmed until reproduced and triaged. No scoped policy overrides exist for scripts, chainman, workflows or reference/toolchain."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The specific reported condition is defeated in the reviewed declared CLI paths.",
+        "drivers": []
+      },
+      "evidence": [
+        "E-UNDICI: full archive census found only node-gyp download.js importing undici; npm enables RetryAgent, while pnpm does not.",
+        "Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed."
+      ],
+      "counterevidence": [
+        "The caller does not use Undici cookie helpers or construct cookie domain/unparsed fields."
+      ],
+      "proof_gaps": [
+        "No dynamic validation; this does not call the vulnerable general Undici version patched."
+      ],
+      "recommended_next_step": "Retain this narrowly scoped static disposition for independent review; do not infer general package safety.",
+      "fix_finding_handoff": null
+    }
+  ]
+}

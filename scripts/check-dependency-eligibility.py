@@ -484,9 +484,290 @@ def tool_advisory_coverage_ok(root: Path, observation: dict | None, now: datetim
             return False
         if not all(row["query"] == queries[key] and isinstance(row["vulns"], list) for key, row in rows.items()):
             return False
+        for row in rows.values():
+            ids = [vuln.get("id") for vuln in row["vulns"] if isinstance(vuln, dict)]
+            if len(ids) != len(row["vulns"]) or any(not isinstance(value, str) or not value for value in ids) or len(set(ids)) != len(ids):
+                return False
         return observation["unresolved"] == [row["id"] for row in observation["rows"] if row["vulns"]]
     except (TypeError, KeyError, ValueError, OSError):
         return False
+
+
+TOOL_FINDING_SCOPES = {
+    "crates.io/anyhow@1.0.102": ("ambient-default-middleware", {"RUSTSEC-2026-0190"}),
+    "crates.io/bincode@1.3.3": ("informational-unmaintained", {"RUSTSEC-2025-0141"}),
+    "crates.io/event-listener@5.4.1": ("declared-cli-not-reachable", {"RUSTSEC-2026-0221"}),
+    "crates.io/h2@0.3.27": ("declared-cli-not-reachable", {"RUSTSEC-2026-0258"}),
+    "crates.io/libsql-sqlite3-parser@0.13.0": ("declared-cli-not-reachable", {"GHSA-8m95-fffc-h4c5"}),
+    "crates.io/proc-macro-error2@2.0.1": ("informational-unmaintained", {"RUSTSEC-2026-0173"}),
+    "crates.io/quinn-proto@0.11.14": ("reqwest-http3-disabled", {"GHSA-4w2j-m93h-cj5j", "RUSTSEC-2026-0185"}),
+    "crates.io/rsa@0.9.10": ("node-public-rsa-verification", {"RUSTSEC-2023-0071"}),
+    "crates.io/xxhash-rust@0.8.15": ("ssri-default-xxh3", {"GHSA-6g2r-675j-hx59"}),
+    "npm/ip-address@10.2.0": ("ip-socks-only", {"GHSA-22jq-vg5j-6vgg", "GHSA-2vr4-cq9g-pvrc", "GHSA-4xrf-jv44-h6hh",
+        "GHSA-h3mg-xc3c-68pw", "GHSA-j6r3-76f7-8jcv", "GHSA-mwp4-54f8-5fhr", "GHSA-rpw4-54j3-4h4q"}),
+    "npm/tar@7.5.19": ("tar-no-member-list", {"GHSA-r292-9mhp-454m"}),
+    "npm/undici@6.27.0": ("undici-downloader-only", {"GHSA-3wwx-pv8p-q78v", "GHSA-8xcm-r25x-g524", "GHSA-m8rv-5g2x-5cg5",
+        "GHSA-r53p-7pc4-xj5r", "GHSA-rfgv-xxqx-mfg5", "GHSA-v3r7-h72x-cjcm"}),
+}
+
+
+def _tool_proof_bytes(root: Path, relative: str, expected: dict | None = None) -> bytes:
+    path = PurePosixPath(relative)
+    if path.is_absolute() or not path.parts or any(part in {"", ".", ".."} for part in relative.split("/")):
+        raise ValueError("invalid tool proof path")
+    current = root
+    for part in path.parts:
+        current = current / part
+        if current.is_symlink():
+            raise ValueError("tool proof path is a symlink")
+    if not current.is_file() or current.stat().st_size > 3_000_000:
+        raise ValueError("tool proof is missing or oversized")
+    raw = current.read_bytes()
+    if expected and (hashlib.sha256(raw).hexdigest() != expected["sha256"] or
+                     ("bytes" in expected and len(raw) != expected["bytes"])):
+        raise ValueError("tool proof source changed: " + relative)
+    return raw
+
+
+def declared_pnpm_cli_graph(packages: list[dict], manifests: dict[str, dict], workspace: dict) -> dict:
+    """Conservative normal/build graph; no Cargo or dependency code is executed."""
+    def resolve(token):
+        parts = token.split(" ", 2)
+        candidates = [i for i, package in enumerate(packages) if package["name"] == parts[0]
+                      and (len(parts) < 2 or package["version"] == parts[1])
+                      and (len(parts) < 3 or package.get("source") == parts[2].strip("()"))]
+        if len(candidates) != 1:
+            raise ValueError("unresolved Cargo dependency " + token)
+        return candidates[0]
+
+    edges = {i: {resolve(token) for token in package.get("dependencies", [])} for i, package in enumerate(packages)}
+    parents = {}
+    for i, package in enumerate(packages):
+        for j in edges[i]:
+            parents.setdefault(packages[j]["name"], set()).add(package["name"])
+        if package.get("source"):
+            continue  # External lock edges include every optional/dev/target path.
+        manifest = manifests[package["name"]]
+        tables = [manifest.get("dependencies", {}), manifest.get("build-dependencies", {})]
+        for target in manifest.get("target", {}).values():
+            tables.extend([target.get("dependencies", {}), target.get("build-dependencies", {})])
+        names = set()
+        for table in tables:
+            for alias, spec in table.items():
+                if isinstance(spec, dict) and spec.get("workspace"):
+                    inherited = workspace[alias]
+                    spec = {**(inherited if isinstance(inherited, dict) else {"version": inherited}), **spec}
+                names.add(spec.get("package", alias) if isinstance(spec, dict) else alias)
+        if names - {packages[j]["name"] for j in edges[i]}:
+            raise ValueError("manifest dependency absent from the lock")
+        edges[i] = {j for j in edges[i] if packages[j]["name"] in names}
+    seen, pending = {resolve("pnpm-cli")}, [resolve("pnpm-cli")]
+    while pending:
+        for j in edges[pending.pop()] - seen:
+            seen.add(j)
+            pending.append(j)
+    return {"closure": {(packages[i]["name"], packages[i]["version"]) for i in seen}, "parents": parents}
+
+
+def tool_review_archives(catalog: dict) -> dict[str, bytes]:
+    """Reuse the authenticated census cache; acquire exact bytes if absent."""
+    cache = Path(os.environ.get("NGX_TOOL_ADVISORY_CACHE", str(Path.home() / ".cache/ngx-compat-material-legacy-closeout/tool-advisory-subjects")))
+    archives = {}
+    for pin in catalog["packages"]:
+        if pin["name"] not in {"npm", "pnpm"}:
+            continue
+        path = cache / (pin["archive_sha256"] + ".tgz")
+        if cache.is_symlink() or path.is_symlink():
+            raise ValueError("tool review cache is a symlink")
+        raw = path.read_bytes() if path.is_file() else acquire_tool_archive(pin)
+        inspect_tool_archive(raw, pin)
+        archives[pin["name"]] = raw
+    return archives
+
+
+def tool_disposition_evidence(root: Path, review: dict) -> dict:
+    """Bind finite reviewed caller facts to unchanged policy, pins and source."""
+    base = "compatibility/rc/tool-advisory-triage/"
+    proof_ref = review["source_proof"]
+    if proof_ref["path"] != base + "source-proof.json":
+        raise ValueError("foreign tool proof")
+    proof = json.loads(_tool_proof_bytes(root, proof_ref["path"], proof_ref))
+    for path, key in [("compatibility/toolchain-advisory-subjects.json", "catalog_sha256"),
+                      ("toolchain-lock.json", "toolchain_sha256"), ("SECURITY.md", "security_policy_sha256")]:
+        _tool_proof_bytes(root, path, {"sha256": proof[key]})
+    expected_files = {base + name for name in ["triage-result.json", "cli-graph-proof.json", "pnpm-authenticated-source-members.json",
+        "reqwest-parent-manifests.json", "anyhow-parent-source-index.json", "rsa-parent-source-index.json",
+        "npm-bundled-caller-members.json", "static-source-excerpts.json", "triage-evidence-manifest.json"]}
+    refs = proof["evidence_files"]
+    if len(refs) != len(expected_files) or {row["path"] for row in refs} != expected_files:
+        raise ValueError("incomplete tool proof roster")
+    evidence = {row["path"]: json.loads(_tool_proof_bytes(root, row["path"], row)) for row in refs}
+    _tool_proof_bytes(root, "compatibility/rc/tool-advisory-details-diagnostic.json",
+                      {"sha256": evidence[base + "triage-evidence-manifest.json"]["advisory_details_sha256"]})
+    catalog = json.loads((root / "compatibility/toolchain-advisory-subjects.json").read_text())
+    archives = tool_review_archives(catalog)
+    excerpts = evidence[base + "static-source-excerpts.json"]["members"]
+    archive_names = {"npm-11.19.0.tgz": "npm", "pnpm-12.4.2.tgz": "pnpm"}
+    callers = evidence[base + "npm-bundled-caller-members.json"]
+    archive_sources = {}
+    for name, raw_archive in archives.items():
+        wanted = {member["member"] for member in excerpts if archive_names.get(member.get("archive")) == name}
+        wanted.update(member["path"] for member in callers if member["tool"] == name)
+        members = {}
+        with tarfile.open(fileobj=io.BytesIO(raw_archive), mode="r:gz") as archive:
+            for member in archive:
+                if member.name in wanted:
+                    members[member.name] = archive.extractfile(member).read()
+        if members.keys() != wanted:
+            raise ValueError("missing authenticated archive caller")
+        archive_sources[name] = members
+    for member in callers:
+        raw = archive_sources[member["tool"]][member["path"]]
+        if (hashlib.sha256(archives[member["tool"]]).hexdigest() != member["archive_sha256"]
+                or hashlib.sha256(raw).hexdigest() != member["sha256"] or len(raw) != member["bytes"]):
+            raise ValueError("bundled caller census changed")
+    index = evidence[base + "pnpm-authenticated-source-members.json"]
+    source_root = "reference/toolchain/pnpm-12.4.2/triage-source"
+    if (proof["pnpm_source_root"] != source_root or proof["source_index_path"] != base + "pnpm-authenticated-source-members.json"
+            or proof["pnpm_source_commit"] != catalog["pnpm_source"]["commit"] or index["commit"] != proof["pnpm_source_commit"]):
+        raise ValueError("wrong pnpm source subject")
+    files, manifests = {}, {}
+    if len(index["members"]) != 160:
+        raise ValueError("incomplete authenticated pnpm source roster")
+    for member in index["members"]:
+        if member["path"] in files:
+            raise ValueError("duplicate pnpm source member")
+        raw = _tool_proof_bytes(root, source_root + "/" + member["path"], member)
+        if hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest() != member["git_blob"]:
+            raise ValueError("wrong immutable pnpm Git blob")
+        files[member["path"]] = raw
+        if member["path"].endswith("Cargo.toml"):
+            manifest = tomllib.loads(raw.decode())
+            if "package" in manifest:
+                manifests[manifest["package"]["name"]] = manifest
+    if len(manifests) != 108 or sum(path.endswith("Cargo.toml") for path in files) != 109:
+        raise ValueError("incomplete pnpm manifest population")
+    packages = tomllib.loads(_tool_proof_bytes(root, catalog["pnpm_source"]["cargo_lock"]["path"],
+                                            catalog["pnpm_source"]["cargo_lock"]).decode())["package"]
+    graph = declared_pnpm_cli_graph(packages, manifests, tomllib.loads(files["Cargo.toml"].decode())["workspace"]["dependencies"])
+    recorded = evidence[base + "cli-graph-proof.json"]
+    if (recorded["cli_closure_count"] != len(graph["closure"]) or
+            {(row["name"], row["version"]) for row in recorded["cli_closure"]} != graph["closure"]):
+        raise ValueError("recorded CLI graph does not match source")
+    if '.github/scripts/cross-build.sh --locked -p pnpm-cli --bin pnpm --release --target="$TARGET"' not in files[".github/workflows/release.yml"].decode():
+        raise ValueError("release no longer builds the reviewed CLI")
+    registry = {}
+    for ref in proof["crate_manifests"]:
+        prefix = "reference/toolchain/pnpm-12.4.2/triage-crates/" + ref["name"] + "-" + ref["version"] + "/Cargo.toml"
+        if ref["path"] != prefix or ref["name"] in registry:
+            raise ValueError("foreign or duplicate registry manifest")
+        registry[ref["name"]] = tomllib.loads(_tool_proof_bytes(root, ref["path"], ref).decode())
+    crate_sources = {}
+    checksums = {(row["name"], row["version"]): row.get("checksum") for row in packages}
+    for ref in proof["crate_source_members"]:
+        prefix = "reference/toolchain/pnpm-12.4.2/triage-crates/" + ref["name"] + "-" + ref["version"] + "/"
+        if not ref["path"].startswith(prefix) or ref["path"] in crate_sources or ref["crate_checksum"] != checksums[(ref["name"], ref["version"])]:
+            raise ValueError("foreign or duplicate crate source")
+        crate_sources[ref["path"]] = _tool_proof_bytes(root, ref["path"], ref)
+    for member in excerpts:
+        if "archive" in member:
+            name = archive_names[member["archive"]]
+            raw_archive = archives[name]
+            if hashlib.sha256(raw_archive).hexdigest() != member["archive_sha256"]:
+                raise ValueError("wrong caller archive")
+            raw = archive_sources[name][member["member"]]
+            digest, size = member["member_sha256"], member["member_bytes"]
+        elif "crate" in member:
+            raw = crate_sources["reference/toolchain/pnpm-12.4.2/triage-crates/" + member["member"]]
+            digest, size = member["member_sha256"], member["member_bytes"]
+        else:
+            raw = files[member["path"]]
+            if member["git_commit"] != index["commit"]:
+                raise ValueError("wrong excerpt commit")
+            digest, size = member["sha256"], member["bytes"]
+        if hashlib.sha256(raw).hexdigest() != digest or len(raw) != size:
+            raise ValueError("caller source changed")
+        lines = raw.decode().splitlines()
+        for excerpt in member["excerpts"]:
+            if excerpt["first_line"] < 1 or excerpt["last_line"] > len(lines) or excerpt["text"] != "\n".join(lines[excerpt["first_line"] - 1:excerpt["last_line"]]):
+                raise ValueError("forged caller source excerpt")
+    reqwest_parents = {row["name"] for row in packages if any(token.split(" ")[0] == "reqwest" for token in row.get("dependencies", [])) and row.get("source", "").startswith("registry+")}
+    if set(registry) != reqwest_parents | {"reqwest"}:
+        raise ValueError("incomplete reqwest feature parents")
+    requested = tomllib.loads(files["Cargo.toml"].decode())["workspace"]["dependencies"]["reqwest"]
+    http3_disabled = (requested.get("default-features") is False and "http3" not in requested.get("features", [])
+        and not any("http3" in json.dumps(value) or "quinn" in json.dumps(value) for value in manifests.values())
+        and not any("http3" in json.dumps(value) for name, value in registry.items() if name != "reqwest")
+        and "http3" not in registry["reqwest"]["features"].get("default", [])
+        and "dep:quinn" in registry["reqwest"]["features"]["http3"]
+        and graph["parents"].get("quinn") == {"reqwest"})
+    triage = evidence[base + "triage-result.json"]
+    findings = {row["triage_item_id"]: row for row in triage["findings"]}
+    if len(findings) != len(triage["findings"]):
+        raise ValueError("duplicate static triage item")
+    return {"graph": graph, "http3_disabled": http3_disabled, "findings": findings,
+            "details": json.loads((root / "compatibility/rc/tool-advisory-details-diagnostic.json").read_text())["advisories"],
+            "proof_sha256": proof_ref["sha256"]}
+
+
+def classify_tool_findings(root: Path, observation: dict, now: datetime | None = None) -> dict:
+    """Raw hits stay intact; only exact reviewed tool/advisory/source scopes close."""
+    result = {"unresolved": list(observation.get("unresolved", [])), "not_applicable": [], "classified": [], "errors": []}
+    try:
+        if not tool_advisory_coverage_ok(root, observation, now):
+            raise ValueError("tool query coverage is unknown")
+        if not observation["unresolved"]:
+            return result
+        review = json.loads(_tool_proof_bytes(root, "compatibility/rc/tool-advisory-dispositions.json"))
+        proof = tool_disposition_evidence(root, review)
+        records = {}
+        expected = {(subject, advisory) for subject, (_, ids) in TOOL_FINDING_SCOPES.items() for advisory in ids}
+        for record in review["records"]:
+            key = record["subject_id"], record["advisory_id"]
+            rule, _ = TOOL_FINDING_SCOPES[record["subject_id"]]
+            finding = proof["findings"][record["triage_item_id"]]
+            if (key in records or key not in expected or record["classification"] != "not-applicable" or record["rule_id"] != rule
+                    or len(record["reason"].strip()) < 40 or finding["verdict"] != "not_actionable"
+                    or finding["input_id"] != key[1] or finding["normalized_input"]["vulnerable_component"] != key[0]
+                    or parse_time(record["advisory_modified"]) is None
+                    or parse_time(record["advisory_modified"]) != parse_time(proof["details"][key[1]]["modified"])
+                    or record["scope"] != "Pinned private linux-x64 glibc pnpm CLI and authenticated npm/pnpm archive callers; static evidence only."):
+                raise ValueError("unreviewed or duplicate tool disposition")
+            records[key] = record
+        if records.keys() != expected:
+            raise ValueError("incomplete finite tool disposition roster")
+        unresolved = []
+        for row in observation["rows"]:
+            if not row["vulns"]:
+                continue
+            remaining = []
+            for vuln in row["vulns"]:
+                record = records.get((row["id"], vuln.get("id")))
+                valid = record is not None and parse_time(vuln.get("modified")) is not None and parse_time(vuln["modified"]) == parse_time(record["advisory_modified"])
+                if valid:
+                    rule = record["rule_id"]
+                    name, version = row["id"].split("/", 1)[1].rsplit("@", 1)
+                    graph = proof["graph"]
+                    if rule == "declared-cli-not-reachable": valid = (name, version) not in graph["closure"]
+                    elif rule == "reqwest-http3-disabled": valid = proof["http3_disabled"]
+                    elif rule == "ambient-default-middleware": valid = (graph["parents"].get("anyhow") == {"astral-reqwest-middleware", "libsql", "prost-derive"}
+                        and not any(n in {"libsql", "prost-derive"} for n, _ in graph["closure"]))
+                    elif rule == "node-public-rsa-verification": valid = (graph["parents"].get("rsa") == {"openidconnect", "pgp", "sqlx-mysql"}
+                        and not any(n in {"openidconnect", "sqlx-mysql"} for n, _ in graph["closure"]) and graph["parents"].get("pgp") == {"pnpm-crypto-shasums-file"})
+                    elif rule == "ssri-default-xxh3": valid = graph["parents"].get("xxhash-rust") == {"ssri"}
+                    elif rule == "informational-unmaintained":
+                        affected = [a for a in proof["details"][vuln["id"]]["affected"] if a.get("package", {}).get("name") == name and a.get("package", {}).get("ecosystem") == "crates.io"]
+                        valid = bool(affected) and all(a.get("database_specific", {}).get("informational") == "unmaintained" for a in affected)
+                result["classified"].append({"subject_id": row["id"], "advisory_id": vuln.get("id"),
+                    "classification": "not-applicable" if valid else "unresolved", "rule_id": record["rule_id"] if valid else None,
+                    "source_proof_sha256": proof["proof_sha256"] if valid else None})
+                if valid: result["not_applicable"].append({"subject_id": row["id"], "advisory_id": vuln["id"]})
+                else: remaining.append(vuln.get("id"))
+            if remaining: unresolved.append(row["id"])
+        result["unresolved"] = unresolved
+    except (TypeError, KeyError, ValueError, OSError, AttributeError) as exc:
+        result.update(not_applicable=[], classified=[], errors=[str(exc)])
+    return result
 
 
 def _vuln_rows(packages: list[tuple[str, str]], results: list) -> tuple[dict, list[str]]:
@@ -1043,13 +1324,26 @@ def perform_lookup(root: Path, now: datetime) -> dict:
 
     dispositions = load_finding_dispositions(root)
     refresh_exception_patch_status(rows, dispositions, now)
+    # Age queries include tool npm packages. Their findings have a separate,
+    # complete tool query and disposition scope; overlapping workspace/vendor
+    # packages retain their independent findings and cannot use a tool review.
+    workspace_vendor_keys = {f"{name}@{version}" for name, version in packages + vendor_packages}
+    tool_only_keys = {f"{name}@{version}" for name, version in tool_npm} - workspace_vendor_keys
+    tool_rows = {row["id"].removeprefix("npm/"): row for row in tool_advisories["rows"] if row["id"].startswith("npm/")}
+    unresolved = [key for key in unresolved if key not in tool_only_keys]
+    for key in sorted(tool_only_keys):
+        age_ids = {item.get("id") for item in rows.get(key, {}).get("vulns", [])}
+        tool_ids = {item.get("id") for item in tool_rows.get(key, {}).get("vulns", [])}
+        if key not in rows or key not in tool_rows or age_ids != tool_ids:
+            unresolved.append("tool-only advisory queries disagree: " + key)
     classified = classify_live_findings(rows, unresolved, dispositions, now)
     unresolved = classified["unresolved"]
     blocked = classified["blocked"]
     if not tool_advisory_coverage_ok(root, tool_advisories, now):
         unresolved.append("tool advisory census/query coverage is unknown")
-    # Workspace-specific exceptions do not cover a separate bundled tool path.
-    unresolved.extend("tool:" + key for key in tool_advisories["unresolved"])
+    classified_tools = classify_tool_findings(root, tool_advisories, now)
+    unresolved.extend("tool:" + key for key in classified_tools["unresolved"])
+    unresolved.extend("tool disposition evidence is unknown: " + error for error in classified_tools["errors"])
     http_known = status == 200 and not truncated and not error and bool(rows or not queried)
     result = "queried" if http_known else "unknown"
     remediation = _remediation_notes(unresolved, rows, now) if http_known else []
@@ -1071,6 +1365,7 @@ def perform_lookup(root: Path, now: datetime) -> dict:
         "toolchain_detail": "; ".join(tool_detail) or error or "toolchain was not queried",
         "toolchain": toolchain_report,
         "tool_advisories": tool_advisories,
+        "tool_finding_dispositions": classified_tools,
         "vendor_ok": vendor_queried and http_known and not vendor_unknown,
         "vendor_detail": (
             f"vendor_packages={len(vendor_packages)} unknown={vendor_unknown[:6]}"
@@ -1229,6 +1524,7 @@ def evaluate(root: Path, now: datetime, *, lookup_performed: bool, lookup: dict 
         "age_exception_problems": age_problems,
         "unresolved_findings": len(unresolved),
         "tool_advisories": (live or {}).get("tool_advisories"),
+        "tool_finding_dispositions": (live or {}).get("tool_finding_dispositions"),
         "vendor": {key: vendor[key] for key in ("files", "hash_mismatches", "missing_files", "license_missing", "origin", "git_head", "license")},
         "security_clearance": "not-passed",
     }
@@ -1286,6 +1582,7 @@ def write_acceptance(request: dict, observation: dict) -> bool:
         "uncovered_lock_packages": observation["uncovered_lock_packages"],
         "uncovered_sample": observation["uncovered_sample"],
         "tool_advisories": observation.get("tool_advisories"),
+        "tool_finding_dispositions": observation.get("tool_finding_dispositions"),
         "vendor_files": observation["vendor"]["files"],
         "vendor_hash_mismatches": observation["vendor"]["hash_mismatches"],
         "security_clearance": "not-passed",
