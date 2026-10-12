@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "file": "legacy-progress-spinner/progress-spinner.ts",
+  "module": "@angular/core",
+  "symbol": "NgZone",
+  "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+  "prior_review": {
+    "path": "compatibility/f10/authored-use-reviews/public-progress-spinner-zone-boundary.json",
+    "sha256": "f9becb44a20914911fd2291f7a3e1f812238f2718f2f6b66c4c866a2fcfc585f"
+  },
+  "unchanged_executed_class": true,
+  "prior_runtime": {
+    "path": "compatibility/rc/progress-spinner-zone-runtime-diagnostic.json",
+    "sha256": "23ce01bbc8e79ee8aa954b013d202da3a37912dc8a7c81f2515272f46dd39c5c",
+    "subjects": 10,
+    "not_reexecuted": true,
+    "reason": "Whole class/color/runtime worker/public namespace bytes are unchanged; all prior independently hashed execution inputs verified."
+  },
+  "reference_class_context": {
+    "file": "legacy-progress-spinner/progress-spinner.ts",
+    "module": "@angular/core",
+    "symbol": "NgZone",
+    "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+    "original_subject": {
+      "path": "compatibility/rc/progress-spinner-zone-original-subjects.json.gz",
+      "sha256": "cca6bbbe97c179d4d7131a3b1cc9a708ed960ed0c64df953e696a55a9cfef7b9"
+    },
+    "constructor_parameter_count": 9,
+    "zone_parameter_index": 7,
+    "constructor_source": "constructor(\n    elementRef: ElementRef<HTMLElement>,\n    _platform: Platform,\n    @Optional() @Inject(DOCUMENT) private _document: any,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n    @Inject(MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS)\n    defaults?: MatProgressSpinnerDefaultOptions,\n    /**\n     * @deprecated `changeDetectorRef`, `viewportRuler` and `ngZone`\n     * parameters to become required.\n     * @breaking-change 14.0.0\n     */\n    changeDetectorRef?: ChangeDetectorRef,\n    viewportRuler?: ViewportRuler,\n    ngZone?: NgZone,\n    @Inject(CSP_NONCE) @Optional() private _nonce?: string | null,\n  ) {\n    super(elementRef);\n\n    const trackedDiameters = MatLegacyProgressSpinner._diameters;\n    this._spinnerAnimationLabel = this._getSpinnerAnimationLabel();\n\n    // The base size is already inserted via the component's structural styles. We still\n    // need to track it so we don't end up adding the same styles again.\n    if (!trackedDiameters.has(_document.head)) {\n      trackedDiameters.set(_document.head, new Set<number>([BASE_SIZE]));\n    }\n\n    this._noopAnimations =\n      animationMode === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;\n\n    if (elementRef.nativeElement.nodeName.toLowerCase() === 'mat-spinner') {\n      this.mode = 'indeterminate';\n    }\n\n    if (defaults) {\n      if (defaults.color) {\n        this.color = this.defaultColor = defaults.color;\n      }\n\n      if (defaults.diameter) {\n        this.diameter = defaults.diameter;\n      }\n\n      if (defaults.strokeWidth) {\n        this.strokeWidth = defaults.strokeWidth;\n      }\n    }\n\n    // Safari has an issue where the circle isn't positioned correctly when the page has a\n    // different zoom level from the default. This handler triggers a recalculation of the\n    // `transform-origin` when the page zoom level changes.\n    // See `_getCircleTransformOrigin` for more info.\n    // @breaking-change 14.0.0 Remove null checks for `_changeDetectorRef`,\n    // `viewportRuler` and `ngZone`.\n    if (_platform.isBrowser && _platform.SAFARI && viewportRuler && changeDetectorRef && ngZone) {\n      this._resizeSubscription = viewportRuler.change(150).subscribe(() => {\n        // When the window is resize while the spinner is in `indeterminate` mode, we\n        // have to mark for check so the transform origin of the circle can be recomputed.\n        if (this.mode === 'indeterminate') {\n          ngZone.run(() => changeDetectorRef.markForCheck());\n        }\n      });\n    }\n  }",
+    "destruction_source": "ngOnDestroy() {\n    this._resizeSubscription.unsubscribe();\n  }",
+    "constructor_fields_and_destruction_match_original": true,
+    "owned_color": {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc"
+    },
+    "scope": "One public NgZone import and its complete historical constructor/field/resize callback/destruction contract. Complete manual classes are loaded; ngOnInit, dynamic styles, shadow lookup, circle geometry and other methods are not qualified. Genuine minimum public Platform/NgZone with explicit UA/window and viewport/change-detector protocols, borrowed RxJS; decorators omitted. No packed/native/AOT or full floor qualification."
+  },
+  "actual_template": {
+    "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.html",
+    "sha256": "df4e7c34e3434e3f99ea651f3aa4b46bcf3f09acebe73e281b24012f8b4c544e",
+    "matches_tagged_bytes": false,
+    "source_proof": {
+      "path": "compatibility/rc/template-control-flow-source-proof.json",
+      "sha256": "a84938812b92f0f003a5c7f173d9396bc2917ecdf9b71c8c5784f5ef01cb5063"
+    },
+    "browser_proof": {
+      "path": "compatibility/rc/template-control-flow-browser-diagnostic.json",
+      "sha256": "df5b735fa228bc283dc943e671eb12fcedcaf14ff589aa8eae7a73760ab5ffd8"
+    },
+    "peer_states": [
+      {
+        "line": "original",
+        "states": [
+          {
+            "family": "legacy-progress-spinner",
+            "variant": "before",
+            "states": [
+              {
+                "name": "determinate",
+                "dom_sha256": "737b32e6266c6efa31a6de28a88bc8fefc63aafd2bd55bc9a0ecc4cf16014c52",
+                "identities": [
+                  0
+                ]
+              },
+              {
+                "name": "indeterminate",
+                "dom_sha256": "5f584a3f2cda6a5f1bef084586247cb80137c70bdccf8cf8dfa7d950eadaeca4",
+                "identities": [
+                  1
+                ]
+              },
+              {
+                "name": "determinate again",
+                "dom_sha256": "737b32e6266c6efa31a6de28a88bc8fefc63aafd2bd55bc9a0ecc4cf16014c52",
+                "identities": [
+                  2
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "line": "main",
+        "states": [
+          {
+            "family": "legacy-progress-spinner",
+            "variant": "before",
+            "states": [
+              {
+                "name": "determinate",
+                "dom_sha256": "737b32e6266c6efa31a6de28a88bc8fefc63aafd2bd55bc9a0ecc4cf16014c52",
+                "identities": [
+                  0
+                ]
+              },
+              {
+                "name": "indeterminate",
+                "dom_sha256": "5f584a3f2cda6a5f1bef084586247cb80137c70bdccf8cf8dfa7d950eadaeca4",
+                "identities": [
+                  1
+                ]
+              },
+              {
+                "name": "determinate again",
+                "dom_sha256": "737b32e6266c6efa31a6de28a88bc8fefc63aafd2bd55bc9a0ecc4cf16014c52",
+                "identities": [
+                  2
+                ]
+              }
+            ]
+          },
+          {
+            "family": "legacy-progress-spinner",
+            "variant": "after",
+            "states": [
+              {
+                "name": "determinate",
+                "dom_sha256": "737b32e6266c6efa31a6de28a88bc8fefc63aafd2bd55bc9a0ecc4cf16014c52",
+                "identities": [
+                  0
+                ]
+              },
+              {
+                "name": "indeterminate",
+                "dom_sha256": "5f584a3f2cda6a5f1bef084586247cb80137c70bdccf8cf8dfa7d950eadaeca4",
+                "identities": [
+                  1
+                ]
+              },
+              {
+                "name": "determinate again",
+                "dom_sha256": "737b32e6266c6efa31a6de28a88bc8fefc63aafd2bd55bc9a0ecc4cf16014c52",
+                "identities": [
+                  2
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "line": "21.x",
+        "states": [
+          {
+            "family": "legacy-progress-spinner",
+            "variant": "before",
+            "states": [
+              {
+                "name": "determinate",
+                "dom_sha256": "737b32e6266c6efa31a6de28a88bc8fefc63aafd2bd55bc9a0ecc4cf16014c52",
+                "identities": [
+                  0
+                ]
+              },
+              {
+                "name": "indeterminate",
+                "dom_sha256": "5f584a3f2cda6a5f1bef084586247cb80137c70bdccf8cf8dfa7d950eadaeca4",
+                "identities": [
+                  1
+                ]
+              },
+              {
+                "name": "determinate again",
+                "dom_sha256": "737b32e6266c6efa31a6de28a88bc8fefc63aafd2bd55bc9a0ecc4cf16014c52",
+                "identities": [
+                  2
+                ]
+              }
+            ]
+          },
+          {
+            "family": "legacy-progress-spinner",
+            "variant": "after",
+            "states": [
+              {
+                "name": "determinate",
+                "dom_sha256": "737b32e6266c6efa31a6de28a88bc8fefc63aafd2bd55bc9a0ecc4cf16014c52",
+                "identities": [
+                  0
+                ]
+              },
+              {
+                "name": "indeterminate",
+                "dom_sha256": "5f584a3f2cda6a5f1bef084586247cb80137c70bdccf8cf8dfa7d950eadaeca4",
+                "identities": [
+                  1
+                ]
+              },
+              {
+                "name": "determinate again",
+                "dom_sha256": "737b32e6266c6efa31a6de28a88bc8fefc63aafd2bd55bc9a0ecc4cf16014c52",
+                "identities": [
+                  2
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "negative_controls": [
+    {
+      "id": "changed-zone-throttle",
+      "rejected": true
+    },
+    {
+      "id": "removed-zone-entry",
+      "rejected": true
+    },
+    {
+      "id": "removed-subscription-cleanup",
+      "rejected": true
+    }
+  ],
+  "scope": "Only the unchanged spinner NgZone constructor/field/resize/destruction dependency is rebound to the changed template context. The immutable original template remains a reference input. Real candidate JIT SVG mode/view identities and exact binding/predicate/geometry-call source structure supplement the unchanged class executions. No native Safari/zoom/geometry, full component/DI/AOT/packed or compiler/runtime/RxJS floor claim.",
+  "g11_claim": "not-passed"
+}

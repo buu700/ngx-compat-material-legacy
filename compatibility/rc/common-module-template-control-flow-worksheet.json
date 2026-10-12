@@ -309,7 +309,7 @@
   "native_or_packed_or_full_floors_qualified": false,
   "g11_claim": "not-passed",
   "implementation": "Nine templates use built-in flow. A private, view-scoped public-IterableDiffers adapter preserves option identities and values, including duplicates/custom differ behavior. The original paginator source and constructor are byte-identical to the parent. No stylesheet changes.",
-  "scoped_lifecycle_decision": "The new private adapter invokes IterableDiffer.onDestroy when its view disappears. Original16/minimum NgFor did not invoke that custom callback. Cleanup is a deliberate resource-lifetime improvement, independently asserted; removing cleanup fails a native negative control. No consumer constructor/HTML/CSS/SCSS edits required.",
+  "scoped_lifecycle_decision": "The private view adapter clears its own differ/items/input references on removal. It calls no differ teardown method: onDestroy is not part of the public IterableDiffer interface, including Original16. Actual owned-state cleanup and its failing native mutant are separately asserted.",
   "deferred_tests": [
     "Added actual paginator duplicate-identity component case and tab reorder/ARIA component case are unexecuted pending final Actions.",
     "Full owned native/AOT/packed/floors/G11/full audit are not qualified by the focused JIT/source probes."

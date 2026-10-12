@@ -59,7 +59,7 @@ try{
   parsers.push({line:model.line,templates:templates.length});
   writeFileSync(join(model.root,'template-input.mjs'),`export const line=${JSON.stringify(model.line)};\nexport const templates=${JSON.stringify(templates)};\n`);
   writeFileSync(join(model.root,'template-options.mjs'),helperJs);
-  writeFileSync(join(model.root,'template-options-no-teardown.mjs'),ts.transpileModule(helper.replace('this._differ?.onDestroy();',''),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022,experimentalDecorators:true}}).outputText);
+  writeFileSync(join(model.root,'template-options-no-teardown.mjs'),ts.transpileModule(helper.replace('this._differ = undefined;','').replace('this._items = [];','').replace('this.values = undefined;',''),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022,experimentalDecorators:true}}).outputText);
   writeFileSync(join(model.root,'template-subject.mjs'),worker);
   // Borrow the pinned host Zone.js runtime for this focused JIT template protocol only.
   const zone=require.resolve('zone.js');
@@ -84,12 +84,12 @@ try{
  for(const candidate of results.slice(1))for(const result of candidate.results.filter(r=>r.variant.startsWith('negative/'))){
   const baseline=candidate.results.find(r=>r.family===result.family&&r.variant==='before');
   assert.ok(result.error||JSON.stringify(result.states)!==JSON.stringify(baseline.states),result.variant+' escaped');
-  if(result.error)assert.match(result.error,/required marker|SVG circle namespace|differ teardown count/);
+  if(result.error)assert.match(result.error,/required marker|SVG circle namespace|owned differ state cleanup/);
   negatives.push({line:candidate.line,id:result.variant,rejected:true,reason:result.error||'actual DOM/view identity differs'});
  }
  const report={schema_version:1,line:worksheet.line,source_parent:worksheet.source_parent,sources,parsers,
    differContracts,results:results.map(r=>({line:r.line,warnings:r.warnings,families:r.results.map(f=>({...f,states:f.states?.map(s=>({name:s.name,dom_sha256:hash(JSON.stringify(s.dom)),identities:s.identities,...(s.differLifetime?{differLifetime:s.differLifetime}:{})}))}))})),negatives,public_subject_capsule_sha256:subjects.capsule_hash,producer_sha256:hash(readFileSync(fileURLToPath(import.meta.url))),worker_sha256:hash(worker),paginator_sha256:hash(paginator),helper_sha256:hash(helper),
-   scope:'Actual Chromium DOM and Angular JIT template control flow from authenticated Original16 and both minima, using exact owned parent/candidate templates, the actual owned view-scoped paginator directive and explicit material/CDK element/service protocols. Default/custom differ view creation and item identities match the historical directive. The new private adapter additionally invokes the public differ teardown callback on view removal; Original16/minimum NgFor did not invoke it. This intentional resource cleanup is asserted separately and a missing-cleanup native mutant is rejected. Not full owned components, AOT, packed artifacts, native style/layout or runtime floors. No styles or consumer source edits.',g11_claim:'not-passed'};
+   scope:'Actual Chromium DOM and Angular JIT template control flow from authenticated Original16 and both minima, using exact owned parent/candidate templates, the actual owned view-scoped paginator directive and explicit material/CDK element/service protocols. Default/custom differ view creation and item identities match the historical directive. The private adapter releases its own references on view removal and invokes no unsupported differ callbacks. Owned-state cleanup is asserted separately and a missing-cleanup native mutant is rejected. Not full owned components, AOT, packed artifacts, native style/layout or runtime floors. No styles or consumer source edits.',g11_claim:'not-passed'};
  if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});
  console.log(JSON.stringify({subjects:results.length,templates:sources.length,states:results.reduce((n,r)=>n+r.results.filter(f=>!f.variant.startsWith('negative/')).reduce((a,f)=>a+f.states.length,0),0),negative_controls:negatives.length,full_native_or_packed_qualified:false}));
 }finally{subjects.dispose();}

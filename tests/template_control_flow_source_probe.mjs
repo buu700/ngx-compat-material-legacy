@@ -16,7 +16,7 @@ const mutations=[
  ['projection-selector','legacy-form-field/form-field.html','select="mat-label"','select="wrong-label"'],
  ['branch-predicate','legacy-menu/menu-item.html','@if (_triggersSubmenu)','@if (false)'],
  ['stylesheet-change','legacy-tabs/tab-group.scss','@use','/* extra */\n@use'],
- ['missing-differ-teardown','legacy-paginator/internal/page-size-options.ts','this._differ?.onDestroy();',''],
+ ['missing-differ-teardown','legacy-paginator/internal/page-size-options.ts','this.values = undefined;',''],
 ];
 const result=proveTemplateControlFlow();
 for(const[id,relative,from,to]of mutations){const path='projects/ngx-material-legacy/'+relative,source=read(path),changed=source.replace(from,to);assert.notEqual(changed,source,id);
