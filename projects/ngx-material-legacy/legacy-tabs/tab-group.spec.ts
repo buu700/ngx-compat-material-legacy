@@ -485,6 +485,27 @@ describe('MatTabGroup', () => {
       fixture.detectChanges();
     }));
 
+    it('should retain label and body views by tab identity when tabs are reordered', fakeAsync(() => {
+      const labels = Array.from(fixture.nativeElement.querySelectorAll('.mat-tab-label'));
+      const bodies = Array.from(fixture.nativeElement.querySelectorAll('mat-tab-body'));
+      const tabs = fixture.componentInstance.tabs;
+      fixture.componentInstance.tabs = [tabs[2], tabs[0], tabs[1]];
+      fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
+
+      const reorderedLabels = Array.from(fixture.nativeElement.querySelectorAll('.mat-tab-label'));
+      const reorderedBodies = Array.from(fixture.nativeElement.querySelectorAll('mat-tab-body'));
+      expect(reorderedLabels[0]).toBe(labels[2]);
+      expect(reorderedLabels[1]).toBe(labels[0]);
+      expect(reorderedLabels[2]).toBe(labels[1]);
+      expect(reorderedBodies[0]).toBe(bodies[2]);
+      expect(reorderedBodies[1]).toBe(bodies[0]);
+      expect(reorderedBodies[2]).toBe(bodies[1]);
+      expect(reorderedLabels.map((label: HTMLElement) => label.getAttribute('aria-posinset')))
+        .toEqual(['1', '2', '3']);
+    }));
+
     it('should be able to add a new tab, select it, and have correct origin position', fakeAsync(() => {
       const component: MatLegacyTabGroup = fixture.debugElement.query(
         By.css('mat-tab-group'),

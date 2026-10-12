@@ -13,7 +13,6 @@
   [attr.viewBox]="_getViewBox()"
   preserveAspectRatio="xMidYMid meet"
   focusable="false"
-  [ngSwitch]="mode === 'indeterminate'"
   aria-hidden="true"
   #svg>
 
@@ -24,24 +23,28 @@
     for a split second and then removing it when switching between modes, but it's hard to know
     for how long to hide the element and it can cause the UI to blink.
   -->
-  <circle
-    *ngSwitchCase="true"
-    cx="50%"
-    cy="50%"
-    [attr.r]="_getCircleRadius()"
-    [style.animation-name]="'mat-progress-spinner-stroke-rotate-' + _spinnerAnimationLabel"
-    [style.stroke-dashoffset.px]="_getStrokeDashOffset()"
-    [style.stroke-dasharray.px]="_getStrokeCircumference()"
-    [style.stroke-width.%]="_getCircleStrokeWidth()"
-    [style.transform-origin]="_getCircleTransformOrigin(svg)"></circle>
+  @switch (mode === 'indeterminate') {
+    @case (true) {
+      <circle
+        cx="50%"
+        cy="50%"
+        [attr.r]="_getCircleRadius()"
+        [style.animation-name]="'mat-progress-spinner-stroke-rotate-' + _spinnerAnimationLabel"
+        [style.stroke-dashoffset.px]="_getStrokeDashOffset()"
+        [style.stroke-dasharray.px]="_getStrokeCircumference()"
+        [style.stroke-width.%]="_getCircleStrokeWidth()"
+        [style.transform-origin]="_getCircleTransformOrigin(svg)"></circle>
+    }
 
-  <circle
-    *ngSwitchCase="false"
-    cx="50%"
-    cy="50%"
-    [attr.r]="_getCircleRadius()"
-    [style.stroke-dashoffset.px]="_getStrokeDashOffset()"
-    [style.stroke-dasharray.px]="_getStrokeCircumference()"
-    [style.stroke-width.%]="_getCircleStrokeWidth()"
-    [style.transform-origin]="_getCircleTransformOrigin(svg)"></circle>
+    @case (false) {
+      <circle
+        cx="50%"
+        cy="50%"
+        [attr.r]="_getCircleRadius()"
+        [style.stroke-dashoffset.px]="_getStrokeDashOffset()"
+        [style.stroke-dasharray.px]="_getStrokeCircumference()"
+        [style.stroke-width.%]="_getCircleStrokeWidth()"
+        [style.transform-origin]="_getCircleTransformOrigin(svg)"></circle>
+    }
+  }
 </svg>

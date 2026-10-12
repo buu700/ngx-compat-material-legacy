@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "ed3c24a76741e32c191d821d1b8e9446ca8aab4e",
+  "tagged_templates": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.html",
+      "tagged_sha256": "5ffcf936ce83a2313b753c2697cad5906762f0ac9cc4e8065fe19ce1aa428712",
+      "pre_repair_sha256": "5ffcf936ce83a2313b753c2697cad5906762f0ac9cc4e8065fe19ce1aa428712",
+      "tagged_bytes_identical_before_repair": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+      "tagged_sha256": "dc80c869416cb7a75c53c9ef6101a379a13d1aa2b0ec7479e734838ff6dc52d3",
+      "pre_repair_sha256": "2f196834f2f6d5b57e8d105f9761f4edb01ea4d1a499e76a10f1bf9ce41c9d4e",
+      "tagged_bytes_identical_before_repair": false,
+      "unchanged_preexisting_delta": "--- tag16.2.14\n+++ pre-repair\n@@ -75,17 +75,27 @@\n   </div>\n \n-  <div class=\"mat-form-field-subscript-wrapper\"\n-       [ngSwitch]=\"_getDisplayedMessages()\">\n-    <div *ngSwitchCase=\"'error'\" [@transitionMessages]=\"_subscriptAnimationState\">\n-      <ng-content select=\"mat-error\"></ng-content>\n-    </div>\n+  <div class=\"mat-form-field-subscript-wrapper\">\n+    <!--\n+      Single permanent wrapper for hints and errors so aria-live works reliably.\n+      Setting aria-live only on errors that appear after render is inconsistent.\n+    -->\n+    <div aria-atomic=\"true\"\n+         aria-live=\"polite\"\n+         class=\"mat-form-field-subscript-message\"\n+         [class.mat-form-field-hint-wrapper]=\"_getDisplayedMessages() === 'hint'\"\n+         [class.mat-form-field-subscript-message-enter]=\"_subscriptAnimationState === 'enter'\"\n+         [class.mat-form-field-subscript-animations-enabled]=\"_animationsEnabled\"\n+         [ngSwitch]=\"_getDisplayedMessages()\">\n+      <ng-container *ngSwitchCase=\"'error'\">\n+        <ng-content select=\"mat-error\"></ng-content>\n+      </ng-container>\n \n-    <div class=\"mat-form-field-hint-wrapper\" *ngSwitchCase=\"'hint'\"\n-      [@transitionMessages]=\"_subscriptAnimationState\">\n-      <!-- TODO(mmalerba): use an actual <mat-hint> once all selectors are switched to mat-* -->\n-      <div *ngIf=\"hintLabel\" [id]=\"_hintLabelId\" class=\"mat-hint\">{{hintLabel}}</div>\n-      <ng-content select=\"mat-hint:not([align='end'])\"></ng-content>\n-      <div class=\"mat-form-field-hint-spacer\"></div>\n-      <ng-content select=\"mat-hint[align='end']\"></ng-content>\n+      <ng-container *ngSwitchCase=\"'hint'\">\n+        <!-- TODO(mmalerba): use an actual <mat-hint> once all selectors are switched to mat-* -->\n+        <div *ngIf=\"hintLabel\" [id]=\"_hintLabelId\" class=\"mat-hint\">{{hintLabel}}</div>\n+        <ng-content select=\"mat-hint:not([align='end'])\"></ng-content>\n+        <div class=\"mat-form-field-hint-spacer\"></div>\n+        <ng-content select=\"mat-hint[align='end']\"></ng-content>\n+      </ng-container>\n     </div>\n   </div>\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-option.html",
+      "tagged_sha256": "e5ca90c2d3a4d5fe0561619d14d97337275fcbe8ca154c0c2623b698874658a3",
+      "pre_repair_sha256": "e5ca90c2d3a4d5fe0561619d14d97337275fcbe8ca154c0c2623b698874658a3",
+      "tagged_bytes_identical_before_repair": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-item.html",
+      "tagged_sha256": "8a76150cd8b906ce81bd3480f7f5daf12b5067f6af8fe6e59cbb0b59b01aa930",
+      "pre_repair_sha256": "8a76150cd8b906ce81bd3480f7f5daf12b5067f6af8fe6e59cbb0b59b01aa930",
+      "tagged_bytes_identical_before_repair": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-paginator/paginator.html",
+      "tagged_sha256": "cc9f27769734dd241cf5ae4ddcdd70b5dd9c92c0bfc1af1e23048c6c8d794d57",
+      "pre_repair_sha256": "cc9f27769734dd241cf5ae4ddcdd70b5dd9c92c0bfc1af1e23048c6c8d794d57",
+      "tagged_bytes_identical_before_repair": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.html",
+      "tagged_sha256": "eb9068351eadefb859233dcc1c1bf3a58dc17231b88f5892604ebd5ed6180a69",
+      "pre_repair_sha256": "eb9068351eadefb859233dcc1c1bf3a58dc17231b88f5892604ebd5ed6180a69",
+      "tagged_bytes_identical_before_repair": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.html",
+      "tagged_sha256": "bf085c3364ffb1ab2956416abaa8725e0b7d78e25ac88763c7c9b16add8b72fd",
+      "pre_repair_sha256": "c54309b92719e6e9bf2e0b77decb82f4347b78a9565a4e22ba7f49f81353e5cf",
+      "tagged_bytes_identical_before_repair": false,
+      "unchanged_preexisting_delta": "--- tag16.2.14\n+++ pre-repair\n@@ -11,5 +11,5 @@\n      [attr.aria-owns]=\"panelOpen ? id + '-panel' : null\"\n      class=\"mat-select-trigger\"\n-     (click)=\"toggle()\"\n+     (click)=\"open()\"\n      #origin=\"cdkOverlayOrigin\"\n      #trigger>\n@@ -33,5 +33,5 @@\n   [cdkConnectedOverlayScrollStrategy]=\"_scrollStrategy\"\n   [cdkConnectedOverlayOrigin]=\"origin\"\n-  [cdkConnectedOverlayOpen]=\"panelOpen\"\n+  [cdkConnectedOverlayOpen]=\"_overlayAttached\"\n   [cdkConnectedOverlayPositions]=\"_positions\"\n   [cdkConnectedOverlayMinWidth]=\"_getOverlayMinWidth()\"\n@@ -40,5 +40,5 @@\n   (attach)=\"_onAttached()\"\n   (detach)=\"close()\">\n-  <div class=\"mat-select-panel-wrap\" [@transformPanelWrap]>\n+  <div class=\"mat-select-panel-wrap\">\n     <div\n       #panel\n@@ -51,6 +51,8 @@\n       [attr.aria-labelledby]=\"_getPanelAriaLabelledby()\"\n       [ngClass]=\"panelClass\"\n-      [@transformPanel]=\"multiple ? 'showing-multiple' : 'showing'\"\n-      (@transformPanel.done)=\"_panelDoneAnimatingStream.next($event.toState)\"\n+      [class.mat-select-panel-animations-enabled]=\"_animationsEnabled\"\n+      [class.mat-select-panel-exit]=\"_panelExiting\"\n+      [class.mat-select-panel-multiple]=\"multiple\"\n+      (animationend)=\"_onPanelAnimationEnd($event)\"\n       [style.transformOrigin]=\"_transformOrigin\"\n       [style.font-size.px]=\"_triggerFontSize\"\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/simple-snack-bar.html",
+      "tagged_sha256": "8772ef5c3c34985af95aa881f81b26048d4abf959dbfc5104b97bbe8b513cd4c",
+      "pre_repair_sha256": "8772ef5c3c34985af95aa881f81b26048d4abf959dbfc5104b97bbe8b513cd4c",
+      "tagged_bytes_identical_before_repair": true
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.html",
+      "tagged_sha256": "a08ef0310f197b4c5302c449467f6cb866f8e688d42544a4b164c09d383592a6",
+      "pre_repair_sha256": "1ce6acdffe51366ad6f439f81a4ecfd3e2d2b79630042cd5ef1ec8dcf23003f4",
+      "tagged_bytes_identical_before_repair": false,
+      "unchanged_preexisting_delta": "--- tag16.2.14\n+++ pre-repair\n@@ -3,4 +3,6 @@\n                [disableRipple]=\"disableRipple\"\n                [disablePagination]=\"disablePagination\"\n+               [aria-label]=\"ariaLabel\"\n+               [aria-labelledby]=\"ariaLabelledby\"\n                (indexFocused)=\"_focusChanged($event)\"\n                (selectFocusedIndex)=\"selectedIndex = $event\">\n@@ -38,5 +40,5 @@\n <div\n   class=\"mat-tab-body-wrapper\"\n-  [class._mat-animation-noopable]=\"_animationMode === 'NoopAnimations'\"\n+  [class._mat-animation-noopable]=\"_animationsDisabled()\"\n   #tabBodyWrapper>\n   <mat-tab-body role=\"tabpanel\"\n@@ -45,4 +47,5 @@\n                [attr.tabindex]=\"(contentTabIndex != null && selectedIndex === i) ? contentTabIndex : null\"\n                [attr.aria-labelledby]=\"_getTabLabelId(i)\"\n+               [attr.aria-hidden]=\"selectedIndex !== i\"\n                [class.mat-tab-body-active]=\"selectedIndex === i\"\n                [ngClass]=\"tab.bodyClass\"\n"
+    }
+  ],
+  "purpose": "Six templates were byte-identical to the untouched tag before repair. Existing form-field/select/tabs accessibility and motion adaptations are retained, not newly approved or converted into historical goldens by this migration."
+}

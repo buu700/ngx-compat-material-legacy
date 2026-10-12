@@ -362,6 +362,32 @@ describe('MatPaginator', () => {
     expect(paginator._displayedPageSizeOptions).toEqual([5, 10, 25, 30, 100]);
   });
 
+  it('should preserve historical duplicate option identities across page size changes', fakeAsync(() => {
+    const fixture = createComponent(MatPaginatorApp);
+    const component = fixture.componentInstance;
+    const select: MatLegacySelect = fixture.debugElement.query(By.directive(MatLegacySelect))!.componentInstance;
+    component.pageSizeOptions = [5, 10, 10, 20];
+    fixture.detectChanges();
+    tick();
+    const initial = select.options.toArray();
+
+    component.pageSizeOptions = [1, 5, 10, 10, 20];
+    fixture.detectChanges();
+    tick();
+    const inserted = select.options.toArray();
+    expect(inserted.slice(1)).toEqual(initial);
+
+    component.pageSizeOptions = [1, 10, 10, 10, 20];
+    fixture.detectChanges();
+    tick();
+    const repeated = select.options.toArray();
+    expect(repeated.map(option => option.value)).toEqual([1, 10, 10, 10, 20]);
+    expect(repeated[0]).toBe(inserted[0]);
+    expect(repeated[1]).toBe(initial[2]);
+    expect(repeated[2]).toBe(initial[1]);
+    expect(repeated[4]).toBe(initial[3]);
+  }));
+
   it('should be able to change the page size while keeping the first item present', () => {
     const fixture = createComponent(MatPaginatorApp);
     const component = fixture.componentInstance;
