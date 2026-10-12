@@ -40,6 +40,7 @@ describe('MatTable', () => {
         NestedHtmlTableApp,
         RawNestedLegacyTablesApp,
         RawNestedCurrentTableApp,
+        MixedLegacyColumnCellsApp,
       ], providers: [LEGACY_NOOP_ANIMATIONS]}).compileComponents();
   }));
 
@@ -60,6 +61,19 @@ describe('MatTable', () => {
     expect(Array.from<HTMLElement>(node.nativeElement.children).map(child => child.tagName))
       .toEqual(['THEAD', 'TBODY', 'TFOOT']);
     expect(node.nativeElement.querySelectorAll('tbody > tr').length).toBe(4);
+  });
+
+  it('preserves legacy column classes on public CDK header, data and footer cells', () => {
+    const fixture = TestBed.createComponent(MixedLegacyColumnCellsApp);
+    fixture.detectChanges();
+
+    for (const cell of fixture.nativeElement.querySelectorAll('[data-legacy-column]')) {
+      expect(cell.classList.contains('cdk-column-value')).toBeTrue();
+      expect(cell.classList.contains('mat-column-value')).toBeTrue();
+    }
+    expect(fixture.nativeElement.querySelectorAll('[data-legacy-column]').length).toBe(3);
+    expect(fixture.nativeElement.querySelector('[data-current-column]').classList.contains('mat-column-value'))
+      .toBeFalse();
   });
 
   for (const [label, host] of [['legacy', () => RawNestedLegacyTablesApp],
@@ -1193,3 +1207,23 @@ class RawNestedLegacyTablesApp {}
     </table>
   `})
 class RawNestedCurrentTableApp {}
+
+@Component({standalone: false, template: `
+  <table mat-table [dataSource]="[{value: 'Legacy'}]">
+    <ng-container matColumnDef="value">
+      <th cdk-header-cell *cdkHeaderCellDef data-legacy-column>Header</th>
+      <td cdk-cell *cdkCellDef="let row" data-legacy-column>{{row.value}}</td>
+      <td cdk-footer-cell *cdkFooterCellDef data-legacy-column>Footer</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="['value']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['value']"></tr>
+    <tr mat-footer-row *matFooterRowDef="['value']"></tr>
+  </table>
+  <table cdk-table [dataSource]="[{value: 'Current'}]">
+    <ng-container cdkColumnDef="value">
+      <td cdk-cell *cdkCellDef="let row" data-current-column>{{row.value}}</td>
+    </ng-container>
+    <tr cdk-row *cdkRowDef="let row; columns: ['value']"></tr>
+  </table>
+`})
+class MixedLegacyColumnCellsApp {}
