@@ -44,6 +44,13 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
             shutil.copyfile(ROOT / name, target)
         for name in ["compatibility/rc/tool-advisory-triage", "reference/toolchain/pnpm-12.4.2"]:
             shutil.copytree(ROOT / name, root / name, dirs_exist_ok=True)
+        manifests = json.loads((ROOT / "compatibility/rc/tool-advisory-triage/private-profile-source-manifests.json").read_text())
+        version = json.loads((ROOT / "projects/ngx-material-legacy/package.json").read_text())["version"]
+        line = "21.x" if version.startswith("21.") else "main"
+        for row in manifests["lines"][line]["source_files"]:
+            target = root / row["path"]
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / row["path"], target)
         return root
 
     def reseal(self, root, changed_evidence=None):
@@ -59,15 +66,18 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
         review["source_proof"]["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
         review_path.write_text(json.dumps(review, indent=2) + "\n")
 
-    def test_actual_static_scope_retains_every_raw_id_and_seven_open_claims(self):
+    def test_actual_static_scope_retains_every_raw_id_and_five_open_claims(self):
         lookup = self.lookup()
         before = copy.deepcopy(lookup)
         result = self.classify(lookup)
         self.assertEqual(result["errors"], [])
         self.assertEqual(len(result["classified"]), 31)
-        self.assertEqual(len(result["not_applicable"]), 24)
-        self.assertEqual(result["unresolved"], ["npm/brace-expansion@5.0.7", "npm/http-cache-semantics@4.2.0", "npm/postcss-selector-parser@7.1.4"])
-        self.assertEqual(sum(row["classification"] == "unresolved" for row in result["classified"]), 7)
+        self.assertEqual(len(result["not_applicable"]), 26)
+        self.assertEqual(result["unresolved"], ["npm/brace-expansion@5.0.7"])
+        self.assertEqual(sum(row["classification"] == "unresolved" for row in result["classified"]), 5)
+        private = [row for row in result["classified"] if row["private_profile_evidence"]]
+        self.assertEqual(len(private), 2)
+        self.assertTrue(all(row["private_profile_evidence"]["source_files"] in {340, 362} for row in private))
         self.assertEqual(lookup, before)
         aliases = [row["advisory_id"] for row in result["classified"] if row["subject_id"] == "crates.io/quinn-proto@0.11.14"]
         self.assertEqual(aliases, ["GHSA-4w2j-m93h-cj5j", "RUSTSEC-2026-0185"])
@@ -166,7 +176,7 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
         changed = eligibility.declared_pnpm_cli_graph(packages, manifests, workspace)
         self.assertEqual(changed["closure"] & excluded, excluded)
 
-    def producer(self, *, overlap=False, disagreement=False):
+    def producer(self, *, overlap=False, disagreement=False, overlap_subject=None):
         tool = self.lookup()
         now = eligibility.datetime.now(eligibility.timezone.utc)
         aged = now - eligibility.timedelta(days=30)
@@ -178,6 +188,7 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
             return 200, results, ""
         packages = eligibility.lock_packages((ROOT / "pnpm-lock.yaml").read_text())
         if overlap: packages.append(("ip-address", "10.2.0"))
+        if overlap_subject: packages.append(overlap_subject)
         with patch.object(eligibility, "tool_advisory_subjects", return_value=tool["inventory"]), \
              patch.object(eligibility, "query_tool_advisories", return_value=tool), \
              patch.object(eligibility, "tool_review_archives", return_value=self.archives), \
@@ -193,15 +204,77 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
     def test_existing_producer_admits_only_tool_scope_and_keeps_open_findings_failed(self):
         live = self.producer()
         self.assertEqual(live["tool_advisories"]["unresolved"], self.lookup()["unresolved"])
-        self.assertEqual(len(live["tool_finding_dispositions"]["not_applicable"]), 24)
+        self.assertEqual(len(live["tool_finding_dispositions"]["not_applicable"]), 26)
         self.assertNotIn("ip-address@10.2.0", live["unresolved"])
-        self.assertEqual(live["unresolved"], ["tool:npm/brace-expansion@5.0.7", "tool:npm/http-cache-semantics@4.2.0", "tool:npm/postcss-selector-parser@7.1.4"])
+        self.assertEqual(live["unresolved"], ["tool:npm/brace-expansion@5.0.7"])
         cases = eligibility.evaluate(ROOT, eligibility.datetime.now(eligibility.timezone.utc), lookup_performed=True, lookup=live)["cases"]
         self.assertEqual(next(row["result"] for row in cases if row["case_id"].endswith("/unresolved-findings-block")), "fail")
 
     def test_workspace_overlap_and_disagreeing_queries_cannot_use_tool_disposition(self):
         self.assertIn("ip-address@10.2.0", self.producer(overlap=True)["unresolved"])
         self.assertIn("tool-only advisory queries disagree: ip-address@10.2.0", self.producer(disagreement=True)["unresolved"])
+
+    def test_private_profile_guard_caller_population_and_configuration_changes_fail(self):
+        for fault in ["guard", "unwrapped", "new-js-caller", "new-python-caller", "new-workflow", "config", "missing", "symlink"]:
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_root(directory)
+                helper = root / "scripts/npm-tooling-options.mjs"
+                if fault == "guard":
+                    helper.write_text(helper.read_text().replace("npm_config_workspaces: 'false'", "npm_config_workspaces: 'true'"))
+                elif fault == "unwrapped":
+                    caller = root / "scripts/pack-library.mjs"
+                    caller.write_text(caller.read_text().replace("npmToolingOptions(", "unownedOptions("))
+                elif fault == "new-js-caller":
+                    (root / "scripts/added-npm-query.mjs").write_text("spawnSync('npm', ['query', userInput]);\n")
+                elif fault == "new-python-caller":
+                    (root / "scripts/added_npm_query.py").write_text("subprocess.run(['npm', 'query', user_input])\n")
+                elif fault == "new-workflow":
+                    (root / ".github/workflows/added-query.yml").write_text("steps:\n  - run: npm query .external\n")
+                elif fault == "config":
+                    (root / ".npmrc").write_text("prefer-offline=true\n")
+                elif fault == "missing":
+                    helper.unlink()
+                else:
+                    helper.unlink()
+                    helper.symlink_to(ROOT / "scripts/npm-tooling-options.mjs")
+                result = self.classify(root=root)
+                self.assertTrue(result["errors"], fault)
+                self.assertEqual(result["not_applicable"], [], fault)
+
+    def test_resealed_private_snapshot_or_triage_cannot_rewrite_reviewed_facts(self):
+        for name in ["private-profile-source-manifests.json", "private-profile-remaining-result.json", "private-profile-remaining-evidence.json"]:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_root(directory)
+                path = root / "compatibility/rc/tool-advisory-triage" / name
+                body = json.loads(path.read_text())
+                if name.endswith("manifests.json"):
+                    version = json.loads((root / "projects/ngx-material-legacy/package.json").read_text())["version"]
+                    line = "21.x" if version.startswith("21.") else "main"
+                    profile = root / "scripts/npm-tooling-options.mjs"
+                    profile.write_text(profile.read_text() + "\n// counterfeit reviewed profile\n")
+                    raw = profile.read_bytes()
+                    ref = next(row for row in body["lines"][line]["source_files"] if row["path"] == "scripts/npm-tooling-options.mjs")
+                    ref.update(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest(),
+                               git_blob=hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest())
+                elif name.endswith("result.json"):
+                    body["findings"][0]["verdict"] = "not_actionable"
+                else:
+                    body["complete_selector_source_population"] = []
+                path.write_text(json.dumps(body, indent=2) + "\n")
+                self.reseal(root)
+                self.assertTrue(self.classify(root=root)["errors"], name)
+
+    def test_private_profile_reviews_do_not_clear_revised_advisories_or_workspace_use(self):
+        for name, version in [("http-cache-semantics", "4.2.0"), ("postcss-selector-parser", "7.1.4")]:
+            with self.subTest(name=name):
+                lookup = self.lookup()
+                subject = "npm/" + name + "@" + version
+                row = next(row for row in lookup["rows"] if row["id"] == subject)
+                row["vulns"][0]["modified"] = "2026-10-12T00:00:00Z"
+                result = self.classify(lookup)
+                self.assertIn(subject, result["unresolved"])
+                self.assertEqual(len(result["not_applicable"]), 25)
+                self.assertIn(name + "@" + version, self.producer(overlap_subject=(name, version))["unresolved"])
 
     def test_complete_reviewed_fixture_can_close_without_hiding_raw_hits(self):
         lookup = self.lookup()

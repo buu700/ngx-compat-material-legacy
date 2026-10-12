@@ -506,9 +506,105 @@ TOOL_FINDING_SCOPES = {
     "npm/ip-address@10.2.0": ("ip-socks-only", {"GHSA-22jq-vg5j-6vgg", "GHSA-2vr4-cq9g-pvrc", "GHSA-4xrf-jv44-h6hh",
         "GHSA-h3mg-xc3c-68pw", "GHSA-j6r3-76f7-8jcv", "GHSA-mwp4-54f8-5fhr", "GHSA-rpw4-54j3-4h4q"}),
     "npm/tar@7.5.19": ("tar-no-member-list", {"GHSA-r292-9mhp-454m"}),
+    "npm/http-cache-semantics@4.2.0": ("npm-private-cache-profile", {"GHSA-ch52-4w7c-c8xp"}),
+    "npm/postcss-selector-parser@7.1.4": ("npm-private-command-profile", {"GHSA-rj75-hqrm-r3gf"}),
     "npm/undici@6.27.0": ("undici-downloader-only", {"GHSA-3wwx-pv8p-q78v", "GHSA-8xcm-r25x-g524", "GHSA-m8rv-5g2x-5cg5",
         "GHSA-r53p-7pc4-xj5r", "GHSA-rfgv-xxqx-mfg5", "GHSA-v3r7-h72x-cjcm"}),
 }
+
+
+NPM_PRIVATE_PROFILE_ARTIFACTS = {
+    "private-profile-remaining-evidence.json": "f944d76dfb5ea39bf4f7743ea377c5112218efcef4c42af465eb59437bcb82fb",
+    "private-profile-remaining-result.json": "54bd6cf921745b848f05fb1d2eaea6339b870bf53ce431e9e5eaad606a390dc0",
+    "private-profile-source-manifests.json": "08f1feb3a2186f6bb0bd9e36af7462e2c752c7a344632b37c44e8bb194b0b3a4",
+}
+
+
+def private_npm_source_paths(root: Path) -> set[str]:
+    """Complete maintained command source population, excluding this trusted checker."""
+    names = set()
+    for directory, suffixes in [("scripts", {".mjs", ".js", ".cjs", ".py", ".sh", ".ts"}),
+                                (".github/workflows", {".yml", ".yaml"})]:
+        parent = root / directory
+        if parent.is_symlink() or not parent.is_dir():
+            raise ValueError("missing or linked private npm source directory")
+        for path in parent.rglob("*"):
+            if path.is_symlink():
+                raise ValueError("linked private npm source")
+            if path.is_file() and path.suffix in suffixes:
+                names.add(path.relative_to(root).as_posix())
+    names.discard("scripts/check-dependency-eligibility.py")
+    names.update({".npmrc", "chainman.toml", "chainman.lock", "justfile", "package.json",
+                  "projects/ngx-material-legacy/package.json", "pnpm-lock.yaml"})
+    return names
+
+
+def private_npm_disposition_evidence(root: Path, archives: dict[str, bytes]) -> dict:
+    """Admit only the exact reviewed private profile; never a general npm waiver."""
+    base = "compatibility/rc/tool-advisory-triage/"
+    documents = {name: json.loads(_tool_proof_bytes(root, base + name, {"sha256": digest}))
+                 for name, digest in NPM_PRIVATE_PROFILE_ARTIFACTS.items()}
+    evidence = documents["private-profile-remaining-evidence.json"]
+    triage = documents["private-profile-remaining-result.json"]
+    manifests = documents["private-profile-source-manifests.json"]
+    major = json.loads(_tool_proof_bytes(root, "projects/ngx-material-legacy/package.json"))["version"].split(".")[0]
+    if major not in {"21", "22"}:
+        raise ValueError("foreign private npm source line")
+    line = "21.x" if major == "21" else "main"
+    subject = manifests["lines"][line]
+    if subject["source_parent"] != evidence["roots"][line]["revision"]:
+        raise ValueError("private npm source attribution changed")
+    rows = {row["path"]: row for row in subject["source_files"]}
+    if len(rows) != len(subject["source_files"]) or rows.keys() != private_npm_source_paths(root):
+        raise ValueError("private npm command source population changed")
+    for path, row in rows.items():
+        raw = _tool_proof_bytes(root, path, row)
+        if hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest() != row["git_blob"]:
+            raise ValueError("private npm source Git blob changed")
+    for path, digest in evidence["roots"][line]["source_hashes"].items():
+        _tool_proof_bytes(root, path, {"sha256": digest})
+
+    # Check actual archive bytes and the complete selector-call population;
+    # report hashes alone cannot authenticate fabricated dependency excerpts.
+    archive_raw = archives["npm"]
+    if hashlib.sha256(archive_raw).hexdigest() != evidence["npm_archive_sha256"]:
+        raise ValueError("private npm archive changed")
+    wanted = {row["archive_member"]: row for row in evidence["source_excerpts"]}
+    found, population, count = set(), [], 0
+    selector_import = re.compile(r"require\(['\"](?:@npmcli/query|postcss-selector-parser)['\"]\)")
+    with tarfile.open(fileobj=io.BytesIO(archive_raw), mode="r:gz") as archive:
+        for member in archive:
+            if not member.isfile():
+                continue
+            count += 1
+            raw = archive.extractfile(member).read()
+            text = raw.decode(errors="replace")
+            lines = text.splitlines()
+            if member.name in wanted:
+                row = wanted[member.name]
+                if hashlib.sha256(raw).hexdigest() != row["sha256"]:
+                    raise ValueError("private npm caller source changed")
+                for excerpt in row["excerpts"]:
+                    first, last = map(int, excerpt["lines"].split("-"))
+                    if first < 1 or last > len(lines) or excerpt["text"] != "\n".join(lines[first - 1:last]):
+                        raise ValueError("forged private npm source excerpt")
+                found.add(member.name)
+            name = member.name.removeprefix("package/")
+            if name.endswith((".js", ".mjs", ".cjs")) and not name.startswith("node_modules/postcss-selector-parser/"):
+                matches = [{"line": i + 1, "text": source.strip()} for i, source in enumerate(lines)
+                           if "querySelectorAll" in source or selector_import.search(source)]
+                if matches:
+                    population.append({"archive_member": member.name, "sha256": hashlib.sha256(raw).hexdigest(), "matches": matches})
+    if (count != evidence["authenticated_archive_members"] or found != wanted.keys()
+            or population != evidence["complete_selector_source_population"]):
+        raise ValueError("private npm archive/caller population changed")
+    findings = {row["triage_item_id"]: row for row in triage["findings"] if row["verdict"] == "not_actionable"}
+    if {row["input_id"] for row in findings.values()} != {"GHSA-ch52-4w7c-c8xp", "GHSA-rj75-hqrm-r3gf"}:
+        raise ValueError("private npm triage scope changed")
+    details = {row["id"]: row["body"] for row in evidence["current_advisories"]}
+    return {"findings": findings, "details": details, "binding": {"line": line,
+            "reviewed_source_parent": subject["source_parent"], "source_files": len(rows),
+            "artifacts": dict(NPM_PRIVATE_PROFILE_ARTIFACTS)}}
 
 
 def _tool_proof_bytes(root: Path, relative: str, expected: dict | None = None) -> bytes:
@@ -705,8 +801,12 @@ def tool_disposition_evidence(root: Path, review: dict) -> dict:
     findings = {row["triage_item_id"]: row for row in triage["findings"]}
     if len(findings) != len(triage["findings"]):
         raise ValueError("duplicate static triage item")
+    private = private_npm_disposition_evidence(root, archives)
+    findings.update(private["findings"])
+    details = json.loads((root / "compatibility/rc/tool-advisory-details-diagnostic.json").read_text())["advisories"]
+    details.update({row["input_id"]: private["details"][row["input_id"]] for row in private["findings"].values()})
     return {"graph": graph, "http3_disabled": http3_disabled, "findings": findings,
-            "details": json.loads((root / "compatibility/rc/tool-advisory-details-diagnostic.json").read_text())["advisories"],
+            "details": details, "private_profile": private["binding"],
             "proof_sha256": proof_ref["sha256"]}
 
 
@@ -760,7 +860,8 @@ def classify_tool_findings(root: Path, observation: dict, now: datetime | None =
                         valid = bool(affected) and all(a.get("database_specific", {}).get("informational") == "unmaintained" for a in affected)
                 result["classified"].append({"subject_id": row["id"], "advisory_id": vuln.get("id"),
                     "classification": "not-applicable" if valid else "unresolved", "rule_id": record["rule_id"] if valid else None,
-                    "source_proof_sha256": proof["proof_sha256"] if valid else None})
+                    "source_proof_sha256": proof["proof_sha256"] if valid else None,
+                    "private_profile_evidence": proof["private_profile"] if valid and record["rule_id"].startswith("npm-private-") else None})
                 if valid: result["not_applicable"].append({"subject_id": row["id"], "advisory_id": vuln["id"]})
                 else: remaining.append(vuln.get("id"))
             if remaining: unresolved.append(row["id"])

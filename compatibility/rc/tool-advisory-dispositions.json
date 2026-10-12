@@ -241,6 +241,26 @@
       "triage_item_id": "triage-031",
       "reason": "The caller does not use Undici cookie helpers or construct cookie domain/unparsed fields.",
       "scope": "Pinned private linux-x64 glibc pnpm CLI and authenticated npm/pnpm archive callers; static evidence only."
+    },
+    {
+      "subject_id": "npm/http-cache-semantics@4.2.0",
+      "advisory_id": "GHSA-ch52-4w7c-c8xp",
+      "advisory_modified": "2026-10-02T22:45:04.334960361Z",
+      "rule_id": "npm-private-cache-profile",
+      "classification": "not-applicable",
+      "triage_item_id": "triage-016",
+      "reason": "Every reviewed private install/ci/local-pack caller uses a fresh process-owned0700 cache and empty host configuration with inherited npm authentication removed. Generated public fixture configuration and online revalidation exclude the supplied cross-identity/max-stale cache-hit preconditions. Actual npm-registry-fetch and make-fetch-happen source and both native caller populations are authenticated; this is not an upstream fix or shared-cache waiver.",
+      "scope": "Pinned private linux-x64 glibc pnpm CLI and authenticated npm/pnpm archive callers; static evidence only."
+    },
+    {
+      "subject_id": "npm/postcss-selector-parser@7.1.4",
+      "advisory_id": "GHSA-rj75-hqrm-r3gf",
+      "advisory_modified": "2026-10-05T23:00:05.308008424Z",
+      "rule_id": "npm-private-command-profile",
+      "classification": "not-applicable",
+      "triage_item_id": "triage-024",
+      "reason": "The authenticated npm archive confines querySelectorAll/astSync consumers to query and SBOM commands. Both maintained private caller populations use install,ci,local pack or harmless version observations under the finite shared profile; other commands/options are rejected and lifecycle scripts are disabled. Actual install/ci/pack paths do not dispatch the parser. A new caller, source/configuration, command or tool invalidates this decision.",
+      "scope": "Pinned private linux-x64 glibc pnpm CLI and authenticated npm/pnpm archive callers; static evidence only."
     }
   ],
   "source_proof": {

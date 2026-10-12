@@ -1,0 +1,753 @@
+{
+  "schema_version": "triage-finding/v0",
+  "repository": {
+    "path": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+    "revision": "7778531059fecb559f1e75dd2fec2c874b58e878"
+  },
+  "findings": [
+    {
+      "triage_item_id": "triage-011",
+      "input_id": "GHSA-6j4f-fj2g-mc7p",
+      "source_type": "advisory",
+      "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-6j4f-fj2g-mc7p"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/index.js",
+          "lines": "149-157,207-268,897-898",
+          "detail": "Pattern is validated, then passed to brace-expansion with optional max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+          "lines": "4-10",
+          "detail": "64KiB limit exists; it is not proof against recursive or multiplicative patterns."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/map-workspaces/lib/index.js",
+          "lines": "8-66,100-128",
+          "detail": "Workspace patterns reach direct minimatch calls before/alongside glob; those calls supply no caller-specific max; the dependency's default final-output count limit still applies."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/ignore-walk/lib/index.js",
+          "lines": "97-114",
+          "detail": "Reads ignore file content and constructs Minimatch without a caller-specific brace limit; the dependency default final-output count limit still applies."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "scripts/npm-tooling-options.mjs",
+          "lines": "13-26,31-75",
+          "detail": "Private process cache and empty configuration files; finite command/option profile; inherited npm credentials removed and online revalidation selected."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/git.js",
+          "lines": "201-225,246-257",
+          "detail": "Remote Git dependency content is forwarded to a DirFetcher for packing."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/dir.js",
+          "lines": "60-84",
+          "detail": "Packing performs Arborist.loadActual and packlist after the prepare-script decision."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/brace-expansion/dist/commonjs/index.js",
+          "lines": "21,46-81,95-209",
+          "detail": "100000 output-count default and rewrite loop exist; recursion, output bytes and intermediate concatenation are distinct mechanisms."
+        }
+      ],
+      "reachable_path": [
+        "A Git dependency selected through dependency metadata can be unpacked/cloned and repacked by pacote.",
+        "DirFetcher performs loadActual and npm-packlist even when prepare scripts are disabled; it creates an Arborist with only the directory path.",
+        "Workspace/ignore patterns can then reach direct minimatch/brace-expansion calls. The current private workspaces=false flag does not establish a bound on this nested packing path."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": null,
+        "policy_basis": "Resolved root SECURITY.md for scripts, reference/toolchain, chainman.toml and workflows; it requires reachable-path/impact evidence and distinguishes tooling from shipped runtime. The maintained frontends are a legacy library and dependency-free migration CLI; npm is private verification/local-pack tooling. Reviewed both branch source subjects and their complete mutating-call census."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 1,
+        "rationale": "The supplied GHSA-6j4f-fj2g-mc7p mechanism remains plausible on nested dependency packing; the currently selected lower-trust source and availability preconditions require proof.",
+        "drivers": [
+          "remote dependency metadata/packing route",
+          "individual recursive/byte/intermediate/CPU mechanism",
+          "current selected-source and availability contract unresolved"
+        ]
+      },
+      "evidence": [
+        "Prior supplied triage evidence: E-BRACE: expansion remains reachable, including recursive comma/group handling; each of the five reported mechanisms is retained separately.",
+        "Prior supplied triage evidence: Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed.",
+        "Current immutable npm11.19.0 archive reauthenticated: SHA256 31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75; all1943 regular members match the extracted static source.",
+        "Both clean source subjects: main@7778531059fecb559f1e75dd2fec2c874b58e878 and21.x@cb03e92842cb3fc1a30955396cbe9d2d3af07a16; all21/main and19/21.x mutating npm call sites use the shared private profile.",
+        "Exact supplied advisory refreshed from https://api.osv.dev/v1/vulns/GHSA-6j4f-fj2g-mc7p; modified=2026-09-30T00:00:03.836613572Z; no withdrawal. Raw claim retained.",
+        "Comma parsing recursively calls parseCommaParts(post) atline58 before final output-count admission; depth is not guarded there."
+      ],
+      "counterevidence": [
+        "Inputs are partly operator/developer configuration; repository workflows intentionally execute candidate source code. No stronger privilege boundary has yet been established for a particular malicious manifest route.",
+        "Glob supplies braceExpandMax=10000, but direct map-workspaces and ignore-walk Minimatch calls do not; a glob-only limit does not close the claim.",
+        "Corrected guard description: brace-expansion5.0.7 has a default100000 output-count cap and an iterative rewrite path; callers lacking a custom max are not literally unbounded in final output count. Neither fact alone bounds recursive parsing, total bytes or accumulated intermediate arrays."
+      ],
+      "proof_gaps": [
+        "Establish whether a supported current generated/packed dependency closure selects a lower-trust Git/local packaging source, and whether this exact pattern mechanism can violate its availability boundary within effective caller limits.",
+        "This phase performs no runtime witness; do not confirm the scanner claim or extend the separate braces workspace exception."
+      ],
+      "recommended_next_step": "Resolve this exact dependency/pattern route and availability contract; use any necessary runtime validation in a separate phase or select authenticated supported tool remediation.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-012",
+      "input_id": "GHSA-mh99-v99m-4gvg",
+      "source_type": "advisory",
+      "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-mh99-v99m-4gvg"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/index.js",
+          "lines": "149-157,207-268,897-898",
+          "detail": "Pattern is validated, then passed to brace-expansion with optional max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+          "lines": "4-10",
+          "detail": "64KiB limit exists; it is not proof against recursive or multiplicative patterns."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/map-workspaces/lib/index.js",
+          "lines": "8-66,100-128",
+          "detail": "Workspace patterns reach direct minimatch calls before/alongside glob; those calls supply no caller-specific max; the dependency's default final-output count limit still applies."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/ignore-walk/lib/index.js",
+          "lines": "97-114",
+          "detail": "Reads ignore file content and constructs Minimatch without a caller-specific brace limit; the dependency default final-output count limit still applies."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "scripts/npm-tooling-options.mjs",
+          "lines": "13-26,31-75",
+          "detail": "Private process cache and empty configuration files; finite command/option profile; inherited npm credentials removed and online revalidation selected."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/git.js",
+          "lines": "201-225,246-257",
+          "detail": "Remote Git dependency content is forwarded to a DirFetcher for packing."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/dir.js",
+          "lines": "60-84",
+          "detail": "Packing performs Arborist.loadActual and packlist after the prepare-script decision."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/brace-expansion/dist/commonjs/index.js",
+          "lines": "21,46-81,95-209",
+          "detail": "100000 output-count default and rewrite loop exist; recursion, output bytes and intermediate concatenation are distinct mechanisms."
+        }
+      ],
+      "reachable_path": [
+        "A Git dependency selected through dependency metadata can be unpacked/cloned and repacked by pacote.",
+        "DirFetcher performs loadActual and npm-packlist even when prepare scripts are disabled; it creates an Arborist with only the directory path.",
+        "Workspace/ignore patterns can then reach direct minimatch/brace-expansion calls. The current private workspaces=false flag does not establish a bound on this nested packing path."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": null,
+        "policy_basis": "Resolved root SECURITY.md for scripts, reference/toolchain, chainman.toml and workflows; it requires reachable-path/impact evidence and distinguishes tooling from shipped runtime. The maintained frontends are a legacy library and dependency-free migration CLI; npm is private verification/local-pack tooling. Reviewed both branch source subjects and their complete mutating-call census."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 3,
+        "rationale": "The supplied GHSA-mh99-v99m-4gvg mechanism remains plausible on nested dependency packing; the currently selected lower-trust source and availability preconditions require proof.",
+        "drivers": [
+          "remote dependency metadata/packing route",
+          "individual recursive/byte/intermediate/CPU mechanism",
+          "current selected-source and availability contract unresolved"
+        ]
+      },
+      "evidence": [
+        "Prior supplied triage evidence: E-BRACE: expansion remains reachable, including recursive comma/group handling; each of the five reported mechanisms is retained separately.",
+        "Prior supplied triage evidence: Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed.",
+        "Current immutable npm11.19.0 archive reauthenticated: SHA256 31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75; all1943 regular members match the extracted static source.",
+        "Both clean source subjects: main@7778531059fecb559f1e75dd2fec2c874b58e878 and21.x@cb03e92842cb3fc1a30955396cbe9d2d3af07a16; all21/main and19/21.x mutating npm call sites use the shared private profile.",
+        "Exact supplied advisory refreshed from https://api.osv.dev/v1/vulns/GHSA-mh99-v99m-4gvg; modified=2026-09-10T03:50:12.282849322Z; no withdrawal. Raw claim retained.",
+        "The100000 final count cap does not cap aggregate string bytes; pre/N/post concatenation atline202 and final unescaping still process every retained string."
+      ],
+      "counterevidence": [
+        "Inputs are partly operator/developer configuration; repository workflows intentionally execute candidate source code. No stronger privilege boundary has yet been established for a particular malicious manifest route.",
+        "Glob supplies braceExpandMax=10000, but direct map-workspaces and ignore-walk Minimatch calls do not; a glob-only limit does not close the claim.",
+        "Corrected guard description: brace-expansion5.0.7 has a default100000 output-count cap and an iterative rewrite path; callers lacking a custom max are not literally unbounded in final output count. Neither fact alone bounds recursive parsing, total bytes or accumulated intermediate arrays."
+      ],
+      "proof_gaps": [
+        "Establish whether a supported current generated/packed dependency closure selects a lower-trust Git/local packaging source, and whether this exact pattern mechanism can violate its availability boundary within effective caller limits.",
+        "This phase performs no runtime witness; do not confirm the scanner claim or extend the separate braces workspace exception."
+      ],
+      "recommended_next_step": "Resolve this exact dependency/pattern route and availability contract; use any necessary runtime validation in a separate phase or select authenticated supported tool remediation.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-013",
+      "input_id": "GHSA-q2hr-2g5m-vwhr",
+      "source_type": "advisory",
+      "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-q2hr-2g5m-vwhr"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/index.js",
+          "lines": "149-157,207-268,897-898",
+          "detail": "Pattern is validated, then passed to brace-expansion with optional max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+          "lines": "4-10",
+          "detail": "64KiB limit exists; it is not proof against recursive or multiplicative patterns."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/map-workspaces/lib/index.js",
+          "lines": "8-66,100-128",
+          "detail": "Workspace patterns reach direct minimatch calls before/alongside glob; those calls supply no caller-specific max; the dependency's default final-output count limit still applies."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/ignore-walk/lib/index.js",
+          "lines": "97-114",
+          "detail": "Reads ignore file content and constructs Minimatch without a caller-specific brace limit; the dependency default final-output count limit still applies."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "scripts/npm-tooling-options.mjs",
+          "lines": "13-26,31-75",
+          "detail": "Private process cache and empty configuration files; finite command/option profile; inherited npm credentials removed and online revalidation selected."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/git.js",
+          "lines": "201-225,246-257",
+          "detail": "Remote Git dependency content is forwarded to a DirFetcher for packing."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/dir.js",
+          "lines": "60-84",
+          "detail": "Packing performs Arborist.loadActual and packlist after the prepare-script decision."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/brace-expansion/dist/commonjs/index.js",
+          "lines": "21,46-81,95-209",
+          "detail": "100000 output-count default and rewrite loop exist; recursion, output bytes and intermediate concatenation are distinct mechanisms."
+        }
+      ],
+      "reachable_path": [
+        "A Git dependency selected through dependency metadata can be unpacked/cloned and repacked by pacote.",
+        "DirFetcher performs loadActual and npm-packlist even when prepare scripts are disabled; it creates an Arborist with only the directory path.",
+        "Workspace/ignore patterns can then reach direct minimatch/brace-expansion calls. The current private workspaces=false flag does not establish a bound on this nested packing path."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": null,
+        "policy_basis": "Resolved root SECURITY.md for scripts, reference/toolchain, chainman.toml and workflows; it requires reachable-path/impact evidence and distinguishes tooling from shipped runtime. The maintained frontends are a legacy library and dependency-free migration CLI; npm is private verification/local-pack tooling. Reviewed both branch source subjects and their complete mutating-call census."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 5,
+        "rationale": "The supplied GHSA-q2hr-2g5m-vwhr mechanism remains plausible on nested dependency packing; the currently selected lower-trust source and availability preconditions require proof.",
+        "drivers": [
+          "remote dependency metadata/packing route",
+          "individual recursive/byte/intermediate/CPU mechanism",
+          "current selected-source and availability contract unresolved"
+        ]
+      },
+      "evidence": [
+        "Prior supplied triage evidence: E-BRACE: expansion remains reachable, including recursive comma/group handling; each of the five reported mechanisms is retained separately.",
+        "Prior supplied triage evidence: Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed.",
+        "Current immutable npm11.19.0 archive reauthenticated: SHA256 31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75; all1943 regular members match the extracted static source.",
+        "Both clean source subjects: main@7778531059fecb559f1e75dd2fec2c874b58e878 and21.x@cb03e92842cb3fc1a30955396cbe9d2d3af07a16; all21/main and19/21.x mutating npm call sites use the shared private profile.",
+        "Exact supplied advisory refreshed from https://api.osv.dev/v1/vulns/GHSA-q2hr-2g5m-vwhr; modified=2026-09-30T00:00:03.849541183Z; no withdrawal. Raw claim retained.",
+        "The rewrite atlines119-124 is iterative, defeating a simple recursive-stack description, but each iteration scans/rewrites the remaining string; its quadratic CPU claim still needs exact contextual assessment."
+      ],
+      "counterevidence": [
+        "Inputs are partly operator/developer configuration; repository workflows intentionally execute candidate source code. No stronger privilege boundary has yet been established for a particular malicious manifest route.",
+        "Glob supplies braceExpandMax=10000, but direct map-workspaces and ignore-walk Minimatch calls do not; a glob-only limit does not close the claim.",
+        "Corrected guard description: brace-expansion5.0.7 has a default100000 output-count cap and an iterative rewrite path; callers lacking a custom max are not literally unbounded in final output count. Neither fact alone bounds recursive parsing, total bytes or accumulated intermediate arrays."
+      ],
+      "proof_gaps": [
+        "Establish whether a supported current generated/packed dependency closure selects a lower-trust Git/local packaging source, and whether this exact pattern mechanism can violate its availability boundary within effective caller limits.",
+        "This phase performs no runtime witness; do not confirm the scanner claim or extend the separate braces workspace exception."
+      ],
+      "recommended_next_step": "Resolve this exact dependency/pattern route and availability contract; use any necessary runtime validation in a separate phase or select authenticated supported tool remediation.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-014",
+      "input_id": "GHSA-qhr7-859c-m2p7",
+      "source_type": "advisory",
+      "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-qhr7-859c-m2p7"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/index.js",
+          "lines": "149-157,207-268,897-898",
+          "detail": "Pattern is validated, then passed to brace-expansion with optional max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+          "lines": "4-10",
+          "detail": "64KiB limit exists; it is not proof against recursive or multiplicative patterns."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/map-workspaces/lib/index.js",
+          "lines": "8-66,100-128",
+          "detail": "Workspace patterns reach direct minimatch calls before/alongside glob; those calls supply no caller-specific max; the dependency's default final-output count limit still applies."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/ignore-walk/lib/index.js",
+          "lines": "97-114",
+          "detail": "Reads ignore file content and constructs Minimatch without a caller-specific brace limit; the dependency default final-output count limit still applies."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "scripts/npm-tooling-options.mjs",
+          "lines": "13-26,31-75",
+          "detail": "Private process cache and empty configuration files; finite command/option profile; inherited npm credentials removed and online revalidation selected."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/git.js",
+          "lines": "201-225,246-257",
+          "detail": "Remote Git dependency content is forwarded to a DirFetcher for packing."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/dir.js",
+          "lines": "60-84",
+          "detail": "Packing performs Arborist.loadActual and packlist after the prepare-script decision."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/brace-expansion/dist/commonjs/index.js",
+          "lines": "21,46-81,95-209",
+          "detail": "100000 output-count default and rewrite loop exist; recursion, output bytes and intermediate concatenation are distinct mechanisms."
+        }
+      ],
+      "reachable_path": [
+        "A Git dependency selected through dependency metadata can be unpacked/cloned and repacked by pacote.",
+        "DirFetcher performs loadActual and npm-packlist even when prepare scripts are disabled; it creates an Arborist with only the directory path.",
+        "Workspace/ignore patterns can then reach direct minimatch/brace-expansion calls. The current private workspaces=false flag does not establish a bound on this nested packing path."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": null,
+        "policy_basis": "Resolved root SECURITY.md for scripts, reference/toolchain, chainman.toml and workflows; it requires reachable-path/impact evidence and distinguishes tooling from shipped runtime. The maintained frontends are a legacy library and dependency-free migration CLI; npm is private verification/local-pack tooling. Reviewed both branch source subjects and their complete mutating-call census."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 2,
+        "rationale": "The supplied GHSA-qhr7-859c-m2p7 mechanism remains plausible on nested dependency packing; the currently selected lower-trust source and availability preconditions require proof.",
+        "drivers": [
+          "remote dependency metadata/packing route",
+          "individual recursive/byte/intermediate/CPU mechanism",
+          "current selected-source and availability contract unresolved"
+        ]
+      },
+      "evidence": [
+        "Prior supplied triage evidence: E-BRACE: expansion remains reachable, including recursive comma/group handling; each of the five reported mechanisms is retained separately.",
+        "Prior supplied triage evidence: Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed.",
+        "Current immutable npm11.19.0 archive reauthenticated: SHA256 31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75; all1943 regular members match the extracted static source.",
+        "Both clean source subjects: main@7778531059fecb559f1e75dd2fec2c874b58e878 and21.x@cb03e92842cb3fc1a30955396cbe9d2d3af07a16; all21/main and19/21.x mutating npm call sites use the shared private profile.",
+        "Exact supplied advisory refreshed from https://api.osv.dev/v1/vulns/GHSA-qhr7-859c-m2p7; modified=2026-09-30T00:00:04.402763332Z; no withdrawal. Raw claim retained.",
+        "Nested option expansion calls expand_(n[0],max,false) atline141; the rewrite loop does not replace this recursion."
+      ],
+      "counterevidence": [
+        "Inputs are partly operator/developer configuration; repository workflows intentionally execute candidate source code. No stronger privilege boundary has yet been established for a particular malicious manifest route.",
+        "Glob supplies braceExpandMax=10000, but direct map-workspaces and ignore-walk Minimatch calls do not; a glob-only limit does not close the claim.",
+        "Corrected guard description: brace-expansion5.0.7 has a default100000 output-count cap and an iterative rewrite path; callers lacking a custom max are not literally unbounded in final output count. Neither fact alone bounds recursive parsing, total bytes or accumulated intermediate arrays."
+      ],
+      "proof_gaps": [
+        "Establish whether a supported current generated/packed dependency closure selects a lower-trust Git/local packaging source, and whether this exact pattern mechanism can violate its availability boundary within effective caller limits.",
+        "This phase performs no runtime witness; do not confirm the scanner claim or extend the separate braces workspace exception."
+      ],
+      "recommended_next_step": "Resolve this exact dependency/pattern route and availability contract; use any necessary runtime validation in a separate phase or select authenticated supported tool remediation.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-015",
+      "input_id": "GHSA-rgw5-rvv9-x895",
+      "source_type": "advisory",
+      "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+      "normalized_input": {
+        "vulnerable_component": "npm/brace-expansion@5.0.7",
+        "claimed_source": "Glob expression supplied through tool arguments or a package/workspace manifest",
+        "claimed_sink": "brace-expansion expansion/recursive parsing",
+        "claimed_control": "minimatch64KiB length check and expansion limits",
+        "affected_version_or_path": "npm/brace-expansion@5.0.7",
+        "preconditions": [
+          "A supported lower-trust source must reach enabled brace expansion.",
+          "The crafted pattern must fit caller limits while triggering the exact advisory mechanism."
+        ],
+        "impact": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-rgw5-rvv9-x895"
+        ]
+      },
+      "verdict": "needs_review",
+      "confidence": "medium",
+      "affected_locations": [
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/index.js",
+          "lines": "149-157,207-268,897-898",
+          "detail": "Pattern is validated, then passed to brace-expansion with optional max."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js",
+          "lines": "4-10",
+          "detail": "64KiB limit exists; it is not proof against recursive or multiplicative patterns."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/map-workspaces/lib/index.js",
+          "lines": "8-66,100-128",
+          "detail": "Workspace patterns reach direct minimatch calls before/alongside glob; those calls supply no caller-specific max; the dependency's default final-output count limit still applies."
+        },
+        {
+          "label": "static source",
+          "path": "external/npm-11.19.0/package/node_modules/ignore-walk/lib/index.js",
+          "lines": "97-114",
+          "detail": "Reads ignore file content and constructs Minimatch without a caller-specific brace limit; the dependency default final-output count limit still applies."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "scripts/npm-tooling-options.mjs",
+          "lines": "13-26,31-75",
+          "detail": "Private process cache and empty configuration files; finite command/option profile; inherited npm credentials removed and online revalidation selected."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/git.js",
+          "lines": "201-225,246-257",
+          "detail": "Remote Git dependency content is forwarded to a DirFetcher for packing."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/pacote/lib/dir.js",
+          "lines": "60-84",
+          "detail": "Packing performs Arborist.loadActual and packlist after the prepare-script decision."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/brace-expansion/dist/commonjs/index.js",
+          "lines": "21,46-81,95-209",
+          "detail": "100000 output-count default and rewrite loop exist; recursion, output bytes and intermediate concatenation are distinct mechanisms."
+        }
+      ],
+      "reachable_path": [
+        "A Git dependency selected through dependency metadata can be unpacked/cloned and repacked by pacote.",
+        "DirFetcher performs loadActual and npm-packlist even when prepare scripts are disabled; it creates an Arborist with only the directory path.",
+        "Workspace/ignore patterns can then reach direct minimatch/brace-expansion calls. The current private workspaces=false flag does not establish a bound on this nested packing path."
+      ],
+      "boundary_assessment": {
+        "product_surface": "CLI",
+        "source_trust": "untrusted",
+        "boundary_crossed": null,
+        "policy_basis": "Resolved root SECURITY.md for scripts, reference/toolchain, chainman.toml and workflows; it requires reachable-path/impact evidence and distinguishes tooling from shipped runtime. The maintained frontends are a legacy library and dependency-free migration CLI; npm is private verification/local-pack tooling. Reviewed both branch source subjects and their complete mutating-call census."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": "needs_review",
+        "rank": 4,
+        "rationale": "The supplied GHSA-rgw5-rvv9-x895 mechanism remains plausible on nested dependency packing; the currently selected lower-trust source and availability preconditions require proof.",
+        "drivers": [
+          "remote dependency metadata/packing route",
+          "individual recursive/byte/intermediate/CPU mechanism",
+          "current selected-source and availability contract unresolved"
+        ]
+      },
+      "evidence": [
+        "Prior supplied triage evidence: E-BRACE: expansion remains reachable, including recursive comma/group handling; each of the five reported mechanisms is retained separately.",
+        "Prior supplied triage evidence: Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed.",
+        "Current immutable npm11.19.0 archive reauthenticated: SHA256 31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75; all1943 regular members match the extracted static source.",
+        "Both clean source subjects: main@7778531059fecb559f1e75dd2fec2c874b58e878 and21.x@cb03e92842cb3fc1a30955396cbe9d2d3af07a16; all21/main and19/21.x mutating npm call sites use the shared private profile.",
+        "Exact supplied advisory refreshed from https://api.osv.dev/v1/vulns/GHSA-rgw5-rvv9-x895; modified=2026-09-10T03:51:14.535270857Z; no withdrawal. Raw claim retained.",
+        "Intermediate N.push.apply atline197 accumulates child expansions before the final expansions.length<max test atline201."
+      ],
+      "counterevidence": [
+        "Inputs are partly operator/developer configuration; repository workflows intentionally execute candidate source code. No stronger privilege boundary has yet been established for a particular malicious manifest route.",
+        "Glob supplies braceExpandMax=10000, but direct map-workspaces and ignore-walk Minimatch calls do not; a glob-only limit does not close the claim.",
+        "Corrected guard description: brace-expansion5.0.7 has a default100000 output-count cap and an iterative rewrite path; callers lacking a custom max are not literally unbounded in final output count. Neither fact alone bounds recursive parsing, total bytes or accumulated intermediate arrays."
+      ],
+      "proof_gaps": [
+        "Establish whether a supported current generated/packed dependency closure selects a lower-trust Git/local packaging source, and whether this exact pattern mechanism can violate its availability boundary within effective caller limits.",
+        "This phase performs no runtime witness; do not confirm the scanner claim or extend the separate braces workspace exception."
+      ],
+      "recommended_next_step": "Resolve this exact dependency/pattern route and availability contract; use any necessary runtime validation in a separate phase or select authenticated supported tool remediation.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-016",
+      "input_id": "GHSA-ch52-4w7c-c8xp",
+      "source_type": "advisory",
+      "title": "http-cache-semantics max-stale handling can disclose cross-user cached responses",
+      "normalized_input": {
+        "vulnerable_component": "npm/http-cache-semantics@4.2.0",
+        "claimed_source": "max-stale request against a security-zeroed cache entry",
+        "claimed_sink": "Cached authenticated body or Set-Cookie response returned to another identity",
+        "claimed_control": "Cache freshness/account partition",
+        "affected_version_or_path": "npm/http-cache-semantics@4.2.0",
+        "preconditions": [
+          "A shared or cross-identity cache must expose a zeroed response to a lower-trust requester."
+        ],
+        "impact": "http-cache-semantics max-stale handling can disclose cross-user cached responses",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-ch52-4w7c-c8xp"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "authenticated static source",
+          "path": "scripts/npm-tooling-options.mjs",
+          "lines": "13-26,31-75",
+          "detail": "Private process cache and empty configuration files; finite command/option profile; inherited npm credentials removed and online revalidation selected."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/npm-registry-fetch/lib/index.js",
+          "lines": "107-136,207-212",
+          "detail": "Cache mode is derived from offline/preferOffline/preferOnline; the selected profile resolves to no-cache."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/make-fetch-happen/lib/cache/index.js",
+          "lines": "6-38",
+          "detail": "no-cache routes to revalidation before max-stale freshness can choose a hit."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/make-fetch-happen/lib/cache/entry.js",
+          "lines": "14-42,96-108,388-415",
+          "detail": "Saved response headers omit Set-Cookie, though network-error stale fallback still exists."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/make-fetch-happen/lib/cache/key.js",
+          "lines": "1-17",
+          "detail": "URL-based cache key is not itself an account partition; exclusion relies on the owned profile and absence of a cross-identity requester."
+        }
+      ],
+      "reachable_path": [
+        "Remote metadata/tarball requests can reach http-cache-semantics through npm-registry-fetch and make-fetch-happen.",
+        "The private profile creates a fresh0700 process-owned cache, supplies empty user/global npmrc, removes inherited npm authentication variables, and uses generated public-registry configurations. Root project npmrc contains only engine-strict on both lines.",
+        "preferOnline=true,preferOffline=false,offline=false become no-cache; that branch revalidates rather than serving a max-stale hit.",
+        "The supported private command path does not import another identity's cache or expose a shared HTTP cache service. URL/auth key design and stale-on-network-error behavior remain present but do not establish this supplied cross-user disclosure."
+      ],
+      "boundary_assessment": {
+        "product_surface": "private CLI build/check/pack tooling",
+        "source_trust": "untrusted",
+        "boundary_crossed": false,
+        "policy_basis": "Resolved root SECURITY.md for scripts, reference/toolchain, chainman.toml and workflows; it requires reachable-path/impact evidence and distinguishes tooling from shipped runtime. The maintained frontends are a legacy library and dependency-free migration CLI; npm is private verification/local-pack tooling. Reviewed both branch source subjects and their complete mutating-call census."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The reviewed profile excludes the claimed cross-identity cache/requester and max-stale-hit preconditions.",
+        "drivers": []
+      },
+      "evidence": [
+        "Prior supplied triage evidence: E-CACHE: the actual vulnerable-version library is called for cached GET/HEAD requests.",
+        "Prior supplied triage evidence: Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed.",
+        "Current immutable npm11.19.0 archive reauthenticated: SHA256 31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75; all1943 regular members match the extracted static source.",
+        "Both clean source subjects: main@7778531059fecb559f1e75dd2fec2c874b58e878 and21.x@cb03e92842cb3fc1a30955396cbe9d2d3af07a16; all21/main and19/21.x mutating npm call sites use the shared private profile.",
+        "Exact supplied advisory refreshed from https://api.osv.dev/v1/vulns/GHSA-ch52-4w7c-c8xp; modified=2026-10-02T22:45:04.334960361Z; no withdrawal. Raw claim retained.",
+        "Earlier independently executed configuration evidence is supplied counterevidence, not validation executed in this read-only triage: pinned11.19.0 confirmed owned config/cache and online flags on both lines.",
+        "Read every private caller's generated .npmrc provenance: constant public fixture options; historical ci fixtures copy only authenticated package/lock files. Both tracked root npmrc files have no credentials or scoped registry keys."
+      ],
+      "counterevidence": [
+        "This is a private CLI cache, not a demonstrated shared HTTP response service; shared:false is explicit.",
+        "shared:false alone was insufficient. The stronger current evidence is fresh private ownership plus the complete profile/caller provenance and no-cache request route; the normal cached-response header list also omits Set-Cookie.",
+        "The package remains an affected version according to the advisory; no-cache still has network-error stale fallback. This is a scoped exclusion of the supplied cross-user/max-stale mechanism, not a general cache correctness guarantee or upstream fix."
+      ],
+      "proof_gaps": [
+        "No runtime disclosure reproduction or canonical full-run qualification is claimed. Arbitrary manual npm deployments using shared caches/changed identities are outside this exact maintained-profile disposition."
+      ],
+      "recommended_next_step": "Bind this exclusion to the exact profile/caller/configuration inputs and authenticated request/cache source; do not clear a workspace overlap, different cache actor, changed profile or new advisory by inheritance.",
+      "fix_finding_handoff": null
+    },
+    {
+      "triage_item_id": "triage-024",
+      "input_id": "GHSA-rj75-hqrm-r3gf",
+      "source_type": "advisory",
+      "title": "PostCSS: Quadratic complexity in flat selector parsing allows CPU exhaustion",
+      "normalized_input": {
+        "vulnerable_component": "npm/postcss-selector-parser@7.1.4",
+        "claimed_source": "Attacker-controlled flat CSS-like dependency selector",
+        "claimed_sink": "Synchronous postcss-selector-parser astSync",
+        "claimed_control": "Selector origin/length; nesting guard does not bound flat selector complexity",
+        "affected_version_or_path": "npm/postcss-selector-parser@7.1.4",
+        "preconditions": [
+          "A lower-trust selector must be parsed in a supported privileged/service path."
+        ],
+        "impact": "PostCSS: Quadratic complexity in flat selector parsing allows CPU exhaustion",
+        "references": [
+          "https://api.osv.dev/v1/vulns/GHSA-rj75-hqrm-r3gf"
+        ]
+      },
+      "verdict": "not_actionable",
+      "confidence": "high",
+      "affected_locations": [
+        {
+          "label": "authenticated static source",
+          "path": "scripts/npm-tooling-options.mjs",
+          "lines": "13-26,31-75",
+          "detail": "Private process cache and empty configuration files; finite command/option profile; inherited npm credentials removed and online revalidation selected."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/lib/commands/query.js",
+          "lines": "74-141",
+          "detail": "Direct argument and generated workspace selector calls are confined to query."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/lib/commands/sbom.js",
+          "lines": "28-97",
+          "detail": "The second command assembles dependency selectors from omit/workspace values."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/arborist/lib/query-selector-all.js",
+          "lines": "943-961",
+          "detail": "Synchronous parser execution occurs only through the explicit querySelectorAll method."
+        },
+        {
+          "label": "authenticated static source",
+          "path": "external/npm-11.19.0/package/node_modules/@npmcli/query/lib/index.js",
+          "lines": "241-255",
+          "detail": "Exports a parser function; the affected astSync occurs when that function is called."
+        }
+      ],
+      "reachable_path": [
+        "The archive's selector method has two command consumers: query and sbom.",
+        "Every maintained private npm mutation is install,ci or a local pack; all other options/commands are rejected before spawning. Their implementations reify/load/pack rather than invoke querySelectorAll.",
+        "Disabled lifecycle scripts prevent package-manifest scripts from adding a query/SBOM command to these private runners; the supported migration frontends do not invoke npm."
+      ],
+      "boundary_assessment": {
+        "product_surface": "private CLI build/check/pack tooling",
+        "source_trust": "trusted_developer_config",
+        "boundary_crossed": false,
+        "policy_basis": "Resolved root SECURITY.md for scripts, reference/toolchain, chainman.toml and workflows; it requires reachable-path/impact evidence and distinguishes tooling from shipped runtime. The maintained frontends are a legacy library and dependency-free migration CLI; npm is private verification/local-pack tooling. Reviewed both branch source subjects and their complete mutating-call census."
+      },
+      "exploitability_stack_rank": {
+        "rank_queue": null,
+        "rank": null,
+        "rationale": "The supplied flat-selector parse mechanism is not invoked by the reviewed private workflows.",
+        "drivers": []
+      },
+      "evidence": [
+        "Prior supplied triage evidence: E-QUERY: synchronous parser is present and reachable from query commands.",
+        "Prior supplied triage evidence: Shared immutable tool/catalog/policy inputs independently match 21.x@498079e5d; no separate21.x runtime execution is claimed.",
+        "Current immutable npm11.19.0 archive reauthenticated: SHA256 31e9770f7dc71119a58509353b27917557aaf0ac9b5ef1a0465ee7d8ec67ae75; all1943 regular members match the extracted static source.",
+        "Both clean source subjects: main@7778531059fecb559f1e75dd2fec2c874b58e878 and21.x@cb03e92842cb3fc1a30955396cbe9d2d3af07a16; all21/main and19/21.x mutating npm call sites use the shared private profile.",
+        "Exact supplied advisory refreshed from https://api.osv.dev/v1/vulns/GHSA-rj75-hqrm-r3gf; modified=2026-10-05T23:00:05.308008424Z; no withdrawal. Raw claim retained.",
+        "Reviewed the complete archive population: only five source files mention the selector import/method; the only invocations are query.js125/140 and sbom.js53. Loading the exported parser is distinct from calling astSync."
+      ],
+      "counterevidence": [
+        "The primary advisory explicitly excludes ordinary trusted build-time use; no remote query gateway is present in this repository.",
+        "Positive command/dataflow exclusion: generated selectors belong to unselected query/SBOM commands, and neither install/ci/pack nor their disabled lifecycle paths dispatch those commands. No dependency selector service or shipped @npmcli/query import is present."
+      ],
+      "proof_gaps": [
+        "No runtime parser reproduction or canonical full-run qualification is claimed; the disposition is limited to the two reviewed maintained private workflows/lines and exact tool bytes."
+      ],
+      "recommended_next_step": "Admit only this finite private-workflow exclusion after binding the actual profile, caller population, archive/source and current advisory; a new query/SBOM caller or changed tool invalidates it.",
+      "fix_finding_handoff": null
+    }
+  ]
+}
