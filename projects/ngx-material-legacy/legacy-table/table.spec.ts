@@ -213,6 +213,8 @@ describe('MatTable', () => {
     const noDataRow: HTMLElement = tbody.querySelector('.mat-no-data-row');
     expect(noDataRow).toBeTruthy();
     expect(noDataRow.getAttribute('role')).toBe('row');
+    expect(noDataRow.className).toBe('mat-no-data-row');
+    expect(noDataRow.querySelector('td')!.className).toBe('');
 
     dataSource.data = initialData;
     fixture.detectChanges();

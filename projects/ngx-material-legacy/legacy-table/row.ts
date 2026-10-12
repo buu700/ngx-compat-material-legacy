@@ -186,6 +186,10 @@ export class MatLegacyNoDataRow extends CdkNoDataRow {
     ]) as MatLegacyNoDataRow;
     row._contentClassName = 'mat-no-data-row';
     row._contentClassNames = ['mat-no-data-row'];
+    // Material 16 did not add classes to the cells inside a no-data row.
+    row._cellClassNames = [];
+    // Even an empty classList.add call creates a class attribute in the DOM.
+    row._cellSelector = ':not(*)';
     return row;
   }
 }

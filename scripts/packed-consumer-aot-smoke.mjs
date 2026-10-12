@@ -1095,7 +1095,7 @@ class SmokeDialogContent {}
       <mat-row *matRowDef="let row; columns:['constructor-probe']"></mat-row>
       <mat-row *matRowDef="let row; columns:['constructor-probe']; when: constructorGridWhen"></mat-row>
       <mat-footer-row *matFooterRowDef="['constructor-probe']"></mat-footer-row>
-      <ng-template #manualNoDataTemplate matNoDataRow><div>Empty grid probe</div></ng-template>
+      <ng-template #manualNoDataTemplate matNoDataRow><div><span class="cdk-cell">Empty grid probe</span></div></ng-template>
     </mat-table>
     <mat-table id="recycle-view-probe" recycleRows [dataSource]="recycleProbeData">
       <ng-container matColumnDef="value"><mat-cell *matCellDef="let row">{{row.value}}</mat-cell></ng-container>
@@ -1502,11 +1502,14 @@ async function main() {
     prototype_identity:Object.getPrototypeOf(manualNoDataRow)===MatLegacyNoDataRow.prototype,
     parent_constructor_identity:Object.getPrototypeOf(MatLegacyNoDataRow)===CdkNoDataRow,
     explicit_legacy_initialization:JSON.stringify(manualNoDataRow._contentClassNames)===JSON.stringify(['mat-no-data-row']),
+    historical_cell_classes:manualNoDataRow._cellClassNames.length===0
+      &&nodeNoDataRow._cellClassNames.length===0,
     historical_member:manualNoDataRow._contentClassName==='mat-no-data-row'
       &&nodeNoDataRow._contentClassName==='mat-no-data-row',
     node_template_anchor:nodeNoDataRow.templateRef.elementRef.nativeElement===suppliedNoDataTemplate.elementRef.nativeElement,
     embedded_view_text:noDataView.rootNodes.map(node=>node.textContent||'').join('').trim()==='Empty grid probe',
-    rendered_legacy_row:false};
+    rendered_legacy_row:false,
+    rendered_legacy_cell:false};
   noDataView.destroy();
   fixture.componentInstance.constructorGridData=[];
   // The public fixture API must dirty the host before checking changed bindings
@@ -1514,6 +1517,7 @@ async function main() {
   fixture.changeDetectorRef.markForCheck();fixture.detectChanges();
   await sleep(20);fixture.detectChanges();
   noDataRowObservation.rendered_legacy_row=fixture.nativeElement.querySelector('#constructor-grid .mat-no-data-row')?.textContent.trim()==='Empty grid probe';
+  noDataRowObservation.rendered_legacy_cell=fixture.nativeElement.querySelector('#constructor-grid .mat-no-data-row .cdk-cell')?.className==='cdk-cell';
   const noDataRowOriginalConstructor=Object.values(noDataRowObservation).every(value=>value===true);
   const eagerNode=fixture.debugElement.query(element=>element.nativeElement?.id==='tooltip-eager');
   const eagerTooltip=eagerNode.injector.get(MatLegacyTooltip);
