@@ -11,6 +11,7 @@ import {Directive, ElementRef, Inject, Input, Optional, TemplateRef} from '@angu
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 type BooleanInput = string | boolean | null | undefined;
 import {constructWithPublicDependencies} from './internal/public-constructor-context';
+import {addLegacyColumnClass, markLegacyColumn} from './internal/column-classes';
 import {
   CdkCell,
   CdkCellDef,
@@ -94,6 +95,7 @@ export class MatLegacyColumnDef extends CdkColumnDef {
   constructor(@Optional() @Inject(CdkTable) table?: any) {
     const definition = constructWithPublicDependencies(CdkColumnDef, new.target, []);
     definition._table = table;
+    markLegacyColumn(definition);
     return definition as MatLegacyColumnDef;
   }
 
@@ -112,21 +114,10 @@ export class MatLegacyColumnDef extends CdkColumnDef {
   /** Unique name for this column. */
   @Input('matColumnDef')
   override get name(): string {
-    return this._name;
+    return super.name;
   }
   override set name(name: string) {
-    this._setNameInput(name);
-  }
-
-  /**
-   * Add "mat-column-" prefix in addition to "cdk-column-" prefix.
-   * In the future, this will only add "mat-column-" and columnCssClassName
-   * will change from type string[] to string.
-   * @docs-private
-   */
-  protected override _updateColumnCssClassName() {
-    super._updateColumnCssClassName();
-    this._columnCssClassName!.push(`mat-column-${this.cssClassFriendlyName}`);
+    super.name = name;
   }
 }
 
@@ -144,10 +135,12 @@ export class MatLegacyColumnDef extends CdkColumnDef {
 export class MatLegacyHeaderCell extends CdkHeaderCell {
   // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
   constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
-    return constructWithPublicDependencies(CdkHeaderCell, new.target, [
+    const cell = constructWithPublicDependencies(CdkHeaderCell, new.target, [
       {provide: CdkColumnDef, useValue: columnDef},
       {provide: ElementRef, useValue: elementRef},
     ]);
+    addLegacyColumnClass(columnDef, elementRef.nativeElement);
+    return cell;
   }
 }
 
@@ -165,10 +158,12 @@ export class MatLegacyHeaderCell extends CdkHeaderCell {
 export class MatLegacyFooterCell extends CdkFooterCell {
   // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
   constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
-    return constructWithPublicDependencies(CdkFooterCell, new.target, [
+    const cell = constructWithPublicDependencies(CdkFooterCell, new.target, [
       {provide: CdkColumnDef, useValue: columnDef},
       {provide: ElementRef, useValue: elementRef},
     ]);
+    addLegacyColumnClass(columnDef, elementRef.nativeElement);
+    return cell;
   }
 }
 
@@ -186,9 +181,11 @@ export class MatLegacyFooterCell extends CdkFooterCell {
 export class MatLegacyCell extends CdkCell {
   // @ts-expect-error TS2377: valid derived object return preserves manual arguments.
   constructor(columnDef: CdkColumnDef, elementRef: ElementRef) {
-    return constructWithPublicDependencies(CdkCell, new.target, [
+    const cell = constructWithPublicDependencies(CdkCell, new.target, [
       {provide: CdkColumnDef, useValue: columnDef},
       {provide: ElementRef, useValue: elementRef},
     ]);
+    addLegacyColumnClass(columnDef, elementRef.nativeElement);
+    return cell;
   }
 }
