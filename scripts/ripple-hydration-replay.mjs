@@ -6,6 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {spawn, spawnSync} from 'node:child_process';
 import {mkdtempSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
@@ -91,7 +92,7 @@ async function build(tarball, line, runtime) {
   writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify(spec.tsconfig, null, 2));
   const env = {...process.env, NODE_OPTIONS:'', NG_CLI_ANALYTICS:'false'}; delete env.NODE_PATH;
   const install = spawnSync('npm', ['install','--ignore-scripts','--no-audit','--no-fund','--package-lock'],
-    {cwd:consumer, env, encoding:'utf8', timeout:300000});
+    npmToolingOptions({cwd:consumer, env, encoding:'utf8', timeout:300000}, ['install','--ignore-scripts','--no-audit','--no-fund','--package-lock']));
   if (install.status !== 0) throw Error((install.stderr || install.stdout || 'Install failed').slice(-4000));
   for (const [name, version] of Object.entries(spec.dependencies)) {
     const actual = JSON.parse(readFileSync(join(consumer, 'node_modules',name,'package.json'))).version;

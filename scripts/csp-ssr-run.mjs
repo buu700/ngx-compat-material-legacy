@@ -1,3 +1,4 @@
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {announcedChromeEndpoint, debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 /**
  * Packed CSP page on Chromium plus one server process per public import,
@@ -75,9 +76,9 @@ async function installConsumer(tarball) {
   writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\n');
   const env = {...process.env, NODE_OPTIONS: ''};
   delete env.NODE_PATH;
-  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], {
+  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], npmToolingOptions({
     cwd: consumer, encoding: 'utf8', timeout: 180000, env,
-  });
+  }, ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock']));
   if (install.status !== 0) throw new Error((install.stderr || install.stdout || 'npm install failed').slice(-2000));
   return {consumer, env};
 }

@@ -1,6 +1,7 @@
 /** Fixed semantic probes against the untouched, lock-authenticated16 environment.
  * The same pinned Sass compiler measures both modules. No golden is rewritten.
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {copyFileSync, mkdtempSync, readFileSync, realpathSync, rmSync} from 'node:fs';
@@ -54,7 +55,7 @@ export function runFunctionContracts({sass,entry,loadPaths,allowedRoots,importer
     copyFileSync(join(referenceDir,'environment-package.json'),join(original,'package.json'));
     copyFileSync(join(referenceDir,'environment-package-lock.json'),join(original,'package-lock.json'));
     const env = {...process.env,NODE_PATH:'',NODE_OPTIONS:''};
-    const child = spawnSync('npm',['ci','--ignore-scripts','--no-audit','--no-fund'],{cwd:original,env,encoding:'utf8',timeout:180000});
+    const child = spawnSync('npm',['ci','--ignore-scripts','--no-audit','--no-fund'],npmToolingOptions({cwd:original,env,encoding:'utf8',timeout:180000}, ['ci','--ignore-scripts','--no-audit','--no-fund']));
     if (child.status !== 0) throw new Error('historical function environment npm ci failed: '+String(child.stderr || child.stdout).slice(-2000));
     const manifest = readFileSync(join(original,'node_modules/@angular/material/package.json'));
     if (sha(manifest) !== provenance.material_manifest_sha256 || JSON.parse(manifest).version !== '16.2.14') throw new Error('original function module is not authenticated Material16.2.14');

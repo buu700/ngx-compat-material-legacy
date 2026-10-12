@@ -31,6 +31,7 @@
  * kind:assertion file per 21.x case is written there. main would be rendered as a
  * report slice only. No G06/G07/G08 claim is made here.
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {spawn, spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
@@ -550,9 +551,9 @@ export function installConsumer(tarball, versions) {
   writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\n');
   const env = {...process.env, NODE_OPTIONS: ''};
   delete env.NODE_PATH;
-  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], {
+  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], npmToolingOptions({
     cwd: consumer, encoding: 'utf8', timeout: 600000, env,
-  });
+  }, ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock']));
   if (install.status !== 0) throw new Error((install.stderr || install.stdout || 'npm install failed').slice(-2000));
   const installed = realpathSync(join(consumer, 'node_modules/@ngx-compat/material-legacy'));
   if (relative(realpathSync(consumer), installed).startsWith('..')) {

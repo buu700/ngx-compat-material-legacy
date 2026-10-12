@@ -11,6 +11,7 @@
  * No npm publish. The ng-packagr invocation stays the 21.x project tsconfig;
  * --line and npm pack --json only name the run. They do not change the toolchain.
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {spawnSync} from 'node:child_process';
 import {cpSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -99,7 +100,7 @@ function npmPack(packageDir, destination) {
   const res = spawnSync(
     'npm',
     ['pack', packageDir, '--json', '--pack-destination', destination],
-    {cwd: root, encoding: 'utf8'},
+    npmToolingOptions({cwd: root, encoding: 'utf8'}, ['pack', packageDir, '--json', '--pack-destination', destination]),
   );
   if (res.status !== 0) {
     console.error(res.stderr || res.stdout);

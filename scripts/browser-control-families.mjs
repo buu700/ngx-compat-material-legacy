@@ -11,6 +11,7 @@
  *   node scripts/browser-control-families.mjs --tarball <path>
  *   node scripts/browser-control-families.mjs --tarball <path> --zoneless
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {observeComponentHighContrast,componentHighContrastOkay} from './component-high-contrast-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
@@ -102,9 +103,9 @@ writeFileSync(join(consumer, 'package.json'), JSON.stringify({
 writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\n');
 const env = {...process.env, NODE_OPTIONS: ''};
 delete env.NODE_PATH;
-const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], {
+const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], npmToolingOptions({
   cwd: consumer, encoding: 'utf8', timeout: 180000, env,
-});
+}, ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock']));
 if (install.status !== 0) fail(1, (install.stderr || install.stdout || 'npm install failed').slice(-2000));
 const installed = realpathSync(join(consumer, 'node_modules/@ngx-compat/material-legacy'));
 if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Library resolved outside the consumer: ${installed}`);

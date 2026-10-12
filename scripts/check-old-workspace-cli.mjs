@@ -3,6 +3,7 @@
  * The resulting application is strictly compiled and interacted with in Chromium.
  * Execution evidence is admitted only through a bound --run invocation.
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {resolveMigrationRun, extractMigrationCli} from './migration-run-inputs.mjs';
 import {OLD_APPLICATION, OLD_STYLES, proveMigratedConsumer} from './migrated-consumer-proof.mjs';
@@ -142,11 +143,11 @@ export async function executeOldWorkspaceCli(runPath) {
     copyFileSync(packageJsonPath, join(work, 'package.json'));
     copyFileSync(packageLockPath, join(work, 'package-lock.json'));
     const packageBefore = readFileSync(join(work, 'package.json'));
-    const install = spawnSync('npm', ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], {
+    const install = spawnSync('npm', ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], npmToolingOptions({
       cwd: work,
       encoding: 'utf8',
       timeout: 180000,
-    });
+    }, ['ci', '--ignore-scripts', '--no-audit', '--no-fund']));
     if (install.status !== 0) {
       throw new Error((install.stderr || install.stdout || 'npm ci failed').slice(-2000));
     }
