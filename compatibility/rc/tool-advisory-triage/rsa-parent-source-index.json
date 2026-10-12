@@ -1,0 +1,1266 @@
+[
+  {
+    "name": "openidconnect",
+    "version": "4.0.1",
+    "crate_sha256": "0d8c6709ba2ea764bbed26bce1adf3c10517113ddea6f2d4196e4851757ef2b2",
+    "manifest_sha256": "213f8d50eeb9f65b4f53b9470f17bde8cfccdd23d5a9b2633dd1534d5a0db1bc",
+    "rsa_dependency": {
+      "version": "0.9.2"
+    },
+    "features": {
+      "accept-rfc3339-timestamps": [],
+      "accept-string-booleans": [],
+      "curl": [
+        "oauth2/curl"
+      ],
+      "default": [
+        "reqwest",
+        "rustls-tls"
+      ],
+      "native-tls": [
+        "oauth2/native-tls"
+      ],
+      "reqwest": [
+        "oauth2/reqwest"
+      ],
+      "reqwest-blocking": [
+        "oauth2/reqwest-blocking"
+      ],
+      "rustls-tls": [
+        "oauth2/rustls-tls"
+      ],
+      "timing-resistant-secret-traits": [
+        "oauth2/timing-resistant-secret-traits"
+      ],
+      "ureq": [
+        "oauth2/ureq"
+      ]
+    },
+    "source_hits": [
+      {
+        "path": "openidconnect-4.0.1/src/core/crypto.rs",
+        "sha256": "13666993f1b9f64b582c2ae6917842123c35b67b3b492118f4392d325e77c076",
+        "rows": [
+          {
+            "line": 86,
+            "text": "let public_key = rsa::RsaPublicKey::new(n_bigint, e_bigint)"
+          },
+          {
+            "line": 212,
+            "text": "rsa::Pkcs1v15Sign::new::<sha2::Sha256>(),"
+          }
+        ]
+      },
+      {
+        "path": "openidconnect-4.0.1/src/core/jwk/mod.rs",
+        "sha256": "7e399b02ba3ef4689504b86ae13872761c74af769b4a79e442033007ed32997d",
+        "rows": [
+          {
+            "line": 11,
+            "text": "use rsa::pkcs1::DecodeRsaPrivateKey;"
+          },
+          {
+            "line": 193,
+            "text": "rsa::Pkcs1v15Sign::new::<sha2::Sha256>(),"
+          },
+          {
+            "line": 206,
+            "text": "rsa::Pkcs1v15Sign::new::<sha2::Sha384>(),"
+          },
+          {
+            "line": 219,
+            "text": "rsa::Pkcs1v15Sign::new::<sha2::Sha512>(),"
+          },
+          {
+            "line": 472,
+            "text": "let signature = key.sign(message);"
+          },
+          {
+            "line": 506,
+            "text": "CoreJwsSigningAlgorithm::EdDsa => Ok(self.key_pair.sign(message)),"
+          },
+          {
+            "line": 550,
+            "text": "key_pair: rsa::RsaPrivateKey,"
+          },
+          {
+            "line": 565,
+            "text": "let key_pair = rsa::RsaPrivateKey::from_pkcs1_pem(pem).map_err(|err| err.to_string())?;"
+          },
+          {
+            "line": 586,
+            "text": "rsa::Pkcs1v15Sign::new::<sha2::Sha256>(),"
+          },
+          {
+            "line": 599,
+            "text": "rsa::Pkcs1v15Sign::new::<sha2::Sha384>(),"
+          },
+          {
+            "line": 612,
+            "text": "rsa::Pkcs1v15Sign::new::<sha2::Sha512>(),"
+          }
+        ]
+      },
+      {
+        "path": "openidconnect-4.0.1/src/core/jwk/tests.rs",
+        "sha256": "818e27ca9b3263af38979307adcfb0b4f1fc106e9cb1defa16f060af51741ea0",
+        "rows": [
+          {
+            "line": 593,
+            "text": "let sig = secret_key.sign(alg, message).unwrap();"
+          },
+          {
+            "line": 629,
+            "text": "secret_key.sign(&CoreJwsSigningAlgorithm::RsaSsaPkcs1V15Sha256, message),"
+          },
+          {
+            "line": 633,
+            "text": "secret_key.sign(&CoreJwsSigningAlgorithm::RsaSsaPkcs1V15Sha384, message),"
+          },
+          {
+            "line": 637,
+            "text": "secret_key.sign(&CoreJwsSigningAlgorithm::RsaSsaPkcs1V15Sha512, message),"
+          },
+          {
+            "line": 641,
+            "text": "secret_key.sign(&CoreJwsSigningAlgorithm::RsaSsaPssSha256, message),"
+          },
+          {
+            "line": 645,
+            "text": "secret_key.sign(&CoreJwsSigningAlgorithm::RsaSsaPssSha384, message),"
+          },
+          {
+            "line": 649,
+            "text": "secret_key.sign(&CoreJwsSigningAlgorithm::RsaSsaPssSha512, message),"
+          },
+          {
+            "line": 653,
+            "text": "secret_key.sign(&CoreJwsSigningAlgorithm::EcdsaP256Sha256, message),"
+          },
+          {
+            "line": 657,
+            "text": "secret_key.sign(&CoreJwsSigningAlgorithm::EcdsaP384Sha384, message),"
+          },
+          {
+            "line": 661,
+            "text": "secret_key.sign(&CoreJwsSigningAlgorithm::EcdsaP521Sha512, message),"
+          },
+          {
+            "line": 665,
+            "text": "secret_key.sign(&CoreJwsSigningAlgorithm::None, message),"
+          },
+          {
+            "line": 713,
+            "text": "let sig = private_key.sign(alg, message).unwrap();"
+          },
+          {
+            "line": 726,
+            "text": "let sig = private_key.sign(alg, message).unwrap();"
+          },
+          {
+            "line": 783,
+            "text": "private_key.sign(&CoreJwsSigningAlgorithm::HmacSha256, message),"
+          },
+          {
+            "line": 788,
+            "text": "private_key.sign(&CoreJwsSigningAlgorithm::None, message),"
+          },
+          {
+            "line": 882,
+            "text": "private_key.sign(&CoreJwsSigningAlgorithm::HmacSha256, message),"
+          },
+          {
+            "line": 886,
+            "text": "private_key.sign(&CoreJwsSigningAlgorithm::HmacSha384, message),"
+          },
+          {
+            "line": 890,
+            "text": "private_key.sign(&CoreJwsSigningAlgorithm::HmacSha512, message),"
+          },
+          {
+            "line": 894,
+            "text": "private_key.sign(&CoreJwsSigningAlgorithm::EcdsaP256Sha256, message),"
+          },
+          {
+            "line": 898,
+            "text": "private_key.sign(&CoreJwsSigningAlgorithm::EcdsaP384Sha384, message),"
+          },
+          {
+            "line": 902,
+            "text": "private_key.sign(&CoreJwsSigningAlgorithm::EcdsaP521Sha512, message),"
+          },
+          {
+            "line": 906,
+            "text": "private_key.sign(&CoreJwsSigningAlgorithm::None, message),"
+          },
+          {
+            "line": 917,
+            "text": ".sign("
+          },
+          {
+            "line": 923,
+            "text": ".sign("
+          }
+        ]
+      },
+      {
+        "path": "openidconnect-4.0.1/src/core/mod.rs",
+        "sha256": "ffb8940760331036bbc9a8a9dcc930c11edd64449df9aea9a9d59d03d9d2f6e1",
+        "rows": [
+          {
+            "line": 558,
+            "text": "RsaOaep,"
+          },
+          {
+            "line": 561,
+            "text": "RsaOaepSha256,"
+          }
+        ]
+      },
+      {
+        "path": "openidconnect-4.0.1/src/discovery/tests.rs",
+        "sha256": "2f5e534625bbae4619fe304781bd54340b198c3eef641c54e0a4b9cec1f94d28",
+        "rows": [
+          {
+            "line": 233,
+            "text": "CoreJweKeyManagementAlgorithm::RsaOaep,"
+          },
+          {
+            "line": 234,
+            "text": "CoreJweKeyManagementAlgorithm::RsaOaepSha256,"
+          },
+          {
+            "line": 542,
+            "text": "CoreJweKeyManagementAlgorithm::RsaOaep,"
+          },
+          {
+            "line": 543,
+            "text": "CoreJweKeyManagementAlgorithm::RsaOaepSha256,"
+          },
+          {
+            "line": 586,
+            "text": "CoreJweKeyManagementAlgorithm::RsaOaep,"
+          },
+          {
+            "line": 587,
+            "text": "CoreJweKeyManagementAlgorithm::RsaOaepSha256,"
+          },
+          {
+            "line": 630,
+            "text": "CoreJweKeyManagementAlgorithm::RsaOaep,"
+          },
+          {
+            "line": 631,
+            "text": "CoreJweKeyManagementAlgorithm::RsaOaepSha256,"
+          }
+        ]
+      },
+      {
+        "path": "openidconnect-4.0.1/src/jwt/mod.rs",
+        "sha256": "3a94a396ad08f7f2e52596996d03716a00478910195a98b5a4d89b37f990d25e",
+        "rows": [
+          {
+            "line": 346,
+            "text": ".sign(alg, signing_input.as_bytes())"
+          }
+        ]
+      },
+      {
+        "path": "openidconnect-4.0.1/src/registration/tests.rs",
+        "sha256": "63dc3b0da0f0fab0c13e7f95ed21f0a39dae713f51aa77a6d63c7b560f563428",
+        "rows": [
+          {
+            "line": 208,
+            "text": "CoreJweKeyManagementAlgorithm::RsaOaep"
+          },
+          {
+            "line": 549,
+            "text": "CoreJweKeyManagementAlgorithm::RsaOaep"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pgp",
+    "version": "0.20.0",
+    "crate_sha256": "1cfa4743b28656065ff4c0ba09e46b357a65e8c00fc2341e89084b82f87cbdf1",
+    "manifest_sha256": "6a90ccc0d34e458875a01fb93516025a5c0d12e3e8ccca7b4a5f49f008b57fe1",
+    "rsa_dependency": {
+      "version": "0.9.10"
+    },
+    "features": {
+      "asm": [
+        "dep:sha1-asm",
+        "sha1/asm",
+        "sha2/asm",
+        "md-5/asm"
+      ],
+      "bzip2": [
+        "dep:bzip2"
+      ],
+      "default": [
+        "bzip2"
+      ],
+      "draft-pqc": [
+        "dep:ml-kem",
+        "dep:ml-dsa",
+        "dep:slh-dsa"
+      ],
+      "draft-wussler-openpgp-forwarding": [],
+      "large-rsa": [],
+      "malformed-artifact-compat": [],
+      "wasm": [
+        "getrandom",
+        "getrandom/js",
+        "web-time"
+      ]
+    },
+    "source_hits": [
+      {
+        "path": "pgp-0.20.0/src/adapter/rsa.rs",
+        "sha256": "a5bf465de6767772cb34c43f3174fffde97a66b3cb941c7f183b270c1fa0b9d4",
+        "rows": [
+          {
+            "line": 6,
+            "text": "RsaPublicKey,"
+          },
+          {
+            "line": 25,
+            "text": "impl HPublicKey for RsaPublicKey {"
+          },
+          {
+            "line": 52,
+            "text": "RsaPublicKey::PGP_ALGORITHM,"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/cleartext.rs",
+        "sha256": "58c3d16b85e31fc0de75ec9fbb54ced47fe7f5cb0d021bf4e6679e5bf12de0aa",
+        "rows": [
+          {
+            "line": 56,
+            "text": "let signature = config.sign(key, key_pw, signature_text)?;"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/key/builder.rs",
+        "sha256": "a65a0a9758fe10c9238de8f6c4ba34678f8fc26384f78c4683631a19e72a33a4",
+        "rows": [
+          {
+            "line": 375,
+            "text": "let signed = key.sign(rng, &key_pw)?;"
+          },
+          {
+            "line": 1420,
+            "text": "assert!(sig.key_flags().sign());"
+          },
+          {
+            "line": 1538,
+            "text": "assert!(sig.key_flags().sign());"
+          },
+          {
+            "line": 1553,
+            "text": "assert!(!sig.key_flags().sign());"
+          },
+          {
+            "line": 1602,
+            "text": "assert!(sig.key_flags().sign());"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/key/secret.rs",
+        "sha256": "3ec2d9d06a248cc59aeb52b051ccc518af9269c8d36300f05c93b7bc488638cc",
+        "rows": [
+          {
+            "line": 43,
+            "text": ".sign(&mut rng, &primary_key, primary_key.public_key(), key_pw)?;"
+          },
+          {
+            "line": 49,
+            "text": "let signature = sub_key.sign("
+          },
+          {
+            "line": 68,
+            "text": "let signature = sub_key.sign("
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/key/shared.rs",
+        "sha256": "8bc22ab7532df3267c62298ba02b8c379cd053528869dd086ccd4dc666181bf7",
+        "rows": [
+          {
+            "line": 180,
+            "text": ".map(|u| u.sign(&mut rng, key, pub_key, key_pw))"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/message/builder.rs",
+        "sha256": "dd95506dc34677f2f24d1eaef38ea46393dcb2b4e3b13d74883346d1478cba84",
+        "rows": [
+          {
+            "line": 1496,
+            "text": ".sign(signer.key, &signer.key_pw)"
+          },
+          {
+            "line": 1781,
+            "text": ".decrypt(&Password::empty(), &skey)"
+          },
+          {
+            "line": 1919,
+            "text": "let mut decrypted = message.decrypt(&\"\".into(), &skey).expect(\"decryption\");"
+          },
+          {
+            "line": 1968,
+            "text": ".decrypt(&Password::empty(), &skey)"
+          },
+          {
+            "line": 2013,
+            "text": ".sign(&*skey, Password::empty(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 2069,
+            "text": "builder.sign(&*skey, Password::empty(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 2076,
+            "text": ".decrypt(&Password::empty(), &skey)"
+          },
+          {
+            "line": 2177,
+            "text": ".sign(&*skey, Password::empty(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 2184,
+            "text": ".decrypt(&Password::empty(), &skey)"
+          },
+          {
+            "line": 2260,
+            "text": ".sign(&*skey1, Password::empty(), HashAlgorithm::Sha256)"
+          },
+          {
+            "line": 2261,
+            "text": ".sign(&*skey2, Password::empty(), HashAlgorithm::Sha512);"
+          },
+          {
+            "line": 2281,
+            "text": "let decrypted = message.decrypt(&Password::empty(), &skey1)?;"
+          },
+          {
+            "line": 2343,
+            "text": ".sign(&*skey1, Password::empty(), HashAlgorithm::Sha256)"
+          },
+          {
+            "line": 2344,
+            "text": ".sign(&*skey2, Password::empty(), HashAlgorithm::Sha512);"
+          },
+          {
+            "line": 2588,
+            "text": "let PlainSessionKey::V3_4 { ref key, .. } = skey.secret_subkeys[0].decrypt("
+          },
+          {
+            "line": 2642,
+            "text": "skey.secret_subkeys[0].decrypt(&Password::empty(), pkesk.values()?, EskType::V6)??"
+          },
+          {
+            "line": 2665,
+            "text": "builder.sign(key, Password::empty(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 2699,
+            "text": "builder.sign(key, Password::empty(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 2708,
+            "text": "builder.sign(key, Password::empty(), HashAlgorithm::Sha256);"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/message/decrypt.rs",
+        "sha256": "426c9352f1d3ad392738dba0a0c52dbcc1a19ea0ccb97551c0fd3ef6b40e04d5",
+        "rows": [
+          {
+            "line": 133,
+            "text": "let decrypted_key = packet.decrypt(&key)?;"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/message/types.rs",
+        "sha256": "ec34682005358e289ffcff43dfeb696bf4f7c0752640fdd4d07c245af88128b9",
+        "rows": [
+          {
+            "line": 685,
+            "text": "reader.decrypt(key, options.seipdv1_read_mode)?;"
+          },
+          {
+            "line": 689,
+            "text": "reader.decrypt(key)?;"
+          },
+          {
+            "line": 699,
+            "text": "reader.decrypt(key, Seipdv1ReadMode::default())?;"
+          },
+          {
+            "line": 1361,
+            "text": "match dec.decrypt(pw, values, typ) {"
+          },
+          {
+            "line": 1383,
+            "text": "match dec.decrypt(&Password::empty(), values, typ) {"
+          },
+          {
+            "line": 1562,
+            "text": "let decrypted = parsed.decrypt(&\"test\".into(), &skey).unwrap();"
+          },
+          {
+            "line": 1622,
+            "text": "let decrypted = parsed.decrypt(&\"test\".into(), &skey).unwrap();"
+          },
+          {
+            "line": 1658,
+            "text": "let decrypted = parsed.decrypt(&\"\".into(), &skey).unwrap();"
+          },
+          {
+            "line": 1696,
+            "text": "let msg = parsed.decrypt(&\"\".into(), &skey).unwrap();"
+          },
+          {
+            "line": 1920,
+            "text": ".sign(&*skey, Password::empty(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 1945,
+            "text": "builder.sign(&*skey, Password::empty(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 1971,
+            "text": "builder.sign(&*skey, Password::empty(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 2012,
+            "text": ".sign(&*skey, Password::from(\"test\"), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 2044,
+            "text": "builder.sign(&*skey, Password::from(\"test\"), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 2075,
+            "text": "builder.sign(&*skey, Password::from(\"test\"), HashAlgorithm::Sha256);"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/signature.rs",
+        "sha256": "74257a4f55e1cbb09779d811220a05dbd94b1b24fb5d0299fb7c60d521614d33",
+        "rows": [
+          {
+            "line": 143,
+            "text": "let sig = config.sign(key, key_pw, data)?;"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/signed_key/public.rs",
+        "sha256": "66eb7db0f49a35863ca5ecae3cffe1ff6fbdaf599a1bd86a4e87218ff8c8714f",
+        "rows": [
+          {
+            "line": 255,
+            "text": "let details = details.sign(&mut rng, primary_signer, &primary_key, key_pw)?;"
+          },
+          {
+            "line": 303,
+            "text": "if sig.key_flags().sign() {"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/signed_key/secret.rs",
+        "sha256": "ced002b3ef7a4dd56de0c229868fda089fab1b12ea3404926e1fac9406bdcf02",
+        "rows": [
+          {
+            "line": 365,
+            "text": "builder.sign(pri, Password::empty(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 406,
+            "text": "builder.sign("
+          },
+          {
+            "line": 437,
+            "text": "builder.sign(&pri, Password::empty(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 448,
+            "text": "builder.sign(&pri, ANNEX_A_5_PASSPHRASE.into(), HashAlgorithm::Sha256);"
+          },
+          {
+            "line": 465,
+            "text": "builder.sign(&pri, ANNEX_A_5_PASSPHRASE.into(), HashAlgorithm::Sha256);"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed/signed_key.rs",
+        "sha256": "3e01bd391d78a8320ddf18e65969f6de284d5bd9feb360f68406c1cbbf2d21f7",
+        "rows": [
+          {
+            "line": 66,
+            "text": "//!     .sign(&passwd, HashAlgorithm::Sha256, digest)"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/composed.rs",
+        "sha256": "f4e6f83d6bf7cfc020593758b532df1bfce423ae4eecf91bff27d1b38a3032af",
+        "rows": [
+          {
+            "line": 85,
+            "text": "//!     .decrypt(&Password::empty(), &signed_secret_key)"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/aead/decryptor.rs",
+        "sha256": "b359dedfc8c80e1f5fdc02aa6017aa67e30cd029a9da09bb38966b73526a2be1",
+        "rows": [
+          {
+            "line": 239,
+            "text": "self.decrypt()?;"
+          },
+          {
+            "line": 293,
+            "text": "self.decrypt()?;"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/dsa.rs",
+        "sha256": "78267651839b70ed93bc95d5da5c186b9e12fd11d10c38246e431066593feb17",
+        "rows": [
+          {
+            "line": 185,
+            "text": "key.sign(hash_algorithm, &hashed).expect(\"failed to sign\")"
+          },
+          {
+            "line": 320,
+            "text": "key.sign(hash_algorithm, &hashed).expect(\"failed to sign\")"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/ecdh.rs",
+        "sha256": "6c2bcc2df00aa05aafa216ecccfe9d348e8d9deda38c76a08387f5316288dbd9",
+        "rows": [
+          {
+            "line": 750,
+            "text": ".decrypt(EncryptionFields {"
+          },
+          {
+            "line": 785,
+            "text": ".decrypt(&Password::empty(), &decrypt_key)"
+          },
+          {
+            "line": 815,
+            "text": ".decrypt(&Password::from(PASSPHRASE), &decrypt_key)"
+          },
+          {
+            "line": 871,
+            "text": ".decrypt("
+          },
+          {
+            "line": 894,
+            "text": "let Ok(mut dec) = message.decrypt(&Password::from(PASSPHRASE), &decrypt_key) else {"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/ed25519.rs",
+        "sha256": "e9af3abe7ee9d0f5e26dd276357f14899965509ea0ea1c778cc9f6ea38fd1e54",
+        "rows": [
+          {
+            "line": 134,
+            "text": "let signature = self.secret.sign(digest);"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/ml_dsa65_ed25519.rs",
+        "sha256": "eb18dc97feed19bef2ed3afbcdbf3c63512a5ca28d81e22b0dba49cd7472efc9",
+        "rows": [
+          {
+            "line": 94,
+            "text": "let ed25519_sig = self.ed25519.sign(digest);"
+          },
+          {
+            "line": 97,
+            "text": "let ml_dsa_sig = self.ml_dsa_sign.sign(digest);"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/ml_dsa87_ed448.rs",
+        "sha256": "772f5f370c5035c522b486fd9296db439d7da3f1172acee82ea269a6d4a5b794",
+        "rows": [
+          {
+            "line": 112,
+            "text": "let ed448_sig = self.ed448.sign(digest);"
+          },
+          {
+            "line": 114,
+            "text": "let ml_dsa_sig = self.ml_dsa_sign.sign(digest);"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/ml_kem1024_x448.rs",
+        "sha256": "40b255b370e8c9b2a29de6d401747b46b028fd2cac5419e639ba9b0f45ef2ebf",
+        "rows": [
+          {
+            "line": 315,
+            "text": "let decrypted = skey.decrypt(data).unwrap();"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/ml_kem768_x25519.rs",
+        "sha256": "a384f74712f87515d3ed567e0d0a24a7e748090689d0b1a0843c7b53b84f4fe9",
+        "rows": [
+          {
+            "line": 321,
+            "text": "let decrypted = skey.decrypt(data).unwrap();"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/rsa.rs",
+        "sha256": "cd7307b6d2c2d327489f19b6c64781f6e5d185c026d177107e7728f4387015ac",
+        "rows": [
+          {
+            "line": 7,
+            "text": "pkcs1v15::{Pkcs1v15Encrypt, Signature as RsaSignature, SigningKey, VerifyingKey},"
+          },
+          {
+            "line": 9,
+            "text": "RsaPrivateKey, RsaPublicKey,"
+          },
+          {
+            "line": 42,
+            "text": "RsaPrivateKey,"
+          },
+          {
+            "line": 55,
+            "text": "let key = RsaPrivateKey::new(&mut rng, bit_size)?;"
+          },
+          {
+            "line": 67,
+            "text": "let secret_key = RsaPrivateKey::from_components("
+          },
+          {
+            "line": 148,
+            "text": "let m = self.0.decrypt(Pkcs1v15Encrypt, mpi.as_ref())?;"
+          },
+          {
+            "line": 176,
+            "text": "impl From<RsaPrivateKey> for SecretKey {"
+          },
+          {
+            "line": 177,
+            "text": "fn from(key: RsaPrivateKey) -> Self {"
+          },
+          {
+            "line": 185,
+            "text": "key: &RsaPublicKey,"
+          },
+          {
+            "line": 188,
+            "text": "let data = key.encrypt(&mut rng, Pkcs1v15Encrypt, plaintext)?;"
+          },
+          {
+            "line": 195,
+            "text": "fn verify_int<D>(key: &RsaPublicKey, hashed: &[u8], signature: &RsaSignature) -> Result<()>"
+          },
+          {
+            "line": 204,
+            "text": "fn sign_int<D>(key: RsaPrivateKey, digest: &[u8]) -> Result<RsaSignature>"
+          },
+          {
+            "line": 215,
+            "text": "key: &rsa::RsaPublicKey,"
+          },
+          {
+            "line": 255,
+            "text": "pub fn key_gen()(seed: u64) -> RsaPrivateKey {"
+          },
+          {
+            "line": 257,
+            "text": "RsaPrivateKey::new(&mut rng, 512).unwrap()"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/slh_dsa_shake128f.rs",
+        "sha256": "6a6f3a4a599ed6820ddd36b0eb814e84f56733fdc0f4766a2d2b4e3adf51b192",
+        "rows": [
+          {
+            "line": 75,
+            "text": "let sig = self.key.sign(digest);"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/slh_dsa_shake128s.rs",
+        "sha256": "db7eaaf9d0142dfe3571850245fd43260789dfe43793018a74035696817bb6d8",
+        "rows": [
+          {
+            "line": 75,
+            "text": "let sig = self.key.sign(digest);"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/slh_dsa_shake256s.rs",
+        "sha256": "4a59590d89e380caacef0ebcf01d2d39434d10972e05186f2eb640e1f96c57ea",
+        "rows": [
+          {
+            "line": 75,
+            "text": "let sig = self.key.sign(digest);"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/sym/decryptor.rs",
+        "sha256": "0408097dcd23d63f66a4601ceb7d581f3c4f8af911c028205b3055c195e1f181",
+        "rows": [
+          {
+            "line": 441,
+            "text": "decryptor.decrypt(&mut prefix);"
+          },
+          {
+            "line": 447,
+            "text": "decryptor.decrypt(&mut prefix);"
+          },
+          {
+            "line": 531,
+            "text": "decryptor.decrypt(&mut buffer[current_len..]);"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/sym.rs",
+        "sha256": "3ab128d11e5e0bb77b01e348b435c3b74c68fca2c838186968d33bba1eafe38c",
+        "rows": [
+          {
+            "line": 43,
+            "text": "mode.decrypt(prefix);"
+          },
+          {
+            "line": 45,
+            "text": "mode.decrypt(data);"
+          },
+          {
+            "line": 65,
+            "text": "mode.decrypt(prefix);"
+          },
+          {
+            "line": 68,
+            "text": "mode.decrypt(data);"
+          },
+          {
+            "line": 392,
+            "text": "Decryptor::<Idea>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 395,
+            "text": "Decryptor::<TdesEde3>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 398,
+            "text": "Decryptor::<Cast5>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 401,
+            "text": "Decryptor::<Blowfish>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 404,
+            "text": "Decryptor::<Aes128>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 407,
+            "text": "Decryptor::<Aes192>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 410,
+            "text": "Decryptor::<Aes256>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 413,
+            "text": "Decryptor::<Twofish>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 416,
+            "text": "Decryptor::<Camellia128>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 419,
+            "text": "Decryptor::<Camellia192>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 422,
+            "text": "Decryptor::<Camellia256>::new_from_slices(key, iv_vec)?.decrypt(ciphertext);"
+          },
+          {
+            "line": 790,
+            "text": "$alg.decrypt(&key, &mut prefix, &mut plaintext).unwrap();"
+          },
+          {
+            "line": 973,
+            "text": ".decrypt(&key, &mut prefix, &mut cipher_text)"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/x25519.rs",
+        "sha256": "c66976590b8a5c436e4ecbf30c4face62c38f1dd3c4af821adb963ca083e66e4",
+        "rows": [
+          {
+            "line": 266,
+            "text": ".decrypt(EncryptionFields {"
+          },
+          {
+            "line": 295,
+            "text": "let decrypted = skey.decrypt(data).unwrap();"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/crypto/x448.rs",
+        "sha256": "d671c209b01e4a18c0b360f16a0e18c087f322b400a31727b27b8b6b87cda6f1",
+        "rows": [
+          {
+            "line": 250,
+            "text": "let decrypted = skey.decrypt(data).unwrap();"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/packet/key/secret.rs",
+        "sha256": "84a02d9f218d25b324d336d85b48c6abeff4c6f7ed6f8580ce8bb5ed4fbd7072",
+        "rows": [
+          {
+            "line": 579,
+            "text": "self.details.sign("
+          },
+          {
+            "line": 598,
+            "text": "priv_key.decrypt(pub_params, values, typ, self.public_key())"
+          },
+          {
+            "line": 611,
+            "text": "priv_key.decrypt(pub_params, values, typ, self.public_key())"
+          },
+          {
+            "line": 630,
+            "text": "priv_key.sign(hash, data)"
+          },
+          {
+            "line": 636,
+            "text": "priv_key.sign(hash, data)"
+          },
+          {
+            "line": 642,
+            "text": "priv_key.sign(hash, data)"
+          },
+          {
+            "line": 665,
+            "text": "priv_key.sign(hash, data)"
+          },
+          {
+            "line": 672,
+            "text": "priv_key.sign(hash, data)"
+          },
+          {
+            "line": 679,
+            "text": "priv_key.sign(hash, data)"
+          },
+          {
+            "line": 685,
+            "text": "priv_key.sign(hash, data)"
+          },
+          {
+            "line": 691,
+            "text": ") => ed25519.sign(hash, data),"
+          },
+          {
+            "line": 710,
+            "text": "priv_key.sign(hash, data)"
+          },
+          {
+            "line": 717,
+            "text": "priv_key.sign(hash, data)"
+          },
+          {
+            "line": 724,
+            "text": "priv_key.sign(hash, data)"
+          },
+          {
+            "line": 803,
+            "text": "assert!(alice_sec.sign(&\"wrong\".into(), hash_algo, DATA).is_err());"
+          },
+          {
+            "line": 806,
+            "text": "assert!(alice_sec.sign(&\"password\".into(), hash_algo, DATA).is_ok());"
+          },
+          {
+            "line": 812,
+            "text": "assert!(alice_sec.sign(&\"\".into(), hash_algo, DATA).is_ok());"
+          },
+          {
+            "line": 818,
+            "text": "assert!(alice_sec.sign(&\"\".into(), hash_algo, DATA).is_err());"
+          },
+          {
+            "line": 821,
+            "text": "assert!(alice_sec.sign(&\"foo\".into(), hash_algo, DATA).is_ok());"
+          },
+          {
+            "line": 836,
+            "text": ".sign(&\"bar\".into(), hash_algo, DATA)"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/packet/signature/config.rs",
+        "sha256": "dad28c443ab6d583cb605818e3ff3980542b7baadb031858341300868b7d61d3",
+        "rows": [
+          {
+            "line": 231,
+            "text": "hasher.sign(key, key_pw)"
+          },
+          {
+            "line": 337,
+            "text": "let signature = signer.sign(signer_pw, self.hash_alg, hash)?;"
+          },
+          {
+            "line": 382,
+            "text": "let signature = signer.sign(signer_pw, self.hash_alg, hash)?;"
+          },
+          {
+            "line": 428,
+            "text": "let signature = signer.sign(signer_pw, self.hash_alg, hash)?;"
+          },
+          {
+            "line": 467,
+            "text": "let signature = signing_key.sign(key_pw, self.hash_alg, hash)?;"
+          },
+          {
+            "line": 789,
+            "text": "let signature = key.sign(key_pw, config.hash_alg, hash)?;"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/packet/signature/types.rs",
+        "sha256": "556560b78068ed3f962f91758bd12cb0cd53edd69e1a6cfce83f544a34959318",
+        "rows": [
+          {
+            "line": 1361,
+            "text": "self.known.sign()"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/packet/sym_encrypted_protected_data.rs",
+        "sha256": "8b5bb5d150de7cf930df342fba668047c7c4d1ed28464e884c028e526d5e9feb",
+        "rows": [
+          {
+            "line": 464,
+            "text": ".decrypt(&session_key, Some(SYM_ALG), Seipdv1ReadMode::default())"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/packet/user_id.rs",
+        "sha256": "759e7f0fb25dbd0c26bc209338366f22e9ee07d172515fa53582a1878caf3dc0",
+        "rows": [
+          {
+            "line": 235,
+            "text": ".sign(&mut rng, &alice_sec, &alice_pub, &\"\".into())"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/packet.rs",
+        "sha256": "89d12324f4ccd629fe9f4f40bc8b0b6142c81549898c07e560b2be2f319cc860",
+        "rows": [
+          {
+            "line": 75,
+            "text": "//!     .sign(&sec_key, &Password::empty(), DATA)"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/types/key_traits.rs",
+        "sha256": "33ba212ce52e843bf0a76c435139df751327ce5e50e51131142ff14eb6d76e23",
+        "rows": [
+          {
+            "line": 160,
+            "text": "(**self).sign(key_pw, hash, data)"
+          },
+          {
+            "line": 208,
+            "text": "(*self).decrypt(key_pw, values, typ)"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/types/params/plain_secret.rs",
+        "sha256": "6f5856f32ed3a7a86eedb7db587b3bd0e09732562b75386a71b7903ab532926d",
+        "rows": [
+          {
+            "line": 428,
+            "text": "priv_key.decrypt(&mpi.to_owned())?"
+          },
+          {
+            "line": 478,
+            "text": "priv_key.decrypt(ecdh::EncryptionFields {"
+          },
+          {
+            "line": 510,
+            "text": "let key = priv_key.decrypt(data)?.into();"
+          },
+          {
+            "line": 545,
+            "text": "let key = priv_key.decrypt(data)?.into();"
+          },
+          {
+            "line": 580,
+            "text": "let key = priv_key.decrypt(data)?.into();"
+          },
+          {
+            "line": 611,
+            "text": "let key = priv_key.decrypt(data)?.into();"
+          }
+        ]
+      },
+      {
+        "path": "pgp-0.20.0/src/types/params/public/rsa.rs",
+        "sha256": "7808ef17edc8ff2bb004774bc4729c2a536fa0caa0dfbb58d977c976b7b35750",
+        "rows": [
+          {
+            "line": 12,
+            "text": "pub key: rsa::RsaPublicKey,"
+          },
+          {
+            "line": 25,
+            "text": "let key = rsa::RsaPublicKey::new_with_max_size("
+          },
+          {
+            "line": 35,
+            "text": "impl From<rsa::RsaPublicKey> for RsaPublicParams {"
+          },
+          {
+            "line": 36,
+            "text": "fn from(key: rsa::RsaPublicKey) -> Self {"
+          },
+          {
+            "line": 68,
+            "text": "pub fn rsa_pub_gen()(seed: u64) -> rsa::RsaPublicKey {"
+          },
+          {
+            "line": 70,
+            "text": "rsa::RsaPrivateKey::new(&mut rng, 512).unwrap().to_public_key()"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sqlx-mysql",
+    "version": "0.8.6",
+    "crate_sha256": "aa003f0038df784eb8fecbbac13affe3da23b45194bd57dba231c8f48199c526",
+    "manifest_sha256": "af6d654abc3a41978e8dc81b94ddb98fe066007ce95250d472d5f958652df834",
+    "rsa_dependency": {
+      "version": "0.9"
+    },
+    "features": {
+      "any": [
+        "sqlx-core/any"
+      ],
+      "bigdecimal": [
+        "dep:bigdecimal",
+        "sqlx-core/bigdecimal"
+      ],
+      "chrono": [
+        "dep:chrono",
+        "sqlx-core/chrono"
+      ],
+      "json": [
+        "sqlx-core/json",
+        "serde"
+      ],
+      "migrate": [
+        "sqlx-core/migrate"
+      ],
+      "offline": [
+        "sqlx-core/offline",
+        "serde/derive"
+      ],
+      "rust_decimal": [
+        "dep:rust_decimal",
+        "rust_decimal/maths",
+        "sqlx-core/rust_decimal"
+      ],
+      "time": [
+        "dep:time",
+        "sqlx-core/time"
+      ],
+      "uuid": [
+        "dep:uuid",
+        "sqlx-core/uuid"
+      ]
+    },
+    "source_hits": [
+      {
+        "path": "sqlx-mysql-0.8.6/src/connection/auth.rs",
+        "sha256": "de00396dece908e052ea99735eb3f4079c098b553137f28e9194307c21003c77",
+        "rows": [
+          {
+            "line": 6,
+            "text": "use rsa::{pkcs8::DecodePublicKey, Oaep, RsaPublicKey};"
+          },
+          {
+            "line": 165,
+            "text": "let padding = Oaep::new::<sha1::Sha1>();"
+          },
+          {
+            "line": 189,
+            "text": "fn parse_rsa_pub_key(key: &[u8]) -> Result<RsaPublicKey, Error> {"
+          },
+          {
+            "line": 196,
+            "text": "RsaPublicKey::from_public_key_pem(pem).map_err(Error::protocol)"
+          }
+        ]
+      },
+      {
+        "path": "sqlx-mysql-0.8.6/src/types/mysql_time.rs",
+        "sha256": "0b423eba3b0342420a8632a99c0e7dbd8fc8d1dc7f301cde9773732bb75b94e6",
+        "rows": [
+          {
+            "line": 316,
+            "text": "Display::fmt(&self.sign(), f)?;"
+          }
+        ]
+      }
+    ]
+  }
+]
