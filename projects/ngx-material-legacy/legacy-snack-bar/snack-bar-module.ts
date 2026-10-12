@@ -16,6 +16,7 @@ import {MatCommonModule} from './internal/common-module';
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {LegacySimpleSnackBar} from './simple-snack-bar';
 import {MatLegacySnackBarContainer} from './snack-bar-container';
+import {MatLegacySnackBar} from './snack-bar';
 import {MAT_SNACK_BAR_DEFAULT_OPTIONS_FACTORY} from './internal/snack-bar-base';
 
 
@@ -24,6 +25,7 @@ import {MAT_SNACK_BAR_DEFAULT_OPTIONS_FACTORY} from './internal/snack-bar-base';
   exports: [MatLegacySnackBarContainer, MatCommonModule],
   declarations: [MatLegacySnackBarContainer, LegacySimpleSnackBar],
   providers: [
+    MatLegacySnackBar,
     {
       provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
       useFactory: MAT_SNACK_BAR_DEFAULT_OPTIONS_FACTORY,

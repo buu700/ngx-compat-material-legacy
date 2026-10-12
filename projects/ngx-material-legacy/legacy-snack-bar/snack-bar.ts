@@ -18,12 +18,11 @@ import {
   MAT_SNACK_BAR_DEFAULT_OPTIONS_FACTORY,
 } from './internal/snack-bar-base';
 import {MatLegacySnackBarContainer} from './snack-bar-container';
-import {MatLegacySnackBarModule} from './snack-bar-module';
 
 /**
  * Service to dispatch Material Design snack bar messages.
  */
-@Injectable({providedIn: MatLegacySnackBarModule})
+@Injectable()
 export class MatLegacySnackBar extends _MatSnackBarBase {
   protected simpleSnackBarComponent = LegacySimpleSnackBar;
   protected snackBarContainerComponent = MatLegacySnackBarContainer;

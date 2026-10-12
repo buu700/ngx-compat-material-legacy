@@ -4,10 +4,13 @@ import {CommonModule} from '@angular/common';
 import {
   Component,
   Directive,
+  EnvironmentInjector,
   Inject,
   TemplateRef,
   ViewChild,
   ViewContainerRef,
+  createEnvironmentInjector,
+  importProvidersFrom,
 } from '@angular/core';
 import {ComponentFixture, fakeAsync, flush, inject, TestBed, tick} from '@angular/core/testing';
 import {LEGACY_NOOP_ANIMATIONS} from '../internal/testing/owned-animation-modules';
@@ -797,6 +800,33 @@ describe('MatSnackBar with parent MatSnackBar', () => {
     expect(overlayContainerElement.textContent)
       .withContext('Expected parent snackbar msg to be dismissed by opening from child')
       .toContain('Taco');
+  }));
+
+  it('should give an importing child module its own service while sharing parent notifications', fakeAsync(() => {
+    const childInjector = createEnvironmentInjector(
+      [importProvidersFrom(MatLegacySnackBarModule)],
+      TestBed.inject(EnvironmentInjector),
+    );
+
+    try {
+      const moduleSnackBar = childInjector.get(MatLegacySnackBar);
+      expect(moduleSnackBar).not.toBe(parentSnackBar);
+      expect(childInjector.get(MatLegacySnackBar)).toBe(moduleSnackBar);
+
+      parentSnackBar.open('Pizza');
+      fixture.detectChanges();
+      tick(1000);
+
+      moduleSnackBar.open('Taco');
+      fixture.detectChanges();
+      tick(1000);
+
+      expect(overlayContainerElement.textContent).toContain('Taco');
+      expect(overlayContainerElement.textContent).not.toContain('Pizza');
+    } finally {
+      childInjector.destroy();
+      flush();
+    }
   }));
 
   it('should close snackBars opened by child when opening from parent', fakeAsync(() => {
