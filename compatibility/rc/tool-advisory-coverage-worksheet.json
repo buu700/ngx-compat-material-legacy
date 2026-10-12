@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "966f8edc13656ba2fbe3fcbc39ab8fc16f95fdd4",
+  "task": "C01 close omitted package-manager archive/native source dependency advisory and age coverage",
+  "subjects": [
+    {
+      "path": "scripts/check-dependency-eligibility.py",
+      "before_sha256": "dc63df6e1512f6faba8268001ad11efaaa81dd34f74036c4311777299190d4c7"
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "before_sha256": "87cd97f1a8e7c837479b944104f58b33bc88201103290947858e1fb8dc81e85f"
+    }
+  ],
+  "finding": "perform_lookup originally queried workspace-lock and vendor npm packages while toolchain_ok observed only three publication dates. Pinned npm/pnpm and their bundled/native source dependencies were absent from advisory lookup.",
+  "scope": [
+    "Extend the existing dependency producer and both line case rosters; no new parallel verifier.",
+    "Use reviewed bootstrap SRI for pinned npm/pnpm archives, exact native platform package SRI, all packaged manifests and the full source Cargo lock bound to the registry provenance statement.",
+    "Advisory lookup or archive/reference failure, truncated coverage and unresolved tool findings remain failed. Workspace risk exceptions cannot excuse bundled tool findings.",
+    "No product, consumer, toolchain pin, credential, publish or install changes. Linux-x64 glibc private tool scope; native source optional/dev crates remain conservatively included."
+  ],
+  "limitations": [
+    "Registry provenance signature verification, Node-core vulnerability review and finding applicability remain separate C04 obligations. This does not assert security clearance."
+  ],
+  "status": "implementation-and-targeted-verification-in-progress",
+  "findings_added_during_validation": [
+    "21.x retained tests still expected removed age exclusions and an unresolved braces grant; correct these against the actual expiry and explicit 2026-10-07 delegation, retaining unverified-authority negatives."
+  ],
+  "additional_test_scope": [
+    "Port missing FRESH-03 dependency coverage tests to 21.x; preserve all existing branch-specific age/authority regression programs."
+  ]
+}

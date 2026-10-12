@@ -23,7 +23,7 @@ ELIGIBILITY = load("check_dependency_eligibility", "check-dependency-eligibility
 
 
 class Fresh03AdmissionTests(unittest.TestCase):
-    def test_matrix_main_ids_match_the_producers(self) -> None:
+    def test_matrix_branch_ids_match_the_producers(self) -> None:
         matrix = json.loads((ROOT / "compatibility/rc/matrices/full-verify.json").read_text())
         rows = {row["check_id"]: row for row in matrix["checks"]}
         import re
@@ -40,11 +40,14 @@ class Fresh03AdmissionTests(unittest.TestCase):
             ("dependency-eligibility", ELIGIBILITY.MAIN_CASES),
         ):
             self.assertTrue(rows[check_id]["implemented"])
-            self.assertEqual(rows[check_id]["acceptance"]["cases_by_line"]["main"], cases)
+            major = json.loads((ROOT / "projects/ngx-material-legacy/package.json").read_text())["version"].split(".")[0]
+            line = {"22": "main", "21": "21.x"}[major]
+            other = "21.x" if line == "main" else "main"
+            self.assertEqual(rows[check_id]["acceptance"]["cases_by_line"][line], cases)
             if check_id == "source-policy":
-                self.assertTrue(all(value is None for value in rows[check_id]["acceptance"]["cases_by_line"]["21.x"].values()))
+                self.assertTrue(all(value is None for value in rows[check_id]["acceptance"]["cases_by_line"][other].values()))
             else:
-                self.assertEqual(rows[check_id]["acceptance"]["cases_by_line"]["21.x"], cases)
+                self.assertEqual(rows[check_id]["acceptance"]["cases_by_line"][other], cases)
         self.assertEqual(len(audit_ids), sum(len(v) for v in audit_groups.values()))
 
     def test_stored_query_mutations_stay_unknown_or_blocked(self) -> None:
