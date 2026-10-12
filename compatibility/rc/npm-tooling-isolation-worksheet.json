@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "88bd5b2dd5dc9c1ea59bf5a3d5992b5e29a544fb",
+  "task": "C03/A09 isolate private npm fixture and packaging configuration/cache without changing consumer/product contracts.",
+  "finding": "Mutating npm child invocations inherit host user/global configuration and shared caches, so dependency-resolution and identity assumptions are not fully check-owned.",
+  "owned_paths": [
+    "scripts/npm-tooling-options.mjs",
+    "scripts/*.mjs exact mutating npm caller arguments only",
+    "tests/npm_tooling_options_probe.mjs",
+    "tests/test_npm_tooling_options.py",
+    "compatibility/rc/npm-tooling-isolation-*.json",
+    "compatibility/rc/session-handoff.json",
+    "tests/npm_tooling_caller_probe.mjs",
+    "tests/npm_tooling_cache_probe.mjs"
+  ],
+  "constraints": [
+    "One helper owns the environment/command contract; preserve caller argv, working directory, timeout, stdout handling, qualified floor npm rewrite and generated project npmrc.",
+    "Private public-registry fixtures and local pack operations use an owned cache and empty user/global config; do not modify or read host credentials.",
+    "No component HTML/CSS/SCSS, TypeScript API, tool pin, consumer engine or public migration frontend change.",
+    "No full installs/builds/Actions locally. Verify bounded environment/argument/source routing and actual pinned read-only configuration, reporting omitted gates.",
+    "Seven advisory inputs stay unresolved until separately justified; configuration isolation alone is not security clearance."
+  ],
+  "status": "bounded-implementation-and-targeted-checks-complete",
+  "cache_followup": "Required-browser and native-motion compiled fixture identities must include the shared npm profile source to exclude previously inherited host-config builds."
+}

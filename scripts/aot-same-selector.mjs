@@ -4,6 +4,7 @@
  *
  *   node scripts/aot-same-selector.mjs --tarball <path>
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {mkdtempSync, mkdirSync, readFileSync, realpathSync, writeFileSync} from 'node:fs';
@@ -68,7 +69,7 @@ delete env.NODE_PATH;
 const install = spawnSync(
   'npm',
   ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'],
-  {cwd: consumer, encoding: 'utf8', timeout: 180000, env},
+  npmToolingOptions({cwd: consumer, encoding: 'utf8', timeout: 180000, env}, ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock']),
 );
 if (install.status !== 0) fail(1, (install.stderr || install.stdout || 'npm install failed').slice(-2000));
 

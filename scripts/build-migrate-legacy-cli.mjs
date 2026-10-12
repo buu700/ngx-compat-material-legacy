@@ -17,6 +17,7 @@
  *   node scripts/build-migrate-legacy-cli.mjs --help
  */
 
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {
   cpSync,
   existsSync,
@@ -153,7 +154,7 @@ function npmPack() {
   const result = spawnSync(
     'npm',
     ['pack', './package', '--pack-destination', distDir],
-    {cwd: distDir, encoding: 'utf8'},
+    npmToolingOptions({cwd: distDir, encoding: 'utf8'}, ['pack', './package', '--pack-destination', distDir]),
   );
   if (result.status !== 0) {
     console.error(result.stdout || '');

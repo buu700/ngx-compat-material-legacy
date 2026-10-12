@@ -10,6 +10,7 @@
  * Enabled snack motion supplements the default snack cell without new matrix ids.
  * SSR has no declared cell ids. Pass --ssr to also run scripts/ssr-dialog.mjs for main.
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {snackMotionFixture} from './snack-motion-fixture.mjs';
 import {snackAnnouncementLifetimeFixture, legacySnackAnnouncementLifetimeNativeOkay} from './snack-announcement-lifetime-fixture.mjs';
@@ -637,6 +638,7 @@ export async function buildConsumer(tarball, zoneless) {
       labSource: spec.labSource,
       themeSource: spec.themeSource,
       probe: readFileSync(probePath, 'utf8'),
+      npmProfile: readFileSync(join(root, 'scripts/npm-tooling-options.mjs'), 'utf8'),
       zoneless,
     }))
     .digest('hex')
@@ -654,9 +656,9 @@ export async function buildConsumer(tarball, zoneless) {
   writeFileSync(join(consumer, '.npmrc'), spec.npmrc);
   const env = {...process.env, NODE_OPTIONS: ''};
   delete env.NODE_PATH;
-  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], {
+  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], npmToolingOptions({
     cwd: consumer, encoding: 'utf8', timeout: 300000, env,
-  });
+  }, ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock']));
   if (install.status !== 0) throw new Error((install.stderr || install.stdout || 'npm install failed').slice(-2000));
   mkdirSync(join(consumer, 'src'), {recursive: true});
   writeFileSync(join(consumer, 'src/main.ts'), spec.labSource);

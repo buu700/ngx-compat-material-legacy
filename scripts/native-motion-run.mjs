@@ -4,6 +4,7 @@
  * derived native-motion roster on Chromium, Firefox, and WebKitGTK.
  * WebKitGTK stays sandboxed. Ports 9335/9336 stay off the browser-matrix ports.
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
@@ -125,6 +126,7 @@ export function readNativeMotionLinkedTooling() {
   return {
     page: readFileSync(join(scriptDir, 'native-motion-page.mjs'), 'utf8'),
     template: readFileSync(join(scriptDir, 'native-motion-consumer.ts'), 'utf8'),
+    npmProfile: readFileSync(join(root, 'scripts/npm-tooling-options.mjs'), 'utf8'),
     esbuild,
   };
 }
@@ -204,9 +206,9 @@ export async function buildConsumer(tarball, zoneless) {
   writeFileSync(join(consumer, '.npmrc'), spec.npmrc);
   const env = {...process.env, NODE_OPTIONS: ''};
   delete env.NODE_PATH;
-  const install = spawnSync('npm', NATIVE_MOTION_INSTALL_ARGS, {
+  const install = spawnSync('npm', NATIVE_MOTION_INSTALL_ARGS, npmToolingOptions({
     cwd: consumer, encoding: 'utf8', timeout: 300000, env,
-  });
+  }, NATIVE_MOTION_INSTALL_ARGS));
   if (install.status !== 0) throw new Error((install.stderr || install.stdout || 'npm install failed').slice(-2000));
   mkdirSync(join(consumer, 'src'), {recursive: true});
   writeFileSync(join(consumer, 'src/main.ts'), spec.source);

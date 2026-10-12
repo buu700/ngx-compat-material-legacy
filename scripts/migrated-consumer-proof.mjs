@@ -1,4 +1,5 @@
 /** Build and interact with the application that the packed CLI migrated. */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createRequire} from 'node:module';
 import {spawnSync} from 'node:child_process';
 import {mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync} from 'node:fs';
@@ -51,7 +52,7 @@ export async function proveMigratedConsumer(work, application, styles, input) {
   writeFileSync(join(work,'package.json'),JSON.stringify(packageJson,null,2));
   const env={...process.env,NODE_OPTIONS:''};delete env.NODE_PATH;
   writeFileSync(join(work,'.npmrc'),'install-links=true\nfund=false\naudit=false\n');
-  const install=spawnSync('npm',['install','--ignore-scripts','--no-audit','--no-fund','--package-lock'],{cwd:work,env,encoding:'utf8',timeout:600000});
+  const install=spawnSync('npm',['install','--ignore-scripts','--no-audit','--no-fund','--package-lock'],npmToolingOptions({cwd:work,env,encoding:'utf8',timeout:600000}, ['install','--ignore-scripts','--no-audit','--no-fund','--package-lock']));
   if(install.status!==0)throw new Error(`upgraded consumer install failed: ${(install.stderr||install.stdout).slice(-3000)}`);
   for(const [name,version] of Object.entries(packageJson.dependencies)) {
     if(name==='@ngx-compat/material-legacy')continue;

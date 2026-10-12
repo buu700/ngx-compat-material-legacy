@@ -25,6 +25,7 @@
  *
  * Does not claim G06–G08.
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {emitMixinMismatchArchive} from './sass-mismatch-diagnostic.mjs';
 import {runFunctionContracts} from './sass-function-contracts.mjs';
@@ -466,12 +467,12 @@ async function main() {
 
   const env = {...process.env, NODE_PATH: '', NODE_OPTIONS: ''};
   delete env.NODE_PATH;
-  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], {
+  const install = spawnSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], npmToolingOptions({
     cwd: consumer,
     encoding: 'utf8',
     timeout: 180000,
     env,
-  });
+  }, ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock']));
   if (install.status !== 0) {
     fail(1, `npm install failed\n${(install.stderr || install.stdout || '').slice(-2000)}`);
   }

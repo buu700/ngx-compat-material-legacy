@@ -12,6 +12,7 @@
  * Evidence:
  *   compatibility/pack-proof/aot-harness-smoke.json
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {
   cpSync,
   existsSync,
@@ -722,11 +723,11 @@ try {
   writeFileSync(join(consumer, 'package.json'), JSON.stringify(pkg, null, 2));
   writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\n');
 
-  const install = run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], {
+  const install = run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock'], npmToolingOptions({
     cwd: consumer,
     timeout: 180000,
     env: isolatedEnv(),
-  });
+  }, ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock']));
   if (install.status !== 0) {
     result.errors.push('npm install failed');
     result.aot = {status: 'fail', stderr: (install.stderr || '').slice(-2000)};

@@ -11,6 +11,7 @@
  * Prefer a fresh nonexisting run directory (not a reused artifacts/main/draft path).
  * No npm publish.
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {spawnSync} from 'node:child_process';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -62,7 +63,7 @@ function npmPack(packageDir, destination) {
   const res = spawnSync(
     'npm',
     ['pack', packageDir, '--json', '--pack-destination', destination],
-    {cwd: root, encoding: 'utf8'},
+    npmToolingOptions({cwd: root, encoding: 'utf8'}, ['pack', packageDir, '--json', '--pack-destination', destination]),
   );
   if (res.status !== 0) {
     console.error(res.stderr || res.stdout);

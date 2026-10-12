@@ -13,6 +13,7 @@
  * Standalone mode still writes the diagnostic fixed report on success and
  * does not grant acceptance.
  */
+import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync} from 'node:fs';
@@ -481,11 +482,11 @@ function main() {
     dependencies: peers,
   }, null, 2));
   writeFileSync(join(consumer, '.npmrc'), 'install-links=true\nfund=false\naudit=false\n');
-  const install = run('npm', NPM_INSTALL_ARGS, {
+  const install = run('npm', NPM_INSTALL_ARGS, npmToolingOptions({
     cwd: consumer,
     timeout: 180000,
     env: isolatedEnv(),
-  });
+  }, NPM_INSTALL_ARGS));
   if (install.status !== 0) {
     if (coordinator) writeFixed({schema_version: 1, role: 'required consumer engine resolution', result: 'fail', step: 'install'});
     fail(1, `npm install failed\n${(install.stderr || install.stdout || '').slice(-2000)}`);
