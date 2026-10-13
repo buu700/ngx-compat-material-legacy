@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "phase": "standalone validation",
+  "observed_at": "2026-10-13T05:49:23.884Z",
+  "candidates": [
+    {
+      "candidate_id": "triage-011",
+      "advisory": "GHSA-6j4f-fj2g-mc7p",
+      "component": "npm 11.19.0 bundled brace-expansion 5.0.7"
+    },
+    {
+      "candidate_id": "triage-012",
+      "advisory": "GHSA-mh99-v99m-4gvg",
+      "component": "npm 11.19.0 bundled brace-expansion 5.0.7"
+    },
+    {
+      "candidate_id": "triage-013",
+      "advisory": "GHSA-q2hr-2g5m-vwhr",
+      "component": "npm 11.19.0 bundled brace-expansion 5.0.7"
+    },
+    {
+      "candidate_id": "triage-014",
+      "advisory": "GHSA-qhr7-859c-m2p7",
+      "component": "npm 11.19.0 bundled brace-expansion 5.0.7"
+    },
+    {
+      "candidate_id": "triage-015",
+      "advisory": "GHSA-rgw5-rvv9-x895",
+      "component": "npm 11.19.0 bundled brace-expansion 5.0.7"
+    }
+  ],
+  "source_subjects": {
+    "main": {
+      "path": "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy",
+      "head": "8039b6dce1165a974c8122f7fe25f7baf2f4288d",
+      "clean": true,
+      "caller_probe": {
+        "result": "pass",
+        "calls": 21,
+        "files": 21,
+        "negative_controls": 4,
+        "node": "v22.23.3",
+        "typescript": "6.0.3",
+        "execution": "static AST only"
+      },
+      "prior_review_subject": "7778531059fecb559f1e75dd2fec2c874b58e878",
+      "relevant_changes_since_prior_review": [
+        "scripts/check-dependency-eligibility.py"
+      ]
+    },
+    "21.x": {
+      "path": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy",
+      "head": "1b510d5d7b2cc1cdc6f262bdaa910a5aac144072",
+      "clean": true,
+      "caller_probe": {
+        "result": "pass",
+        "calls": 19,
+        "files": 19,
+        "negative_controls": 4,
+        "node": "v22.23.3",
+        "typescript": "6.0.3",
+        "execution": "static AST only"
+      },
+      "prior_review_subject": "cb03e92842cb3fc1a30955396cbe9d2d3af07a16",
+      "relevant_changes_since_prior_review": [
+        "scripts/check-dependency-eligibility.py"
+      ]
+    }
+  },
+  "common_profile": {
+    "sha256": "cf285c2d3d81d5a51cddfafd03e8307741530224a6cfb94e175a7cdd2acf3e71",
+    "commands": [
+      "install",
+      "ci",
+      "pack",
+      "--version",
+      "-v"
+    ],
+    "install_options": [
+      "--ignore-scripts",
+      "--no-audit",
+      "--no-fund",
+      "--package-lock"
+    ],
+    "pack_constraint": "absolute or ./ local package path plus an explicit absolute --pack-destination",
+    "configuration": {
+      "cache": "fresh process-owned 0700 directory",
+      "userconfig": "fresh empty 0600 file",
+      "globalconfig": "fresh empty 0600 file",
+      "registry": "https://registry.npmjs.org/",
+      "global": false,
+      "workspaces": false,
+      "ignore_scripts": true,
+      "prefer_online": true,
+      "prefer_offline": false,
+      "offline": false,
+      "inherited_npm_and_token_environment_removed": true
+    }
+  },
+  "caller_boundary": {
+    "main_roster_sha256": "165286a1815e50fc5d85e2252380afd234da7246906b9923bd62fcd811d5ae44",
+    "line_21_roster_sha256": "224ce105adb855510983e5b7172a3c06303a984271221d2bc4ca58d452d4964e",
+    "pack_callers": [
+      {
+        "path": "scripts/pack-library.mjs",
+        "sources": [
+          "dist/ngx-material-legacy"
+        ],
+        "ownership": "ng-packagr output built from the reviewed repository",
+        "main_sha256": "0b9f86b5731d90fdbea5582246d6e6601c8220d2bab8f29c5e54d68a3b88f749",
+        "line_21_sha256": "8a6ff2bfceebf45a1603e8c0231d116074b7a6cd3b39674ba21d50dd7e732ba2"
+      },
+      {
+        "path": "scripts/build-migrate-legacy-cli.mjs",
+        "sources": [
+          "./package"
+        ],
+        "ownership": "directory assembled by the reviewed script from constant owned inputs",
+        "main_sha256": "36d59e4b74f93f166465b58e6e927d2694afa911eb6e492d04b28c5120e49db1",
+        "line_21_sha256": "d1bb59cc5210b18b1eba89bcb7533d998f6f90631e43a5421e61e08b3997e226"
+      }
+    ],
+    "install_ci_sources": {
+      "dependency_kinds": [
+        "registry package versions/integrities",
+        "owned packed @ngx-compat/material-legacy .tgz"
+      ],
+      "arbitrary_package_arguments": false,
+      "git_dependencies_found": false,
+      "local_directory_dependencies_found": false,
+      "historical_environment_package_sha256": "411c0e68e82a38148d2eccc6edc6317307333a703b933c351479a13923baf008",
+      "historical_environment_lock_sha256": "ad2f9d62bf04758f87650cae408f805e667236f992cd6d8e481c5577c939d130",
+      "historical_lock_resolved_origins": [
+        "https://registry.npmjs.org/"
+      ]
+    }
+  },
+  "boundary_decision": {
+    "selected_lower_trust_glob_source": false,
+    "rationale": [
+      "Registry tarballs are already packed; the maintained install/ci manifests select no Git or local-directory package whose workspace or ignore patterns npm would repack.",
+      "The only maintained npm pack sources are generated from reviewed repository inputs.",
+      "A pull-request author already controls code executed in the pull-request job; making that same isolated read-only job fail does not cross an additional repository security boundary, and concurrency is keyed by ref and SHA."
+    ],
+    "invalidation_conditions": [
+      "a maintained caller accepts an arbitrary package directory, Git dependency, workspace glob, ignore pattern, or user glob",
+      "npm is exposed as a shared or privileged service",
+      "the profile, npm pin, caller population, CI permissions, or concurrency boundary changes"
+    ]
+  },
+  "limitations": [
+    "Dynamic validation used borrowed Node 22.23.3 rather than the canonical Node 24 toolchain.",
+    "No current library build, packed artifact suite, Actions run, or product qualification was executed in this security phase.",
+    "The initial direct caller-probe attempt lacked TypeScript; the successful rerun used the existing workspace TypeScript 6.0.3 through NODE_PATH."
+  ]
+}

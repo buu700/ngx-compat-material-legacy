@@ -506,6 +506,8 @@ TOOL_FINDING_SCOPES = {
     "npm/ip-address@10.2.0": ("ip-socks-only", {"GHSA-22jq-vg5j-6vgg", "GHSA-2vr4-cq9g-pvrc", "GHSA-4xrf-jv44-h6hh",
         "GHSA-h3mg-xc3c-68pw", "GHSA-j6r3-76f7-8jcv", "GHSA-mwp4-54f8-5fhr", "GHSA-rpw4-54j3-4h4q"}),
     "npm/tar@7.5.19": ("tar-no-member-list", {"GHSA-r292-9mhp-454m"}),
+    "npm/brace-expansion@5.0.7": ("npm-private-brace-inputs", {"GHSA-6j4f-fj2g-mc7p", "GHSA-mh99-v99m-4gvg",
+        "GHSA-q2hr-2g5m-vwhr", "GHSA-qhr7-859c-m2p7", "GHSA-rgw5-rvv9-x895"}),
     "npm/http-cache-semantics@4.2.0": ("npm-private-cache-profile", {"GHSA-ch52-4w7c-c8xp"}),
     "npm/postcss-selector-parser@7.1.4": ("npm-private-command-profile", {"GHSA-rj75-hqrm-r3gf"}),
     "npm/undici@6.27.0": ("undici-downloader-only", {"GHSA-3wwx-pv8p-q78v", "GHSA-8xcm-r25x-g524", "GHSA-m8rv-5g2x-5cg5",
@@ -518,6 +520,56 @@ NPM_PRIVATE_PROFILE_ARTIFACTS = {
     "private-profile-remaining-result.json": "54bd6cf921745b848f05fb1d2eaea6339b870bf53ce431e9e5eaad606a390dc0",
     "private-profile-source-manifests.json": "08f1feb3a2186f6bb0bd9e36af7462e2c752c7a344632b37c44e8bb194b0b3a4",
 }
+
+NPM_BRACE_VALIDATION_MANIFEST = "298377d0f16614deb6c19699f69cf617d91d867e7e5e878311ee1185c4937713"
+NPM_BRACE_INPUT_PATHS = {
+    "compatibility/rc/consumer-floor-plan.json", "compatibility/rc/npm-tooling-isolation-callers.json",
+    "reference/material-16.2.14/environment-package.json", "reference/material-16.2.14/environment-package-lock.json",
+    "reference/material-16.2.14/PROVENANCE.json", "projects/ngx-material-legacy/ng-package.json",
+}
+
+
+def private_npm_brace_validation(root: Path, line: str, triage: dict) -> dict:
+    """Five authentic mechanism reviews, limited to unchanged private input sources."""
+    base = "compatibility/rc/tool-advisory-triage/brace-profile-validation/"
+    manifest = json.loads(_tool_proof_bytes(root, base + "manifest.json", {"sha256": NPM_BRACE_VALIDATION_MANIFEST}))
+    source = manifest["lines"][line]
+    rows = {row["path"]: row for row in source["source_inputs"]}
+    if len(rows) != len(source["source_inputs"]) or rows.keys() != NPM_BRACE_INPUT_PATHS:
+        raise ValueError("private npm brace input population changed")
+    for path, row in rows.items():
+        _tool_proof_bytes(root, path, row)
+    files = {row["path"]: row for row in manifest["files"]}
+    if len(files) != len(manifest["files"]) or len(files) != 25:
+        raise ValueError("private npm brace validation population changed")
+    documents = {path: _tool_proof_bytes(root, base + path, row) for path, row in files.items()}
+    boundary = json.loads(documents["npm-brace-validation/source-boundary-evidence.json"])
+    if (boundary["source_subjects"][line]["head"] != source["source_parent"]
+            or boundary["boundary_decision"]["selected_lower_trust_glob_source"] is not False):
+        raise ValueError("private npm brace boundary attribution changed")
+    expected_ids = {"triage-011", "triage-012", "triage-013", "triage-014", "triage-015"}
+    candidates = {row["candidate_id"]: row for row in manifest["candidates"]}
+    if (len(candidates) != len(manifest["candidates"]) or candidates.keys() != expected_ids
+            or {row["advisory"] for row in candidates.values()} != TOOL_FINDING_SCOPES["npm/brace-expansion@5.0.7"][1]):
+        raise ValueError("private npm brace candidate scope changed")
+    original = {row["triage_item_id"]: row for row in triage["findings"]}
+    findings = {}
+    for candidate_id, candidate in candidates.items():
+        receipts = [json.loads(row) for row in documents[candidate_id + "/candidate_ledger.jsonl"].decode().splitlines()]
+        validation = [row for row in receipts if row["receipt_type"] == "validation"]
+        if (len(validation) != 1 or validation[0]["candidate_id"] != candidate_id
+                or validation[0]["input_id"] != candidate["advisory"]
+                or validation[0]["disposition"] != "not_applicable" or validation[0]["confidence"] != "high"
+                or original[candidate_id]["input_id"] != candidate["advisory"]
+                or original[candidate_id]["normalized_input"]["vulnerable_component"] != "npm/brace-expansion@5.0.7"):
+            raise ValueError("private npm brace validation receipt changed")
+        # The supplied static needs_review row remains intact on disk. Only its
+        # authenticated supplemental validation supplies this bounded verdict.
+        findings[candidate_id] = {**original[candidate_id], "verdict": "not_actionable",
+                                  "validation": validation[0]}
+    return {"findings": findings, "binding": {"manifest_sha256": NPM_BRACE_VALIDATION_MANIFEST,
+            "reviewed_source_parent": source["source_parent"], "source_inputs": len(rows),
+            "validation_candidates": len(findings), "runtime": "Node22.23.3 bounded diagnosis"}}
 
 
 def private_npm_source_paths(root: Path) -> set[str]:
@@ -601,10 +653,12 @@ def private_npm_disposition_evidence(root: Path, archives: dict[str, bytes]) -> 
     findings = {row["triage_item_id"]: row for row in triage["findings"] if row["verdict"] == "not_actionable"}
     if {row["input_id"] for row in findings.values()} != {"GHSA-ch52-4w7c-c8xp", "GHSA-rj75-hqrm-r3gf"}:
         raise ValueError("private npm triage scope changed")
+    brace = private_npm_brace_validation(root, line, triage)
+    findings.update(brace["findings"])
     details = {row["id"]: row["body"] for row in evidence["current_advisories"]}
     return {"findings": findings, "details": details, "binding": {"line": line,
             "reviewed_source_parent": subject["source_parent"], "source_files": len(rows),
-            "artifacts": dict(NPM_PRIVATE_PROFILE_ARTIFACTS)}}
+            "artifacts": dict(NPM_PRIVATE_PROFILE_ARTIFACTS), "brace_validation": brace["binding"]}}
 
 
 def _tool_proof_bytes(root: Path, relative: str, expected: dict | None = None) -> bytes:
@@ -831,7 +885,8 @@ def classify_tool_findings(root: Path, observation: dict, now: datetime | None =
                     or finding["input_id"] != key[1] or finding["normalized_input"]["vulnerable_component"] != key[0]
                     or parse_time(record["advisory_modified"]) is None
                     or parse_time(record["advisory_modified"]) != parse_time(proof["details"][key[1]]["modified"])
-                    or record["scope"] != "Pinned private linux-x64 glibc pnpm CLI and authenticated npm/pnpm archive callers; static evidence only."):
+                    or record["scope"] != ("Pinned npm11.19.0 private generated fixtures/local packs; authenticated individual runtime validation and unchanged reviewed input sources."
+                        if rule == "npm-private-brace-inputs" else "Pinned private linux-x64 glibc pnpm CLI and authenticated npm/pnpm archive callers; static evidence only.")):
                 raise ValueError("unreviewed or duplicate tool disposition")
             records[key] = record
         if records.keys() != expected:
