@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "sha": "737c7a8f1a5bc4df0e790d3ecdd227f8342499f8",
+  "line": "21.x",
+  "source_parent": "9846f5811d4e31fe775b97956079b07eedcf3261",
+  "source": "https://github.com/angular/components/commit/737c7a8f1a5bc4df0e790d3ecdd227f8342499f8.patch",
+  "diff_sha256": "3b851d3ccee1db729cd51680182d3832947fec5533e30bb18f851d6813325e20",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/737c7a8f1a5bc4df0e790d3ecdd227f8342499f8.patch",
+  "patch_bytes": 5497,
+  "patch_paths": [
+    "src/cdk/a11y/fake-event-detection.ts",
+    "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+    "src/cdk/a11y/input-modality/input-modality-detector.spec.ts",
+    "src/cdk/drag-drop/directives/drag.spec.ts",
+    "src/cdk/testing/testbed/fake-events/event-objects.ts",
+    "src/material/core/ripple/ripple.spec.ts"
+  ],
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "21.x"
+  ],
+  "final_disposition": "inherited",
+  "closure": "finite-predicate-fix-reviewed",
+  "decision": "Individually reviewed all six hunk paths. The production hunk replaces layout-coordinate reads with buttons/detail; the other five files update public test event defaults and fake-event setup. The authenticated16.2.14 reference already contains the final predicate. CDK21.2.14 exports the identical complete predicate and stable public MouseEvent-to-boolean signature. Genuine original and both minimum public exports execute without offsetX/offsetY reads, including zero-coordinate traps and short-circuit getter checks. The exact tagged owned menu handlers delegate to these exports and preserve fake-event origin, genuine mouse-button origin, submenu prevention and touch origin in44 cases per subject. Owned ripple helper imports remain under their existing separate reviewed renderer boundary. Current CDK owns focus-monitor/input-modality/drag-drop and its test helper; no CDK code is forked. This finite fix is inherited at the branch minimum; whole native focus, assistive-technology behavior and unrelated component routes are not certified.",
+  "installed_member": {
+    "path": "package/fesm2022/_fake-event-detection-chunk.mjs",
+    "sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf"
+  },
+  "independent_evidence": [
+    {
+      "path": "compatibility/rc/screen-reader-event-source-diagnostic.json",
+      "sha256": "1a406577a863da8a0032e3e1f8116ed6dec86acdfd834b14232fe2c54dbd8818"
+    },
+    {
+      "path": "scripts/screen-reader-event-use-review.mjs",
+      "sha256": "5fea3e4a4887358fc62bdaf86ca80da2bfb2014056aed276b8708dd87bd4777b"
+    },
+    {
+      "path": "tests/screen_reader_event_review_probe.mjs",
+      "sha256": "ac606ea60680283acc55f65aefe96f4c8545d61aa877522f1219c742f5723dcb"
+    }
+  ],
+  "original_already_contains_fix": true,
+  "complete_native_component_or_upstream_test_suite_executed": false,
+  "prior_entry": {
+    "sha": "737c7a8f1a5bc4df0e790d3ecdd227f8342499f8",
+    "bucket": "behavior-semantic",
+    "subject": "perf(cdk/a11y): Don't trigger re-layout when detecting fake mousedown (#28029)",
+    "files": [
+      "src/cdk/a11y/fake-event-detection.ts",
+      "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "src/cdk/a11y/input-modality/input-modality-detector.spec.ts",
+      "src/material/core/ripple/ripple.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "g11_claim": "not-passed"
+}
