@@ -6,22 +6,10 @@
 # moment the release passes the seven-day window on its own.
 # scripts/check-dependency-eligibility.py rejects any exclude entry without a
 # live, exact, cited record here, and any expired record still configured.
+#
+# source-map-js@1.2.2 was removed on 2026-10-13: published 2026-09-30T14:08:09Z,
+# natural seven-day window ended 2026-10-07T14:08:09Z, so the age finding clears
+# without an exception. No other age exceptions are active.
 
 schema = 1
 policy_minimum_age_minutes = 10080
-
-[[exception]]
-# The original group-chat grant is unavailable in this task. Preserve the
-# historical claim and expiry, but do not admit it as authenticated authority.
-classification = "pending-owner-authority"
-package = "source-map-js"
-version = "1.2.2"
-published_at = "2026-09-30T14:08:09.382Z"
-expires_at = "2026-10-07T14:08:09.382Z"   # 2026-10-07 10:08 ET: publish time + 7 days
-replaces = "source-map-js@1.2.1"
-advisory = "GHSA-68fv-2mgg-jv7q"
-granted_by = "Ryan Lester"
-granted_on = "2026-10-06"
-granted_at = "2026-10-06T03:43:00-04:00"
-authority = "Ryan Lester granted this temporary minimum-age exception in the project group chat on 2026-10-06 at 03:43 ET for exactly source-map-js@1.2.2."
-reason = "GHSA-68fv-2mgg-jv7q affects source-map-js@1.2.1, which pnpm-lock.yaml pinned. The only fixed release, 1.2.2, was published 2026-09-30T14:08:09Z and is inside the seven-day minimumReleaseAge until 2026-10-07T14:08:09Z. The exception lets the lock move to the fix before then. It does not clear any other package, advisory or age finding, and it is not a G11 or publication claim."
