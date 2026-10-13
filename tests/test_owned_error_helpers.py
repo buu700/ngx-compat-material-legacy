@@ -7,6 +7,19 @@ import subprocess
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
 class OwnedErrorHelperTests(unittest.TestCase):
+    def test_actual_owned_modules_and_frozen_local_caller_bindings(self):
+        result=subprocess.run(['node','--experimental-vm-modules','tests/owned_error_helper_use_probe.mjs'],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        body=json.loads(result.stdout)
+        self.assertEqual(body['original_factories'],6)
+        self.assertEqual(body['frozen_uses'],5)
+        self.assertEqual(body['local_throw_calls'],7)
+        self.assertEqual(body['historical_export_aliases'],6)
+        self.assertEqual(body['negative_controls'],12)
+        self.assertTrue(body['alias_positive'])
+        self.assertFalse(body['native_or_packed_qualified'])
+        self.assertEqual(body['g11_claim'],'not-passed')
+
     def test_original_functions_and_legacy_exports(self):
         ref=ROOT/'reference/material-16.2.14/error-helper-sources'
         expected={'form-field-errors.ts':'43dcfdbc17bb67ef20bdf2ee7f4372c4d889b90c53abcfd58accb68082cc625c','tooltip-invalid-position.ts':'5c335f133dee4ef738ff1a5bc8b644d4afa1773aceef74ea8fe47728cfacf99f','input-errors.ts':'f90b89bc25105ebd22a73ccd5d3f9799d86a967c0ef68fa37dcb40f0cc9bf10d','autocomplete-missing-panel.ts':'58c47b8ca51fd119246c4c1fb4ce3b25c8c099af10dce48b86934b9786a27cca'}
