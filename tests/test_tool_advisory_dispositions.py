@@ -51,6 +51,11 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
             target = root / row["path"]
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / row["path"], target)
+        brace = json.loads((ROOT / "compatibility/rc/tool-advisory-triage/brace-profile-validation/manifest.json").read_text())
+        for row in brace["lines"][line]["source_inputs"]:
+            target = root / row["path"]
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / row["path"], target)
         return root
 
     def reseal(self, root, changed_evidence=None):
@@ -66,18 +71,22 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
         review["source_proof"]["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
         review_path.write_text(json.dumps(review, indent=2) + "\n")
 
-    def test_actual_static_scope_retains_every_raw_id_and_five_open_claims(self):
+    def test_actual_reviewed_scope_retains_every_raw_id_and_distinct_brace_claim(self):
         lookup = self.lookup()
         before = copy.deepcopy(lookup)
         result = self.classify(lookup)
         self.assertEqual(result["errors"], [])
         self.assertEqual(len(result["classified"]), 31)
-        self.assertEqual(len(result["not_applicable"]), 26)
-        self.assertEqual(result["unresolved"], ["npm/brace-expansion@5.0.7"])
-        self.assertEqual(sum(row["classification"] == "unresolved" for row in result["classified"]), 5)
+        self.assertEqual(len(result["not_applicable"]), 31)
+        self.assertEqual(result["unresolved"], [])
+        self.assertEqual(sum(row["classification"] == "unresolved" for row in result["classified"]), 0)
         private = [row for row in result["classified"] if row["private_profile_evidence"]]
-        self.assertEqual(len(private), 2)
+        self.assertEqual(len(private), 7)
         self.assertTrue(all(row["private_profile_evidence"]["source_files"] in {340, 362} for row in private))
+        brace = [row for row in private if row["rule_id"] == "npm-private-brace-inputs"]
+        self.assertEqual(len(brace), 5)
+        self.assertEqual({row["advisory_id"] for row in brace}, eligibility.TOOL_FINDING_SCOPES["npm/brace-expansion@5.0.7"][1])
+        self.assertTrue(all(row["private_profile_evidence"]["brace_validation"]["validation_candidates"] == 5 for row in brace))
         self.assertEqual(lookup, before)
         aliases = [row["advisory_id"] for row in result["classified"] if row["subject_id"] == "crates.io/quinn-proto@0.11.14"]
         self.assertEqual(aliases, ["GHSA-4w2j-m93h-cj5j", "RUSTSEC-2026-0185"])
@@ -201,14 +210,14 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
              patch.object(eligibility, "_remediation_notes", return_value=[]):
             return eligibility.perform_lookup(ROOT, now)
 
-    def test_existing_producer_admits_only_tool_scope_and_keeps_open_findings_failed(self):
+    def test_existing_producer_admits_complete_private_scope_without_hiding_raw_hits(self):
         live = self.producer()
         self.assertEqual(live["tool_advisories"]["unresolved"], self.lookup()["unresolved"])
-        self.assertEqual(len(live["tool_finding_dispositions"]["not_applicable"]), 26)
+        self.assertEqual(len(live["tool_finding_dispositions"]["not_applicable"]), 31)
         self.assertNotIn("ip-address@10.2.0", live["unresolved"])
-        self.assertEqual(live["unresolved"], ["tool:npm/brace-expansion@5.0.7"])
+        self.assertEqual(live["unresolved"], [])
         cases = eligibility.evaluate(ROOT, eligibility.datetime.now(eligibility.timezone.utc), lookup_performed=True, lookup=live)["cases"]
-        self.assertEqual(next(row["result"] for row in cases if row["case_id"].endswith("/unresolved-findings-block")), "fail")
+        self.assertEqual(next(row["result"] for row in cases if row["case_id"].endswith("/unresolved-findings-block")), "pass")
 
     def test_workspace_overlap_and_disagreeing_queries_cannot_use_tool_disposition(self):
         self.assertIn("ip-address@10.2.0", self.producer(overlap=True)["unresolved"])
@@ -265,7 +274,7 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
                 self.assertTrue(self.classify(root=root)["errors"], name)
 
     def test_private_profile_reviews_do_not_clear_revised_advisories_or_workspace_use(self):
-        for name, version in [("http-cache-semantics", "4.2.0"), ("postcss-selector-parser", "7.1.4")]:
+        for name, version in [("http-cache-semantics", "4.2.0"), ("postcss-selector-parser", "7.1.4"), ("brace-expansion", "5.0.7")]:
             with self.subTest(name=name):
                 lookup = self.lookup()
                 subject = "npm/" + name + "@" + version
@@ -273,20 +282,80 @@ class ToolAdvisoryDispositionTests(unittest.TestCase):
                 row["vulns"][0]["modified"] = "2026-10-12T00:00:00Z"
                 result = self.classify(lookup)
                 self.assertIn(subject, result["unresolved"])
-                self.assertEqual(len(result["not_applicable"]), 25)
+                self.assertEqual(len(result["not_applicable"]), 30)
                 self.assertIn(name + "@" + version, self.producer(overlap_subject=(name, version))["unresolved"])
 
     def test_complete_reviewed_fixture_can_close_without_hiding_raw_hits(self):
         lookup = self.lookup()
-        open_subjects = {"npm/brace-expansion@5.0.7", "npm/http-cache-semantics@4.2.0", "npm/postcss-selector-parser@7.1.4"}
-        for row in lookup["rows"]:
-            if row["id"] in open_subjects: row["vulns"] = []
-        lookup["unresolved"] = [row["id"] for row in lookup["rows"] if row["vulns"]]
+        before = copy.deepcopy(lookup)
         result = self.classify(lookup)
         self.assertEqual(result["errors"], [])
         self.assertEqual(result["unresolved"], [])
-        self.assertEqual(len(result["not_applicable"]), 24)
-        self.assertEqual(sum(len(row["vulns"]) for row in lookup["rows"]), 24)
+        self.assertEqual(len(result["not_applicable"]), 31)
+        self.assertEqual(sum(len(row["vulns"]) for row in lookup["rows"]), 31)
+        self.assertEqual(lookup, before)
+
+    def test_each_brace_advisory_requires_its_own_current_revision_and_receipt(self):
+        for advisory in eligibility.TOOL_FINDING_SCOPES["npm/brace-expansion@5.0.7"][1]:
+            with self.subTest(advisory=advisory):
+                lookup = self.lookup()
+                row = next(row for row in lookup["rows"] if row["id"] == "npm/brace-expansion@5.0.7")
+                next(v for v in row["vulns"] if v["id"] == advisory)["modified"] = "2026-10-12T00:00:00Z"
+                result = self.classify(lookup)
+                self.assertEqual(result["unresolved"], [row["id"]])
+                self.assertEqual(len(result["not_applicable"]), 30)
+                self.assertEqual([item["advisory_id"] for item in result["classified"] if item["classification"] == "unresolved"], [advisory])
+
+    def test_brace_dependency_input_and_generated_pack_changes_invalidate_reviews(self):
+        for name in eligibility.NPM_BRACE_INPUT_PATHS | {"scripts/native-motion-run.mjs"}:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_root(directory)
+                path = root / name
+                if name.endswith("environment-package.json"):
+                    data = json.loads(path.read_text())
+                    data.setdefault("dependencies", {})["unreviewed"] = "git+https://example.invalid/lower-trust.git"
+                    path.write_text(json.dumps(data))
+                elif name.endswith("environment-package-lock.json"):
+                    data = json.loads(path.read_text())
+                    data["packages"]["node_modules/unreviewed"] = {"version": "1.0.0", "resolved": "file:../lower-trust"}
+                    path.write_text(json.dumps(data))
+                else:
+                    path.write_bytes(path.read_bytes() + b"\nchanged private input\n")
+                result = self.classify(root=root)
+                self.assertTrue(result["errors"], name)
+                self.assertEqual(result["not_applicable"], [], name)
+
+    def test_missing_mutated_or_resealed_brace_validation_cannot_clear_findings(self):
+        for fault in ["missing-manifest", "missing-receipt", "changed-runtime", "counterfeit-resealed", "wrong-line"]:
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as directory:
+                root = self.copy_root(directory)
+                base = root / "compatibility/rc/tool-advisory-triage/brace-profile-validation"
+                manifest_path = base / "manifest.json"
+                manifest = json.loads(manifest_path.read_text())
+                if fault == "missing-manifest":
+                    manifest_path.unlink()
+                elif fault == "missing-receipt":
+                    (base / "triage-014/candidate_ledger.jsonl").unlink()
+                elif fault == "changed-runtime":
+                    path = base / "npm-brace-validation/validation_artifacts/mechanism-results.json"
+                    path.write_bytes(path.read_bytes() + b"\nchanged runtime receipt\n")
+                elif fault == "wrong-line":
+                    manifest["lines"]["main"] = manifest["lines"]["21.x"]
+                    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+                else:
+                    name = "triage-011/candidate_ledger.jsonl"
+                    path = base / name
+                    receipts = [json.loads(row) for row in path.read_text().splitlines()]
+                    receipts[-1]["evidence"] = ["counterfeit no runtime failure"]
+                    path.write_text("\n".join(json.dumps(row) for row in receipts) + "\n")
+                    ref = next(row for row in manifest["files"] if row["path"] == name)
+                    raw = path.read_bytes()
+                    ref.update(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
+                    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+                    self.reseal(root)
+                result = self.classify(root=root)
+                self.assertTrue(result["errors"], fault)
+                self.assertEqual(result["not_applicable"], [], fault)
 
 
 if __name__ == "__main__":

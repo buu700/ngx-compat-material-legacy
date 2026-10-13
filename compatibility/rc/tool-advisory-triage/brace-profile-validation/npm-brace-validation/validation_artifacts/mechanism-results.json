@@ -1,0 +1,359 @@
+{
+  "schema_version": 1,
+  "child_heap_megabytes": 64,
+  "timeout_seconds": 2,
+  "results": [
+    {
+      "case": "control",
+      "variant": "original",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original",
+        "control"
+      ],
+      "returncode": 0,
+      "stdout": "{\"id\":\"control\",\"node\":\"v22.23.3\",\"module\":\"5.0.7\",\"input_bytes\":17,\"output_count\":2,\"output_characters\":26,\"elapsed_ms\":0.47587500000000205,\"sample\":[\"packages/a/**\",\"packages/b/**\"],\"limits\":{\"minimatch_pattern_length\":65536,\"brace_default_count\":100000},\"exact_actual_caller\":\"npm bundled minimatch.braceExpand with default options\",\"result\":\"returned\"}\n",
+      "stderr": "",
+      "elapsed_seconds": 0.03574304096400738,
+      "timed_out": false,
+      "observation": {
+        "id": "control",
+        "node": "v22.23.3",
+        "module": "5.0.7",
+        "input_bytes": 17,
+        "output_count": 2,
+        "output_characters": 26,
+        "elapsed_ms": 0.47587500000000205,
+        "sample": [
+          "packages/a/**",
+          "packages/b/**"
+        ],
+        "limits": {
+          "minimatch_pattern_length": 65536,
+          "brace_default_count": 100000
+        },
+        "exact_actual_caller": "npm bundled minimatch.braceExpand with default options",
+        "result": "returned"
+      }
+    },
+    {
+      "case": "control",
+      "variant": "fixed",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-fixed",
+        "control"
+      ],
+      "returncode": 0,
+      "stdout": "{\"id\":\"control\",\"node\":\"v22.23.3\",\"module\":\"5.0.12\",\"input_bytes\":17,\"output_count\":2,\"output_characters\":26,\"elapsed_ms\":0.44750000000000156,\"sample\":[\"packages/a/**\",\"packages/b/**\"],\"limits\":{\"minimatch_pattern_length\":65536,\"brace_default_count\":100000},\"exact_actual_caller\":\"npm bundled minimatch.braceExpand with default options\",\"result\":\"returned\"}\n",
+      "stderr": "",
+      "elapsed_seconds": 0.02786091691814363,
+      "timed_out": false,
+      "observation": {
+        "id": "control",
+        "node": "v22.23.3",
+        "module": "5.0.12",
+        "input_bytes": 17,
+        "output_count": 2,
+        "output_characters": 26,
+        "elapsed_ms": 0.44750000000000156,
+        "sample": [
+          "packages/a/**",
+          "packages/b/**"
+        ],
+        "limits": {
+          "minimatch_pattern_length": 65536,
+          "brace_default_count": 100000
+        },
+        "exact_actual_caller": "npm bundled minimatch.braceExpand with default options",
+        "result": "returned"
+      }
+    },
+    {
+      "case": "triage-011",
+      "variant": "original",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original",
+        "triage-011"
+      ],
+      "returncode": 2,
+      "stdout": "{\"id\":\"triage-011\",\"node\":\"v22.23.3\",\"module\":\"5.0.7\",\"input_bytes\":64003,\"elapsed_ms\":8.346125,\"result\":\"exception\",\"error\":{\"name\":\"RangeError\",\"message\":\"Maximum call stack size exceeded\",\"stack\":\"RangeError: Maximum call stack size exceeded\\n    at [Symbol.hasInstance] (<anonymous>)\\n    at balanced (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/balanced-match/dist/commonjs/index.js:5:18)\\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:51:45)\\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\"}}\n",
+      "stderr": "",
+      "elapsed_seconds": 0.03407587483525276,
+      "timed_out": false,
+      "observation": {
+        "id": "triage-011",
+        "node": "v22.23.3",
+        "module": "5.0.7",
+        "input_bytes": 64003,
+        "elapsed_ms": 8.346125,
+        "result": "exception",
+        "error": {
+          "name": "RangeError",
+          "message": "Maximum call stack size exceeded",
+          "stack": "RangeError: Maximum call stack size exceeded\n    at [Symbol.hasInstance] (<anonymous>)\n    at balanced (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/balanced-match/dist/commonjs/index.js:5:18)\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:51:45)\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:58:23)"
+        }
+      }
+    },
+    {
+      "case": "triage-011",
+      "variant": "fixed",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-fixed",
+        "triage-011"
+      ],
+      "returncode": 0,
+      "stdout": "{\"id\":\"triage-011\",\"node\":\"v22.23.3\",\"module\":\"5.0.12\",\"input_bytes\":64003,\"output_count\":16001,\"output_characters\":48001,\"elapsed_ms\":27.890292,\"sample\":[\"{a}\",\"{a}\"],\"limits\":{\"minimatch_pattern_length\":65536,\"brace_default_count\":100000},\"exact_actual_caller\":\"npm bundled minimatch.braceExpand with default options\",\"result\":\"returned\"}\n",
+      "stderr": "",
+      "elapsed_seconds": 0.05426175007596612,
+      "timed_out": false,
+      "observation": {
+        "id": "triage-011",
+        "node": "v22.23.3",
+        "module": "5.0.12",
+        "input_bytes": 64003,
+        "output_count": 16001,
+        "output_characters": 48001,
+        "elapsed_ms": 27.890292,
+        "sample": [
+          "{a}",
+          "{a}"
+        ],
+        "limits": {
+          "minimatch_pattern_length": 65536,
+          "brace_default_count": 100000
+        },
+        "exact_actual_caller": "npm bundled minimatch.braceExpand with default options",
+        "result": "returned"
+      }
+    },
+    {
+      "case": "triage-012",
+      "variant": "original",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original",
+        "triage-012"
+      ],
+      "returncode": null,
+      "stdout": "",
+      "stderr": "\n<--- Last few GCs --->\n\n[558673:0xf2b5501a0000]      201 ms: Mark-Compact 73.9 (91.6) -> 61.5 (95.0) MB, pooled: 0 MB, 39.29 / 0.00 ms  (average mu = 0.478, current mu = 0.189) allocation failure; scavenge might not succeed\n[558673:0xf2b5501a0000]      247 ms: Mark-Compact 67.4 (97.3) -> 64.7 (98.3) MB, pooled: 0 MB, 44.62 / 0.00 ms  (average mu = 0.286, current mu = 0.029) allocation failure; scavenge might not succeed\n\n\n<--- JS stacktrace --->\n\nFATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory\n----- Native stack trace -----\n\n 1: 0xe1a178 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [node]\n 2: 0x11cd5ec v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [node]\n 3: 0x11cd79c v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [node]\n 4: 0x13f322c  [node]\n 5: 0x140b170 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [node]\n 6: 0x13e1b68 v8::internal::HeapAllocator::AllocateRawWithLightRetrySlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [node]\n 7: 0x13e29a0 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [node]\n 8: 0x13bd0d0 v8::internal::Factory::AllocateRaw(int, v8::internal::AllocationType, v8::internal::AllocationAlignment) [node]\n 9: 0x13aa5b4 v8::internal::FactoryBase<v8::internal::Factory>::AllocateRawArray(int, v8::internal::AllocationType, v8::internal::AllocationAlignment) [node]\n10: 0x13ab22c v8::internal::FactoryBase<v8::internal::Factory>::NewFixedArray(int, v8::internal::AllocationType) [node]\n11: 0x156dd30  [node]\n12: 0x156df38  [node]\n13: 0x17c72bc v8::internal::Runtime_GrowArrayElements(int, unsigned long*, v8::internal::Isolate*) [node]\n14: 0x1ceacd4  [node]\n",
+      "elapsed_seconds": 2.0153674599714577,
+      "timed_out": true,
+      "observation": null
+    },
+    {
+      "case": "triage-012",
+      "variant": "fixed",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-fixed",
+        "triage-012"
+      ],
+      "returncode": 0,
+      "stdout": "{\"id\":\"triage-012\",\"node\":\"v22.23.3\",\"module\":\"5.0.12\",\"input_bytes\":500,\"output_count\":40000,\"output_characters\":4000000,\"elapsed_ms\":346.64966699999997,\"sample\":[\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab\"],\"limits\":{\"minimatch_pattern_length\":65536,\"brace_default_count\":100000},\"exact_actual_caller\":\"npm bundled minimatch.braceExpand with default options\",\"result\":\"returned\"}\n",
+      "stderr": "",
+      "elapsed_seconds": 0.40294712502509356,
+      "timed_out": false,
+      "observation": {
+        "id": "triage-012",
+        "node": "v22.23.3",
+        "module": "5.0.12",
+        "input_bytes": 500,
+        "output_count": 40000,
+        "output_characters": 4000000,
+        "elapsed_ms": 346.64966699999997,
+        "sample": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab"
+        ],
+        "limits": {
+          "minimatch_pattern_length": 65536,
+          "brace_default_count": 100000
+        },
+        "exact_actual_caller": "npm bundled minimatch.braceExpand with default options",
+        "result": "returned"
+      }
+    },
+    {
+      "case": "triage-013",
+      "variant": "original",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original",
+        "triage-013"
+      ],
+      "returncode": null,
+      "stdout": "",
+      "stderr": "",
+      "elapsed_seconds": 2.0084477090276778,
+      "timed_out": true,
+      "observation": null
+    },
+    {
+      "case": "triage-013",
+      "variant": "fixed",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-fixed",
+        "triage-013"
+      ],
+      "returncode": 0,
+      "stdout": "{\"id\":\"triage-013\",\"node\":\"v22.23.3\",\"module\":\"5.0.12\",\"input_bytes\":64006,\"output_count\":1,\"output_characters\":64006,\"elapsed_ms\":31.1275,\"sample\":[\"{a}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}\"],\"limits\":{\"minimatch_pattern_length\":65536,\"brace_default_count\":100000},\"exact_actual_caller\":\"npm bundled minimatch.braceExpand with default options\",\"result\":\"returned\"}\n",
+      "stderr": "",
+      "elapsed_seconds": 0.058175875106826425,
+      "timed_out": false,
+      "observation": {
+        "id": "triage-013",
+        "node": "v22.23.3",
+        "module": "5.0.12",
+        "input_bytes": 64006,
+        "output_count": 1,
+        "output_characters": 64006,
+        "elapsed_ms": 31.1275,
+        "sample": [
+          "{a}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}"
+        ],
+        "limits": {
+          "minimatch_pattern_length": 65536,
+          "brace_default_count": 100000
+        },
+        "exact_actual_caller": "npm bundled minimatch.braceExpand with default options",
+        "result": "returned"
+      }
+    },
+    {
+      "case": "triage-014",
+      "variant": "original",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original",
+        "triage-014"
+      ],
+      "returncode": 2,
+      "stdout": "{\"id\":\"triage-014\",\"node\":\"v22.23.3\",\"module\":\"5.0.7\",\"input_bytes\":8003,\"elapsed_ms\":366.000917,\"result\":\"exception\",\"error\":{\"name\":\"RangeError\",\"message\":\"Maximum call stack size exceeded\",\"stack\":\"RangeError: Maximum call stack size exceeded\\n    at balanced (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/balanced-match/dist/commonjs/index.js:4:18)\\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:51:45)\\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:138:17)\\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/d\"}}\n",
+      "stderr": "",
+      "elapsed_seconds": 0.39533929200842977,
+      "timed_out": false,
+      "observation": {
+        "id": "triage-014",
+        "node": "v22.23.3",
+        "module": "5.0.7",
+        "input_bytes": 8003,
+        "elapsed_ms": 366.000917,
+        "result": "exception",
+        "error": {
+          "name": "RangeError",
+          "message": "Maximum call stack size exceeded",
+          "stack": "RangeError: Maximum call stack size exceeded\n    at balanced (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/balanced-match/dist/commonjs/index.js:4:18)\n    at parseCommaParts (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:51:45)\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:138:17)\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/dist/commonjs/index.js:141:21)\n    at expand_ (/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original/node_modules/brace-expansion/d"
+        }
+      }
+    },
+    {
+      "case": "triage-014",
+      "variant": "fixed",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-fixed",
+        "triage-014"
+      ],
+      "returncode": 0,
+      "stdout": "{\"id\":\"triage-014\",\"node\":\"v22.23.3\",\"module\":\"5.0.12\",\"input_bytes\":8003,\"output_count\":1,\"output_characters\":8003,\"elapsed_ms\":202.03666700000002,\"sample\":[\"{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{\"],\"limits\":{\"minimatch_pattern_length\":65536,\"brace_default_count\":100000},\"exact_actual_caller\":\"npm bundled minimatch.braceExpand with default options\",\"result\":\"returned\"}\n",
+      "stderr": "",
+      "elapsed_seconds": 0.23349908413365483,
+      "timed_out": false,
+      "observation": {
+        "id": "triage-014",
+        "node": "v22.23.3",
+        "module": "5.0.12",
+        "input_bytes": 8003,
+        "output_count": 1,
+        "output_characters": 8003,
+        "elapsed_ms": 202.03666700000002,
+        "sample": [
+          "{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{"
+        ],
+        "limits": {
+          "minimatch_pattern_length": 65536,
+          "brace_default_count": 100000
+        },
+        "exact_actual_caller": "npm bundled minimatch.braceExpand with default options",
+        "result": "returned"
+      }
+    },
+    {
+      "case": "triage-015",
+      "variant": "original",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-original",
+        "triage-015"
+      ],
+      "returncode": -6,
+      "stdout": "",
+      "stderr": "\n<--- Last few GCs --->\n\n[558790:0xfda2b94b0000]      614 ms: Mark-Compact (reduce) 63.8 (67.8) -> 61.9 (64.9) MB, pooled: 0 MB, 54.15 / 0.00 ms  (+ 2.2 ms in 0 steps since start of marking, biggest step 0.0 ms, walltime since start of marking 59 ms) (average mu = 0.136, current \n\n<--- JS stacktrace --->\n\nFATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory\n----- Native stack trace -----\n\n 1: 0xe1a178 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [node]\n 2: 0x11cd5ec v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [node]\n 3: 0x11cd79c v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [node]\n 4: 0x13f322c  [node]\n 5: 0x13f325c  [node]\n 6: 0x140ac10  [node]\n 7: 0x140d7fc  [node]\n 8: 0x1bf4fb4  [node]\n",
+      "elapsed_seconds": 1.695992459077388,
+      "timed_out": false,
+      "observation": null
+    },
+    {
+      "case": "triage-015",
+      "variant": "fixed",
+      "command": [
+        "node",
+        "--max-old-space-size=64",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/worker.cjs",
+        "/tmp/codex-security-artifacts-16f815018ecc03a422549c47ee52aba016a65bd7eedc5ad2f8eaf34703633594/artifacts/05_findings/npm-brace-validation/validation_artifacts/npm-fixed",
+        "triage-015"
+      ],
+      "returncode": 0,
+      "stdout": "{\"id\":\"triage-015\",\"node\":\"v22.23.3\",\"module\":\"5.0.12\",\"input_bytes\":24801,\"output_count\":78431,\"output_characters\":3999981,\"elapsed_ms\":169.735375,\"sample\":[\"000000000000000000000000000000000000000000000000001\",\"000000000000000000000000000000000000000000000000002\"],\"limits\":{\"minimatch_pattern_length\":65536,\"brace_default_count\":100000},\"exact_actual_caller\":\"npm bundled minimatch.braceExpand with default options\",\"result\":\"returned\"}\n",
+      "stderr": "",
+      "elapsed_seconds": 0.2069115419872105,
+      "timed_out": false,
+      "observation": {
+        "id": "triage-015",
+        "node": "v22.23.3",
+        "module": "5.0.12",
+        "input_bytes": 24801,
+        "output_count": 78431,
+        "output_characters": 3999981,
+        "elapsed_ms": 169.735375,
+        "sample": [
+          "000000000000000000000000000000000000000000000000001",
+          "000000000000000000000000000000000000000000000000002"
+        ],
+        "limits": {
+          "minimatch_pattern_length": 65536,
+          "brace_default_count": 100000
+        },
+        "exact_actual_caller": "npm bundled minimatch.braceExpand with default options",
+        "result": "returned"
+      }
+    }
+  ]
+}
