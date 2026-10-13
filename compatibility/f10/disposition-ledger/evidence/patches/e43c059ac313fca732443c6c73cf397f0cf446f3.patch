@@ -1,0 +1,46 @@
+From e43c059ac313fca732443c6c73cf397f0cf446f3 Mon Sep 17 00:00:00 2001
+From: Karl Seamon <bannanafiend@gmail.com>
+Date: Tue, 2 Jan 2024 06:52:40 -0500
+Subject: [PATCH] perf(cdk/a11y): Micro-optimizations to aria-reference.ts.
+ (#28337)
+
+---
+ src/cdk/a11y/aria-describer/aria-reference.ts | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/src/cdk/a11y/aria-describer/aria-reference.ts b/src/cdk/a11y/aria-describer/aria-reference.ts
+index 3fb6a4833dad..368dc911a8fe 100644
+--- a/src/cdk/a11y/aria-describer/aria-reference.ts
++++ b/src/cdk/a11y/aria-describer/aria-reference.ts
+@@ -15,10 +15,11 @@ const ID_DELIMITER = ' ';
+  */
+ export function addAriaReferencedId(el: Element, attr: `aria-${string}`, id: string) {
+   const ids = getAriaReferenceIds(el, attr);
+-  if (ids.some(existingId => existingId.trim() == id.trim())) {
++  id = id.trim();
++  if (ids.some(existingId => existingId.trim() === id)) {
+     return;
+   }
+-  ids.push(id.trim());
++  ids.push(id);
+ 
+   el.setAttribute(attr, ids.join(ID_DELIMITER));
+ }
+@@ -29,7 +30,8 @@ export function addAriaReferencedId(el: Element, attr: `aria-${string}`, id: str
+  */
+ export function removeAriaReferencedId(el: Element, attr: `aria-${string}`, id: string) {
+   const ids = getAriaReferenceIds(el, attr);
+-  const filteredIds = ids.filter(val => val != id.trim());
++  id = id.trim();
++  const filteredIds = ids.filter(val => val !== id);
+ 
+   if (filteredIds.length) {
+     el.setAttribute(attr, filteredIds.join(ID_DELIMITER));
+@@ -44,5 +46,6 @@ export function removeAriaReferencedId(el: Element, attr: `aria-${string}`, id:
+  */
+ export function getAriaReferenceIds(el: Element, attr: string): string[] {
+   // Get string array of all individual ids (whitespace delimited) in the attribute value
+-  return (el.getAttribute(attr) || '').match(/\S+/g) || [];
++  const attrValue = el.getAttribute(attr);
++  return attrValue?.match(/\S+/g) ?? [];
+ }
