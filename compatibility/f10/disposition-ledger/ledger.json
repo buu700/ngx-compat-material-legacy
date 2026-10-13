@@ -8450,8 +8450,8 @@
       "bucket": "behavior-semantic",
       "subject": "perf(cdk/a11y): Micro-optimizations to aria-reference.ts. (#28337)",
       "final_disposition": "inherited",
-      "reason": "The patch trims the aria id once and uses strict comparison inside the CDK aria-reference helpers. The owned select and autocomplete import those helpers from @angular/cdk/a11y. The package does not define them. The comparison was not copied. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
-      "read_note_disposition": "not-owned",
+      "reason": "Individually reviewed the complete one-file production hunk: add/remove trim the id once and use strict comparisons, while list extraction uses one getAttribute and a nullish fallback. Both 22.1.7 and the other line minimum contain all three complete resulting functions and the space delimiter, proven against the reviewed hunk and genuine public export identity. Primitive string ids used by the owned callers retain original attribute results and exact get/set/remove calls in192 comparisons per current peer; repeated operations are idempotent. Separate trim-counter protocols confirm one trim per operation. Complete tagged select/autocomplete modal ownership methods replay with each original/current public implementation and preserve other references through attachment, modal movement and cleanup. Full close/attach/destroy, native browser or assistive-technology behavior is not inferred from these method replays. No CDK helper or component is forked. This finite public helper optimization is inherited at this branch minimum.",
+      "read_note_disposition": "public-reference-helper-individually-reviewed-on-main",
       "files": [
         "src/cdk/a11y/aria-describer/aria-reference.ts"
       ],
@@ -8470,9 +8470,61 @@
         ]
       },
       "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
-      "recorded_at_utc": "2026-10-01T16:49:17Z",
+      "recorded_at_utc": "2026-10-13T07:00:37.118749+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "e43c059ac313fca732443c6c73cf397f0cf446f3",
+          "bucket": "behavior-semantic",
+          "subject": "perf(cdk/a11y): Micro-optimizations to aria-reference.ts. (#28337)",
+          "final_disposition": "inherited",
+          "reason": "The patch trims the aria id once and uses strict comparison inside the CDK aria-reference helpers. The owned select and autocomplete import those helpers from @angular/cdk/a11y. The package does not define them. The comparison was not copied. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+          "read_note_disposition": "not-owned",
+          "files": [
+            "src/cdk/a11y/aria-describer/aria-reference.ts"
+          ],
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/e43c059ac313fca732443c6c73cf397f0cf446f3.json",
+          "peer_floor": {
+            "package": "@angular/cdk",
+            "advertised_range": "^22.1.7",
+            "installed_version": "22.1.7",
+            "contains_fix_tag": "v22.1.7",
+            "sha_is_ancestor_of_tag": true,
+            "cdk_modules": [
+              "a11y"
+            ],
+            "owned_import_intersection": [
+              "a11y"
+            ]
+          },
+          "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+          "recorded_at_utc": "2026-10-01T16:49:17Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "diff_sha256": "b7f43524551ae931446c984057ad09ac32b52f7fbbff7c1c2e7ab780d3760695",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Individually reviewed the complete one-file production hunk: add/remove trim the id once and use strict comparisons, while list extraction uses one getAttribute and a nullish fallback. Both 22.1.7 and the other line minimum contain all three complete resulting functions and the space delimiter, proven against the reviewed hunk and genuine public export identity. Primitive string ids used by the owned callers retain original attribute results and exact get/set/remove calls in192 comparisons per current peer; repeated operations are idempotent. Separate trim-counter protocols confirm one trim per operation. Complete tagged select/autocomplete modal ownership methods replay with each original/current public implementation and preserve other references through attachment, modal movement and cleanup. Full close/attach/destroy, native browser or assistive-technology behavior is not inferred from these method replays. No CDK helper or component is forked. This finite public helper optimization is inherited at this branch minimum.",
+        "proof_kind": "complete-reviewed-helper-hunk-and-tagged-owned-method-replay",
+        "installed_member": {
+          "path": "package/fesm2022/a11y.mjs",
+          "sha256": "664e6e790f99f67c8e730bfd03bcc8d98349d8872b7df720b6f3fe67ef1768e8"
+        },
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "compatibility/rc/aria-reference-source-diagnostic.json"
+        }
+      }
     },
     {
       "sha": "1fe1f69303780c11c07ff84313f5fdc10440d55b",

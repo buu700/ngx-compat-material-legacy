@@ -1,0 +1,361 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "public_subjects_sha256": "97733629aa03a8faa5dfa88ccf96efa9f1cb3b40914f65efed7123870eedc0fb",
+  "upstream_sha": "e43c059ac313fca732443c6c73cf397f0cf446f3",
+  "patch_path": "compatibility/f10/disposition-ledger/evidence/patches/e43c059ac313fca732443c6c73cf397f0cf446f3.patch",
+  "patch_sha256": "b7f43524551ae931446c984057ad09ac32b52f7fbbff7c1c2e7ab780d3760695",
+  "cases": [
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "addAriaReferencedId",
+      "local_name": "addAriaReferencedId",
+      "candidate_source_sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "references": [
+        {
+          "line": 729,
+          "expression": "addAriaReferencedId(this._trackedModal, 'aria-owns', this.autocomplete.id)",
+          "member": "_openPanelInternal"
+        },
+        {
+          "line": 1044,
+          "expression": "addAriaReferencedId(modal, 'aria-owns', panelId)",
+          "member": "_applyModalPanelOwnership"
+        }
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "removeAriaReferencedId",
+      "local_name": "removeAriaReferencedId",
+      "candidate_source_sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "references": [
+        {
+          "line": 314,
+          "expression": "removeAriaReferencedId(this._trackedModal, 'aria-owns', panelId)",
+          "member": "closePanel"
+        },
+        {
+          "line": 1041,
+          "expression": "removeAriaReferencedId(this._trackedModal, 'aria-owns', panelId)",
+          "member": "_applyModalPanelOwnership"
+        },
+        {
+          "line": 1053,
+          "expression": "removeAriaReferencedId(this._trackedModal, 'aria-owns', panelId)",
+          "member": "_clearFromModal"
+        }
+      ]
+    },
+    {
+      "file": "legacy-select/internal/select-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "addAriaReferencedId",
+      "local_name": "addAriaReferencedId",
+      "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+      "references": [
+        {
+          "line": 720,
+          "expression": "addAriaReferencedId(modal, 'aria-owns', panelId)",
+          "member": "_applyModalPanelOwnership"
+        }
+      ]
+    },
+    {
+      "file": "legacy-select/internal/select-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "removeAriaReferencedId",
+      "local_name": "removeAriaReferencedId",
+      "candidate_source_sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432",
+      "references": [
+        {
+          "line": 717,
+          "expression": "removeAriaReferencedId(this._trackedModal, 'aria-owns', panelId)",
+          "member": "_applyModalPanelOwnership"
+        },
+        {
+          "line": 733,
+          "expression": "removeAriaReferencedId(this._trackedModal, 'aria-owns', panelId)",
+          "member": "_clearFromModal"
+        }
+      ]
+    }
+  ],
+  "tagged_ownership_methods": [
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "family": "autocomplete",
+      "methods": [
+        {
+          "name": "_applyModalPanelOwnership",
+          "source": "private _applyModalPanelOwnership() {\n    // TODO(http://github.com/angular/components/issues/26853): consider de-duplicating this with\n    // the `LiveAnnouncer` and any other usages.\n    //\n    // Note that the selector here is limited to CDK overlays at the moment in order to reduce the\n    // section of the DOM we need to look through. This should cover all the cases we support, but\n    // the selector can be expanded if it turns out to be too narrow.\n    const modal = this._element.nativeElement.closest(\n      'body > .cdk-overlay-container [aria-modal=\"true\"]',\n    );\n\n    if (!modal) {\n      // Most commonly, the autocomplete trigger is not inside a modal.\n      return;\n    }\n\n    const panelId = this.autocomplete.id;\n\n    if (this._trackedModal) {\n      removeAriaReferencedId(this._trackedModal, 'aria-owns', panelId);\n    }\n\n    addAriaReferencedId(modal, 'aria-owns', panelId);\n    this._trackedModal = modal;\n  }",
+          "tagged_body_sha256": "68fef9407384915e59eebb53c46387cabe33fa02577871a83c63c79ac4c75e26"
+        },
+        {
+          "name": "_clearFromModal",
+          "source": "private _clearFromModal() {\n    if (this._trackedModal) {\n      const panelId = this.autocomplete.id;\n\n      removeAriaReferencedId(this._trackedModal, 'aria-owns', panelId);\n      this._trackedModal = null;\n    }\n  }",
+          "tagged_body_sha256": "adb4b4ae0b0727272ed4d93a433cc46cde59ef49ca7ffeba9f4971daeb59b006"
+        }
+      ],
+      "tagged_member_sha256": "3ca8638bddcd80a88936cc7dcb3fc52a284931052c96cbf2ab8bae075480f988"
+    },
+    {
+      "file": "legacy-select/internal/select-base.ts",
+      "family": "select",
+      "methods": [
+        {
+          "name": "_applyModalPanelOwnership",
+          "source": "private _applyModalPanelOwnership() {\n    // TODO(http://github.com/angular/components/issues/26853): consider de-duplicating this with\n    // the `LiveAnnouncer` and any other usages.\n    //\n    // Note that the selector here is limited to CDK overlays at the moment in order to reduce the\n    // section of the DOM we need to look through. This should cover all the cases we support, but\n    // the selector can be expanded if it turns out to be too narrow.\n    const modal = this._elementRef.nativeElement.closest(\n      'body > .cdk-overlay-container [aria-modal=\"true\"]',\n    );\n\n    if (!modal) {\n      // Most commonly, the autocomplete trigger is not inside a modal.\n      return;\n    }\n\n    const panelId = `${this.id}-panel`;\n\n    if (this._trackedModal) {\n      removeAriaReferencedId(this._trackedModal, 'aria-owns', panelId);\n    }\n\n    addAriaReferencedId(modal, 'aria-owns', panelId);\n    this._trackedModal = modal;\n  }",
+          "tagged_body_sha256": "8719ad2cbd925d615954eae34657273c7d1ed4ce6dbed171bf4ac12dd5512290"
+        },
+        {
+          "name": "_clearFromModal",
+          "source": "private _clearFromModal() {\n    if (!this._trackedModal) {\n      // Most commonly, the autocomplete trigger is not used inside a modal.\n      return;\n    }\n\n    const panelId = `${this.id}-panel`;\n\n    removeAriaReferencedId(this._trackedModal, 'aria-owns', panelId);\n    this._trackedModal = null;\n  }",
+          "tagged_body_sha256": "3d7a24e891d7a69024ed639d22c7bd7a7a7f8fe176dcdda7a9fc6e4d93409e94"
+        }
+      ],
+      "tagged_member_sha256": "068653465c40b8333ba9e47a0f52f35254aaa0a5d2ad181208173cca79338858"
+    }
+  ],
+  "contracts": [
+    {
+      "line": "original",
+      "cdk_version": "16.2.14",
+      "public_entry": "@angular/cdk/fesm2022/a11y.mjs",
+      "helpers": [
+        {
+          "name": "addAriaReferencedId",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "20fd67cd6c248220d6d40af5d82accc7cdd7299d9fd53e6d286c2e43035efc56",
+          "function_source": "function addAriaReferencedId(el, attr, id) {\n    const ids = getAriaReferenceIds(el, attr);\n    if (ids.some(existingId => existingId.trim() == id.trim())) {\n        return;\n    }\n    ids.push(id.trim());\n    el.setAttribute(attr, ids.join(ID_DELIMITER));\n}",
+          "function_sha256": "46f87c05cbc99ba7d4fd75534a102755a79eacb205075e53395f4a93ce886cc9",
+          "declaration": "declare function addAriaReferencedId(el: Element, attr: `aria-${string}`, id: string): void;",
+          "declaration_path": "@angular/cdk/a11y/index.d.ts",
+          "declaration_sha256": "ed9103e5f0877a65229960ef138b193333a36259238bddb91ac839fe37bb2a17",
+          "id_delimiter": " "
+        },
+        {
+          "name": "removeAriaReferencedId",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "20fd67cd6c248220d6d40af5d82accc7cdd7299d9fd53e6d286c2e43035efc56",
+          "function_source": "function removeAriaReferencedId(el, attr, id) {\n    const ids = getAriaReferenceIds(el, attr);\n    const filteredIds = ids.filter(val => val != id.trim());\n    if (filteredIds.length) {\n        el.setAttribute(attr, filteredIds.join(ID_DELIMITER));\n    }\n    else {\n        el.removeAttribute(attr);\n    }\n}",
+          "function_sha256": "b080f6cfba8ddccc495976791763641a01196fe23ae6fcbbd435b405aa351c37",
+          "declaration": "declare function removeAriaReferencedId(el: Element, attr: `aria-${string}`, id: string): void;",
+          "declaration_path": "@angular/cdk/a11y/index.d.ts",
+          "declaration_sha256": "ed9103e5f0877a65229960ef138b193333a36259238bddb91ac839fe37bb2a17",
+          "id_delimiter": " "
+        },
+        {
+          "name": "getAriaReferenceIds",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "20fd67cd6c248220d6d40af5d82accc7cdd7299d9fd53e6d286c2e43035efc56",
+          "function_source": "function getAriaReferenceIds(el, attr) {\n    // Get string array of all individual ids (whitespace delimited) in the attribute value\n    return (el.getAttribute(attr) || '').match(/\\S+/g) || [];\n}",
+          "function_sha256": "c6d2839a9778da58ea1caee43ef110cf07344afd85e302d63f38c55292ecd63f",
+          "declaration": "declare function getAriaReferenceIds(el: Element, attr: string): string[];",
+          "declaration_path": "@angular/cdk/a11y/index.d.ts",
+          "declaration_sha256": "ed9103e5f0877a65229960ef138b193333a36259238bddb91ac839fe37bb2a17",
+          "id_delimiter": " "
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "cdk_version": "21.2.14",
+      "public_entry": "@angular/cdk/fesm2022/a11y.mjs",
+      "helpers": [
+        {
+          "name": "addAriaReferencedId",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "35ad4762a2506389b71e72c299b93f0c15d6a9c0ceb1e7834673107d8e96640d",
+          "function_source": "function addAriaReferencedId(el, attr, id) {\n  const ids = getAriaReferenceIds(el, attr);\n  id = id.trim();\n  if (ids.some(existingId => existingId.trim() === id)) {\n    return;\n  }\n  ids.push(id);\n  el.setAttribute(attr, ids.join(ID_DELIMITER));\n}",
+          "function_sha256": "33e83032d45e6e2b3a4033382bcfe452ecb1309c29d367d03b7c79751d5c43f9",
+          "declaration": "declare function addAriaReferencedId(el: Element, attr: `aria-${string}`, id: string): void;",
+          "declaration_path": "@angular/cdk/types/a11y.d.ts",
+          "declaration_sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16",
+          "id_delimiter": " "
+        },
+        {
+          "name": "removeAriaReferencedId",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "35ad4762a2506389b71e72c299b93f0c15d6a9c0ceb1e7834673107d8e96640d",
+          "function_source": "function removeAriaReferencedId(el, attr, id) {\n  const ids = getAriaReferenceIds(el, attr);\n  id = id.trim();\n  const filteredIds = ids.filter(val => val !== id);\n  if (filteredIds.length) {\n    el.setAttribute(attr, filteredIds.join(ID_DELIMITER));\n  } else {\n    el.removeAttribute(attr);\n  }\n}",
+          "function_sha256": "d2bb6e1d95d047a8c3a44cf9339c1591ca2786dc78f6b01999b182a5b0e9547c",
+          "declaration": "declare function removeAriaReferencedId(el: Element, attr: `aria-${string}`, id: string): void;",
+          "declaration_path": "@angular/cdk/types/a11y.d.ts",
+          "declaration_sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16",
+          "id_delimiter": " "
+        },
+        {
+          "name": "getAriaReferenceIds",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "35ad4762a2506389b71e72c299b93f0c15d6a9c0ceb1e7834673107d8e96640d",
+          "function_source": "function getAriaReferenceIds(el, attr) {\n  const attrValue = el.getAttribute(attr);\n  return attrValue?.match(/\\S+/g) ?? [];\n}",
+          "function_sha256": "2a8224e07298c2e80ace79bcb0834debd66d0c3540f62e3bc1060d89c7f8255b",
+          "declaration": "declare function getAriaReferenceIds(el: Element, attr: string): string[];",
+          "declaration_path": "@angular/cdk/types/a11y.d.ts",
+          "declaration_sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16",
+          "id_delimiter": " "
+        }
+      ]
+    },
+    {
+      "line": "main",
+      "cdk_version": "22.1.7",
+      "public_entry": "@angular/cdk/fesm2022/a11y.mjs",
+      "helpers": [
+        {
+          "name": "addAriaReferencedId",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "664e6e790f99f67c8e730bfd03bcc8d98349d8872b7df720b6f3fe67ef1768e8",
+          "function_source": "function addAriaReferencedId(el, attr, id) {\n  const ids = getAriaReferenceIds(el, attr);\n  id = id.trim();\n  if (ids.some(existingId => existingId.trim() === id)) {\n    return;\n  }\n  ids.push(id);\n  el.setAttribute(attr, ids.join(ID_DELIMITER));\n}",
+          "function_sha256": "33e83032d45e6e2b3a4033382bcfe452ecb1309c29d367d03b7c79751d5c43f9",
+          "declaration": "declare function addAriaReferencedId(el: Element, attr: `aria-${string}`, id: string): void;",
+          "declaration_path": "@angular/cdk/types/a11y.d.ts",
+          "declaration_sha256": "d3c1b9be3d42573c4ef2bea969a3749c41bd26f86f89d8a921cdc5ce3ae73be6",
+          "id_delimiter": " "
+        },
+        {
+          "name": "removeAriaReferencedId",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "664e6e790f99f67c8e730bfd03bcc8d98349d8872b7df720b6f3fe67ef1768e8",
+          "function_source": "function removeAriaReferencedId(el, attr, id) {\n  const ids = getAriaReferenceIds(el, attr);\n  id = id.trim();\n  const filteredIds = ids.filter(val => val !== id);\n  if (filteredIds.length) {\n    el.setAttribute(attr, filteredIds.join(ID_DELIMITER));\n  } else {\n    el.removeAttribute(attr);\n  }\n}",
+          "function_sha256": "d2bb6e1d95d047a8c3a44cf9339c1591ca2786dc78f6b01999b182a5b0e9547c",
+          "declaration": "declare function removeAriaReferencedId(el: Element, attr: `aria-${string}`, id: string): void;",
+          "declaration_path": "@angular/cdk/types/a11y.d.ts",
+          "declaration_sha256": "d3c1b9be3d42573c4ef2bea969a3749c41bd26f86f89d8a921cdc5ce3ae73be6",
+          "id_delimiter": " "
+        },
+        {
+          "name": "getAriaReferenceIds",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "664e6e790f99f67c8e730bfd03bcc8d98349d8872b7df720b6f3fe67ef1768e8",
+          "function_source": "function getAriaReferenceIds(el, attr) {\n  const attrValue = el.getAttribute(attr);\n  return attrValue?.match(/\\S+/g) ?? [];\n}",
+          "function_sha256": "2a8224e07298c2e80ace79bcb0834debd66d0c3540f62e3bc1060d89c7f8255b",
+          "declaration": "declare function getAriaReferenceIds(el: Element, attr: string): string[];",
+          "declaration_path": "@angular/cdk/types/a11y.d.ts",
+          "declaration_sha256": "d3c1b9be3d42573c4ef2bea969a3749c41bd26f86f89d8a921cdc5ce3ae73be6",
+          "id_delimiter": " "
+        }
+      ]
+    }
+  ],
+  "behaviors": [
+    {
+      "line": "21.x",
+      "primitive_string_cases": 192,
+      "receipt_sha256": "92b2cdf8841bbc5cf3dbb6653eb1e0de05df58b19636b794d3f8dcdf2f214921",
+      "repeated_operation_idempotent": true,
+      "trim_once_checks": 2,
+      "trim_counter_scope": "Instrumented trim protocol diagnoses the upstream optimization; the public API/callers still require primitive string ids."
+    },
+    {
+      "line": "main",
+      "primitive_string_cases": 192,
+      "receipt_sha256": "92b2cdf8841bbc5cf3dbb6653eb1e0de05df58b19636b794d3f8dcdf2f214921",
+      "repeated_operation_idempotent": true,
+      "trim_once_checks": 2,
+      "trim_counter_scope": "Instrumented trim protocol diagnoses the upstream optimization; the public API/callers still require primitive string ids."
+    }
+  ],
+  "delegations": [
+    {
+      "line": "original",
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "ownership_transitions": 8,
+      "receipt_sha256": "4455508072bf87706def1cdcebc8451a1a1266b7ca4f8fc87d28683e4603f9ba",
+      "whole_component_or_native_DOM_executed": false
+    },
+    {
+      "line": "original",
+      "file": "legacy-select/internal/select-base.ts",
+      "ownership_transitions": 8,
+      "receipt_sha256": "8ce3040ef16d826787cd84ee4aab4cda3f040ec495ab29c2a77a55adb4317912",
+      "whole_component_or_native_DOM_executed": false
+    },
+    {
+      "line": "21.x",
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "ownership_transitions": 8,
+      "receipt_sha256": "4455508072bf87706def1cdcebc8451a1a1266b7ca4f8fc87d28683e4603f9ba",
+      "whole_component_or_native_DOM_executed": false
+    },
+    {
+      "line": "21.x",
+      "file": "legacy-select/internal/select-base.ts",
+      "ownership_transitions": 8,
+      "receipt_sha256": "8ce3040ef16d826787cd84ee4aab4cda3f040ec495ab29c2a77a55adb4317912",
+      "whole_component_or_native_DOM_executed": false
+    },
+    {
+      "line": "main",
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "ownership_transitions": 8,
+      "receipt_sha256": "4455508072bf87706def1cdcebc8451a1a1266b7ca4f8fc87d28683e4603f9ba",
+      "whole_component_or_native_DOM_executed": false
+    },
+    {
+      "line": "main",
+      "file": "legacy-select/internal/select-base.ts",
+      "ownership_transitions": 8,
+      "receipt_sha256": "8ce3040ef16d826787cd84ee4aab4cda3f040ec495ab29c2a77a55adb4317912",
+      "whole_component_or_native_DOM_executed": false
+    }
+  ],
+  "source_override_used": false,
+  "runtime_override_used": false,
+  "rxjs": {
+    "version": "7.8.2",
+    "entry_sha256": "bde56ab43879fcb76c9be9176daeb7abf1a775deed1606d0e88d0ac3012f4886",
+    "operators_sha256": "815337444ecd9f481f1fa4f80039796c6e73458d985256c895c7b27b268430c0",
+    "scope": "Borrowed host RxJS only, not runtime/family floor qualification"
+  },
+  "limits": [
+    "Genuine complete authenticated public modules; id-list comparisons use explicit Element get/set/removeAttribute protocols, not a native DOM or assistive technology.",
+    "Two exact tagged ownership methods per component replay modal movement, duplicate attachment and cleanup. Autocomplete close/attach and full select/overlay lifecycle remain separate; only their helper-call contexts are inspected.",
+    "No complete Angular component, native view/focus, browser, packed consumer or runtime-floor execution."
+  ],
+  "g11_claim": "not-passed",
+  "negative_controls_rejected": 8,
+  "alias_positive": true,
+  "source_parent": "47ae03c3f1849892981eb4754093f0be3a2bcce1",
+  "source_inputs": [
+    {
+      "path": "scripts/aria-reference-use-review.mjs",
+      "sha256": "c012941e4f7ae523d01e68b3a9d6ca5f54adc963358830ea6d46cf17285c3254"
+    },
+    {
+      "path": "tests/aria_reference_review_probe.mjs",
+      "sha256": "493e62ac224594c4b23d7cf073500fab5705919132fa750cb05f00ac016209fb"
+    },
+    {
+      "path": "tests/test_aria_reference_review.py",
+      "sha256": "a5f5928bb0c11483d6bec807f885eabe79b77c0b2ee5d75cfb51f4ce681851c4"
+    },
+    {
+      "path": "scripts/key-manager-public-subjects.mjs",
+      "sha256": "904eb0aca144a2d0b002572a1a671ffb021f5a06b5a09ad3514f5182f81b9f18"
+    },
+    {
+      "path": "compatibility/rc/key-manager-public-subjects.json",
+      "sha256": "97733629aa03a8faa5dfa88ccf96efa9f1cb3b40914f65efed7123870eedc0fb"
+    },
+    {
+      "path": "compatibility/rc/key-manager-tagged-construction-subjects.json",
+      "sha256": "50e7f14e8460bef4eab432c53de985b502678d5c1f0257b1dbcc4a2e30e1aad2"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "3a0e28d25fa553220d0faeff8c00b4bd3c343cdd27051e25eda7efef6a80b432"
+    }
+  ],
+  "source_only": true,
+  "product_or_consumer_changed": false
+}
