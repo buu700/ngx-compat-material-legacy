@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "upstream_sha": "737c7a8f1a5bc4df0e790d3ecdd227f8342499f8",
+  "patch_path": "compatibility/f10/disposition-ledger/evidence/patches/737c7a8f1a5bc4df0e790d3ecdd227f8342499f8.patch",
+  "patch_sha256": "3b851d3ccee1db729cd51680182d3832947fec5533e30bb18f851d6813325e20",
+  "public_subjects_sha256": "97733629aa03a8faa5dfa88ccf96efa9f1cb3b40914f65efed7123870eedc0fb",
+  "cases": [
+    {
+      "file": "legacy-menu/internal/menu-trigger-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "isFakeMousedownFromScreenReader",
+      "local_name": "isFakeMousedownFromScreenReader",
+      "candidate_source_sha256": "9c3b605d77935394dd158547b85d3174fb1e1ea142bd3953bc706e51bbe95d66",
+      "references": [
+        {
+          "line": 587,
+          "expression": "isFakeMousedownFromScreenReader(event)",
+          "member": "_handleMousedown",
+          "member_source": "_handleMousedown(event: MouseEvent): void {\n    if (!isFakeMousedownFromScreenReader(event)) {\n      // Since right or middle button clicks won't trigger the `click` event,\n      // we shouldn't consider the menu as opened by mouse in those cases.\n      this._openedBy = event.button === 0 ? 'mouse' : undefined;\n\n      // Since clicking on the trigger won't close the menu if it opens a sub-menu,\n      // we should prevent focus from moving onto it via click to avoid the\n      // highlight from lingering on the menu item.\n      if (this.triggersSubmenu()) {\n        event.preventDefault();\n      }\n    }\n  }"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-trigger-base.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "isFakeTouchstartFromScreenReader",
+      "local_name": "isFakeTouchstartFromScreenReader",
+      "candidate_source_sha256": "9c3b605d77935394dd158547b85d3174fb1e1ea142bd3953bc706e51bbe95d66",
+      "references": [
+        {
+          "line": 124,
+          "expression": "isFakeTouchstartFromScreenReader(event)",
+          "member": "_handleTouchStart",
+          "member_source": "private _handleTouchStart = (event: TouchEvent) => {\n    if (!isFakeTouchstartFromScreenReader(event)) {\n      this._openedBy = 'touch';\n    }\n  };"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "isFakeMousedownFromScreenReader",
+      "local_name": "isFakeMousedownFromScreenReader",
+      "candidate_source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "references": [
+        {
+          "line": 291,
+          "expression": "isFakeMousedownFromScreenReader(event)",
+          "member": "_onMousedown",
+          "member_source": "private _onMousedown(event: MouseEvent) {\n    const isFakeMousedown = isFakeMousedownFromScreenReader(event);\n    const isSyntheticEvent =\n      this._lastTouchStartEvent && Date.now() < this._lastTouchStartEvent + ignoreMouseEventsTimeout;\n\n    if (!this._target.rippleDisabled && !isFakeMousedown && !isSyntheticEvent) {\n      this._isPointerDown = true;\n      this.fadeInRipple(event.clientX, event.clientY, this._target.rippleConfig);\n    }\n  }"
+        }
+      ]
+    },
+    {
+      "file": "legacy-core/ripple/ripple-renderer.ts",
+      "module": "@angular/cdk/a11y",
+      "symbol": "isFakeTouchstartFromScreenReader",
+      "local_name": "isFakeTouchstartFromScreenReader",
+      "candidate_source_sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "references": [
+        {
+          "line": 302,
+          "expression": "isFakeTouchstartFromScreenReader(event)",
+          "member": "_onTouchStart",
+          "member_source": "private _onTouchStart(event: TouchEvent) {\n    if (!this._target.rippleDisabled && !isFakeTouchstartFromScreenReader(event)) {\n      this._lastTouchStartEvent = Date.now();\n      this._isPointerDown = true;\n      const touches = event.changedTouches as TouchList | undefined;\n      if (touches) {\n        for (let i = 0; i < touches.length; i++) {\n          this.fadeInRipple(touches[i].clientX, touches[i].clientY, this._target.rippleConfig);\n        }\n      }\n    }\n  }"
+        }
+      ]
+    }
+  ],
+  "contracts": [
+    {
+      "line": "original",
+      "cdk_version": "16.2.14",
+      "public_entry": "@angular/cdk/fesm2022/a11y.mjs",
+      "helpers": [
+        {
+          "name": "isFakeMousedownFromScreenReader",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "20fd67cd6c248220d6d40af5d82accc7cdd7299d9fd53e6d286c2e43035efc56",
+          "function_sha256": "8264bce1e731d3ceb19e0402251e7d5b7b209c7722d978d128cc66e4f2da9769",
+          "body_code": "{\n    return event.buttons === 0 || event.detail === 0;\n}",
+          "body_syntax_sha256": "6d043032837f4b91a0dd18bc0bf84b45b1f1be14920f4d0d0c87a9489c0f9457",
+          "declaration_path": "@angular/cdk/a11y/index.d.ts",
+          "declaration_sha256": "ed9103e5f0877a65229960ef138b193333a36259238bddb91ac839fe37bb2a17",
+          "declaration": "declare function isFakeMousedownFromScreenReader(event: MouseEvent): boolean;"
+        },
+        {
+          "name": "isFakeTouchstartFromScreenReader",
+          "runtime_path": "@angular/cdk/fesm2022/a11y.mjs",
+          "runtime_sha256": "20fd67cd6c248220d6d40af5d82accc7cdd7299d9fd53e6d286c2e43035efc56",
+          "function_sha256": "9839accdb06f09f2221ecfe76e9414f9675261ed55338edb9cfc9da9b12ce4c3",
+          "body_code": "{\n    const touch = (event.touches && event.touches[0]) || (event.changedTouches && event.changedTouches[0]);\n    return (!!touch &&\n        touch.identifier === -1 &&\n        (touch.radiusX == null || touch.radiusX === 1) &&\n        (touch.radiusY == null || touch.radiusY === 1));\n}",
+          "body_syntax_sha256": "3a188d8893e8886e830c62db2149651143b0665946c8cfade09d42dda414fc0a",
+          "declaration_path": "@angular/cdk/a11y/index.d.ts",
+          "declaration_sha256": "ed9103e5f0877a65229960ef138b193333a36259238bddb91ac839fe37bb2a17",
+          "declaration": "declare function isFakeTouchstartFromScreenReader(event: TouchEvent): boolean;"
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "cdk_version": "21.2.14",
+      "public_entry": "@angular/cdk/fesm2022/a11y.mjs",
+      "helpers": [
+        {
+          "name": "isFakeMousedownFromScreenReader",
+          "runtime_path": "@angular/cdk/fesm2022/_fake-event-detection-chunk.mjs",
+          "runtime_sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf",
+          "function_sha256": "2ba998e5217603f6c0dd645c95f6706b1677d0147923b83442648cee0763a4b9",
+          "body_code": "{\n    return event.buttons === 0 || event.detail === 0;\n}",
+          "body_syntax_sha256": "6d043032837f4b91a0dd18bc0bf84b45b1f1be14920f4d0d0c87a9489c0f9457",
+          "declaration_path": "@angular/cdk/types/a11y.d.ts",
+          "declaration_sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16",
+          "declaration": "declare function isFakeMousedownFromScreenReader(event: MouseEvent): boolean;"
+        },
+        {
+          "name": "isFakeTouchstartFromScreenReader",
+          "runtime_path": "@angular/cdk/fesm2022/_fake-event-detection-chunk.mjs",
+          "runtime_sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf",
+          "function_sha256": "6084b9564bc6c1f7c2c01b4ce0a4d319b25d1c4ba641525753c1debac77ede19",
+          "body_code": "{\n    const touch = event.touches && event.touches[0] || event.changedTouches && event.changedTouches[0];\n    return !!touch && touch.identifier === -1 && (touch.radiusX == null || touch.radiusX === 1) && (touch.radiusY == null || touch.radiusY === 1);\n}",
+          "body_syntax_sha256": "3a188d8893e8886e830c62db2149651143b0665946c8cfade09d42dda414fc0a",
+          "declaration_path": "@angular/cdk/types/a11y.d.ts",
+          "declaration_sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16",
+          "declaration": "declare function isFakeTouchstartFromScreenReader(event: TouchEvent): boolean;"
+        }
+      ]
+    },
+    {
+      "line": "main",
+      "cdk_version": "22.1.7",
+      "public_entry": "@angular/cdk/fesm2022/a11y.mjs",
+      "helpers": [
+        {
+          "name": "isFakeMousedownFromScreenReader",
+          "runtime_path": "@angular/cdk/fesm2022/_fake-event-detection-chunk.mjs",
+          "runtime_sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf",
+          "function_sha256": "2ba998e5217603f6c0dd645c95f6706b1677d0147923b83442648cee0763a4b9",
+          "body_code": "{\n    return event.buttons === 0 || event.detail === 0;\n}",
+          "body_syntax_sha256": "6d043032837f4b91a0dd18bc0bf84b45b1f1be14920f4d0d0c87a9489c0f9457",
+          "declaration_path": "@angular/cdk/types/a11y.d.ts",
+          "declaration_sha256": "d3c1b9be3d42573c4ef2bea969a3749c41bd26f86f89d8a921cdc5ce3ae73be6",
+          "declaration": "declare function isFakeMousedownFromScreenReader(event: MouseEvent): boolean;"
+        },
+        {
+          "name": "isFakeTouchstartFromScreenReader",
+          "runtime_path": "@angular/cdk/fesm2022/_fake-event-detection-chunk.mjs",
+          "runtime_sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf",
+          "function_sha256": "6084b9564bc6c1f7c2c01b4ce0a4d319b25d1c4ba641525753c1debac77ede19",
+          "body_code": "{\n    const touch = event.touches && event.touches[0] || event.changedTouches && event.changedTouches[0];\n    return !!touch && touch.identifier === -1 && (touch.radiusX == null || touch.radiusX === 1) && (touch.radiusY == null || touch.radiusY === 1);\n}",
+          "body_syntax_sha256": "3a188d8893e8886e830c62db2149651143b0665946c8cfade09d42dda414fc0a",
+          "declaration_path": "@angular/cdk/types/a11y.d.ts",
+          "declaration_sha256": "d3c1b9be3d42573c4ef2bea969a3749c41bd26f86f89d8a921cdc5ce3ae73be6",
+          "declaration": "declare function isFakeTouchstartFromScreenReader(event: TouchEvent): boolean;"
+        }
+      ]
+    }
+  ],
+  "tagged_menu_bodies": [
+    {
+      "name": "isFakeMousedownFromScreenReader",
+      "tagged_member_sha256": "b959687b035871b5c718ca4ea75f293d67224cf6e25b0f1bf93f33519f3a3a6f",
+      "handler_body_sha256": "e69e558390cdbaab1a4be2e73c41003a8d42c53d4251b04561325534af504ebe",
+      "owned_body_matches_tag": true
+    },
+    {
+      "name": "isFakeTouchstartFromScreenReader",
+      "tagged_member_sha256": "b959687b035871b5c718ca4ea75f293d67224cf6e25b0f1bf93f33519f3a3a6f",
+      "handler_body_sha256": "9b61f7d37fbec6c998808258bb126119c9bccd920bbd77c36d3535aae861ed3e",
+      "owned_body_matches_tag": true
+    }
+  ],
+  "helpers": [
+    {
+      "line": "original",
+      "mouse_cases": 16,
+      "touch_cases": 153,
+      "receipt_sha256": "29cfea75e396d0f1a6866b03b23c84c659174dbd3127f0b7f99a52ccc6764269",
+      "layout_coordinate_reads": 0
+    },
+    {
+      "line": "21.x",
+      "mouse_cases": 16,
+      "touch_cases": 153,
+      "receipt_sha256": "29cfea75e396d0f1a6866b03b23c84c659174dbd3127f0b7f99a52ccc6764269",
+      "layout_coordinate_reads": 0
+    },
+    {
+      "line": "main",
+      "mouse_cases": 16,
+      "touch_cases": 153,
+      "receipt_sha256": "29cfea75e396d0f1a6866b03b23c84c659174dbd3127f0b7f99a52ccc6764269",
+      "layout_coordinate_reads": 0
+    }
+  ],
+  "delegations": [
+    {
+      "line": "original",
+      "mouse_cases": 36,
+      "touch_cases": 8,
+      "receipt_sha256": "9f46431d602db4cbd03b9262a115e24a29817bb115bb1bbc2303dde6027c3649",
+      "exact_owned_handlers_replayed": true,
+      "whole_angular_class_constructed": false,
+      "native_focus_or_view_executed": false
+    },
+    {
+      "line": "21.x",
+      "mouse_cases": 36,
+      "touch_cases": 8,
+      "receipt_sha256": "9f46431d602db4cbd03b9262a115e24a29817bb115bb1bbc2303dde6027c3649",
+      "exact_owned_handlers_replayed": true,
+      "whole_angular_class_constructed": false,
+      "native_focus_or_view_executed": false
+    },
+    {
+      "line": "main",
+      "mouse_cases": 36,
+      "touch_cases": 8,
+      "receipt_sha256": "9f46431d602db4cbd03b9262a115e24a29817bb115bb1bbc2303dde6027c3649",
+      "exact_owned_handlers_replayed": true,
+      "whole_angular_class_constructed": false,
+      "native_focus_or_view_executed": false
+    }
+  ],
+  "runtime_override_used": false,
+  "source_override_used": false,
+  "original_already_has_detail_based_fix": true,
+  "rxjs": {
+    "version": "7.8.2",
+    "entry_sha256": "bde56ab43879fcb76c9be9176daeb7abf1a775deed1606d0e88d0ac3012f4886",
+    "operators_sha256": "815337444ecd9f481f1fa4f80039796c6e73458d985256c895c7b27b268430c0",
+    "scope": "Borrowed host RxJS only, not runtime/family floor qualification"
+  },
+  "limits": [
+    "Complete genuine original/minimum public a11y modules are executed with existing authenticated Core/compiler capsules and borrowed host RxJS.",
+    "Only the two exact historical menu handler bodies are replayed with explicit input-origin/submenu protocols; no complete Angular component construction, native focus, screen reader/browser, packed consumer or runtime-floor pass.",
+    "The upstream test-helper default/detail changes exercise the same predicate. No unrelated focus-monitor, drag/drop, input-modality or whole ripple behavior is claimed."
+  ],
+  "g11_claim": "not-passed",
+  "negative_controls_rejected": 12,
+  "alias_positive": true,
+  "test_source_overrides_changed_no_files": true,
+  "source_parent": "568caa93460919111561351b7a1458e0ecb8e8f4",
+  "source_inputs": [
+    {
+      "path": "scripts/screen-reader-event-use-review.mjs",
+      "sha256": "5fea3e4a4887358fc62bdaf86ca80da2bfb2014056aed276b8708dd87bd4777b"
+    },
+    {
+      "path": "tests/screen_reader_event_review_probe.mjs",
+      "sha256": "ac606ea60680283acc55f65aefe96f4c8545d61aa877522f1219c742f5723dcb"
+    },
+    {
+      "path": "tests/test_screen_reader_event_review.py",
+      "sha256": "2f5c7edf2c00e7b630bcb7dd86580b5860f74d377e5537bf7799b86f9d844c00"
+    },
+    {
+      "path": "scripts/key-manager-public-subjects.mjs",
+      "sha256": "904eb0aca144a2d0b002572a1a671ffb021f5a06b5a09ad3514f5182f81b9f18"
+    },
+    {
+      "path": "compatibility/rc/key-manager-public-subjects.json",
+      "sha256": "97733629aa03a8faa5dfa88ccf96efa9f1cb3b40914f65efed7123870eedc0fb"
+    },
+    {
+      "path": "compatibility/rc/key-manager-tagged-construction-subjects.json",
+      "sha256": "50e7f14e8460bef4eab432c53de985b502678d5c1f0257b1dbcc4a2e30e1aad2"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+      "sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+      "sha256": "9c3b605d77935394dd158547b85d3174fb1e1ea142bd3953bc706e51bbe95d66"
+    }
+  ],
+  "source_only": true,
+  "product_or_consumer_changed": false
+}

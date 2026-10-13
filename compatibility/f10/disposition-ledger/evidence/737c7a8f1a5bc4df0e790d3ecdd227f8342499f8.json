@@ -1,8 +1,9 @@
 {
+  "schema_version": 1,
   "sha": "737c7a8f1a5bc4df0e790d3ecdd227f8342499f8",
-  "sensitive_class": "a11y",
-  "final_disposition": "inherited",
-  "final_disposition_changed": false,
+  "line": "main",
+  "source_parent": "568caa93460919111561351b7a1458e0ecb8e8f4",
+  "source": "https://github.com/angular/components/commit/737c7a8f1a5bc4df0e790d3ecdd227f8342499f8.patch",
   "diff_sha256": "3b851d3ccee1db729cd51680182d3832947fec5533e30bb18f851d6813325e20",
   "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/737c7a8f1a5bc4df0e790d3ecdd227f8342499f8.patch",
   "patch_bytes": 5497,
@@ -14,8 +15,61 @@
     "src/cdk/testing/testbed/fake-events/event-objects.ts",
     "src/material/core/ripple/ripple.spec.ts"
   ],
-  "owned_legacy_paths": [],
-  "source": "https://github.com/angular/components/commit/737c7a8f1a5bc4df0e790d3ecdd227f8342499f8.patch",
-  "closure": "not-closed",
-  "why_not_closed": "This row stays open for admission. Inherited rows still need installed peer bytes and an executed delegation. already-adapted rows are material behavior and were not given a new final. The patch hash is recorded so the next read does not start from nothing."
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "inherited",
+  "closure": "finite-predicate-fix-reviewed",
+  "decision": "Individually reviewed all six hunk paths. The production hunk replaces layout-coordinate reads with buttons/detail; the other five files update public test event defaults and fake-event setup. The authenticated16.2.14 reference already contains the final predicate. CDK22.1.7 exports the identical complete predicate and stable public MouseEvent-to-boolean signature. Genuine original and both minimum public exports execute without offsetX/offsetY reads, including zero-coordinate traps and short-circuit getter checks. The exact tagged owned menu handlers delegate to these exports and preserve fake-event origin, genuine mouse-button origin, submenu prevention and touch origin in44 cases per subject. Owned ripple helper imports remain under their existing separate reviewed renderer boundary. Current CDK owns focus-monitor/input-modality/drag-drop and its test helper; no CDK code is forked. This finite fix is inherited at the branch minimum; whole native focus, assistive-technology behavior and unrelated component routes are not certified.",
+  "installed_member": {
+    "path": "package/fesm2022/_fake-event-detection-chunk.mjs",
+    "sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf"
+  },
+  "independent_evidence": [
+    {
+      "path": "compatibility/rc/screen-reader-event-source-diagnostic.json",
+      "sha256": "0ce9e750e383bfd61738dc1b6543f76663d8ea9d8854127c56275da47da9b3c0"
+    },
+    {
+      "path": "scripts/screen-reader-event-use-review.mjs",
+      "sha256": "5fea3e4a4887358fc62bdaf86ca80da2bfb2014056aed276b8708dd87bd4777b"
+    },
+    {
+      "path": "tests/screen_reader_event_review_probe.mjs",
+      "sha256": "ac606ea60680283acc55f65aefe96f4c8545d61aa877522f1219c742f5723dcb"
+    }
+  ],
+  "original_already_contains_fix": true,
+  "complete_native_component_or_upstream_test_suite_executed": false,
+  "prior_entry": {
+    "sha": "737c7a8f1a5bc4df0e790d3ecdd227f8342499f8",
+    "bucket": "behavior-semantic",
+    "subject": "perf(cdk/a11y): Don't trigger re-layout when detecting fake mousedown (#28029)",
+    "final_disposition": "inherited",
+    "reason": "The patch changes isFakeMousedownFromScreenReader to test event.detail instead of offsetX and offsetY. That function is imported from @angular/cdk/a11y by the owned menu trigger and ripple renderer. It is not defined in this package, and the CDK body was not copied. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+    "read_note_disposition": "not-owned",
+    "files": [
+      "src/cdk/a11y/fake-event-detection.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/737c7a8f1a5bc4df0e790d3ecdd227f8342499f8.json",
+    "peer_floor": {
+      "package": "@angular/cdk",
+      "advertised_range": "^22.1.7",
+      "installed_version": "22.1.7",
+      "contains_fix_tag": "v22.1.7",
+      "sha_is_ancestor_of_tag": true,
+      "cdk_modules": [
+        "a11y"
+      ],
+      "owned_import_intersection": [
+        "a11y"
+      ]
+    },
+    "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+    "recorded_at_utc": "2026-10-01T16:49:17Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+  },
+  "g11_claim": "not-passed"
 }
