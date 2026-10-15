@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "role": "Source-confirmed mixed-generation snack-bar modal ownership lead; genuine method protocol reproduction and prefix repair are next, no runtime clearance",
+  "runtime_capsule": {
+    "path": "compatibility/rc/remaining-identity-public-subjects.json",
+    "sha256": "c3600dff7acf9eeb0a0bbd0fd893273e392592fc1bae06110fb792ffe673a8fc"
+  },
+  "members": [
+    {
+      "line": "main",
+      "path": "@angular/material/fesm2022/snack-bar.mjs",
+      "sha256": "a3aef232509cc44e971b41be1bc017ba543374b323d16bce90a5162fc568922b",
+      "methods": [
+        {
+          "class": "MatSnackBarContainer",
+          "method": "_exposeToModals",
+          "source": "_exposeToModals() {\n    const id = this._liveElementId;\n    const modals = this._document.querySelectorAll('body > .cdk-overlay-container [aria-modal=\"true\"]');\n    for (let i = 0; i < modals.length; i++) {\n      const modal = modals[i];\n      const ariaOwns = modal.getAttribute('aria-owns');\n      this._trackedModals.add(modal);\n      if (!ariaOwns) {\n        modal.setAttribute('aria-owns', id);\n      } else if (ariaOwns.indexOf(id) === -1) {\n        modal.setAttribute('aria-owns', ariaOwns + ' ' + id);\n      }\n    }\n  }",
+          "line": 424
+        },
+        {
+          "class": "MatSnackBarContainer",
+          "method": "_clearFromModals",
+          "source": "_clearFromModals() {\n    this._trackedModals.forEach(modal => {\n      const ariaOwns = modal.getAttribute('aria-owns');\n      if (ariaOwns) {\n        const newValue = ariaOwns.replace(this._liveElementId, '').trim();\n        if (newValue.length > 0) {\n          modal.setAttribute('aria-owns', newValue);\n        } else {\n          modal.removeAttribute('aria-owns');\n        }\n      }\n    });\n    this._trackedModals.clear();\n  }",
+          "line": 438
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "path": "@angular/material/fesm2022/snack-bar.mjs",
+      "sha256": "2c5d78a32e101a37d3f99592409e436f45fe99a964fd349038be8223a931ee60",
+      "methods": [
+        {
+          "class": "MatSnackBarContainer",
+          "method": "_exposeToModals",
+          "source": "_exposeToModals() {\n    const id = this._liveElementId;\n    const modals = this._document.querySelectorAll('body > .cdk-overlay-container [aria-modal=\"true\"]');\n    for (let i = 0; i < modals.length; i++) {\n      const modal = modals[i];\n      const ariaOwns = modal.getAttribute('aria-owns');\n      this._trackedModals.add(modal);\n      if (!ariaOwns) {\n        modal.setAttribute('aria-owns', id);\n      } else if (ariaOwns.indexOf(id) === -1) {\n        modal.setAttribute('aria-owns', ariaOwns + ' ' + id);\n      }\n    }\n  }",
+          "line": 428
+        },
+        {
+          "class": "MatSnackBarContainer",
+          "method": "_clearFromModals",
+          "source": "_clearFromModals() {\n    this._trackedModals.forEach(modal => {\n      const ariaOwns = modal.getAttribute('aria-owns');\n      if (ariaOwns) {\n        const newValue = ariaOwns.replace(this._liveElementId, '').trim();\n        if (newValue.length > 0) {\n          modal.setAttribute('aria-owns', newValue);\n        } else {\n          modal.removeAttribute('aria-owns');\n        }\n      }\n    });\n    this._trackedModals.clear();\n  }",
+          "line": 442
+        }
+      ]
+    }
+  ],
+  "example": {
+    "owned": "mat-snack-bar-container-live-0-legacy",
+    "current": "mat-snack-bar-container-live-0",
+    "expected": "Both IDs must remain separate aria-owns tokens until their own container is dismissed.",
+    "source_inference": "If legacy opens first, current indexOf sees its entire ID inside the legacy token and omits the current target. Current replace can then remove the legacy token prefix. A legacy namespace must also avoid this substring relationship."
+  },
+  "packed_case_would_reject_missing_target": true,
+  "actual_packed_or_native_execution": false,
+  "g11_claim": "not-passed"
+}

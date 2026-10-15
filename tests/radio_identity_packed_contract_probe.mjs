@@ -15,8 +15,11 @@ import {dirname,join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {RADIO_IDENTITY_CASE_ID,packedRadioIdentityCase} from '../scripts/radio-identity-packed-contract.mjs';
+import {packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-contract.mjs';
 import {radioIdentityPackedFixture} from '../scripts/radio-identity-packed-fixture.mjs';
-import {RADIO_IDENTITY_PACKED_PREIMAGES,RADIO_IDENTITY_PACKED_EDITS,reverseRadioIdentityPackedSource} from '../scripts/radio-identity-packed-source-requalification.mjs';
+import {RADIO_IDENTITY_PACKED_PREIMAGES,RADIO_IDENTITY_PACKED_EDITS,reverseRadioIdentityPackedSource as reverseOldRadioIdentityPackedSource} from '../scripts/radio-identity-packed-source-requalification.mjs';
+import {reverseGeneratedIdentityPackedSource} from '../scripts/generated-identity-packed-source-requalification.mjs';
+const reverseRadioIdentityPackedSource=(path,raw,line)=>reverseOldRadioIdentityPackedSource(path,reverseGeneratedIdentityPackedSource(path,raw,line),line);
 import {packedTableOnPushCase} from '../scripts/table-onpush-packed-contract.mjs';
 import {packedValueAccessorCases} from '../scripts/value-accessor-packed-contract.mjs';
 import {allConsumerCaseIds,declarationObservations,declarationKeys,librarySpec,harnessCaseIds,loadExportKeys,writeAcceptanceReport} from '../scripts/packed-consumer-evidence.mjs';
@@ -34,8 +37,8 @@ const sample={execution:'packed-angular-testbed-dom',error:null,scopes_separate:
  destroy:{fixture_destroyed:true,notified_distinct_names:2,checked_before:[false,true,false,false,true,false],checked_after:[false,true,false,false,true,false]}};
 const producerPath='scripts/packed-consumer-aot-smoke.mjs',raw=read(producerPath),sf=ts.createSourceFile(producerPath,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);assert.equal(sf.parseDiagnostics.length,0);
 const source=sf.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases').getText(sf);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase);
-const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,103);assert.equal(new Set(expected).size,103);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase);
+const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,104);assert.equal(new Set(expected).size,104);
 const observe=(value,fn=load(source))=>{const rows=fn({harness:{status:'ok',result:{radioIdentity:value}}},keys,'/tmp/consumer','/tmp/source').filter(r=>r.case_id===RADIO_IDENTITY_CASE_ID);assert.equal(rows.length,1);return rows[0];};
 assert.equal(observe(sample).result,'pass');
 const mutations=[o=>o.execution='workspace-projection',o=>o.error='fixture-failure',o=>o.scopes_separate=false,
@@ -58,9 +61,9 @@ try{for(const name of ['complete','missing','failed']){const runDir=join(scratch
 const matrix=JSON.parse(read('compatibility/rc/matrices/full-verify.json')),check=matrix.checks.find(row=>row.check_id==='packed-consumer');
 for(const branch of ['main','21.x']){const roster=check.acceptance.cases_by_line[branch];if(roster.harness===null)continue;assert.deepEqual(Object.values(roster).flat().sort(),[...expected].sort());}
 let sourceNegatives=0;for(const path of Object.keys(RADIO_IDENTITY_PACKED_PREIMAGES[line].members)){const original=execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','show',RADIO_IDENTITY_PACKED_PREIMAGES[line].commit+':'+path],{cwd:root,encoding:'utf8'});assert.equal(reverseRadioIdentityPackedSource(path,read(path),line),original);assert.throws(()=>reverseRadioIdentityPackedSource(path,read(path)+'\n',line));sourceNegatives++;
- if(RADIO_IDENTITY_PACKED_EDITS[path])for(const [,after] of RADIO_IDENTITY_PACKED_EDITS[path]){assert.ok(read(path).includes(after));assert.throws(()=>reverseRadioIdentityPackedSource(path,read(path).replace(after,after+'\n// mutated addition'),line));sourceNegatives++;}
+ if(RADIO_IDENTITY_PACKED_EDITS[path])for(const [,after] of RADIO_IDENTITY_PACKED_EDITS[path]){const prior=reverseGeneratedIdentityPackedSource(path,read(path),line);assert.ok(prior.includes(after));assert.throws(()=>reverseOldRadioIdentityPackedSource(path,prior.replace(after,after+'\n// mutated addition'),line));sourceNegatives++;}
 }
 assert.throws(()=>reverseRadioIdentityPackedSource('foreign.mjs',raw,line));sourceNegatives++;assert.throws(()=>reverseRadioIdentityPackedSource(producerPath,raw,line==='main'?'21.x':'main'));sourceNegatives++;
 const fixture=radioIdentityPackedFixture(),parsed=ts.createSourceFile('radio-identity-probe.ts',fixture,ts.ScriptTarget.Latest,true);assert.equal(parsed.parseDiagnostics.length,0);assert.doesNotMatch(fixture,/ɵ|_IdGenerator|new UniqueSelectionDispatcher|provide:\s*UniqueSelectionDispatcher|\.ngOnDestroy\(/);assert.ok(fixture.includes('fixture.destroy()'));assert.ok(fixture.includes('input(node).click()'));assert.ok(fixture.includes('legacyScope.queryAll(By.directive(MatRadioButton)).length===0'));assert.ok(raw.indexOf('const radioIdentity=await observePackedRadioIdentity();')<raw.indexOf('const fixture = TestBed.createComponent(HarnessHost);'));
-const output={schema_version:1,line,role:'Synthetic actual collector/writer controls, generated fixture syntax and exact whole-program reversal; no actual radio component execution',derived_cases:103,retained_previous_cases:102,negative_cases:negatives,collector_mutants:mutants.length,writer_cases:3,source_reversal_negative_controls:sourceNegatives,fixture_sha256:hash(fixture),contract_sha256:hash(read('scripts/radio-identity-packed-contract.mjs')),typescript:ts.version,node:process.version,roster_bound:true,actual_packed_radio_executed:false,native_browser_executed:false};
+const output={schema_version:1,line,role:'Synthetic actual collector/writer controls, generated fixture syntax and exact whole-program reversal; no actual radio component execution',derived_cases:104,retained_previous_cases:102,negative_cases:negatives,collector_mutants:mutants.length,writer_cases:3,source_reversal_negative_controls:sourceNegatives,fixture_sha256:hash(fixture),contract_sha256:hash(read('scripts/radio-identity-packed-contract.mjs')),typescript:ts.version,node:process.version,roster_bound:true,actual_packed_radio_executed:false,native_browser_executed:false};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(output,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(output));
