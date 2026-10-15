@@ -69,7 +69,9 @@ export function createFixture(sourceRoot, individualReview = null) {
   repoPut('compatibility/f10/authored-dependency-inventory-seed.json', frozenBytes);
   const note = 'Synthetic validator fixture only. No real source API, runtime, package, advisory or approval is qualified by this fixture.\n';
   for (const file of new Set(frozen.symbol_uses.map(row => row.file))) repoPut('projects/ngx-material-legacy/' + file, '// ' + note);
-  for (const path of SELECT_FOCUS_MEMBERS) repoPut(path, read(path));
+  const requiredMembers = new Set([...SELECT_FOCUS_MEMBERS,
+    ...(individualReview?.entry.individual_proof.artifact_behavior.source_members ?? []).map(row => row.path)]);
+  for (const path of requiredMembers) repoPut(path, read(path));
   repoPut('compatibility/rc/artifact-validator-note.txt', note);
   const noteRef = {path: 'compatibility/rc/artifact-validator-note.txt', sha256: hash(note)};
   const active = scanCurrentAuthoredUses({root}), key = row => JSON.stringify([row.file, row.module, row.symbol]);
@@ -92,7 +94,8 @@ export function createFixture(sourceRoot, individualReview = null) {
   repoPut('symbols.json', {schema_version: 1, line, status: 'closed', symbol_uses: frozen.symbol_uses.map(close), fixture_only: true});
   repoPut('current.json', {schema_version: 1, line, status: 'closed', current_uses: active.symbol_uses.length, current_source_files: active.source_files.length,
     current_source_population_sha256: active.source_population_sha256, symbol_use_count: additional.length, symbol_uses: additional.map(close), fixture_only: true});
-  const patchPath = 'compatibility/rc/select-focus-click-original.patch'; repoPut(patchPath, read(patchPath));
+  const patchPath = individualReview?.review.patch_file ?? 'compatibility/rc/select-focus-click-original.patch';
+  repoPut(patchPath, read(patchPath));
   const reviewPath = individualReview?.entry.evidence_report ?? 'compatibility/f10/disposition-ledger/evidence/artifact-fixture.json';
   const review = individualReview ? structuredClone(individualReview.review) :
     {sha: SELECT_FOCUS_SHA, status: 'reviewed', final_disposition: 'already-adapted',

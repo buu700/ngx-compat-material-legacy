@@ -133,9 +133,14 @@ try{
  const lowRisk=clone(docs);lowRisk.subject='docs: general fixture';
  assert.equal(run('pending-nonsensitive-final',lowRisk,{...docsReview,status:'pending'},false).evidence_failures[0].reason,'unfinished-review');
  // Execute weakened copies of the shipped checker: each real CLI control must catch its guard.
+ // The real select SHA now also has an independent artifact guard. Isolate the
+ // older source-kind guard on an explicitly synthetic, unregistered subject.
+ const isolated=clone(weak);isolated.sha='f'.repeat(40);isolated.fixture_only=true;
+ const isolatedReview={...clone(weakCompleted),sha:isolated.sha,fixture_only:true};
+ assert.equal(run('synthetic-unregistered-source-kind-baseline',isolated,isolatedReview,false).insufficient_behavior,1);
  const checker=read('scripts/check-upstream-audit-disposition.mjs').toString();
  let mutated=checker.replace('if(!individualReviewScopeOk(', 'if(false&&!individualReviewScopeOk(');assert.notEqual(mutated,checker);
- put('scripts/scope-mutant-proof.mjs',mutated);run('mutant-source-kind-guard',weak,weakCompleted,true,'scripts/scope-mutant-proof.mjs');checkerMutants++;
+ put('scripts/scope-mutant-proof.mjs',mutated);run('mutant-source-kind-guard',isolated,isolatedReview,true,'scripts/scope-mutant-proof.mjs');checkerMutants++;
  mutated=checker.replace('if(ALLOWED_FINAL.has(entry.final_disposition)&&!reviewMetadataComplete(', 'if(false&&ALLOWED_FINAL.has(entry.final_disposition)&&!reviewMetadataComplete(');assert.notEqual(mutated,checker);
  put('scripts/scope-mutant-state.mjs',mutated);run('mutant-final-state-guard',lowRisk,{...docsReview,status:'pending'},true,'scripts/scope-mutant-state.mjs');checkerMutants++;
 }finally{rmSync(fixture,{recursive:true,force:true});}
