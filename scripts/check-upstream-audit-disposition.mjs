@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 /**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
  * Structural inventory of the frozen seed versus the disposition ledger.
  *
  * A structural pass is unique final rows for every seed SHA. It is not
@@ -24,6 +31,7 @@ import {TEST_CONSOLIDATION_ROLE,TEST_CONSOLIDATION_PATCHES,testConsolidationBatc
 import {COMMENT_SCOPE_ROLE,COMMENT_SHAS,commentScopeEvidenceOk} from './upstream-comment-review.mjs';
 import {SLIDER_TOKEN_SHA,SLIDER_TOKEN_ROLE,sliderTokenEvidenceOk} from './upstream-slider-token-evidence.mjs';
 import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
+import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
 import {TEST_IMPORT_ROLE, TEST_IMPORT_SHAS, testImportBatchOk, testImportEntryOk} from './upstream-test-import-cleanup-evidence.mjs';
 
@@ -146,7 +154,7 @@ function evidenceClass(entry) {
   if (named && named[0] !== entry.sha) return 'other-sha';
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
-    if (!body || typeof body !== 'object') return 'unreadable';
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';
     if (TEST_IMPORT_SHAS.includes(entry.sha) || body.role === TEST_IMPORT_ROLE) {
       const readMember = rel => {const member = regularRepoMember(rel); return member ? readFileSync(member) : null;};
       if (!testImportCache.has(file)) testImportCache.set(file, testImportBatchOk(body, readMember, line || body.line));
@@ -173,11 +181,11 @@ function evidenceClass(entry) {
         || entry.batch_id==='closeout-fourteen-build-source-scope') && !buildScopeEvidenceOk(body,entry,rel=>{
         const member=regularRepoMember(rel);return member?readFileSync(member):null;
       },currentProductPaths())) return 'invalid-build-scope';
-    if (Array.isArray(body.reviews)) {
-      return body.reviews.some(item => item && item.sha === entry.sha) ? 'file' : 'not-in-report';
-    }
-    if (typeof body.sha === 'string' && body.sha !== entry.sha) return 'other-sha';
-    if (rel.startsWith('compatibility/f10/disposition-ledger/evidence/') && body.sha !== entry.sha) return 'other-sha';
+    const review=Array.isArray(body.reviews)?body.reviews.find(item=>item&&item.sha===entry.sha):body;
+    if(Array.isArray(body.reviews)&&!review)return 'not-in-report';
+    if (!Array.isArray(body.reviews)&&typeof body.sha === 'string' && body.sha !== entry.sha) return 'other-sha';
+    if (!Array.isArray(body.reviews)&&rel.startsWith('compatibility/f10/disposition-ledger/evidence/') && body.sha !== entry.sha) return 'other-sha';
+    if(ALLOWED_FINAL.has(entry.final_disposition)&&!reviewMetadataComplete({entry,body,review}))return 'unfinished-review';
   }
   return 'file';
 }
@@ -203,6 +211,9 @@ function individualPatchBound(entry, proof) {
   const review = Array.isArray(body?.reviews)
     ? body.reviews.find(item => item?.sha === entry.sha) : body;
   if (!review || review.sha !== entry.sha || review.diff_sha256 !== proof.diff_sha256) return false;
+  if(!individualReviewScopeOk({entry,proof,body,review,
+    requiresIndividual:Boolean(sensitiveClass(entry))||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),
+    claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)}))return false;
   let bytes;
   if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {
     bytes = Buffer.from(review.diff, 'utf8');
