@@ -26,6 +26,7 @@ class ExtendedArtifactScopeTests(unittest.TestCase):
         for field in ['complete_run_validation_text_preserved', 'complete_path_hash_primitives_preserved',
                 'focus_observation_predicate_preserved', 'existing_focus_hunk_judgment_unchanged']:
             self.assertTrue(observed[field], field)
-        self.assertEqual(observed['real_new_source_judgments_closed'], 0)
+        self.assertEqual(observed['real_source_judgments_used'], 2)
+        self.assertEqual(observed['real_runtime_judgments_closed'], 0)
         self.assertFalse(observed['actual_product_or_packed_or_native_qualified'])
         self.assertEqual(observed['g11_claim'], 'not-passed')

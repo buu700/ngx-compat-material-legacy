@@ -32,8 +32,6 @@ cf3506adf1af1556d705dbb651e7e96a7141b81d
 86a96c9290e3896485c6b6c0d039873652f543df
 86ad5150110522873dae2801fd3c2957502949e7
 68b267dd59f3addf92a3b9f8ce9e8baa479df7f4
-688c430fe8df09152ee59eb8a2ca62b5ba2fb81e
-ca9c490ee30dbf7c9c147079197d0dbc0abcd611
 938f478efdc96ef0de1217e806f98939beb027cd
 9494ff2d65c98726046e6a20dd6a6d938e97a2f6
 ea0aed5a0cba3288d89e7448073e0a5556487313
@@ -44,7 +42,15 @@ cf456a2d43837497367662e7de22f1b2bcbf4f00
 25f391a3c545a1b829a74584c4f9235ab8d18497
 10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb
 """.split())
-ARTIFACT_REQUIRED_SHA_IDS = frozenset({'1b6db8c89b00ace8aaa0e0824866acec5369635f'})
+ARTIFACT_REQUIRED_SUBJECTS = {
+    '1b6db8c89b00ace8aaa0e0824866acec5369635f':
+        ('already-adapted', 'select-focus-before-click', 'packed-consumer/harness/legacy-select', 10),
+    '688c430fe8df09152ee59eb8a2ca62b5ba2fb81e':
+        ('already-adapted', 'select-close-on-real-scroll-detach', 'packed-consumer/harness/select-close-on-real-scroll-detach', 9),
+    'ca9c490ee30dbf7c9c147079197d0dbc0abcd611':
+        ('inherited', 'table-no-data-row-on-push', 'packed-consumer/harness/table-no-data-row-on-push-rendering', 13),
+}
+ARTIFACT_REQUIRED_SHA_IDS = frozenset(ARTIFACT_REQUIRED_SUBJECTS)
 LATER_METHOD_PROOFS = {
     '737c7a8f1a5bc4df0e790d3ecdd227f8342499f8':
         ('complete-public-predicate-and-exact-owned-handler-replay',
@@ -100,12 +106,13 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         self.assertEqual(runtime_required, ARTIFACT_REQUIRED_SHA_IDS)
         for row in entries:
             if row['sha'] in runtime_required:
-                self.assertEqual(row['final_disposition'], 'already-adapted')
+                disposition, kind, case_id, members = ARTIFACT_REQUIRED_SUBJECTS[row['sha']]
+                self.assertEqual(row['final_disposition'], disposition)
                 proof = row['individual_proof']
                 self.assertEqual(proof['affected_branches'], ['main'])
-                self.assertEqual(proof['artifact_behavior']['kind'], 'select-focus-before-click')
-                self.assertEqual(proof['artifact_behavior']['case_ids'], ['packed-consumer/harness/legacy-select'])
-                self.assertEqual(len(proof['artifact_behavior']['source_members']), 10)
+                self.assertEqual(proof['artifact_behavior']['kind'], kind)
+                self.assertEqual(proof['artifact_behavior']['case_ids'], [case_id])
+                self.assertEqual(len(proof['artifact_behavior']['source_members']), members)
 
     def test_intact_ledger_covers_every_seed_sha(self) -> None:
         self.assert_pending_roster(json.loads(LEDGER.read_text())['entries'])
@@ -453,6 +460,23 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         self.assertEqual(observed['g11_claim'], 'not-passed')
 
     def assert_reopened_inherited_history(self, entry, report):
+        if entry['sha'] == 'ca9c490ee30dbf7c9c147079197d0dbc0abcd611' and (entry.get('individual_proof') or {}).get('proof_kind') == 'artifact-required-individual-behavior':
+            self.assertEqual(entry['evidence_report'], 'compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-source-judgment.json')
+            self.assertEqual(entry['final_disposition'], 'inherited')
+            self.assertEqual(report['status'], 'reviewed')
+            self.assertEqual(report['line'], 'main')
+            self.assertEqual(report['g11_claim'], 'not-passed')
+            self.assertEqual(report['judgment_stage'], 'source-complete-runtime-required')
+            self.assertTrue(report['runtime_qualification']['required'])
+            self.assertFalse(report['runtime_qualification']['qualified_by_this_document'])
+            self.assertFalse(report['semantic_pass'])
+            self.assertFalse(report['actual_packed_table_executed'])
+            self.assertEqual(report['installed_member'], entry['individual_proof']['installed_member'])
+            prior = report['prior_pending_record']
+            self.assertEqual(prior['path'], REOPENED_INHERITED_REPORTS[entry['sha']])
+            self.assertEqual(hashlib.sha256((ROOT / prior['path']).read_bytes()).hexdigest(), prior['sha256'])
+            self.assert_reopened_inherited_history(report['prior_entry'], json.loads((ROOT / prior['path']).read_text()))
+            return
         self.assertEqual(entry['evidence_report'], REOPENED_INHERITED_REPORTS[entry['sha']])
         self.assertEqual(entry['final_disposition'], 'needs-individual-review')
         self.assertNotIn('individual_proof', entry)
@@ -710,7 +734,13 @@ for(const proof of proofs)assert.equal(candidateSourceEvidenceOk(proof,p=>readFi
         # This mechanical observation cannot create individual proofs for its
         # member rows. Separate fresh reviews outside this roster can execute
         # behavior probes and record their own immutable source/artifact scope.
-        independent = [e for e in ledger if e['sha'] in rows and (e.get('individual_proof') or {}).get('reachable_behavior')]
+        required = [e for e in ledger if e['sha'] in rows and e['sha'] in ARTIFACT_REQUIRED_SHA_IDS
+                    and (e.get('individual_proof') or {}).get('reachable_behavior')]
+        self.assertEqual({e['sha'] for e in required}, {'ca9c490ee30dbf7c9c147079197d0dbc0abcd611'})
+        for entry in required:
+            self.assert_reopened_inherited_history(entry, json.loads((ROOT / entry['evidence_report']).read_text()))
+        independent = [e for e in ledger if e['sha'] in rows and e['sha'] not in ARTIFACT_REQUIRED_SHA_IDS
+                       and (e.get('individual_proof') or {}).get('reachable_behavior')]
         self.assertEqual({e['sha'] for e in independent}, {'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3', *LATER_METHOD_PROOFS})
         for entry in independent:
             if entry['sha'] in LATER_METHOD_PROOFS:
@@ -728,7 +758,7 @@ for(const proof of proofs)assert.equal(candidateSourceEvidenceOk(proof,p=>readFi
         with self.assertRaises(AssertionError):
             self.assert_pending_roster(extra)
         changed = json.loads(json.dumps(entries))
-        next(row for row in changed if row['sha'] == '688c430fe8df09152ee59eb8a2ca62b5ba2fb81e')['final_disposition'] = 'already-adapted'
+        next(row for row in changed if row['sha'] == '688c430fe8df09152ee59eb8a2ca62b5ba2fb81e')['final_disposition'] = 'needs-individual-review'
         with self.assertRaises(AssertionError):
             self.assert_pending_roster(changed)
         for field in ['proof_kind', 'artifact_behavior']:
@@ -762,7 +792,8 @@ for(const proof of proofs)assert.equal(candidateSourceEvidenceOk(proof,p=>readFi
             entry = next(row for row in entries if row['sha'] == sha)
             report = json.loads((ROOT / entry['evidence_report']).read_text())
             self.assert_reopened_inherited_history(entry, report)
-            for field, replacement in [('status', 'reviewed'), ('line', '21.x'), ('g11_claim', 'passed')]:
+            status = 'pending' if sha in ARTIFACT_REQUIRED_SHA_IDS else 'reviewed'
+            for field, replacement in [('status', status), ('line', '21.x'), ('g11_claim', 'passed')]:
                 mutated = json.loads(json.dumps(report))
                 mutated[field] = replacement
                 with self.subTest(sha=sha, field=field), self.assertRaises(AssertionError):

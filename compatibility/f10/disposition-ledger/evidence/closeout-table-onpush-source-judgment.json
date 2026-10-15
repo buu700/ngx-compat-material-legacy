@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "judgment_stage": "source-complete-runtime-required",
+  "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+  "final_disposition": "inherited",
+  "source_parent": "ea481155fd3822ac891f4adcc106df8eb6605bf7",
+  "diff_sha256": "3630c1798278c09cfd65afa8a4d5853034cfd2a0bd67eff9dc2edd6aa4d8808f",
+  "patch_file": "compatibility/rc/table-onpush-original.patch",
+  "complete_original_files": [
+    "src/cdk/table/table.spec.ts",
+    "src/cdk/table/table.ts"
+  ],
+  "complete_original_hunks": 8,
+  "original_patch_has_test_hunk": true,
+  "source_conclusion": "The complete no-data OnPush fix is inherited through the actual public CdkTable parent on this branch. Both authenticated minimum renderer implementations mark the owning view after no-data visibility transitions; owned MatLegacyTable overrides neither renderer nor render subscription, and its public datasource/outlet/no-data routes reach that parent. The earlier marker/replay-only inheritance statement remains historical. Qualification requires the exact current packed Angular OnPush case, not ancestry or a mark-call spy. No packed/native, G11 or security pass is asserted here.",
+  "hunk_reviews": [
+    {
+      "hunk": 1,
+      "file": "src/cdk/table/table.spec.ts",
+      "judgment": "The ChangeDetectionStrategy import enables the added OnPush test component; it has no runtime library effect."
+    },
+    {
+      "hunk": 2,
+      "file": "src/cdk/table/table.spec.ts",
+      "judgment": "The new regression keeps the child datasource input object stable, empties its data through the parent and requires a bound colspan value. The mandatory legacy case preserves that trigger and parent-only detection, adding restored/repeated-empty states, class/text assertions and teardown."
+    },
+    {
+      "hunk": 3,
+      "file": "src/cdk/table/table.spec.ts",
+      "judgment": "The new parent/OnPush child creates the real change-detection boundary. The legacy case uses actual owned/public table and no-data provider identities. Its dynamic colspan is on the native td alongside interpolation within the same no-data embedded view, preserving valid legacy cell structure while requiring view update. A static row or mark-call spy cannot satisfy this case."
+    },
+    {
+      "hunk": 4,
+      "file": "src/cdk/table/table.ts",
+      "judgment": "The data outlet constructor is reformatted only. The ViewContainerRef/ElementRef parameter order, public parameter properties and empty constructor body remain unchanged; this hunk introduces no behavior or compatibility requirement."
+    },
+    {
+      "hunk": 5,
+      "file": "src/cdk/table/table.ts",
+      "judgment": "The header outlet constructor is reformatted only. The ViewContainerRef/ElementRef parameter order, public parameter properties and empty constructor body remain unchanged; this hunk introduces no behavior or compatibility requirement."
+    },
+    {
+      "hunk": 6,
+      "file": "src/cdk/table/table.ts",
+      "judgment": "The footer outlet constructor is reformatted only. The ViewContainerRef/ElementRef parameter order, public parameter properties and empty constructor body remain unchanged; this hunk introduces no behavior or compatibility requirement."
+    },
+    {
+      "hunk": 7,
+      "file": "src/cdk/table/table.ts",
+      "judgment": "The no-data outlet constructor is reformatted only. The ViewContainerRef/ElementRef parameter order, public parameter properties and empty constructor body remain unchanged; this hunk introduces no behavior or compatibility requirement."
+    },
+    {
+      "hunk": 8,
+      "file": "src/cdk/table/table.ts",
+      "judgment": "The only runtime addition marks the owning change detector after no-data visibility state changes. Both exact minimum public CdkTable implementations retain it. The datasource subscription calls renderRows; both changed and unchanged render paths call _updateNoDataRow. That inherited method creates/clears the no-data view then marks the owner. MatLegacyTable overrides none of these methods. Its outlet adapter supplies public view/element references and its no-data provider supplies the same owned directive to public parent queries. Actual Angular OnPush child checking remains a mandatory artifact requirement."
+    }
+  ],
+  "branch_review": {
+    "source_line": "main",
+    "minimum_cdk": "22.1.7",
+    "minimum_framework": "22.1.7",
+    "basis": "Own source and authenticated minimum implementations/caller routes; no ancestry or cross-line execution attribution."
+  },
+  "reviewed_source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "156faca47dc2fa1efdd2fcfbbe9a0424aa48e7a840c62178c4f2d7068ae33683"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+      "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table-module.ts",
+      "sha256": "be102d89a290d5028da2e1f2a6a19dd8a1d543a68e57861fb22b35ff4c8e2818"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table-data-source.ts",
+      "sha256": "b8c35487e4234549a48563b64665b9d38e0ac0f90310d3957b7f31e8084f7904"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+      "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+    },
+    {
+      "path": "scripts/table-onpush-packed-fixture.mjs",
+      "sha256": "df1660fb53c824d02bf2b2403b895ed548146dfb86b10d348744456e5b9f9312"
+    },
+    {
+      "path": "scripts/table-onpush-packed-contract.mjs",
+      "sha256": "5d38b3fbc3d3e30a412827f24a2a12b578fdca1ed124304737e16e07548f4a65"
+    },
+    {
+      "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+      "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+    },
+    {
+      "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+      "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "01cd202ea3bd7bc981ba228583ba8ce92e8a8c21bf6acacda21713aa1c762f15"
+    },
+    {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+    },
+    {
+      "path": "compatibility/rc/matrices/library-exports.json",
+      "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "41e2cdb30d4af995966b00f039dbe67443a1476deba218a017645f0bb763b912"
+    }
+  ],
+  "installed_member": {
+    "package": "@angular/cdk",
+    "version": "22.1.7",
+    "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+    "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+    "member": "CdkTable._updateNoDataRow"
+  },
+  "caller_flow": [
+    "owned MatLegacyTableDataSource data setter -> _renderData stream",
+    "public CdkTable connection -> _observeRenderChanges -> renderRows",
+    "inherited _updateNoDataRow -> owned outlet/no-data template identity -> view create/clear -> markForCheck",
+    "required actual Angular OnPush child binding assertion; not yet executed"
+  ],
+  "independent_evidence": [
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-packed-pending.json",
+      "sha256": "a4b3d553776162c32a984fe57104b4b816f024d66195237eef21bebf6fdd9741"
+    },
+    {
+      "path": "compatibility/rc/dual-behavior-source-authentication.json",
+      "sha256": "43f9036dcc463efcd35b734008d98b0349793e20be40646e105ae7ea90716615"
+    },
+    {
+      "path": "compatibility/rc/table-public-module-import-source-proof.json",
+      "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+    },
+    {
+      "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+      "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+    },
+    {
+      "path": "compatibility/rc/table-no-data-cell-source-proof.json",
+      "sha256": "2c724b3f09a3527e57b3fee7d71be6e8e8c6d0f323c7968364e9cdbb77331c22"
+    },
+    {
+      "path": "compatibility/rc/table-onpush-packed-admission-diagnostic.json",
+      "sha256": "693e6d91df3bd0bbec7c3a7ba564f82a602c9deae78166e4aed03c8e798c2cf9"
+    },
+    {
+      "path": "scripts/table-onpush-packed-fixture.mjs",
+      "sha256": "df1660fb53c824d02bf2b2403b895ed548146dfb86b10d348744456e5b9f9312"
+    },
+    {
+      "path": "scripts/table-onpush-packed-contract.mjs",
+      "sha256": "5d38b3fbc3d3e30a412827f24a2a12b578fdca1ed124304737e16e07548f4a65"
+    },
+    {
+      "path": "tests/table_onpush_packed_contract_probe.mjs",
+      "sha256": "89c39a4de62d32d5c90d53a051aa4b5f49eff89f862d0a4514556d4d6dbe1b28"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+      "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts",
+      "sha256": "522c2133fd03d68e669c521a029e060754d1c2de92cf1a500b33993f7cd31a8e"
+    },
+    {
+      "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+      "sha256": "15a5155eaaf3276e8204652dc706baa5535e4a9f997f9f0af39a2ab46e142d89"
+    },
+    {
+      "path": "scripts/upstream-packed-run-evidence.mjs",
+      "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+    }
+  ],
+  "prior_entry": {
+    "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+    "bucket": "behavior-semantic",
+    "subject": "fix(cdk/table): the CdkNoDataRow directive does not render in the OnPush strategy (#27687)",
+    "final_disposition": "needs-individual-review",
+    "reason": "Original hunk and complete packed OnPush regression reviewed/prepared. Existing protocol replay does not establish actual Angular bound-row rendering. This SHA remains pending the mandatory extracted-artifact execution; no inheritance or G11 pass is claimed.",
+    "read_note_disposition": "not-owned",
+    "files": [
+      "src/cdk/table/table.ts",
+      "src/cdk/table/table.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-packed-pending.json",
+    "peer_floor": {
+      "package": "@angular/cdk",
+      "advertised_range": "^22.1.7",
+      "installed_version": "22.1.7",
+      "contains_fix_tag": "v22.1.7",
+      "sha_is_ancestor_of_tag": true,
+      "cdk_modules": [
+        "table"
+      ],
+      "owned_import_intersection": [
+        "table"
+      ]
+    },
+    "recorded_at_utc": "2026-10-01T16:49:17Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+  },
+  "prior_pending_record": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-packed-pending.json",
+    "sha256": "a4b3d553776162c32a984fe57104b4b816f024d66195237eef21bebf6fdd9741"
+  },
+  "runtime_qualification": {
+    "required": true,
+    "qualified_by_this_document": false,
+    "check": "packed-consumer",
+    "case_ids": [
+      "packed-consumer/harness/table-no-data-row-on-push-rendering"
+    ],
+    "contract": "A current successful coordinator-observed packed invocation, complete106-case branch report, matching source/line/run/artifact, hashed owned assertion and re-evaluated complete structured case/raw harness observation are required. Source inheritance and marker fields are conditional requirements, never observations of earlier execution."
+  },
+  "consumer": {
+    "cyph_read_only": true,
+    "visible_related_files_rehashed": 16,
+    "consumer_build_executed": false,
+    "required_consumer_HTML_CSS_SCSS_changes": false,
+    "TS_API_changed": false
+  },
+  "actual_packed_or_native_executed": false,
+  "actual_packed_table_executed": false,
+  "semantic_pass": false,
+  "security_clearance": "not-passed",
+  "g11_claim": "not-passed"
+}
