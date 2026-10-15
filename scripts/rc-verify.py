@@ -498,6 +498,14 @@ def run_node(script: str, args: list[str], *, record: bool = True) -> int:
            'RC_ASSERTION_OUTPUT_DIR': str(output_dir),
            'RC_EVIDENCE_BINDING': json.dumps(ACTIVE_RUN.binding, sort_keys=True),
            'RC_RUN_ID': ACTIVE_RUN.manifest['run_id']}
+    if check_id == 'upstream-audit-disposition':
+        # Capture the actual earlier child outcome; a self-written report cannot
+        # stand in for the coordinator's invocation. Final sealing checks both.
+        env['RC_UPSTREAM_PACKED_CONSUMER'] = json.dumps({
+            'run_id': ACTIVE_RUN.manifest['run_id'],
+            'invocation_id': ACTIVE_RUN.invocations.get('packed-consumer'),
+            'exit_code': ACTIVE_RUN.exit_codes.get('packed-consumer'),
+        }, sort_keys=True)
     code = 1
     try:
         if script in FIXED_DETAILS:
