@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
+  "line": "main",
+  "status": "pending",
+  "final_disposition": "needs-individual-review",
+  "source_parent": "f44be2a1b695f16e528baa2189f09c7155591070",
+  "prior_entry": {
+    "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): close panel on detach output event (#30634)",
+    "final_disposition": "already-adapted",
+    "reason": "The patch closes the select when the overlay emits detach. Owned select already binds that output to close (legacy-select/select.html). That binding was already present.",
+    "read_note_disposition": "already-present",
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "source_check": "Owned select already binds that output to close (legacy-select/select",
+    "files": [
+      "src/material/select/select.html"
+    ],
+    "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+    "recorded_at_utc": "2026-10-01T16:46:41Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "individual_proof": {
+      "diff_sha256": "b443861e8eabbfa6c7613fc26349a89e59d2b364493d426461957beb247b691a",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Upstream binds the connected overlay (detach) output to close() so the select panel closes when the overlay detaches (for example on scroll strategy close). The owned legacy select template binds (detach)=\"close()\" on its cdk-connected-overlay, so the fix was already present in the candidate.",
+      "proof_kind": "candidate-source-line-match",
+      "upstream_file": "src/material/select/select.html",
+      "candidate_member": {
+        "path": "projects/ngx-material-legacy/legacy-select/select.html",
+        "sha256": "c54309b92719e6e9bf2e0b77decb82f4347b78a9565a4e22ba7f49f81353e5cf"
+      },
+      "added_lines": [
+        {
+          "upstream_added": "(detach)=\"close()\"",
+          "candidate_lines": [
+            41
+          ]
+        }
+      ],
+      "read_note": "already-present",
+      "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+      "recomputed_by": "scripts/record-candidate-line-proofs.py"
+    }
+  },
+  "diff_sha256": "b443861e8eabbfa6c7613fc26349a89e59d2b364493d426461957beb247b691a",
+  "patch_file": "compatibility/rc/select-detach-upstream.diff",
+  "complete_original_files": [
+    "src/material/select/select.html",
+    "src/material/select/select.spec.ts"
+  ],
+  "whole_original_patch_read": true,
+  "owned_context": {
+    "path": "projects/ngx-material-legacy/legacy-select/select.html",
+    "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da",
+    "current_detach_binding_present": true,
+    "prior_candidate_hash": "c54309b92719e6e9bf2e0b77decb82f4347b78a9565a4e22ba7f49f81353e5cf",
+    "prior_source_proof_retired_without_rehashing": true
+  },
+  "independent_peer_source_review": {
+    "path": "compatibility/rc/select-detach-peer-source-review.json",
+    "sha256": "436e32c64822fad83935630b2d1b77a8af97501da06f6ae12908f6f799ec7787"
+  },
+  "analysis": [
+    "The original patch has two files. It adds the modern select detach output binding and a real CloseScrollStrategy regression: emit scrolling through ScrollDispatcher, then require panelOpen=false. The earlier owned decision omitted this test scope.",
+    "Untouched Material16 legacy compiled template already contains the detach=close binding. The current owned template retains that event binding, with subsequent CSS-motion/control-flow changes. There is no demonstrated missing product binding to repair.",
+    "The main source-line-match subject names an obsolete select.html hash. Retain that exact proof and earlier report as historical data; do not rehash it into a passing individual behavior proof. The21.x row remains pending with its own branch attribution.",
+    "Both exact current peers retain the select detach binding. Their genuine CdkConnectedOverlay forwards real OverlayRef detachments to its detach output, and real CloseScrollStrategy consumes ScrollDispatcher.scrolled(0). These are static code/declaration observations only.",
+    "Implement one mandatory packed Angular DOM case: actual CdkScrollable scroll events, real public Overlay.close strategy, real public CdkConnectedOverlay/OverlayRef observations, isolated generation scopes, two reopen/detach cycles, values/focus/ARIA and teardown. Keep all prior104 cases. No replacement scroll dispatcher or callback-only observation.",
+    "Final individual disposition remains pending until actual artifact-bound execution and branch-native evidence. Strict templates/AOT, real browser rendering and canonical consumer floors remain separate obligations."
+  ],
+  "actual_packed_or_native_executed": false,
+  "new_SHA_closures": 0,
+  "g11_claim": "not-passed"
+}

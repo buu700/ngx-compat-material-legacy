@@ -5499,43 +5499,61 @@
       "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
       "bucket": "behavior-semantic",
       "subject": "fix(material/select): close panel on detach output event (#30634)",
-      "final_disposition": "already-adapted",
-      "reason": "The patch closes the select when the overlay emits detach. Owned select already binds that output to close (legacy-select/select.html). That binding was already present.",
-      "read_note_disposition": "already-present",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "Owned select already binds that output to close (legacy-select/select",
+      "final_disposition": "needs-individual-review",
+      "reason": "Individual whole-patch review confirms the historical legacy detach binding is present, but the prior main file hash is stale and the genuine close-on-scroll regression was not executed. Preserve that prior proof without rehashing and await actual artifact-bound scroll/overlay/state evidence on this line.",
+      "read_note_disposition": "reopened-pending-real-scroll-execution",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-select-detach-review.json",
       "files": [
-        "src/material/select/select.html"
+        "src/material/select/select.html",
+        "src/material/select/select.spec.ts"
       ],
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "individual_proof": {
-        "diff_sha256": "b443861e8eabbfa6c7613fc26349a89e59d2b364493d426461957beb247b691a",
-        "review_depth": "individual-compatibility",
-        "affected_branches": [
-          "main"
-        ],
-        "decision": "Upstream binds the connected overlay (detach) output to close() so the select panel closes when the overlay detaches (for example on scroll strategy close). The owned legacy select template binds (detach)=\"close()\" on its cdk-connected-overlay, so the fix was already present in the candidate.",
-        "proof_kind": "candidate-source-line-match",
-        "upstream_file": "src/material/select/select.html",
-        "candidate_member": {
-          "path": "projects/ngx-material-legacy/legacy-select/select.html",
-          "sha256": "c54309b92719e6e9bf2e0b77decb82f4347b78a9565a4e22ba7f49f81353e5cf"
-        },
-        "added_lines": [
-          {
-            "upstream_added": "(detach)=\"close()\"",
-            "candidate_lines": [
-              41
-            ]
+      "prior_dispositions": [
+        {
+          "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/select): close panel on detach output event (#30634)",
+          "final_disposition": "already-adapted",
+          "reason": "The patch closes the select when the overlay emits detach. Owned select already binds that output to close (legacy-select/select.html). That binding was already present.",
+          "read_note_disposition": "already-present",
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "Owned select already binds that output to close (legacy-select/select",
+          "files": [
+            "src/material/select/select.html"
+          ],
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "individual_proof": {
+            "diff_sha256": "b443861e8eabbfa6c7613fc26349a89e59d2b364493d426461957beb247b691a",
+            "review_depth": "individual-compatibility",
+            "affected_branches": [
+              "main"
+            ],
+            "decision": "Upstream binds the connected overlay (detach) output to close() so the select panel closes when the overlay detaches (for example on scroll strategy close). The owned legacy select template binds (detach)=\"close()\" on its cdk-connected-overlay, so the fix was already present in the candidate.",
+            "proof_kind": "candidate-source-line-match",
+            "upstream_file": "src/material/select/select.html",
+            "candidate_member": {
+              "path": "projects/ngx-material-legacy/legacy-select/select.html",
+              "sha256": "c54309b92719e6e9bf2e0b77decb82f4347b78a9565a4e22ba7f49f81353e5cf"
+            },
+            "added_lines": [
+              {
+                "upstream_added": "(detach)=\"close()\"",
+                "candidate_lines": [
+                  41
+                ]
+              }
+            ],
+            "read_note": "already-present",
+            "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
+            "recomputed_by": "scripts/record-candidate-line-proofs.py"
           }
-        ],
-        "read_note": "already-present",
-        "recorded_by": "Grok, FIN-02-C02; Codex validates in FIN-02-C05",
-        "recomputed_by": "scripts/record-candidate-line-proofs.py"
-      }
+        }
+      ]
     },
     {
       "sha": "40d0ab4fc73f059cb5496c4c035d4dcebc08b8b0",
@@ -5984,7 +6002,7 @@
       "bucket": "behavior-semantic",
       "subject": "docs(material/list): fix grammar in MAT_LIST_CONFIG token description (#28284)",
       "final_disposition": "not-applicable",
-      "reason": "Only the MAT_LIST_CONFIG description adds the missing word “for”. The complete token declaration, import, options interface and all executable/type syntax are unchanged. This is documentation grammar, not a token-identity or default-options fix to adopt.",
+      "reason": "Only the MAT_LIST_CONFIG description adds the missing word \u201cfor\u201d. The complete token declaration, import, options interface and all executable/type syntax are unchanged. This is documentation grammar, not a token-identity or default-options fix to adopt.",
       "read_note_disposition": "complete-documentation-source-identity",
       "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-ten-comment-source-review.json",
       "files": [
@@ -6022,7 +6040,7 @@
         "affected_branches": [
           "main"
         ],
-        "decision": "Only the MAT_LIST_CONFIG description adds the missing word “for”. The complete token declaration, import, options interface and all executable/type syntax are unchanged. This is documentation grammar, not a token-identity or default-options fix to adopt.",
+        "decision": "Only the MAT_LIST_CONFIG description adds the missing word \u201cfor\u201d. The complete token declaration, import, options interface and all executable/type syntax are unchanged. This is documentation grammar, not a token-identity or default-options fix to adopt.",
         "proof_kind": "complete-syntax-and-documentation-review"
       }
     },
@@ -6357,7 +6375,7 @@
     {
       "sha": "46db6a6ba5619cddffc1dbf7a78696d5249abf50",
       "bucket": "behavior-semantic",
-      "subject": "fix(material/button-toggle): standard button toggle strong focus bord… (#28790)",
+      "subject": "fix(material/button-toggle): standard button toggle strong focus bord\u2026 (#28790)",
       "final_disposition": "irrelevant",
       "reason": "The patch rounds the standard button toggle focus indicator to the toggle shape. The package does not define that structural stylesheet. The focus-indicator radius slots were not added.",
       "read_note_disposition": "not-owned",
@@ -7102,7 +7120,7 @@
     {
       "sha": "d7fc5601405f83e5418121382b7647d4dcc7793c",
       "bucket": "behavior-semantic",
-      "subject": "fix(docs): add example for adding icon in meta section using matListI… (#30068)",
+      "subject": "fix(docs): add example for adding icon in meta section using matListI\u2026 (#30068)",
       "final_disposition": "not-applicable",
       "reason": "The sole list.md hunk adds a modern matListItemMeta example with title/line directives and @for syntax. It changes no component/directive implementation. Those modern meta/title directives are not the historical owned list API, and the upstream overview is neither maintained nor packaged here. No modern list API mirror or ordinary component fork should be introduced for this example.",
       "read_note_disposition": "individually-reviewed-upstream-guidance",
@@ -7118,7 +7136,7 @@
         {
           "sha": "d7fc5601405f83e5418121382b7647d4dcc7793c",
           "bucket": "behavior-semantic",
-          "subject": "fix(docs): add example for adding icon in meta section using matListI… (#30068)",
+          "subject": "fix(docs): add example for adding icon in meta section using matListI\u2026 (#30068)",
           "final_disposition": "irrelevant",
           "reason": "The patch adds a matListItemMeta example to the list guide. This package does not ship that guide and does not define matListItemMeta. That example was not added.",
           "read_note_disposition": "not-owned",
@@ -10066,7 +10084,7 @@
       "bucket": "behavior-semantic",
       "subject": "fix(cdk/overlay): ensure re-exported transitive `Dir` directive can be imported (#30679)",
       "final_disposition": "inherited",
-      "reason": "The patch re-exports Dir as ɵɵDir from the CDK overlay module so the compiler can import it. This package does not define OverlayModule. That re-export was not added. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+      "reason": "The patch re-exports Dir as \u0275\u0275Dir from the CDK overlay module so the compiler can import it. This package does not define OverlayModule. That re-export was not added. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
       "read_note_disposition": "not-owned",
       "files": [
         "src/cdk/overlay/overlay-module.ts"
@@ -13002,7 +13020,7 @@
       "bucket": "behavior-semantic",
       "subject": "docs: fix whether typos",
       "final_disposition": "not-applicable",
-      "reason": "Four component comments correct “Wheter” to “Whether”. The hideSingleSelectionIndicator declarations and all complete option/select/list/selectable-list code remain identical. This neither adds the modern input to the owned frozen API nor changes selection, icon visibility or styling.",
+      "reason": "Four component comments correct \u201cWheter\u201d to \u201cWhether\u201d. The hideSingleSelectionIndicator declarations and all complete option/select/list/selectable-list code remain identical. This neither adds the modern input to the owned frozen API nor changes selection, icon visibility or styling.",
       "read_note_disposition": "complete-documentation-source-identity",
       "files": [
         "src/material/autocomplete/autocomplete.ts",
@@ -13045,7 +13063,7 @@
         "affected_branches": [
           "main"
         ],
-        "decision": "Four component comments correct “Wheter” to “Whether”. The hideSingleSelectionIndicator declarations and all complete option/select/list/selectable-list code remain identical. This neither adds the modern input to the owned frozen API nor changes selection, icon visibility or styling.",
+        "decision": "Four component comments correct \u201cWheter\u201d to \u201cWhether\u201d. The hideSingleSelectionIndicator declarations and all complete option/select/list/selectable-list code remain identical. This neither adds the modern input to the owned frozen API nor changes selection, icon visibility or styling.",
         "proof_kind": "complete-syntax-and-documentation-review"
       }
     },
@@ -16489,7 +16507,7 @@
         "src/material/core/tokens/m3/mat/_badge.scss"
       ],
       "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "glob projects/ngx-material-legacy/*badge* → empty; badge not in 22-family surface",
+      "source_check": "glob projects/ngx-material-legacy/*badge* \u2192 empty; badge not in 22-family surface",
       "batch_id": "sensitive-owned-retain-2026-10-01-h",
       "recorded_at_utc": "2026-10-01T17:05:21Z",
       "g11_claim": "not-passed",
@@ -16507,7 +16525,7 @@
         "src/material/core/tokens/m3/mat/_badge.scss"
       ],
       "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "glob projects/ngx-material-legacy/*badge* → empty; badge not in 22-family surface",
+      "source_check": "glob projects/ngx-material-legacy/*badge* \u2192 empty; badge not in 22-family surface",
       "batch_id": "sensitive-owned-retain-2026-10-01-h",
       "recorded_at_utc": "2026-10-01T17:05:21Z",
       "g11_claim": "not-passed",
@@ -16597,7 +16615,7 @@
       "bucket": "behavior-semantic",
       "subject": "fix(multiple): ensure mat-option parents are the offsetParent (#30977)",
       "final_disposition": "already-adapted",
-      "reason": "The patch changes MDC autocomplete/select panels from position static to relative so nested options use the panel as offsetParent. Owned autocomplete panel already sets position: relative (legacy-autocomplete/autocomplete.scss). Owned select panel uses menu-common.base(), which sets position: absolute — also a non-static containing block for offsetParent. Neither owned panel uses the pre-fix static positioning the patch addressed. Already adapted for offsetParent purposes.",
+      "reason": "The patch changes MDC autocomplete/select panels from position static to relative so nested options use the panel as offsetParent. Owned autocomplete panel already sets position: relative (legacy-autocomplete/autocomplete.scss). Owned select panel uses menu-common.base(), which sets position: absolute \u2014 also a non-static containing block for offsetParent. Neither owned panel uses the pre-fix static positioning the patch addressed. Already adapted for offsetParent purposes.",
       "read_note_disposition": "owned-retained",
       "files": [
         "src/material/select/select.scss"
@@ -18464,7 +18482,7 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/core): option showing double selected indicator in high contrast mode",
       "final_disposition": "already-adapted",
-      "reason": "Owned MDC and legacy option HC selected marks use :has(.…-pseudo-checkbox) instead of the multiple-option class so a checkmark and dot do not both show.",
+      "reason": "Owned MDC and legacy option HC selected marks use :has(.\u2026-pseudo-checkbox) instead of the multiple-option class so a checkmark and dot do not both show.",
       "read_note_disposition": "owned-retained",
       "files": [
         "src/material/core/option/option.scss"
@@ -20513,7 +20531,7 @@
           "bucket": "test-only-batch-candidate",
           "subject": "test(material/datepicker): combine shared tests",
           "final_disposition": "irrelevant",
-          "reason": "Inspected upstream patch content (sha256=3cc14feb3153d0f5f49669683fbfd790e66f3a3caa0cb7cbd6463fd23793bdb9, bytes=79709). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/datepicker/testing/BUILD.bazel, src/material/datepicker/testing/calendar-harness-shared.spec.ts, src/material/datepicker/testing/calendar-harness.spec.ts, src/material/datepicker/testing/date-range-input-harness-shared.spec.ts, src/material/datepicker/testing/date-range-input-harness.spec.ts, src/material/datepicker/testing/datepicker-input-harness-shared.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+          "reason": "Inspected upstream patch content (sha256=3cc14feb3153d0f5f49669683fbfd790e66f3a3caa0cb7cbd6463fd23793bdb9, bytes=79709). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/datepicker/testing/BUILD.bazel, src/material/datepicker/testing/calendar-harness-shared.spec.ts, src/material/datepicker/testing/calendar-harness.spec.ts, src/material/datepicker/testing/date-range-input-harness-shared.spec.ts, src/material/datepicker/testing/date-range-input-harness.spec.ts, src/material/datepicker/testing/datepicker-input-harness-shared.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
           "read_note_disposition": null,
           "files": [
             "src/material/datepicker/testing/BUILD.bazel",
@@ -20624,7 +20642,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test: move some CDK tests to zoneless (#29083)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=4165f3e15f573d26533f9c1f21163146c5560bd27e649b4545e04aa9ca139b23, bytes=287607). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/a11y/focus-monitor/focus-monitor.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts, src/cdk/a11y/live-announcer/live-announcer.spec.ts, src/cdk/clipboard/copy-to-clipboard.spec.ts, src/cdk/drag-drop/directives/drag.spec.ts, src/cdk/drag-drop/directives/drag.zone.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=4165f3e15f573d26533f9c1f21163146c5560bd27e649b4545e04aa9ca139b23, bytes=287607). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/a11y/focus-monitor/focus-monitor.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts, src/cdk/a11y/live-announcer/live-announcer.spec.ts, src/cdk/clipboard/copy-to-clipboard.spec.ts, src/cdk/drag-drop/directives/drag.spec.ts, src/cdk/drag-drop/directives/drag.zone.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
@@ -20660,7 +20678,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test: move some CDK tests to zoneless (#29103)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=28001aeb546d6a096520d01a15221c347f5e66e947ac37239e4a68e7cb12c214, bytes=37642). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/overlay/overlay.spec.ts, src/cdk/overlay/scroll/close-scroll-strategy.spec.ts, src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts, src/cdk/portal/portal.spec.ts, src/cdk/scrolling/scrollable.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=28001aeb546d6a096520d01a15221c347f5e66e947ac37239e4a68e7cb12c214, bytes=37642). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/overlay/overlay.spec.ts, src/cdk/overlay/scroll/close-scroll-strategy.spec.ts, src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts, src/cdk/portal/portal.spec.ts, src/cdk/scrolling/scrollable.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk/overlay/overlay.spec.ts",
@@ -20698,7 +20716,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test: remove compileComponent calls (#29535)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=7dda7da32f21609bf172b1da11cb0853a485804647a512254a3d7a33fc40ac61, bytes=154940). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/combobox/combobox.spec.ts, src/cdk-experimental/popover-edit/popover-edit.spec.ts, src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts, src/cdk-experimental/selection/selection.spec.ts, src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts, src/cdk/a11y/aria-describer/aria-describer.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=7dda7da32f21609bf172b1da11cb0853a485804647a512254a3d7a33fc40ac61, bytes=154940). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/combobox/combobox.spec.ts, src/cdk-experimental/popover-edit/popover-edit.spec.ts, src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts, src/cdk-experimental/selection/selection.spec.ts, src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts, src/cdk/a11y/aria-describer/aria-describer.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk-experimental/combobox/combobox.spec.ts",
@@ -20925,7 +20943,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): remove unnecessary fakeAsync and add flush",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=d51cdd3a5027982b713733222c170a0bc27473096f17e6478c02996a85640781, bytes=142206). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/selection/selection.spec.ts, src/cdk/bidi/directionality.spec.ts, src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts, src/cdk/overlay/overlay.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts, src/material-experimental/column-resize/column-resize.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=d51cdd3a5027982b713733222c170a0bc27473096f17e6478c02996a85640781, bytes=142206). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/selection/selection.spec.ts, src/cdk/bidi/directionality.spec.ts, src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts, src/cdk/overlay/overlay.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts, src/material-experimental/column-resize/column-resize.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk-experimental/selection/selection.spec.ts",
@@ -20999,7 +21017,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): remove CommonModule imports (#29900)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=4100b24cd896be336c850d343f408101cf6b6d29dea0cf905c3a309b2a228ccf, bytes=33181). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/popover-edit/popover-edit.spec.ts, src/cdk/listbox/listbox.spec.ts, src/cdk/portal/portal.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts, src/material-experimental/popover-edit/popover-edit.spec.ts, src/material/button-toggle/button-toggle.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=4100b24cd896be336c850d343f408101cf6b6d29dea0cf905c3a309b2a228ccf, bytes=33181). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/popover-edit/popover-edit.spec.ts, src/cdk/listbox/listbox.spec.ts, src/cdk/portal/portal.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts, src/material-experimental/popover-edit/popover-edit.spec.ts, src/material/button-toggle/button-toggle.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk-experimental/popover-edit/popover-edit.spec.ts",
@@ -21030,7 +21048,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): clean up standalone flags (#30189)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=e174f4291274268ccd3c96721cd336b22980f4c97e3f68951085218cbe69190e, bytes=177154). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/combobox/combobox.spec.ts, src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts, src/cdk-experimental/selection/selection.spec.ts, src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts, src/cdk/a11y/aria-describer/aria-describer.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=e174f4291274268ccd3c96721cd336b22980f4c97e3f68951085218cbe69190e, bytes=177154). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/combobox/combobox.spec.ts, src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts, src/cdk-experimental/selection/selection.spec.ts, src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts, src/cdk/a11y/aria-describer/aria-describer.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk-experimental/combobox/combobox.spec.ts",
@@ -21277,7 +21295,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): remove animations module from tests (#30497)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=1c835160acc1368bcedbe5ee0ad824e48f5a09b1fc9958d8d1d0a8ab232f2116, bytes=14473). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/accordion/accordion-item.spec.ts, src/cdk/accordion/accordion.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/dialog/dialog.spec.ts, src/material/expansion/accordion.spec.ts, src/material/input/input.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=1c835160acc1368bcedbe5ee0ad824e48f5a09b1fc9958d8d1d0a8ab232f2116, bytes=14473). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/accordion/accordion-item.spec.ts, src/cdk/accordion/accordion.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/dialog/dialog.spec.ts, src/material/expansion/accordion.spec.ts, src/material/input/input.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk/accordion/accordion-item.spec.ts",
@@ -21333,7 +21351,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): clean up DI in tests (#30848)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=f359768f62ef6f5be9c8183e7c08120f3991076453bf7b214db8dbdf943e42bd, bytes=66323). Changed paths are only unit/harness specs and testing BUILD.bazel (material.angular.io/src/app/shared/guide-items/guide-items.spec.ts, material.angular.io/src/app/shared/style-manager/style-manager.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts, src/cdk/drag-drop/drag-drop-registry.spec.ts, src/cdk/layout/breakpoints-observer.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=f359768f62ef6f5be9c8183e7c08120f3991076453bf7b214db8dbdf943e42bd, bytes=66323). Changed paths are only unit/harness specs and testing BUILD.bazel (material.angular.io/src/app/shared/guide-items/guide-items.spec.ts, material.angular.io/src/app/shared/style-manager/style-manager.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts, src/cdk/drag-drop/drag-drop-registry.spec.ts, src/cdk/layout/breakpoints-observer.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "material.angular.io/src/app/shared/guide-items/guide-items.spec.ts",
@@ -21390,7 +21408,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): remove noop module from tests (#30855)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=1a8410b9c9eee015c1c620b7ac12ecaa626565979558a26c6c6285cd94e0b364, bytes=81310). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/text-field/autosize.spec.ts, src/material/autocomplete/autocomplete.spec.ts, src/material/autocomplete/autocomplete.zone.spec.ts, src/material/autocomplete/testing/autocomplete-harness.spec.ts, src/material/bottom-sheet/bottom-sheet.spec.ts, src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=1a8410b9c9eee015c1c620b7ac12ecaa626565979558a26c6c6285cd94e0b364, bytes=81310). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/text-field/autosize.spec.ts, src/material/autocomplete/autocomplete.spec.ts, src/material/autocomplete/autocomplete.zone.spec.ts, src/material/autocomplete/testing/autocomplete-harness.spec.ts, src/material/bottom-sheet/bottom-sheet.spec.ts, src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk/text-field/autosize.spec.ts",
@@ -21457,7 +21475,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): rework whenStable usages (#30878)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=7860d246feff11ec984e0b745a47e35df975bc1b19a9612aa7dd3bdacb613868, bytes=21290). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/a11y/focus-trap/focus-trap.spec.ts, src/cdk/overlay/overlay.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts, src/material/bottom-sheet/bottom-sheet.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/datepicker/datepicker.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=7860d246feff11ec984e0b745a47e35df975bc1b19a9612aa7dd3bdacb613868, bytes=21290). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/a11y/focus-trap/focus-trap.spec.ts, src/cdk/overlay/overlay.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts, src/material/bottom-sheet/bottom-sheet.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/datepicker/datepicker.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
@@ -21492,7 +21510,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): switch CDK tests to standalone (#31113)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=6753978fd0aedaa20f5cf1462b2762a820624ebffd6313ada56a1677bbacf632, bytes=114479). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/popover-edit/popover-edit.spec.ts, src/cdk/dialog/dialog.spec.ts, src/cdk/listbox/listbox.spec.ts, src/cdk/menu/context-menu-trigger.spec.ts, src/cdk/menu/menu-trigger.spec.ts, src/cdk/table/table.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=6753978fd0aedaa20f5cf1462b2762a820624ebffd6313ada56a1677bbacf632, bytes=114479). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/popover-edit/popover-edit.spec.ts, src/cdk/dialog/dialog.spec.ts, src/cdk/listbox/listbox.spec.ts, src/cdk/menu/context-menu-trigger.spec.ts, src/cdk/menu/menu-trigger.spec.ts, src/cdk/table/table.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk-experimental/popover-edit/popover-edit.spec.ts",
@@ -21516,7 +21534,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): convert Material tests to standalone (#31140)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=dbd2a44a24a23fb7f3ecccf802decbbd1f856ef7d5dabd26e538117d500e17bf, bytes=192512). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/autocomplete/autocomplete.spec.ts, src/material/autocomplete/autocomplete.zone.spec.ts, src/material/grid-list/grid-list.spec.ts, src/material/input/input.spec.ts, src/material/menu/menu.spec.ts, src/material/select/select.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=dbd2a44a24a23fb7f3ecccf802decbbd1f856ef7d5dabd26e538117d500e17bf, bytes=192512). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/autocomplete/autocomplete.spec.ts, src/material/autocomplete/autocomplete.zone.spec.ts, src/material/grid-list/grid-list.spec.ts, src/material/input/input.spec.ts, src/material/menu/menu.spec.ts, src/material/select/select.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/material/autocomplete/autocomplete.spec.ts",
@@ -21555,7 +21573,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): switch remaining tests to standalone",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=bcd5806d9c19cc35c286547c5e50ae77324f281f0355019d5ccf6c5019e2adc8, bytes=70495). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material-experimental/column-resize/column-resize.spec.ts, src/material-experimental/popover-edit/popover-edit.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/chips/chip-input.spec.ts, src/material/chips/chip-listbox.spec.ts, src/material/chips/chip-option.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=bcd5806d9c19cc35c286547c5e50ae77324f281f0355019d5ccf6c5019e2adc8, bytes=70495). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material-experimental/column-resize/column-resize.spec.ts, src/material-experimental/popover-edit/popover-edit.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/chips/chip-input.spec.ts, src/material/chips/chip-listbox.spec.ts, src/material/chips/chip-option.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/material-experimental/column-resize/column-resize.spec.ts",
@@ -21602,7 +21620,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): clean up some unnecessary imports (#31605)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=28649cd999f21f6207e8ee920e8c59d9565ca545f698eac158b8b8411493f816, bytes=46522). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/accordion/accordion.spec.ts, src/cdk-experimental/combobox/combobox.spec.ts, src/cdk-experimental/deferred-content/deferred-content.spec.ts, src/cdk-experimental/listbox/listbox.spec.ts, src/cdk-experimental/radio-group/radio-group.spec.ts, src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=28649cd999f21f6207e8ee920e8c59d9565ca545f698eac158b8b8411493f816, bytes=46522). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/accordion/accordion.spec.ts, src/cdk-experimental/combobox/combobox.spec.ts, src/cdk-experimental/deferred-content/deferred-content.spec.ts, src/cdk-experimental/listbox/listbox.spec.ts, src/cdk-experimental/radio-group/radio-group.spec.ts, src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk-experimental/accordion/accordion.spec.ts",
@@ -22695,7 +22713,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test: replace native date module with provider function (#32114)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=f65b48e2afaa9aa1c4a6d2e04702b3057d29ee8a7606b9614bd7354d16d795c2, bytes=38964). Changed paths are only unit/harness specs and testing BUILD.bazel (src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts, src/components-examples/material/timepicker/timepicker-harness/timepicker-harness-example.spec.ts, src/material/datepicker/calendar-header.spec.ts, src/material/datepicker/date-range-input.spec.ts, src/material/datepicker/date-range-selection-strategy.spec.ts, src/material/datepicker/datepicker.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=f65b48e2afaa9aa1c4a6d2e04702b3057d29ee8a7606b9614bd7354d16d795c2, bytes=38964). Changed paths are only unit/harness specs and testing BUILD.bazel (src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts, src/components-examples/material/timepicker/timepicker-harness/timepicker-harness-example.spec.ts, src/material/datepicker/calendar-header.spec.ts, src/material/datepicker/date-range-input.spec.ts, src/material/datepicker/date-range-selection-strategy.spec.ts, src/material/datepicker/datepicker.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts",
@@ -22872,7 +22890,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): remove most remaining fakeAsync usages (#33748)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=0925e6f79518679edcad31d0ae36e9bbe455cb32d4873b2c62c7d5df4f1692ca, bytes=26722). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/list/selection-list.spec.ts, src/material/menu/context-menu-trigger.spec.ts, src/material/paginator/paginator.spec.ts, src/material/radio/radio.spec.ts, src/material/table/table-data-source.spec.ts, src/material/table/table.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=0925e6f79518679edcad31d0ae36e9bbe455cb32d4873b2c62c7d5df4f1692ca, bytes=26722). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/list/selection-list.spec.ts, src/material/menu/context-menu-trigger.spec.ts, src/material/paginator/paginator.spec.ts, src/material/radio/radio.spec.ts, src/material/table/table-data-source.spec.ts, src/material/table/table.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/material/list/selection-list.spec.ts",
@@ -23012,7 +23030,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(cdk/a11y): switch tests away from fakeAsync (#32942)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=b7251c55b7b034eb0ce39e69439c5c33085a70f0d07493f93b987ecc295710ee, bytes=67067). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/a11y/focus-monitor/focus-monitor.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts, src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts, src/cdk/a11y/input-modality/input-modality-detector.spec.ts, src/cdk/a11y/key-manager/list-key-manager.spec.ts, src/cdk/a11y/key-manager/tree-key-manager.spec.ts…). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=b7251c55b7b034eb0ce39e69439c5c33085a70f0d07493f93b987ecc295710ee, bytes=67067). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/a11y/focus-monitor/focus-monitor.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts, src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts, src/cdk/a11y/input-modality/input-modality-detector.spec.ts, src/cdk/a11y/key-manager/list-key-manager.spec.ts, src/cdk/a11y/key-manager/tree-key-manager.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
@@ -23141,7 +23159,7 @@
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/chips): switch tests away from fakeAsync (#33112)",
       "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=e92da7273f47093337946b009d1e0334cf6ee78ef94008a39b7c9dda20a5d761, bytes=57573). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/autocomplete/autocomplete.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/chips/chip-input.spec.ts, src/material/chips/chip-listbox.spec.ts, src/material/chips/chip-option.spec.ts, src/material/chips/chip-remove.spec.ts…). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "reason": "Inspected upstream patch content (sha256=e92da7273f47093337946b009d1e0334cf6ee78ef94008a39b7c9dda20a5d761, bytes=57573). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/autocomplete/autocomplete.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/chips/chip-input.spec.ts, src/material/chips/chip-listbox.spec.ts, src/material/chips/chip-option.spec.ts, src/material/chips/chip-remove.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
       "read_note_disposition": null,
       "files": [
         "src/material/autocomplete/autocomplete.spec.ts",
@@ -23642,7 +23660,7 @@
           "bucket": "needs-triage",
           "subject": "docs(material/datepicker): fixed typo in ssrSafeIsHTMLTextAreaElement function description (#33107)",
           "final_disposition": "irrelevant",
-          "reason": "Inspected upstream patch content (sha256=b3f7e90980bf3b0cfc4847ce53c25880f96a34e0778d12999f42cd05a02e0148, bytes=684). Changed paths: src/material/datepicker/aria-accessible-name.ts. Comment-only typo fix (funciton→function) in current Material datepicker aria helper. This package does not ship that TypeScript source; companion datepicker coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior.",
+          "reason": "Inspected upstream patch content (sha256=b3f7e90980bf3b0cfc4847ce53c25880f96a34e0778d12999f42cd05a02e0148, bytes=684). Changed paths: src/material/datepicker/aria-accessible-name.ts. Comment-only typo fix (funciton\u2192function) in current Material datepicker aria helper. This package does not ship that TypeScript source; companion datepicker coverage is Sass bridge/theme only. Irrelevant to retained legacy product behavior.",
           "read_note_disposition": "not-owned",
           "files": [
             "src/material/datepicker/aria-accessible-name.ts"
@@ -28450,7 +28468,7 @@
     {
       "sha": "54d514df66b9a1ea544df0aacc7069defcd78dcd",
       "bucket": "test-only-batch-candidate",
-      "subject": "feat(material/testing): Add 'type' attribute filter and getter to Mat… (#31657)",
+      "subject": "feat(material/testing): Add 'type' attribute filter and getter to Mat\u2026 (#31657)",
       "final_disposition": "irrelevant",
       "reason": "Inspected upstream patch content (sha256=200b997cfd71ad91b4ff7ad5e44638a09ffc4e09ab2f39b76b4d8ab07a480a95, bytes=6284). Changed paths: goldens/material/button/testing/index.api.md, src/material/button/testing/button-harness-filters.ts, src/material/button/testing/button-harness.spec.ts, src/material/button/testing/button-harness.ts. modern Material harness/testing API change; legacy harness ports are separate and were not updated by this patch. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
       "batch_id": "needs-triage-experimental-m3-build-docs-harness-input-transform-2026-10-01",
@@ -29468,7 +29486,7 @@
     {
       "sha": "b01f682c93601b5cbf076829c52addf46f2fa0da",
       "bucket": "needs-triage",
-      "subject": "Revert \"refactor(material/table): remove use of zone onStable for style sched…\" (#28777)",
+      "subject": "Revert \"refactor(material/table): remove use of zone onStable for style sched\u2026\" (#28777)",
       "final_disposition": "irrelevant",
       "reason": "Inspected upstream patch content (sha256=2e0fddd73e33abbc4fd65ebded9607bf7f8cc66d301b0051e538cc158611f4d7, bytes=25076). Changed paths: src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts, src/cdk/table/coalesced-style-scheduler.ts, src/cdk/table/table.spec.ts, src/material-experimental/column-resize/column-resize.spec.ts, tools/public_api_guard/cdk/table.md, tslint.json. material-experimental only; not a retained legacy product family in this package. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
       "batch_id": "needs-triage-surface-m3-nonshipped-cdk-2026-10-01",
@@ -30613,7 +30631,7 @@
       "g11_claim": "not-passed",
       "final_disposition": "needs-individual-review",
       "read_note_disposition": "inherited",
-      "reason": "Complete five-path patch read: BidiModule imports rather than declares standalone Dir, unchanged exports/provider/input/output/host binding, docs whitespace, standalone test hosts and exact Angular static type membership. Prior whole original/bothminimum public module proof observes the real declaration→import change and scoped public provider/Dir lifecycle.25 owned NgModules reexport BidiModule from stable current peer. Source/declaration/manual Injector probes do not prove actual legacy NgModule compiled scope, node ancestry or dynamic bound dir. Newly required packed field/input fixture reaches Dir through the actual legacy modules, checks closest Directionality identity, initial raw/normalized direction and one live output. No current component/library fork, modern directive mirror or consumer-resource change. Prior inherited ancestry label preserved but release disposition awaits actual packed node execution.",
+      "reason": "Complete five-path patch read: BidiModule imports rather than declares standalone Dir, unchanged exports/provider/input/output/host binding, docs whitespace, standalone test hosts and exact Angular static type membership. Prior whole original/bothminimum public module proof observes the real declaration\u2192import change and scoped public provider/Dir lifecycle.25 owned NgModules reexport BidiModule from stable current peer. Source/declaration/manual Injector probes do not prove actual legacy NgModule compiled scope, node ancestry or dynamic bound dir. Newly required packed field/input fixture reaches Dir through the actual legacy modules, checks closest Directionality identity, initial raw/normalized direction and one live output. No current component/library fork, modern directive mirror or consumer-resource change. Prior inherited ancestry label preserved but release disposition awaits actual packed node execution.",
       "peer_floor": {
         "package": "@angular/cdk",
         "installed": "22.1.7",
@@ -31620,7 +31638,7 @@
     {
       "sha": "8583ca661ded3d7e6b7d2053c84678a6c9b23a69",
       "bucket": "needs-triage",
-      "subject": "Revert \"refactor(material/tabs): Remove use of zone onStable for aligning tab…\" (#28764)",
+      "subject": "Revert \"refactor(material/tabs): Remove use of zone onStable for aligning tab\u2026\" (#28764)",
       "files": [
         "src/material/tabs/paginated-tab-header.ts"
       ],
@@ -35148,7 +35166,7 @@
     {
       "sha": "9ce023d9771b07229df59c6aa360ae0462980b60",
       "bucket": "behavior-semantic",
-      "subject": "fix(material/slider): ensure disabled slider thumb input has 'auto' c… (#31311)",
+      "subject": "fix(material/slider): ensure disabled slider thumb input has 'auto' c\u2026 (#31311)",
       "files": [
         "src/material/slider/slider.scss",
         "src/material/slider/slider.spec.ts"
@@ -38717,7 +38735,7 @@
       "g11_claim": "not-passed",
       "final_disposition": "inherited",
       "read_note_disposition": "inherited",
-      "reason": "The diff in src/cdk/dialog/dialog-module.ts changes `CdkPortal as ɵɵCdkPortal,`. That line is not in the legacy sources. @angular/cdk/dialog is exercised by projects/ngx-material-legacy/legacy-dialog/dialog-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
+      "reason": "The diff in src/cdk/dialog/dialog-module.ts changes `CdkPortal as \u0275\u0275CdkPortal,`. That line is not in the legacy sources. @angular/cdk/dialog is exercised by projects/ngx-material-legacy/legacy-dialog/dialog-module.ts. The commit is an ancestor of v22.1.7 (e950f29dcfbda93c13bff0d1a632465364488249), so installed peer @angular/cdk@22.1.7 supplies the change.",
       "peer_floor": {
         "package": "@angular/cdk",
         "installed": "22.1.7",
@@ -41816,7 +41834,7 @@
       "g11_claim": "not-passed",
       "final_disposition": "not-applicable",
       "read_note_disposition": "complete-documentation-source-identity",
-      "reason": "The datepicker input-element helper comment corrects “funciton” to “function”; complete SSR checks, node-name predicate, signatures and metadata are unchanged. Main previously labeled this typo inherited without behavior proof. It is a documentation-only patch, not an inherited runtime repair or SSR compatibility qualification.",
+      "reason": "The datepicker input-element helper comment corrects \u201cfunciton\u201d to \u201cfunction\u201d; complete SSR checks, node-name predicate, signatures and metadata are unchanged. Main previously labeled this typo inherited without behavior proof. It is a documentation-only patch, not an inherited runtime repair or SSR compatibility qualification.",
       "peer_floor": {
         "package": "@angular/material",
         "installed": "22.1.7",
@@ -41857,7 +41875,7 @@
         "affected_branches": [
           "main"
         ],
-        "decision": "The datepicker input-element helper comment corrects “funciton” to “function”; complete SSR checks, node-name predicate, signatures and metadata are unchanged. Main previously labeled this typo inherited without behavior proof. It is a documentation-only patch, not an inherited runtime repair or SSR compatibility qualification.",
+        "decision": "The datepicker input-element helper comment corrects \u201cfunciton\u201d to \u201cfunction\u201d; complete SSR checks, node-name predicate, signatures and metadata are unchanged. Main previously labeled this typo inherited without behavior proof. It is a documentation-only patch, not an inherited runtime repair or SSR compatibility qualification.",
         "proof_kind": "complete-syntax-and-documentation-review"
       }
     },

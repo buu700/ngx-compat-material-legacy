@@ -18,7 +18,7 @@ class TableOnPushPackedContractTests(unittest.TestCase):
             cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         observed = json.loads(result.stdout.strip().splitlines()[-1])
-        self.assertEqual(observed['derived_cases'], 104)
+        self.assertEqual(observed['derived_cases'], 105)
         self.assertEqual(observed['collector_mutants'], 2)
         self.assertEqual(observed['writer_cases'], 3)
         self.assertGreaterEqual(observed['negative_cases'], 50)
