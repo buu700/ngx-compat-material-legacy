@@ -41,6 +41,8 @@ import {radioIdentityPackedFixture} from './radio-identity-packed-fixture.mjs';
 import {packedRadioIdentityCase} from './radio-identity-packed-contract.mjs';
 import {generatedIdentityPackedFixture} from './generated-identity-packed-fixture.mjs';
 import {packedGeneratedIdentityCase} from './generated-identity-packed-contract.mjs';
+import {selectDetachPackedFixture} from './select-detach-packed-fixture.mjs';
+import {packedSelectDetachCase} from './select-detach-packed-contract.mjs';
 import {assertEngineFreeConsumer, assertEngineFreeHarnessInputs} from './consumer-animation-engine.mjs';
 import {
   allConsumerCaseIds,
@@ -473,6 +475,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
   const tableOnPushCase = packedTableOnPushCase(parsed.tableOnPushRendering);
   const radioIdentityCase = packedRadioIdentityCase(parsed.radioIdentity);
   const generatedIdentityCase = packedGeneratedIdentityCase(parsed.generatedIdentity);
+  const selectDetachCase = packedSelectDetachCase(parsed.selectScrollDetach);
   const harnessMap = {
     'packed-consumer/harness/legacy-button': parsed.buttonText === 'Go',
     'packed-consumer/harness/legacy-select': parsed.selectOpened === true && parsed.selectClosed === true && parsed.viewportShared === true,
@@ -534,6 +537,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     if (caseId === tableOnPushCase.case_id) return tableOnPushCase;
     if (caseId === radioIdentityCase.case_id) return radioIdentityCase;
     if (caseId === generatedIdentityCase.case_id) return generatedIdentityCase;
+    if (caseId === selectDetachCase.case_id) return selectDetachCase;
     const ok = harnessMap[caseId] === true;
     return {case_id: caseId, result: ok ? 'pass' : 'fail', failure: ok ? null : 'harness behavior did not match the reviewed fixture'};
   });
@@ -885,6 +889,8 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
     writeFileSync(join(consumer, 'src/radio-identity-contract.mjs'), readFileSync(join(root, 'scripts/radio-identity-packed-contract.mjs')));
     writeFileSync(join(consumer, 'src/generated-identity-probe.ts'), generatedIdentityPackedFixture());
     writeFileSync(join(consumer, 'src/generated-identity-contract.mjs'), readFileSync(join(root, 'scripts/generated-identity-packed-contract.mjs')));
+    writeFileSync(join(consumer, 'src/select-detach-probe.ts'), selectDetachPackedFixture());
+    writeFileSync(join(consumer, 'src/select-detach-contract.mjs'), readFileSync(join(root, 'scripts/select-detach-packed-contract.mjs')));
     writeFileSync(
       join(consumer, 'src/harness-runtime.ts'),
       `import {JSDOM} from 'jsdom';
@@ -933,6 +939,7 @@ import {observePackedValueAccessors} from './value-accessor-probe';
 import {PackedOnPushTableHost, observePackedTableOnPush} from './table-onpush-probe';
 import {PackedRadioIdentityHost, observePackedRadioIdentity} from './radio-identity-probe';
 import {GENERATED_IDENTITY_IMPORTS, observePackedGeneratedIdentity} from './generated-identity-probe';
+import {SELECT_DETACH_IMPORTS, observePackedSelectDetach} from './select-detach-probe';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {MatTabContent,MatTabLabel} from '@angular/material/tabs';
 import {_LegacyViewport} from '@ngx-compat/material-legacy/legacy-core';
@@ -1247,7 +1254,7 @@ async function main() {
     }]}});
   }
   TestBed.configureTestingModule({
-    imports: [HarnessHost, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule, PackedOnPushTableHost, PackedRadioIdentityHost, ...GENERATED_IDENTITY_IMPORTS],
+    imports: [HarnessHost, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule, PackedOnPushTableHost, PackedRadioIdentityHost, ...GENERATED_IDENTITY_IMPORTS, ...SELECT_DETACH_IMPORTS],
     providers: [
       {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
       // Preserve historical constructor-mode checks without installing an engine.
@@ -1277,6 +1284,7 @@ async function main() {
   const secondIcon=await iconSvg();
   const radioIdentity=await observePackedRadioIdentity();
   const generatedIdentity=await observePackedGeneratedIdentity();
+  const selectScrollDetach=await observePackedSelectDetach();
   const fixture = TestBed.createComponent(HarnessHost);
   fixture.detectChanges();
   const cellDefinitionObservation=[];
@@ -1932,6 +1940,7 @@ async function main() {
     tableOnPushRendering:tableOnPush.observed,
     radioIdentity:radioIdentity.observed,
     generatedIdentity:generatedIdentity.observed,
+    selectScrollDetach:selectScrollDetach.observed,
     ok:
       text === 'Go' &&
       isOpen === false &&
@@ -1944,7 +1953,7 @@ async function main() {
       selectOpened === true &&
       selectClosed === true &&
       tabCount === 2 &&
-      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && chipDisabledIsolation && selectionComparatorExposure && legacyBidiScope && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && radioIdentity.okay && generatedIdentity.okay && tableOnPush.okay && valueAccessors.okay && engineFreeAnimationPolicy,
+      selected === 'Two' && viewportShared && nativeDateConstructor && nativeDateProvider && chipTabIndex === 6 && radioTabIndex === 8 && chipBackspaceRelease && chipRepeatedEvents && chipDisabledIsolation && selectionComparatorExposure && legacyBidiScope && errorLiveRegion && formFieldTokenIsolation && progressLocationAndDefaults && commonModuleBehavior && checkboxAttribute && slideToggleAttribute && sliderAttribute && tabLinkAttribute && peerIconLiteralSanitization && checkboxNodeFactoryContext && peerStepperAbstractControl && tooltipOriginalEagerDependencies && cellDefinitionOriginalConstructors && cellOriginalConstructors && textColumnOriginalConstructor && tabContentOriginalConstructor && noDataRowOriginalConstructor && constructorBorrowedProviderLifecycle && tableOriginalStickyBehavior && tableOriginalBooleanInputs && tableRecycleRowIdentity && tableDefinitionOriginalConstructors && tableAngularDiConstruction && tableOutletAndDefinitionOwnership && tabLabelOriginalConstructor && radioIdentity.okay && generatedIdentity.okay && selectScrollDetach.okay && tableOnPush.okay && valueAccessors.okay && engineFreeAnimationPolicy,
     buttonText: text,
     selectIsOpen: isOpen,
     dialogText,

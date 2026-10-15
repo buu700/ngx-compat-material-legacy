@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
+  "line": "21.x",
+  "status": "pending",
+  "final_disposition": "needs-individual-review",
+  "source_parent": "02e51fd6f4683c8d49dfdfc664adb013611ef585",
+  "prior_entry": {
+    "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): close panel on detach output event (#30634)",
+    "files": [
+      "src/material/select/select.html",
+      "src/material/select/select.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "diff_sha256": "b443861e8eabbfa6c7613fc26349a89e59d2b364493d426461957beb247b691a",
+  "patch_file": "compatibility/rc/select-detach-upstream.diff",
+  "complete_original_files": [
+    "src/material/select/select.html",
+    "src/material/select/select.spec.ts"
+  ],
+  "whole_original_patch_read": true,
+  "owned_context": {
+    "path": "projects/ngx-material-legacy/legacy-select/select.html",
+    "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da",
+    "current_detach_binding_present": true,
+    "prior_candidate_hash": null,
+    "prior_source_proof_retired_without_rehashing": false
+  },
+  "independent_peer_source_review": {
+    "path": "compatibility/rc/select-detach-peer-source-review.json",
+    "sha256": "436e32c64822fad83935630b2d1b77a8af97501da06f6ae12908f6f799ec7787"
+  },
+  "analysis": [
+    "The original patch has two files. It adds the modern select detach output binding and a real CloseScrollStrategy regression: emit scrolling through ScrollDispatcher, then require panelOpen=false. The earlier owned decision omitted this test scope.",
+    "Untouched Material16 legacy compiled template already contains the detach=close binding. The current owned template retains that event binding, with subsequent CSS-motion/control-flow changes. There is no demonstrated missing product binding to repair.",
+    "The main source-line-match subject names an obsolete select.html hash. Retain that exact proof and earlier report as historical data; do not rehash it into a passing individual behavior proof. The21.x row remains pending with its own branch attribution.",
+    "Both exact current peers retain the select detach binding. Their genuine CdkConnectedOverlay forwards real OverlayRef detachments to its detach output, and real CloseScrollStrategy consumes ScrollDispatcher.scrolled(0). These are static code/declaration observations only.",
+    "Implement one mandatory packed Angular DOM case: actual CdkScrollable scroll events, real public Overlay.close strategy, real public CdkConnectedOverlay/OverlayRef observations, isolated generation scopes, two reopen/detach cycles, values/focus/ARIA and teardown. Keep all prior104 cases. No replacement scroll dispatcher or callback-only observation.",
+    "Final individual disposition remains pending until actual artifact-bound execution and branch-native evidence. Strict templates/AOT, real browser rendering and canonical consumer floors remain separate obligations."
+  ],
+  "actual_packed_or_native_executed": false,
+  "new_SHA_closures": 0,
+  "g11_claim": "not-passed"
+}
