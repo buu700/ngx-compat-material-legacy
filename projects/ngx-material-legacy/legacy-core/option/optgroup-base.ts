@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -49,7 +50,7 @@ export class _MatOptgroupBase extends _MatOptgroupMixinBase implements CanDisabl
   @Input() label: string;
 
   /** Unique id for the underlying label. */
-  _labelId: string = `mat-optgroup-label-${_uniqueOptgroupIdCounter++}`;
+  _labelId: string = `mat-optgroup-label-${_uniqueOptgroupIdCounter++}-legacy`;
 
   /** Whether the group is in inert a11y mode. */
   _inert: boolean;
