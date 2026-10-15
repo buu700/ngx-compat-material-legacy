@@ -33,7 +33,6 @@ cf3506adf1af1556d705dbb651e7e96a7141b81d
 86ad5150110522873dae2801fd3c2957502949e7
 68b267dd59f3addf92a3b9f8ce9e8baa479df7f4
 688c430fe8df09152ee59eb8a2ca62b5ba2fb81e
-1b6db8c89b00ace8aaa0e0824866acec5369635f
 ca9c490ee30dbf7c9c147079197d0dbc0abcd611
 938f478efdc96ef0de1217e806f98939beb027cd
 9494ff2d65c98726046e6a20dd6a6d938e97a2f6
@@ -45,6 +44,7 @@ cf456a2d43837497367662e7de22f1b2bcbf4f00
 25f391a3c545a1b829a74584c4f9235ab8d18497
 10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb
 """.split())
+ARTIFACT_REQUIRED_SHA_IDS = frozenset({'1b6db8c89b00ace8aaa0e0824866acec5369635f'})
 LATER_METHOD_PROOFS = {
     '737c7a8f1a5bc4df0e790d3ecdd227f8342499f8':
         ('complete-public-predicate-and-exact-owned-handler-replay',
@@ -95,6 +95,17 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         pending = {row['sha'] for row in entries
                    if row['final_disposition'] == 'needs-individual-review'}
         self.assertEqual(pending, PENDING_SHA_IDS)
+        runtime_required = {row['sha'] for row in entries
+                            if (row.get('individual_proof') or {}).get('proof_kind') == 'artifact-required-individual-behavior'}
+        self.assertEqual(runtime_required, ARTIFACT_REQUIRED_SHA_IDS)
+        for row in entries:
+            if row['sha'] in runtime_required:
+                self.assertEqual(row['final_disposition'], 'already-adapted')
+                proof = row['individual_proof']
+                self.assertEqual(proof['affected_branches'], ['main'])
+                self.assertEqual(proof['artifact_behavior']['kind'], 'select-focus-before-click')
+                self.assertEqual(proof['artifact_behavior']['case_ids'], ['packed-consumer/harness/legacy-select'])
+                self.assertEqual(len(proof['artifact_behavior']['source_members']), 10)
 
     def test_intact_ledger_covers_every_seed_sha(self) -> None:
         self.assert_pending_roster(json.loads(LEDGER.read_text())['entries'])
@@ -720,6 +731,12 @@ for(const proof of proofs)assert.equal(candidateSourceEvidenceOk(proof,p=>readFi
         next(row for row in changed if row['sha'] == '688c430fe8df09152ee59eb8a2ca62b5ba2fb81e')['final_disposition'] = 'already-adapted'
         with self.assertRaises(AssertionError):
             self.assert_pending_roster(changed)
+        for field in ['proof_kind', 'artifact_behavior']:
+            changed = json.loads(json.dumps(entries))
+            proof = next(row for row in changed if row['sha'] in ARTIFACT_REQUIRED_SHA_IDS)['individual_proof']
+            proof.pop(field)
+            with self.subTest(runtime_required_field=field), self.assertRaises((AssertionError, KeyError)):
+                self.assert_pending_roster(changed)
         for sha in LATER_METHOD_PROOFS:
             entry = next(row for row in entries if row['sha'] == sha)
             self.assert_later_method_review(entry)

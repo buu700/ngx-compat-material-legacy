@@ -41,7 +41,7 @@ export function focusSample() {
     }))};
 }
 
-export function createFixture(sourceRoot) {
+export function createFixture(sourceRoot, individualReview = null) {
   const temp = mkdtempSync(join(tmpdir(), 'artifact-behavior-validator-'));
   const root = join(temp, 'repo'), runDir = join(temp, 'run');
   const read = path => readFileSync(join(sourceRoot, path));
@@ -93,14 +93,17 @@ export function createFixture(sourceRoot) {
   repoPut('current.json', {schema_version: 1, line, status: 'closed', current_uses: active.symbol_uses.length, current_source_files: active.source_files.length,
     current_source_population_sha256: active.source_population_sha256, symbol_use_count: additional.length, symbol_uses: additional.map(close), fixture_only: true});
   const patchPath = 'compatibility/rc/select-focus-click-original.patch'; repoPut(patchPath, read(patchPath));
-  const reviewPath = 'compatibility/f10/disposition-ledger/evidence/artifact-fixture.json';
-  const review = {sha: SELECT_FOCUS_SHA, status: 'reviewed', final_disposition: 'already-adapted',
-    diff_sha256: SELECT_FOCUS_PATCH, patch_file: patchPath, fixture_only: true};
+  const reviewPath = individualReview?.entry.evidence_report ?? 'compatibility/f10/disposition-ledger/evidence/artifact-fixture.json';
+  const review = individualReview ? structuredClone(individualReview.review) :
+    {sha: SELECT_FOCUS_SHA, status: 'reviewed', final_disposition: 'already-adapted',
+      diff_sha256: SELECT_FOCUS_PATCH, patch_file: patchPath, fixture_only: true};
   repoPut(reviewPath, review);
-  const proof = {proof_kind: ARTIFACT_BEHAVIOR_KIND, diff_sha256: SELECT_FOCUS_PATCH, review_depth: 'individual-compatibility',
+  const proof = individualReview ? structuredClone(individualReview.entry.individual_proof) :
+    {proof_kind: ARTIFACT_BEHAVIOR_KIND, diff_sha256: SELECT_FOCUS_PATCH, review_depth: 'individual-compatibility',
     affected_branches: [line], decision: note, artifact_behavior: {kind: 'select-focus-before-click',
       case_ids: ['packed-consumer/harness/legacy-select'], source_members: SELECT_FOCUS_MEMBERS.map(path => ({path, sha256: hash(readFileSync(join(root, path)))}))}};
-  const entry = {sha: SELECT_FOCUS_SHA, subject: 'fix(material/select): focus-handler click fixture', bucket: 'behavior-semantic',
+  const entry = individualReview ? {...structuredClone(individualReview.entry), individual_proof: proof} :
+    {sha: SELECT_FOCUS_SHA, subject: 'fix(material/select): focus-handler click fixture', bucket: 'behavior-semantic',
     final_disposition: 'already-adapted', evidence_report: reviewPath, individual_proof: proof, fixture_only: true};
   const git = args => execFileSync('git', ['-c', 'gc.auto=0', '-c', 'maintenance.auto=0', ...args], {cwd: root, encoding: 'utf8'}).trim();
   git(['init', '-q']); git(['add', '.']);
