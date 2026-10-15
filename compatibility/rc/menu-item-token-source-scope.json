@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "029cca1139751125fc1c1bf3bc952cd350a81eeb",
+  "role": "Bounded source and consumer scope observation only; no removed-use or public-token qualification",
+  "finding": "All three frozen current MatMenuItem dependencies remain as the public provider/query/self-injection token. Only nominal parent inheritance was retired. The old removed-use hypothesis is disproved by the current aliases and exact call sites.",
+  "uses": [
+    {
+      "file": "legacy-menu/menu-item.ts",
+      "module": "@angular/material/menu",
+      "symbol": "MatMenuItem",
+      "candidate_source_sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4",
+      "still_imported": true,
+      "local_name": "PeerMatMenuItem",
+      "frozen_disposition": "open",
+      "occurrences": [
+        {
+          "line": 15,
+          "syntax": "ImportSpecifier",
+          "expression": "MatMenuItem as PeerMatMenuItem"
+        },
+        {
+          "line": 49,
+          "syntax": "PropertyAssignment",
+          "expression": "provide: PeerMatMenuItem"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-base.ts",
+      "module": "@angular/material/menu",
+      "symbol": "MatMenuItem",
+      "candidate_source_sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945",
+      "still_imported": true,
+      "local_name": "PeerMatMenuItem",
+      "frozen_disposition": "open",
+      "occurrences": [
+        {
+          "line": 67,
+          "syntax": "ImportSpecifier",
+          "expression": "MatMenuItem as PeerMatMenuItem"
+        },
+        {
+          "line": 95,
+          "syntax": "CallExpression",
+          "expression": "ContentChildren(PeerMatMenuItem, {descendants: true})"
+        },
+        {
+          "line": 180,
+          "syntax": "CallExpression",
+          "expression": "ContentChildren(PeerMatMenuItem, {descendants: false})"
+        }
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-trigger-base.ts",
+      "module": "@angular/material/menu",
+      "symbol": "MatMenuItem",
+      "candidate_source_sha256": "9c3b605d77935394dd158547b85d3174fb1e1ea142bd3953bc706e51bbe95d66",
+      "still_imported": true,
+      "local_name": "PeerMatMenuItem",
+      "frozen_disposition": "open",
+      "occurrences": [
+        {
+          "line": 33,
+          "syntax": "ImportSpecifier",
+          "expression": "MatMenuItem as PeerMatMenuItem"
+        },
+        {
+          "line": 259,
+          "syntax": "CallExpression",
+          "expression": "Inject(PeerMatMenuItem)"
+        }
+      ]
+    }
+  ],
+  "actual_existing_packed_source": {
+    "path": "scripts/packed-consumer-aot-smoke.mjs",
+    "sha256": "9f8e7c13a1d39116e1d478a0ff48c6ecef963971d35bf927eaf396fc80dc60f6",
+    "required_case": "packed-consumer/harness/legacy-menu",
+    "observed_assertions": [
+      "&& !(normalMenuItem instanceof MatMenuItem)",
+      "&& normalMenuNode!.injector.get(MatMenuItem)===normalMenuItem",
+      "fixture.componentInstance.lazyMenu.items.length===2",
+      "'packed-consumer/harness/legacy-menu': parsed.menuOpen === true && parsed.menuItemConstruction === true"
+    ],
+    "top_level_menu_trigger_bindings": 2,
+    "submenu_item_trigger_binding": false,
+    "coverage_gap": "The existing source checks leaf provider identity and direct/lazy menu queries, but neither top-level trigger is on a mat-menu-item. It does not exercise Optional+Self MatMenuItem injection on an actual submenu trigger or nested query ownership."
+  },
+  "cyph_read_only": {
+    "git_head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "visible_typescript_files": 775,
+    "explicit_item_or_panel_type_hits": [],
+    "menu_item_templates": [
+      {
+        "path": "shared/js/cyph/components/account-base-file-list/account-base-file-list.component.html",
+        "sha256": "359ca646d1039ae152f36da6c3db4ef6555359622cc95d94d412d9e3d80160a8"
+      },
+      {
+        "path": "shared/js/cyph/components/account-post/account-post.component.html",
+        "sha256": "03d29a9ad013bb046b3ea40075b81d5b68273d3a5f41d601fed8efe6084bffa4"
+      },
+      {
+        "path": "shared/js/cyph/components/account-menu/account-menu.component.html",
+        "sha256": "a97ccd98fe1679bd8d237485d8e86d2315979de875661ad63682ccdaa79ed595"
+      },
+      {
+        "path": "shared/js/cyph/components/chat-message-box/chat-message-box.component.html",
+        "sha256": "70d5ddc60100f192d14a7b47b915eb492afafa4a12d6319872ed5892956a53e9"
+      },
+      {
+        "path": "shared/js/cyph/components/account-contact/account-contact.component.html",
+        "sha256": "9f93833372f07fe18400d0f2565f50159db2c91f03c62ecedec9106584ebb0ea"
+      },
+      {
+        "path": "shared/js/cyph/components/account/account.component.html",
+        "sha256": "e8aa624223ef0088719e487576ad62065c346884552fca08616ddeb950daeda4"
+      },
+      {
+        "path": "shared/js/cyph/components/chat-message/chat-message.component.html",
+        "sha256": "86449662e8534014fcb486656d4b9ae33291770c2ad27e2f7fa5376ed3ea60c3"
+      },
+      {
+        "path": "shared/js/cyph/components/account-notification-center/account-notification-center.component.html",
+        "sha256": "d77d6a297e2a99721d5c7a5411465ad48f05e8161a04ae30bbd25f4017eff789"
+      },
+      {
+        "path": "shared/js/cyph/components/account-profile/account-profile.component.html",
+        "sha256": "af88e1fedc039eff26a5f905d48f21e767c70ec378508a0b1edc18486204ab7b"
+      },
+      {
+        "path": "shared/js/cyph/components/account-contacts/account-contacts.component.html",
+        "sha256": "907c84cca8361acef721edb542ad391d0e2c1382cce77b1079422c44fa9f6157"
+      }
+    ],
+    "templates_with_item_submenu_trigger": [
+      "shared/js/cyph/components/account-base-file-list/account-base-file-list.component.html"
+    ],
+    "scope": "Visible rg-discovered files only, no ignored/generated/vendor/dynamic inference and no consumer build or write."
+  },
+  "authority": {
+    "path": "compatibility/rc/owned-menu-item-implementation-decision.json",
+    "sha256": "3d0c87a6a9e02ef6d72fd8777db3385672e3f4edad4e50db0ae875df4d992a80",
+    "scope": "Preserved explicit historical implementation approval. Earlier DI-only choice is superseded; no renewed approval inferred."
+  },
+  "new_use_or_SHA_closures": 0,
+  "authored_rows_unchanged": true,
+  "product_HTML_CSS_SCSS_unchanged": true,
+  "actual_packed_or_native_executed": false,
+  "push_or_Actions": false,
+  "credentials_changed": false,
+  "owner_decision_needed": false,
+  "g11_claim": "not-passed",
+  "next_action": "Add a bounded mandatory packed nested-menu item/token regression exercising the actual public provider token, descendant/direct queries, Optional+Self trigger injection, sibling/nested ownership and teardown/reopen. Preserve all105 existing cases and original source preimages; execute only with the plausible final Actions candidate. Keep all three dependencies open until the required evidence is substantive. Repair the old patch-binding fixture import closure separately, then continue all remaining C02/C03/C04, C05 and A/R obligations."
+}
