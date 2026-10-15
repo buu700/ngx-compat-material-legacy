@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "node": "v22.23.3",
+  "producer_sha256": "567854491711a5920314d399c3bc9371ab44abe6daea26ecd343f29a41be3800",
+  "worker_sha256": "fa45add7c125b8dcba4b8cb2243db6ee50756d640bb67be560ec1690653ef307",
+  "helper_sha256": "48c0caa01f1b5457c651fb99ec587bdedb280200ac943bc11ce3f071b452790a",
+  "source": {
+    "schema_version": 1,
+    "cases": [
+      {
+        "file": "legacy-radio/radio.ts",
+        "module": "@angular/cdk/collections",
+        "symbol": "UniqueSelectionDispatcher",
+        "candidate_source_sha256": "dffd3e4daf0d50d915303b2e3d13d26e8c97fb77756ccf8c618e34022f548f1e",
+        "references": [
+          105
+        ],
+        "local_name": "UniqueSelectionDispatcher",
+        "constructor_parameter": "radioDispatcher",
+        "constructor_parameter_index": 4
+      },
+      {
+        "file": "legacy-radio/internal/radio-base.ts",
+        "module": "@angular/cdk/collections",
+        "symbol": "UniqueSelectionDispatcher",
+        "candidate_source_sha256": "584e9b199758f9975fd68e76d7e566b939f1fbec8656970a598e96c9fae2c8b2",
+        "references": [
+          493
+        ],
+        "local_name": "UniqueSelectionDispatcher",
+        "constructor_parameter": "_radioDispatcher",
+        "constructor_parameter_index": 4
+      }
+    ],
+    "methods": [
+      {
+        "kind": "get",
+        "name": "checked",
+        "tagged_body_sha256": "84703cc601ca1472307bbc3810469dd48f876b9cbf20fe9b7e30f12203f54cca",
+        "original": "get checked(){return this._checked;}",
+        "candidate": "get checked(){return this._checked;}"
+      },
+      {
+        "kind": "set",
+        "name": "checked",
+        "tagged_body_sha256": "c9437f3e7fc080686104634178d1618a063f1eea313e9a65638c7c2bcdaab917",
+        "original": "set checked(value){const newCheckedState = coerceBooleanProperty(value);\nif (this._checked !== newCheckedState) {\n            this._checked = newCheckedState;\n            if (newCheckedState && this.radioGroup && this.radioGroup.value !== this.value) {\n                this.radioGroup.selected = this;\n            }\n            else if (!newCheckedState && this.radioGroup && this.radioGroup.value === this.value) {\n                // When unchecking the selected radio button, update the selected radio\n                // property on the group.\n                this.radioGroup.selected = null;\n            }\n            if (newCheckedState) {\n                // Notify all radio buttons with the same name to un-check.\n                this._radioDispatcher.notify(this.id, this.name);\n            }\n            this._changeDetector.markForCheck();\n        }}",
+        "candidate": "set checked(value){const newCheckedState = coerceBooleanProperty(value);\nif (this._checked !== newCheckedState) {\n      this._checked = newCheckedState;\n      if (newCheckedState && this.radioGroup && this.radioGroup.value !== this.value) {\n        this.radioGroup.selected = this;\n      } else if (!newCheckedState && this.radioGroup && this.radioGroup.value === this.value) {\n        // When unchecking the selected radio button, update the selected radio\n        // property on the group.\n        this.radioGroup.selected = null;\n      }\n\n      if (newCheckedState) {\n        // Notify all radio buttons with the same name to un-check.\n        this._radioDispatcher.notify(this.id, this.name);\n      }\n      this._changeDetector.markForCheck();\n    }}"
+      },
+      {
+        "kind": "get",
+        "name": "value",
+        "tagged_body_sha256": "9267f961e7654e11b1c8dcb781dde2f79bff228644945814b3489aee3c0398aa",
+        "original": "get value(){return this._value;}",
+        "candidate": "get value(){return this._value;}"
+      },
+      {
+        "kind": "method",
+        "name": "ngOnInit",
+        "tagged_body_sha256": "3b7270a3f434387f659906af4cce4d91c25facffdfeb5ab77659ee36ffd20d0f",
+        "original": "ngOnInit(){if (this.radioGroup) {\n            // If the radio is inside a radio group, determine if it should be checked\n            this.checked = this.radioGroup.value === this._value;\n            if (this.checked) {\n                this.radioGroup.selected = this;\n            }\n            // Copy name from parent radio group\n            this.name = this.radioGroup.name;\n        }\nthis._removeUniqueSelectionListener = this._radioDispatcher.listen((id, name) => {\n            if (id !== this.id && name === this.name) {\n                this.checked = false;\n            }\n        });}",
+        "candidate": "ngOnInit(){if (this.radioGroup) {\n      // If the radio is inside a radio group, determine if it should be checked\n      this.checked = this.radioGroup.value === this._value;\n\n      if (this.checked) {\n        this.radioGroup.selected = this;\n      }\n\n      // Copy name from parent radio group\n      this.name = this.radioGroup.name;\n    }\nthis._removeUniqueSelectionListener = this._radioDispatcher.listen((id, name) => {\n      if (id !== this.id && name === this.name) {\n        this.checked = false;\n      }\n    });}"
+      },
+      {
+        "kind": "method",
+        "name": "ngOnDestroy",
+        "tagged_body_sha256": "b62b8cf6d4e78fbce201519ba457e859cc0b284f8406836a2749fcbd91a17be1",
+        "original": "ngOnDestroy(){this._focusMonitor.stopMonitoring(this._elementRef);\nthis._removeUniqueSelectionListener();}",
+        "candidate": "ngOnDestroy(){this._focusMonitor.stopMonitoring(this._elementRef);\nthis._removeUniqueSelectionListener();}"
+      },
+      {
+        "kind": "method",
+        "name": "_onInputInteraction",
+        "tagged_body_sha256": "67af0e94638a76d3166f08eb82170dfb8f9dc99d9ec52e750cd6633cb4b03023",
+        "original": "_onInputInteraction(event){event.stopPropagation();\nif (!this.checked && !this.disabled) {\n            const groupValueChanged = this.radioGroup && this.value !== this.radioGroup.value;\n            this.checked = true;\n            this._emitChangeEvent();\n            if (this.radioGroup) {\n                this.radioGroup._controlValueAccessorChangeFn(this.value);\n                if (groupValueChanged) {\n                    this.radioGroup._emitChangeEvent();\n                }\n            }\n        }}",
+        "candidate": "_onInputInteraction(event){event.stopPropagation();\nif (!this.checked && !this.disabled) {\n      const groupValueChanged = this.radioGroup && this.value !== this.radioGroup.value;\n      this.checked = true;\n      this._emitChangeEvent();\n\n      if (this.radioGroup) {\n        this.radioGroup._controlValueAccessorChangeFn(this.value);\n        if (groupValueChanged) {\n          this.radioGroup._emitChangeEvent();\n        }\n      }\n    }}"
+      },
+      {
+        "kind": "method",
+        "name": "_emitChangeEvent",
+        "tagged_body_sha256": "0015257e3c03313794c32a8f0aa368458d5ce8c41b42f5d793c85b87d0bdaf7e",
+        "original": "_emitChangeEvent(){this.change.emit(new MatRadioChange(this, this._value));}",
+        "candidate": "_emitChangeEvent(){this.change.emit(new MatRadioChange(this, this._value));}"
+      }
+    ],
+    "original": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.RadioReplay = exports.MatRadioChange = void 0;\nclass MatRadioChange {\n    constructor(source, value) {\n        this.source = source;\n        this.value = value;\n    }\n}\nexports.MatRadioChange = MatRadioChange;\nclass RadioReplay {\n    get checked() { return this._checked; }\n    set checked(value) {\n        const newCheckedState = coerceBooleanProperty(value);\n        if (this._checked !== newCheckedState) {\n            this._checked = newCheckedState;\n            if (newCheckedState && this.radioGroup && this.radioGroup.value !== this.value) {\n                this.radioGroup.selected = this;\n            }\n            else if (!newCheckedState && this.radioGroup && this.radioGroup.value === this.value) {\n                this.radioGroup.selected = null;\n            }\n            if (newCheckedState) {\n                this._radioDispatcher.notify(this.id, this.name);\n            }\n            this._changeDetector.markForCheck();\n        }\n    }\n    get value() { return this._value; }\n    ngOnInit() {\n        if (this.radioGroup) {\n            this.checked = this.radioGroup.value === this._value;\n            if (this.checked) {\n                this.radioGroup.selected = this;\n            }\n            this.name = this.radioGroup.name;\n        }\n        this._removeUniqueSelectionListener = this._radioDispatcher.listen((id, name) => {\n            if (id !== this.id && name === this.name) {\n                this.checked = false;\n            }\n        });\n    }\n    ngOnDestroy() {\n        this._focusMonitor.stopMonitoring(this._elementRef);\n        this._removeUniqueSelectionListener();\n    }\n    _onInputInteraction(event) {\n        event.stopPropagation();\n        if (!this.checked && !this.disabled) {\n            const groupValueChanged = this.radioGroup && this.value !== this.radioGroup.value;\n            this.checked = true;\n            this._emitChangeEvent();\n            if (this.radioGroup) {\n                this.radioGroup._controlValueAccessorChangeFn(this.value);\n                if (groupValueChanged) {\n                    this.radioGroup._emitChangeEvent();\n                }\n            }\n        }\n    }\n    _emitChangeEvent() { this.change.emit(new MatRadioChange(this, this._value)); }\n}\nexports.RadioReplay = RadioReplay;\n",
+    "candidate": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.RadioReplay = exports.MatRadioChange = void 0;\nclass MatRadioChange {\n    constructor(source, value) {\n        this.source = source;\n        this.value = value;\n    }\n}\nexports.MatRadioChange = MatRadioChange;\nclass RadioReplay {\n    get checked() { return this._checked; }\n    set checked(value) {\n        const newCheckedState = coerceBooleanProperty(value);\n        if (this._checked !== newCheckedState) {\n            this._checked = newCheckedState;\n            if (newCheckedState && this.radioGroup && this.radioGroup.value !== this.value) {\n                this.radioGroup.selected = this;\n            }\n            else if (!newCheckedState && this.radioGroup && this.radioGroup.value === this.value) {\n                this.radioGroup.selected = null;\n            }\n            if (newCheckedState) {\n                this._radioDispatcher.notify(this.id, this.name);\n            }\n            this._changeDetector.markForCheck();\n        }\n    }\n    get value() { return this._value; }\n    ngOnInit() {\n        if (this.radioGroup) {\n            this.checked = this.radioGroup.value === this._value;\n            if (this.checked) {\n                this.radioGroup.selected = this;\n            }\n            this.name = this.radioGroup.name;\n        }\n        this._removeUniqueSelectionListener = this._radioDispatcher.listen((id, name) => {\n            if (id !== this.id && name === this.name) {\n                this.checked = false;\n            }\n        });\n    }\n    ngOnDestroy() {\n        this._focusMonitor.stopMonitoring(this._elementRef);\n        this._removeUniqueSelectionListener();\n    }\n    _onInputInteraction(event) {\n        event.stopPropagation();\n        if (!this.checked && !this.disabled) {\n            const groupValueChanged = this.radioGroup && this.value !== this.radioGroup.value;\n            this.checked = true;\n            this._emitChangeEvent();\n            if (this.radioGroup) {\n                this.radioGroup._controlValueAccessorChangeFn(this.value);\n                if (groupValueChanged) {\n                    this.radioGroup._emitChangeEvent();\n                }\n            }\n        }\n    }\n    _emitChangeEvent() { this.change.emit(new MatRadioChange(this, this._value)); }\n}\nexports.RadioReplay = RadioReplay;\n",
+    "event_class_emit_sha256": "8f8c85f1165f2446b6a6b375a59152ca00b0faf9d150a12760965fbd6faa3b2b",
+    "derived_constructor_structure_sha256": "7dabb221618f28835c2fc7fd358735f4b4c5e2a1d7b2bb61d3c1cb8b615932a2",
+    "tagged_capsule_sha256": "9c1108b2de88d6b207a78e0cf75cf9153968d1ac44e8ba7ac6b359a265871e1b",
+    "limits": "Exact seven methods and pure complete event class, plus eight-argument constructor forwarding. Runtime creation is a protocol fixture, never the actual owned component/node/factory."
+  },
+  "subjects": [
+    {
+      "line": "original",
+      "contract": {
+        "line": "original",
+        "version": "16.2.14",
+        "entry": "collections/index.d.ts",
+        "public_chain": [
+          "collections/index.d.ts#UniqueSelectionDispatcher"
+        ],
+        "signatures": {
+          "notify": "notify(id:string,name:string):void;",
+          "listen": "listen(listener:UniqueSelectionDispatcherListener):()=>void;",
+          "ngOnDestroy": "ngOnDestroy():void;"
+        },
+        "listener_type": "(id:string,name:string)=>void",
+        "runtime_bodies": {
+          "notify": "6f3d3eb9a210c8e7b725ba7894b7ace7a0b721135c0bc2b5c5ed9e82aa5272d1",
+          "listen": "f0878a013e20c655642f1b115886ce49277c2fedd2d3f59609fc776d8fd18af1",
+          "ngOnDestroy": "30b873b4e095c1f420e3d0b7983645523703052f18992235504f5897b460a402"
+        },
+        "runtime_path": "fesm2022/collections.mjs",
+        "runtime_sha256": "3f0434a3819d8a3880e4fb1aac7fbcca1c2d7fa7d1ffb7a7e9d174ddb0dbd2d3",
+        "default_scope": "qualified only by actual createApplication worker, not metadata ancestry"
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "borrowed_zone": "0.16.3"
+    },
+    {
+      "line": "main",
+      "contract": {
+        "line": "main",
+        "version": "22.1.7",
+        "entry": "types/collections.d.ts",
+        "public_chain": [
+          "types/collections.d.ts#UniqueSelectionDispatcher",
+          "types/_unique-selection-dispatcher-chunk.d.ts#UniqueSelectionDispatcher"
+        ],
+        "signatures": {
+          "notify": "notify(id:string,name:string):void;",
+          "listen": "listen(listener:UniqueSelectionDispatcherListener):()=>void;",
+          "ngOnDestroy": "ngOnDestroy():void;"
+        },
+        "listener_type": "(id:string,name:string)=>void",
+        "runtime_bodies": {
+          "notify": "6f3d3eb9a210c8e7b725ba7894b7ace7a0b721135c0bc2b5c5ed9e82aa5272d1",
+          "listen": "f0878a013e20c655642f1b115886ce49277c2fedd2d3f59609fc776d8fd18af1",
+          "ngOnDestroy": "30b873b4e095c1f420e3d0b7983645523703052f18992235504f5897b460a402"
+        },
+        "runtime_path": "fesm2022/_unique-selection-dispatcher-chunk.mjs",
+        "runtime_sha256": "257ec72a8f6840fe9a9d0e2233dc5274f5131088ec36a8d03e61a7015792be2c",
+        "default_scope": "qualified only by actual createApplication worker, not metadata ancestry"
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "borrowed_zone": "0.16.3"
+    },
+    {
+      "line": "21.x",
+      "contract": {
+        "line": "21.x",
+        "version": "21.2.14",
+        "entry": "types/collections.d.ts",
+        "public_chain": [
+          "types/collections.d.ts#UniqueSelectionDispatcher",
+          "types/_unique-selection-dispatcher-chunk.d.ts#UniqueSelectionDispatcher"
+        ],
+        "signatures": {
+          "notify": "notify(id:string,name:string):void;",
+          "listen": "listen(listener:UniqueSelectionDispatcherListener):()=>void;",
+          "ngOnDestroy": "ngOnDestroy():void;"
+        },
+        "listener_type": "(id:string,name:string)=>void",
+        "runtime_bodies": {
+          "notify": "6f3d3eb9a210c8e7b725ba7894b7ace7a0b721135c0bc2b5c5ed9e82aa5272d1",
+          "listen": "f0878a013e20c655642f1b115886ce49277c2fedd2d3f59609fc776d8fd18af1",
+          "ngOnDestroy": "30b873b4e095c1f420e3d0b7983645523703052f18992235504f5897b460a402"
+        },
+        "runtime_path": "fesm2022/_unique-selection-dispatcher-chunk.mjs",
+        "runtime_sha256": "899e598f88cbee664aae65cd0a18e64f4f6189651ec754a4cddfa0fc54207925",
+        "default_scope": "qualified only by actual createApplication worker, not metadata ancestry"
+      },
+      "borrowed": {
+        "rxjs": {
+          "version": "7.8.2",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs"
+        },
+        "tslib": {
+          "version": "2.8.1",
+          "root": "/home/parallels/ngx-compat-material-legacy/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib"
+        }
+      },
+      "borrowed_zone": "0.16.3"
+    }
+  ],
+  "results": [
+    {
+      "line": "original",
+      "mode": "zoneful",
+      "default_root_service": true,
+      "child_identity": true,
+      "applications_isolated": true,
+      "destruction_clears_listeners": true,
+      "manual_listener_cases": 7,
+      "document_and_renderer_protocol": true,
+      "whole_component_or_native_or_packed_qualified": false
+    },
+    {
+      "line": "main",
+      "mode": "zoneful",
+      "default_root_service": true,
+      "child_identity": true,
+      "applications_isolated": true,
+      "destruction_clears_listeners": true,
+      "manual_listener_cases": 7,
+      "document_and_renderer_protocol": true,
+      "whole_component_or_native_or_packed_qualified": false
+    },
+    {
+      "line": "main",
+      "mode": "zoneless",
+      "default_root_service": true,
+      "child_identity": true,
+      "applications_isolated": true,
+      "destruction_clears_listeners": true,
+      "manual_listener_cases": 7,
+      "document_and_renderer_protocol": true,
+      "whole_component_or_native_or_packed_qualified": false
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneful",
+      "default_root_service": true,
+      "child_identity": true,
+      "applications_isolated": true,
+      "destruction_clears_listeners": true,
+      "manual_listener_cases": 7,
+      "document_and_renderer_protocol": true,
+      "whole_component_or_native_or_packed_qualified": false
+    },
+    {
+      "line": "21.x",
+      "mode": "zoneless",
+      "default_root_service": true,
+      "child_identity": true,
+      "applications_isolated": true,
+      "destruction_clears_listeners": true,
+      "manual_listener_cases": 7,
+      "document_and_renderer_protocol": true,
+      "whole_component_or_native_or_packed_qualified": false
+    }
+  ],
+  "negative_controls": [
+    "type-only-token",
+    "unreviewed-token-route",
+    "base-parameter-type",
+    "derived-parameter-type",
+    "wrong-registration-name",
+    "missing-cleanup",
+    "changed-selection-notification",
+    "changed-event-identity",
+    "changed-forwarding"
+  ],
+  "import_alias_positive": true,
+  "limits": [
+    "Complete genuine public dispatcher/default application DI and manual algorithms. Complete seven tagged-owned methods and event/forwarding shapes; actual owned construction belongs to separate radio identity proof.",
+    "Explicit document/renderer and callback protocols. No full Angular component/node/native/packed or compiler/Node/RxJS floor claim."
+  ],
+  "g11_claim": "not-passed"
+}

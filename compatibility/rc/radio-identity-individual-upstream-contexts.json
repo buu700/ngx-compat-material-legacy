@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "410195f4e8ceeb88bbce4d8802485c586686c685",
+  "reviews": [
+    {
+      "sha": "e3abc65d7d191f2adf1c294bdb84f532d4eac05c",
+      "prior_source_check": {
+        "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+        "sha256": "d88f1ee678e3b18707d7698be87f307c3c471eb6dd5b696571955444e5420f9b",
+        "executed_diagnostic": "compatibility/f10/disposition-ledger/evidence/closeout-radio-touch-and-early-destroy-review.json",
+        "native_regressions_pending": true
+      },
+      "original_report": {
+        "path": "compatibility/f10/disposition-ledger/evidence/closeout-radio-touch-and-early-destroy-review.json",
+        "sha256": "a46bb4709ea72d8c29f55ec81f3eeab4ec8986bc2d8f44e242eedea1fa92df2c"
+      },
+      "original_diff_sha256": "862c15e2583e7346bab407c45627409d9cbbbd74370a8d3e50441a68a6b890ef",
+      "source": {
+        "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+        "before_sha256": "d88f1ee678e3b18707d7698be87f307c3c471eb6dd5b696571955444e5420f9b",
+        "candidate_sha256": "584e9b199758f9975fd68e76d7e566b939f1fbec8656970a598e96c9fae2c8b2",
+        "edits": [
+          [
+            "`mat-radio-group-${nextUniqueId++}`",
+            "`mat-radio-group-${nextUniqueId++}-legacy`"
+          ],
+          [
+            "`mat-radio-${++nextUniqueId}`",
+            "`mat-radio-${++nextUniqueId}-legacy`"
+          ]
+        ],
+        "exact_reversal_to_parent": true
+      },
+      "finding": "The entire _touch body and FocusMonitor blur caller are byte-identical after exact initializer reversal; callback-before-mark and its guard remain unchanged. The old OnPush rendering obligation remains pending.",
+      "original_runtime_receipt_not_reexecuted": true
+    },
+    {
+      "sha": "fd47a0e60dd9ab50d9f923713ca60a7fd21ccc16",
+      "prior_source_check": {
+        "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+        "sha256": "d88f1ee678e3b18707d7698be87f307c3c471eb6dd5b696571955444e5420f9b",
+        "executed_diagnostic": "compatibility/f10/disposition-ledger/evidence/closeout-radio-touch-and-early-destroy-review.json",
+        "native_regressions_pending": true
+      },
+      "original_report": {
+        "path": "compatibility/f10/disposition-ledger/evidence/closeout-radio-touch-and-early-destroy-review.json",
+        "sha256": "a46bb4709ea72d8c29f55ec81f3eeab4ec8986bc2d8f44e242eedea1fa92df2c"
+      },
+      "original_diff_sha256": "a30093a30310a1c2354b237309d4e16da3adfac16482156fdc511033cfdb0c33",
+      "source": {
+        "path": "projects/ngx-material-legacy/legacy-radio/internal/radio-base.ts",
+        "before_sha256": "d88f1ee678e3b18707d7698be87f307c3c471eb6dd5b696571955444e5420f9b",
+        "candidate_sha256": "584e9b199758f9975fd68e76d7e566b939f1fbec8656970a598e96c9fae2c8b2",
+        "edits": [
+          [
+            "`mat-radio-group-${nextUniqueId++}`",
+            "`mat-radio-group-${nextUniqueId++}-legacy`"
+          ],
+          [
+            "`mat-radio-${++nextUniqueId}`",
+            "`mat-radio-${++nextUniqueId}-legacy`"
+          ]
+        ],
+        "exact_reversal_to_parent": true
+      },
+      "finding": "The complete destroy-before-view/selection-cleanup and touch-target guard methods are byte-identical after exact initializer reversal. New actual owned construction/cleanup observations are separately bounded and do not reexecute the old seven-case lifecycle receipt.",
+      "original_runtime_receipt_not_reexecuted": true
+    }
+  ],
+  "evidence": [
+    {
+      "path": "compatibility/rc/radio-identity-source-proof.json",
+      "sha256": "b48bd26c1878ba480161655b152a0c0e8585420110a41ce640a4097c416bb448"
+    },
+    {
+      "path": "compatibility/rc/radio-identity-constructor-diagnostic.json",
+      "sha256": "440a2e046ccb479ef36b6cee2f90c18b26a24cbd0018c11deda24c16a1548a0a"
+    }
+  ],
+  "no_new_upstream_closures": true,
+  "g11_claim": "not-passed"
+}

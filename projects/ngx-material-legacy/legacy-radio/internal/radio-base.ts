@@ -83,7 +83,7 @@ export abstract class _MatRadioGroupBase<T extends _MatRadioButtonBase>
   private _value: any = null;
 
   /** The HTML name attribute applied to radio buttons in this group. */
-  private _name: string = `mat-radio-group-${nextUniqueId++}`;
+  private _name: string = `mat-radio-group-${nextUniqueId++}-legacy`;
 
   /** The currently selected radio button. Should match value. */
   private _selected: T | null = null;
@@ -339,7 +339,7 @@ export abstract class _MatRadioButtonBase
   extends _MatRadioButtonMixinBase
   implements OnInit, AfterViewInit, DoCheck, OnDestroy, CanDisableRipple, HasTabIndex
 {
-  private _uniqueId: string = `mat-radio-${++nextUniqueId}`;
+  private _uniqueId: string = `mat-radio-${++nextUniqueId}-legacy`;
 
   /** The unique ID for the radio button. */
   @Input() id: string = this._uniqueId;
