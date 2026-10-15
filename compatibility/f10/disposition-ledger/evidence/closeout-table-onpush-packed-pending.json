@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "pending-packed-execution",
+  "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+  "upstream_sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+  "original_patch": {
+    "path": "compatibility/rc/table-onpush-original.patch",
+    "sha256": "3630c1798278c09cfd65afa8a4d5853034cfd2a0bd67eff9dc2edd6aa4d8808f"
+  },
+  "prior_entry": {
+    "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+    "bucket": "behavior-semantic",
+    "subject": "fix(cdk/table): the CdkNoDataRow directive does not render in the OnPush strategy (#27687)",
+    "final_disposition": "inherited",
+    "reason": "The patch calls markForCheck on CdkTable when the no-data row is shown or hidden. MatLegacyTable extends CdkTable and does not reimplement that toggle. MatLegacyNoDataRow only sets the mat-no-data-row class. The CDK method was not copied into this package. Inherited via installed peer @angular/cdk@22.1.7 (advertised floor ^22.1.7); upstream SHA is an ancestor of v22.1.7.",
+    "read_note_disposition": "not-owned",
+    "files": [
+      "src/cdk/table/table.ts",
+      "src/cdk/table/table.spec.ts"
+    ],
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "peer_floor": {
+      "package": "@angular/cdk",
+      "advertised_range": "^22.1.7",
+      "installed_version": "22.1.7",
+      "contains_fix_tag": "v22.1.7",
+      "sha_is_ancestor_of_tag": true,
+      "cdk_modules": [
+        "table"
+      ],
+      "owned_import_intersection": [
+        "table"
+      ]
+    },
+    "batch_id": "cdk-inherited-not-owned-retain-2026-10-01-d",
+    "recorded_at_utc": "2026-10-01T16:49:17Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+  },
+  "evidence": [
+    {
+      "path": "compatibility/rc/table-onpush-packed-worksheet.json",
+      "sha256": "e812687d8f09f56bd05c408af60cea6e3c0ab1c2e7f907e02fd9ce7a63a9859a"
+    },
+    {
+      "path": "compatibility/rc/table-onpush-packed-source-proof.json",
+      "sha256": "0a9a284f0c3cf44a8316e50d65a53fdc230468c645bfe644b2ad5b61cad2323e"
+    },
+    {
+      "path": "compatibility/rc/table-onpush-packed-admission-diagnostic.json",
+      "sha256": "693e6d91df3bd0bbec7c3a7ba564f82a602c9deae78166e4aed03c8e798c2cf9"
+    },
+    {
+      "path": "scripts/table-onpush-packed-fixture.mjs",
+      "sha256": "df1660fb53c824d02bf2b2403b895ed548146dfb86b10d348744456e5b9f9312"
+    },
+    {
+      "path": "scripts/table-onpush-packed-contract.mjs",
+      "sha256": "5d38b3fbc3d3e30a412827f24a2a12b578fdca1ed124304737e16e07548f4a65"
+    },
+    {
+      "path": "scripts/table-onpush-packed-source-requalification.mjs",
+      "sha256": "b8f12e984af9469b71544975c8208461a06bf13895a14fcc951b81707f70b0bc"
+    },
+    {
+      "path": "tests/table_onpush_packed_contract_probe.mjs",
+      "sha256": "c498fd07cf5493b9a8b8dcf20f8563656dc3e4026c15234b59d09abb2965a38b"
+    }
+  ],
+  "analysis": "The complete original patch has one runtime addition: markForCheck after the no-data visibility state changes. Four outlet constructor edits are formatting. The new upstream Angular test uses an OnPush child, a stable data-source input and an evaluated colspan binding. Earlier complete-renderer-method replay supplies an explicit markForCheck protocol and cannot prove actual Angular child checking. The owned table delegates rendering to public CdkTable; owned no-data configuration preserves original row/cell classes. A matching packed standalone regression is now mandatory but has not executed. Ancestry, a mark-call spy and a static row are insufficient for inheritance closure.",
+  "required_execution": "Actual extracted-artifact Angular TestBed case on this line; native/browser/compiler floors remain separate.",
+  "actual_packed_table_executed": false,
+  "semantic_pass": false,
+  "g11_claim": "not-passed"
+}

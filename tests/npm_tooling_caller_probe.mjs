@@ -12,6 +12,7 @@ import {readFileSync, readdirSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {reverseTableOnPushPackedSource, TABLE_ONPUSH_SOURCE_PREIMAGES} from '../scripts/table-onpush-packed-source-requalification.mjs';
 
 const ts = createRequire(import.meta.url)('typescript');
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -19,6 +20,13 @@ const roster = JSON.parse(readFileSync(join(root, 'compatibility/rc/npm-tooling-
 const printer = ts.createPrinter({removeComments: true});
 const hash = text => createHash('sha256').update(text).digest('hex');
 const parse = (path, text) => ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+const line = JSON.parse(readFileSync(join(root, 'projects/ngx-material-legacy/package.json'))).version.startsWith('21.') ? '21.x' : 'main';
+// Authenticate the entire program before the finite regression-test addition too.
+const tablePreimage = TABLE_ONPUSH_SOURCE_PREIMAGES[line];
+const tableOriginal = spawnSync('git', ['-c', 'gc.auto=0', '-c', 'maintenance.auto=0', 'show',
+  tablePreimage.commit + ':scripts/packed-consumer-aot-smoke.mjs'], {cwd: root, encoding: 'utf8'});
+assert.equal(tableOriginal.status, 0, tableOriginal.stderr);
+assert.equal(hash(tableOriginal.stdout), tablePreimage.producer);
 
 // Recompute the untouched commit blobs; a rewritten hash in the roster is not an oracle.
 for (const row of roster.source_preimages) {
@@ -56,13 +64,18 @@ function audit(overrides = new Map()) {
     }
     visit(sf);
     if (found.some(row => row.path === path)) {
-      const transform = ts.transform(sf, [context => {
+      // Scan actual current callers above; only the authenticated test addition is
+      // reversed for the older environment-only whole-program equality below.
+      const restoreSf = path === 'scripts/packed-consumer-aot-smoke.mjs'
+        ? parse(path, reverseTableOnPushPackedSource(path, source, line)) : sf;
+      const restorePrint = node => printer.printNode(ts.EmitHint.Unspecified, node, restoreSf);
+      const transform = ts.transform(restoreSf, [context => {
         const visitor = node => {
           if (ts.isImportDeclaration(node) && node.moduleSpecifier.text === './npm-tooling-options.mjs') return undefined;
-          if (ts.isCallExpression(node) && node.expression.getText(sf) === 'npmToolingOptions') return node.arguments[0];
+          if (ts.isCallExpression(node) && node.expression.getText(restoreSf) === 'npmToolingOptions') return node.arguments[0];
           if (['scripts/native-motion-run.mjs', 'scripts/browser-required-cells.mjs'].includes(path)
-              && ts.isPropertyAssignment(node) && node.name.getText(sf) === 'npmProfile') {
-            assert.equal(print(node.initializer), "readFileSync(join(root, 'scripts/npm-tooling-options.mjs'), 'utf8')");
+              && ts.isPropertyAssignment(node) && node.name.getText(restoreSf) === 'npmProfile') {
+            assert.equal(restorePrint(node.initializer), "readFileSync(join(root, 'scripts/npm-tooling-options.mjs'), 'utf8')");
             return undefined;
           }
           return ts.visitEachChild(node, visitor, context);
