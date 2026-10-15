@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Exact minimum public peer source and read-only consumer context; not native/packed qualification",
+  "runtime_capsule": {
+    "path": "compatibility/rc/remaining-identity-public-subjects.json",
+    "sha256": "c3600dff7acf9eeb0a0bbd0fd893273e392592fc1bae06110fb792ffe673a8fc"
+  },
+  "models": [
+    {
+      "line": "main",
+      "material_version": "22.1.7",
+      "angular_version": "22.1.7",
+      "public_export": "@angular/material/select#MatSelect",
+      "module_key": "@angular/material/fesm2022/select.mjs",
+      "module_sha256": "ff5933e67ecdc489b88dbd5307278993b2bb8441aa2a45c0c2436e8d557f1669",
+      "public_package_export": {
+        "types": "./types/select.d.ts",
+        "default": "./fesm2022/select.mjs"
+      },
+      "methods": {
+        "open": {
+          "source": "open() {\n    if (!this._canOpen()) {\n      return;\n    }\n    if (this._parentFormField) {\n      this._preferredOverlayOrigin = this._parentFormField.getConnectedOverlayOrigin();\n    }\n    this._cleanupDetach?.();\n    this._overlayWidth = this._getOverlayWidth(this._preferredOverlayOrigin);\n    this._panelOpen = true;\n    this._overlayDir.positionChange.pipe(take(1)).subscribe(() => {\n      this._changeDetectorRef.detectChanges();\n      this._positioningSettled();\n    });\n    this._overlayDir.attachOverlay();\n    this._keyManager.withHorizontalOrientation(null);\n    this._highlightCorrectOption();\n    this._changeDetectorRef.markForCheck();\n    this.stateChanges.next();\n    Promise.resolve().then(() => this.openedChange.emit(true));\n  }",
+          "sha256": "3c0f09506f004e4b69ca66f7040b12c3064c723e60f91c9e4c71a489a495f5dc"
+        },
+        "close": {
+          "source": "close() {\n    if (this._panelOpen) {\n      this._panelOpen = false;\n      this._exitAndDetach();\n      this._keyManager.withHorizontalOrientation(this._isRtl() ? 'rtl' : 'ltr');\n      this._changeDetectorRef.markForCheck();\n      this._onTouched();\n      this.stateChanges.next();\n      Promise.resolve().then(() => this.openedChange.emit(false));\n    }\n  }",
+          "sha256": "a4080611c28e50d01b265d462cdde9546fd9e3f506079144f4d5ab5273e4ac5a"
+        },
+        "toggle": {
+          "source": "toggle() {\n    this.panelOpen ? this.close() : this.open();\n  }",
+          "sha256": "fa6aed2e52bc470a87bfc3ad48cfd9a1cdfddfc4766aa724d57e7e613403d59f"
+        },
+        "onContainerClick": {
+          "source": "onContainerClick(event) {\n    const target = _getEventTarget(event);\n    if (target && (target.tagName === 'MAT-OPTION' || target.classList.contains('cdk-overlay-backdrop') || target.closest('.mat-mdc-select-panel'))) {\n      return;\n    }\n    this.focus();\n    this.open();\n  }",
+          "sha256": "daba0b16a3f79402ec7fa4b5744459317fc23b06ee438ef4aa08df1d14e646a0"
+        },
+        "_canOpen": {
+          "source": "_canOpen() {\n    return !this._panelOpen && !this.disabled && this.options?.length > 0 && !!this._overlayDir;\n  }",
+          "sha256": "268ff19629f81d24d7a6bbc19c2e6f9307214a666e47b87707d61e42122df3a2"
+        }
+      },
+      "code_executed": false
+    },
+    {
+      "line": "21.x",
+      "material_version": "21.2.14",
+      "angular_version": "21.2.23",
+      "public_export": "@angular/material/select#MatSelect",
+      "module_key": "@angular/material/fesm2022/select.mjs",
+      "module_sha256": "232446055bcef61e7427e3ed9a0e7f2c25916bdb16fd2ffa59297491767305cf",
+      "public_package_export": {
+        "types": "./types/select.d.ts",
+        "default": "./fesm2022/select.mjs"
+      },
+      "methods": {
+        "open": {
+          "source": "open() {\n    if (!this._canOpen()) {\n      return;\n    }\n    if (this._parentFormField) {\n      this._preferredOverlayOrigin = this._parentFormField.getConnectedOverlayOrigin();\n    }\n    this._cleanupDetach?.();\n    this._overlayWidth = this._getOverlayWidth(this._preferredOverlayOrigin);\n    this._applyModalPanelOwnership();\n    this._panelOpen = true;\n    this._overlayDir.positionChange.pipe(take(1)).subscribe(() => {\n      this._changeDetectorRef.detectChanges();\n      this._positioningSettled();\n    });\n    this._overlayDir.attachOverlay();\n    this._keyManager.withHorizontalOrientation(null);\n    this._highlightCorrectOption();\n    this._changeDetectorRef.markForCheck();\n    this.stateChanges.next();\n    Promise.resolve().then(() => this.openedChange.emit(true));\n  }",
+          "sha256": "737d660e1d7724feae039ca67fbd1333ac224463eebc8fb7e56901d6290972c3"
+        },
+        "close": {
+          "source": "close() {\n    if (this._panelOpen) {\n      this._panelOpen = false;\n      this._exitAndDetach();\n      this._keyManager.withHorizontalOrientation(this._isRtl() ? 'rtl' : 'ltr');\n      this._changeDetectorRef.markForCheck();\n      this._onTouched();\n      this.stateChanges.next();\n      Promise.resolve().then(() => this.openedChange.emit(false));\n    }\n  }",
+          "sha256": "a4080611c28e50d01b265d462cdde9546fd9e3f506079144f4d5ab5273e4ac5a"
+        },
+        "toggle": {
+          "source": "toggle() {\n    this.panelOpen ? this.close() : this.open();\n  }",
+          "sha256": "fa6aed2e52bc470a87bfc3ad48cfd9a1cdfddfc4766aa724d57e7e613403d59f"
+        },
+        "onContainerClick": {
+          "source": "onContainerClick(event) {\n    const target = _getEventTarget(event);\n    if (target && (target.tagName === 'MAT-OPTION' || target.classList.contains('cdk-overlay-backdrop') || target.closest('.mat-mdc-select-panel'))) {\n      return;\n    }\n    this.focus();\n    this.open();\n  }",
+          "sha256": "daba0b16a3f79402ec7fa4b5744459317fc23b06ee438ef4aa08df1d14e646a0"
+        },
+        "_canOpen": {
+          "source": "_canOpen() {\n    return !this._panelOpen && !this.disabled && this.options?.length > 0 && !!this._overlayDir;\n  }",
+          "sha256": "268ff19629f81d24d7a6bbc19c2e6f9307214a666e47b87707d61e42122df3a2"
+        }
+      },
+      "code_executed": false
+    }
+  ],
+  "cyph": {
+    "git_head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "visible_related_sources": [
+      {
+        "path": "shared/js/cyph/components/account-post-compose/account-post-compose.component.html",
+        "sha256": "d650998f8f4491b2f851f5359f616dcee80b175109e8d869ddd228e91da535d6"
+      },
+      {
+        "path": "shared/js/cyph/components/email-view/email-view.component.ts",
+        "sha256": "2ad0aab4bd120265bfb7b8b962be319c64283c593848daa92b987a3127d96ea0"
+      },
+      {
+        "path": "shared/js/cyph/components/email-view/email-view.component.html",
+        "sha256": "c7b7453224e3ec5720715e7b6ba51c30e515b71bbb873321e4b24c7261f5bfca"
+      },
+      {
+        "path": "shared/js/cyph/components/dynamic-form/dynamic-form.component.html",
+        "sha256": "78d27ff78c2d622ed2cb0cf09fefca1f3ee9e1192b4e234a7067bc6ed7569df3"
+      },
+      {
+        "path": "shared/js/cyph/components/email-compose/email-compose.component.ts",
+        "sha256": "54885c76d15a7a1755d651f9a8188e5095a337f2270a75a0d2d21f66a5678574"
+      },
+      {
+        "path": "shared/js/cyph/components/email-compose/email-compose.component.html",
+        "sha256": "fb41ff21cec259e9456c32e0c630e2bcf7ed58dce9401232566117461cf45272"
+      },
+      {
+        "path": "shared/js/cyph/components/account-pgp/account-pgp.component.html",
+        "sha256": "860b6cc45402ba7fce67532b9805c59e2f3a321e6f5dfb4e12ad8918645fd73e"
+      },
+      {
+        "path": "shared/js/cyph/components/checkout/checkout.component.html",
+        "sha256": "4d38c16ffab2946a327c291a622947b15b0ec713784fceda46b4689fef9032ff"
+      },
+      {
+        "path": "shared/js/cyph/components/contact/contact.component.html",
+        "sha256": "357a9f1a6bd8f55ab562eb768fef8f0346e8b6a0f1507a5c4ae5d8188e12e45a"
+      },
+      {
+        "path": "shared/js/cyph/components/calendar-invite/calendar-invite.component.html",
+        "sha256": "56d0d8eb86098f7b867ad054533c2a035427e615118288c4e7905adc85d89007"
+      },
+      {
+        "path": "shared/js/cyph/components/account-menu/account-menu.component.html",
+        "sha256": "a97ccd98fe1679bd8d237485d8e86d2315979de875661ad63682ccdaa79ed595"
+      },
+      {
+        "path": "shared/js/cyph/components/link-connection/link-connection.component.html",
+        "sha256": "195eaf433bf405a036aa0774eb678ead1f7181cca525222a0a203c6aabbf59ad"
+      }
+    ],
+    "scope": "Visible rg-discovered TypeScript/HTML only; no ignored/generated/dynamic/reflection or consumer build qualification."
+  },
+  "product_or_consumer_changed": false,
+  "actual_packed_focus_click_executed": false,
+  "g11_claim": "not-passed"
+}

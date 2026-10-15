@@ -15,8 +15,11 @@ import {dirname,join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {MENU_ITEM_TOKEN_CASE_ID,packedMenuItemTokenCase} from '../scripts/menu-item-token-packed-contract.mjs';
+import {packedSelectFocusClickCase} from '../scripts/select-focus-click-packed-contract.mjs';
 import {menuItemTokenPackedFixture} from '../scripts/menu-item-token-packed-fixture.mjs';
-import {MENU_ITEM_TOKEN_PACKED_PREIMAGES,MENU_ITEM_TOKEN_PACKED_EDITS,reverseMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
+import {MENU_ITEM_TOKEN_PACKED_PREIMAGES,MENU_ITEM_TOKEN_PACKED_EDITS,reverseMenuItemTokenPackedSource as reverseOldMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
+import {reverseSelectFocusClickPackedSource} from '../scripts/select-focus-click-packed-source-requalification.mjs';
+const reverseMenuItemTokenPackedSource=(path,raw,line)=>reverseOldMenuItemTokenPackedSource(path,reverseSelectFocusClickPackedSource(path,raw,line),line);
 import {packedSelectDetachCase} from '../scripts/select-detach-packed-contract.mjs';
 import {packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-contract.mjs';
 import {packedRadioIdentityCase} from '../scripts/radio-identity-packed-contract.mjs';
@@ -43,8 +46,8 @@ const sample={execution:'packed-angular-testbed-dom',error:null,generations:['le
 assert.equal(packedMenuItemTokenCase(sample).result,'pass');
 const producerPath='scripts/packed-consumer-aot-smoke.mjs',raw=read(producerPath),sf=ts.createSourceFile(producerPath,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);assert.equal(sf.parseDiagnostics.length,0);
 const source=sf.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases').getText(sf);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase',text+';return collectAcceptanceCases;')(
- declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase',text+';return collectAcceptanceCases;')(
+ declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase);
 const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,106);assert.equal(new Set(expected).size,106);
 const observe=(value,fn=load(source))=>{const rows=fn({harness:{status:'ok',result:{menuItemToken:value}}},keys,'/tmp/consumer','/tmp/source').filter(row=>row.case_id===MENU_ITEM_TOKEN_CASE_ID);assert.equal(rows.length,1);return rows[0];};
 assert.equal(observe(sample).result,'pass');
@@ -77,7 +80,7 @@ let sourceNegatives=0;
 for(const path of Object.keys(MENU_ITEM_TOKEN_PACKED_PREIMAGES[line].members)){
  const original=execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','show',MENU_ITEM_TOKEN_PACKED_PREIMAGES[line].commit+':'+path],{cwd:root,encoding:'utf8'});
  assert.equal(reverseMenuItemTokenPackedSource(path,read(path),line),original);assert.throws(()=>reverseMenuItemTokenPackedSource(path,read(path)+'\n',line));sourceNegatives++;
- if(MENU_ITEM_TOKEN_PACKED_EDITS[path])for(const [,after]of MENU_ITEM_TOKEN_PACKED_EDITS[path]){assert.ok(read(path).includes(after));assert.throws(()=>reverseMenuItemTokenPackedSource(path,read(path).replace(after,()=>after+'\n// foreign addition'),line));sourceNegatives++;}
+ if(MENU_ITEM_TOKEN_PACKED_EDITS[path])for(const [,after]of MENU_ITEM_TOKEN_PACKED_EDITS[path]){const prior=reverseSelectFocusClickPackedSource(path,read(path),line);assert.ok(prior.includes(after));assert.throws(()=>reverseOldMenuItemTokenPackedSource(path,prior.replace(after,()=>after+'\n// foreign addition'),line));sourceNegatives++;}
 }
 assert.throws(()=>reverseMenuItemTokenPackedSource('foreign.mjs',raw,line));sourceNegatives++;
 assert.throws(()=>reverseMenuItemTokenPackedSource(producerPath,raw,line==='main'?'21.x':'main'));sourceNegatives++;

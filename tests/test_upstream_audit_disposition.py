@@ -21,7 +21,7 @@ LEDGER = ROOT / "compatibility" / "f10" / "disposition-ledger" / "ledger.json"
 MECHANICAL = ROOT / "compatibility" / "f10" / "disposition-ledger" / "evidence" / "mechanical"
 JOIN = ROOT / "compatibility" / "f10" / "audit-join" / "join.json"
 QUEUE = ROOT / "compatibility" / "f10" / "audit-join" / "review-queue.json"
-# Explicit current subjects, including reopened stale proofs. This roster is a
+# Explicit current subjects, including reopened unexecuted/stale proofs. This roster is a
 # regression guard, never an authorization to close a row or a G11 pass.
 PENDING_SHA_IDS = frozenset("""
 cf3506adf1af1556d705dbb651e7e96a7141b81d
@@ -33,6 +33,7 @@ cf3506adf1af1556d705dbb651e7e96a7141b81d
 86ad5150110522873dae2801fd3c2957502949e7
 68b267dd59f3addf92a3b9f8ce9e8baa479df7f4
 688c430fe8df09152ee59eb8a2ca62b5ba2fb81e
+1b6db8c89b00ace8aaa0e0824866acec5369635f
 ca9c490ee30dbf7c9c147079197d0dbc0abcd611
 938f478efdc96ef0de1217e806f98939beb027cd
 9494ff2d65c98726046e6a20dd6a6d938e97a2f6
