@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "13a8d937596f7990d0c3c112726f64dea2edb7f4",
+  "task": "Correct the incomplete missing-keydown diagnosis and validate effective current overlay-dispatch keyboard routing without product changes",
+  "owned_paths": [
+    "projects/ngx-material-legacy/legacy-menu/menu.html",
+    "reference/material-16.2.14/menu-keydown-sources/",
+    "tests/menu_panel_keydown_probe.mjs",
+    "tests/menu_panel_keydown_subject.mjs",
+    "tests/test_menu_panel_keydown.py",
+    "compatibility/rc/menu-keydown-*",
+    "compatibility/rc/session-handoff.json"
+  ],
+  "subjects": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+      "before_sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47"
+    }
+  ],
+  "required_contract": [
+    "Preserve all product bytes. Do not restore the old template listener or stopPropagation without considering current OverlayKeyboardDispatcher forwarding. Original16 reference stays untouched.",
+    "Validate the current single route: public overlay keydown stream forwards the same event to the matching owned menu handler; keep stacked overlay handling and current handler behavior distinct from original16 DOM listener behavior.",
+    "Use genuine public compiler parsing and actual public CDK dispatcher when feasible with explicit document/renderer/overlay protocols. No protocol fixture qualifies actual Angular/native/packed nodes. Mandatory106-case nested regression remains pending.",
+    "Keep the earlier committed source-only diagnosis as history and explicitly correct its incomplete caller analysis. No use or SHA closure or green G11 inference.",
+    "Inventory all30 template event differences as leads; no other source change or broad exception. No expensive commands, install, credentials, push, Actions or publication."
+  ],
+  "initial_proposal": "Restore old template binding; withdrawn before commit after identifying existing OverlayRef.keydownEvents forwarding and double-handling risk."
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "source-inference-corrected; actual packed keyboard execution remains pending",
+  "superseded_diagnosis": {
+    "path": "compatibility/rc/menu-item-token-packed-keydown-source-lead.json",
+    "sha256": "de1448007723e2a802004e55e60301862804bb9cc1e0e976f1a777d6c348bde3",
+    "retained_unchanged": true,
+    "incomplete_claim": "No panel listener meant keyboard events could not reach the handler. This inference omitted the alternate trigger/overlay caller."
+  },
+  "corrected_facts": [
+    "The untouched16 menu template had a panel keydown listener and its handler stopped propagation after Escape/left/right branches.",
+    "The owned trigger already subscribes once to public OverlayRef.keydownEvents and forwards the same event to the corresponding owned menu handler. Its handler matches the original whole method after removal of the old panel-level propagation stop.",
+    "The current public CDK dispatcher handles the topmost subscribed overlay, including when closing a child removes it during the callback. Adding the old panel binding would introduce a second route and risk duplicate navigation.",
+    "The proposed one-line restoration was withdrawn before commit. No product byte changed; original tagged reference sources and the prior incomplete diagnosis remain preserved."
+  ],
+  "route": {
+    "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+    "sha256": "9c3b605d77935394dd158547b85d3174fb1e1ea142bd3953bc706e51bbe95d66",
+    "method": "_createOverlay",
+    "source_parent": "13a8d937596f7990d0c3c112726f64dea2edb7f4",
+    "public_stream": "OverlayRef.keydownEvents()",
+    "forwarded_handler": "this.menu._handleKeydown(event)"
+  },
+  "verification": {
+    "path": "compatibility/rc/menu-keydown-route-diagnostic.json",
+    "sha256": "0c23e8bc0d77e72962aedf5bf1da2e69200641b32388c2649229907764673051",
+    "compiler_contexts": 3,
+    "actual_current_public_dispatcher_contexts": 2,
+    "body_EventTarget_protocol_events": 14,
+    "owned_method_mutants_rejected": 12,
+    "scope": "Complete owned method replay with menu-identity protocol and actual current public dispatcher/FocusKeyManager. Document body uses Node EventTarget; renderer, overlay refs, items and zone are explicit protocols. No whole component, actual Angular DOM listener, actual OverlayRef, native/packed/AOT or canonical floor qualification."
+  },
+  "actual_packed_keyboard_regression": "packed-consumer/harness/nested-menu-item-token-ownership; execution pending final plausible Actions candidate",
+  "decision": "Keep one current public overlay-dispatch route. Do not restore the old template listener or old propagation stop. Keep three current MatMenuItem token uses open pending substantive packed evidence.",
+  "product_HTML_CSS_SCSS_changed": false,
+  "new_use_or_SHA_closures": 0,
+  "g11_claim": "not-passed"
+}
