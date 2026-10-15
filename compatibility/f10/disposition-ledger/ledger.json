@@ -1153,15 +1153,95 @@
         "src/cdk/table/table.spec.ts",
         "src/cdk/table/table.ts"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "Original hunk and complete packed OnPush regression reviewed/prepared. Existing protocol replay does not establish actual Angular bound-row rendering. This SHA remains pending the mandatory extracted-artifact execution; no inheritance or G11 pass is claimed.",
-      "read_note_disposition": "unreviewed-on-21.x",
+      "final_disposition": "inherited",
+      "reason": "The complete no-data OnPush fix is inherited through the actual public CdkTable parent on this branch. Both authenticated minimum renderer implementations mark the owning view after no-data visibility transitions; owned MatLegacyTable overrides neither renderer nor render subscription, and its public datasource/outlet/no-data routes reach that parent. The earlier marker/replay-only inheritance statement remains historical. Qualification requires the exact current packed Angular OnPush case, not ancestry or a mark-call spy. No packed/native, G11 or security pass is asserted here.",
+      "read_note_disposition": "source-reviewed-runtime-required",
       "affected_branches": [
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-packed-pending.json"
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-source-judgment.json",
+      "individual_proof": {
+        "proof_kind": "artifact-required-individual-behavior",
+        "diff_sha256": "3630c1798278c09cfd65afa8a4d5853034cfd2a0bd67eff9dc2edd6aa4d8808f",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "21.x"
+        ],
+        "decision": "The complete no-data OnPush fix is inherited through the actual public CdkTable parent on this branch. Both authenticated minimum renderer implementations mark the owning view after no-data visibility transitions; owned MatLegacyTable overrides neither renderer nor render subscription, and its public datasource/outlet/no-data routes reach that parent. The earlier marker/replay-only inheritance statement remains historical. Qualification requires the exact current packed Angular OnPush case, not ancestry or a mark-call spy. No packed/native, G11 or security pass is asserted here.",
+        "artifact_behavior": {
+          "kind": "table-no-data-row-on-push",
+          "case_ids": [
+            "packed-consumer/harness/table-no-data-row-on-push-rendering"
+          ],
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+              "sha256": "156faca47dc2fa1efdd2fcfbbe9a0424aa48e7a840c62178c4f2d7068ae33683"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+              "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/table-module.ts",
+              "sha256": "be102d89a290d5028da2e1f2a6a19dd8a1d543a68e57861fb22b35ff4c8e2818"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/table-data-source.ts",
+              "sha256": "b8c35487e4234549a48563b64665b9d38e0ac0f90310d3957b7f31e8084f7904"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+              "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+            },
+            {
+              "path": "scripts/table-onpush-packed-fixture.mjs",
+              "sha256": "df1660fb53c824d02bf2b2403b895ed548146dfb86b10d348744456e5b9f9312"
+            },
+            {
+              "path": "scripts/table-onpush-packed-contract.mjs",
+              "sha256": "5d38b3fbc3d3e30a412827f24a2a12b578fdca1ed124304737e16e07548f4a65"
+            },
+            {
+              "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+              "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+            },
+            {
+              "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+              "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+            },
+            {
+              "path": "scripts/packed-consumer-aot-smoke.mjs",
+              "sha256": "232fb42f805683f6daa35971948bfb1b0b3249b31d38ba5271b8945dc34e908a"
+            },
+            {
+              "path": "scripts/packed-consumer-evidence.mjs",
+              "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+            },
+            {
+              "path": "compatibility/rc/matrices/library-exports.json",
+              "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "3183957162d74d931bdd1f41c56d48f637599065ea16ff2b02b922ee68fdc224"
+            }
+          ]
+        },
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "21.2.14",
+          "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+          "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+          "member": "CdkTable._updateNoDataRow"
+        },
+        "reachable_behavior": {
+          "kind": "executed-delegation",
+          "id": "packed-consumer/harness/table-no-data-row-on-push-rendering"
+        }
+      }
     },
     {
       "sha": "f6949e3e57fe25406968eeaea90ba662343c3e79",
@@ -24846,15 +24926,15 @@
         "src/material/select/select.html",
         "src/material/select/select.spec.ts"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "Individual whole-patch review confirms the historical legacy detach binding is present, but the prior main file hash is stale and the genuine close-on-scroll regression was not executed. Preserve that prior proof without rehashing and await actual artifact-bound scroll/overlay/state evidence on this line.",
-      "read_note_disposition": "reopened-pending-real-scroll-execution",
+      "final_disposition": "already-adapted",
+      "reason": "The complete overlay-detach fix is already present in the owned historical select. Untouched16 legacy and the current owned template bind detach to close(); both minimum public CDK overlay/scroll implementations carry native scrolling through the close strategy and OverlayRef detachment to that output. The stale earlier source-line proof remains retired. This is a completed source conclusion with mandatory artifact-required real-scroll behavior; no source record or synthetic fixture is a packed/native, G11 or security pass.",
+      "read_note_disposition": "source-reviewed-runtime-required",
       "affected_branches": [
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-select-detach-review.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-select-detach-source-judgment.json",
       "prior_dispositions": [
         {
           "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
@@ -24874,7 +24954,60 @@
           "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
           "evidence_report": null
         }
-      ]
+      ],
+      "individual_proof": {
+        "proof_kind": "artifact-required-individual-behavior",
+        "diff_sha256": "b443861e8eabbfa6c7613fc26349a89e59d2b364493d426461957beb247b691a",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "21.x"
+        ],
+        "decision": "The complete overlay-detach fix is already present in the owned historical select. Untouched16 legacy and the current owned template bind detach to close(); both minimum public CDK overlay/scroll implementations carry native scrolling through the close strategy and OverlayRef detachment to that output. The stale earlier source-line proof remains retired. This is a completed source conclusion with mandatory artifact-required real-scroll behavior; no source record or synthetic fixture is a packed/native, G11 or security pass.",
+        "artifact_behavior": {
+          "kind": "select-close-on-real-scroll-detach",
+          "case_ids": [
+            "packed-consumer/harness/select-close-on-real-scroll-detach"
+          ],
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/select.html",
+              "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+              "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+              "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+            },
+            {
+              "path": "scripts/select-detach-packed-fixture.mjs",
+              "sha256": "74b3e12b85edb9300c239d4956ba25e0af53b03bc26f0eaa1b8de709c12257cf"
+            },
+            {
+              "path": "scripts/select-detach-packed-contract.mjs",
+              "sha256": "29a24c8965af4a58cc694ebfa634541ab7d6c17479b34a622c017893f0ec80d0"
+            },
+            {
+              "path": "scripts/packed-consumer-aot-smoke.mjs",
+              "sha256": "232fb42f805683f6daa35971948bfb1b0b3249b31d38ba5271b8945dc34e908a"
+            },
+            {
+              "path": "scripts/packed-consumer-evidence.mjs",
+              "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+            },
+            {
+              "path": "compatibility/rc/matrices/library-exports.json",
+              "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "3183957162d74d931bdd1f41c56d48f637599065ea16ff2b02b922ee68fdc224"
+            }
+          ]
+        }
+      }
     },
     {
       "sha": "8c35b62f65ed6cb9f56d9ad32ca558bb482c1e12",

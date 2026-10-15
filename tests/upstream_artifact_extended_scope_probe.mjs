@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/** Finite admission fixtures only. Neither new real source judgment is closed. */
+/** Real source judgments with synthetic runtime controls; no product execution. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
@@ -72,20 +72,18 @@ const definitions = [
 const observations = []; let cases = 0;
 for (const definition of definitions) {
   const actual = json('compatibility/f10/disposition-ledger/ledger.json').entries.find(row => row.sha === definition.sha);
-  assert.equal(actual.final_disposition, 'needs-individual-review'); assert.equal(actual.individual_proof, undefined);
+  assert.equal(actual.final_disposition, definition.disposition);
   assert.equal(hash(read(definition.patchPath)), definition.patch); assert.equal(requiresArtifactBehavior(actual, {}), true);
-  const proof = {proof_kind: ARTIFACT_BEHAVIOR_KIND, diff_sha256: definition.patch, affected_branches: [line], review_depth: 'individual-compatibility',
-    decision: 'Synthetic validator fixture only. This declaration and fabricated runtime data qualify no real upstream source judgment, component, runtime or release.',
-    artifact_behavior: {kind: definition.kind, case_ids: [definition.caseId], source_members: definition.members.map(path => ({path, sha256: hash(read(path))}))}};
-  if (definition.sha === TABLE_ONPUSH_SHA) {
-    const version = line === 'main' ? '22.1.7' : '21.2.14', path = `compatibility/rc/table-public-module-sources/cdk-${version}-table.mjs`;
-    proof.installed_member = {package: '@angular/cdk', version, path, sha256: hash(read(path)), member: 'CdkTable._updateNoDataRow'};
-    proof.reachable_behavior = {kind: 'executed-delegation', id: definition.caseId};
-  }
-  const entry = {sha: definition.sha, bucket: 'behavior-semantic', subject: 'Synthetic fixture: ' + definition.kind, final_disposition: definition.disposition,
-    evidence_report: 'compatibility/f10/disposition-ledger/evidence/extended-fixture.json', individual_proof: proof, fixture_only: true};
-  const review = {sha: entry.sha, status: 'reviewed', final_disposition: entry.final_disposition,
-    diff_sha256: definition.patch, patch_file: definition.patchPath, fixture_only: true};
+  const entry = structuredClone(actual), proof = entry.individual_proof, review = json(entry.evidence_report);
+  assert.equal(proof.proof_kind, ARTIFACT_BEHAVIOR_KIND); assert.equal(proof.diff_sha256, definition.patch);
+  assert.deepEqual(proof.affected_branches, [line]); assert.equal(proof.artifact_behavior.kind, definition.kind);
+  assert.deepEqual(proof.artifact_behavior.source_members.map(row => row.path), definition.members);
+  assert.equal(review.status, 'reviewed'); assert.equal(review.judgment_stage, 'source-complete-runtime-required');
+  assert.equal(review.runtime_qualification.required, true); assert.equal(review.runtime_qualification.qualified_by_this_document, false);
+  assert.equal(review.semantic_pass, false); assert.equal(review.actual_packed_or_native_executed, false); assert.equal(review.g11_claim, 'not-passed');
+  assert.equal(review.prior_entry.final_disposition, 'needs-individual-review');
+  for (const record of [...review.independent_evidence, ...review.reviewed_source_members, review.prior_pending_record]) assert.equal(hash(read(record.path)), record.sha256, record.path);
+  assert.ok(json(review.prior_pending_record.path).status.startsWith('pending'));
   const f = createFixture(root, {entry, review}), fixtureObservation = sample(definition.samplePath, definition.functionName);
   const selected = f.observation.cases.find(row => row.case_id === definition.caseId);
   selected.observation = fixtureObservation; f.observation.extra.harness[definition.harness] = structuredClone(fixtureObservation);
@@ -143,10 +141,10 @@ for (const definition of definitions) {
     }
   } finally { f.dispose(); }
 }
-const output = {schema_version: 1, line, role: 'Shared admission refactor and finite three-SHA synthetic validator controls only',
+const output = {schema_version: 1, line, role: 'Finite three-SHA admission using real source judgments and synthetic runtime controls only',
   actual_cli_cases: cases, new_scopes: definitions.length, complete_original_patches_bound: 2, complete_run_validation_text_preserved: true,
   complete_path_hash_primitives_preserved: true, focus_observation_predicate_preserved: true, existing_focus_hunk_judgment_unchanged: true,
-  real_new_source_judgments_closed: 0, actual_product_or_packed_or_native_qualified: false, g11_claim: 'not-passed', observations,
+  real_source_judgments_used: 2, real_runtime_judgments_closed: 0, actual_product_or_packed_or_native_qualified: false, g11_claim: 'not-passed', observations,
   producer_sha256: hash(read('tests/upstream_artifact_extended_scope_probe.mjs')),
   wrapper_sha256: hash(read('scripts/upstream-artifact-behavior-evidence.mjs')),
   shared_run_sha256: hash(read('scripts/upstream-packed-run-evidence.mjs')),

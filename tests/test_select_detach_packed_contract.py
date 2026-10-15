@@ -14,13 +14,23 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class SelectDetachPackedContractTests(unittest.TestCase):
-    def test_stale_source_proof_is_preserved_and_neither_line_is_closed(self):
+    def test_stale_source_proof_is_preserved_and_current_runtime_is_required(self):
         sha = '688c430fe8df09152ee59eb8a2ca62b5ba2fb81e'
         ledger = json.loads((ROOT / 'compatibility/f10/disposition-ledger/ledger.json').read_text())
         entry = next(row for row in ledger['entries'] if row['sha'] == sha)
-        self.assertEqual(entry['final_disposition'], 'needs-individual-review')
-        self.assertNotIn('individual_proof', entry)
-        report = json.loads((ROOT / entry['evidence_report']).read_text())
+        self.assertEqual(entry['final_disposition'], 'already-adapted')
+        self.assertEqual(entry['individual_proof']['proof_kind'], 'artifact-required-individual-behavior')
+        current = json.loads((ROOT / entry['evidence_report']).read_text())
+        self.assertEqual(current['status'], 'reviewed')
+        self.assertEqual(current['judgment_stage'], 'source-complete-runtime-required')
+        self.assertTrue(current['runtime_qualification']['required'])
+        self.assertFalse(current['runtime_qualification']['qualified_by_this_document'])
+        self.assertFalse(current['semantic_pass'])
+        self.assertFalse(current['actual_packed_or_native_executed'])
+        prior_ref = current['prior_pending_record']
+        self.assertEqual(hashlib.sha256((ROOT / prior_ref['path']).read_bytes()).hexdigest(), prior_ref['sha256'])
+        self.assertEqual(current['prior_entry']['final_disposition'], 'needs-individual-review')
+        report = json.loads((ROOT / prior_ref['path']).read_text())
         self.assertEqual(report['sha'], sha)
         self.assertEqual(report['status'], 'pending')
         self.assertFalse(report['actual_packed_or_native_executed'])
