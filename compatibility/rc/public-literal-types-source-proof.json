@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "c1b1c7886842fcc485bdf45606d1c2d9bea4738e",
+  "unchanged_product_files": 1140,
+  "unchanged_styles": 409,
+  "unchanged_templates": 30,
+  "package_archives_sri_verified": 6,
+  "public_module_subjects": 24,
+  "complete_alias_subjects": 33,
+  "retained_members": 48,
+  "capsule": {
+    "path": "compatibility/rc/public-literal-types-declaration-subjects.json",
+    "sha256": "1a419466a1bc51dd3f514fff74f3e57a13bf3649ec5c02aa1e66befb51f078c5"
+  },
+  "capture_script": {
+    "sha256": "f20f96acad27bd70b3937babacbea3460c473ff618b110b4f8bccb4a20dc2f7a",
+    "source": "# @license\n# Copyright Google LLC All Rights Reserved.\n# Copyright (c) 2026 Ryan Lester.\n# Use of this source code is governed by an MIT-style license that can be\n# found in the LICENSE file at https://angular.io/license\n\"\"\"Retain exact declaration members from six already pinned, freshly SRI-verified archives.\"\"\"\nfrom pathlib import Path\nimport json,hashlib,gzip,tarfile,base64\nROOT=Path('/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy')\nARCHIVES=Path('/tmp/closeout-configurable-sort-tree-20261015-m02wodg4')\nSELECTION=json.loads((ROOT/'compatibility/rc/public-literal-types-worksheet.json').read_text())['selection']\nORIGINAL=json.loads((ROOT/'reference/material-16.2.14/environment-package-lock.json').read_text())['packages']\nPEERS=json.loads((ARCHIVES/'peer-sources/identities.json').read_text())\nsha=lambda b:hashlib.sha256(b).hexdigest()\nSUBJECTS=[];PACKAGES=[];total=0\nfor line in ['original','main','21.x']:\n    for package in ['@angular/cdk','@angular/material']:\n        if line=='original':\n            version='16.2.14';lock=ORIGINAL['node_modules/'+package]\n            expected=next(p for p in json.loads((ARCHIVES/'reference16/source-identities.json').read_text())['packages'] if p['package']==package)\n            integrity=lock['integrity'];digest=expected['archive_sha256'];path=ARCHIVES/'reference16/archives'/(package.replace('/','__')+'.tgz')\n        else:\n            expected=next(p for p in PEERS[line] if p['package']==package);version=expected['version'];integrity=expected['integrity'];digest=expected['archive_sha256'];path=ARCHIVES/'peer-sources'/line/'archives'/(package.replace('/','__')+'.tgz')\n        raw=path.read_bytes();assert sha(raw)==digest;assert 'sha512-'+base64.b64encode(hashlib.sha512(raw).digest()).decode()==integrity\n        with tarfile.open(path) as archive:\n            pkg_raw=archive.extractfile('package/package.json').read();pkg=json.loads(pkg_raw);assert pkg['name']==package and pkg['version']==version\n            refs={}\n            def retain(member):\n                global total\n                if member in refs:return refs[member]\n                info=archive.getmember(member);assert info.isfile();data=archive.extractfile(info).read();assert member.startswith('package/') and '..' not in member.split('/')\n                target=Path('compatibility/rc/public-literal-types-sources')/line.replace('.','-')/package.split('/')[-1]/(member.removeprefix('package/').replace('/','--')+'.gz')\n                assert not (ROOT/target).exists();(ROOT/target).parent.mkdir(parents=True,exist_ok=True);stored=gzip.compress(data,mtime=0);(ROOT/target).write_bytes(stored)\n                refs[member]={'path':target.as_posix(),'archive_member':member,'sha256':sha(data),'bytes':len(data),'gzip_sha256':sha(stored)};total+=1;return refs[member]\n            manifest=retain('package/package.json');license=retain('package/LICENSE')\n            for module,names in SELECTION.items():\n                if not module.startswith(package+'/'):continue\n                family=module.split('/')[-1];entry='package/'+pkg['exports']['./'+family]['types'].removeprefix('./')\n                source=entry if line=='original' or family not in ['a11y','dialog','progress-spinner'] else 'package/types/_'+family+'-module-chunk.d.ts' if family=='a11y' else 'package/types/_'+family+'-chunk.d.ts'\n                legacy='package/legacy-'+family+'/index.d.ts' if line=='original' and family in ['dialog','progress-bar','progress-spinner','snack-bar','tabs','tooltip'] else None\n                SUBJECTS.append({'line':line,'package':package,'version':version,'module':module,'symbols':names,'entry':retain(entry),'source':retain(source),'original_legacy_entry':retain(legacy) if legacy else None})\n            PACKAGES.append({'line':line,'package':package,'version':version,'integrity':integrity,'archive_sha256':digest,'archive_bytes':len(raw),'archive_sri_verified':True,'manifest':manifest,'license':license})\nCAPSULE={'schema_version':1,'role':'Complete original/minimum public declaration entries and type targets for eleven self-contained aliases. Partial extracted aliases are type fixtures only; no other peer member or runtime is qualified.','packages':PACKAGES,'subjects':SUBJECTS}\np=ROOT/'compatibility/rc/public-literal-types-declaration-subjects.json';assert not p.exists();p.write_text(json.dumps(CAPSULE,indent=2)+'\\n')\nprint(json.dumps({'packages_sri_verified':6,'public_module_subjects':len(SUBJECTS),'alias_subjects':sum(len(s['symbols']) for s in SUBJECTS),'retained_members':total,'capsule_sha256':sha(p.read_bytes())}))\n"
+  },
+  "producer": {
+    "path": "scripts/public-literal-types-use-review.mjs",
+    "sha256": "eb07309a495fee0a9ddf6ddfec0b3e7a94f2a5f9e911863ae3c373f749684c8d"
+  },
+  "controller": {
+    "path": "tests/public_literal_types_probe.mjs",
+    "sha256": "b16ec2819f809748a42b1680c19e6aa171974b20417cbb42d89ea79576ffd16c"
+  },
+  "diagnostic": {
+    "path": "compatibility/rc/public-literal-types-source-diagnostic.json",
+    "sha256": "8146947b0bca0651d76d0d81852b866e16ffe1e4fe37379c057edc0c23ba4a88"
+  },
+  "source_roles": {
+    "frozen": 10,
+    "current": 11,
+    "typed_or_reexported": 20,
+    "preserved_unused_import": 1
+  },
+  "public_aliases_from_original_legacy_declarations": 9,
+  "strict_partial_consumer_qualifies_only_selected_aliases": true,
+  "unqualified_other_surface_diagnostics": [
+    {
+      "file": "projects/ngx-material-legacy/legacy-dialog/public-api.ts",
+      "count": 13
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-progress-bar/public-api.ts",
+      "count": 6
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-progress-spinner/public-api.ts",
+      "count": 7
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-snack-bar/public-api.ts",
+      "count": 11
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tabs/public-api.ts",
+      "count": 24
+    },
+    {
+      "file": "projects/ngx-material-legacy/legacy-tooltip/public-api.ts",
+      "count": 9
+    }
+  ],
+  "reflection_metadata_disabled": true,
+  "production_or_consumer_changes": false,
+  "whole_component_or_barrel_or_Angular_or_native_or_packed_or_compiler_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
