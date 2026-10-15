@@ -32,7 +32,7 @@ const symbol={symbol_id:'legacy-table/primary/MatLegacyTable',family:'legacy-tab
 symbol.shape.originalFactoryContext=originalCompilerFactoryContext(symbol.shape.originalFactory);
 const contract=approvedTableContract(symbol),differences=loadDifferences();
 assert.equal(expectedFactoryDi(symbol.shape).length,11);assert.deepEqual(symbol.shape.originalFactory.inherited_factory.attributes,['role']);
-assert.equal(contract.runtime_requests.length,7);assert.equal(inputs.signatures.length,4);
+assert.equal(contract.runtime_requests.length,8);assert.equal(inputs.signatures.length,4);
 const path='projects/ngx-material-legacy/legacy-table/table.ts',source=read(path),candidate=packedShape(sf(source,path),name);
 const matched=compareSignatures(symbol,candidate,differences);assert.deepEqual(matched.blocking,[]);
 assert.equal(matched.rows.filter(r=>r.construction_contract===contract.profile_id).length,1);
@@ -79,8 +79,13 @@ if(existsSync(sibling)){
  assert.throws(()=>approvedTableContract(symbol,p=>p===TABLE_CONTRACT_PATH?readFileSync(sibling):readFileSync(resolve(root,p))));
  signatureMutants.push({id:'other-line-contract-cannot-be-borrowed',rejected:true});
 }
-const emit=text=>ts.transpileModule(text,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,experimentalDecorators:true}}).outputText
+const constructionContextSource=readFileSync(resolve(root,'projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts'),'utf8');
+const constructionContextCode=ts.transpileModule(constructionContextSource,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,experimentalDecorators:true}}).outputText
  .replace(/(['"])(@angular\/[^'"]+)\1/g,(_,q,spec)=>JSON.stringify(url(spec)));
+const constructionContextUrl='data:text/javascript;base64,'+Buffer.from(constructionContextCode).toString('base64');
+const emit=text=>ts.transpileModule(text,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,experimentalDecorators:true}}).outputText
+ .replace(/(['"])(@angular\/[^'"]+)\1/g,(_,q,spec)=>JSON.stringify(url(spec)))
+ .replaceAll("'./internal/table-construction-context'", JSON.stringify(constructionContextUrl));
 const temp=mkdtempSync(join(tmpdir(),'table-api-contract-')),runtime=[],settlementMutants=[];
 async function observe(id,leaf=source,footer=''){
  const directory=join(temp,id);mkdirSync(join(directory,'fesm2022'),{recursive:true});
@@ -90,9 +95,10 @@ async function observe(id,leaf=source,footer=''){
 let good;
 try{
  good=await observe('positive');assert.equal(good.result,'pass',JSON.stringify({problems:good.problems,observed:good.observed,observation:good.approved_construction}));assert.equal(good.status,'intentional-legacy-difference');assert.deepEqual(good.problems,[]);
- assert.equal(good.factory_outcome,'returned');assert.equal(good.observed.length,7);assert.equal(good.approved_construction.parent_comparison.length,2);
+ assert.equal(good.factory_outcome,'returned');assert.equal(good.observed.length,8);assert.equal(good.approved_construction.parent_comparison.length,2);
  runtime.push({id:'actual-source-factory-checker-and-settlement',result:'pass',historical:good.historical,observed:good.observed,approved_construction:good.approved_construction});
  for(const [id,leaf,footer]of [
+  ['missing-construction-boundary',source.replace('@preserveLegacyTableViewport\n',''),''],
   ['missing-manual-argument-rejection',source.replace('if (arguments.length)','if (false)'), ''],
   ['wrong-node-element',source.replace('super();',"super();this._elementRef=new (Object.getPrototypeOf(this._elementRef).constructor)({nodeName:'MAT-TABLE',setAttribute(){}});"),''],
   ['wrong-borrowed-detector',source.replace('super();','super();this._changeDetectorRef={markForCheck(){}};'),''],
@@ -120,6 +126,10 @@ try{
   ['different-flags',row=>row.approved_construction.parent_comparison[0].options_equal=false],
   ['different-resolution-kinds',row=>row.approved_construction.parent_comparison[0].trace_kinds_equal=false],
   ['omitted-trace-request',row=>row.approved_construction.parent_comparison[0].trace_count--],
+  ['unverified-context',row=>row.approved_construction.parent_comparison[0].construction_context_verified=false],
+  ['extra-context-node-request',row=>row.approved_construction.parent_comparison[0].parent_node_request_count++],
+  ['omitted-owned-trace',row=>row.approved_construction.parent_comparison[0].owned_trace_count--],
+  ['omitted-normalized-request',row=>row.approved_construction.parent_comparison[0].remaining_trace_count--],
   ['missing-root-proof',row=>row.approved_construction.root_requests.pop()],
   ['unresolved-root-provider',row=>row.approved_construction.root_requests[0].unresolved=true],
   ['missing-public-node-request',row=>row.observed.pop()],
@@ -131,8 +141,8 @@ try{
   ['null-parent-proof',row=>row.approved_construction.parent_comparison[0]=null],
   ['null-root-proof',row=>row.approved_construction.root_requests[0]=null],
   ['unproved-public-node-identity',row=>row.approved_construction.public_node_requests[0].identity_matched=false],
-  ['wrong-sticky-skip-self',row=>row.approved_construction.public_node_requests[5].skipSelf=false],
-  ['wrong-public-node-optional-flag',row=>row.approved_construction.public_node_requests[2].optional=false],
+  ['wrong-sticky-skip-self',row=>row.approved_construction.public_node_requests[6].skipSelf=false],
+  ['wrong-public-node-optional-flag',row=>row.approved_construction.public_node_requests[3].optional=false],
   ['wrong-role-default',row=>row.approved_construction.parent_comparison[1].role_behavior=false],
   ['manual-arguments-not-rejected',row=>row.approved_construction.counts.manualRejects=0],
   ['subclass-not-initialized',row=>row.approved_construction.counts.subclass=0],
@@ -149,8 +159,8 @@ const peerPath=req.resolve('@angular/cdk/table'),peerSha=sha(readFileSync(peerPa
 const subjects=JSON.parse(read('compatibility/rc/table-public-module-import-source-proof.json')).subjects;
 const peer=subjects.find(s=>s.members.some(m=>m.path.endsWith('.mjs')&&m.sha256===peerSha));assert.ok(peer,'actual peer source identity missing');
 const report={schema_version:1,role:'Table-specific delegated construction API/DI producer integration with emitted source, not packed/AOT qualification',line:contract.line,node:process.version,compiler:ts.version,runtime_peer:core.VERSION.full,peer_table:{version:peer.version,sha256:peerSha},
- source_caps:[path,'scripts/api-surface.mjs','scripts/api-di-observe.mjs','scripts/api-completeness.mjs','scripts/api-table-factory.mjs','scripts/table-construction-contract.mjs','tests/table_api_contract_probe.mjs',TABLE_CONTRACT_PATH,contract.authority.path].map(p=>({path:p,sha256:sha(readFileSync(resolve(root,p)))})),
+ source_caps:[path,'projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts','scripts/api-surface.mjs','scripts/api-di-observe.mjs','scripts/api-completeness.mjs','scripts/api-table-factory.mjs','scripts/table-construction-contract.mjs','tests/table_api_contract_probe.mjs',TABLE_CONTRACT_PATH,contract.authority.path].map(p=>({path:p,sha256:sha(readFileSync(resolve(root,p)))})),
  original:{constructor,factory:symbol.shape.originalFactory,inherited_inputs:inputs,expected_factory_di:expectedFactoryDi(symbol.shape)},signature_comparison:matched,signature_mutants:signatureMutants,runtime,settlement_mutants:settlementMutants,
  limits:['Actual Angular22 JIT factory and independent current public CdkTable execute with synthetic server DOM and public node/root services.','Actual borrowed22 peer bytes authenticated; own-line contract/declarations differ. No actualAngular21 runtime/compiler/native/AOT/packed/floor or whole API/security audit qualification.','The original constructor/eleven DI dependencies/role and four independently read inherited input signatures remain unchanged. Only the delegated table constructor difference is accepted.','Other inherited table members and generic/behavior obligations remain part of the full audit; this finite input coverage repair is not an exhaustive inherited-member audit.']};
 const argv=process.argv.slice(2),at=argv.indexOf('--report');if(at>=0){assert.equal(existsSync(argv[at+1]),false);writeFileSync(argv[at+1],JSON.stringify(report,null,2)+'\n');}
-console.log(JSON.stringify({line:contract.line,signature_mutants:signatureMutants.length,runtime_positive:1,runtime_mutants:runtime.length-1,settlement_mutants:settlementMutants.length,original_factory_dependencies:11,accepted_public_node_requests:7,runtime_peer:core.VERSION.full}));
+console.log(JSON.stringify({line:contract.line,signature_mutants:signatureMutants.length,runtime_positive:1,runtime_mutants:runtime.length-1,settlement_mutants:settlementMutants.length,original_factory_dependencies:11,accepted_public_node_requests:8,runtime_peer:core.VERSION.full}));

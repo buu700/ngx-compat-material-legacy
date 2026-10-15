@@ -11,6 +11,7 @@ import assert from 'node:assert/strict';
 export async function observeTableFactory(Table,loaded,importModule=spec=>import(spec)){
  const core=await importModule('@angular/core'),{BrowserModule}=await importModule('@angular/platform-browser');
  const {CdkTable,STICKY_POSITIONING_LISTENER}=await importModule('@angular/cdk/table');
+ const {CDK_VIRTUAL_SCROLL_VIEWPORT}=await importModule('@angular/cdk/scrolling');
  const {Directionality}=await importModule('@angular/cdk/bidi'),rx=await importModule('rxjs');
  const behaviorProblems=[],parentComparison=[],counts={borrowedDestroyed:0,manualRejects:0,subclass:0,disconnects:0};
  const document={documentElement:{},body:{querySelector(){return null;},querySelectorAll(){return [];}}};
@@ -56,19 +57,32 @@ export async function observeTableFactory(Table,loaded,importModule=spec=>import
    const parent=execute(()=>new CdkTable(),baseline),actual=execute(()=>Table.ɵfac(),owned);
    if(parent.value)instances.push(parent.value);if(actual.value)instances.push(actual.value);
    if(index===0){primary=actual.value;primaryFixture=owned;outcome=actual.outcome;error=actual.error;primaryRequests=[...owned.requests];primaryRootRequests=[...owned.rootRequests];}
-   const pairs=baseline.trace.map((p,i)=>[p,owned.trace[i]]);
-   const tokenObjectsEqual=baseline.trace.length===owned.trace.length&&pairs.every(([a,b])=>b&&(a.token===b.token
+   // The owned construction boundary adds exactly one public node-injector
+   // request and suppresses exactly the parent's optional host viewport lookup.
+   // Compare every remaining token object, option and trace position unchanged.
+   const viewportRequests=baseline.trace.filter(p=>p.token===CDK_VIRTUAL_SCROLL_VIEWPORT);
+   const contextRequest=owned.trace[0];
+   const contextValid=viewportRequests.length===1&&viewportRequests[0].kind==='root'
+    &&viewportRequests[0].options.optional&&viewportRequests[0].options.host
+    &&!viewportRequests[0].options.self&&!viewportRequests[0].options.skipSelf
+    &&contextRequest?.kind==='node'&&contextRequest.token===core.Injector
+    &&Object.values(contextRequest.options).every(flag=>flag===false)
+    &&owned.trace.every(p=>p.token!==CDK_VIRTUAL_SCROLL_VIEWPORT);
+   const parentTrace=baseline.trace.filter(p=>p.token!==CDK_VIRTUAL_SCROLL_VIEWPORT);
+   const ownedTrace=owned.trace.slice(1);
+   const pairs=parentTrace.map((p,i)=>[p,ownedTrace[i]]);
+   const tokenObjectsEqual=contextValid&&parentTrace.length===ownedTrace.length&&pairs.every(([a,b])=>b&&(a.token===b.token
       ||a.token instanceof core.HostAttributeToken&&b.token instanceof core.HostAttributeToken&&a.token.toString()===b.token.toString()));
-   const optionsEqual=baseline.trace.length===owned.trace.length&&pairs.every(([a,b])=>b&&Object.keys(a.options).every(k=>a.options[k]===b.options[k]));
-   const traceKindsEqual=baseline.trace.length===owned.trace.length&&pairs.every(([a,b])=>b&&a.kind===b.kind);
+   const optionsEqual=contextValid&&parentTrace.length===ownedTrace.length&&pairs.every(([a,b])=>b&&Object.keys(a.options).every(k=>a.options[k]===b.options[k]));
+   const traceKindsEqual=contextValid&&parentTrace.length===ownedTrace.length&&pairs.every(([a,b])=>b&&a.kind===b.kind);
    const rootServicesResolved=baseline.rootRequests.every(r=>!r.unresolved)&&owned.rootRequests.every(r=>!r.unresolved);
    const roleBehavior=baseline.element.getAttribute('role')===(role||'table')&&owned.element.getAttribute('role')===(role||'table');
    parentComparison.push({context:name,parent_outcome:parent.outcome,owned_outcome:actual.outcome,
-    trace_count:baseline.trace.length,parent_root_request_count:baseline.rootRequests.length,owned_root_request_count:owned.rootRequests.length,node_request_count:owned.requests.length,attribute_request_count:owned.trace.filter(r=>r.kind==='attribute').length,token_objects_equal:tokenObjectsEqual,options_equal:optionsEqual,trace_kinds_equal:traceKindsEqual,role_behavior:roleBehavior,root_services_resolved:rootServicesResolved});
+    trace_count:baseline.trace.length,owned_trace_count:owned.trace.length,parent_node_request_count:baseline.requests.length,construction_context_verified:contextValid,remaining_trace_count:parentTrace.length,parent_root_request_count:baseline.rootRequests.length,owned_root_request_count:owned.rootRequests.length,node_request_count:owned.requests.length,attribute_request_count:owned.trace.filter(r=>r.kind==='attribute').length,token_objects_equal:tokenObjectsEqual,options_equal:optionsEqual,trace_kinds_equal:traceKindsEqual,role_behavior:roleBehavior,root_services_resolved:rootServicesResolved});
    check(name+' genuine factory/control trace',()=>{
     assert.equal(parent.outcome,'returned',parent.error);assert.equal(actual.outcome,'returned',actual.error);
     assert.ok(tokenObjectsEqual);assert.ok(optionsEqual);assert.ok(traceKindsEqual);assert.ok(roleBehavior);assert.ok(rootServicesResolved);
-    assert.equal(Object.getPrototypeOf(Table),CdkTable);assert.ok(actual.value instanceof Table);assert.ok(actual.value instanceof CdkTable);
+    assert.equal(Object.getPrototypeOf(Table.prototype),CdkTable.prototype);assert.equal(Object.getPrototypeOf(Table).prototype,CdkTable.prototype);assert.ok(actual.value instanceof Table);assert.ok(actual.value instanceof CdkTable);
     assert.equal(Object.getPrototypeOf(actual.value),Table.prototype);
     assert.equal(actual.value._elementRef,owned.elementRef);assert.equal(actual.value._changeDetectorRef,owned.detector);assert.equal(actual.value._dir,owned.direction);assert.equal(actual.value.stickyCssClass,'mat-table-sticky');assert.equal(actual.value.needsPositionStickyOnElement,false);
    });

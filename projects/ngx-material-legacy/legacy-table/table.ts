@@ -12,6 +12,7 @@ import {
   STICKY_POSITIONING_LISTENER,
 } from '@angular/cdk/table';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
+import {preserveLegacyTableViewport} from './internal/table-construction-context';
 
 import {assertInInjectionContext, ChangeDetectionStrategy, Component, Directive, ViewEncapsulation} from '@angular/core';
 
@@ -36,6 +37,7 @@ export class MatLegacyRecycleRows {
 /**
  * Wrapper for the CdkTable with Material design styles.
  */
+@preserveLegacyTableViewport
 @Component({
   standalone: false,
   selector: 'mat-table, table[mat-table]',

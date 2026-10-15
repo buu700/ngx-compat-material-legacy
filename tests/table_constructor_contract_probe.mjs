@@ -21,9 +21,14 @@ const core=await import(url('@angular/core')),{BrowserModule}=await import(url('
 const {Platform}=await import(url('@angular/cdk/platform')),peer=await import(url('@angular/cdk/table'));
 const rx=await import(url('rxjs'));
 const path='projects/ngx-material-legacy/legacy-table/table.ts',source=readFileSync(resolve(root,path),'utf8');
+const constructionContextSource=readFileSync(resolve(root,'projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts'),'utf8');
+const constructionContextCode=ts.transpileModule(constructionContextSource,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,experimentalDecorators:true}}).outputText
+ .replace(/(['"])(@angular\/[^'"]+)\1/g,(_,q,spec)=>JSON.stringify(url(spec)));
+const constructionContextUrl='data:text/javascript;base64,'+Buffer.from(constructionContextCode).toString('base64');
 const emit=text=>ts.transpileModule(text,{compilerOptions:{target:ts.ScriptTarget.ES2022,
   module:ts.ModuleKind.ESNext,experimentalDecorators:true}}).outputText
-  .replace(/(['"])(@angular\/[^'"]+|rxjs(?:\/operators)?)\1/g,(_,q,spec)=>JSON.stringify(url(spec)));
+  .replace(/(['"])(@angular\/[^'"]+|rxjs(?:\/operators)?)\1/g,(_,q,spec)=>JSON.stringify(url(spec)))
+ .replaceAll("'./internal/table-construction-context'", JSON.stringify(constructionContextUrl));
 const {MatLegacyTable}=await import(data(emit(source)));
 const provenancePaths=['reference/material-16.2.14/table-outlet-sources/provenance.json',
   'reference/material-16.2.14/table-constructor-sources/provenance.json'];
