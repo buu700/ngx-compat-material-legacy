@@ -12,13 +12,15 @@ import {createHash} from 'node:crypto';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
-import {compileRemainingIdentityGraph,remainingIdentityEntries,remainingIdentityLiteralEdits,remainingIdentityBeforeHashes,reverseRemainingIdentitySource,inspectTabPanelTypeOwnership} from '../scripts/remaining-identity-construction.mjs';
+import {compileRemainingIdentityGraph,remainingIdentityEntries,remainingIdentityLiteralEdits,remainingIdentityBeforeHashes,reverseRemainingIdentitySource as reversePreviousRemainingIdentitySource,inspectTabPanelTypeOwnership} from '../scripts/remaining-identity-construction.mjs';
 import {prepareRemainingIdentitySubjects} from '../scripts/remaining-identity-public-subjects.mjs';
+import {SNACK_MODAL_IDENTITY_PATH,reverseSnackModalIdentitySource,currentRemainingIdentityLiteral} from '../scripts/snack-modal-identity-source.mjs';
+const reverseRemainingIdentitySource=(path,text)=>reversePreviousRemainingIdentitySource(path,path===SNACK_MODAL_IDENTITY_PATH?reverseSnackModalIdentitySource(path,text):text);
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=path=>readFileSync(join(root,path),'utf8'),hash=b=>createHash('sha256').update(b).digest('hex');
 const compiled=compileRemainingIdentityGraph({root}),loaded=prepareRemainingIdentitySubjects(root),worker=readFileSync(join(root,'tests/remaining_identity_construction_subject.mjs')),results=[];
 const families=['autocomplete','menu','select','snack-bar','tab-link','tab-panel'],roles=['autocomplete','menu-panel','select','select-value','snack-live','tab-link','tab-panel'],roleFamilies=['autocomplete','menu','select','select','snack-bar','tab-link','tab-panel'];
-const variants=remainingIdentityLiteralEdits.map(([path,before,after],index)=>({id:'old-'+roles[index],family:roleFamilies[index],role:roles[index],modules:compileRemainingIdentityGraph({root,readSource:p=>p===path?read(p).replace(after,before):read(p)}).modules}));
-let sourceNegatives=0;for(const path of Object.keys(remainingIdentityBeforeHashes)){assert.ok(reverseRemainingIdentitySource(path,read(path)));assert.throws(()=>reverseRemainingIdentitySource(path,read(path)+'\n// foreign source byte\n'));sourceNegatives++;}for(const [path,before,after] of remainingIdentityLiteralEdits){assert.throws(()=>reverseRemainingIdentitySource(path,read(path).replace(after,before)));sourceNegatives++;}
+const variants=remainingIdentityLiteralEdits.map(([path,before,after],index)=>({id:'old-'+roles[index],family:roleFamilies[index],role:roles[index],modules:compileRemainingIdentityGraph({root,readSource:p=>p===path?read(p).replace(currentRemainingIdentityLiteral(path,after),before):read(p)}).modules}));
+let sourceNegatives=0;for(const path of Object.keys(remainingIdentityBeforeHashes)){assert.ok(reverseRemainingIdentitySource(path,read(path)));assert.throws(()=>reverseRemainingIdentitySource(path,read(path)+'\n// foreign source byte\n'));sourceNegatives++;}for(const [path,before,after] of remainingIdentityLiteralEdits){assert.throws(()=>reverseRemainingIdentitySource(path,read(path).replace(currentRemainingIdentityLiteral(path,after),before)));sourceNegatives++;}
 const ownership=inspectTabPanelTypeOwnership({root});assert.equal(ownership.kind,'InterfaceDeclaration');const beforeOwnership=JSON.parse(read('compatibility/rc/remaining-identity-tab-panel-before-ownership.json'));assert.deepEqual(ownership.instance_fields,beforeOwnership.instance_fields);assert.deepEqual(ownership.public_exports,beforeOwnership.public_exports);
 const base=ownership.source,pub=ownership.public_barrel,ownershipControls=[
  [base,read(base)+'\nconst unexpectedRuntimeValue=MatTabNavPanel;\n'],

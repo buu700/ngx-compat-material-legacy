@@ -36,7 +36,7 @@ function makeOrder(first) {
     const prefix = {option:'mat-option-', 'active-option':'mat-option-', 'optgroup-label':'mat-optgroup-label-',
       autocomplete:'mat-autocomplete-', select:'mat-select-', 'select-value':'mat-select-value-',
       'menu-panel':'mat-menu-panel-', 'snack-live':'mat-snack-bar-container-live-', 'tab-link':'mat-tab-link-', 'tab-panel':'mat-tab-nav-panel-'}[role];
-    return prefix + (role === 'active-option' ? index + 10 : index) + (generation === 'legacy' ? '-legacy' : '');
+    return (role==='snack-live'&&generation==='legacy'?'mat-legacy-snack-bar-container-live-':prefix) + (role === 'active-option' ? index + 10 : index) + (generation === 'legacy'&&role!=='snack-live' ? '-legacy' : '');
   };
   const edge = (generation, name, attribute, value) => ({generation,name,attribute,value,target_id:value,target_count:1,exact_target:true});
   return {order:first+'-first', creation_order:names, scopes_separate:true, duplicate_id_snapshots:[],
@@ -86,6 +86,7 @@ for (let order=0;order<2;order++) {
   const change = fn => mutations.push(o=>fn(o.orders[order]));
   change(o=>o.order='wrong'); change(o=>o.creation_order.reverse()); change(o=>o.scopes_separate=false);
   change(o=>o.duplicate_id_snapshots.push('duplicate')); change(o=>o.nodes.pop()); change(o=>o.nodes.push(o.nodes[0]));
+  change(o=>{const node=o.nodes.find(n=>n.generation==='legacy'&&n.role==='snack-live'),prior=node.id;node.id='mat-snack-bar-container-live-0-legacy';for(const stage of o.snack_lifecycle)stage.modal_owns=stage.modal_owns.map(id=>id===prior?node.id:id);});
   for (let row=0;row<32;row++) for (const [key,value] of [['id','wrong'],['generation','wrong'],['role','wrong'],['index',50],['resolution_count',0],['resolution_count',2],['exact_node',false],['owner_matches',false]]) change(o=>o.nodes[row][key]=value);
   for (let generation=0;generation<2;generation++) {
     for(const key of ['public_instances','option_explicit_resolves','snack_panel_class']) change(o=>o.generations[generation][key]=false);
