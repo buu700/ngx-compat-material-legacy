@@ -19,7 +19,7 @@ class IndividualEvidenceScopeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         observed = json.loads(result.stdout.strip().splitlines()[-1])
         for field, expected in [('helper_positives', 17), ('helper_negatives', 303),
-                ('actual_CLI_cases', 11), ('checker_mutants_detected', 2),
+                ('actual_CLI_cases', 12), ('checker_mutants_detected', 2),
                 ('frozen_fixture_uses', 1736), ('current_fixture_additional_uses', 1)]:
             self.assertEqual(observed[field], expected, field)
         self.assertTrue(observed['complete_positive_behavior_fixture'])

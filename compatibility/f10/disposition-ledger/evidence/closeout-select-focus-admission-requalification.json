@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "judgment_stage": "source-complete-runtime-required",
+  "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+  "final_disposition": "already-adapted",
+  "diff_sha256": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+  "patch_file": "compatibility/rc/select-focus-click-original.patch",
+  "complete_original_files": [
+    "src/material/select/select.html",
+    "src/material/select/select.ts"
+  ],
+  "original_patch_has_test_hunk": false,
+  "source_parent": "6806026680f10750d761a2968c266e11e8eae646",
+  "source_conclusion": "The complete two-file/four-hunk focus-handler fix is already incorporated in the owned legacy select: trigger click opens idempotently, both base and derived open guards precede side effects/geometry, closed close() performs no touch/notification work, and public toggle() remains available. Modern-only MDC state notification mechanics are not copied into the historical form-field lifecycle. This is a completed source disposition with mandatory artifact-required behavior evidence; it is not a local packed/native execution, G11 pass or security clearance.",
+  "hunk_reviews": [
+    {
+      "hunk": 1,
+      "file": "src/material/select/select.html",
+      "change": "Trigger click toggle() -> open().",
+      "candidate": "legacy-select/select.html",
+      "judgment": "The owned trigger already calls open(). A focus listener can open before click; calling open again is idempotent. Explicit public toggle remains a separate operation. This changes event behavior intentionally while preserving rendered hierarchy/classes and all consumer HTML/CSS/SCSS requirements.",
+      "evidence": [
+        "select-focus-click-original-review.json",
+        "select-focus-click-method-diagnostic.json",
+        "select-focus-click-packed-admission-diagnostic.json"
+      ]
+    },
+    {
+      "hunk": 2,
+      "file": "src/material/select/select.ts",
+      "change": "Move _canOpen() early return before geometry/modal work.",
+      "candidate": "legacy-select/internal/select-base.ts and legacy-select/select.ts",
+      "judgment": "Owned base open checks destroyed/_canOpen before motion, modal or key-manager work. Derived public open checks super._canOpen before base open and trigger measurement, font-size reads, position calculation or render subscription. Disabled, empty and already-open calls avoid work; whole-method protocol reversions expose missing base/derived guards.",
+      "evidence": [
+        "select-focus-click-method-diagnostic.json"
+      ]
+    },
+    {
+      "hunk": 3,
+      "file": "src/material/select/select.ts",
+      "change": "Flatten successful-open block after early guard; avoid unconditional MDC stateChanges on no-op open.",
+      "candidate": "legacy-select/internal/select-base.ts",
+      "judgment": "Successful legacy opening still sets its own panel/overlay state and drives the existing historical attach/motion lifecycle. No-op focus-trigger open returns before those effects. Historical legacy open did not need the unconditional MDC form-field stateChanges notification; adding it would change the owned lifecycle without serving this fix. Both minimum current peer methods likewise guard first; their explicit attach/notification implementation remains peer-owned.",
+      "evidence": [
+        "select-focus-click-peer-source-review.json",
+        "select-focus-click-method-diagnostic.json"
+      ]
+    },
+    {
+      "hunk": 4,
+      "file": "src/material/select/select.ts",
+      "change": "Emit MDC close stateChanges only when previously open.",
+      "candidate": "legacy-select/internal/select-base.ts",
+      "judgment": "Owned close guards !_motionDestroyed && _panelOpen before state mutation, touch, key-manager work and exit/detach. It already lacks an unconditional legacy close notification, so a closed close remains a no-op. The original16 legacy lifecycle is preserved; there is no justification to add the MDC notification. Whole-owned-method protocol and the mandatory packed case cover repeated close/touch/state/output effects.",
+      "evidence": [
+        "select-focus-click-method-diagnostic.json",
+        "select-focus-click-packed-admission-diagnostic.json"
+      ]
+    }
+  ],
+  "branch_review": {
+    "source_line": "21.x",
+    "minimum_material": "21.2.14",
+    "scope": "Own branch source and authenticated public minimum package, not tag ancestry or cross-line execution attribution.",
+    "both_minimum_sources_reauthenticated": true,
+    "current_peer_static_only": true
+  },
+  "original16": {
+    "sources": [
+      {
+        "path": "reference/material-16.2.14/select-render-sources/select-base.ts",
+        "sha256": "ba939bcc724eab50cc71c628c3977ddd68f052bfb265a77de8793ec09562cd73"
+      },
+      {
+        "path": "reference/material-16.2.14/select-render-sources/select.ts",
+        "sha256": "f75594460cc49d590a74643ce2888990f498262d83c63d907966d5095ee0098d"
+      },
+      {
+        "path": "reference/material-16.2.14/template-control-flow/legacy-select--select.html",
+        "sha256": "bf085c3364ffb1ab2956416abaa8725e0b7d78e25ac88763c7c9b16add8b72fd"
+      }
+    ],
+    "expected_focus_click_bug_reproduced_by_whole_prototype_protocol": true,
+    "actual_constructor_or_Angular_node_executed": false
+  },
+  "reviewed_source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.html",
+      "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+      "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+      "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "232fb42f805683f6daa35971948bfb1b0b3249b31d38ba5271b8945dc34e908a"
+    },
+    {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+    },
+    {
+      "path": "scripts/select-focus-click-packed-fixture.mjs",
+      "sha256": "2219e4ce6ffab2f631f2577466fe79bb862542eda877a97d31a59a3178bf730e"
+    },
+    {
+      "path": "scripts/select-focus-click-packed-contract.mjs",
+      "sha256": "649c152cc7655ef086ee2eaf362810d279a03c6858d7d3c334fce1f46e707897"
+    },
+    {
+      "path": "compatibility/rc/matrices/library-exports.json",
+      "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "3183957162d74d931bdd1f41c56d48f637599065ea16ff2b02b922ee68fdc224"
+    }
+  ],
+  "independent_evidence": [
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-click-review.json",
+      "sha256": "11a6fbf21095b6b0c3c66b44973b4106f4a91b595561d0b0e8456bfd11c7ecce"
+    },
+    {
+      "path": "compatibility/rc/select-focus-click-original-review.json",
+      "sha256": "5b8227ba98aad4f15df04f61d158e548793249201f2b0b8aa99885f8c1d1c010"
+    },
+    {
+      "path": "compatibility/rc/select-focus-click-peer-source-review.json",
+      "sha256": "6554b451129749bb1bdc17b49570693c9b3605f16b9842a3096807925c28b98b"
+    },
+    {
+      "path": "compatibility/rc/select-focus-click-method-diagnostic.json",
+      "sha256": "24221c9b2dd17b76006879d779f5b50c6160bd3191ea1ea2e22c0e5de4604f87"
+    },
+    {
+      "path": "compatibility/rc/select-focus-click-packed-admission-diagnostic.json",
+      "sha256": "bfc180b530258b589490521591bbcb9eb99fd7a388a4e1a4e11321509e430b95"
+    },
+    {
+      "path": "compatibility/rc/select-focus-source-judgment-authentication.json",
+      "sha256": "17a853e89dd8970e440a0e87c29560bcd74184d74b7bb8445c3bfc903f509aa5"
+    },
+    {
+      "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+      "sha256": "15a5155eaaf3276e8204652dc706baa5535e4a9f997f9f0af39a2ab46e142d89"
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "232fb42f805683f6daa35971948bfb1b0b3249b31d38ba5271b8945dc34e908a"
+    },
+    {
+      "path": "scripts/select-focus-click-packed-fixture.mjs",
+      "sha256": "2219e4ce6ffab2f631f2577466fe79bb862542eda877a97d31a59a3178bf730e"
+    },
+    {
+      "path": "scripts/select-focus-click-packed-contract.mjs",
+      "sha256": "649c152cc7655ef086ee2eaf362810d279a03c6858d7d3c334fce1f46e707897"
+    },
+    {
+      "path": "tests/select_focus_click_method_probe.mjs",
+      "sha256": "6801359e2c7c6b7a7215758c636e720ceb5e086a41a476cf1a4e1ea5dda20eef"
+    },
+    {
+      "path": "tests/select_focus_click_packed_contract_probe.mjs",
+      "sha256": "a47a8278196eb4e6266dedb56b6aba18b86806cf582fa5a9c13319eb342039a6"
+    },
+    {
+      "path": "tests/select_public_open_lifetime_probe.mjs",
+      "sha256": "ad8b78eac9eb8ec6db234ac7246eaae80821847e8ce26268a99ad520710b3c08"
+    },
+    {
+      "path": "scripts/upstream-packed-run-evidence.mjs",
+      "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+    }
+  ],
+  "prior_entry": {
+    "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): flicker if opened from inside a focus handler (#28287)",
+    "files": [
+      "src/material/select/select.html",
+      "src/material/select/select.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Complete original hunk and21.x owned/peer source review support the focus-before-click regression preparation. This line remains pending until the strengthened actual artifact-bound select case executes; no earlier21.x behavior qualification is inferred from main or from source presence.",
+    "read_note_disposition": "complete-source-review-awaiting-packed-focus-click-execution",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-click-review.json"
+  },
+  "prior_pending_record": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-click-review.json",
+    "sha256": "11a6fbf21095b6b0c3c66b44973b4106f4a91b595561d0b0e8456bfd11c7ecce"
+  },
+  "runtime_qualification": {
+    "required": true,
+    "qualified_by_this_document": false,
+    "check": "packed-consumer",
+    "case_ids": [
+      "packed-consumer/harness/legacy-select"
+    ],
+    "contract": "Current coordinator-observed successful invocation and complete106-case report, same clean source/line/run/library bytes and hashed owned assertion, structured bare/form-field legacy/current focus-click, native backdrop, no-op guards, public toggle and teardown. Re-evaluated by registered artifact-required proof; absent or insufficient runtime stays failed."
+  },
+  "consumer": {
+    "cyph_read_only": true,
+    "related_files_rehashed": 12,
+    "required_consumer_HTML_CSS_SCSS_changes": false,
+    "component_structure_or_styles_changed": false,
+    "TS_API_changed": false
+  },
+  "actual_packed_or_native_executed": false,
+  "semantic_pass": false,
+  "security_clearance": "not-passed",
+  "g11_claim": "not-passed",
+  "prior_source_judgment": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-click-source-judgment.json",
+    "sha256": "ae42373e2dab130ffbb4e6e2dbfb5d267483007cd7a08b7343cb83c921bf213e"
+  },
+  "admission_refactor_review": {
+    "worksheet": {
+      "path": "compatibility/rc/artifact-extended-worksheet.json",
+      "sha256": "ffc65285e09a908d4d6f556d772b49ad49741b5b3fa1ee9d04112d44a5f5a992"
+    },
+    "exact_before_helper": {
+      "path": "compatibility/rc/artifact-extended-focus-helper-preimage.mjs",
+      "sha256": "f6bd49a06b6ed991d1ebe230c2bcf7ca2ffcfb68c4d892f6654d9b8644dcdfd6"
+    },
+    "scope": "Only the admission helper is factored into shared packed-run validation plus a finite three-SHA wrapper. Focus source judgment, original hunk/peer/caller evidence, all ten pinned source/producer members and its exact observation predicate are retained. Existing87 controls and real-source11 actual CLI fixture cases must pass; no runtime or G11 qualification follows from this requalification."
+  }
+}
