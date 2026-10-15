@@ -51,7 +51,7 @@ export function packedGeneratedIdentityCase(observed) {
             const row = node(generation, role, index);
             demand(typeof row.id === 'string' && row.resolution_count === 1 && row.exact_node === true && row.owner_matches === true);
             if (role === 'select-panel') demand(row.id === node(generation, 'select', index).id + '-panel');
-            else demand(new RegExp('^' + prefixes[role] + '[0-9]+' + (generation === 'legacy' ? '-legacy' : '') + '$').test(row.id));
+            else {const prefix=role==='snack-live'&&generation==='legacy'?'mat-legacy-snack-bar-container-live-':prefixes[role];const suffix=generation==='legacy'&&role!=='snack-live'?'-legacy':'';demand(new RegExp('^'+prefix+'[0-9]+'+suffix+'$').test(row.id));}
           }
         }
       }

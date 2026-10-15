@@ -1,0 +1,66 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,existsSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {dirname,join,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {SNACK_MODAL_IDENTITY_PATH,reverseSnackModalIdentitySource} from './snack-modal-identity-source.mjs';
+import {SNACK_MODAL_DIAGNOSTIC_PREIMAGES,SNACK_MODAL_DIAGNOSTIC_EDITS,reverseSnackModalDiagnosticSource} from './snack-modal-identity-requalification.mjs';
+import {authoredUseReviewEvidence} from './authored-use-inventory.mjs';
+import {scanCurrentAuthoredUses} from './authored-current-use-inventory.mjs';
+import {generatedIdentityPackedFixture} from './generated-identity-packed-fixture.mjs';
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=p=>readFileSync(join(root,p)),json=p=>JSON.parse(read(p)),hash=b=>createHash('sha256').update(b).digest('hex');
+const write=(p,b)=>{assert.equal(existsSync(join(root,p)),false);writeFileSync(join(root,p),JSON.stringify(b,null,2)+'\n');};
+const git=args=>execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root});
+const worksheetPath='compatibility/rc/snack-modal-identity-worksheet.json',worksheet=json(worksheetPath),line=worksheet.line;
+const beforePath='compatibility/rc/snack-modal-identity-before-diagnostic.json',afterPath='compatibility/rc/snack-modal-identity-after-diagnostic.json',constructorPath='compatibility/rc/snack-modal-identity-constructor-diagnostic.json',packedPath='compatibility/rc/snack-modal-identity-packed-admission-diagnostic.json';
+const before=json(beforePath),after=json(afterPath),constructors=json(constructorPath),packed=json(packedPath);
+for(const report of [before,after,constructors,packed])assert.equal(report.line,line);
+for(const [report,probe,worker]of [[before,'compatibility/rc/snack-modal-identity-before-probe.mjs','compatibility/rc/snack-modal-identity-before-subject.mjs'],[after,'tests/snack_modal_identity_probe.mjs','tests/snack_modal_identity_subject.mjs'],[constructors,'tests/remaining_identity_construction_probe.mjs','tests/remaining_identity_construction_subject.mjs']]){assert.equal(report.producer_sha256,hash(read(probe)));assert.equal(report.worker_sha256,hash(read(worker)));assert.equal(report.compiler_helper_sha256,hash(read('scripts/remaining-identity-construction.mjs')));}
+assert.equal(after.namespace_helper_sha256,hash(read('scripts/snack-modal-identity-source.mjs')));
+assert.equal(before.results.length,12);assert.equal(before.results.filter(r=>!r.modal_stages.every(s=>s.okay)).length,4);
+assert.equal(after.results.length,20);assert.equal(after.results.filter(r=>r.variant==='after'&&r.line!=='original').length,8);
+assert.ok(after.results.filter(r=>r.variant==='after').every(r=>r.modal_stages.every(s=>s.okay)));
+assert.equal(after.results.filter(r=>!r.modal_stages.every(s=>s.okay)).length,4);
+for(const result of [...before.results,...after.results]){assert.equal(result.actual_whole_modal_methods_executed,true);assert.equal(result.actual_modal_nodes_or_overlay_lifecycle_qualified,false);assert.ok(result.values.every(v=>v.unique));}
+assert.equal(constructors.results.length,50);assert.equal(constructors.source_requalification_negatives,13);assert.equal(constructors.type_ownership_negative_controls,4);
+assert.equal(packed.derived_cases,104);assert.equal(packed.negative_cases,1174);assert.equal(packed.source_reversal_negative_controls,50);assert.equal(packed.actual_packed_generated_identity_executed,false);
+assert.equal(packed.producer_sha256,hash(read('tests/generated_identity_packed_contract_probe.mjs')));assert.equal(packed.contract_sha256,hash(read('scripts/generated-identity-packed-contract.mjs')));assert.equal(packed.fixture_sha256,hash(generatedIdentityPackedFixture()));
+const candidate=read(SNACK_MODAL_IDENTITY_PATH),old=Buffer.from(reverseSnackModalIdentitySource(SNACK_MODAL_IDENTITY_PATH,candidate.toString()));
+assert.equal(hash(old),worksheet.source.before_sha256);assert.deepEqual(old,git(['show',worksheet.source_parent+':'+SNACK_MODAL_IDENTITY_PATH]));
+const changed=[{...worksheet.source,candidate_sha256:hash(candidate),bytes:candidate.length,exact_reversal_to_parent:true}];
+let sourceNegatives=0;
+const diagnostics=Object.entries(SNACK_MODAL_DIAGNOSTIC_PREIMAGES).map(([path,prior])=>{const now=read(path).toString(),previous=reverseSnackModalDiagnosticSource(path,now);assert.deepEqual(Buffer.from(previous),read(prior.snapshot));assert.deepEqual(Buffer.from(previous),git(['show',worksheet.source_parent+':'+path]));assert.throws(()=>reverseSnackModalDiagnosticSource(path,now+'\n'));sourceNegatives++;for(const [,added]of SNACK_MODAL_DIAGNOSTIC_EDITS[path]){assert.throws(()=>reverseSnackModalDiagnosticSource(path,now.replace(added,added+'\n// foreign mutation')));sourceNegatives++;}return {path,before_sha256:prior.sha256,candidate_sha256:hash(now),snapshot:prior.snapshot,exact_reversal_to_parent:true};});
+assert.throws(()=>reverseSnackModalDiagnosticSource('foreign.mjs',''));sourceNegatives++;
+for(const module of after.owned_modules){assert.equal(module.sha256,hash(read(module.path)));assert.equal(before.owned_modules.find(m=>m.path===module.path)?.sha256,module.path===SNACK_MODAL_IDENTITY_PATH?worksheet.source.before_sha256:module.sha256);}
+const members=git(['ls-tree','-rz',worksheet.source_parent,'--','projects/ngx-material-legacy']).toString().split('\0').filter(Boolean).map(text=>{const [prefix,path]=text.split('\t'),[mode,type,blob]=prefix.split(' ');assert.equal(type,'blob');assert.ok(['100644','100755'].includes(mode));const data=read(path),prior=path===SNACK_MODAL_IDENTITY_PATH?old:data;assert.equal(createHash('sha1').update('blob '+prior.length+'\0').update(prior).digest('hex'),blob,'unrelated product changed '+path);return {path,sha256:hash(data),bytes:data.length};});
+assert.equal(members.length,1140);assert.deepEqual(members.map(m=>m.path),git(['ls-files','projects/ngx-material-legacy']).toString().trim().split('\n'));
+const consumer='/home/parallels/cyph',consumerPaths=json('compatibility/rc/remaining-identity-source-proof.json').cyph.files.map(r=>r.path);
+const proofPath='compatibility/rc/snack-modal-identity-source-proof.json';
+write(proofPath,{schema_version:1,line,source_parent:worksheet.source_parent,producer_sha256:hash(read('scripts/record-snack-modal-identity-review.mjs')),changed,changed_diagnostic_sources:diagnostics,diagnostic_source_negatives:sourceNegatives,unchanged_product_members:members.filter(m=>m.path!==SNACK_MODAL_IDENTITY_PATH),product_files:members.length,unchanged_styles:409,unchanged_templates:30,cyph:{read_only:true,files:consumerPaths.map(path=>({path,sha256:hash(readFileSync(join(consumer,path)))})),consumer_build_or_rendering_executed:false},observations:[beforePath,afterPath,constructorPath,packedPath].map(path=>({path,sha256:hash(read(path))})),actual_modal_nodes_or_packed_or_canonical_floor_qualified:false,g11_claim:'not-passed'});
+const frozenPath='compatibility/f10/authored-dependency-dispositions.json',currentPath='compatibility/f10/authored-dependency-current-dispositions.json',frozen=json(frozenPath),current=json(currentPath),rows=[...frozen.symbol_uses,...current.symbol_uses],key=r=>JSON.stringify([r.file,r.module,r.symbol]);
+const failures=[...authoredUseReviewEvidence(frozen,line,read,hash).insufficient_uses,...authoredUseReviewEvidence(current,line,read,hash).insufficient_uses];assert.equal(failures.length,167);
+const changes=new Map([...changed,...diagnostics].map(row=>[row.path,row])),priorContexts=[],reviews=[];
+const evidence=[worksheetPath,'compatibility/rc/snack-modal-identity-packed-admission-worksheet.json',proofPath,beforePath,afterPath,constructorPath,packedPath,'scripts/snack-modal-identity-source.mjs','scripts/snack-modal-identity-requalification.mjs','tests/snack_modal_identity_probe.mjs','tests/snack_modal_identity_subject.mjs','tests/remaining_identity_construction_probe.mjs','scripts/generated-identity-packed-fixture.mjs','scripts/generated-identity-packed-contract.mjs','tests/generated_identity_packed_contract_probe.mjs'].map(path=>({path,sha256:hash(read(path))}));
+for(const failed of failures){const row=rows.find(r=>key(r)===key(failed)),bytes=read(row.source_review.path);assert.equal(hash(bytes),row.source_review.sha256);const prior=JSON.parse(bytes).reviews.find(r=>key(r)===key(row));assert.ok(prior);const path='projects/ngx-material-legacy/'+row.file;assert.equal(prior.candidate_source_sha256,changes.get(path)?.before_sha256??hash(read(path)));
+ const refs=prior.independent_evidence.map(ref=>{const now=hash(read(ref.path));if(now===ref.sha256)return ref;const delta=changes.get(ref.path);assert.ok(delta,'unrelated prior evidence changed '+ref.path);assert.equal(ref.sha256,delta.before_sha256);return {...ref,sha256:now};});
+ priorContexts.push({file:row.file,module:row.module,symbol:row.symbol,prior_source_review:row.source_review,prior_review:prior});
+ reviews.push({...prior,candidate_source_sha256:hash(read(path)),prior_source_review:row.source_review,decision:prior.decision+' Scoped modal identity requalification: the only product edit changes the generated live-element literal from a suffix-only namespace to mat-legacy-snack-bar-container-live- plus the existing counter. Complete source reversal recovers the prior file; all other 1139 product files, every template/style, public types, configuration, constructor and method bodies are unchanged. Actual complete owned and genuine tagged/current constructors and actual expose/clear methods execute through explicit server/document/modal-attribute protocols for both opening orders and either dismissal order. The suffix-only baseline and eight independent reversions expose four current ownership failures; all eight repaired current contexts and four genuine reference contexts retain the exact expected tokens. The field values were already unique: indexOf/replace substring semantics caused the lost or damaged reference. No private helper is imported into product. Existing fifty constructor contexts and thirteen source/four ownership corruptions rerun on current source; the original historical helper preimages remain immutable behind the exact prefix reversal. Five complete diagnostic programs recover their parent bytes through bounded source reversals. The packed contract retains104 cases and rejects1174 synthetic corruptions including both old suffix namespace controls, but actual packed/native/modal overlay/AOT and canonical Node/compiler/RxJS-floor qualification remain pending. Earlier independent runtime observations retain their original identities and scope, and the previous removed-use conclusions stay removed. No new authored-use or upstream SHA closure is claimed.',independent_evidence:[...refs,...evidence]});
+}
+const priorPath='compatibility/rc/snack-modal-identity-prior-source-contexts.json';write(priorPath,{schema_version:1,line,source_parent:worksheet.source_parent,contexts:priorContexts,old_receipts_not_reattributed:true});
+const reviewPath='compatibility/f10/authored-use-reviews/snack-modal-identity-requalified-boundaries.json';write(reviewPath,{schema_version:1,line,status:'reviewed',reviews,prior_contexts:{path:priorPath,sha256:hash(read(priorPath))},g11_claim:'not-passed'});
+for(const review of reviews){const row=rows.find(r=>key(r)===key(review));row.source_review_history=[...(row.source_review_history||[]),{prior_source_review:row.source_review,reason:'One disjoint snack live ID prefix plus exactly reversed diagnostic additions; prior runtime scopes preserved.'}];row.source_review={path:reviewPath,sha256:hash(read(reviewPath))};}
+const snapshot=scanCurrentAuthoredUses({root});assert.equal(snapshot.symbol_uses.length,1951);assert.equal(snapshot.source_files.length,530);
+current.source_snapshot_history=[...(current.source_snapshot_history||[]),{current_source_population_sha256:current.current_source_population_sha256,reason:'One generated snack live-element literal; all import/use routes unchanged.'}];
+for(const row of current.symbol_uses){const fresh=snapshot.symbol_uses.find(r=>key(r)===key(row));assert.ok(fresh);row.candidate_source_sha256=fresh.candidate_source_sha256;row.occurrences=fresh.occurrences;}
+Object.assign(current,{current_source_population_sha256:snapshot.source_population_sha256,current_uses:1951,current_source_files:530});
+const a=authoredUseReviewEvidence(frozen,line,read,hash),b=authoredUseReviewEvidence(current,line,read,hash);assert.equal(a.insufficient+b.insufficient,0);assert.equal(a.reviewed,1444);assert.equal(b.reviewed,167);
+for(const [path,body]of [[frozenPath,frozen],[currentPath,current]])writeFileSync(join(root,path),JSON.stringify(body,null,2)+'\n');
+console.log(JSON.stringify({line,requalified_roles:167,diagnostic_source_negatives:sourceNegatives,product_files:1140,changed_product_files:1,unchanged_styles:409,unchanged_templates:30,invalid_closed:0,new_use_or_SHA_closures:0}));
