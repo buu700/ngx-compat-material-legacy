@@ -32,6 +32,7 @@ import {COMMENT_SCOPE_ROLE,COMMENT_SHAS,commentScopeEvidenceOk} from './upstream
 import {SLIDER_TOKEN_SHA,SLIDER_TOKEN_ROLE,sliderTokenEvidenceOk} from './upstream-slider-token-evidence.mjs';
 import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
+import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
 import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
 import {TEST_IMPORT_ROLE, TEST_IMPORT_SHAS, testImportBatchOk, testImportEntryOk} from './upstream-test-import-cleanup-evidence.mjs';
 
@@ -115,6 +116,7 @@ function sensitiveClass(entry) {
 }
 
 const evidenceCache = new Map();
+const artifactBehaviorResults = new Map();
 const testConsolidationCache = new Map();
 const testImportCache = new Map();
 let buildScopeProductPaths;
@@ -240,6 +242,11 @@ function individualProofOk(entry) {
   if (line && !proof.affected_branches.includes(line)) return false;
   if (typeof proof.decision !== 'string' || proof.decision.trim().length < 40) return false;
   if (proof.proof_kind === 'batch' || proof.proof_kind === 'ancestry' || proof.proof_kind === 'import') return false;
+  if (requiresArtifactBehavior(entry, proof)) {
+    const result = validateArtifactBehavior({root, entry, proof, request});
+    artifactBehaviorResults.set(entry.sha, result);
+    if (!result.ok) return false;
+  }
   if (INHERITED.has(entry.final_disposition)) {
     const installed = proof.installed_member;
     const behavior = proof.reachable_behavior;
@@ -250,6 +257,9 @@ function individualProofOk(entry) {
   }
   return true;
 }
+
+const request = coordinatorRequest();
+if (request && request.error) fail(2, `upstream-audit-disposition: refusing acceptance report: ${request.error}`);
 
 if (!existsSync(seedPath)) fail(2, `Missing seed: ${seedPath}`);
 if (!existsSync(ledgerPath)) fail(1, `Missing disposition ledger: ${ledgerPath}`);
@@ -372,6 +382,7 @@ const report = {
   role: 'upstream audit disposition coverage',
   check_id: 'upstream-audit-disposition',
   evidence_failures: evidenceFailures,
+  artifact_behavior_evidence: [...artifactBehaviorResults].map(([sha, result]) => ({sha, ...result})),
   insufficient_review_sha_ids: {
     sensitive: insufficientSensitive,
     inherited: insufficientInherited,
@@ -439,11 +450,14 @@ function coordinatorRequest() {
   if (!stat.isDirectory() || stat.isSymbolicLink()) return {error: 'assertion output directory is not a real directory'};
   const expectedSuffix = join('evidence', 'upstream-audit-disposition', invocation);
   if (!outputDir.endsWith(expectedSuffix)) return {error: 'assertion directory is not check-owned'};
-  return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line};
+  let packedConsumerExecution;
+  if (process.env.RC_UPSTREAM_PACKED_CONSUMER !== undefined) {
+    try { packedConsumerExecution = JSON.parse(process.env.RC_UPSTREAM_PACKED_CONSUMER); }
+    catch { return {error: 'RC_UPSTREAM_PACKED_CONSUMER is not JSON'}; }
+  }
+  return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line, packedConsumerExecution};
 }
 
-const request = coordinatorRequest();
-if (request && request.error) fail(2, `upstream-audit-disposition: refusing acceptance report: ${request.error}`);
 const dependencyGroups = request ? JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'))
   .checks.find(check => check.check_id === 'dependency-eligibility').acceptance.cases_by_line[request.line] : null;
 const advisory = request ? validateCurrentAdvisories({runDir: request.runDir, binding: request.binding,
@@ -482,6 +496,7 @@ function writeAcceptance(request) {
     line: request.line,
     binding: request.binding,
     current_advisories: advisory,
+    artifact_behavior_evidence: report.artifact_behavior_evidence,
     note: 'Structural row equality is recorded separately from security clearance. Failed cases are the admission gap.',
     cases,
   };
