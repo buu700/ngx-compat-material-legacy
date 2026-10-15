@@ -14,9 +14,7 @@ import {
   AfterContentInit,
   AfterViewInit,
   Attribute,
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
   ContentChildren,
   Directive,
   ElementRef,
@@ -28,7 +26,6 @@ import {
   Optional,
   QueryList,
   ViewChild,
-  ViewEncapsulation,
 } from '@angular/core';
 import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions, ThemePalette} from '@angular/material/core';
 import {
@@ -217,7 +214,7 @@ export class _MatTabLinkBase
   }
 
   /** Unique id for the tab. */
-  @Input() id = `mat-tab-link-${nextUniqueId++}`;
+  @Input() id = `mat-tab-link-${nextUniqueId++}-legacy`;
 
   constructor(
     private _tabNavBar: _MatTabNavBase,
@@ -310,24 +307,7 @@ const _MatTabLinkBaseWithInkBarItem = mixinInkBarItem(_MatTabLinkBase);
  * Provides anchored navigation with animated ink bar.
  */
 
-@Component({
-  standalone: false,
-  selector: 'mat-tab-nav-panel',
-  exportAs: 'matTabNavPanel',
-  template: '<ng-content></ng-content>',
-  host: {
-    '[attr.aria-labelledby]': '_activeTabId',
-    '[attr.id]': 'id',
-    'class': 'mat-mdc-tab-nav-panel',
-    'role': 'tabpanel',
-  },
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class MatTabNavPanel {
-  /** Unique id for the tab panel. */
-  @Input() id = `mat-tab-nav-panel-${nextUniqueId++}`;
-
-  /** Id of the active tab in the nav bar. */
+export interface MatTabNavPanel {
+  id: string;
   _activeTabId?: string;
 }

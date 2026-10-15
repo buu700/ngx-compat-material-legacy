@@ -151,7 +151,7 @@ export class MatLegacyTabLink extends _MatTabLinkBase implements OnDestroy {
 })
 export class MatLegacyTabNavPanel {
   /** Unique id for the tab panel. */
-  @Input() id = `mat-tab-nav-panel-${nextUniqueId++}`;
+  @Input() id = `mat-tab-nav-panel-${nextUniqueId++}-legacy`;
 
   /** Id of the active tab in the nav bar. */
   _activeTabId?: string;

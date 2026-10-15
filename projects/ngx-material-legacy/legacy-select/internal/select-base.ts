@@ -274,7 +274,7 @@ export abstract class _MatSelectBase<C>
   private _compareWith = (o1: any, o2: any) => o1 === o2;
 
   /** Unique id for this input. */
-  private _uid = `mat-select-${nextUniqueId++}`;
+  private _uid = `mat-select-${nextUniqueId++}-legacy`;
 
   /** Current `aria-labelledby` value for the select trigger. */
   private _triggerAriaLabelledBy: string | null = null;
@@ -310,7 +310,7 @@ export abstract class _MatSelectBase<C>
   _onTouched = () => {};
 
   /** ID for the DOM node containing the select's value. */
-  _valueId = `mat-select-value-${nextUniqueId++}`;
+  _valueId = `mat-select-value-${nextUniqueId++}-legacy`;
 
   /** Emits when the panel element is finished transforming in. */
   readonly _panelDoneAnimatingStream = new Subject<string>();

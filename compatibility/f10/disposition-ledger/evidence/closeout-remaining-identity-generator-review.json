@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "pending",
+  "source_parent": "98705c04c233bbadb011194f082696266b750781",
+  "worksheet": {
+    "path": "compatibility/rc/remaining-identity-generator-worksheet.json",
+    "sha256": "b56618e59adcbcf7eac580f0e8ba55c85d920a586c935354a94780f49c6846a9"
+  },
+  "producer_sha256": "e12e005262271d6806095388008978427b59d4af48fbc2afeb845f61543ce1aa",
+  "source_proof": {
+    "path": "compatibility/rc/remaining-identity-source-proof.json",
+    "sha256": "ebc4ac0f79f91dfc68f7f99dde8ca8625cf1dd268c86c314d8da83b88c4b6c26"
+  },
+  "runtime_capsule": {
+    "path": "compatibility/rc/remaining-identity-public-subjects.json",
+    "sha256": "c3600dff7acf9eeb0a0bbd0fd893273e392592fc1bae06110fb792ffe673a8fc"
+  },
+  "peer_sources": [
+    {
+      "line": "main",
+      "path": "@angular/cdk/fesm2022/_id-generator-chunk.mjs",
+      "sha256": "f0892b3412633492aafe4fd3e149495352427aff5a870c8cd07d3b67fe90614b",
+      "bytes": 1151,
+      "actual_source": "import * as i0 from '@angular/core';\nimport { inject, APP_ID, Service } from '@angular/core';\n\nconst counters = new Map();\nclass _IdGenerator {\n  _appId = inject(APP_ID);\n  static _infix = `a${Math.floor(Math.random() * 100000).toString()}`;\n  getId(prefix, randomize = false) {\n    if (this._appId !== 'ng') {\n      prefix += this._appId;\n    }\n    let count = counters.get(prefix);\n    if (count === undefined) {\n      count = 0;\n    } else {\n      count++;\n    }\n    counters.set(prefix, count);\n    return `${prefix}${randomize ? _IdGenerator._infix + '-' : ''}${count}`;\n  }\n  static ɵfac = i0.ɵɵngDeclareFactory({\n    minVersion: \"12.0.0\",\n    version: \"22.1.6\",\n    ngImport: i0,\n    type: _IdGenerator,\n    deps: [],\n    target: i0.ɵɵFactoryTarget.Service\n  });\n  static ɵprov = i0.ɵɵngDeclareService({\n    minVersion: \"22.0.0\",\n    version: \"22.1.6\",\n    ngImport: i0,\n    type: _IdGenerator\n  });\n}\ni0.ɵɵngDeclareClassMetadata({\n  minVersion: \"12.0.0\",\n  version: \"22.1.6\",\n  ngImport: i0,\n  type: _IdGenerator,\n  decorators: [{\n    type: Service\n  }]\n});\n\nexport { _IdGenerator };\n//# sourceMappingURL=_id-generator-chunk.mjs.map\n",
+      "semantics": "Actual main floor uses a module Map keyed by prefix, optional application-ID prefix and optional random infix; getId still ends in an incrementing decimal count."
+    },
+    {
+      "line": "21.x",
+      "path": "@angular/cdk/fesm2022/_id-generator-chunk.mjs",
+      "sha256": "b230dd0785cfb872757bdb9684aebea82deda164912a0b70abf113b48795c1d8",
+      "bytes": 1167,
+      "actual_source": "import * as i0 from '@angular/core';\nimport { inject, APP_ID, Injectable } from '@angular/core';\n\nconst counters = {};\nclass _IdGenerator {\n  _appId = inject(APP_ID);\n  static _infix = `a${Math.floor(Math.random() * 100000).toString()}`;\n  getId(prefix, randomize = false) {\n    if (this._appId !== 'ng') {\n      prefix += this._appId;\n    }\n    if (!counters.hasOwnProperty(prefix)) {\n      counters[prefix] = 0;\n    }\n    return `${prefix}${randomize ? _IdGenerator._infix + '-' : ''}${counters[prefix]++}`;\n  }\n  static ɵfac = i0.ɵɵngDeclareFactory({\n    minVersion: \"12.0.0\",\n    version: \"21.2.11\",\n    ngImport: i0,\n    type: _IdGenerator,\n    deps: [],\n    target: i0.ɵɵFactoryTarget.Injectable\n  });\n  static ɵprov = i0.ɵɵngDeclareInjectable({\n    minVersion: \"12.0.0\",\n    version: \"21.2.11\",\n    ngImport: i0,\n    type: _IdGenerator,\n    providedIn: 'root'\n  });\n}\ni0.ɵɵngDeclareClassMetadata({\n  minVersion: \"12.0.0\",\n  version: \"21.2.11\",\n  ngImport: i0,\n  type: _IdGenerator,\n  decorators: [{\n    type: Injectable,\n    args: [{\n      providedIn: 'root'\n    }]\n  }]\n});\n\nexport { _IdGenerator };\n//# sourceMappingURL=_id-generator-chunk.mjs.map\n",
+      "semantics": "Actual 21.x floor uses a module object keyed by prefix, optional application-ID prefix and optional random infix; getId still ends in an incrementing decimal count."
+    }
+  ],
+  "reviews": [
+    {
+      "sha": "938f478efdc96ef0de1217e806f98939beb027cd",
+      "files": [
+        "src/cdk/a11y/id-generator.ts",
+        "src/cdk/a11y/public-api.ts",
+        "tools/public_api_guard/cdk/a11y.md"
+      ],
+      "analysis": "All three original files were read: a root injectable takes APP_ID, keeps module counters per prefix and omits the default ng application ID; the root public barrel and API guard expose the underscore helper. Current exact main and 21.x implementations are retained separately, including their later optional random infix and differing counter storage. Peer ancestry shows the service exists, but owned historical counters do not invoke it or share its counters. Actual public peer component construction therefore does not inherit uniqueness for the separate owned defaults. The original inherited disposition lacked this caller proof and is reopened. Product code must not import this private underscore surface. A separately owned legacy ID suffix preserves manual construction and the historical global-counter model. Constructor uniqueness evidence is useful but cannot close the broader DOM/ARIA, application and reference contract review.",
+      "line": "21.x",
+      "final_disposition": "needs-individual-review",
+      "status": "pending",
+      "original_patch": {
+        "path": "compatibility/rc/remaining-identity-938f478efdc96ef0de1217e806f98939beb027cd.diff",
+        "sha256": "e756cce5271186044ae2f18746d6685f7bee5a83328605800cea0817b761cb35",
+        "complete_files": [
+          "src/cdk/a11y/id-generator.ts",
+          "src/cdk/a11y/public-api.ts",
+          "tools/public_api_guard/cdk/a11y.md"
+        ],
+        "all_hunks_read": true
+      },
+      "prior_entry": {
+        "sha": "938f478efdc96ef0de1217e806f98939beb027cd",
+        "bucket": "behavior-semantic",
+        "subject": "refactor(cdk/a11y): add ID generator service",
+        "files": [
+          "src/cdk/a11y/id-generator.ts",
+          "src/cdk/a11y/public-api.ts"
+        ],
+        "final_disposition": "needs-individual-review",
+        "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+        "read_note_disposition": "unreviewed-on-21.x",
+        "affected_branches": [
+          "21.x"
+        ],
+        "g11_claim": "not-passed",
+        "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+        "evidence_report": null
+      },
+      "required_remaining_evidence": [
+        "Actual packed DOM/ARIA identities and target resolution in both peer generations and creation orders.",
+        "Review explicit/application-ID semantics and preserve historical constructor/input contracts; no private helper dependency.",
+        "Cross-link resulting packed assertions and branch-native execution before any final closure."
+      ]
+    },
+    {
+      "sha": "ea0aed5a0cba3288d89e7448073e0a5556487313",
+      "files": [
+        "src/material/menu/menu.ts"
+      ],
+      "analysis": "The complete original menu hunk removes menuPanelUid, adds the underscore ID-generator import and changes panelId initialization to injected getId(mat-menu-panel-). No template, method or style changes occur in this patch. Owned menu retains its historical counter and constructor contract, while the actual current peer uses a separate service counter. Real constructor contexts reproduce a duplicate panel ID before the suffix repair in both creation orders at both floors. Counter retention therefore demonstrates the applicability risk rather than making the upstream change irrelevant. The legacy suffix separates the generated defaults while preserving the historical API and every template/style byte. Packed menu trigger aria-controls/expanded state and panel resolution, overlay lifecycle and explicit identities remain required; the old not-applicable decision is reopened rather than replaced by a constructor-only pass.",
+      "line": "21.x",
+      "final_disposition": "needs-individual-review",
+      "status": "pending",
+      "original_patch": {
+        "path": "compatibility/rc/remaining-identity-ea0aed5a0cba3288d89e7448073e0a5556487313.diff",
+        "sha256": "61e21a3d1846f725b6a048fe434d74e0bd173a6fc3e90bca79091c349a39c7ec",
+        "complete_files": [
+          "src/material/menu/menu.ts"
+        ],
+        "all_hunks_read": true
+      },
+      "prior_entry": {
+        "sha": "ea0aed5a0cba3288d89e7448073e0a5556487313",
+        "bucket": "behavior-semantic",
+        "subject": "refactor(material/menu): use ID generator",
+        "files": [
+          "src/material/menu/menu.ts"
+        ],
+        "final_disposition": "needs-individual-review",
+        "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+        "read_note_disposition": "unreviewed-on-21.x",
+        "affected_branches": [
+          "21.x"
+        ],
+        "g11_claim": "not-passed",
+        "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+        "evidence_report": null
+      },
+      "required_remaining_evidence": [
+        "Actual packed DOM/ARIA identities and target resolution in both peer generations and creation orders.",
+        "Review explicit/application-ID semantics and preserve historical constructor/input contracts; no private helper dependency.",
+        "Cross-link resulting packed assertions and branch-native execution before any final closure."
+      ]
+    },
+    {
+      "sha": "69968510fb0222ee565f57171640a99768efa972",
+      "files": [
+        "src/material/snack-bar/snack-bar-container.ts"
+      ],
+      "analysis": "The complete original snack-bar hunk removes uniqueId, adds the underscore ID-generator import and changes the live-element ID initialization to injected getId(mat-snack-bar-container-live-). This is the target referenced by the snack-bar live/description contract, not an irrelevant internal number. Owned historical and genuine current constructors use separate counters; both orders at both floors reproduce the same default live-element ID before repair. The suffix isolates that target while leaving all templates/styles and explicit content/config inputs unchanged. The old local-counter not-applicable reason is contradicted by actual construction and is reopened. Real packed aria-describedby resolution, announcement/lifecycle behavior and DOM uniqueness still need execution; constructor-only results are not an accessibility or runtime completion claim.",
+      "line": "21.x",
+      "final_disposition": "needs-individual-review",
+      "status": "pending",
+      "original_patch": {
+        "path": "compatibility/rc/remaining-identity-69968510fb0222ee565f57171640a99768efa972.diff",
+        "sha256": "3809a4c8be10fbe0e99531fda686e37f32dc153640055c86b612be0668849dbe",
+        "complete_files": [
+          "src/material/snack-bar/snack-bar-container.ts"
+        ],
+        "all_hunks_read": true
+      },
+      "prior_entry": {
+        "sha": "69968510fb0222ee565f57171640a99768efa972",
+        "bucket": "behavior-semantic",
+        "subject": "refactor(material/snack-bar): use ID generator",
+        "files": [
+          "src/material/snack-bar/snack-bar-container.ts"
+        ],
+        "final_disposition": "needs-individual-review",
+        "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+        "read_note_disposition": "unreviewed-on-21.x",
+        "affected_branches": [
+          "21.x"
+        ],
+        "g11_claim": "not-passed",
+        "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+        "evidence_report": null
+      },
+      "required_remaining_evidence": [
+        "Actual packed DOM/ARIA identities and target resolution in both peer generations and creation orders.",
+        "Review explicit/application-ID semantics and preserve historical constructor/input contracts; no private helper dependency.",
+        "Cross-link resulting packed assertions and branch-native execution before any final closure."
+      ]
+    }
+  ],
+  "native_or_packed_executed": false,
+  "new_SHA_closures": 0,
+  "g11_claim": "not-passed"
+}
