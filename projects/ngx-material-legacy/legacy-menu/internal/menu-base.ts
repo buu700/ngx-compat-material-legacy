@@ -258,7 +258,7 @@ export class _MatMenuBase
    */
   @Output() readonly close: EventEmitter<MenuCloseReason> = this.closed;
 
-  readonly panelId = `mat-menu-panel-${menuPanelUid++}`;
+  readonly panelId = `mat-menu-panel-${menuPanelUid++}-legacy`;
 
   constructor(
     elementRef: ElementRef<HTMLElement>,

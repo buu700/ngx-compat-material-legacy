@@ -72,7 +72,7 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
   _role?: 'status' | 'alert';
 
   /** Unique ID of the aria-live element. */
-  readonly _liveElementId = `mat-snack-bar-container-live-${uniqueId++}`;
+  readonly _liveElementId = `mat-snack-bar-container-live-${uniqueId++}-legacy`;
 
   constructor(
     private _ngZone: NgZone,

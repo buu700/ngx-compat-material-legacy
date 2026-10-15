@@ -224,7 +224,7 @@ export abstract class _MatAutocompleteBase
   _classList: {[key: string]: boolean} = {};
 
   /** Unique ID to be used by autocomplete trigger's "aria-owns" property. */
-  id: string = `mat-autocomplete-${_uniqueAutocompleteIdCounter++}`;
+  id: string = `mat-autocomplete-${_uniqueAutocompleteIdCounter++}-legacy`;
 
   /**
    * Tells any descendant `mat-optgroup` to use the inert a11y pattern.

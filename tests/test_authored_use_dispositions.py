@@ -1,3 +1,8 @@
+# @license
+# Copyright Google LLC All Rights Reserved.
+# Copyright (c) 2026 Ryan Lester.
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
 """Actual partial source decisions cannot shrink scope or pass all-use admission."""
 import hashlib
 import json
@@ -20,7 +25,9 @@ const sha=b=>createHash('sha256').update(b).digest('hex');
 const seed=JSON.parse(readFileSync('compatibility/f10/authored-dependency-inventory-seed.json'));
 const all=JSON.parse(readFileSync('compatibility/f10/authored-dependency-dispositions.json'));
 const reviewPath='compatibility/f10/authored-use-reviews/menu-panel-owned-type-and-unused-token.json';
-const candidate={...all,symbol_uses:all.symbol_uses.map(row=>row.source_review?.path===reviewPath?row:
+const belongs=row=>row.source_review?.path===reviewPath ||
+ (row.source_review_history || []).some(previous=>previous.prior_source_review?.path===reviewPath);
+const candidate={...all,symbol_uses:all.symbol_uses.map(row=>belongs(row)?row:
  {...row,status:'pending',disposition:'open',source_review:undefined})};
 const read=p=>readFileSync(p),good=authoredUseReviewEvidence(candidate,candidate.line,read,sha);
 assert.equal(seed.symbol_uses.length,1736);
