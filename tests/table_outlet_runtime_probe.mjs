@@ -29,9 +29,14 @@ const base='projects/ngx-material-legacy/legacy-table/';
 const tablePath=base+'table.ts',helperPath=base+'internal/table-outlet.ts',ownerPath=base+'internal/definition-owner.ts';
 const tableSource=readFileSync(resolve(root,tablePath),'utf8'),helperSource=readFileSync(resolve(root,helperPath),'utf8'),ownerSource=readFileSync(resolve(root,ownerPath),'utf8');
 const data=text=>'data:text/javascript;base64,'+Buffer.from(text).toString('base64');
+const constructionContextSource=readFileSync(resolve(root,'projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts'),'utf8');
+const constructionContextCode=ts.transpileModule(constructionContextSource,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,experimentalDecorators:true}}).outputText
+ .replace(/(['"])(@angular\/[^'"]+)\1/g,(_,q,spec)=>JSON.stringify(url(spec)));
+const constructionContextUrl='data:text/javascript;base64,'+Buffer.from(constructionContextCode).toString('base64');
 const emit=text=>ts.transpileModule(text,{compilerOptions:{target:ts.ScriptTarget.ES2022,
   module:ts.ModuleKind.ESNext,experimentalDecorators:true}}).outputText
-  .replace(/(['"])(@angular\/[^'"]+)\1/g,(_,q,name)=>JSON.stringify(url(name)));
+  .replace(/(['"])(@angular\/[^'"]+)\1/g,(_,q,name)=>JSON.stringify(url(name)))
+ .replaceAll("'./internal/table-construction-context'", JSON.stringify(constructionContextUrl));
 const tableUrl=data(emit(tableSource)),{MatLegacyTable}=await import(tableUrl);
 async function load(source=helperSource,definition=ownerSource){return {...await import(data(emit(source))),...await import(data(emit(definition).replaceAll("'../table'",JSON.stringify(tableUrl))))};}
 const provenance=JSON.parse(readFileSync(resolve(root,'reference/material-16.2.14/table-outlet-sources/provenance.json'),'utf8'));

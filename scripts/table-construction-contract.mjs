@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 export const TABLE_SYMBOL='legacy-table/primary/MatLegacyTable';
 export const TABLE_CONTRACT_PATH='compatibility/rc/api/table-construction-contract.json';
-const contractSha='01cc3b65e1e92014752a7f19c80c37c2c21d82e18e096bc17aa0d5a91bbe113b';
+const contractSha='c91717603b892cfce602683c13edb75f701116b36014b9f6ed6bb31e472bcdbc';
 const line='21.x';
 const sha=b=>createHash('sha256').update(b).digest('hex');
 /** Exact delegated table decision; original manual constructor/factory remain normative evidence. */
@@ -64,9 +64,12 @@ export function tableConstructionObservationComplete(observation,contract,row){
     &&p.parent_outcome==='returned'&&p.owned_outcome==='returned'
     &&p.token_objects_equal===true&&p.options_equal===true&&p.trace_kinds_equal===true
     &&Number.isInteger(p.trace_count)&&Number.isInteger(p.parent_root_request_count)
-    &&p.parent_root_request_count>=3&&p.owned_root_request_count===p.parent_root_request_count
-    &&p.node_request_count===contract.runtime_requests.length&&p.attribute_request_count===1
-    &&p.trace_count===p.node_request_count+p.parent_root_request_count+p.attribute_request_count
+    &&p.parent_root_request_count>=4&&p.owned_root_request_count===p.parent_root_request_count-1
+    &&p.node_request_count===contract.runtime_requests.length&&p.parent_node_request_count===p.node_request_count-1&&p.attribute_request_count===1
+    &&p.construction_context_verified===true&&p.remaining_trace_count===p.trace_count-1
+    &&p.remaining_trace_count===p.owned_trace_count-1
+    &&p.trace_count===p.parent_node_request_count+p.parent_root_request_count+p.attribute_request_count
+    &&p.owned_trace_count===p.node_request_count+p.owned_root_request_count+p.attribute_request_count
     &&p.role_behavior===true&&p.root_services_resolved===true)
   &&Array.isArray(observation.root_requests)&&observation.root_requests.length===observation.parent_comparison[0].owned_root_request_count
   &&observation.root_requests.some(r=>r&&r.optional===false)

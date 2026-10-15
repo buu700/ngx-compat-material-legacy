@@ -1,7 +1,8 @@
 import {DataSource} from '@angular/cdk/collections';
+import {CDK_VIRTUAL_SCROLL_VIEWPORT, CdkVirtualScrollViewport, ScrollingModule} from '@angular/cdk/scrolling';
 import {CdkColumnDef, CdkFooterRowDef, CdkHeaderRowDef, CdkRowDef, CdkTable, CdkTableModule} from '@angular/cdk/table';
 import {By} from '@angular/platform-browser';
-import {Component, OnInit, ViewChild, AfterViewInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Directive, inject, OnInit, ViewChild, AfterViewInit} from '@angular/core';
 import {
   waitForAsync,
   ComponentFixture,
@@ -1227,3 +1228,79 @@ class RawNestedCurrentTableApp {}
   </table>
 `})
 class MixedLegacyColumnCellsApp {}
+
+
+// The viewport belongs to the consumer. Legacy tables must neither attach as
+// virtual repeaters nor hide it from embedded cell templates.
+@Directive({selector: '[legacyViewportReader]', standalone: false})
+class LegacyViewportReader {
+  readonly viewport = inject(CDK_VIRTUAL_SCROLL_VIEWPORT);
+}
+
+@Component({
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
+  template: `
+    <cdk-virtual-scroll-viewport itemSize="20" style="height: 100px; width: 200px">
+      <mat-table [dataSource]="rows" [fixedLayout]="fixedLayout">
+        <ng-container matColumnDef="value">
+          <mat-header-cell *matHeaderCellDef>Value</mat-header-cell>
+          <mat-cell *matCellDef="let value" legacyViewportReader>{{value}}</mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: columns"></mat-row>
+      </mat-table>
+      <table mat-table [dataSource]="rows" [fixedLayout]="fixedLayout">
+        <ng-container matColumnDef="value">
+          <th mat-header-cell *matHeaderCellDef>Value</th>
+          <td mat-cell *matCellDef="let value" legacyViewportReader>{{value}}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+    </cdk-virtual-scroll-viewport>
+  `,
+})
+class LegacyTablesWithinViewport {
+  rows = Array.from({length: 20}, (_, index) => index);
+  columns = ['value'];
+  fixedLayout = false;
+}
+
+describe('legacy tables within a consumer viewport', () => {
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [MatLegacyTableModule, ScrollingModule],
+      declarations: [LegacyTablesWithinViewport, LegacyViewportReader],
+    }).compileComponents();
+  }));
+
+  it('renders all flex and native rows, preserves layout inputs and cell injection', () => {
+    const fixture = TestBed.createComponent(LegacyTablesWithinViewport);
+    const host = fixture.componentInstance;
+    for (const [count, fixedLayout] of [[20, false], [30, true], [0, false], [5, false]] as const) {
+      host.rows = Array.from({length: count}, (_, index) => index);
+      host.fixedLayout = fixedLayout;
+      fixture.detectChanges();
+      const viewport = fixture.debugElement.query(By.directive(CdkVirtualScrollViewport))
+        .injector.get(CdkVirtualScrollViewport);
+      const tables = fixture.debugElement.queryAll(By.directive(MatLegacyTable));
+      expect(tables.length).toBe(2);
+      for (const node of tables) {
+        const table = node.injector.get(MatLegacyTable);
+        expect(table instanceof CdkTable).toBeTrue();
+        expect(node.injector.get(CdkTable)).toBe(table);
+        expect(table.fixedLayout).toBe(fixedLayout);
+        expect(node.nativeElement.classList.contains('mat-table-fixed-layout')).toBe(fixedLayout);
+        expect(Array.from<HTMLElement>(node.nativeElement.querySelectorAll('.mat-cell'))
+          .map(cell => cell.textContent!.trim())).toEqual(host.rows.map(String));
+      }
+      const readers = fixture.debugElement.queryAll(By.directive(LegacyViewportReader));
+      expect(readers.length).toBe(count * 2);
+      for (const reader of readers) {
+        expect(reader.injector.get(LegacyViewportReader).viewport).toBe(viewport);
+      }
+    }
+    fixture.destroy();
+  });
+});
