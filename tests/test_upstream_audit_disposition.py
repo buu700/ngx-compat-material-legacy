@@ -713,6 +713,24 @@ for(const proof of proofs)assert.equal(candidateSourceEvidenceOk(proof,p=>readFi
                     self.assertRegex(member['program_tokens_sha256'], r'^[0-9a-f]{64}$')
                 self.assertEqual(report['g11_claim'], 'not-passed')
                 continue
+            if sha in {'b777c2df0052232cc304e20c46b0d0572d1f9894', 'ba5cf3d06ebfbb2bf945378cf0f786e68abeab6a'}:
+                self.assertEqual(report['role'], 'C04 two individual upstream build-only scope reviews')
+                self.assertEqual(report['g11_claim'], 'not-passed')
+                self.assertEqual(len(report['reviews']), 2)
+                source = report['source_analysis']
+                self.assertEqual([len(r['paths']) for r in source['reviews']], [37, 157])
+                self.assertEqual([r['hunks'] for r in source['reviews']], [74, 332])
+                self.assertEqual(source['starlark']['parsed_member_versions'], 376)
+                self.assertEqual(sum(r['count'] for r in source['annotations']), 5)
+                self.assertFalse(source['upstream_code_or_tests_executed'])
+                self.assertEqual(entry['individual_proof']['proof_kind'], 'complete-upstream-build-only-source-exclusion')
+                self.assertEqual(entry['individual_proof']['diff_sha256'], review['diff_sha256'])
+                self.assertEqual(hashlib.sha256(review['diff'].encode()).hexdigest(), review['diff_sha256'])
+                self.assertEqual(entry['files'], review['paths'])
+                self.assertEqual(entry['prior_dispositions'][-1], review['prior_entry'])
+                self.assertTrue(report['candidate_context']['library_builder'].startswith('pnpm exec ng-packagr '))
+                self.assertEqual(report['candidate_context']['bazel_product_members'], [])
+                continue
             self.assertFalse(review["runtime_change_in_patch"])
             self.assertTrue(all(line.startswith(("*", "//", "/**")) for line in review["changed_lines"]))
         statuses = {"all-added-lines-present-and-executed", "some-added-lines-executed", "present-not-executed",
