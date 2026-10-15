@@ -1,0 +1,61 @@
+diff --git a/src/material/select/select.html b/src/material/select/select.html
+index 8043ec305..44d4f11e4 100644
+--- a/src/material/select/select.html
++++ b/src/material/select/select.html
+@@ -1,6 +1,6 @@
+ <div cdk-overlay-origin
+      class="mat-mdc-select-trigger"
+-     (click)="toggle()"
++     (click)="open()"
+      #fallbackOverlayOrigin="cdkOverlayOrigin"
+      #trigger>
+ 
+diff --git a/src/material/select/select.ts b/src/material/select/select.ts
+index 21a3a9606..7d596b262 100644
+--- a/src/material/select/select.ts
++++ b/src/material/select/select.ts
+@@ -726,6 +726,10 @@ export class MatSelect
+ 
+   /** Opens the overlay panel. */
+   open(): void {
++    if (!this._canOpen()) {
++      return;
++    }
++
+     // It's important that we read this as late as possible, because doing so earlier will
+     // return a different element since it's based on queries in the form field which may
+     // not have run yet. Also this needs to be assigned before we measure the overlay width.
+@@ -734,15 +738,12 @@ export class MatSelect
+     }
+ 
+     this._overlayWidth = this._getOverlayWidth(this._preferredOverlayOrigin);
++    this._applyModalPanelOwnership();
++    this._panelOpen = true;
++    this._keyManager.withHorizontalOrientation(null);
++    this._highlightCorrectOption();
++    this._changeDetectorRef.markForCheck();
+ 
+-    if (this._canOpen()) {
+-      this._applyModalPanelOwnership();
+-
+-      this._panelOpen = true;
+-      this._keyManager.withHorizontalOrientation(null);
+-      this._highlightCorrectOption();
+-      this._changeDetectorRef.markForCheck();
+-    }
+     // Required for the MDC form field to pick up when the overlay has been opened.
+     this.stateChanges.next();
+   }
+@@ -819,10 +820,9 @@ export class MatSelect
+       this._keyManager.withHorizontalOrientation(this._isRtl() ? 'rtl' : 'ltr');
+       this._changeDetectorRef.markForCheck();
+       this._onTouched();
++      // Required for the MDC form field to pick up when the overlay has been closed.
++      this.stateChanges.next();
+     }
+-
+-    // Required for the MDC form field to pick up when the overlay has been closed.
+-    this.stateChanges.next();
+   }
+ 
+   /**

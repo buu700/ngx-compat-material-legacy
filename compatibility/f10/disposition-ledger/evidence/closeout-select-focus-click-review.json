@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "pending",
+  "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+  "source_parent": "ebd8e750c0905181074efe26330a79d59ae1405d",
+  "diff_sha256": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+  "patch_file": "compatibility/rc/select-focus-click-original.patch",
+  "complete_original_files": [
+    "src/material/select/select.html",
+    "src/material/select/select.ts"
+  ],
+  "original_patch_has_test_hunk": false,
+  "analysis": [
+    "Template switches trigger click from toggle to open to avoid closing/reopening a select opened earlier in a focus handler.",
+    "open moves its _canOpen guard before measurement and modal ownership work; earlier valid-open operations stay in the same order.",
+    "close keeps stateChanges notification inside the actual-open branch; MDC form-field notification details belong to the current companion implementation, not a requirement to add modern host state changes to the historical control.",
+    "Owned open has an earlier lifetime/_canOpen guard and delegates public derived geometry only for a newly opened panel. Its explicit public toggle method remains intact; onContainerClick focuses then calls open. Focus-trigger click should be idempotent without requiring consumer HTML/CSS/SCSS changes. Actual artifact observations remain pending."
+  ],
+  "prior_entry": {
+    "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): flicker if opened from inside a focus handler (#28287)",
+    "files": [
+      "src/material/select/select.html",
+      "src/material/select/select.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "required_packed_case": "packed-consumer/harness/legacy-select",
+  "required_observation": "Structured native focus then trigger click in bare/form-field legacy/current scopes, no close/detach/touch/reopen transition, genuine backdrop closure, disabled/empty open guards, public toggle and teardown. Original three select harness conditions remain required.",
+  "candidate_sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.html",
+      "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+      "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+      "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+    }
+  ],
+  "actual_packed_or_native_executed": false,
+  "semantic_pass": false,
+  "g11_claim": "not-passed"
+}

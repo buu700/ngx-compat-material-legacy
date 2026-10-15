@@ -17,10 +17,13 @@ import {fileURLToPath} from 'node:url';
 import {GENERATED_IDENTITY_CASE_ID, GENERATED_IDENTITY_ROLE_COUNTS, packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-contract.mjs';
 import {packedSelectDetachCase} from '../scripts/select-detach-packed-contract.mjs';
 import {packedMenuItemTokenCase} from '../scripts/menu-item-token-packed-contract.mjs';
+import {packedSelectFocusClickCase} from '../scripts/select-focus-click-packed-contract.mjs';
 import {generatedIdentityPackedFixture} from '../scripts/generated-identity-packed-fixture.mjs';
 import {GENERATED_IDENTITY_PACKED_PREIMAGES, GENERATED_IDENTITY_PACKED_EDITS, reverseGeneratedIdentityPackedSource as reverseOldGeneratedIdentityPackedSource} from '../scripts/generated-identity-packed-source-requalification.mjs';
 import {reverseSelectDetachPackedSource as reverseOldSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
-import {reverseMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
+import {reverseMenuItemTokenPackedSource as reverseOldMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
+import {reverseSelectFocusClickPackedSource} from '../scripts/select-focus-click-packed-source-requalification.mjs';
+const reverseMenuItemTokenPackedSource=(path,raw,line)=>reverseOldMenuItemTokenPackedSource(path,reverseSelectFocusClickPackedSource(path,raw,line),line);
 const reverseSelectDetachPackedSource=(path,raw,line)=>reverseOldSelectDetachPackedSource(path,reverseMenuItemTokenPackedSource(path,raw,line),line);
 const reverseGeneratedIdentityPackedSource=(path,raw,line)=>reverseOldGeneratedIdentityPackedSource(path,reverseSelectDetachPackedSource(path,raw,line),line);
 import {packedRadioIdentityCase} from '../scripts/radio-identity-packed-contract.mjs';
@@ -78,8 +81,8 @@ const producerPath = 'scripts/packed-consumer-aot-smoke.mjs', raw = read(produce
 const sf = ts.createSourceFile(producerPath, raw, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 assert.equal(sf.parseDiagnostics.length,0);
 const source = sf.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases').getText(sf);
-const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase',text+';return collectAcceptanceCases;')(
-  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase);
+const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase',text+';return collectAcceptanceCases;')(
+  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase);
 const keys = loadExportKeys(), expected = allConsumerCaseIds(keys);
 assert.equal(expected.length,106); assert.equal(new Set(expected).size,106);
 const observe = (value, fn=load(source)) => {
