@@ -14,6 +14,7 @@ import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {reverseTableOnPushPackedSource, TABLE_ONPUSH_SOURCE_PREIMAGES} from '../scripts/table-onpush-packed-source-requalification.mjs';
 import {reverseRadioIdentityPackedSource} from '../scripts/radio-identity-packed-source-requalification.mjs';
+import {reverseGeneratedIdentityPackedSource} from '../scripts/generated-identity-packed-source-requalification.mjs';
 
 const ts = createRequire(import.meta.url)('typescript');
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -68,7 +69,7 @@ function audit(overrides = new Map()) {
       // Scan actual current callers above; only the authenticated test addition is
       // reversed for the older environment-only whole-program equality below.
       const restoreSf = path === 'scripts/packed-consumer-aot-smoke.mjs'
-        ? parse(path, reverseTableOnPushPackedSource(path, reverseRadioIdentityPackedSource(path, source, line), line)) : sf;
+        ? parse(path, reverseTableOnPushPackedSource(path, reverseRadioIdentityPackedSource(path, reverseGeneratedIdentityPackedSource(path, source, line), line), line)) : sf;
       const restorePrint = node => printer.printNode(ts.EmitHint.Unspecified, node, restoreSf);
       const transform = ts.transform(restoreSf, [context => {
         const visitor = node => {
