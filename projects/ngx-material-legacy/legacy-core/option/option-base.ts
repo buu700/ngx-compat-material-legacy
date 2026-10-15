@@ -69,7 +69,7 @@ export class _MatOptionBase<T = any> implements FocusableOption, AfterViewChecke
   @Input() value: T;
 
   /** The unique ID of the option. */
-  @Input() id: string = `mat-option-${_uniqueIdCounter++}`;
+  @Input() id: string = `mat-option-${_uniqueIdCounter++}-legacy`;
 
   /** Whether the option is disabled. */
   @Input()
