@@ -21,9 +21,20 @@ const names = ['OnInit', 'OnDestroy', 'OnChanges', 'DoCheck', 'AfterContentInit'
   'AfterContentChecked', 'AfterViewInit', 'AfterViewChecked', 'SimpleChanges'];
 const selected = new Set(names);
 const dependencies = [...names, 'SimpleChange'];
+export const ADDITIONAL_LIFECYCLE_USES = Object.freeze([
+  {file: 'legacy-core/internal/legacy-viewport.ts', module: '@angular/core', symbol: 'OnDestroy', owner_class: '_LegacyViewport'},
+  {file: 'legacy-dialog/internal/dialog-container-base.ts', module: '@angular/core', symbol: 'OnDestroy', owner_class: '_MatDialogContainerBase'},
+  {file: 'legacy-table/internal/table-outlet.ts', module: '@angular/core', symbol: 'OnInit', owner_class: '_LegacyTableOutlet'},
+].map(Object.freeze));
+
+/** Only the finite supplementary implements bindings; never DI/body clearance. */
+export function reviewAdditionalFrameworkLifecycleTypes(options = {}) {
+  return reviewFrameworkLifecycleTypes({...options, additionalUseMode: true});
+}
 
 /** Type-only public-framework uses; hook execution/body behavior is separate. */
-export function reviewFrameworkLifecycleTypes({root = defaultRoot, readSource, subjectData} = {}) {
+export function reviewFrameworkLifecycleTypes({root = defaultRoot, readSource, subjectData, additionalUseMode = false} = {}) {
+  assert.equal(typeof additionalUseMode, 'boolean');
   const ts = createRequire(import.meta.url)('typescript');
   const read = path => readSource ? readSource(path) : readFileSync(resolve(root, path), 'utf8');
   const seedBytes = readFileSync(resolve(root, seedPath)); assert.equal(sha(seedBytes), seedSha);
@@ -99,7 +110,8 @@ export function reviewFrameworkLifecycleTypes({root = defaultRoot, readSource, s
   assert.equal(diagnostics.length, 0, 'unparameterized public type equivalence failed: ' +
     ts.formatDiagnostics(diagnostics, {getCanonicalFileName: p => p, getCurrentDirectory: () => root, getNewLine: () => '\n'}));
 
-  const uses = JSON.parse(seedBytes).symbol_uses.filter(row => row.module === '@angular/core' && selected.has(row.symbol));
+  const uses = additionalUseMode ? ADDITIONAL_LIFECYCLE_USES :
+    JSON.parse(seedBytes).symbol_uses.filter(row => row.module === '@angular/core' && selected.has(row.symbol));
   const files = new Map(), cases = [];
   const emit = text => ts.transpileModule(text, {compilerOptions: {
     target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext,
@@ -149,18 +161,34 @@ export function reviewFrameworkLifecycleTypes({root = defaultRoot, readSource, s
           && ts.isHeritageClause(parent.parent) && (parent.parent.token === ts.SyntaxKind.ImplementsKeyword
             || ts.isInterfaceDeclaration(parent.parent.parent));
         assert.ok(type || heritage, 'runtime/unsupported lifecycle type reference: ' + use.file);
+        if (additionalUseMode) {
+          assert.ok(heritage && parent.parent.token === ts.SyntaxKind.ImplementsKeyword
+            && ts.isClassDeclaration(parent.parent.parent)
+            && parent.parent.parent.name?.text === use.owner_class,
+          'additional lifecycle import is not its exact class implements boundary');
+        }
         assert.equal(parent.typeArguments?.length || 0, 0, 'modern generic type usage needs a separate contract');
         referenceLines.push(file.getLineAndCharacterOfPosition(node.getStart(file)).line + 1);
       }
       ts.forEachChild(node, visit);
     }
     visit(file);
+    if (additionalUseMode) {
+      assert.equal(referenceLines.length, 1, 'additional lifecycle reference count changed');
+      const owner = file.statements.find(node => ts.isClassDeclaration(node) && node.name?.text === use.owner_class);
+      const hooks = owner.members.filter(node => ts.isMethodDeclaration(node)
+        && node.name?.getText(file) === (use.symbol === 'OnInit' ? 'ngOnInit' : 'ngOnDestroy'));
+      assert.equal(hooks.length, 1, 'missing owned lifecycle method');
+      assert.ok(hooks[0].parameters.length === 0 && hooks[0].type?.kind === ts.SyntaxKind.VoidKeyword,
+        'owned lifecycle signature is not the original zero-argument void boundary');
+    }
     cases.push({...use, candidate_source_sha256: cap.sha256,
       import_line: file.getLineAndCharacterOfPosition(binding.getStart(file)).line + 1,
       local_name: binding.name.text, reference_lines: referenceLines,
       minimum_public_declaration: models.find(m => m.subject.line === line).subject.path});
   }
   return {schema_version: 1, line, role: 'Exact public lifecycle type/default and type-only use review;not hook execution qualification',
+    population: additionalUseMode ? 'three-finite-additional-implements-bindings' : 'original-frozen-lifecycle-uses',
     node: process.version, compiler: ts.version, models: models.map(m => ({...m.subject,
       declarations: Object.fromEntries([...m.declarations].map(([name, node]) => [name, node.getText(m.file)]))})),
     strict_default_assignments: (models.length - 1) * dependencies.length * 2,
