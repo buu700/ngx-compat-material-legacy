@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 1683,
-  "open_or_deferred": 14,
+  "closed_dispositions": 1680,
+  "open_or_deferred": 17,
   "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
   "batch_id": "unread-seed-content-review-2026-10-02",
   "entries": [
@@ -6217,17 +6217,49 @@
       "sha": "41766330b6993628dc511bf8595b8d58dd495c22",
       "bucket": "behavior-semantic",
       "subject": "fix(material/slider): error if slider is destroyed before first change detection (#28494)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch skips removing pointer listeners when the MDC slider thumb is destroyed before the input element exists. The package has no slider thumb class. The owned slider removes its listeners from the document and the host element. The guard was not added.",
+      "final_disposition": "not-applicable",
+      "reason": "The complete original two-path/three-hunk patch changes only modern MatSliderVisualThumb and its modern StandardSlider regression. The old main entry omitted slider.spec.ts; that incomplete file account and both prior decisions are preserved. The modern visual thumb assigns an HTMLInputElement during view initialization; its original complete destructor throws before that assignment, while the patched complete method safely skips six removals and still removes real EventTarget listeners when initialized. The independently owned historical slider has no visual-thumb component or input directive. Every current product source is checked for those classes and public runtime routes; the exact13 current companion roster excludes slider. Its original HTML and eight complete constructor/view/destroy/pointer/focus methods remain identical, and the additional whole global-cleanup method also matches the tagged source. Complete original/owned destructor and global-cleanup methods remove host/document/window listeners and clear pointer/monitor/subscription protocols in both exercised receiver states. Those are method replays with explicit receiver protocols, not actual constructors, Angular views, browser or peer-floor evidence. Conclude this particular modern visual-thumb fix is not applicable to the add-on; do not transplant a modern component or claim an inherited fix. Historical ordinary slider Sass remains required and is not exempted by this runtime source exclusion. All product resources, consumer HTML/CSS/SCSS and other1696 SHA decisions remain unchanged; full G11, native/artifact and independent audit remain open.",
       "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-slider-thumb-destroy-review.json",
       "files": [
-        "src/material/slider/slider-thumb.ts"
+        "src/material/slider/slider-thumb.ts",
+        "src/material/slider/slider.spec.ts"
       ],
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+      "batch_id": "closeout-individual-slider-thumb-destroy",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "affected_branches": [
+        "main"
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "retained-legacy-slider-visual-thumb-exclusion",
+        "diff_sha256": "4947c3df7e1412dc60a015a4fa89b16c47256f2b717397590a73ac97988ddaa7",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete original two-path/three-hunk patch changes only modern MatSliderVisualThumb and its modern StandardSlider regression. The old main entry omitted slider.spec.ts; that incomplete file account and both prior decisions are preserved. The modern visual thumb assigns an HTMLInputElement during view initialization; its original complete destructor throws before that assignment, while the patched complete method safely skips six removals and still removes real EventTarget listeners when initialized. The independently owned historical slider has no visual-thumb component or input directive. Every current product source is checked for those classes and public runtime routes; the exact13 current companion roster excludes slider. Its original HTML and eight complete constructor/view/destroy/pointer/focus methods remain identical, and the additional whole global-cleanup method also matches the tagged source. Complete original/owned destructor and global-cleanup methods remove host/document/window listeners and clear pointer/monitor/subscription protocols in both exercised receiver states. Those are method replays with explicit receiver protocols, not actual constructors, Angular views, browser or peer-floor evidence. Conclude this particular modern visual-thumb fix is not applicable to the add-on; do not transplant a modern component or claim an inherited fix. Historical ordinary slider Sass remains required and is not exempted by this runtime source exclusion. All product resources, consumer HTML/CSS/SCSS and other1696 SHA decisions remain unchanged; full G11, native/artifact and independent audit remain open."
+      },
+      "prior_dispositions": [
+        {
+          "sha": "41766330b6993628dc511bf8595b8d58dd495c22",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/slider): error if slider is destroyed before first change detection (#28494)",
+          "final_disposition": "irrelevant",
+          "reason": "The patch skips removing pointer listeners when the MDC slider thumb is destroyed before the input element exists. The package has no slider thumb class. The owned slider removes its listeners from the document and the host element. The guard was not added.",
+          "read_note_disposition": "not-owned",
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "files": [
+            "src/material/slider/slider-thumb.ts"
+          ],
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        }
+      ]
     },
     {
       "sha": "f1e82da40e9a05edd4af8c65a18ab56c92783a8a",

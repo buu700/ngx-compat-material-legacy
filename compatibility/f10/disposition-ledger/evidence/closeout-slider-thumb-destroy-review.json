@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "sha": "41766330b6993628dc511bf8595b8d58dd495c22",
+  "line": "main",
+  "role": "C04 individual modern visual-thumb early-destruction applicability",
+  "status": "reviewed",
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "not-applicable",
+  "diff": "diff --git a/src/material/slider/slider-thumb.ts b/src/material/slider/slider-thumb.ts\nindex 5988970896a2664a6643ab54a715d0d91b46780b..413e04659a68fbcc6bf41d94f8ad6e6db153b144 100644\n--- a/src/material/slider/slider-thumb.ts\n+++ b/src/material/slider/slider-thumb.ts\n@@ -75,7 +75,7 @@ export class MatSliderVisualThumb implements _MatSliderVisualThumb, AfterViewIni\n   private _sliderInput: _MatSliderThumb;\n \n   /** The native html element of the slider input corresponding to this thumb. */\n-  private _sliderInputEl: HTMLInputElement;\n+  private _sliderInputEl: HTMLInputElement | undefined;\n \n   /** The RippleRef for the slider thumbs hover state. */\n   private _hoverRippleRef: RippleRef | undefined;\n@@ -129,12 +129,15 @@ export class MatSliderVisualThumb implements _MatSliderVisualThumb, AfterViewIni\n \n   ngOnDestroy() {\n     const input = this._sliderInputEl;\n-    input.removeEventListener('pointermove', this._onPointerMove);\n-    input.removeEventListener('pointerdown', this._onDragStart);\n-    input.removeEventListener('pointerup', this._onDragEnd);\n-    input.removeEventListener('pointerleave', this._onMouseLeave);\n-    input.removeEventListener('focus', this._onFocus);\n-    input.removeEventListener('blur', this._onBlur);\n+\n+    if (input) {\n+      input.removeEventListener('pointermove', this._onPointerMove);\n+      input.removeEventListener('pointerdown', this._onDragStart);\n+      input.removeEventListener('pointerup', this._onDragEnd);\n+      input.removeEventListener('pointerleave', this._onMouseLeave);\n+      input.removeEventListener('focus', this._onFocus);\n+      input.removeEventListener('blur', this._onBlur);\n+    }\n   }\n \n   private _onPointerMove = (event: PointerEvent): void => {\ndiff --git a/src/material/slider/slider.spec.ts b/src/material/slider/slider.spec.ts\nindex 9759d2fd6fc5d2aaf2f2d16a3b07c06524a27046..e8c3e91b74db9b6f8460e9b3b376d45401956e4f 100644\n--- a/src/material/slider/slider.spec.ts\n+++ b/src/material/slider/slider.spec.ts\n@@ -91,6 +91,16 @@ describe('MDC-based MatSlider', () => {\n     }\n   }\n \n+  // Note that this test is outside of the other `describe` blocks, because they all run\n+  // `detectChanges` in the `beforeEach` and we're testing specifically what happens if it\n+  // is destroyed before change detection has run.\n+  it('should not throw if a slider is destroyed before the first change detection run', () => {\n+    expect(() => {\n+      const fixture = createComponent(StandardSlider);\n+      fixture.destroy();\n+    }).not.toThrow();\n+  });\n+\n   describe('standard slider', () => {\n     let fixture: ComponentFixture<StandardSlider>;\n     let slider: MatSlider;\n",
+  "diff_sha256": "4947c3df7e1412dc60a015a4fa89b16c47256f2b717397590a73ac97988ddaa7",
+  "paths": [
+    "src/material/slider/slider-thumb.ts",
+    "src/material/slider/slider.spec.ts"
+  ],
+  "hunk_reviews": [
+    {
+      "path": "src/material/slider/slider-thumb.ts",
+      "hunk": 1,
+      "decision": "Allow _sliderInputEl to be undefined before the modern visual-thumb view initializes; no corresponding field exists in the legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider-thumb.ts",
+      "hunk": 2,
+      "decision": "Guard all six input event listener removals. Full original method failure and patched undefined/real EventTarget paths are replayed."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "hunk": 1,
+      "decision": "Original StandardSlider fixture is destroyed before any first detectChanges. Preserve and account for this omitted upstream regression; do not relabel it an executed legacy fixture."
+    }
+  ],
+  "decision": "The complete original two-path/three-hunk patch changes only modern MatSliderVisualThumb and its modern StandardSlider regression. The old main entry omitted slider.spec.ts; that incomplete file account and both prior decisions are preserved. The modern visual thumb assigns an HTMLInputElement during view initialization; its original complete destructor throws before that assignment, while the patched complete method safely skips six removals and still removes real EventTarget listeners when initialized. The independently owned historical slider has no visual-thumb component or input directive. Every current product source is checked for those classes and public runtime routes; the exact13 current companion roster excludes slider. Its original HTML and eight complete constructor/view/destroy/pointer/focus methods remain identical, and the additional whole global-cleanup method also matches the tagged source. Complete original/owned destructor and global-cleanup methods remove host/document/window listeners and clear pointer/monitor/subscription protocols in both exercised receiver states. Those are method replays with explicit receiver protocols, not actual constructors, Angular views, browser or peer-floor evidence. Conclude this particular modern visual-thumb fix is not applicable to the add-on; do not transplant a modern component or claim an inherited fix. Historical ordinary slider Sass remains required and is not exempted by this runtime source exclusion. All product resources, consumer HTML/CSS/SCSS and other1696 SHA decisions remain unchanged; full G11, native/artifact and independent audit remain open.",
+  "source_scope": {
+    "schema_version": 1,
+    "line": "main",
+    "sha": "41766330b6993628dc511bf8595b8d58dd495c22",
+    "diff_sha256": "4947c3df7e1412dc60a015a4fa89b16c47256f2b717397590a73ac97988ddaa7",
+    "paths": [
+      "src/material/slider/slider-thumb.ts",
+      "src/material/slider/slider.spec.ts"
+    ],
+    "hunks": 3,
+    "original_subject_sha256": "1783a1d9b6ced4c73e20c9fe1adf824c6b29490788ccf771a7fb910df83a9a07",
+    "retained_architecture": {
+      "schema_version": 1,
+      "line": "main",
+      "subject_capsule_sha256": "8b183009711204961acc0e16f33b6b381f1b2dceabb7671aaf3b7e29fea72340",
+      "candidate_sources": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+          "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+          "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+        }
+      ],
+      "original_template_sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3",
+      "retained_contexts": [
+        {
+          "name": "constructor",
+          "candidate_line": 523,
+          "original_member_sha256": "b3935b1c140e77982f4eb9f46fc29bf2331170ead0a38a7a8c3a3e4ebe253bff",
+          "candidate_member_sha256": "b3935b1c140e77982f4eb9f46fc29bf2331170ead0a38a7a8c3a3e4ebe253bff"
+        },
+        {
+          "name": "ngAfterViewInit",
+          "candidate_line": 544,
+          "original_member_sha256": "c81a8113ae7970c0541e5b3ca57d37fbcd91b87c179404b7f3ac3e1c71652449",
+          "candidate_member_sha256": "c81a8113ae7970c0541e5b3ca57d37fbcd91b87c179404b7f3ac3e1c71652449"
+        },
+        {
+          "name": "ngOnDestroy",
+          "candidate_line": 556,
+          "original_member_sha256": "05988151b39dc15343609397b7df0a34d116f35be18a794b7913bb718f886f1d",
+          "candidate_member_sha256": "05988151b39dc15343609397b7df0a34d116f35be18a794b7913bb718f886f1d"
+        },
+        {
+          "name": "_onFocus",
+          "candidate_line": 577,
+          "original_member_sha256": "0134c7b31d9fd5516f3be73c0402b37c183121c9a55fbda0a357208068a0a5df",
+          "candidate_member_sha256": "0134c7b31d9fd5516f3be73c0402b37c183121c9a55fbda0a357208068a0a5df"
+        },
+        {
+          "name": "_pointerDown",
+          "candidate_line": 654,
+          "original_member_sha256": "fc8e3ead45af3f8130d22a395f870d49388666b6a865fd668b575c9c2afe42aa",
+          "candidate_member_sha256": "fc8e3ead45af3f8130d22a395f870d49388666b6a865fd668b575c9c2afe42aa"
+        },
+        {
+          "name": "_pointerMove",
+          "candidate_line": 697,
+          "original_member_sha256": "44629280fff36d1d67851b39fbc84a8e4dd414e9c827533835e8fa6a49744e3b",
+          "candidate_member_sha256": "44629280fff36d1d67851b39fbc84a8e4dd414e9c827533835e8fa6a49744e3b"
+        },
+        {
+          "name": "_pointerUp",
+          "candidate_line": 719,
+          "original_member_sha256": "ff5f645dfaac62e186eb509ad485b1d4945d642fe85bd85e1b971a42bacd21a8",
+          "candidate_member_sha256": "ff5f645dfaac62e186eb509ad485b1d4945d642fe85bd85e1b971a42bacd21a8"
+        },
+        {
+          "name": "_updateValueFromPosition",
+          "candidate_line": 809,
+          "original_member_sha256": "f85ebfca9c3f11428a1d53fab1df64f1fc7e31330a8d86bcb63c463c9ec49fe6",
+          "candidate_member_sha256": "f85ebfca9c3f11428a1d53fab1df64f1fc7e31330a8d86bcb63c463c9ec49fe6"
+        }
+      ],
+      "absent_modern_identifiers": [
+        "MatSliderThumb",
+        "MatSliderRangeThumb",
+        "MatSliderVisualThumb",
+        "_isCursorOnSliderThumb",
+        "_updateWidthActive",
+        "_updateWidthInactive"
+      ],
+      "product_source_files": 1027,
+      "product_source_population_sha256": "8c9b07871122d5584b65c2ae8ff9644a34f8c4c49201f530d9e13648deb86285",
+      "original_changed_files": 8,
+      "reviews": [
+        {
+          "sha": "776e530f7d9dbec0208f5f6302ad46db66a4da16",
+          "diff_sha256": "dceaecb315e1d9340d19bcdeae1b10828846d7ddbb16c79b3a6cd52f92407249",
+          "paths": [
+            "src/material/slider/slider-input.ts",
+            "src/material/slider/slider-interface.ts",
+            "src/material/slider/slider-thumb.ts",
+            "src/material/slider/slider.spec.ts",
+            "src/material/slider/slider.ts",
+            "tools/public_api_guard/material/slider.md"
+          ]
+        },
+        {
+          "sha": "eef45562035448212e0f827c5dbc31b3fd621255",
+          "diff_sha256": "65a9635f52d5c3e4510f9d1847e250fc219685c9c40256611586e0dd34b9a3e4",
+          "paths": [
+            "src/material/slider/slider-input.ts"
+          ]
+        },
+        {
+          "sha": "291b9db9105846ff0ae37581263725bebb6f0a45",
+          "diff_sha256": "55fee8d2b25ac67ee766bb5efba1f8d3876de94cbb6d3b5e8be5948f60877d50",
+          "paths": [
+            "src/material/slider/slider-input.ts"
+          ]
+        }
+      ],
+      "source_only": true,
+      "iOS_or_native_or_packed_execution": false,
+      "g11_claim": "not-passed"
+    },
+    "cleanup_contexts": [
+      {
+        "name": "ngOnDestroy",
+        "sha256": "05988151b39dc15343609397b7df0a34d116f35be18a794b7913bb718f886f1d"
+      },
+      {
+        "name": "_removeGlobalEvents",
+        "sha256": "b9e3e86eed52ccef893667708449329f6fafc50587c43b6436c0d98341a1e196"
+      }
+    ],
+    "excluded_runtime_routes": [
+      "@angular/material/slider",
+      "mat-slider-visual-thumb"
+    ],
+    "current_companion_roster": {
+      "path": "scripts/companion-bridge-peer-oracle.mjs",
+      "sha256": "1c496559ae981ca9c6765156e9861401336becd382cf55efb26b4801848b3839",
+      "names": [
+        "badge",
+        "bottom-sheet",
+        "button-toggle",
+        "datepicker",
+        "divider",
+        "expansion",
+        "grid-list",
+        "icon",
+        "sidenav",
+        "stepper",
+        "sort",
+        "toolbar",
+        "tree"
+      ]
+    },
+    "modern_method_replay": {
+      "original_undefined_input_throws": true,
+      "patched_undefined_input_safe": true,
+      "patched_real_EventTarget_removed": [
+        "pointermove",
+        "pointerdown",
+        "pointerup",
+        "pointerleave",
+        "focus",
+        "blur"
+      ],
+      "callbacks_after_cleanup": 0,
+      "scope": "Complete methods with explicit receiver, not component construction or browser execution"
+    },
+    "legacy_method_replay": [
+      {
+        "tagged": {
+          "active_globals": false,
+          "host_removed": [
+            "mousedown",
+            "touchstart"
+          ],
+          "document_removed": [
+            "mousemove",
+            "mouseup",
+            "touchmove",
+            "touchend",
+            "touchcancel"
+          ],
+          "window_removed": [
+            "blur"
+          ],
+          "callbacks_after_cleanup": 0,
+          "pointer_cleared": true,
+          "focus_monitor_protocol_calls": 1,
+          "direction_subscription_protocol_calls": 1
+        },
+        "owned": {
+          "active_globals": false,
+          "host_removed": [
+            "mousedown",
+            "touchstart"
+          ],
+          "document_removed": [
+            "mousemove",
+            "mouseup",
+            "touchmove",
+            "touchend",
+            "touchcancel"
+          ],
+          "window_removed": [
+            "blur"
+          ],
+          "callbacks_after_cleanup": 0,
+          "pointer_cleared": true,
+          "focus_monitor_protocol_calls": 1,
+          "direction_subscription_protocol_calls": 1
+        }
+      },
+      {
+        "tagged": {
+          "active_globals": true,
+          "host_removed": [
+            "mousedown",
+            "touchstart"
+          ],
+          "document_removed": [
+            "mousemove",
+            "mouseup",
+            "touchmove",
+            "touchend",
+            "touchcancel"
+          ],
+          "window_removed": [
+            "blur"
+          ],
+          "callbacks_after_cleanup": 0,
+          "pointer_cleared": true,
+          "focus_monitor_protocol_calls": 1,
+          "direction_subscription_protocol_calls": 1
+        },
+        "owned": {
+          "active_globals": true,
+          "host_removed": [
+            "mousedown",
+            "touchstart"
+          ],
+          "document_removed": [
+            "mousemove",
+            "mouseup",
+            "touchmove",
+            "touchend",
+            "touchcancel"
+          ],
+          "window_removed": [
+            "blur"
+          ],
+          "callbacks_after_cleanup": 0,
+          "pointer_cleared": true,
+          "focus_monitor_protocol_calls": 1,
+          "direction_subscription_protocol_calls": 1
+        }
+      }
+    ],
+    "constructors_Angular_views_native_browser_packed_or_floor_executed": false,
+    "g11_claim": "not-passed"
+  },
+  "prior_entry": {
+    "sha": "41766330b6993628dc511bf8595b8d58dd495c22",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/slider): error if slider is destroyed before first change detection (#28494)",
+    "final_disposition": "irrelevant",
+    "reason": "The patch skips removing pointer listeners when the MDC slider thumb is destroyed before the input element exists. The package has no slider thumb class. The owned slider removes its listeners from the document and the host element. The guard was not added.",
+    "read_note_disposition": "not-owned",
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "files": [
+      "src/material/slider/slider-thumb.ts"
+    ],
+    "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+    "recorded_at_utc": "2026-10-01T16:46:41Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+  },
+  "prior_entry_sha256": "38098148f1ecbaa35fd5d5e3baf2b046ddde4d12c77a966b4eadb6d52755a9e6",
+  "g11_claim": "not-passed"
+}

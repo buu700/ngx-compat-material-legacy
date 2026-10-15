@@ -34,6 +34,7 @@ import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
 import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
+import {SLIDER_THUMB_DESTROY_SHA, SLIDER_THUMB_DESTROY_ROLE, sliderThumbDestroyEvidenceOk} from './upstream-slider-thumb-destroy-scope.mjs';
 import {TEST_IMPORT_ROLE, TEST_IMPORT_SHAS, testImportBatchOk, testImportEntryOk} from './upstream-test-import-cleanup-evidence.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -145,6 +146,7 @@ function evidenceClass(entry) {
   if (typeof rel !== 'string' || !rel.trim()) return 'missing';
   if (TEST_IMPORT_SHAS.includes(entry.sha) && !rel.endsWith('.json')) return 'invalid-test-import-cleanup-scope';
   if (SLIDER_INPUT_SHAS.includes(entry.sha) && !rel.endsWith('.json')) return 'invalid-slider-input-scope';
+  if (entry.sha === SLIDER_THUMB_DESTROY_SHA && !rel.endsWith('.json')) return 'invalid-slider-thumb-destroy-scope';
   const consolidationScope = Object.hasOwn(TEST_CONSOLIDATION_PATCHES, entry.sha)
     || entry.batch_id === 'closeout-test-consolidation-source-review';
   if (consolidationScope && !rel.endsWith('.json')) return 'invalid-test-consolidation-scope';
@@ -165,6 +167,10 @@ function evidenceClass(entry) {
     if (SLIDER_INPUT_SHAS.includes(entry.sha) || body.role === SLIDER_INPUT_ROLE) {
       const readMember = rel => {const member = regularRepoMember(rel); return member ? readFileSync(member) : null;};
       if (!sliderInputScopeEvidenceOk(body, entry, readMember, () => candidateProductSourcePaths(root), line || body.line)) return 'invalid-slider-input-scope';
+    }
+    if (entry.sha === SLIDER_THUMB_DESTROY_SHA || body.role === SLIDER_THUMB_DESTROY_ROLE) {
+      const readMember = rel => {const member = regularRepoMember(rel); return member ? readFileSync(member) : null;};
+      if (!sliderThumbDestroyEvidenceOk(body, entry, readMember, () => candidateProductSourcePaths(root), line || body.line)) return 'invalid-slider-thumb-destroy-scope';
     }
     if(entry.sha===SLIDER_TOKEN_SHA||body.role===SLIDER_TOKEN_ROLE){
       const readMember=rel=>{const member=regularRepoMember(rel);return member?readFileSync(member):null;};
