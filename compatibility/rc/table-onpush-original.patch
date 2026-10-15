@@ -1,0 +1,154 @@
+commit ca9c490ee30dbf7c9c147079197d0dbc0abcd611
+Author:     kryshac <vladislav.tornea@gmail.com>
+AuthorDate: Tue Aug 22 15:40:37 2023 +0200
+Commit:     GitHub <noreply@github.com>
+CommitDate: Tue Aug 22 06:40:37 2023 -0700
+
+    fix(cdk/table): the CdkNoDataRow directive does not render in the OnPush strategy (#27687)
+    
+    Fixes a bug in the Angular CDK `table` component where the CdkNoDataRow directive with binding data
+    is not rendered correctly when the parent component has the OnPush strategy set
+
+diff --git a/src/cdk/table/table.spec.ts b/src/cdk/table/table.spec.ts
+index a4cf43643..798e41234 100644
+--- a/src/cdk/table/table.spec.ts
++++ b/src/cdk/table/table.spec.ts
+@@ -9,6 +9,7 @@ import {
+   Type,
+   ViewChild,
+   AfterViewInit,
++  ChangeDetectionStrategy,
+ } from '@angular/core';
+ import {ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed} from '@angular/core/testing';
+ import {BehaviorSubject, combineLatest, Observable, of as observableOf} from 'rxjs';
+@@ -1913,6 +1914,20 @@ describe('CdkTable', () => {
+     expect(cellElement.classList.contains('custom-cell-class-even')).toBe(true);
+     expect(cellElement.classList.contains('custom-cell-class-odd')).toBe(false);
+   });
++
++  it('should be able to show a message when no data is being displayed in the strategy ChangeDetectionOnPush', () => {
++    setupTableTestApp(WrapNativeHtmlTableAppOnPush, [NativeHtmlTableAppOnPush]);
++
++    expect(tableElement.querySelector('.cdk-no-data-row')).toBeFalsy();
++
++    component.dataSource.data = [];
++
++    fixture.detectChanges();
++
++    const noDataRow = tableElement.querySelector('.cdk-no-data-row')!;
++    expect(noDataRow).toBeTruthy();
++    expect(noDataRow.getAttribute('colspan')).toEqual('3');
++  });
+ });
+ 
+ interface TestData {
+@@ -3011,6 +3026,48 @@ class TableWithIndirectDescendantDefs {
+   dataSource = new FakeDataSource();
+ }
+ 
++@Component({
++  selector: 'cdk-table-change-detection-on-push',
++  template: `
++    <table cdk-table [dataSource]="dataSource">
++      <ng-container cdkColumnDef="column_a">
++        <th cdk-header-cell *cdkHeaderCellDef> Column A</th>
++        <td cdk-cell *cdkCellDef="let row"> {{row.a}}</td>
++      </ng-container>
++
++      <ng-container cdkColumnDef="column_b">
++        <th cdk-header-cell *cdkHeaderCellDef> Column B</th>
++        <td cdk-cell *cdkCellDef="let row"> {{row.b}}</td>
++      </ng-container>
++
++      <ng-container cdkColumnDef="column_c">
++        <th cdk-header-cell *cdkHeaderCellDef> Column C</th>
++        <td cdk-cell *cdkCellDef="let row"> {{row.c}}</td>
++      </ng-container>
++
++      <tr cdk-header-row *cdkHeaderRowDef="columnsToRender"></tr>
++      <tr cdk-row *cdkRowDef="let row; columns: columnsToRender" class="customRowClass"></tr>
++      <tr *cdkNoDataRow [attr.colspan]="columnsToRender.length">
++        <td>No data</td>
++      </tr>
++    </table>
++  `,
++  changeDetection: ChangeDetectionStrategy.OnPush,
++})
++class NativeHtmlTableAppOnPush {
++  @Input() dataSource: Observable<TestData[]> | null = null;
++  columnsToRender = ['column_a', 'column_b', 'column_c'];
++}
++
++@Component({
++  template: `
++    <cdk-table-change-detection-on-push [dataSource]="dataSource"></cdk-table-change-detection-on-push>
++  `,
++})
++class WrapNativeHtmlTableAppOnPush {
++  dataSource: FakeDataSource = new FakeDataSource();
++}
++
+ function getElements(element: Element, query: string): HTMLElement[] {
+   return [].slice.call(element.querySelectorAll(query));
+ }
+diff --git a/src/cdk/table/table.ts b/src/cdk/table/table.ts
+index 3668a2d0b..0fd73a714 100644
+--- a/src/cdk/table/table.ts
++++ b/src/cdk/table/table.ts
+@@ -110,7 +110,10 @@ export type CdkTableDataSourceInput<T> = readonly T[] | DataSource<T> | Observab
+  */
+ @Directive({selector: '[rowOutlet]'})
+ export class DataRowOutlet implements RowOutlet {
+-  constructor(public viewContainer: ViewContainerRef, public elementRef: ElementRef) {}
++  constructor(
++    public viewContainer: ViewContainerRef,
++    public elementRef: ElementRef,
++  ) {}
+ }
+ 
+ /**
+@@ -119,7 +122,10 @@ export class DataRowOutlet implements RowOutlet {
+  */
+ @Directive({selector: '[headerRowOutlet]'})
+ export class HeaderRowOutlet implements RowOutlet {
+-  constructor(public viewContainer: ViewContainerRef, public elementRef: ElementRef) {}
++  constructor(
++    public viewContainer: ViewContainerRef,
++    public elementRef: ElementRef,
++  ) {}
+ }
+ 
+ /**
+@@ -128,7 +134,10 @@ export class HeaderRowOutlet implements RowOutlet {
+  */
+ @Directive({selector: '[footerRowOutlet]'})
+ export class FooterRowOutlet implements RowOutlet {
+-  constructor(public viewContainer: ViewContainerRef, public elementRef: ElementRef) {}
++  constructor(
++    public viewContainer: ViewContainerRef,
++    public elementRef: ElementRef,
++  ) {}
+ }
+ 
+ /**
+@@ -138,7 +147,10 @@ export class FooterRowOutlet implements RowOutlet {
+  */
+ @Directive({selector: '[noDataRowOutlet]'})
+ export class NoDataRowOutlet implements RowOutlet {
+-  constructor(public viewContainer: ViewContainerRef, public elementRef: ElementRef) {}
++  constructor(
++    public viewContainer: ViewContainerRef,
++    public elementRef: ElementRef,
++  ) {}
+ }
+ 
+ /**
+@@ -1337,6 +1349,8 @@ export class CdkTable<T> implements AfterContentChecked, CollectionViewer, OnDes
+     }
+ 
+     this._isShowingNoDataRow = shouldShow;
++
++    this._changeDetectorRef.markForCheck();
+   }
+ }
+ 
