@@ -60,6 +60,7 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/table-recycle-row-view-identity',
   'packed-consumer/harness/table-angular-di-construction',
   'packed-consumer/harness/table-no-data-row-on-push-rendering',
+  'packed-consumer/harness/radio-generated-identity-coexistence',
   'packed-consumer/harness/table-definition-original-constructors',
   'packed-consumer/harness/tab-label-original-constructor-and-nearest-tab',
   'packed-consumer/harness/value-accessor-autocomplete',
