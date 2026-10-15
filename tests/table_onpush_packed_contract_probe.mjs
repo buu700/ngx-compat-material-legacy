@@ -16,8 +16,11 @@ import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {TABLE_ONPUSH_CASE_ID, packedTableOnPushCase} from '../scripts/table-onpush-packed-contract.mjs';
 import {tableOnPushPackedFixture} from '../scripts/table-onpush-packed-fixture.mjs';
-import {reverseTableOnPushPackedSource, TABLE_ONPUSH_SOURCE_PREIMAGES, TABLE_ONPUSH_SOURCE_EDITS} from '../scripts/table-onpush-packed-source-requalification.mjs';
+import {reverseTableOnPushPackedSource as reverseOldTableOnPushPackedSource, TABLE_ONPUSH_SOURCE_PREIMAGES, TABLE_ONPUSH_SOURCE_EDITS} from '../scripts/table-onpush-packed-source-requalification.mjs';
 import {packedValueAccessorCases} from '../scripts/value-accessor-packed-contract.mjs';
+import {packedRadioIdentityCase} from '../scripts/radio-identity-packed-contract.mjs';
+import {reverseRadioIdentityPackedSource} from '../scripts/radio-identity-packed-source-requalification.mjs';
+const reverseTableOnPushPackedSource=(path,raw,line)=>reverseOldTableOnPushPackedSource(path,reverseRadioIdentityPackedSource(path,raw,line),line);
 import {allConsumerCaseIds, declarationObservations, declarationKeys, librarySpec, harnessCaseIds, loadExportKeys, writeAcceptanceReport} from '../scripts/packed-consumer-evidence.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),ts=createRequire(import.meta.url)('typescript');
 const read=path=>readFileSync(join(root,path),'utf8'),hash=raw=>createHash('sha256').update(raw).digest('hex');
@@ -31,9 +34,9 @@ const sample={execution:'packed-angular-testbed-dom',error:null,parent_detection
 const path='scripts/packed-consumer-aot-smoke.mjs',raw=read(path),sf=ts.createSourceFile(path,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
 assert.equal(sf.parseDiagnostics.length,0);
 const source=sf.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='collectAcceptanceCases').getText(sf);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase',text+';return collectAcceptanceCases;')
-  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase);
-const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,102);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase',text+';return collectAcceptanceCases;')
+  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase);
+const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,103);
 const observe=(input,collector=load(source))=>{
   const rows=collector({harness:{status:'ok',result:{tableOnPushRendering:input}}},keys,'/tmp/consumer','/tmp/source').filter(row=>row.case_id===TABLE_ONPUSH_CASE_ID);
   assert.equal(rows.length,1);return rows[0];
@@ -79,7 +82,7 @@ for(const file of [path,'scripts/packed-consumer-evidence.mjs','compatibility/rc
   assert.equal(reverseTableOnPushPackedSource(file,read(file),line),original);
   assert.throws(()=>reverseTableOnPushPackedSource(file,read(file)+'\n',line));sourceNegatives++;
 }
-for(const [,after] of TABLE_ONPUSH_SOURCE_EDITS){assert.throws(()=>reverseTableOnPushPackedSource(path,raw.replace(after,after+'\n// mutated addition'),line));sourceNegatives++;}
+for(const [,after] of TABLE_ONPUSH_SOURCE_EDITS){assert.throws(()=>reverseOldTableOnPushPackedSource(path,reverseRadioIdentityPackedSource(path,raw,line).replace(after,after+'\n// mutated addition'),line));sourceNegatives++;}
 assert.throws(()=>reverseTableOnPushPackedSource('foreign.mjs',raw,line));sourceNegatives++;
 assert.throws(()=>reverseTableOnPushPackedSource(path,raw,line==='main'?'21.x':'main'));sourceNegatives++;
 const fixture=tableOnPushPackedFixture(),parsed=ts.createSourceFile('table-onpush-probe.ts',fixture,ts.ScriptTarget.Latest,true);

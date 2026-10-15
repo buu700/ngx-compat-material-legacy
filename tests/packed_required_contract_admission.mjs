@@ -15,6 +15,7 @@ import {fileURLToPath} from 'node:url';
 import {declarationObservations,declarationKeys,librarySpec,harnessCaseIds,allConsumerCaseIds,loadExportKeys,writeAcceptanceReport} from '../scripts/packed-consumer-evidence.mjs';
 import {packedValueAccessorCases} from '../scripts/value-accessor-packed-contract.mjs';
 import {packedTableOnPushCase} from '../scripts/table-onpush-packed-contract.mjs';
+import {packedRadioIdentityCase} from '../scripts/radio-identity-packed-contract.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),ts=createRequire(import.meta.url)('typescript');
 const contracts={table:{id:'packed-consumer/harness/table-angular-di-construction',field:'tableAngularDiConstruction'},
  chip:{id:'packed-consumer/harness/chip-individual-disabled-form-isolation',field:'chipDisabledIsolation'},
@@ -27,7 +28,7 @@ export function probeRequiredPackedContract(name){
  const {id,field}=contracts[name]||{};assert.ok(id,'unknown finite contract');
  const path='scripts/packed-consumer-aot-smoke.mjs',raw=readFileSync(join(root,path),'utf8'),file=ts.createSourceFile(path,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);assert.equal(file.parseDiagnostics.length,0);
  const node=file.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases');assert.ok(node);const source=node.getText(file),keys=loadExportKeys();
- const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase);
+ const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase);
  const expected=allConsumerCaseIds(keys);assert.equal(new Set(expected).size,expected.length);assert.ok(expected.includes(id));
  const manifest=JSON.parse(readFileSync(join(root,'projects/ngx-material-legacy/package.json'))),line=manifest.version.startsWith('21.')?'21.x':'main';
  const matrix=JSON.parse(readFileSync(join(root,'compatibility/rc/matrices/full-verify.json')));
