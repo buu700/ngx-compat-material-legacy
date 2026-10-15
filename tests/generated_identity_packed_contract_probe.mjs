@@ -16,9 +16,12 @@ import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {GENERATED_IDENTITY_CASE_ID, GENERATED_IDENTITY_ROLE_COUNTS, packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-contract.mjs';
 import {packedSelectDetachCase} from '../scripts/select-detach-packed-contract.mjs';
+import {packedMenuItemTokenCase} from '../scripts/menu-item-token-packed-contract.mjs';
 import {generatedIdentityPackedFixture} from '../scripts/generated-identity-packed-fixture.mjs';
 import {GENERATED_IDENTITY_PACKED_PREIMAGES, GENERATED_IDENTITY_PACKED_EDITS, reverseGeneratedIdentityPackedSource as reverseOldGeneratedIdentityPackedSource} from '../scripts/generated-identity-packed-source-requalification.mjs';
-import {reverseSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
+import {reverseSelectDetachPackedSource as reverseOldSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
+import {reverseMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
+const reverseSelectDetachPackedSource=(path,raw,line)=>reverseOldSelectDetachPackedSource(path,reverseMenuItemTokenPackedSource(path,raw,line),line);
 const reverseGeneratedIdentityPackedSource=(path,raw,line)=>reverseOldGeneratedIdentityPackedSource(path,reverseSelectDetachPackedSource(path,raw,line),line);
 import {packedRadioIdentityCase} from '../scripts/radio-identity-packed-contract.mjs';
 import {packedTableOnPushCase} from '../scripts/table-onpush-packed-contract.mjs';
@@ -75,10 +78,10 @@ const producerPath = 'scripts/packed-consumer-aot-smoke.mjs', raw = read(produce
 const sf = ts.createSourceFile(producerPath, raw, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 assert.equal(sf.parseDiagnostics.length,0);
 const source = sf.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases').getText(sf);
-const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase',text+';return collectAcceptanceCases;')(
-  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase);
+const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase',text+';return collectAcceptanceCases;')(
+  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase);
 const keys = loadExportKeys(), expected = allConsumerCaseIds(keys);
-assert.equal(expected.length,105); assert.equal(new Set(expected).size,105);
+assert.equal(expected.length,106); assert.equal(new Set(expected).size,106);
 const observe = (value, fn=load(source)) => {
   const rows = fn({harness:{status:'ok',result:{generatedIdentity:value}}},keys,'/tmp/consumer','/tmp/source').filter(r=>r.case_id===GENERATED_IDENTITY_CASE_ID);
   assert.equal(rows.length,1); return rows[0];
@@ -136,6 +139,6 @@ const fixture=generatedIdentityPackedFixture(),parsed=ts.createSourceFile('gener
 assert.equal(parsed.parseDiagnostics.length,0);assert.doesNotMatch(fixture,/ɵ|_IdGenerator|provide:\s*MatOption|\.ngOnDestroy\(/);
 assert.ok(fixture.includes('split(/\\s+/)'));assert.ok(fixture.includes('fixture.destroy()'));assert.doesNotMatch(fixture,/once\(ref\.afterOpened\(\)\)/);
 assert.ok(raw.indexOf('const generatedIdentity=await observePackedGeneratedIdentity();')<raw.indexOf('const fixture = TestBed.createComponent(HarnessHost);'));
-const output={schema_version:1,line,role:'Synthetic actual collector/writer controls and whole source reversals; no actual packed component execution',derived_cases:105,retained_previous_cases:103,negative_cases:negatives,collector_mutants:mutants.length,writer_cases:3,source_reversal_negative_controls:sourceNegatives,producer_sha256:hash(read('tests/generated_identity_packed_contract_probe.mjs')),source_guard_sha256:hash(read('scripts/generated-identity-packed-source-requalification.mjs')),packed_producer_sha256:hash(raw),packed_evidence_sha256:hash(read('scripts/packed-consumer-evidence.mjs')),fixture_sha256:hash(fixture),contract_sha256:hash(read('scripts/generated-identity-packed-contract.mjs')),typescript:ts.version,node:process.version,roster_bound:true,actual_packed_generated_identity_executed:false,native_browser_executed:false};
+const output={schema_version:1,line,role:'Synthetic actual collector/writer controls and whole source reversals; no actual packed component execution',derived_cases:106,retained_previous_cases:103,negative_cases:negatives,collector_mutants:mutants.length,writer_cases:3,source_reversal_negative_controls:sourceNegatives,producer_sha256:hash(read('tests/generated_identity_packed_contract_probe.mjs')),source_guard_sha256:hash(read('scripts/generated-identity-packed-source-requalification.mjs')),packed_producer_sha256:hash(raw),packed_evidence_sha256:hash(read('scripts/packed-consumer-evidence.mjs')),fixture_sha256:hash(fixture),contract_sha256:hash(read('scripts/generated-identity-packed-contract.mjs')),typescript:ts.version,node:process.version,roster_bound:true,actual_packed_generated_identity_executed:false,native_browser_executed:false};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(output,null,2)+'\n',{flag:'wx'});
 console.log(JSON.stringify(output));

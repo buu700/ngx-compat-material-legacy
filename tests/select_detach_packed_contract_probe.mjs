@@ -15,8 +15,11 @@ import {dirname,join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {SELECT_DETACH_CASE_ID,packedSelectDetachCase} from '../scripts/select-detach-packed-contract.mjs';
+import {packedMenuItemTokenCase} from '../scripts/menu-item-token-packed-contract.mjs';
 import {selectDetachPackedFixture} from '../scripts/select-detach-packed-fixture.mjs';
-import {SELECT_DETACH_PACKED_PREIMAGES,SELECT_DETACH_PACKED_EDITS,reverseSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
+import {SELECT_DETACH_PACKED_PREIMAGES,SELECT_DETACH_PACKED_EDITS,reverseSelectDetachPackedSource as reverseOldSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
+import {reverseMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
+const reverseSelectDetachPackedSource=(path,raw,line)=>reverseOldSelectDetachPackedSource(path,reverseMenuItemTokenPackedSource(path,raw,line),line);
 import {packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-contract.mjs';
 import {packedRadioIdentityCase} from '../scripts/radio-identity-packed-contract.mjs';
 import {packedTableOnPushCase} from '../scripts/table-onpush-packed-contract.mjs';
@@ -42,9 +45,9 @@ const sample={execution:'packed-angular-testbed-dom',error:null,tokens_distinct:
 assert.equal(packedSelectDetachCase(sample).result,'pass');
 const producerPath='scripts/packed-consumer-aot-smoke.mjs',raw=read(producerPath),sf=ts.createSourceFile(producerPath,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);assert.equal(sf.parseDiagnostics.length,0);
 const source=sf.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases').getText(sf);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase',text+';return collectAcceptanceCases;')(
- declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase);
-const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,105);assert.equal(new Set(expected).size,105);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase',text+';return collectAcceptanceCases;')(
+ declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase);
+const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,106);assert.equal(new Set(expected).size,106);
 const observe=(value,fn=load(source))=>{const rows=fn({harness:{status:'ok',result:{selectScrollDetach:value}}},keys,'/tmp/consumer','/tmp/source').filter(row=>row.case_id===SELECT_DETACH_CASE_ID);assert.equal(rows.length,1);return rows[0];};
 assert.equal(observe(sample).result,'pass');
 const mutations=[o=>o.execution='workspace-projection',o=>o.error='failure',o=>o.tokens_distinct=false,o=>o.generations.pop(),o=>o.generations.push(o.generations[0])];
@@ -76,7 +79,7 @@ let sourceNegatives=0;
 for(const path of Object.keys(SELECT_DETACH_PACKED_PREIMAGES[line].members)){
  const original=execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0','show',SELECT_DETACH_PACKED_PREIMAGES[line].commit+':'+path],{cwd:root,encoding:'utf8'});
  assert.equal(reverseSelectDetachPackedSource(path,read(path),line),original);assert.throws(()=>reverseSelectDetachPackedSource(path,read(path)+'\n',line));sourceNegatives++;
- if(SELECT_DETACH_PACKED_EDITS[path])for(const [,after]of SELECT_DETACH_PACKED_EDITS[path]){assert.ok(read(path).includes(after));assert.throws(()=>reverseSelectDetachPackedSource(path,read(path).replace(after,after+'\n// foreign addition'),line));sourceNegatives++;}
+ if(SELECT_DETACH_PACKED_EDITS[path])for(const [,after]of SELECT_DETACH_PACKED_EDITS[path]){const prior=reverseMenuItemTokenPackedSource(path,read(path),line);assert.ok(prior.includes(after));assert.throws(()=>reverseOldSelectDetachPackedSource(path,prior.replace(after,()=>after+'\n// foreign addition'),line));sourceNegatives++;}
 }
 assert.throws(()=>reverseSelectDetachPackedSource('foreign.mjs',raw,line));sourceNegatives++;
 assert.throws(()=>reverseSelectDetachPackedSource(producerPath,raw,line==='main'?'21.x':'main'));sourceNegatives++;
@@ -85,7 +88,7 @@ assert.doesNotMatch(fixture,/ɵ|_overlayDir|_scrollStrategy|provide:\s*ScrollDis
 assert.ok(fixture.includes("dispatchEvent(new Event('scroll'))"));assert.ok(fixture.includes('scrollable.elementScrolled().subscribe'));
 assert.ok(fixture.includes('ref.getConfig().scrollStrategy instanceof CloseScrollStrategy'));assert.ok(fixture.includes('fixture.destroy()'));
 assert.ok(raw.indexOf('const selectScrollDetach=await observePackedSelectDetach();')<raw.indexOf('const fixture = TestBed.createComponent(HarnessHost);'));
-const output={schema_version:1,line,role:'Synthetic actual collector/writer controls and exact whole-source reversal; actual scroll/component execution remains pending',derived_cases:105,retained_previous_cases:104,
+const output={schema_version:1,line,role:'Synthetic actual collector/writer controls and exact whole-source reversal; actual scroll/component execution remains pending',derived_cases:106,retained_previous_cases:104,
  negative_cases:negatives,collector_mutants:mutants.length,writer_cases:3,source_reversal_negative_controls:sourceNegatives,producer_sha256:hash(read('tests/select_detach_packed_contract_probe.mjs')),
  source_guard_sha256:hash(read('scripts/select-detach-packed-source-requalification.mjs')),packed_producer_sha256:hash(raw),packed_evidence_sha256:hash(read('scripts/packed-consumer-evidence.mjs')),
  fixture_sha256:hash(fixture),contract_sha256:hash(read('scripts/select-detach-packed-contract.mjs')),typescript:ts.version,node:process.version,roster_bound:true,actual_packed_scroll_or_components_executed:false,native_browser_executed:false};

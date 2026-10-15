@@ -19,7 +19,7 @@ class ValueAccessorPackedContractTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         observed = json.loads(result.stdout.strip().splitlines()[-1])
         self.assertEqual(observed['families'], 6)
-        self.assertEqual(observed['derived_cases'], 105)
+        self.assertEqual(observed['derived_cases'], 106)
         self.assertEqual(observed['negative_cases'], 157)
         self.assertEqual(observed['collector_mutants'], 2)
         self.assertEqual(observed['writer_cases'], 3)

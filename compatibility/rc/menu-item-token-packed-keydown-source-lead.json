@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Confirmed source omission; actual native keyboard behavior has not executed in this packet",
+  "finding": "The current legacy menu panel template has no original keydown listener, while its handler remains in the owned base. Neither menu component/base host declares an equivalent listener. ArrowDown and submenu ArrowLeft events therefore have no panel binding to the existing handler; runtime/native confirmation and exact repair are next.",
+  "original": {
+    "tag": "16.2.14",
+    "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "path": "src/material/legacy-menu/menu.html",
+    "git_blob": "8bd298ce6417c05eaf978a61a91408173c409dde",
+    "sha256": "caa94f4a75f88ac6996711d0d147d4c8fc4b7ad86177a4fe2eef66fe8be8ed14",
+    "source": "<ng-template>\n  <div\n    class=\"mat-menu-panel\"\n    [id]=\"panelId\"\n    [ngClass]=\"_classList\"\n    (keydown)=\"_handleKeydown($event)\"\n    (click)=\"closed.emit('click')\"\n    [@transformMenu]=\"_panelAnimationState\"\n    (@transformMenu.start)=\"_onAnimationStart($event)\"\n    (@transformMenu.done)=\"_onAnimationDone($event)\"\n    tabindex=\"-1\"\n    role=\"menu\"\n    [attr.aria-label]=\"ariaLabel || null\"\n    [attr.aria-labelledby]=\"ariaLabelledby || null\"\n    [attr.aria-describedby]=\"ariaDescribedby || null\">\n    <div class=\"mat-menu-content\">\n      <ng-content></ng-content>\n    </div>\n  </div>\n</ng-template>\n",
+    "package_archive_sha256": "de41309d20b1d98a7fd6d028a7de42853ea2d453a329c7a8815aaf73ea7f365b",
+    "package_version": "16.2.14",
+    "package_module": "package/fesm2022/legacy-menu.mjs",
+    "package_module_sha256": "bff6f9ebcded2d29c4c604efa6c3e56d66de567b6a21f54226f0bfb6b9dd29e4",
+    "all_original_compiled_panel_templates_equal_tagged_source": true
+  },
+  "candidate": {
+    "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+    "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47",
+    "missing_binding": "(keydown)=\"_handleKeydown($event)\"",
+    "source": "<ng-template>\n  <div\n    class=\"mat-menu-panel\"\n    [id]=\"panelId\"\n    [ngClass]=\"_classList\"\n    [class.mat-menu-panel-animations-enabled]=\"_animationsEnabled\"\n    [class.mat-menu-panel-exit-animation]=\"_panelAnimationState === 'void'\"\n    [class.mat-menu-panel-animating]=\"_isAnimating\"\n    (click)=\"closed.emit('click')\"\n    (animationstart)=\"_onCssAnimationStart($event)\"\n    (animationend)=\"_onCssAnimationDone($event)\"\n    tabindex=\"-1\"\n    role=\"menu\"\n    [attr.aria-label]=\"ariaLabel || null\"\n    [attr.aria-labelledby]=\"ariaLabelledby || null\"\n    [attr.aria-describedby]=\"ariaDescribedby || null\">\n    <div class=\"mat-menu-content\">\n      <ng-content></ng-content>\n    </div>\n  </div>\n</ng-template>\n"
+  },
+  "next_action": "Restore only the original event binding in a separate bounded product packet. Preserve DOM structure/selectors/styles and motion handling. Use authentic template event parsing/compiler and mutation controls, then actual mandatory packed keyboard path before final acceptance.",
+  "actual_packed_or_native_executed": false,
+  "g11_claim": "not-passed"
+}

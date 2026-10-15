@@ -21,9 +21,12 @@ import {packedValueAccessorCases} from '../scripts/value-accessor-packed-contrac
 import {packedRadioIdentityCase} from '../scripts/radio-identity-packed-contract.mjs';
 import {packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-contract.mjs';
 import {packedSelectDetachCase} from '../scripts/select-detach-packed-contract.mjs';
+import {packedMenuItemTokenCase} from '../scripts/menu-item-token-packed-contract.mjs';
 import {reverseRadioIdentityPackedSource} from '../scripts/radio-identity-packed-source-requalification.mjs';
 import {reverseGeneratedIdentityPackedSource} from '../scripts/generated-identity-packed-source-requalification.mjs';
-import {reverseSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
+import {reverseSelectDetachPackedSource as reverseOldSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
+import {reverseMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
+const reverseSelectDetachPackedSource=(path,raw,line)=>reverseOldSelectDetachPackedSource(path,reverseMenuItemTokenPackedSource(path,raw,line),line);
 const reverseTableOnPushPackedSource=(path,raw,line)=>reverseOldTableOnPushPackedSource(path,reverseRadioIdentityPackedSource(path,reverseGeneratedIdentityPackedSource(path,reverseSelectDetachPackedSource(path,raw,line),line),line),line);
 import {allConsumerCaseIds, declarationObservations, declarationKeys, librarySpec, harnessCaseIds, loadExportKeys, writeAcceptanceReport} from '../scripts/packed-consumer-evidence.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),ts=createRequire(import.meta.url)('typescript');
@@ -38,9 +41,9 @@ const sample={execution:'packed-angular-testbed-dom',error:null,parent_detection
 const path='scripts/packed-consumer-aot-smoke.mjs',raw=read(path),sf=ts.createSourceFile(path,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
 assert.equal(sf.parseDiagnostics.length,0);
 const source=sf.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='collectAcceptanceCases').getText(sf);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase',text+';return collectAcceptanceCases;')
-  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase);
-const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,105);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase',text+';return collectAcceptanceCases;')
+  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase);
+const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,106);
 const observe=(input,collector=load(source))=>{
   const rows=collector({harness:{status:'ok',result:{tableOnPushRendering:input}}},keys,'/tmp/consumer','/tmp/source').filter(row=>row.case_id===TABLE_ONPUSH_CASE_ID);
   assert.equal(rows.length,1);return rows[0];

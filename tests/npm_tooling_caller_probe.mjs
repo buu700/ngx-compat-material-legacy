@@ -15,7 +15,9 @@ import {fileURLToPath} from 'node:url';
 import {reverseTableOnPushPackedSource, TABLE_ONPUSH_SOURCE_PREIMAGES} from '../scripts/table-onpush-packed-source-requalification.mjs';
 import {reverseRadioIdentityPackedSource} from '../scripts/radio-identity-packed-source-requalification.mjs';
 import {reverseGeneratedIdentityPackedSource} from '../scripts/generated-identity-packed-source-requalification.mjs';
-import {reverseSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
+import {reverseSelectDetachPackedSource as reverseOldSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
+import {reverseMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
+const reverseSelectDetachPackedSource=(path,raw,line)=>reverseOldSelectDetachPackedSource(path,reverseMenuItemTokenPackedSource(path,raw,line),line);
 
 const ts = createRequire(import.meta.url)('typescript');
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
