@@ -63,6 +63,7 @@ export const HARNESS_CASE_IDS = [
   'packed-consumer/harness/radio-generated-identity-coexistence',
   'packed-consumer/harness/generated-identity-coexistence',
   'packed-consumer/harness/select-close-on-real-scroll-detach',
+  'packed-consumer/harness/nested-menu-item-token-ownership',
   'packed-consumer/harness/table-definition-original-constructors',
   'packed-consumer/harness/tab-label-original-constructor-and-nearest-tab',
   'packed-consumer/harness/value-accessor-autocomplete',

@@ -18,7 +18,7 @@ class GeneratedIdentityPackedContractTests(unittest.TestCase):
             cwd=ROOT, text=True, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         observed = json.loads(result.stdout.strip().splitlines()[-1])
-        for field, expected in [('derived_cases', 105), ('retained_previous_cases', 103),
+        for field, expected in [('derived_cases', 106), ('retained_previous_cases', 103),
                 ('negative_cases', 1174), ('collector_mutants', 3), ('writer_cases', 3),
                 ('source_reversal_negative_controls', 50)]:
             self.assertEqual(observed[field], expected, field)

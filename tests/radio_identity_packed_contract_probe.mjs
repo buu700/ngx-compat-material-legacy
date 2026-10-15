@@ -17,10 +17,13 @@ import {fileURLToPath} from 'node:url';
 import {RADIO_IDENTITY_CASE_ID,packedRadioIdentityCase} from '../scripts/radio-identity-packed-contract.mjs';
 import {packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-contract.mjs';
 import {packedSelectDetachCase} from '../scripts/select-detach-packed-contract.mjs';
+import {packedMenuItemTokenCase} from '../scripts/menu-item-token-packed-contract.mjs';
 import {radioIdentityPackedFixture} from '../scripts/radio-identity-packed-fixture.mjs';
 import {RADIO_IDENTITY_PACKED_PREIMAGES,RADIO_IDENTITY_PACKED_EDITS,reverseRadioIdentityPackedSource as reverseOldRadioIdentityPackedSource} from '../scripts/radio-identity-packed-source-requalification.mjs';
 import {reverseGeneratedIdentityPackedSource} from '../scripts/generated-identity-packed-source-requalification.mjs';
-import {reverseSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
+import {reverseSelectDetachPackedSource as reverseOldSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
+import {reverseMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
+const reverseSelectDetachPackedSource=(path,raw,line)=>reverseOldSelectDetachPackedSource(path,reverseMenuItemTokenPackedSource(path,raw,line),line);
 const reverseRadioIdentityPackedSource=(path,raw,line)=>reverseOldRadioIdentityPackedSource(path,reverseGeneratedIdentityPackedSource(path,reverseSelectDetachPackedSource(path,raw,line),line),line);
 import {packedTableOnPushCase} from '../scripts/table-onpush-packed-contract.mjs';
 import {packedValueAccessorCases} from '../scripts/value-accessor-packed-contract.mjs';
@@ -39,8 +42,8 @@ const sample={execution:'packed-angular-testbed-dom',error:null,scopes_separate:
  destroy:{fixture_destroyed:true,notified_distinct_names:2,checked_before:[false,true,false,false,true,false],checked_after:[false,true,false,false,true,false]}};
 const producerPath='scripts/packed-consumer-aot-smoke.mjs',raw=read(producerPath),sf=ts.createSourceFile(producerPath,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);assert.equal(sf.parseDiagnostics.length,0);
 const source=sf.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases').getText(sf);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase);
-const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,105);assert.equal(new Set(expected).size,105);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase);
+const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,106);assert.equal(new Set(expected).size,106);
 const observe=(value,fn=load(source))=>{const rows=fn({harness:{status:'ok',result:{radioIdentity:value}}},keys,'/tmp/consumer','/tmp/source').filter(r=>r.case_id===RADIO_IDENTITY_CASE_ID);assert.equal(rows.length,1);return rows[0];};
 assert.equal(observe(sample).result,'pass');
 const mutations=[o=>o.execution='workspace-projection',o=>o.error='fixture-failure',o=>o.scopes_separate=false,
@@ -67,5 +70,5 @@ let sourceNegatives=0;for(const path of Object.keys(RADIO_IDENTITY_PACKED_PREIMA
 }
 assert.throws(()=>reverseRadioIdentityPackedSource('foreign.mjs',raw,line));sourceNegatives++;assert.throws(()=>reverseRadioIdentityPackedSource(producerPath,raw,line==='main'?'21.x':'main'));sourceNegatives++;
 const fixture=radioIdentityPackedFixture(),parsed=ts.createSourceFile('radio-identity-probe.ts',fixture,ts.ScriptTarget.Latest,true);assert.equal(parsed.parseDiagnostics.length,0);assert.doesNotMatch(fixture,/ɵ|_IdGenerator|new UniqueSelectionDispatcher|provide:\s*UniqueSelectionDispatcher|\.ngOnDestroy\(/);assert.ok(fixture.includes('fixture.destroy()'));assert.ok(fixture.includes('input(node).click()'));assert.ok(fixture.includes('legacyScope.queryAll(By.directive(MatRadioButton)).length===0'));assert.ok(raw.indexOf('const radioIdentity=await observePackedRadioIdentity();')<raw.indexOf('const fixture = TestBed.createComponent(HarnessHost);'));
-const output={schema_version:1,line,role:'Synthetic actual collector/writer controls, generated fixture syntax and exact whole-program reversal; no actual radio component execution',derived_cases:105,retained_previous_cases:102,negative_cases:negatives,collector_mutants:mutants.length,writer_cases:3,source_reversal_negative_controls:sourceNegatives,fixture_sha256:hash(fixture),contract_sha256:hash(read('scripts/radio-identity-packed-contract.mjs')),typescript:ts.version,node:process.version,roster_bound:true,actual_packed_radio_executed:false,native_browser_executed:false};
+const output={schema_version:1,line,role:'Synthetic actual collector/writer controls, generated fixture syntax and exact whole-program reversal; no actual radio component execution',derived_cases:106,retained_previous_cases:102,negative_cases:negatives,collector_mutants:mutants.length,writer_cases:3,source_reversal_negative_controls:sourceNegatives,fixture_sha256:hash(fixture),contract_sha256:hash(read('scripts/radio-identity-packed-contract.mjs')),typescript:ts.version,node:process.version,roster_bound:true,actual_packed_radio_executed:false,native_browser_executed:false};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(output,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(output));
