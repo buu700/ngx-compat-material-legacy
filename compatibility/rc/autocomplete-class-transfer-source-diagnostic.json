@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "node": "v22.23.3",
+  "typescript": "6.0.3",
+  "coercion_subjects_sha256": "be5c12b5d9829221410bb9b1ce490f247cf1992059fcd1893a1a5b7f90b86d86",
+  "portable_subjects_sha256": "f75ef8d0b4751f1854ecb95b940544859be3390e0f00753ec6c5d9d0490aa38f",
+  "case": {
+    "file": "legacy-autocomplete/internal/autocomplete-base.ts",
+    "module": "@angular/cdk/coercion",
+    "symbol": "coerceStringArray",
+    "candidate_source_sha256": "f874b1dbd357dacc0044302fb728ef4155428866435a0d102ab85d2a8de48374",
+    "local_name": "coerceStringArray",
+    "references": [
+      "coerceStringArray(value)"
+    ],
+    "methods": [
+      {
+        "name": "classList",
+        "original": "set classList(value){if (value && value.length) {\n            this._classList = coerceStringArray(value).reduce((classList, className) => {\n                classList[className] = true;\n                return classList;\n            }, {});\n        }\n        else {\n            this._classList = {};\n        }\nthis._setVisibilityClasses(this._classList);\nthis._setThemeClasses(this._classList);\nthis._elementRef.nativeElement.className = '';}",
+        "candidate": "set classList(value){if (value && value.length) {\n      this._classList = coerceStringArray(value).reduce((classList, className) => {\n        classList[className] = true;\n        return classList;\n      }, {} as {[key: string]: boolean});\n    } else {\n      this._classList = {};\n    }\nthis._setVisibilityClasses(this._classList);\nthis._setThemeClasses(this._classList);\nthis._elementRef.nativeElement.className = '';}",
+        "tagged_body_sha256": "3782813efdd7c04ef47158d2e4fb05ff70fbecc37577863c1ffa0357eb2a1a00"
+      },
+      {
+        "name": "_setVisibilityClasses",
+        "original": "_setVisibilityClasses(classList){classList[this._visibleClass] = this.showPanel;\nclassList[this._hiddenClass] = !this.showPanel;}",
+        "candidate": "_setVisibilityClasses(classList){classList[this._visibleClass] = this.showPanel;\nclassList[this._hiddenClass] = !this.showPanel;}",
+        "tagged_body_sha256": "ae0be205e5b2ab67cb2e50eaf28e23f8e87c52ed26ebdbea00f6a2a98b295ae5"
+      },
+      {
+        "name": "_setThemeClasses",
+        "original": "_setThemeClasses(classList){classList['mat-primary'] = this._color === 'primary';\nclassList['mat-warn'] = this._color === 'warn';\nclassList['mat-accent'] = this._color === 'accent';}",
+        "candidate": "_setThemeClasses(classList){classList['mat-primary'] = this._color === 'primary';\nclassList['mat-warn'] = this._color === 'warn';\nclassList['mat-accent'] = this._color === 'accent';}",
+        "tagged_body_sha256": "0aee8c037ae8a9c16e5021b2afb1dc48ee8e8bb2a7b8317807aeda9c697b715b"
+      }
+    ],
+    "tagged_member_sha256": "3ca8638bddcd80a88936cc7dcb3fc52a284931052c96cbf2ab8bae075480f988"
+  },
+  "contracts": [
+    {
+      "line": "original",
+      "version": "16.2.14",
+      "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+      "module_sha256": "00a2c7cf54b95e05479ad09cfe2653243bf8bbb01acb0e550381cd115896af0d",
+      "function_source": "function coerceStringArray(value, separator = /\\s+/) {\n    const result = [];\n    if (value != null) {\n        const sourceValues = Array.isArray(value) ? value : `${value}`.split(separator);\n        for (const sourceValue of sourceValues) {\n            const trimmedString = `${sourceValue}`.trim();\n            if (trimmedString) {\n                result.push(trimmedString);\n            }\n        }\n    }\n    return result;\n}",
+      "declaration": {
+        "generics": [],
+        "parameters": [
+          {
+            "type": "any",
+            "optional": false,
+            "rest": false
+          },
+          {
+            "type": "string | RegExp",
+            "optional": true,
+            "rest": false
+          }
+        ],
+        "returns": "string[]"
+      },
+      "framework_version": "16.2.12",
+      "complete_runtime_modules": [
+        {
+          "path": "fesm2022/coercion.mjs",
+          "sha256": "00a2c7cf54b95e05479ad09cfe2653243bf8bbb01acb0e550381cd115896af0d"
+        }
+      ]
+    },
+    {
+      "line": "main",
+      "version": "22.1.7",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "module_sha256": "3b338eba41f3081a81b3d2936688be6e86d0bc7456ad494198e5a02aef0cdac4",
+      "function_source": "function coerceStringArray(value, separator = /\\s+/) {\n    const result = [];\n    if (value != null) {\n        const sourceValues = Array.isArray(value) ? value : `${value}`.split(separator);\n        for (const sourceValue of sourceValues) {\n            const trimmedString = `${sourceValue}`.trim();\n            if (trimmedString) {\n                result.push(trimmedString);\n            }\n        }\n    }\n    return result;\n}",
+      "declaration": {
+        "generics": [],
+        "parameters": [
+          {
+            "type": "any",
+            "optional": false,
+            "rest": false
+          },
+          {
+            "type": "string | RegExp",
+            "optional": true,
+            "rest": false
+          }
+        ],
+        "returns": "string[]"
+      },
+      "framework_version": "22.1.7",
+      "complete_runtime_modules": [
+        {
+          "path": "fesm2022/coercion.mjs",
+          "sha256": "3b338eba41f3081a81b3d2936688be6e86d0bc7456ad494198e5a02aef0cdac4"
+        },
+        {
+          "path": "fesm2022/_element-chunk.mjs",
+          "sha256": "c6873321426cc9b75d4106149027c34bf0b513da2f262997e9e02aa323ca3027"
+        },
+        {
+          "path": "fesm2022/_array-chunk.mjs",
+          "sha256": "a641d8d02f153d4f5d06afe2ee047e054aa4a24234237101eb60ecbcf930fe8a"
+        },
+        {
+          "path": "fesm2022/_css-pixel-value-chunk.mjs",
+          "sha256": "a30ca5bb8390b275b9755b0bb0dacc959d67166f8f7e04b050a4d05fcd8aa983"
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "version": "21.2.14",
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "module_sha256": "3b338eba41f3081a81b3d2936688be6e86d0bc7456ad494198e5a02aef0cdac4",
+      "function_source": "function coerceStringArray(value, separator = /\\s+/) {\n    const result = [];\n    if (value != null) {\n        const sourceValues = Array.isArray(value) ? value : `${value}`.split(separator);\n        for (const sourceValue of sourceValues) {\n            const trimmedString = `${sourceValue}`.trim();\n            if (trimmedString) {\n                result.push(trimmedString);\n            }\n        }\n    }\n    return result;\n}",
+      "declaration": {
+        "generics": [],
+        "parameters": [
+          {
+            "type": "any",
+            "optional": false,
+            "rest": false
+          },
+          {
+            "type": "string | RegExp",
+            "optional": true,
+            "rest": false
+          }
+        ],
+        "returns": "string[]"
+      },
+      "framework_version": "21.2.23",
+      "complete_runtime_modules": [
+        {
+          "path": "fesm2022/coercion.mjs",
+          "sha256": "3b338eba41f3081a81b3d2936688be6e86d0bc7456ad494198e5a02aef0cdac4"
+        },
+        {
+          "path": "fesm2022/_element-chunk.mjs",
+          "sha256": "c6873321426cc9b75d4106149027c34bf0b513da2f262997e9e02aa323ca3027"
+        },
+        {
+          "path": "fesm2022/_array-chunk.mjs",
+          "sha256": "a641d8d02f153d4f5d06afe2ee047e054aa4a24234237101eb60ecbcf930fe8a"
+        },
+        {
+          "path": "fesm2022/_css-pixel-value-chunk.mjs",
+          "sha256": "a30ca5bb8390b275b9755b0bb0dacc959d67166f8f7e04b050a4d05fcd8aa983"
+        }
+      ]
+    }
+  ],
+  "behaviors": [
+    {
+      "line": "original",
+      "cases": 30,
+      "receipt_sha256": "18aeaf6bb44386023a606206ac38832d437376009b56a90f25cfa4a2bce0b78a",
+      "authored_argument_count": 1
+    },
+    {
+      "line": "main",
+      "cases": 30,
+      "receipt_sha256": "18aeaf6bb44386023a606206ac38832d437376009b56a90f25cfa4a2bce0b78a",
+      "authored_argument_count": 1
+    },
+    {
+      "line": "21.x",
+      "cases": 30,
+      "receipt_sha256": "18aeaf6bb44386023a606206ac38832d437376009b56a90f25cfa4a2bce0b78a",
+      "authored_argument_count": 1
+    }
+  ],
+  "delegations": [
+    {
+      "line": "original",
+      "cases": 64,
+      "receipt_sha256": "6ad678b71ebcc36d58dca5805356f0536fccbe95bd8b110519a45bff83875206",
+      "complete_methods": 3,
+      "execution": "exact-source methods with explicit host className/state protocols",
+      "whole_component_or_DOM_executed": false
+    },
+    {
+      "line": "main",
+      "cases": 64,
+      "receipt_sha256": "6ad678b71ebcc36d58dca5805356f0536fccbe95bd8b110519a45bff83875206",
+      "complete_methods": 3,
+      "execution": "exact-source methods with explicit host className/state protocols",
+      "whole_component_or_DOM_executed": false
+    },
+    {
+      "line": "21.x",
+      "cases": 64,
+      "receipt_sha256": "6ad678b71ebcc36d58dca5805356f0536fccbe95bd8b110519a45bff83875206",
+      "complete_methods": 3,
+      "execution": "exact-source methods with explicit host className/state protocols",
+      "whole_component_or_DOM_executed": false
+    }
+  ],
+  "source_override_used": false,
+  "runtime_override_used": false,
+  "limits": "One frozen public helper call, complete original/minimum public helper and exact original/current setter plus two helper methods. Explicit host/state protocol replay; no whole Angular component, native/overlay rendering, assistive technology, packed or runtime/compiler-floor execution. Other APIs and all upstream SHAs remain separate.",
+  "g11_claim": "not-passed",
+  "negative_controls_rejected": 13,
+  "alias_positive": true
+}
