@@ -1,0 +1,402 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "3806c7170e7f88e3546e145d7d27db9fd9e8a8dd",
+  "subject": "test(multiple): add more time parsing tests",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "f1f684f64b78626addbe2fa274905f32b6cddd2d",
+      "after_blob": "f31457cbbce7483c8f2f73ff192b0cd3682c9b32"
+    },
+    {
+      "path": "src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "8ee0701ece03263e9892c0656a900cb5be0ea731",
+      "after_blob": "4cbcf3655a377a8d87325c92598a7ec6f2013b2e"
+    },
+    {
+      "path": "src/material-moment-adapter/adapter/moment-date-adapter.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "86cb41c12f59ec265ac8b63a830e6b82286716c3",
+      "after_blob": "dffc542d3c26bdb2ba790b404ca3bb3fd90d504d"
+    },
+    {
+      "path": "src/material/core/datetime/native-date-adapter.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "cd1979274c2e59bc9cd499ea23cfbc190bdd9770",
+      "after_blob": "5a2df4672f5bbbb8d85c2a946792cb5de2b15785"
+    }
+  ],
+  "original_files": 4,
+  "original_hunks": 4,
+  "raw_commit_sha256": "31b3cd69c5290ca10dd43837f7945eac3c4f695523b083e6e282eefb85d9bfc9",
+  "original_sources": [
+    {
+      "path": "src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts",
+      "before": {
+        "git_blob": "f1f684f64b78626addbe2fa274905f32b6cddd2d",
+        "sha256": "e4985882eff6d1a8d7f1e9cddadc588e84eae490195f51c2ef8188a99069f6e0",
+        "bytes": 18666
+      },
+      "after": {
+        "git_blob": "f31457cbbce7483c8f2f73ff192b0cd3682c9b32",
+        "sha256": "68c73e208d89bcc76b84957fb29de1351b476f5947e60bf8e9a3583eeaf235c0",
+        "bytes": 18794
+      }
+    },
+    {
+      "path": "src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts",
+      "before": {
+        "git_blob": "8ee0701ece03263e9892c0656a900cb5be0ea731",
+        "sha256": "1228ed36e17b951ee96ec36221b052ab640af5484f2a25f4f3433f7a83cb244d",
+        "bytes": 24665
+      },
+      "after": {
+        "git_blob": "4cbcf3655a377a8d87325c92598a7ec6f2013b2e",
+        "sha256": "c4b185a39ed5b216532be05d01b1e4247c71b6fe80197e670ae957d6057d4bda",
+        "bytes": 24818
+      }
+    },
+    {
+      "path": "src/material-moment-adapter/adapter/moment-date-adapter.spec.ts",
+      "before": {
+        "git_blob": "86cb41c12f59ec265ac8b63a830e6b82286716c3",
+        "sha256": "5baf9d20615d4fbcc3d6eaa8aa91420fc2affcb93e4a3dca9a34dc57919aeae4",
+        "bytes": 24500
+      },
+      "after": {
+        "git_blob": "dffc542d3c26bdb2ba790b404ca3bb3fd90d504d",
+        "sha256": "bfc86a9ccf2d74717f0061550d000846ff9022e1ef3301f4b83a289419da74e7",
+        "bytes": 24628
+      }
+    },
+    {
+      "path": "src/material/core/datetime/native-date-adapter.spec.ts",
+      "before": {
+        "git_blob": "cd1979274c2e59bc9cd499ea23cfbc190bdd9770",
+        "sha256": "3f001bac0446d27dd9d80fb6e43c613021b787dad1808f6dbde72e95bd2dfee8",
+        "bytes": 21691
+      },
+      "after": {
+        "git_blob": "5a2df4672f5bbbb8d85c2a946792cb5de2b15785",
+        "sha256": "d1a6e12e85598abfbed983328c1fe97f434cbf750d0623a3719b94585428892f",
+        "bytes": 21819
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts b/src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts\nindex f1f684f64b78626addbe2fa274905f32b6cddd2d..f31457cbbce7483c8f2f73ff192b0cd3682c9b32 100644\n--- a/src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts\n+++ b/src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts\n@@ -549,23 +549,25 @@ describe('DateFnsAdapter', () => {\n   });\n \n   it('should compare times', () => {\n-    const base = [2024, JAN, 1] as const;\n+    // Use different dates to guarantee that we only compare the times.\n+    const aDate = [2024, JAN, 1] as const;\n+    const bDate = [2024, FEB, 7] as const;\n \n     expect(\n-      adapter.compareTime(new Date(...base, 12, 0, 0), new Date(...base, 13, 0, 0)),\n+      adapter.compareTime(new Date(...aDate, 12, 0, 0), new Date(...bDate, 13, 0, 0)),\n     ).toBeLessThan(0);\n     expect(\n-      adapter.compareTime(new Date(...base, 12, 50, 0), new Date(...base, 12, 51, 0)),\n+      adapter.compareTime(new Date(...aDate, 12, 50, 0), new Date(...bDate, 12, 51, 0)),\n     ).toBeLessThan(0);\n-    expect(adapter.compareTime(new Date(...base, 1, 2, 3), new Date(...base, 1, 2, 3))).toBe(0);\n+    expect(adapter.compareTime(new Date(...aDate, 1, 2, 3), new Date(...bDate, 1, 2, 3))).toBe(0);\n     expect(\n-      adapter.compareTime(new Date(...base, 13, 0, 0), new Date(...base, 12, 0, 0)),\n+      adapter.compareTime(new Date(...aDate, 13, 0, 0), new Date(...bDate, 12, 0, 0)),\n     ).toBeGreaterThan(0);\n     expect(\n-      adapter.compareTime(new Date(...base, 12, 50, 11), new Date(...base, 12, 50, 10)),\n+      adapter.compareTime(new Date(...aDate, 12, 50, 11), new Date(...bDate, 12, 50, 10)),\n     ).toBeGreaterThan(0);\n     expect(\n-      adapter.compareTime(new Date(...base, 13, 0, 0), new Date(...base, 10, 59, 59)),\n+      adapter.compareTime(new Date(...aDate, 13, 0, 0), new Date(...bDate, 10, 59, 59)),\n     ).toBeGreaterThan(0);\n   });\n \ndiff --git a/src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts b/src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts\nindex 8ee0701ece03263e9892c0656a900cb5be0ea731..4cbcf3655a377a8d87325c92598a7ec6f2013b2e 100644\n--- a/src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts\n+++ b/src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts\n@@ -657,25 +657,30 @@ describe('LuxonDateAdapter', () => {\n   });\n \n   it('should compare times', () => {\n-    const base = [2024, JAN, 1] as const;\n+    // Use different dates to guarantee that we only compare the times.\n+    const aDate = [2024, JAN, 1] as const;\n+    const bDate = [2024, FEB, 7] as const;\n \n     expect(\n-      adapter.compareTime(DateTime.local(...base, 12, 0, 0), DateTime.local(...base, 13, 0, 0)),\n+      adapter.compareTime(DateTime.local(...aDate, 12, 0, 0), DateTime.local(...bDate, 13, 0, 0)),\n     ).toBeLessThan(0);\n     expect(\n-      adapter.compareTime(DateTime.local(...base, 12, 50, 0), DateTime.local(...base, 12, 51, 0)),\n+      adapter.compareTime(DateTime.local(...aDate, 12, 50, 0), DateTime.local(...bDate, 12, 51, 0)),\n     ).toBeLessThan(0);\n     expect(\n-      adapter.compareTime(DateTime.local(...base, 1, 2, 3), DateTime.local(...base, 1, 2, 3)),\n+      adapter.compareTime(DateTime.local(...aDate, 1, 2, 3), DateTime.local(...bDate, 1, 2, 3)),\n     ).toBe(0);\n     expect(\n-      adapter.compareTime(DateTime.local(...base, 13, 0, 0), DateTime.local(...base, 12, 0, 0)),\n+      adapter.compareTime(DateTime.local(...aDate, 13, 0, 0), DateTime.local(...bDate, 12, 0, 0)),\n     ).toBeGreaterThan(0);\n     expect(\n-      adapter.compareTime(DateTime.local(...base, 12, 50, 11), DateTime.local(...base, 12, 50, 10)),\n+      adapter.compareTime(\n+        DateTime.local(...aDate, 12, 50, 11),\n+        DateTime.local(...bDate, 12, 50, 10),\n+      ),\n     ).toBeGreaterThan(0);\n     expect(\n-      adapter.compareTime(DateTime.local(...base, 13, 0, 0), DateTime.local(...base, 10, 59, 59)),\n+      adapter.compareTime(DateTime.local(...aDate, 13, 0, 0), DateTime.local(...bDate, 10, 59, 59)),\n     ).toBeGreaterThan(0);\n   });\n \ndiff --git a/src/material-moment-adapter/adapter/moment-date-adapter.spec.ts b/src/material-moment-adapter/adapter/moment-date-adapter.spec.ts\nindex 86cb41c12f59ec265ac8b63a830e6b82286716c3..dffc542d3c26bdb2ba790b404ca3bb3fd90d504d 100644\n--- a/src/material-moment-adapter/adapter/moment-date-adapter.spec.ts\n+++ b/src/material-moment-adapter/adapter/moment-date-adapter.spec.ts\n@@ -639,23 +639,25 @@ describe('MomentDateAdapter', () => {\n   });\n \n   it('should compare times', () => {\n-    const base = [2024, JAN, 1] as const;\n+    // Use different dates to guarantee that we only compare the times.\n+    const aDate = [2024, JAN, 1] as const;\n+    const bDate = [2024, FEB, 7] as const;\n \n     expect(\n-      adapter.compareTime(moment([...base, 12, 0, 0]), moment([...base, 13, 0, 0])),\n+      adapter.compareTime(moment([...aDate, 12, 0, 0]), moment([...bDate, 13, 0, 0])),\n     ).toBeLessThan(0);\n     expect(\n-      adapter.compareTime(moment([...base, 12, 50, 0]), moment([...base, 12, 51, 0])),\n+      adapter.compareTime(moment([...aDate, 12, 50, 0]), moment([...bDate, 12, 51, 0])),\n     ).toBeLessThan(0);\n-    expect(adapter.compareTime(moment([...base, 1, 2, 3]), moment([...base, 1, 2, 3]))).toBe(0);\n+    expect(adapter.compareTime(moment([...aDate, 1, 2, 3]), moment([...bDate, 1, 2, 3]))).toBe(0);\n     expect(\n-      adapter.compareTime(moment([...base, 13, 0, 0]), moment([...base, 12, 0, 0])),\n+      adapter.compareTime(moment([...aDate, 13, 0, 0]), moment([...bDate, 12, 0, 0])),\n     ).toBeGreaterThan(0);\n     expect(\n-      adapter.compareTime(moment([...base, 12, 50, 11]), moment([...base, 12, 50, 10])),\n+      adapter.compareTime(moment([...aDate, 12, 50, 11]), moment([...bDate, 12, 50, 10])),\n     ).toBeGreaterThan(0);\n     expect(\n-      adapter.compareTime(moment([...base, 13, 0, 0]), moment([...base, 10, 59, 59])),\n+      adapter.compareTime(moment([...aDate, 13, 0, 0]), moment([...bDate, 10, 59, 59])),\n     ).toBeGreaterThan(0);\n   });\n \ndiff --git a/src/material/core/datetime/native-date-adapter.spec.ts b/src/material/core/datetime/native-date-adapter.spec.ts\nindex cd1979274c2e59bc9cd499ea23cfbc190bdd9770..5a2df4672f5bbbb8d85c2a946792cb5de2b15785 100644\n--- a/src/material/core/datetime/native-date-adapter.spec.ts\n+++ b/src/material/core/datetime/native-date-adapter.spec.ts\n@@ -605,23 +605,25 @@ describe('NativeDateAdapter', () => {\n   });\n \n   it('should compare times', () => {\n-    const base = [2024, JAN, 1] as const;\n+    // Use different dates to guarantee that we only compare the times.\n+    const aDate = [2024, JAN, 1] as const;\n+    const bDate = [2024, FEB, 7] as const;\n \n     expect(\n-      adapter.compareTime(new Date(...base, 12, 0, 0), new Date(...base, 13, 0, 0)),\n+      adapter.compareTime(new Date(...aDate, 12, 0, 0), new Date(...bDate, 13, 0, 0)),\n     ).toBeLessThan(0);\n     expect(\n-      adapter.compareTime(new Date(...base, 12, 50, 0), new Date(...base, 12, 51, 0)),\n+      adapter.compareTime(new Date(...aDate, 12, 50, 0), new Date(...bDate, 12, 51, 0)),\n     ).toBeLessThan(0);\n-    expect(adapter.compareTime(new Date(...base, 1, 2, 3), new Date(...base, 1, 2, 3))).toBe(0);\n+    expect(adapter.compareTime(new Date(...aDate, 1, 2, 3), new Date(...bDate, 1, 2, 3))).toBe(0);\n     expect(\n-      adapter.compareTime(new Date(...base, 13, 0, 0), new Date(...base, 12, 0, 0)),\n+      adapter.compareTime(new Date(...aDate, 13, 0, 0), new Date(...bDate, 12, 0, 0)),\n     ).toBeGreaterThan(0);\n     expect(\n-      adapter.compareTime(new Date(...base, 12, 50, 11), new Date(...base, 12, 50, 10)),\n+      adapter.compareTime(new Date(...aDate, 12, 50, 11), new Date(...bDate, 12, 50, 10)),\n     ).toBeGreaterThan(0);\n     expect(\n-      adapter.compareTime(new Date(...base, 13, 0, 0), new Date(...base, 10, 59, 59)),\n+      adapter.compareTime(new Date(...aDate, 13, 0, 0), new Date(...bDate, 10, 59, 59)),\n     ).toBeGreaterThan(0);\n   });\n \n",
+  "diff_sha256": "3f7a6557f904c16b290159f1d0d3ca9dc71019050be8a8108b25bb290ea4eaaa",
+  "hunk_reviews": [
+    {
+      "path": "src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts",
+      "header": "@@ -549,23 +549,25 @@ describe('DateFnsAdapter', () => {",
+      "sha256": "6244fc4d0007d831888bdb22e8cf29c5fb82163395732071748fa822e93f334e",
+      "judgment": "In src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts, the existing should-compare-times body now uses Jan1 and Feb7 calendar dates. All six original time tuples and their two less-than, one equal and three greater-than expectations are identical after only date-identifier normalization. All other complete-file bytes are exact. This strengthens test discrimination without changing a production adapter."
+    },
+    {
+      "path": "src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts",
+      "header": "@@ -657,25 +657,30 @@ describe('LuxonDateAdapter', () => {",
+      "sha256": "8c88793a1feb5e9bd7fc0248bd2b7194a0d8062bb0d9a4f70610200f63cfa31c",
+      "judgment": "In src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts, the existing should-compare-times body now uses Jan1 and Feb7 calendar dates. All six original time tuples and their two less-than, one equal and three greater-than expectations are identical after only date-identifier normalization. All other complete-file bytes are exact. This strengthens test discrimination without changing a production adapter."
+    },
+    {
+      "path": "src/material-moment-adapter/adapter/moment-date-adapter.spec.ts",
+      "header": "@@ -639,23 +639,25 @@ describe('MomentDateAdapter', () => {",
+      "sha256": "1e80bca2b8032a001708068d1e24907ccde0541f1a3f5beeafeaf36c4e9106a0",
+      "judgment": "In src/material-moment-adapter/adapter/moment-date-adapter.spec.ts, the existing should-compare-times body now uses Jan1 and Feb7 calendar dates. All six original time tuples and their two less-than, one equal and three greater-than expectations are identical after only date-identifier normalization. All other complete-file bytes are exact. This strengthens test discrimination without changing a production adapter."
+    },
+    {
+      "path": "src/material/core/datetime/native-date-adapter.spec.ts",
+      "header": "@@ -605,23 +605,25 @@ describe('NativeDateAdapter', () => {",
+      "sha256": "42edc7592dff2e3773ed28b4e511ecb3c569f94c3c90608dcfcee421fbe2a136",
+      "judgment": "In src/material/core/datetime/native-date-adapter.spec.ts, the existing should-compare-times body now uses Jan1 and Feb7 calendar dates. All six original time tuples and their two less-than, one equal and three greater-than expectations are identical after only date-identifier normalization. All other complete-file bytes are exact. This strengthens test discrimination without changing a production adapter."
+    }
+  ],
+  "semantics": [
+    {
+      "path": "src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts",
+      "kind": "compareTime-date-independence-strengthening",
+      "existing_cases": 1,
+      "comparisons": 6,
+      "a_date": [
+        2024,
+        "JAN",
+        1
+      ],
+      "b_date": [
+        2024,
+        "FEB",
+        7
+      ],
+      "times_and_expected_relations_preserved": true,
+      "production_parser_or_adapter_changed": false
+    },
+    {
+      "path": "src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts",
+      "kind": "compareTime-date-independence-strengthening",
+      "existing_cases": 1,
+      "comparisons": 6,
+      "a_date": [
+        2024,
+        "JAN",
+        1
+      ],
+      "b_date": [
+        2024,
+        "FEB",
+        7
+      ],
+      "times_and_expected_relations_preserved": true,
+      "production_parser_or_adapter_changed": false
+    },
+    {
+      "path": "src/material-moment-adapter/adapter/moment-date-adapter.spec.ts",
+      "kind": "compareTime-date-independence-strengthening",
+      "existing_cases": 1,
+      "comparisons": 6,
+      "a_date": [
+        2024,
+        "JAN",
+        1
+      ],
+      "b_date": [
+        2024,
+        "FEB",
+        7
+      ],
+      "times_and_expected_relations_preserved": true,
+      "production_parser_or_adapter_changed": false
+    },
+    {
+      "path": "src/material/core/datetime/native-date-adapter.spec.ts",
+      "kind": "compareTime-date-independence-strengthening",
+      "existing_cases": 1,
+      "comparisons": 6,
+      "a_date": [
+        2024,
+        "JAN",
+        1
+      ],
+      "b_date": [
+        2024,
+        "FEB",
+        7
+      ],
+      "times_and_expected_relations_preserved": true,
+      "production_parser_or_adapter_changed": false
+    }
+  ],
+  "decision": "All four original hunks strengthen the existing compareTime case in the date-fns, Luxon, Moment and native adapters. They replace one shared calendar date with Jan1 and Feb7 while preserving six time comparisons and their two negative, one equal and three positive results per adapter. No case, production parser, adapter algorithm or public API is added or changed. The complete owned product contains no ordinary date-adapter fork; public current datepicker/native-adapter use is reachable through the legacy form-field harness and Cyph. Do not copy peer private adapter specs or claim inherited correct time parsing/comparison merely because the tests changed. This excludes those private test changes from owned source adaptation only; actual public peer/datepicker interoperability and supported-floor gates remain separate.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "3f7a6557f904c16b290159f1d0d3ca9dc71019050be8a8108b25bb290ea4eaaa",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "All four original hunks strengthen the existing compareTime case in the date-fns, Luxon, Moment and native adapters. They replace one shared calendar date with Jan1 and Feb7 while preserving six time comparisons and their two negative, one equal and three positive results per adapter. No case, production parser, adapter algorithm or public API is added or changed. The complete owned product contains no ordinary date-adapter fork; public current datepicker/native-adapter use is reachable through the legacy form-field harness and Cyph. Do not copy peer private adapter specs or claim inherited correct time parsing/comparison merely because the tests changed. This excludes those private test changes from owned source adaptation only; actual public peer/datepicker interoperability and supported-floor gates remain separate.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-theme-date-source-review.mjs",
+        "sha256": "24c509c86fc83d61d63610569bc423046fccbc545c7a214834edbef304b8c92f"
+      },
+      {
+        "path": "tests/spec_theme_date_source_probe.mjs",
+        "sha256": "2deb49ebcdcc13634942418e378cf1a412187a04813ae7119b3406dc83de6c60"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-subjects.json.gz",
+        "sha256": "26b49659f5dcc1b75a5f2879d963b33acccd18158915231ee45965a5f2008faa"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-acquisition.json.gz",
+        "sha256": "4d29b8e9a84f58acd41ca3d1c60caa73cca7253d7cdc63d4b68715106099540e"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-controls.json",
+        "sha256": "9fbc54294da383e836e7dab6ab7ae918f6ec2328415e4192020311f713a5abbe"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-review.json",
+        "sha256": "19cc1d615193cd7b4af2b7d4f1447e33cfe81d3688e2c77f6c08dc36f98b4d75"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.spec.ts",
+        "sha256": "3c4eb8fff2e07edd8243bff934f226a80a8004a29a69f93896322977d8fe218f"
+      },
+      {
+        "path": "testing/legacy-runner/shims/harness/form-field/shared.spec.ts",
+        "sha256": "40ef26bce00f4b8088b021994363ed503b2c9d395e0c98a304ff107bbe0544a1"
+      },
+      {
+        "path": "testing/legacy-runner/adapt-spec.mjs",
+        "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+      },
+      {
+        "path": "compatibility/rc/material-public-subjects.json",
+        "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+      },
+      {
+        "path": "compatibility/rc/material-public-source-members/06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880.gz",
+        "sha256": "55e60cf4148c6f57c24888fc47fcaf3d9d7ba1c11de88a80caca1e709cabc4fb"
+      },
+      {
+        "path": "compatibility/rc/material-public-source-members/c411f1fcb4b76b838433f9c4d6dd2da1f489609f82e417ab14730c5c68dc6b60.gz",
+        "sha256": "033364c4c6b628183bf8d0f0a5013996a3e6dbf0a0d54b973eb909d3a0c9f18e"
+      },
+      {
+        "path": "compatibility/rc/material-public-source-members/e69eba12b87eaae09de70629e0637fc9b07751a7fb4493dac9d7e3cf0ed21964.gz",
+        "sha256": "0283a9011ad20c094b16bc1f74bbfff38b3f5d9521a3567f1aa44023f212536a"
+      },
+      {
+        "path": "compatibility/rc/material-public-source-members/af1db9de63ad6c2953f211b34af25568aab1efccad253725621b63a2210488f0.gz",
+        "sha256": "b715536b513f9362fa296d0809fce0ce2d928320c56e41ecc493dcf31d5eed0c"
+      }
+    ],
+    "actual_Angular_Sass_browser_native_packed_or_floor_qualified": false,
+    "adapter_source_context": {
+      "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+      "sha256": "0cec5e2cf1b3a762218be1d53d1bb7692405772f7b3f275333e432092fd277be"
+    }
+  },
+  "prior_entry": {
+    "sha": "3806c7170e7f88e3546e145d7d27db9fd9e8a8dd",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(multiple): add more time parsing tests",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=b073585b708b34e66bf588c752b08866dab0034ab301b4329826d7483717843f, bytes=7789). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts, src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts, src/material-moment-adapter/adapter/moment-date-adapter.spec.ts, src/material/core/datetime/native-date-adapter.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts",
+      "src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts",
+      "src/material-moment-adapter/adapter/moment-date-adapter.spec.ts",
+      "src/material/core/datetime/native-date-adapter.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/3806c7170e7f88e3546e145d7d27db9fd9e8a8dd.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "b073585b708b34e66bf588c752b08866dab0034ab301b4329826d7483717843f"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-theme-date-source-prior.json.gz",
+    "sha256": "fad8bea54c9b0700e031880acdf46a3a7889bfb5c099f8aeea1924d30a522972"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-theme-date-source-review.mjs",
+      "sha256": "24c509c86fc83d61d63610569bc423046fccbc545c7a214834edbef304b8c92f"
+    },
+    {
+      "path": "tests/spec_theme_date_source_probe.mjs",
+      "sha256": "2deb49ebcdcc13634942418e378cf1a412187a04813ae7119b3406dc83de6c60"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-subjects.json.gz",
+      "sha256": "26b49659f5dcc1b75a5f2879d963b33acccd18158915231ee45965a5f2008faa"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-acquisition.json.gz",
+      "sha256": "4d29b8e9a84f58acd41ca3d1c60caa73cca7253d7cdc63d4b68715106099540e"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-controls.json",
+      "sha256": "9fbc54294da383e836e7dab6ab7ae918f6ec2328415e4192020311f713a5abbe"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-review.json",
+      "sha256": "19cc1d615193cd7b4af2b7d4f1447e33cfe81d3688e2c77f6c08dc36f98b4d75"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.spec.ts",
+      "sha256": "3c4eb8fff2e07edd8243bff934f226a80a8004a29a69f93896322977d8fe218f"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/form-field/shared.spec.ts",
+      "sha256": "40ef26bce00f4b8088b021994363ed503b2c9d395e0c98a304ff107bbe0544a1"
+    },
+    {
+      "path": "testing/legacy-runner/adapt-spec.mjs",
+      "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+    },
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    },
+    {
+      "path": "compatibility/rc/material-public-source-members/06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880.gz",
+      "sha256": "55e60cf4148c6f57c24888fc47fcaf3d9d7ba1c11de88a80caca1e709cabc4fb"
+    },
+    {
+      "path": "compatibility/rc/material-public-source-members/c411f1fcb4b76b838433f9c4d6dd2da1f489609f82e417ab14730c5c68dc6b60.gz",
+      "sha256": "033364c4c6b628183bf8d0f0a5013996a3e6dbf0a0d54b973eb909d3a0c9f18e"
+    },
+    {
+      "path": "compatibility/rc/material-public-source-members/e69eba12b87eaae09de70629e0637fc9b07751a7fb4493dac9d7e3cf0ed21964.gz",
+      "sha256": "0283a9011ad20c094b16bc1f74bbfff38b3f5d9521a3567f1aa44023f212536a"
+    },
+    {
+      "path": "compatibility/rc/material-public-source-members/af1db9de63ad6c2953f211b34af25568aab1efccad253725621b63a2210488f0.gz",
+      "sha256": "b715536b513f9362fa296d0809fce0ce2d928320c56e41ecc493dcf31d5eed0c"
+    }
+  ],
+  "production_HTML_CSS_SCSS_or_TS_changed_in_this_review": false,
+  "actual_Angular_Sass_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "adapter_eager_source_requalification": {
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+      "sha256": "0cec5e2cf1b3a762218be1d53d1bb7692405772f7b3f275333e432092fd277be"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-theme-date-3806c7170e7f88e3546e145d7d27db9fd9e8a8dd.json",
+      "sha256": "c3449b9b375120dfbb697778ad2a4145de96c6971f71442702dab56b6ea3d245"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "e8efdfdb25881e1688fcc237dfb8c075cf22e562",
+      "entry_sha256": "f7954bef9d2fc672d54e006c9a9bcda96c8d3cde229008d532dd4e4a7d9d9fc1"
+    },
+    "source_judgment_and_runtime_requirements_preserved": true
+  }
+}
