@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "8e091797f8664cf99af86a5c7c4d5615734fcaf1",
+  "subject": "build: fix failing test (#30443)",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a1ea6491643678c1221e59a9f7f826f905b7b4af",
+      "after_blob": "6a0f4d610fbdcb4c525229689269ed5833a4a8f7"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 1,
+  "raw_commit_sha256": "b2cf6c434b85620a3c0c526886edc41f57fe0ebaea53f9e9e099869686cbee3b",
+  "original_sources": [
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "before": {
+        "git_blob": "a1ea6491643678c1221e59a9f7f826f905b7b4af",
+        "sha256": "4b3ea597faa3ce42ee656e18a23d8338275eda4a21c18fa8616f2a8606603bef",
+        "bytes": 40665
+      },
+      "after": {
+        "git_blob": "6a0f4d610fbdcb4c525229689269ed5833a4a8f7",
+        "sha256": "740696fd09b5f7e6a42f733788ca8ecc04c564a6a6541dbac5bb4b361b448461",
+        "bytes": 40686
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/chips/chip-listbox.spec.ts b/src/material/chips/chip-listbox.spec.ts\nindex a1ea6491643678c1221e59a9f7f826f905b7b4af..6a0f4d610fbdcb4c525229689269ed5833a4a8f7 100644\n--- a/src/material/chips/chip-listbox.spec.ts\n+++ b/src/material/chips/chip-listbox.spec.ts\n@@ -1050,6 +1050,7 @@ class MultiSelectionChipListbox {\n         </mat-chip-option>\n       </mat-chip-listbox>\n   `,\n+  standalone: false,\n })\n class AsyncMultiSelectionChipListbox {\n   private _chipsSubject = new BehaviorSubject(['tutorial-1', 'tutorial-2', 'tutorial-3']);\n",
+  "diff_sha256": "fd4b410c3cd8c5b71315f1e656a9df1d88ddc58b27b4cb5f87049fde03c6b142",
+  "hunk_reviews": [
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -1050,6 +1050,7 @@ class MultiSelectionChipListbox {",
+      "sha256": "d160cacac2faad6e4526fe0f8030498dd01169cdaa8e5cfcbe5613c6ccd41fcc",
+      "judgment": "The sole decorator hunk adds standalone:false to AsyncMultiSelectionChipListbox and leaves the complete remaining file unchanged. Component metadata changes must be reviewed as such. Current source absence and actual adapter behavior address this particular test declaration; no standalone default or chip runtime equivalence is inferred across all Angular versions."
+    }
+  ],
+  "semantics": {
+    "kind": "fixture-ngmodule-metadata-repair",
+    "metadata_default_changes": true,
+    "all_other_source_bytes_preserved": true,
+    "ordinary_type_only_cleanup": false
+  },
+  "decision": "The complete original patch adds standalone:false to the private modern AsyncMultiSelectionChipListbox fixture. It changes Angular component metadata and is not type-only. That class and the modern chip-listbox fixture are absent from the owned historical chip suite. The actual historical test adapter already inserts standalone:false only when metadata omits standalone, and preserves explicit true and false; three executed source adapter controls cover those cases. Keep the independently owned legacy chip list and existing adapter. This conclusion neither imports the modern fixture nor proves actual Angular forms/chip behavior or compiler/peer floors.",
+  "prior_entry": {
+    "sha": "8e091797f8664cf99af86a5c7c4d5615734fcaf1",
+    "bucket": "test-only-batch-candidate",
+    "subject": "build: fix failing test (#30443)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=ea6ca035de473f34fe3408e15c490b8733452e3e81d529307040baaf6a02aa9c, bytes=496). Changed paths are only unit specs (src/material/chips/chip-listbox.spec.ts). Subject prefix is 'build', but the patch body has no production runtime, style, public API, harness implementation, or config hunks. This package does not ship or depend on upstream Material unit-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/chips/chip-listbox.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/8e091797f8664cf99af86a5c7c4d5615734fcaf1.json",
+    "batch_id": "test-only-residual-needs-triage-docs-2026-10-01",
+    "recorded_at_utc": "2026-10-01T19:02:59Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "ea6ca035de473f34fe3408e15c490b8733452e3e81d529307040baaf6a02aa9c"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "fd4b410c3cd8c5b71315f1e656a9df1d88ddc58b27b4cb5f87049fde03c6b142",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete original patch adds standalone:false to the private modern AsyncMultiSelectionChipListbox fixture. It changes Angular component metadata and is not type-only. That class and the modern chip-listbox fixture are absent from the owned historical chip suite. The actual historical test adapter already inserts standalone:false only when metadata omits standalone, and preserves explicit true and false; three executed source adapter controls cover those cases. Keep the independently owned legacy chip list and existing adapter. This conclusion neither imports the modern fixture nor proves actual Angular forms/chip behavior or compiler/peer floors.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-small-source-review.mjs",
+        "sha256": "a3f8c6ea65db0588648675819751fc76df41001b0ac160099b87de6ae00e3b16"
+      },
+      {
+        "path": "tests/spec_small_source_probe.mjs",
+        "sha256": "385b82de643416a5c54c82016a79367cd4b84c2f3ec548d0bdb19b2056f36f62"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-subjects.json.gz",
+        "sha256": "055c40ba3907191e258676b4ebff84ea5d233fb5c00bb877eac0f525dcf5ccfd"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-acquisition.json.gz",
+        "sha256": "f71a905296710e45c15a2e6bfb3766a741061aebb39b8d55e7aa7d48fa6a8200"
+      },
+      {
+        "path": "compatibility/rc/spec-small-fixture-prior.json.gz",
+        "sha256": "da83db9d7a07c2cc3f1dcf89a5fd312f433966b3486ceebf5b05d9d45bf1c9fc"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-controls.json",
+        "sha256": "b81aa3d32cbce32f51164dcc63776ada5c1e7e63537ae150c8693783b6d666ba"
+      },
+      {
+        "path": "compatibility/rc/spec-small-context-proof.json",
+        "sha256": "835ff94c0a8ffdd4c49f6e3816bb908c35f6464c8a5017c76b9e4fcaeca91888"
+      },
+      {
+        "path": "compatibility/rc/spec-small-context-checkpoint.json",
+        "sha256": "686dc5ec22f4fc6e2cb557c65d8c206f33ee605b30fbd87476598932322d85fa"
+      },
+      {
+        "path": "compatibility/rc/historical-source-replay-fixture-context-checkpoint.json",
+        "sha256": "c5ef2627c3f93f029af03036f3a8f9b2c9f453cdf610332ea935885f0271c4cd"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+        "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+        "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+        "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+        "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+      },
+      {
+        "path": "projects/ngx-material-legacy/ng-package.json",
+        "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33"
+      },
+      {
+        "path": "testing/legacy-runner/adapt-spec.mjs",
+        "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-small-individual-source-proof.json",
+      "sha256": "ca245ae0e159e9e089203c79978a620fe1bb0e402a1940061fab79d28cc4ab23"
+    },
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "compatibility/rc/spec-small-individual-source-proof.json",
+      "sha256": "ca245ae0e159e9e089203c79978a620fe1bb0e402a1940061fab79d28cc4ab23"
+    },
+    {
+      "path": "scripts/spec-small-source-review.mjs",
+      "sha256": "a3f8c6ea65db0588648675819751fc76df41001b0ac160099b87de6ae00e3b16"
+    },
+    {
+      "path": "tests/spec_small_source_probe.mjs",
+      "sha256": "385b82de643416a5c54c82016a79367cd4b84c2f3ec548d0bdb19b2056f36f62"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-subjects.json.gz",
+      "sha256": "055c40ba3907191e258676b4ebff84ea5d233fb5c00bb877eac0f525dcf5ccfd"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-acquisition.json.gz",
+      "sha256": "f71a905296710e45c15a2e6bfb3766a741061aebb39b8d55e7aa7d48fa6a8200"
+    },
+    {
+      "path": "compatibility/rc/spec-small-fixture-prior.json.gz",
+      "sha256": "da83db9d7a07c2cc3f1dcf89a5fd312f433966b3486ceebf5b05d9d45bf1c9fc"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-controls.json",
+      "sha256": "b81aa3d32cbce32f51164dcc63776ada5c1e7e63537ae150c8693783b6d666ba"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-proof.json",
+      "sha256": "835ff94c0a8ffdd4c49f6e3816bb908c35f6464c8a5017c76b9e4fcaeca91888"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-checkpoint.json",
+      "sha256": "686dc5ec22f4fc6e2cb557c65d8c206f33ee605b30fbd87476598932322d85fa"
+    },
+    {
+      "path": "compatibility/rc/historical-source-replay-fixture-context-checkpoint.json",
+      "sha256": "c5ef2627c3f93f029af03036f3a8f9b2c9f453cdf610332ea935885f0271c4cd"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+      "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+      "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+    },
+    {
+      "path": "projects/ngx-material-legacy/ng-package.json",
+      "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33"
+    },
+    {
+      "path": "testing/legacy-runner/adapt-spec.mjs",
+      "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
