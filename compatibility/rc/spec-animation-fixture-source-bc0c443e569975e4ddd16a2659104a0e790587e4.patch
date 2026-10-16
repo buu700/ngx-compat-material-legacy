@@ -1,0 +1,333 @@
+diff --git a/src/cdk/accordion/accordion-item.spec.ts b/src/cdk/accordion/accordion-item.spec.ts
+index cbf5c7bfbc4d58aeeb38e9cde6c2146beb252584..441ec3f46f3cd6e64e21d7a24bf2bfaee287df84 100644
+--- a/src/cdk/accordion/accordion-item.spec.ts
++++ b/src/cdk/accordion/accordion-item.spec.ts
+@@ -1,19 +1,12 @@
+ import {waitForAsync, TestBed, ComponentFixture} from '@angular/core/testing';
+ import {Component} from '@angular/core';
+ import {By} from '@angular/platform-browser';
+-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+ import {CdkAccordionModule, CdkAccordionItem} from './public-api';
+ 
+ describe('CdkAccordionItem', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        BrowserAnimationsModule,
+-        CdkAccordionModule,
+-        SingleItem,
+-        ItemGroupWithoutAccordion,
+-        ItemGroupWithAccordion,
+-      ],
++      imports: [CdkAccordionModule, SingleItem, ItemGroupWithoutAccordion, ItemGroupWithAccordion],
+     });
+   }));
+ 
+diff --git a/src/cdk/accordion/accordion.spec.ts b/src/cdk/accordion/accordion.spec.ts
+index f0e137a50b7fa0cd40667c9571c8fd2baf21bf22..81984fe39c802b0b346cf0cd1335a77f412d5273 100644
+--- a/src/cdk/accordion/accordion.spec.ts
++++ b/src/cdk/accordion/accordion.spec.ts
+@@ -1,7 +1,6 @@
+ import {waitForAsync, TestBed} from '@angular/core/testing';
+ import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';
+ import {By} from '@angular/platform-browser';
+-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+ import {CdkAccordion} from './accordion';
+ import {CdkAccordionItem} from './accordion-item';
+ import {CdkAccordionModule} from './accordion-module';
+@@ -9,7 +8,7 @@ import {CdkAccordionModule} from './accordion-module';
+ describe('CdkAccordion', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [BrowserAnimationsModule, CdkAccordionModule, SetOfItems, NestedItems],
++      imports: [CdkAccordionModule, SetOfItems, NestedItems],
+     });
+   }));
+ 
+diff --git a/src/material/chips/chip-grid.spec.ts b/src/material/chips/chip-grid.spec.ts
+index 6865f4e49565a68bc431a32233523e0ecb716e56..ae569dede5614092b86cc47b24cce4be4307c2e1 100644
+--- a/src/material/chips/chip-grid.spec.ts
++++ b/src/material/chips/chip-grid.spec.ts
+@@ -37,8 +37,8 @@ import {FormControl, FormsModule, NgForm, ReactiveFormsModule, Validators} from
+ import {MatFormFieldModule} from '@angular/material/form-field';
+ import {MatInputModule} from '@angular/material/input';
+ import {By} from '@angular/platform-browser';
+-import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatChipEvent, MatChipGrid, MatChipInputEvent, MatChipRow, MatChipsModule} from './index';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ 
+ describe('MatChipGrid', () => {
+   let chipGridDebugElement: DebugElement;
+@@ -339,7 +339,7 @@ describe('MatChipGrid', () => {
+         let fixture: ComponentFixture<StandardChipGrid>;
+ 
+         beforeEach(() => {
+-          fixture = createComponent(StandardChipGrid, undefined, 'rtl');
++          fixture = createComponent(StandardChipGrid, 'rtl');
+         });
+ 
+         it('should focus previous column when press RIGHT ARROW', () => {
+@@ -1015,9 +1015,6 @@ describe('MatChipGrid', () => {
+ 
+   function createComponent<T>(
+     component: Type<T>,
+-    animationsModule:
+-      | Type<NoopAnimationsModule>
+-      | Type<BrowserAnimationsModule> = NoopAnimationsModule,
+     direction: Direction = 'ltr',
+   ): ComponentFixture<T> {
+     directionality = {
+@@ -1032,7 +1029,7 @@ describe('MatChipGrid', () => {
+         MatChipsModule,
+         MatFormFieldModule,
+         MatInputModule,
+-        animationsModule,
++        NoopAnimationsModule,
+       ],
+       providers: [{provide: Directionality, useValue: directionality}],
+       declarations: [component],
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index b3752a42af52d719923e757f74611ead4727b0c6..8c2f3991f3c188b4ae33be9f08fd96f42f9023de 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -38,7 +38,7 @@ import {
+   tick,
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
+ import {CLOSE_ANIMATION_DURATION, OPEN_ANIMATION_DURATION} from './dialog-container';
+ import {
+@@ -2043,12 +2043,7 @@ describe('MatDialog with animations enabled', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        MatDialogModule,
+-        BrowserAnimationsModule,
+-        ComponentWithChildViewContainer,
+-        DirectiveWithViewContainer,
+-      ],
++      imports: [MatDialogModule, ComponentWithChildViewContainer, DirectiveWithViewContainer],
+     });
+ 
+     dialog = TestBed.inject(MatDialog);
+@@ -2102,7 +2097,7 @@ describe('MatDialog with explicit injector provided', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatDialogModule, BrowserAnimationsModule, ModuleBoundDialogParentComponent],
++      imports: [MatDialogModule, ModuleBoundDialogParentComponent],
+     });
+ 
+     overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+diff --git a/src/material/expansion/accordion.spec.ts b/src/material/expansion/accordion.spec.ts
+index 64cb07a80b7dfb9bf36828f1cd19ab2bc3c04d6c..5f846d66c6ed1049ddfa0f99ef6c2bdabb146243 100644
+--- a/src/material/expansion/accordion.spec.ts
++++ b/src/material/expansion/accordion.spec.ts
+@@ -8,7 +8,6 @@ import {
+ import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';
+ import {TestBed, inject, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+ import {
+   MatAccordion,
+   MatExpansionModule,
+@@ -22,7 +21,6 @@ describe('MatAccordion', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [
+-        BrowserAnimationsModule,
+         MatExpansionModule,
+         AccordionWithHideToggle,
+         AccordionWithTogglePosition,
+diff --git a/src/material/input/input.spec.ts b/src/material/input/input.spec.ts
+index 3a778acbcee4d9f943f08ad190dc9d28243828cd..8ecedf942c606f14c8527dd2390f9728d7766177 100644
+--- a/src/material/input/input.spec.ts
++++ b/src/material/input/input.spec.ts
+@@ -36,7 +36,6 @@ import {
+ } from '@angular/material/form-field';
+ import {MatIconModule} from '@angular/material/icon';
+ import {By} from '@angular/platform-browser';
+-import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MAT_INPUT_VALUE_ACCESSOR, MatInput, MatInputModule} from './index';
+ 
+ describe('MatMdcInput without forms', () => {
+@@ -1656,17 +1655,15 @@ function configureTestingModule(
+     providers?: Provider[];
+     imports?: any[];
+     declarations?: any[];
+-    animations?: boolean;
+   } = {},
+ ) {
+-  const {providers = [], imports = [], declarations = [], animations = true} = options;
++  const {providers = [], imports = [], declarations = []} = options;
+   TestBed.configureTestingModule({
+     imports: [
+       FormsModule,
+       MatFormFieldModule,
+       MatIconModule,
+       MatInputModule,
+-      animations ? BrowserAnimationsModule : NoopAnimationsModule,
+       ReactiveFormsModule,
+       ...imports,
+     ],
+diff --git a/src/material/sidenav/drawer.spec.ts b/src/material/sidenav/drawer.spec.ts
+index 144207131276d9ee3be1a3a2cbb0feebc9a4e8ae..7e21171f5b973c9648b7bee7211a9b8064ef2d96 100644
+--- a/src/material/sidenav/drawer.spec.ts
++++ b/src/material/sidenav/drawer.spec.ts
+@@ -18,7 +18,7 @@ import {
+   waitForAsync,
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatDrawer, MatDrawerContainer, MatSidenavModule} from './index';
+ 
+ describe('MatDrawer', () => {
+@@ -517,14 +517,12 @@ describe('MatDrawer', () => {
+ 
+     it('should not throw when a two-way binding is toggled quickly while animating', fakeAsync(() => {
+       TestBed.resetTestingModule().configureTestingModule({
+-        imports: [MatSidenavModule, BrowserAnimationsModule, DrawerOpenBinding],
++        imports: [MatSidenavModule, DrawerOpenBinding],
+       });
+ 
+       const fixture = TestBed.createComponent(DrawerOpenBinding);
+       fixture.detectChanges();
+ 
+-      // Note that we need actual timeouts and the `BrowserAnimationsModule`
+-      // in order to test it correctly.
+       setTimeout(() => {
+         fixture.componentInstance.isOpen = !fixture.componentInstance.isOpen;
+         fixture.changeDetectorRef.markForCheck();
+@@ -1019,7 +1017,7 @@ describe('MatDrawerContainer', () => {
+ 
+   it('should not animate when the sidenav is open on load', fakeAsync(() => {
+     TestBed.resetTestingModule().configureTestingModule({
+-      imports: [MatSidenavModule, BrowserAnimationsModule, DrawerSetToOpenedTrue],
++      imports: [MatSidenavModule, DrawerSetToOpenedTrue],
+     });
+ 
+     const fixture = TestBed.createComponent(DrawerSetToOpenedTrue);
+diff --git a/src/material/tabs/tab-group.spec.ts b/src/material/tabs/tab-group.spec.ts
+index 15f321f57370544ee03839c2504c1cbcd08b4659..d19e22d080e97c5fc52cd99f36936401b071a8bd 100644
+--- a/src/material/tabs/tab-group.spec.ts
++++ b/src/material/tabs/tab-group.spec.ts
+@@ -11,7 +11,7 @@ import {
+   waitForAsync,
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Observable} from 'rxjs';
+ import {
+   MAT_TABS_CONFIG,
+@@ -1026,12 +1026,7 @@ describe('MatTabGroup', () => {
+ describe('nested MatTabGroup with enabled animations', () => {
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        MatTabsModule,
+-        BrowserAnimationsModule,
+-        NestedTabs,
+-        TabsWithCustomAnimationDuration,
+-      ],
++      imports: [MatTabsModule, NestedTabs, TabsWithCustomAnimationDuration],
+     });
+   }));
+ 
+@@ -1066,7 +1061,7 @@ describe('MatTabGroup with ink bar fit to content', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatTabsModule, BrowserAnimationsModule, TabGroupWithInkBarFitToContent],
++      imports: [MatTabsModule, TabGroupWithInkBarFitToContent],
+     });
+   }));
+ 
+@@ -1108,7 +1103,7 @@ describe('MatTabNavBar with a default config', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatTabsModule, BrowserAnimationsModule, SimpleTabsTestApp],
++      imports: [MatTabsModule, SimpleTabsTestApp],
+       providers: [
+         {
+           provide: MAT_TABS_CONFIG,
+@@ -1139,7 +1134,7 @@ describe('MatTabNavBar with a default config', () => {
+ describe('MatTabGroup labels aligned with a config', () => {
+   it('should work with start align', () => {
+     const fixture = TestBed.configureTestingModule({
+-      imports: [MatTabsModule, BrowserAnimationsModule, TabsWithAlignConfig],
++      imports: [MatTabsModule, TabsWithAlignConfig],
+       providers: [
+         {
+           provide: MAT_TABS_CONFIG,
+@@ -1155,7 +1150,7 @@ describe('MatTabGroup labels aligned with a config', () => {
+ 
+   it('should work with center align', () => {
+     const fixture = TestBed.configureTestingModule({
+-      imports: [MatTabsModule, BrowserAnimationsModule, TabsWithAlignConfig],
++      imports: [MatTabsModule, TabsWithAlignConfig],
+       providers: [
+         {
+           provide: MAT_TABS_CONFIG,
+@@ -1171,7 +1166,7 @@ describe('MatTabGroup labels aligned with a config', () => {
+ 
+   it('should work with end align', () => {
+     const fixture = TestBed.configureTestingModule({
+-      imports: [MatTabsModule, BrowserAnimationsModule, TabsWithAlignConfig],
++      imports: [MatTabsModule, TabsWithAlignConfig],
+       providers: [
+         {
+           provide: MAT_TABS_CONFIG,
+@@ -1187,7 +1182,7 @@ describe('MatTabGroup labels aligned with a config', () => {
+ 
+   it('should not add align if default config doesnt set align', () => {
+     const fixture = TestBed.configureTestingModule({
+-      imports: [MatTabsModule, BrowserAnimationsModule, TabsWithAlignConfig],
++      imports: [MatTabsModule, TabsWithAlignConfig],
+     }).createComponent(TabsWithAlignConfig);
+     fixture.detectChanges();
+ 
+@@ -1206,7 +1201,7 @@ describe('MatTabGroup labels aligned with a config', () => {
+ 
+   it('should not break if config sets align on already aligned tabs', () => {
+     const fixture = TestBed.configureTestingModule({
+-      imports: [MatTabsModule, BrowserAnimationsModule, TabsWithAlignCenter],
++      imports: [MatTabsModule, TabsWithAlignCenter],
+       providers: [{provide: MAT_TABS_CONFIG, useValue: {alignTabs: 'end'}}],
+     }).createComponent(TabsWithAlignCenter);
+     fixture.detectChanges();
+diff --git a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+index f3cb50704c18e81e009d0c583666216726e857aa..d640cfd62abf49b7e717e91e7e79365e9f7b3a67 100644
+--- a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
++++ b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+@@ -10,7 +10,6 @@ import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions} from '@angular/material/core';
+ import {By} from '@angular/platform-browser';
+-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
+ import {MAT_TABS_CONFIG} from '../index';
+ import {MatTabsModule} from '../module';
+@@ -512,7 +511,7 @@ describe('MatTabNavBar with a default config', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatTabsModule, BrowserAnimationsModule, TabLinkWithNgIf],
++      imports: [MatTabsModule, TabLinkWithNgIf],
+       providers: [{provide: MAT_TABS_CONFIG, useValue: {fitInkBarToContent: true}}],
+     });
+   }));
+@@ -534,7 +533,7 @@ describe('MatTabNavBar with a default config', () => {
+ describe('MatTabNavBar with enabled animations', () => {
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatTabsModule, BrowserAnimationsModule, TabsWithCustomAnimationDuration],
++      imports: [MatTabsModule, TabsWithCustomAnimationDuration],
+     });
+   }));
+ 
