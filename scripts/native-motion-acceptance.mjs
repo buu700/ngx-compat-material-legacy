@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 /**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
  * Coordinator path for native-motion. Derives the 21.x roster before launching
  * browsers, then binds observations to the packed artifact. WebKitGTK is the
  * webkit engine, not Safari. Does not claim G04 or G10.
@@ -10,14 +17,14 @@ import {createHash} from 'node:crypto';
 import {dirname, join, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {resolveLibraryFromRun} from './resolve-run-library.mjs';
-import {deriveMainRoster, observationProblems, SOURCE_LINE} from './native-motion-roster.mjs';
+import {deriveMainRoster, observationProblems, assertCase, SOURCE_LINE} from './native-motion-roster.mjs';
 import {executeNativeMotion} from './native-motion-run.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 function gitValue(args) {
   const result = spawnSync('git', args, {cwd: root, encoding: 'utf8'});
-  return result.status === 0 ? result.stdout.trim() : '';
+  return result.status === 0 ? result.stdout.trim() : null;
 }
 
 function coordinatorRequest() {
@@ -62,6 +69,29 @@ function preflight() {
   return {missing: [...new Set(missing)], notes, chrome, firefox};
 }
 
+/** Keep actual discovery/execution distinct from the expected roster. Recheck
+ * raw states rather than copying a child's pass label into the owned report. */
+export function qualifyNativeMotionOutcomes(expectedIds, outcomes) {
+  const expected = new Set(expectedIds), byId = new Map(), discovered = [], duplicates = new Set(), problems = [];
+  if (!expectedIds.length || expected.size !== expectedIds.length) problems.push('invalid expected native-motion roster');
+  for (const row of outcomes || []) {
+    if (!row || typeof row.id !== 'string' || !row.id) {problems.push('malformed native-motion outcome'); continue;}
+    if (byId.has(row.id)) {duplicates.add(row.id); problems.push('duplicate native-motion outcome ' + row.id); continue;}
+    byId.set(row.id, row); discovered.push(row.id);
+    if (!expected.has(row.id)) problems.push('unexpected native-motion outcome ' + row.id);
+  }
+  const executed = expectedIds.filter(id => {
+    const observation = byId.get(id)?.observation;
+    return observation !== null && typeof observation === 'object' && !Array.isArray(observation);
+  }), executedSet = new Set(executed), passed = [], failed = [];
+  for (const id of executed) {
+    const row = byId.get(id), rawProblems = assertCase(id, row.observation);
+    if (row.ok === true && typeof row.evidence === 'string' && row.evidence.length > 0 && !duplicates.has(id) && !rawProblems.length) passed.push(id);
+    else {failed.push(id); problems.push(id + ': ' + (rawProblems.join('; ') || 'child failed, duplicate result or missing evidence'));}
+  }
+  return {byId, discovered, executed, passed, failed, unresolved: expectedIds.filter(id => !executedSet.has(id)), problems};
+}
+
 export async function runAcceptance({runPath}) {
   const request = coordinatorRequest();
   const roster = deriveMainRoster();
@@ -95,7 +125,10 @@ export async function runAcceptance({runPath}) {
   });
   const commit = gitValue(['rev-parse', 'HEAD']);
   const tree = gitValue(['rev-parse', 'HEAD^{tree}']);
+  const status = gitValue(['status', '--porcelain', '--untracked-files=normal']);
   const identity = [];
+  if (status === null) identity.push('checkout clean source state is unknown');
+  else if (status !== '') identity.push('checkout source became dirty during native-motion execution');
   if (!request || request.error) identity.push(request ? request.error : 'missing coordinator request');
   if (request && request.binding) {
     if (request.binding.source_clean !== true) identity.push('dirty source');
@@ -109,10 +142,11 @@ export async function runAcceptance({runPath}) {
   for (const [name, info] of Object.entries(engines)) {
     if (info && info.error) identity.push(`${name}: ${info.error}`);
   }
-  const problems = [...identity, ...observed.problems.filter(item => !identity.includes(item))];
-  const accepted = problems.length === 0 && observed.skipped.length === 0;
-  const byId = new Map(outcomes.filter(item => item && item.ok === true).map(item => [item.id, item]));
-  const evidenceById = new Map(outcomes.filter(item => item && item.id).map(item => [item.id, item.evidence || '']));
+  const qualification = qualifyNativeMotionOutcomes(roster.ids, outcomes);
+  const problems = [...new Set([...identity, ...observed.problems, ...qualification.problems])];
+  const accepted = problems.length === 0 && observed.skipped.length === 0 && qualification.unresolved.length === 0 && qualification.failed.length === 0;
+  const passedSet = new Set(qualification.passed), failedSet = new Set(qualification.failed);
+  const caseResult = id => passedSet.has(id) ? 'pass' : failedSet.has(id) ? 'fail' : 'unresolved';
   if (!request || request.error) {
     console.error(problems.join('\n'));
     return 1;
@@ -123,7 +157,9 @@ export async function runAcceptance({runPath}) {
     run_id: request.runId,
     invocation_id: request.invocation,
     library_sha256: artifactSha,
-    source_clean: request.binding.source_clean === true,
+    source_clean: request.binding.source_clean === true && status === '',
+    source_commit: commit,
+    source_tree: tree,
     webkit_backend: 'webkitgtk',
     safari_certification: false,
     engines,
@@ -133,8 +169,9 @@ export async function runAcceptance({runPath}) {
     note: 'Cases were derived before the browsers launched. WebKitGTK is not Safari. detectChanges, a zero-duration stylesheet, a wrapper background, a missing engine, dirty source, and an unbound artifact are rejected. motion-smoke is a separate source check.',
     cases: roster.ids.map(id => ({
       case_id: id,
-      result: byId.has(id) ? 'pass' : 'fail',
-      evidence: evidenceById.get(id) || '',
+      result: caseResult(id),
+      evidence: qualification.byId.get(id)?.evidence || '',
+      observation: qualification.byId.get(id)?.observation ?? null,
     })),
   };
   const assertionPath = join(request.outputDir, 'motion-observations.json');
@@ -142,8 +179,6 @@ export async function runAcceptance({runPath}) {
   writeFileSync(assertionPath, assertionBytes);
   const relativeAssertion = relative(request.runDir, assertionPath).split('\\').join('/');
   const output = {path: relativeAssertion, sha256: createHash('sha256').update(assertionBytes).digest('hex'), bytes: assertionBytes.length};
-  const passedIds = roster.ids.filter(id => byId.has(id));
-  const failedIds = roster.ids.filter(id => !byId.has(id));
   const report = {
     schema_version: 1,
     template: false,
@@ -159,21 +194,21 @@ export async function runAcceptance({runPath}) {
     subject_ids: ['library'],
     artifacts: {library: {sha256: artifactSha, bytes: artifactBytes}},
     expected_case_ids: roster.ids,
-    discovered_case_ids: roster.ids,
-    executed_case_ids: roster.ids,
-    passed_case_ids: passedIds,
-    failed_case_ids: accepted ? [] : failedIds.slice(0, 50),
+    discovered_case_ids: qualification.discovered,
+    executed_case_ids: qualification.executed,
+    passed_case_ids: qualification.passed,
+    failed_case_ids: qualification.failed,
     skipped_case_ids: [],
-    unresolved_case_ids: [],
+    unresolved_case_ids: qualification.unresolved,
     exceptions: [],
-    passed: passedIds.length,
-    failed: accepted ? 0 : failedIds.length,
+    passed: qualification.passed.length,
+    failed: qualification.failed.length,
     skipped: 0,
     outputs: [output],
     case_results: roster.ids.map(id => ({
       case_id: id,
-      result: byId.has(id) ? 'pass' : 'fail',
-      kind: 'assertion',
+      result: caseResult(id),
+      kind: caseResult(id) === 'unresolved' ? 'not-executed' : 'assertion',
       output_paths: [relativeAssertion],
     })),
     command: ['node', 'scripts/native-motion-acceptance.mjs', '--run', request.runId],

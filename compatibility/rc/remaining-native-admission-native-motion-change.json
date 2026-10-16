@@ -1,0 +1,92 @@
+{
+  "line": "21.x",
+  "path": "scripts/native-motion-acceptance.mjs",
+  "before_sha256": "b1910157013a11065235f15b6e130817a2a8cb52011fac3b1c1651b0ee9b0201",
+  "current_sha256": "859cc5e981bce80c4c54e7c36b25f2303b324fe63470eed0ef51914da4581518",
+  "edits": [
+    {
+      "start": 20,
+      "end": 254,
+      "before": "",
+      "after": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n"
+    },
+    {
+      "start": 815,
+      "end": 922,
+      "before": "import {deriveMainRoster, observationProblems, SOURCE_LINE} from './native-motion-roster.mjs';\n",
+      "after": "import {deriveMainRoster, observationProblems, assertCase, SOURCE_LINE} from './native-motion-roster.mjs';\n"
+    },
+    {
+      "start": 1149,
+      "end": 1209,
+      "before": "  return result.status === 0 ? result.stdout.trim() : '';\n",
+      "after": "  return result.status === 0 ? result.stdout.trim() : null;\n"
+    },
+    {
+      "start": 4140,
+      "end": 5821,
+      "before": "",
+      "after": "/** Keep actual discovery/execution distinct from the expected roster. Recheck\n * raw states rather than copying a child's pass label into the owned report. */\nexport function qualifyNativeMotionOutcomes(expectedIds, outcomes) {\n  const expected = new Set(expectedIds), byId = new Map(), discovered = [], duplicates = new Set(), problems = [];\n  if (!expectedIds.length || expected.size !== expectedIds.length) problems.push('invalid expected native-motion roster');\n  for (const row of outcomes || []) {\n    if (!row || typeof row.id !== 'string' || !row.id) {problems.push('malformed native-motion outcome'); continue;}\n    if (byId.has(row.id)) {duplicates.add(row.id); problems.push('duplicate native-motion outcome ' + row.id); continue;}\n    byId.set(row.id, row); discovered.push(row.id);\n    if (!expected.has(row.id)) problems.push('unexpected native-motion outcome ' + row.id);\n  }\n  const executed = expectedIds.filter(id => {\n    const observation = byId.get(id)?.observation;\n    return observation !== null && typeof observation === 'object' && !Array.isArray(observation);\n  }), executedSet = new Set(executed), passed = [], failed = [];\n  for (const id of executed) {\n    const row = byId.get(id), rawProblems = assertCase(id, row.observation);\n    if (row.ok === true && typeof row.evidence === 'string' && row.evidence.length > 0 && !duplicates.has(id) && !rawProblems.length) passed.push(id);\n    else {failed.push(id); problems.push(id + ': ' + (rawProblems.join('; ') || 'child failed, duplicate result or missing evidence'));}\n  }\n  return {byId, discovered, executed, passed, failed, unresolved: expectedIds.filter(id => !executedSet.has(id)), problems};\n}\n\n"
+    },
+    {
+      "start": 7328,
+      "end": 7410,
+      "before": "",
+      "after": "  const status = gitValue(['status', '--porcelain', '--untracked-files=normal']);\n"
+    },
+    {
+      "start": 7433,
+      "end": 7617,
+      "before": "",
+      "after": "  if (status === null) identity.push('checkout clean source state is unknown');\n  else if (status !== '') identity.push('checkout source became dirty during native-motion execution');\n"
+    },
+    {
+      "start": 8451,
+      "end": 8969,
+      "before": "  const problems = [...identity, ...observed.problems.filter(item => !identity.includes(item))];\n  const accepted = problems.length === 0 && observed.skipped.length === 0;\n  const byId = new Map(outcomes.filter(item => item && item.ok === true).map(item => [item.id, item]));\n  const evidenceById = new Map(outcomes.filter(item => item && item.id).map(item => [item.id, item.evidence || '']));\n",
+      "after": "  const qualification = qualifyNativeMotionOutcomes(roster.ids, outcomes);\n  const problems = [...new Set([...identity, ...observed.problems, ...qualification.problems])];\n  const accepted = problems.length === 0 && observed.skipped.length === 0 && qualification.unresolved.length === 0 && qualification.failed.length === 0;\n  const passedSet = new Set(qualification.passed), failedSet = new Set(qualification.failed);\n  const caseResult = id => passedSet.has(id) ? 'pass' : failedSet.has(id) ? 'fail' : 'unresolved';\n"
+    },
+    {
+      "start": 9254,
+      "end": 9378,
+      "before": "    source_clean: request.binding.source_clean === true,\n",
+      "after": "    source_clean: request.binding.source_clean === true && status === '',\n    source_commit: commit,\n    source_tree: tree,\n"
+    },
+    {
+      "start": 9882,
+      "end": 10040,
+      "before": "      result: byId.has(id) ? 'pass' : 'fail',\n      evidence: evidenceById.get(id) || '',\n",
+      "after": "      result: caseResult(id),\n      evidence: qualification.byId.get(id)?.evidence || '',\n      observation: qualification.byId.get(id)?.observation ?? null,\n"
+    },
+    {
+      "start": 10483,
+      "end": 10483,
+      "before": "  const passedIds = roster.ids.filter(id => byId.has(id));\n  const failedIds = roster.ids.filter(id => !byId.has(id));\n",
+      "after": ""
+    },
+    {
+      "start": 10988,
+      "end": 11172,
+      "before": "    discovered_case_ids: roster.ids,\n    executed_case_ids: roster.ids,\n    passed_case_ids: passedIds,\n    failed_case_ids: accepted ? [] : failedIds.slice(0, 50),\n",
+      "after": "    discovered_case_ids: qualification.discovered,\n    executed_case_ids: qualification.executed,\n    passed_case_ids: qualification.passed,\n    failed_case_ids: qualification.failed,\n"
+    },
+    {
+      "start": 11198,
+      "end": 11249,
+      "before": "    unresolved_case_ids: [],\n",
+      "after": "    unresolved_case_ids: qualification.unresolved,\n"
+    },
+    {
+      "start": 11269,
+      "end": 11351,
+      "before": "    passed: passedIds.length,\n    failed: accepted ? 0 : failedIds.length,\n",
+      "after": "    passed: qualification.passed.length,\n    failed: qualification.failed.length,\n"
+    },
+    {
+      "start": 11451,
+      "end": 11557,
+      "before": "      result: byId.has(id) ? 'pass' : 'fail',\n      kind: 'assertion',\n",
+      "after": "      result: caseResult(id),\n      kind: caseResult(id) === 'unresolved' ? 'not-executed' : 'assertion',\n"
+    }
+  ]
+}
