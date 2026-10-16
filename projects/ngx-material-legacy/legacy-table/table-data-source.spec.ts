@@ -73,6 +73,20 @@ describe('MatTableDataSource', () => {
       dataSource.data = [5, 4, 3, 2, 1];
       expect(dataSource.filteredData).toEqual([5, 4, 3, 2, 1]);
     });
+
+    it('should be able to correctly sort an array of strings and numbers with left zero', () => {
+      testSortWithValues([
+        '001',
+        '2',
+        3,
+        4,
+        'apples',
+        'bananas',
+        'cherries',
+        'lemons',
+        'strawberries',
+      ]);
+    });
   });
 });
 

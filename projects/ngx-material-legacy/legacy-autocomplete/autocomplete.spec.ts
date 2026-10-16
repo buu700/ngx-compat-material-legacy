@@ -3553,6 +3553,18 @@ describe('MatAutocomplete', () => {
 
     subscription.unsubscribe();
   }));
+
+  it('should not throw errors when closing without options', fakeAsync(() => {
+    const fixture = createComponent(SimpleAutocomplete);
+    fixture.componentInstance.filteredStates = fixture.componentInstance.states = [];
+    fixture.detectChanges();
+    expect(fixture.componentInstance.options.length).toBe(0);
+    const trigger = fixture.componentInstance.trigger;
+
+    trigger.openPanel();
+    expect(() => trigger.closePanel()).not.toThrow();
+    fixture.destroy();
+  }));
 });
 
 const SIMPLE_AUTOCOMPLETE_TEMPLATE = `
