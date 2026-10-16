@@ -1,0 +1,388 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "3e092f10d49a274d79ca73222510eb45de098a6a",
+  "subject": "refactor(material/datepicker): switch tests to standalone",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "927a2425688b6f82db9a5bab5e646a1c7982f649",
+      "after_blob": "adf1dd2ccdcd2e1f224270ad215fb65d6c310d3a"
+    },
+    {
+      "path": "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "db04be17df381526088120150366ae26d9dcb744",
+      "after_blob": "ea61771307eb740a3e2cd1d4a6390d41c0128482"
+    },
+    {
+      "path": "src/material/form-field/testing/form-field-harness.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "6a3438f22627867feb2883be6f12d014a93d18a3",
+      "after_blob": "37949514c6e006a9e6d8965632e0f42c80654641"
+    }
+  ],
+  "original_files": 3,
+  "original_hunks": 17,
+  "raw_commit_sha256": "35e86051bb2af55850a976b9b8522c25b1cc49fec6fe98a913f6957430b4b8b7",
+  "original_sources": [
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "before": {
+        "git_blob": "927a2425688b6f82db9a5bab5e646a1c7982f649",
+        "sha256": "e5e44bf06de49a4bbcf4d535f6213678ee839940ad42a6c5c7ed4417f41df726",
+        "bytes": 46153
+      },
+      "after": {
+        "git_blob": "adf1dd2ccdcd2e1f224270ad215fb65d6c310d3a",
+        "sha256": "749421bbe49628d4c2a4f82785ed08fd3582d7ffaa66f6635376115040433ec0",
+        "bytes": 47031
+      }
+    },
+    {
+      "path": "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+      "before": {
+        "git_blob": "db04be17df381526088120150366ae26d9dcb744",
+        "sha256": "681d662a5601bca431bfe003c8a5b8992389c30503ecf836678c228ea171f3b3",
+        "bytes": 10544
+      },
+      "after": {
+        "git_blob": "ea61771307eb740a3e2cd1d4a6390d41c0128482",
+        "sha256": "db3e18e51868f064f0cc55465e3c4bcc1183e59cd05dc6d6b1eb0ded62a18c8f",
+        "bytes": 10695
+      }
+    },
+    {
+      "path": "src/material/form-field/testing/form-field-harness.spec.ts",
+      "before": {
+        "git_blob": "6a3438f22627867feb2883be6f12d014a93d18a3",
+        "sha256": "77654b33c9bb2b51d83717e85af3e34410b6fc20438e773dc976274370a12b3c",
+        "bytes": 16828
+      },
+      "after": {
+        "git_blob": "37949514c6e006a9e6d8965632e0f42c80654641",
+        "sha256": "7564a5801168a51cfe2888304d23a64b83951bdf5e363d82cd7a8a2c4bf2b050",
+        "bytes": 17048
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/datepicker/date-range-input.spec.ts b/src/material/datepicker/date-range-input.spec.ts\nindex 927a2425688b6f82db9a5bab5e646a1c7982f649..adf1dd2ccdcd2e1f224270ad215fb65d6c310d3a 100644\n--- a/src/material/datepicker/date-range-input.spec.ts\n+++ b/src/material/datepicker/date-range-input.spec.ts\n@@ -15,7 +15,7 @@ import {Directionality} from '@angular/cdk/bidi';\n import {OverlayContainer} from '@angular/cdk/overlay';\n import {ErrorStateMatcher, MatNativeDateModule} from '@angular/material/core';\n import {MatDatepickerModule} from './datepicker-module';\n-import {MatFormFieldModule} from '@angular/material/form-field';\n+import {MatFormField, MatFormFieldModule, MatLabel} from '@angular/material/form-field';\n import {MatInputModule} from '@angular/material/input';\n import {dispatchFakeEvent, dispatchKeyboardEvent} from '@angular/cdk/testing/private';\n import {FocusMonitor} from '@angular/cdk/a11y';\n@@ -26,11 +26,7 @@ import {MatStartDate, MatEndDate} from './date-range-input-parts';\n import {Subscription} from 'rxjs';\n \n describe('MatDateRangeInput', () => {\n-  function createComponent<T>(\n-    component: Type<T>,\n-    declarations: Type<any>[] = [],\n-    providers: Provider[] = [],\n-  ): ComponentFixture<T> {\n+  function createComponent<T>(component: Type<T>, providers: Provider[] = []): ComponentFixture<T> {\n     TestBed.configureTestingModule({\n       imports: [\n         FormsModule,\n@@ -40,9 +36,9 @@ describe('MatDateRangeInput', () => {\n         NoopAnimationsModule,\n         ReactiveFormsModule,\n         MatNativeDateModule,\n+        component,\n       ],\n       providers,\n-      declarations: [component, ...declarations],\n     });\n \n     return TestBed.createComponent(component);\n@@ -818,16 +814,12 @@ describe('MatDateRangeInput', () => {\n     class RTL extends Directionality {\n       override readonly value = 'rtl';\n     }\n-    const fixture = createComponent(\n-      StandardRangePicker,\n-      [],\n-      [\n-        {\n-          provide: Directionality,\n-          useFactory: () => new RTL(null),\n-        },\n-      ],\n-    );\n+    const fixture = createComponent(StandardRangePicker, [\n+      {\n+        provide: Directionality,\n+        useFactory: () => new RTL(null),\n+      },\n+    ]);\n     fixture.detectChanges();\n     const {start, end} = fixture.componentInstance;\n \n@@ -1156,6 +1148,16 @@ describe('MatDateRangeInput', () => {\n         #rangePicker></mat-date-range-picker>\n     </mat-form-field>\n   `,\n+  standalone: true,\n+  imports: [\n+    MatDateRangeInput,\n+    MatStartDate,\n+    MatEndDate,\n+    MatFormField,\n+    MatLabel,\n+    MatDateRangePicker,\n+    ReactiveFormsModule,\n+  ],\n })\n class StandardRangePicker {\n   @ViewChild('start') start: ElementRef<HTMLInputElement>;\n@@ -1189,6 +1191,8 @@ class StandardRangePicker {\n       <mat-date-range-picker #rangePicker></mat-date-range-picker>\n     </mat-form-field>\n   `,\n+  standalone: true,\n+  imports: [MatDateRangeInput, MatStartDate, MatEndDate, MatFormField, MatDateRangePicker],\n })\n class RangePickerNoStart {}\n \n@@ -1202,6 +1206,8 @@ class RangePickerNoStart {}\n       <mat-date-range-picker #rangePicker></mat-date-range-picker>\n     </mat-form-field>\n   `,\n+  standalone: true,\n+  imports: [MatDateRangeInput, MatStartDate, MatEndDate, MatFormField, MatDateRangePicker],\n })\n class RangePickerNoEnd {}\n \n@@ -1216,6 +1222,15 @@ class RangePickerNoEnd {}\n       <mat-date-range-picker #rangePicker></mat-date-range-picker>\n     </mat-form-field>\n   `,\n+  standalone: true,\n+  imports: [\n+    MatDateRangeInput,\n+    MatStartDate,\n+    MatEndDate,\n+    MatFormField,\n+    MatDateRangePicker,\n+    FormsModule,\n+  ],\n })\n class RangePickerNgModel {\n   @ViewChild(MatStartDate, {read: NgModel}) startModel: NgModel;\n@@ -1254,6 +1269,8 @@ class RangePickerNgModel {\n       <mat-date-range-picker #rangePicker></mat-date-range-picker>\n     </mat-form-field>\n   `,\n+  standalone: true,\n+  imports: [MatDateRangeInput, MatStartDate, MatEndDate, MatFormField, MatDateRangePicker],\n })\n class RangePickerNoLabel {\n   @ViewChild('start') start: ElementRef<HTMLInputElement>;\n@@ -1269,6 +1286,7 @@ class RangePickerNoLabel {\n       multi: true,\n     },\n   ],\n+  standalone: true,\n })\n class CustomValidator implements Validator {\n   validate = jasmine.createSpy('validate spy').and.returnValue(null);\n@@ -1285,6 +1303,16 @@ class CustomValidator implements Validator {\n       <mat-date-range-picker #rangePicker></mat-date-range-picker>\n     </mat-form-field>\n   `,\n+  standalone: true,\n+  imports: [\n+    MatDateRangeInput,\n+    MatStartDate,\n+    MatEndDate,\n+    MatFormField,\n+    MatDateRangePicker,\n+    CustomValidator,\n+    FormsModule,\n+  ],\n })\n class RangePickerWithCustomValidator {\n   @ViewChild(CustomValidator) validator: CustomValidator;\n@@ -1305,6 +1333,8 @@ class RangePickerWithCustomValidator {\n       <mat-date-range-picker #rangePicker></mat-date-range-picker>\n     </mat-form-field>\n   `,\n+  standalone: true,\n+  imports: [MatDateRangeInput, MatStartDate, MatEndDate, MatFormField, MatDateRangePicker],\n })\n class RangePickerErrorStateMatcher {\n   @ViewChild(MatStartDate) startInput: MatStartDate<Date>;\ndiff --git a/src/material/datepicker/testing/date-range-input-harness.spec.ts b/src/material/datepicker/testing/date-range-input-harness.spec.ts\nindex db04be17df381526088120150366ae26d9dcb744..ea61771307eb740a3e2cd1d4a6390d41c0128482 100644\n--- a/src/material/datepicker/testing/date-range-input-harness.spec.ts\n+++ b/src/material/datepicker/testing/date-range-input-harness.spec.ts\n@@ -4,7 +4,13 @@ import {HarnessLoader, parallel} from '@angular/cdk/testing';\n import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';\n import {MatNativeDateModule} from '@angular/material/core';\n import {FormsModule} from '@angular/forms';\n-import {MatDatepickerModule} from '@angular/material/datepicker';\n+import {\n+  MatDateRangeInput,\n+  MatDateRangePicker,\n+  MatDatepickerModule,\n+  MatEndDate,\n+  MatStartDate,\n+} from '@angular/material/datepicker';\n import {NoopAnimationsModule} from '@angular/platform-browser/animations';\n import {MatCalendarHarness} from './calendar-harness';\n import {\n@@ -255,7 +261,14 @@ describe('matDateRangeInputHarness', () => {\n     </mat-date-range-input>\n   `,\n   standalone: true,\n-  imports: [MatNativeDateModule, MatDatepickerModule, FormsModule],\n+  imports: [\n+    MatNativeDateModule,\n+    MatDateRangeInput,\n+    MatStartDate,\n+    MatEndDate,\n+    MatDateRangePicker,\n+    FormsModule,\n+  ],\n })\n class DateRangeInputHarnessTest {\n   startDate: Date | null = null;\ndiff --git a/src/material/form-field/testing/form-field-harness.spec.ts b/src/material/form-field/testing/form-field-harness.spec.ts\nindex 6a3438f22627867feb2883be6f12d014a93d18a3..37949514c6e006a9e6d8965632e0f42c80654641 100644\n--- a/src/material/form-field/testing/form-field-harness.spec.ts\n+++ b/src/material/form-field/testing/form-field-harness.spec.ts\n@@ -5,12 +5,27 @@ import {createFakeEvent, dispatchFakeEvent} from '@angular/cdk/testing/private';\n import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';\n import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';\n import {NoopAnimationsModule} from '@angular/platform-browser/animations';\n-import {MatFormFieldModule} from '@angular/material/form-field';\n-import {MatAutocompleteModule} from '@angular/material/autocomplete';\n-import {MatInputModule} from '@angular/material/input';\n-import {MatSelectModule} from '@angular/material/select';\n+import {\n+  MatError,\n+  MatFormField,\n+  MatHint,\n+  MatLabel,\n+  MatPrefix,\n+  MatSuffix,\n+} from '@angular/material/form-field';\n+import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';\n+import {MatInput} from '@angular/material/input';\n+import {MatSelect} from '@angular/material/select';\n import {MatNativeDateModule} from '@angular/material/core';\n-import {MatDatepickerModule} from '@angular/material/datepicker';\n+import {\n+  MatDateRangeInput,\n+  MatDateRangePicker,\n+  MatDatepicker,\n+  MatDatepickerInput,\n+  MatDatepickerModule,\n+  MatEndDate,\n+  MatStartDate,\n+} from '@angular/material/datepicker';\n import {MatInputHarness} from '@angular/material/input/testing';\n import {MatSelectHarness} from '@angular/material/select/testing';\n import {\n@@ -28,14 +43,9 @@ describe('MatFormFieldHarness', () => {\n     await TestBed.configureTestingModule({\n       imports: [\n         NoopAnimationsModule,\n-        ReactiveFormsModule,\n-        MatFormFieldModule,\n-        MatAutocompleteModule,\n-        MatInputModule,\n-        MatSelectModule,\n         MatNativeDateModule,\n-        MatDatepickerModule,\n         FormFieldHarnessTest,\n+        MatDatepickerModule,\n       ],\n     }).compileComponents();\n \n@@ -350,12 +360,23 @@ describe('MatFormFieldHarness', () => {\n   standalone: true,\n   imports: [\n     ReactiveFormsModule,\n-    MatFormFieldModule,\n-    MatAutocompleteModule,\n-    MatInputModule,\n-    MatSelectModule,\n     MatNativeDateModule,\n-    MatDatepickerModule,\n+    MatAutocomplete,\n+    MatAutocompleteTrigger,\n+    MatDatepicker,\n+    MatDatepickerInput,\n+    MatDateRangePicker,\n+    MatDateRangeInput,\n+    MatEndDate,\n+    MatError,\n+    MatFormField,\n+    MatHint,\n+    MatInput,\n+    MatLabel,\n+    MatPrefix,\n+    MatSelect,\n+    MatStartDate,\n+    MatSuffix,\n   ],\n })\n class FormFieldHarnessTest {\n",
+  "diff_sha256": "c7610760f5b5577f7f6c3050a2cc8174bc1d96e1d91c17d29608c0c8aaed48ce",
+  "hunk_reviews": [
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -15,7 +15,7 @@ import {Directionality} from '@angular/cdk/bidi';",
+      "sha256": "a8d24ca300b5e63417e9681980fda70ddecfec1f4457d602c3088b12776e9e9c",
+      "judgment": "Adds direct MatFormField/MatLabel imports beside the retained module import for private standalone date-range fixtures. No product import or consumer scope changes."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -26,11 +26,7 @@ import {MatStartDate, MatEndDate} from './date-range-input-parts';",
+      "sha256": "53fffaa1e9047a1bb4779b6b4e9c998600a89b1f43c6e0df28e866a15814f7e0",
+      "judgment": "Removes the private createComponent declarations parameter. The normalized remaining signature/body preserves providers and TestBed creation; the owned shared legacy helper retains its own modules/declarations API."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -40,9 +36,9 @@ describe('MatDateRangeInput', () => {",
+      "sha256": "9fdcbbaf210f87da5304b24760feddfa723de46d595328ccc55f8f9a671e4c58",
+      "judgment": "Moves the fixture into TestBed imports and removes its declarations array. This is a modern standalone test-environment change, not a change to date-range behavior or retained legacy declarations."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -818,16 +814,12 @@ describe('MatDateRangeInput', () => {",
+      "sha256": "052e92b434fa6fbdcd65c4a55ea6f382baaf2de56168eafc61e0ffbb91fed14a",
+      "judgment": "Removes the empty declarations argument from the RTL fixture call, preserving its Directionality provider object and assertions."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -1156,6 +1148,16 @@ describe('MatDateRangeInput', () => {",
+      "sha256": "3dd82455fd6af105c17e55fcdb4b4bdcaca757b7a60d8573d4aa837510acb4da",
+      "judgment": "Marks StandardRangePicker standalone and adds its exact seven directive/form imports. Its entire template and executable class body remain unchanged."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -1189,6 +1191,8 @@ class StandardRangePicker {",
+      "sha256": "d2219440d29e6d8f3e3ed9d501e202b2098e165cffd75142ca67446f73bba431",
+      "judgment": "Marks RangePickerNoStart standalone with its exact five date-range/form-field imports; preserves its intentionally malformed fixture and assertion."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -1202,6 +1206,8 @@ class RangePickerNoStart {}",
+      "sha256": "68715a46ac445a52d5b6c636dd81a4f428dc09e710c3c34dfef74aad1a55929a",
+      "judgment": "Marks RangePickerNoEnd standalone with the same exact five imports; preserves this separate malformed fixture and assertion."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -1216,6 +1222,15 @@ class RangePickerNoEnd {}",
+      "sha256": "9fd32374d3e8da1b965cfde852b99cd31f7da7c62fbbcbe4e326ba96fc580b8b",
+      "judgment": "Marks RangePickerNgModel standalone with its exact six imports including FormsModule; preserves model bindings and assertions."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -1254,6 +1269,8 @@ class RangePickerNgModel {",
+      "sha256": "47bfedb5e6c033e6fceaacd9b8894531f4a87023d98d2b6c63faf5e18fa4a335",
+      "judgment": "Marks RangePickerNoLabel standalone with five exact imports; preserves the unlabeled fixture and existing behavior checks."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -1269,6 +1286,7 @@ class RangePickerNoLabel {",
+      "sha256": "dda3bf04e08e232334ff430afd488e4cef146c401dbcc40f8a73a02d44e3201c",
+      "judgment": "Marks the private CustomValidator directive standalone without adding imports; preserves its validator provider and implementation."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -1285,6 +1303,16 @@ class CustomValidator implements Validator {",
+      "sha256": "98408a1f52d6e929464c9f2dc0ca692492f40a6716b97fa29a8efed84fee6374",
+      "judgment": "Marks RangePickerWithCustomValidator standalone with seven exact imports including CustomValidator/FormsModule. The validator and template bytes are unchanged."
+    },
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "header": "@@ -1305,6 +1333,8 @@ class RangePickerWithCustomValidator {",
+      "sha256": "0199ef56baff1f76da25f019a77425992f9148831eb5f758c54f5ac8904a550a",
+      "judgment": "Marks RangePickerErrorStateMatcher standalone with five exact imports; preserves its matcher fixture and assertions."
+    },
+    {
+      "path": "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+      "header": "@@ -4,7 +4,13 @@ import {HarnessLoader, parallel} from '@angular/cdk/testing';",
+      "sha256": "e152dd2f3ebf8ab4f8ad7a0987f73d74f1262083681b589c7845fa8181d223a6",
+      "judgment": "Expands public datepicker imports for the private standalone date-range harness. No owned public datepicker implementation is introduced."
+    },
+    {
+      "path": "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+      "header": "@@ -255,7 +261,14 @@ describe('matDateRangeInputHarness', () => {",
+      "sha256": "befe3764bb42150816f42cdfd9bacc73558ecf1555bcc3dbafd9031b39970c83",
+      "judgment": "Replaces the private DateRangeInputHarnessTest module import with its exact six native/date-range/form imports. The template, cases and harness operations stay exact."
+    },
+    {
+      "path": "src/material/form-field/testing/form-field-harness.spec.ts",
+      "header": "@@ -5,12 +5,27 @@ import {createFakeEvent, dispatchFakeEvent} from '@angular/cdk/testing/private';",
+      "sha256": "8696e97242ac64b3bb48cd0bc1326510e3273e7c574cac4d0247c83cdc2ab072",
+      "judgment": "Changes the modern form-field harness imports from aggregate modules to public standalone components/directives. The owned MatLegacy module configuration remains distinct and reachable."
+    },
+    {
+      "path": "src/material/form-field/testing/form-field-harness.spec.ts",
+      "header": "@@ -28,14 +43,9 @@ describe('MatFormFieldHarness', () => {",
+      "sha256": "05c24739215248afe3733547310e7cf24eabe028c6b2e8cf09d3e16bba487a6d",
+      "judgment": "Simplifies modern root TestBed imports while keeping native-date, fixture and datepicker module provisioning. No legacy TestBed declaration is removed."
+    },
+    {
+      "path": "src/material/form-field/testing/form-field-harness.spec.ts",
+      "header": "@@ -350,12 +360,23 @@ describe('MatFormFieldHarness', () => {",
+      "sha256": "b5c98d847e86cb5a8fe8ba1784eb61f80b4128196802a1bc73150418dc057ebf",
+      "judgment": "Expands modern FormFieldHarnessTest imports to the exact eighteen native/form/control/date directive bindings. All template bytes and assertions remain intact; retain the owned legacy fixture."
+    }
+  ],
+  "semantics": [
+    {
+      "path": "src/material/datepicker/date-range-input.spec.ts",
+      "kind": "private-standalone-fixture-scope-migration",
+      "fixture_templates_preserved": 7,
+      "whole_program_equal_after_only_import_metadata_helper_argument_normalization": true,
+      "owned_legacy_module_fixtures_not_converted": true
+    },
+    {
+      "path": "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+      "kind": "private-standalone-fixture-scope-migration",
+      "fixture_templates_preserved": 1,
+      "whole_program_equal_after_only_import_metadata_helper_argument_normalization": true,
+      "owned_legacy_module_fixtures_not_converted": true
+    },
+    {
+      "path": "src/material/form-field/testing/form-field-harness.spec.ts",
+      "kind": "private-standalone-fixture-scope-migration",
+      "fixture_templates_preserved": 1,
+      "whole_program_equal_after_only_import_metadata_helper_argument_normalization": true,
+      "owned_legacy_module_fixtures_not_converted": true
+    }
+  ],
+  "decision": "Review all17 hunks across the complete date-range-input, date-range harness and form-field harness files. They migrate private fixture declarations/import scopes to standalone components/directives, add explicit per-fixture imports, simplify the createComponent declarations parameter and its RTL provider call, and move public Material imports. Every fixture template, assertion and other operation is preserved after only those exact setup normalizations, and the ten explicit resulting fixture scopes are checked independently. The owned legacy harness is reachable: it uses MatLegacy modules, a shared FormFieldHarnessTest TestBed declaration, current public datepicker harnesses and a stable public native-date module. Preserve this non-standalone historical module setup, exact templates/selectors and case roster; do not transplant modern standalone component contracts. Decline the private fixture migration. Actual harness compilation, mixed legacy/current behavior and floors remain pending.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "c7610760f5b5577f7f6c3050a2cc8174bc1d96e1d91c17d29608c0c8aaed48ce",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Review all17 hunks across the complete date-range-input, date-range harness and form-field harness files. They migrate private fixture declarations/import scopes to standalone components/directives, add explicit per-fixture imports, simplify the createComponent declarations parameter and its RTL provider call, and move public Material imports. Every fixture template, assertion and other operation is preserved after only those exact setup normalizations, and the ten explicit resulting fixture scopes are checked independently. The owned legacy harness is reachable: it uses MatLegacy modules, a shared FormFieldHarnessTest TestBed declaration, current public datepicker harnesses and a stable public native-date module. Preserve this non-standalone historical module setup, exact templates/selectors and case roster; do not transplant modern standalone component contracts. Decline the private fixture migration. Actual harness compilation, mixed legacy/current behavior and floors remain pending.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-theme-date-source-review.mjs",
+        "sha256": "24c509c86fc83d61d63610569bc423046fccbc545c7a214834edbef304b8c92f"
+      },
+      {
+        "path": "tests/spec_theme_date_source_probe.mjs",
+        "sha256": "2deb49ebcdcc13634942418e378cf1a412187a04813ae7119b3406dc83de6c60"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-subjects.json.gz",
+        "sha256": "00763e3eff2e7b37667982760d8bd844f40fb6db457fe2e06f401aa430ab9835"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-acquisition.json.gz",
+        "sha256": "a835206a510eee5c96379d99d659f465cb67c6dc7b34e9ef6490195ce7ae665b"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-controls.json",
+        "sha256": "4d81ffb4f99a0c408a94a815b97468c22ece0257d14e8a368a1be9031eeb7a2e"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-review.json",
+        "sha256": "9327614e0592fa5c56b0e85527868582421a72bd712b1f3d3395aad6146f6157"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.spec.ts",
+        "sha256": "3c4eb8fff2e07edd8243bff934f226a80a8004a29a69f93896322977d8fe218f"
+      },
+      {
+        "path": "testing/legacy-runner/shims/harness/form-field/shared.spec.ts",
+        "sha256": "40ef26bce00f4b8088b021994363ed503b2c9d395e0c98a304ff107bbe0544a1"
+      },
+      {
+        "path": "testing/legacy-runner/adapt-spec.mjs",
+        "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+      },
+      {
+        "path": "compatibility/rc/material-public-subjects.json",
+        "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+      },
+      {
+        "path": "compatibility/rc/material-public-source-members/06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880.gz",
+        "sha256": "55e60cf4148c6f57c24888fc47fcaf3d9d7ba1c11de88a80caca1e709cabc4fb"
+      },
+      {
+        "path": "compatibility/rc/material-public-source-members/c411f1fcb4b76b838433f9c4d6dd2da1f489609f82e417ab14730c5c68dc6b60.gz",
+        "sha256": "033364c4c6b628183bf8d0f0a5013996a3e6dbf0a0d54b973eb909d3a0c9f18e"
+      },
+      {
+        "path": "compatibility/rc/material-public-source-members/e69eba12b87eaae09de70629e0637fc9b07751a7fb4493dac9d7e3cf0ed21964.gz",
+        "sha256": "0283a9011ad20c094b16bc1f74bbfff38b3f5d9521a3567f1aa44023f212536a"
+      },
+      {
+        "path": "compatibility/rc/material-public-source-members/af1db9de63ad6c2953f211b34af25568aab1efccad253725621b63a2210488f0.gz",
+        "sha256": "b715536b513f9362fa296d0809fce0ce2d928320c56e41ecc493dcf31d5eed0c"
+      }
+    ],
+    "actual_Angular_Sass_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "3e092f10d49a274d79ca73222510eb45de098a6a",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/datepicker): switch tests to standalone",
+    "files": [
+      "src/material/datepicker/date-range-input.spec.ts",
+      "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+      "src/material/form-field/testing/form-field-harness.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-theme-date-source-prior.json.gz",
+    "sha256": "2ee28eaaaf97f3d1d720e891783c81cc1fe11d0b83a0ae46e8c6e9e82bd5ddf4"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-theme-date-source-review.mjs",
+      "sha256": "24c509c86fc83d61d63610569bc423046fccbc545c7a214834edbef304b8c92f"
+    },
+    {
+      "path": "tests/spec_theme_date_source_probe.mjs",
+      "sha256": "2deb49ebcdcc13634942418e378cf1a412187a04813ae7119b3406dc83de6c60"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-subjects.json.gz",
+      "sha256": "00763e3eff2e7b37667982760d8bd844f40fb6db457fe2e06f401aa430ab9835"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-acquisition.json.gz",
+      "sha256": "a835206a510eee5c96379d99d659f465cb67c6dc7b34e9ef6490195ce7ae665b"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-controls.json",
+      "sha256": "4d81ffb4f99a0c408a94a815b97468c22ece0257d14e8a368a1be9031eeb7a2e"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-review.json",
+      "sha256": "9327614e0592fa5c56b0e85527868582421a72bd712b1f3d3395aad6146f6157"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.spec.ts",
+      "sha256": "3c4eb8fff2e07edd8243bff934f226a80a8004a29a69f93896322977d8fe218f"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/form-field/shared.spec.ts",
+      "sha256": "40ef26bce00f4b8088b021994363ed503b2c9d395e0c98a304ff107bbe0544a1"
+    },
+    {
+      "path": "testing/legacy-runner/adapt-spec.mjs",
+      "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+    },
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    },
+    {
+      "path": "compatibility/rc/material-public-source-members/06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880.gz",
+      "sha256": "55e60cf4148c6f57c24888fc47fcaf3d9d7ba1c11de88a80caca1e709cabc4fb"
+    },
+    {
+      "path": "compatibility/rc/material-public-source-members/c411f1fcb4b76b838433f9c4d6dd2da1f489609f82e417ab14730c5c68dc6b60.gz",
+      "sha256": "033364c4c6b628183bf8d0f0a5013996a3e6dbf0a0d54b973eb909d3a0c9f18e"
+    },
+    {
+      "path": "compatibility/rc/material-public-source-members/e69eba12b87eaae09de70629e0637fc9b07751a7fb4493dac9d7e3cf0ed21964.gz",
+      "sha256": "0283a9011ad20c094b16bc1f74bbfff38b3f5d9521a3567f1aa44023f212536a"
+    },
+    {
+      "path": "compatibility/rc/material-public-source-members/af1db9de63ad6c2953f211b34af25568aab1efccad253725621b63a2210488f0.gz",
+      "sha256": "b715536b513f9362fa296d0809fce0ce2d928320c56e41ecc493dcf31d5eed0c"
+    }
+  ],
+  "production_HTML_CSS_SCSS_or_TS_changed_in_this_review": false,
+  "actual_Angular_Sass_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
