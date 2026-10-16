@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "658952712df682e26130b754fa19c041712ad747",
+  "subject": "refactor(material/input): remove explicit change detection",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/input/input.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "f7bf11ae5ab9795cdacd45a7221c2d58df75d7a5",
+      "after_blob": "27a3c8dbfa0a92fab2ead04601c3cffabd15cce4"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 1,
+  "raw_commit_sha256": "d0bfb5a3d01a0d0d10275cb4d44820d75a7ffd3bc9627cf48e8a7f2cfc366b22",
+  "original_sources": [
+    {
+      "path": "src/material/input/input.spec.ts",
+      "before": {
+        "git_blob": "f7bf11ae5ab9795cdacd45a7221c2d58df75d7a5",
+        "sha256": "11c4eae73bf27a2bd4c38b20d83441736cc130bb25172c49ba3c01bce7bfe02f",
+        "bytes": 83258
+      },
+      "after": {
+        "git_blob": "27a3c8dbfa0a92fab2ead04601c3cffabd15cce4",
+        "sha256": "17ce7a4f5ed5a5d267e7828d5dfbe3a2e41e72a4128f4cb758323e04bbce14af",
+        "bytes": 83207
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/input/input.spec.ts b/src/material/input/input.spec.ts\nindex f7bf11ae5ab9795cdacd45a7221c2d58df75d7a5..27a3c8dbfa0a92fab2ead04601c3cffabd15cce4 100644\n--- a/src/material/input/input.spec.ts\n+++ b/src/material/input/input.spec.ts\n@@ -2140,7 +2140,6 @@ class MatInputWithNgIf {\n }\n \n @Component({\n-  changeDetection: ChangeDetectionStrategy.OnPush,\n   template: `\n     <mat-form-field>\n       <mat-label>Label</mat-label>\n",
+  "diff_sha256": "1c30f80ee84c17acd69d4e3a041d0681e6c9dd81e17be4a7e17f831965401074",
+  "hunk_reviews": [
+    {
+      "path": "src/material/input/input.spec.ts",
+      "header": "@@ -2140,7 +2140,6 @@ class MatInputWithNgIf {",
+      "sha256": "9524b4d0133d339a908dd7b6f5b5448efda938b88ae8781b5a157d7c06f0e336",
+      "judgment": "The complete one-file one-hunk input test change removes explicit ChangeDetectionStrategy.OnPush from the private MatInputOnPush fixture while retaining all102 callback bodies. The unchanged class name and assertions do not establish the default checking policy at either advertised minimum. Decline the metadata removal and retain the owned explicit OnPush fixture plus the historical programmatic FormControl/empty-class assertion. All noncase operations outside that exact private decorator property match and no current research Eager/default API is installed or mirrored. No product or consumer markup/style or TypeScript change is needed for this source decision. Actual OnPush behavior in packed historical tests and both supported peer floors remains to be executed.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    }
+  ],
+  "stability_semantics": {
+    "sha": "658952712df682e26130b754fa19c041712ad747",
+    "complete_original_files": 1,
+    "complete_original_hunks": 1,
+    "before_static_occurrences": 102,
+    "after_static_occurrences": 102,
+    "full_ordered_path_suite_mode_occurrence_pairing": true,
+    "removed": [],
+    "added": [],
+    "programs": [
+      {
+        "path": "src/material/input/input.spec.ts",
+        "all_other_noncase_operations_and_metadata_equal": true
+      }
+    ],
+    "fixtureChanges": [
+      {
+        "path": "src/material/input/input.spec.ts",
+        "name": "MatInputOnPush",
+        "before_sha256": "71901680acd31df884d55087bfb463f94f04752c3399230e9d084a98015cac78",
+        "after_sha256": "31ecf460a26fdd71b6948edf5da4ce1d88aff6f5b5a94b9ef3626c01e12edaa1",
+        "kind": "explicit-OnPush-removed-from-private-fixture",
+        "minimum_peer_default_equivalence_proved": false,
+        "owned_explicit_OnPush_retained": true
+      }
+    ],
+    "callback_identity_is_not_fixture_or_peer_behavior_equivalence": true,
+    "actual_original_or_owned_Angular_native_or_floor_tests_executed": false,
+    "complete_ordered_case_pairs_and_program_reviews": {
+      "path": "compatibility/rc/spec-stability-source-review.json.gz",
+      "sha256": "fadd4916ec34b01c85eb158af9b34b84e6d228d823f432238e1cb14afd882d00"
+    }
+  },
+  "decision": "The complete one-file one-hunk input test change removes explicit ChangeDetectionStrategy.OnPush from the private MatInputOnPush fixture while retaining all102 callback bodies. The unchanged class name and assertions do not establish the default checking policy at either advertised minimum. Decline the metadata removal and retain the owned explicit OnPush fixture plus the historical programmatic FormControl/empty-class assertion. All noncase operations outside that exact private decorator property match and no current research Eager/default API is installed or mirrored. No product or consumer markup/style or TypeScript change is needed for this source decision. Actual OnPush behavior in packed historical tests and both supported peer floors remains to be executed.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "1c30f80ee84c17acd69d4e3a041d0681e6c9dd81e17be4a7e17f831965401074",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete one-file one-hunk input test change removes explicit ChangeDetectionStrategy.OnPush from the private MatInputOnPush fixture while retaining all102 callback bodies. The unchanged class name and assertions do not establish the default checking policy at either advertised minimum. Decline the metadata removal and retain the owned explicit OnPush fixture plus the historical programmatic FormControl/empty-class assertion. All noncase operations outside that exact private decorator property match and no current research Eager/default API is installed or mirrored. No product or consumer markup/style or TypeScript change is needed for this source decision. Actual OnPush behavior in packed historical tests and both supported peer floors remains to be executed.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-stability-source-review.mjs",
+        "sha256": "7a69a7fc852bbd0fa39d121f44ecbcb95fb578e07a9774d196b67acdd86b8981"
+      },
+      {
+        "path": "tests/spec_stability_source_probe.mjs",
+        "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-subjects.json.gz",
+        "sha256": "9612288e34795175517212df2ff4a9052ba0975c96166927d2cfb2c37be265a2"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-acquisition.json.gz",
+        "sha256": "706373adfb5cae2b22018979d2f9d3494af8bcf4428b442104a0a923e9514acc"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-controls.json",
+        "sha256": "551c7fdf984ec2b7812aded8b5b1c4eae26df1d3bb7fa54246732a3aaddd08a8"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-review.json.gz",
+        "sha256": "fadd4916ec34b01c85eb158af9b34b84e6d228d823f432238e1cb14afd882d00"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-python.log.gz",
+        "sha256": "04c1a725bc32b7e9b1fb9acba27cd75a34b7fbce553260125865f5d7a7291091"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-cyph-sanity.json",
+        "sha256": "77007e75d0ab7f8f70ee16f1aee7dcfd10049346073d42799857f46ee374fbb5"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "tests/spec_stability_chip_probe.mjs",
+        "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+        "sha256": "98afc2ceca25ccb8dbaf9737032d8ebaa8474d48538dff95129ffaa5798017c1"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+        "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-replay-checkpoint.json",
+        "sha256": "3f0315ca68ff5d92e0ebf6d26c09ae9d7bc4ae14169a797072a836046861a159"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+        "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+        "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "658952712df682e26130b754fa19c041712ad747",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/input): remove explicit change detection",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=fd5361bf0faca04b806d08506d3b44b498da31cee4cb5892a27cd95ad64e5d23, bytes=384). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/input/input.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/input/input.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/658952712df682e26130b754fa19c041712ad747.json",
+    "batch_id": "test-only-refactor-wave2-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:47:11Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "fd5361bf0faca04b806d08506d3b44b498da31cee4cb5892a27cd95ad64e5d23"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-stability-source-prior.json.gz",
+    "sha256": "073b2b4a3058bdb6f13e60aff4f65275c4f74f75989c39266464e130f26a24fa"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-stability-source-review.mjs",
+      "sha256": "7a69a7fc852bbd0fa39d121f44ecbcb95fb578e07a9774d196b67acdd86b8981"
+    },
+    {
+      "path": "tests/spec_stability_source_probe.mjs",
+      "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-subjects.json.gz",
+      "sha256": "9612288e34795175517212df2ff4a9052ba0975c96166927d2cfb2c37be265a2"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-acquisition.json.gz",
+      "sha256": "706373adfb5cae2b22018979d2f9d3494af8bcf4428b442104a0a923e9514acc"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-controls.json",
+      "sha256": "551c7fdf984ec2b7812aded8b5b1c4eae26df1d3bb7fa54246732a3aaddd08a8"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-review.json.gz",
+      "sha256": "fadd4916ec34b01c85eb158af9b34b84e6d228d823f432238e1cb14afd882d00"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-python.log.gz",
+      "sha256": "04c1a725bc32b7e9b1fb9acba27cd75a34b7fbce553260125865f5d7a7291091"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-cyph-sanity.json",
+      "sha256": "77007e75d0ab7f8f70ee16f1aee7dcfd10049346073d42799857f46ee374fbb5"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "tests/spec_stability_chip_probe.mjs",
+      "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+      "sha256": "98afc2ceca25ccb8dbaf9737032d8ebaa8474d48538dff95129ffaa5798017c1"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+      "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-replay-checkpoint.json",
+      "sha256": "3f0315ca68ff5d92e0ebf6d26c09ae9d7bc4ae14169a797072a836046861a159"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+      "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+    }
+  ],
+  "all_other1693_rows_unchanged": true,
+  "new_owned_Angular_chip_case_executed": false,
+  "production_changes_in_this_source_decision": 0,
+  "preceding_owned_chip_two_file_repair": false,
+  "actual_Angular_native_artifact_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

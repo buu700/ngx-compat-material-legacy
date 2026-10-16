@@ -23633,7 +23633,7 @@
           "bucket": "test-only-batch-candidate",
           "subject": "test(material/datepicker): combine shared tests",
           "final_disposition": "irrelevant",
-          "reason": "Inspected upstream patch content (sha256=3cc14feb3153d0f5f49669683fbfd790e66f3a3caa0cb7cbd6463fd23793bdb9, bytes=79709). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/datepicker/testing/BUILD.bazel, src/material/datepicker/testing/calendar-harness-shared.spec.ts, src/material/datepicker/testing/calendar-harness.spec.ts, src/material/datepicker/testing/date-range-input-harness-shared.spec.ts, src/material/datepicker/testing/date-range-input-harness.spec.ts, src/material/datepicker/testing/datepicker-input-harness-shared.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+          "reason": "Inspected upstream patch content (sha256=3cc14feb3153d0f5f49669683fbfd790e66f3a3caa0cb7cbd6463fd23793bdb9, bytes=79709). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/datepicker/testing/BUILD.bazel, src/material/datepicker/testing/calendar-harness-shared.spec.ts, src/material/datepicker/testing/calendar-harness.spec.ts, src/material/datepicker/testing/date-range-input-harness-shared.spec.ts, src/material/datepicker/testing/date-range-input-harness.spec.ts, src/material/datepicker/testing/datepicker-input-harness-shared.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
           "read_note_disposition": null,
           "files": [
             "src/material/datepicker/testing/BUILD.bazel",
@@ -27894,61 +27894,388 @@
       "sha": "ad5fba32ac21e4fb32ba75591dfa1273f692d58a",
       "bucket": "test-only-batch-candidate",
       "subject": "test(cdk/a11y): attempt to deflake tests (#33073)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=f36b1a84972e0f6d728753ef9186d9544d2bc7a1f614f8dc4ec1e603ea4ee88d, bytes=2411). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/a11y/key-manager/tree-key-manager.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The complete one-file one-hunk tree test change is a coverage contraction, not merely a deflake. It removes the default200ms debounce registration under both declared itemParameters contexts (Observable children and array children), and removes the custom300ms near-boundary assertion while widening inter-key waits1/1 to50/50 and the final wait to1.5 times the configured interval. Static registrations53 to52 pair52 retained cases;51 callbacks are unchanged and one is individually recorded with three assertions reduced to two. There is no owned legacy-tree TypeScript family: only the historical tree Sass modules are owned. Decline this private CDK test contraction; retain owned select typeahead default/custom interval and blur observations without claiming they execute or replace TreeKeyManager coverage. Current public CDK accessibility remains a reachable peer dependency; no CDK fork, invented legacy tree fixture, upstream-test absence waiver or inherited behavior pass. Actual artifact/native and supported-floor gates remain open.",
+      "read_note_disposition": "individual complete-original source conclusion; actual product/floor and G11 gates remain separate",
       "files": [
         "src/cdk/a11y/key-manager/tree-key-manager.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/ad5fba32ac21e4fb32ba75591dfa1273f692d58a.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-stability-ad5fba32ac21e4fb32ba75591dfa1273f692d58a.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
       "patch_sha256": "f36b1a84972e0f6d728753ef9186d9544d2bc7a1f614f8dc4ec1e603ea4ee88d",
       "individual_proof": {
-        "diff_sha256": "074fd60d898e30d0e3d9c0ac58e4df79ad28a557c980b709125c38e2b29d5048",
-        "review_depth": "individual-semantic",
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "4f352fb92415fba9cc4037fbcb08609a85bb393448d73e3b22e4c2e0b78c1ae0",
+        "review_depth": "individual-compatibility",
         "affected_branches": [
           "main"
         ],
-        "decision": "Read upstream patch ad5fba32ac21e4fb32ba75591dfa1273f692d58a (test(cdk/a11y): attempt to deflake tests (#33073)). It touches 1 paths: src/cdk/a11y/key-manager/tree-key-manager.spec.ts. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+        "decision": "The complete one-file one-hunk tree test change is a coverage contraction, not merely a deflake. It removes the default200ms debounce registration under both declared itemParameters contexts (Observable children and array children), and removes the custom300ms near-boundary assertion while widening inter-key waits1/1 to50/50 and the final wait to1.5 times the configured interval. Static registrations53 to52 pair52 retained cases;51 callbacks are unchanged and one is individually recorded with three assertions reduced to two. There is no owned legacy-tree TypeScript family: only the historical tree Sass modules are owned. Decline this private CDK test contraction; retain owned select typeahead default/custom interval and blur observations without claiming they execute or replace TreeKeyManager coverage. Current public CDK accessibility remains a reachable peer dependency; no CDK fork, invented legacy tree fixture, upstream-test absence waiver or inherited behavior pass. Actual artifact/native and supported-floor gates remain open.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-stability-source-review.mjs",
+            "sha256": "7a69a7fc852bbd0fa39d121f44ecbcb95fb578e07a9774d196b67acdd86b8981"
+          },
+          {
+            "path": "tests/spec_stability_source_probe.mjs",
+            "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-subjects.json.gz",
+            "sha256": "9612288e34795175517212df2ff4a9052ba0975c96166927d2cfb2c37be265a2"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-acquisition.json.gz",
+            "sha256": "706373adfb5cae2b22018979d2f9d3494af8bcf4428b442104a0a923e9514acc"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-controls.json",
+            "sha256": "551c7fdf984ec2b7812aded8b5b1c4eae26df1d3bb7fa54246732a3aaddd08a8"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-review.json.gz",
+            "sha256": "fadd4916ec34b01c85eb158af9b34b84e6d228d823f432238e1cb14afd882d00"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-python.log.gz",
+            "sha256": "04c1a725bc32b7e9b1fb9acba27cd75a34b7fbce553260125865f5d7a7291091"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-cyph-sanity.json",
+            "sha256": "77007e75d0ab7f8f70ee16f1aee7dcfd10049346073d42799857f46ee374fbb5"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "tests/spec_stability_chip_probe.mjs",
+            "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+            "sha256": "98afc2ceca25ccb8dbaf9737032d8ebaa8474d48538dff95129ffaa5798017c1"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-replay-checkpoint.json",
+            "sha256": "3f0315ca68ff5d92e0ebf6d26c09ae9d7bc4ae14169a797072a836046861a159"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+            "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+            "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+            "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false
+      },
+      "diff_sha256": "4f352fb92415fba9cc4037fbcb08609a85bb393448d73e3b22e4c2e0b78c1ae0",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "source_check": "Authenticated all1 original hunks and all1 files. Accounted for53 to52 static occurrences, every changed whole callback and all noncase fixture changes. Actual Angular/native/packed and floor gates remain unexecuted.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "e1481e44cd14f3fb6222939e33ec856858299fa4",
       "bucket": "test-only-batch-candidate",
       "subject": "test: attempt to resolve flaky tests (#33166)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=10a2834bec8e4ff59de285e4d79c899b3011b33691a442a39a8220558a75dd85, bytes=9638). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/drag-drop/directives/drop-list-shared.spec.ts, src/material/sidenav/drawer.spec.ts, src/material/tooltip/tooltip.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The complete three-file26-hunk wait adjustment retains302 static registrations,280 unchanged callbacks and22 changed callbacks. Whole callback comparison, including helper assertions and variable declaration kinds, accounts for28 changed wait durations: two CDK auto-scroll waits10 to100ms,25 drawer waits20 to100ms across19 callbacks, and one tooltip wait500 to600ms plus a new fixture.whenStable. The tooltip still observes absence after250ms and presence after finishing animation, but the later observation time and added stabilization are not scheduling or deadline equivalence. The comment-only dela correction is recorded separately. Decline these private wait widenings; retain owned legacy tooltip fakeAsync250/500ms observations, focus/overlay/form assertions and all existing source cases. Current public CDK/Material dependencies remain reachable: no drag/drop or drawer fork, absent-peer waiver, inherited runtime pass or weakened golden. No owned HTML/CSS/SCSS or template changes. Actual browser/native/packed, zoneful/zoneless and supported-floor gates remain open.",
+      "read_note_disposition": "individual complete-original source conclusion; actual product/floor and G11 gates remain separate",
       "files": [
         "src/cdk/drag-drop/directives/drop-list-shared.spec.ts",
         "src/material/sidenav/drawer.spec.ts",
         "src/material/tooltip/tooltip.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/e1481e44cd14f3fb6222939e33ec856858299fa4.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-stability-e1481e44cd14f3fb6222939e33ec856858299fa4.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "10a2834bec8e4ff59de285e4d79c899b3011b33691a442a39a8220558a75dd85"
+      "patch_sha256": "10a2834bec8e4ff59de285e4d79c899b3011b33691a442a39a8220558a75dd85",
+      "diff_sha256": "c4e8e66590dbcb5a1b6a393b0054773903b19fb26d1ce527506f360fb90af2c7",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "c4e8e66590dbcb5a1b6a393b0054773903b19fb26d1ce527506f360fb90af2c7",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete three-file26-hunk wait adjustment retains302 static registrations,280 unchanged callbacks and22 changed callbacks. Whole callback comparison, including helper assertions and variable declaration kinds, accounts for28 changed wait durations: two CDK auto-scroll waits10 to100ms,25 drawer waits20 to100ms across19 callbacks, and one tooltip wait500 to600ms plus a new fixture.whenStable. The tooltip still observes absence after250ms and presence after finishing animation, but the later observation time and added stabilization are not scheduling or deadline equivalence. The comment-only dela correction is recorded separately. Decline these private wait widenings; retain owned legacy tooltip fakeAsync250/500ms observations, focus/overlay/form assertions and all existing source cases. Current public CDK/Material dependencies remain reachable: no drag/drop or drawer fork, absent-peer waiver, inherited runtime pass or weakened golden. No owned HTML/CSS/SCSS or template changes. Actual browser/native/packed, zoneful/zoneless and supported-floor gates remain open.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-stability-source-review.mjs",
+            "sha256": "7a69a7fc852bbd0fa39d121f44ecbcb95fb578e07a9774d196b67acdd86b8981"
+          },
+          {
+            "path": "tests/spec_stability_source_probe.mjs",
+            "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-subjects.json.gz",
+            "sha256": "9612288e34795175517212df2ff4a9052ba0975c96166927d2cfb2c37be265a2"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-acquisition.json.gz",
+            "sha256": "706373adfb5cae2b22018979d2f9d3494af8bcf4428b442104a0a923e9514acc"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-controls.json",
+            "sha256": "551c7fdf984ec2b7812aded8b5b1c4eae26df1d3bb7fa54246732a3aaddd08a8"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-review.json.gz",
+            "sha256": "fadd4916ec34b01c85eb158af9b34b84e6d228d823f432238e1cb14afd882d00"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-python.log.gz",
+            "sha256": "04c1a725bc32b7e9b1fb9acba27cd75a34b7fbce553260125865f5d7a7291091"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-cyph-sanity.json",
+            "sha256": "77007e75d0ab7f8f70ee16f1aee7dcfd10049346073d42799857f46ee374fbb5"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "tests/spec_stability_chip_probe.mjs",
+            "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+            "sha256": "98afc2ceca25ccb8dbaf9737032d8ebaa8474d48538dff95129ffaa5798017c1"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-replay-checkpoint.json",
+            "sha256": "3f0315ca68ff5d92e0ebf6d26c09ae9d7bc4ae14169a797072a836046861a159"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+            "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+            "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+            "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false
+      },
+      "source_check": "Authenticated all26 original hunks and all3 files. Accounted for302 to302 static occurrences, every changed whole callback and all noncase fixture changes. Actual Angular/native/packed and floor gates remain unexecuted.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "88b24e0296bfadcac4bc47c823b47890eeda7a6b",
       "bucket": "test-only-batch-candidate",
       "subject": "test(material/chips): fix flakes and re-enable test (#33426)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=c35fe7345534c134297afe262a7042080ad8cecaa561c06a3f6a6afba5989c69, bytes=7433). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/chips/chip-grid.spec.ts, src/material/chips/chip-listbox.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "adapt",
+      "reason": "The complete two-file14-hunk chip test change activates one previously commented destruction registration, not an xit. It creates InputChipGrid, patches focus, empties a signal and checks activeItemIndex after stability. Of119 retained static cases112 callback semantics are unchanged and seven changes are individually accounted for: one array observer becomes a signal read; six listbox callbacks extract eight identical-duration timer operations, including one added fixture.whenStable before inspecting initial async chips. InputChipGrid changes its eight-value mutable array, add/remove identity and @for binding into a readonly signal with fresh-array updates; these notifications and rendering are not declared equivalent. Adapt only the destruction purpose to the owned legacy MatChipList. A demonstrated stale reference is repaired by updateActiveItem(-1) for an empty QueryList, preserving neighbor/refocus behavior; append one lifecycle regression covering destruction, repopulation and fresh focus while preserving all2222 old cases and all production HTML/CSS/SCSS. The isolated actual-method controls use public QueryList/FocusKeyManager with fake chips, not a full Angular component or21.x floor. Its source context83/native bindings20/generic records13/import receipts27 has been qualified and original programs retained through immutable replay. Decline the modern grid/signal fixture migration. The new real Angular case and packed/browser/both-floor execution remain mandatory and unexecuted.",
+      "read_note_disposition": "individual complete-original source conclusion; actual product/floor and G11 gates remain separate",
       "files": [
         "src/material/chips/chip-grid.spec.ts",
         "src/material/chips/chip-listbox.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/88b24e0296bfadcac4bc47c823b47890eeda7a6b.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-stability-88b24e0296bfadcac4bc47c823b47890eeda7a6b.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "c35fe7345534c134297afe262a7042080ad8cecaa561c06a3f6a6afba5989c69"
+      "patch_sha256": "c35fe7345534c134297afe262a7042080ad8cecaa561c06a3f6a6afba5989c69",
+      "diff_sha256": "29552abd8a1ddc561165178cb0a435647bf3941f2cad09bd8cbd184b827047d1",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "29552abd8a1ddc561165178cb0a435647bf3941f2cad09bd8cbd184b827047d1",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete two-file14-hunk chip test change activates one previously commented destruction registration, not an xit. It creates InputChipGrid, patches focus, empties a signal and checks activeItemIndex after stability. Of119 retained static cases112 callback semantics are unchanged and seven changes are individually accounted for: one array observer becomes a signal read; six listbox callbacks extract eight identical-duration timer operations, including one added fixture.whenStable before inspecting initial async chips. InputChipGrid changes its eight-value mutable array, add/remove identity and @for binding into a readonly signal with fresh-array updates; these notifications and rendering are not declared equivalent. Adapt only the destruction purpose to the owned legacy MatChipList. A demonstrated stale reference is repaired by updateActiveItem(-1) for an empty QueryList, preserving neighbor/refocus behavior; append one lifecycle regression covering destruction, repopulation and fresh focus while preserving all2222 old cases and all production HTML/CSS/SCSS. The isolated actual-method controls use public QueryList/FocusKeyManager with fake chips, not a full Angular component or21.x floor. Its source context83/native bindings20/generic records13/import receipts27 has been qualified and original programs retained through immutable replay. Decline the modern grid/signal fixture migration. The new real Angular case and packed/browser/both-floor execution remain mandatory and unexecuted.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-stability-source-review.mjs",
+            "sha256": "7a69a7fc852bbd0fa39d121f44ecbcb95fb578e07a9774d196b67acdd86b8981"
+          },
+          {
+            "path": "tests/spec_stability_source_probe.mjs",
+            "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-subjects.json.gz",
+            "sha256": "9612288e34795175517212df2ff4a9052ba0975c96166927d2cfb2c37be265a2"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-acquisition.json.gz",
+            "sha256": "706373adfb5cae2b22018979d2f9d3494af8bcf4428b442104a0a923e9514acc"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-controls.json",
+            "sha256": "551c7fdf984ec2b7812aded8b5b1c4eae26df1d3bb7fa54246732a3aaddd08a8"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-review.json.gz",
+            "sha256": "fadd4916ec34b01c85eb158af9b34b84e6d228d823f432238e1cb14afd882d00"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-python.log.gz",
+            "sha256": "04c1a725bc32b7e9b1fb9acba27cd75a34b7fbce553260125865f5d7a7291091"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-cyph-sanity.json",
+            "sha256": "77007e75d0ab7f8f70ee16f1aee7dcfd10049346073d42799857f46ee374fbb5"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "tests/spec_stability_chip_probe.mjs",
+            "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+            "sha256": "98afc2ceca25ccb8dbaf9737032d8ebaa8474d48538dff95129ffaa5798017c1"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-replay-checkpoint.json",
+            "sha256": "3f0315ca68ff5d92e0ebf6d26c09ae9d7bc4ae14169a797072a836046861a159"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+            "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+            "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+            "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false
+      },
+      "source_check": "Authenticated all14 original hunks and all2 files. Accounted for119 to120 static occurrences, every changed whole callback and all noncase fixture changes. Actual Angular/native/packed and floor gates remain unexecuted.",
+      "source_conclusion_only": true,
+      "product_adaptation": true
     },
     {
       "sha": "c6505d8ea45631d58c5dc1f427996dfb93d6de92",
@@ -28653,17 +28980,129 @@
       "sha": "658952712df682e26130b754fa19c041712ad747",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/input): remove explicit change detection",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=fd5361bf0faca04b806d08506d3b44b498da31cee4cb5892a27cd95ad64e5d23, bytes=384). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/input/input.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The complete one-file one-hunk input test change removes explicit ChangeDetectionStrategy.OnPush from the private MatInputOnPush fixture while retaining all102 callback bodies. The unchanged class name and assertions do not establish the default checking policy at either advertised minimum. Decline the metadata removal and retain the owned explicit OnPush fixture plus the historical programmatic FormControl/empty-class assertion. All noncase operations outside that exact private decorator property match and no current research Eager/default API is installed or mirrored. No product or consumer markup/style or TypeScript change is needed for this source decision. Actual OnPush behavior in packed historical tests and both supported peer floors remains to be executed.",
+      "read_note_disposition": "individual complete-original source conclusion; actual product/floor and G11 gates remain separate",
       "files": [
         "src/material/input/input.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/658952712df682e26130b754fa19c041712ad747.json",
-      "batch_id": "test-only-refactor-wave2-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-stability-658952712df682e26130b754fa19c041712ad747.json",
       "recorded_at_utc": "2026-10-01T18:47:11Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "fd5361bf0faca04b806d08506d3b44b498da31cee4cb5892a27cd95ad64e5d23"
+      "patch_sha256": "fd5361bf0faca04b806d08506d3b44b498da31cee4cb5892a27cd95ad64e5d23",
+      "diff_sha256": "1c30f80ee84c17acd69d4e3a041d0681e6c9dd81e17be4a7e17f831965401074",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "1c30f80ee84c17acd69d4e3a041d0681e6c9dd81e17be4a7e17f831965401074",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete one-file one-hunk input test change removes explicit ChangeDetectionStrategy.OnPush from the private MatInputOnPush fixture while retaining all102 callback bodies. The unchanged class name and assertions do not establish the default checking policy at either advertised minimum. Decline the metadata removal and retain the owned explicit OnPush fixture plus the historical programmatic FormControl/empty-class assertion. All noncase operations outside that exact private decorator property match and no current research Eager/default API is installed or mirrored. No product or consumer markup/style or TypeScript change is needed for this source decision. Actual OnPush behavior in packed historical tests and both supported peer floors remains to be executed.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-stability-source-review.mjs",
+            "sha256": "7a69a7fc852bbd0fa39d121f44ecbcb95fb578e07a9774d196b67acdd86b8981"
+          },
+          {
+            "path": "tests/spec_stability_source_probe.mjs",
+            "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-subjects.json.gz",
+            "sha256": "9612288e34795175517212df2ff4a9052ba0975c96166927d2cfb2c37be265a2"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-acquisition.json.gz",
+            "sha256": "706373adfb5cae2b22018979d2f9d3494af8bcf4428b442104a0a923e9514acc"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-controls.json",
+            "sha256": "551c7fdf984ec2b7812aded8b5b1c4eae26df1d3bb7fa54246732a3aaddd08a8"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-review.json.gz",
+            "sha256": "fadd4916ec34b01c85eb158af9b34b84e6d228d823f432238e1cb14afd882d00"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-python.log.gz",
+            "sha256": "04c1a725bc32b7e9b1fb9acba27cd75a34b7fbce553260125865f5d7a7291091"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-cyph-sanity.json",
+            "sha256": "77007e75d0ab7f8f70ee16f1aee7dcfd10049346073d42799857f46ee374fbb5"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "tests/spec_stability_chip_probe.mjs",
+            "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+            "sha256": "98afc2ceca25ccb8dbaf9737032d8ebaa8474d48538dff95129ffaa5798017c1"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-replay-checkpoint.json",
+            "sha256": "3f0315ca68ff5d92e0ebf6d26c09ae9d7bc4ae14169a797072a836046861a159"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+            "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+            "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+            "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false
+      },
+      "source_check": "Authenticated all1 original hunks and all1 files. Accounted for102 to102 static occurrences, every changed whole callback and all noncase fixture changes. Actual Angular/native/packed and floor gates remain unexecuted.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "f35961a095dc2fbee6bfeb09878a82d391932cf7",
