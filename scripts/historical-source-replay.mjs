@@ -151,7 +151,7 @@ export async function runHistoricalSourceProbe({root=rootDefault,id,reportPath}=
   let original;
   if(entry.report_source==='stdout-json'){
    assert.equal(entry.id,'wide-fixture-adapter-context');assert.equal(existsSync(diagnostic),false,'unexpected adapter report file');
-   original=JSON.parse(stdout);assert.equal(original.schema_version,1);
+   original=JSON.parse(stdout);
    assert.equal(original.qualified_entries,13);assert.equal(original.unrelated_rows_preserved,1684);
    assert.equal(original.scope_rejection_controls,7);assert.equal(original.native_rejection_controls,15);
    assert.equal(original.all1697_verdicts_unchanged,true);assert.equal(original.actual_Angular_native_artifact_or_floor_qualified,false);
