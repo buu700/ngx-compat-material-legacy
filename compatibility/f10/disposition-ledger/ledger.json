@@ -24216,9 +24216,9 @@
       "sha": "4718718e3f66e0de2341c9f46bae59be1470b971",
       "bucket": "test-only-batch-candidate",
       "subject": "test: remove compileComponent calls (#29535)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=7dda7da32f21609bf172b1da11cb0853a485804647a512254a3d7a33fc40ac61, bytes=154940). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/combobox/combobox.spec.ts, src/cdk-experimental/popover-edit/popover-edit.spec.ts, src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts, src/cdk-experimental/selection/selection.spec.ts, src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts, src/cdk/a11y/aria-describer/aria-describer.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline the upstream private fixture compilation cleanup. Its complete187-file patch removes302 TestBed compilation operations and51 async beforeEach modifiers, while preserving one compiler-availability assertion and four async hooks. All4486 static cases and690 hooks keep their full path/scope/mode/interleaving;21 callbacks change only at the recorded compiler boundary. Provider resets and overrides remain, and the disabled autocomplete case stays disabled. This does not establish compiler readiness, creation, rendering, error timing, overlay or lifecycle equivalence. Keep owned Material16 compilation and module-host fixture behavior, stable Eager strategy and explicit OnPush handling. The independent adapter API repair has already been qualified. No product or consumer structure/style/API port follows from this private test preference; actual artifact/native/minimum tests remain required.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/cdk-experimental/combobox/combobox.spec.ts",
         "src/cdk-experimental/popover-edit/popover-edit.spec.ts",
@@ -24408,20 +24408,94 @@
         "src/material/tree/tree-using-tree-control.spec.ts",
         "src/material/tree/tree.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/4718718e3f66e0de2341c9f46bae59be1470b971.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-wide-fixture-4718718e3f66e0de2341c9f46bae59be1470b971.json",
       "batch_id": "test-only-clear-wave1-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:25:29Z",
+      "recorded_at_utc": "2026-10-16T20:18:26.057421+00:00",
       "g11_claim": "not-passed",
       "patch_sha256": "7dda7da32f21609bf172b1da11cb0853a485804647a512254a3d7a33fc40ac61",
       "individual_proof": {
-        "diff_sha256": "428a13989d9d062fb6d9c14d1317044f7a9ec44f5e056313f61dd068c7a18022",
-        "review_depth": "individual-semantic",
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "9da15660f514e093c5c72c0e5afac05c3900c1ed91432f7e4132f0b6a1d342ef",
+        "review_depth": "individual-compatibility",
         "affected_branches": [
           "main"
         ],
-        "decision": "Read upstream patch 4718718e3f66e0de2341c9f46bae59be1470b971 (test: remove compileComponent calls (#29535)). It touches 187 paths: src/cdk-experimental/combobox/combobox.spec.ts, src/cdk-experimental/popover-edit/popover-edit.spec.ts, src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts, src/cdk-experimental/selection/selection.spec.ts, src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts, src/cdk/a11y/aria-describer/aria-describer.spec.ts and 181 more. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+        "decision": "Decline the upstream private fixture compilation cleanup. Its complete187-file patch removes302 TestBed compilation operations and51 async beforeEach modifiers, while preserving one compiler-availability assertion and four async hooks. All4486 static cases and690 hooks keep their full path/scope/mode/interleaving;21 callbacks change only at the recorded compiler boundary. Provider resets and overrides remain, and the disabled autocomplete case stays disabled. This does not establish compiler readiness, creation, rendering, error timing, overlay or lifecycle equivalence. Keep owned Material16 compilation and module-host fixture behavior, stable Eager strategy and explicit OnPush handling. The independent adapter API repair has already been qualified. No product or consumer structure/style/API port follows from this private test preference; actual artifact/native/minimum tests remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-wide-fixture-source-review.mjs",
+            "sha256": "0555144c22434a3e8cafdbe2bf7c0e412d7501b8db424ba15558f591eddecc1f"
+          },
+          {
+            "path": "tests/spec_wide_fixture_source_probe.mjs",
+            "sha256": "b572af3b69cd69d43e386e0f355f2869c43c2e5bde52a9fa89598fcf27d9df55"
+          },
+          {
+            "path": "tests/test_spec_wide_fixture_source.py",
+            "sha256": "095e987a6d0bb1ab6151ef96f370c84d5b7854d322f3639e539ac1cd95650d86"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-wide-fixture-originals.py",
+            "sha256": "b44054599c79a0981bced031374033b121339709e9315989e6dbf7b1ba8f3dda"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-subjects.json.gz",
+            "sha256": "9f410ef6bc9a5f8ca57807f005c23e5affc56656a9722459ecf0a02de688f0a8"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-acquisition.json.gz",
+            "sha256": "2b86157c3f075e7d24072124ba578880ccab2e33345b7764c49b85b8e85bd3b1"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-prior.json.gz",
+            "sha256": "d969694b947106f3babea2d3799a44565c8c94c8ada3dcd1886b41105518b352"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-review.json.gz",
+            "sha256": "992d6811ca9e0b9eb6c65e41fc306c7bbc5e377b56e1819823e5043b6a2e0f90"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-controls.json",
+            "sha256": "749fca485b612855263677e961a70cba23b7458ea1e4c50ce0fa24e6993141e2"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-checkpoint.json",
+            "sha256": "700b09010cf26630ee658f0f7180535b94c956a2deddaf763b1dee55d5815782"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+            "sha256": "0cec5e2cf1b3a762218be1d53d1bb7692405772f7b3f275333e432092fd277be"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-replay-checkpoint.json",
+            "sha256": "8ee0ccc4507043d0412bd6dfefe5a10b20c653af315302196a545706ce21a99a"
+          },
+          {
+            "path": "testing/legacy-runner/adapt-spec.mjs",
+            "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-cyph-sanity.json",
+            "sha256": "c5b119a4cfb10a65ed2e8038df8e90ac52efddaeef946dfa8f7a2b104fb1b1fe"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_check": {
+        "kind": "individual-complete-original-fixture-source-review",
+        "diff_sha256": "9da15660f514e093c5c72c0e5afac05c3900c1ed91432f7e4132f0b6a1d342ef",
+        "evidence_report_sha256": "150ab428b10d77107a8760354bc6843fc03b9cfbeb9372bc82fd8fba908a122f"
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "df7104f86f19bf34846e9081be232489ca4f120d",
@@ -24874,9 +24948,9 @@
       "sha": "209176990ce1d70e904a3169460d18f081e26b76",
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): clean up standalone flags (#30189)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=e174f4291274268ccd3c96721cd336b22980f4c97e3f68951085218cbe69190e, bytes=177154). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk-experimental/combobox/combobox.spec.ts, src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts, src/cdk-experimental/selection/selection.spec.ts, src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts, src/cdk/a11y/aria-describer/aria-describer.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline the upstream private fixture standalone-default cleanup. Its complete175-file patch removes553 explicit standalone:true metadata properties from543 public core Component and10 Directive decorators. All3633 static cases and526 hooks keep their full path/scope/mode/interleaving;three callbacks change only through local host decorator metadata. All other operations, predicates, explicit false values, templates and styles remain. Removing true flags relies on a younger framework default and proves no compiler, injector, lifecycle or rendering equivalence. Keep owned Material16 module-host fixtures, explicit production standalone flags and the stable strategy adapter. No product or consumer structure/style/API port follows from this private test preference; supported-minimum/native/consumer tests remain required.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/cdk-experimental/combobox/combobox.spec.ts",
         "src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts",
@@ -25054,20 +25128,94 @@
         "src/material/tree/testing/tree-harness.spec.ts",
         "src/youtube-player/youtube-player.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/209176990ce1d70e904a3169460d18f081e26b76.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-wide-fixture-209176990ce1d70e904a3169460d18f081e26b76.json",
       "batch_id": "test-only-clear-wave1-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:25:29Z",
+      "recorded_at_utc": "2026-10-16T20:18:26.063244+00:00",
       "g11_claim": "not-passed",
       "patch_sha256": "e174f4291274268ccd3c96721cd336b22980f4c97e3f68951085218cbe69190e",
       "individual_proof": {
-        "diff_sha256": "3593bfe08c0f1faa756b512546ffc69d037894feb7018f718d7ed0fa0675d593",
-        "review_depth": "individual-semantic",
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "f6e83309cae1f6214c26b2834f39726066676bce9f542a90ea30cf2c0bbf6aac",
+        "review_depth": "individual-compatibility",
         "affected_branches": [
           "main"
         ],
-        "decision": "Read upstream patch 209176990ce1d70e904a3169460d18f081e26b76 (test(multiple): clean up standalone flags (#30189)). It touches 175 paths: src/cdk-experimental/combobox/combobox.spec.ts, src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts, src/cdk-experimental/selection/selection.spec.ts, src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts, src/cdk/a11y/aria-describer/aria-describer.spec.ts, src/cdk/a11y/focus-monitor/focus-monitor.spec.ts and 169 more. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+        "decision": "Decline the upstream private fixture standalone-default cleanup. Its complete175-file patch removes553 explicit standalone:true metadata properties from543 public core Component and10 Directive decorators. All3633 static cases and526 hooks keep their full path/scope/mode/interleaving;three callbacks change only through local host decorator metadata. All other operations, predicates, explicit false values, templates and styles remain. Removing true flags relies on a younger framework default and proves no compiler, injector, lifecycle or rendering equivalence. Keep owned Material16 module-host fixtures, explicit production standalone flags and the stable strategy adapter. No product or consumer structure/style/API port follows from this private test preference; supported-minimum/native/consumer tests remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-wide-fixture-source-review.mjs",
+            "sha256": "0555144c22434a3e8cafdbe2bf7c0e412d7501b8db424ba15558f591eddecc1f"
+          },
+          {
+            "path": "tests/spec_wide_fixture_source_probe.mjs",
+            "sha256": "b572af3b69cd69d43e386e0f355f2869c43c2e5bde52a9fa89598fcf27d9df55"
+          },
+          {
+            "path": "tests/test_spec_wide_fixture_source.py",
+            "sha256": "095e987a6d0bb1ab6151ef96f370c84d5b7854d322f3639e539ac1cd95650d86"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-wide-fixture-originals.py",
+            "sha256": "b44054599c79a0981bced031374033b121339709e9315989e6dbf7b1ba8f3dda"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-subjects.json.gz",
+            "sha256": "9f410ef6bc9a5f8ca57807f005c23e5affc56656a9722459ecf0a02de688f0a8"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-acquisition.json.gz",
+            "sha256": "2b86157c3f075e7d24072124ba578880ccab2e33345b7764c49b85b8e85bd3b1"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-prior.json.gz",
+            "sha256": "d969694b947106f3babea2d3799a44565c8c94c8ada3dcd1886b41105518b352"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-review.json.gz",
+            "sha256": "992d6811ca9e0b9eb6c65e41fc306c7bbc5e377b56e1819823e5043b6a2e0f90"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-controls.json",
+            "sha256": "749fca485b612855263677e961a70cba23b7458ea1e4c50ce0fa24e6993141e2"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-checkpoint.json",
+            "sha256": "700b09010cf26630ee658f0f7180535b94c956a2deddaf763b1dee55d5815782"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+            "sha256": "0cec5e2cf1b3a762218be1d53d1bb7692405772f7b3f275333e432092fd277be"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-replay-checkpoint.json",
+            "sha256": "8ee0ccc4507043d0412bd6dfefe5a10b20c653af315302196a545706ce21a99a"
+          },
+          {
+            "path": "testing/legacy-runner/adapt-spec.mjs",
+            "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-cyph-sanity.json",
+            "sha256": "c5b119a4cfb10a65ed2e8038df8e90ac52efddaeef946dfa8f7a2b104fb1b1fe"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_check": {
+        "kind": "individual-complete-original-fixture-source-review",
+        "diff_sha256": "f6e83309cae1f6214c26b2834f39726066676bce9f542a90ea30cf2c0bbf6aac",
+        "evidence_report_sha256": "b4fd48da912522e0ed38b89dbf8db9ea967b9f64a8d90b8eb2eac0cbfc61b0c2"
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "9cd1d30839a737c2fc929f32e20242f180bc3828",
