@@ -18392,13 +18392,37 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test: remove compileComponent calls (#29535)",
       "files": [
+        "src/cdk-experimental/combobox/combobox.spec.ts",
+        "src/cdk-experimental/popover-edit/popover-edit.spec.ts",
+        "src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts",
+        "src/cdk-experimental/selection/selection.spec.ts",
+        "src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts",
         "src/cdk/a11y/aria-describer/aria-describer.spec.ts",
         "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
         "src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts",
         "src/cdk/a11y/focus-trap/configurable-focus-trap.spec.ts",
         "src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts",
         "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "src/cdk/accordion/accordion-item.spec.ts",
+        "src/cdk/accordion/accordion.spec.ts",
         "src/cdk/bidi/directionality.spec.ts",
+        "src/cdk/clipboard/copy-to-clipboard.spec.ts",
+        "src/cdk/dialog/dialog.spec.ts",
+        "src/cdk/drag-drop/directives/test-utils.spec.ts",
+        "src/cdk/drag-drop/drag-drop-registry.spec.ts",
+        "src/cdk/drag-drop/drag-drop.spec.ts",
+        "src/cdk/listbox/listbox.spec.ts",
+        "src/cdk/menu/context-menu-trigger.spec.ts",
+        "src/cdk/menu/menu-bar.spec.ts",
+        "src/cdk/menu/menu-group.spec.ts",
+        "src/cdk/menu/menu-item-checkbox.spec.ts",
+        "src/cdk/menu/menu-item-radio.spec.ts",
+        "src/cdk/menu/menu-item.spec.ts",
+        "src/cdk/menu/menu-stack.spec.ts",
+        "src/cdk/menu/menu-trigger.spec.ts",
+        "src/cdk/menu/menu.spec.ts",
+        "src/cdk/menu/pointer-focus-tracker.spec.ts",
+        "src/cdk/observers/observe-content.spec.ts",
         "src/cdk/overlay/fullscreen-overlay-container.spec.ts",
         "src/cdk/overlay/overlay-container.spec.ts",
         "src/cdk/overlay/overlay.spec.ts",
@@ -18414,6 +18438,38 @@
         "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts",
         "src/cdk/table/table.spec.ts",
         "src/cdk/table/text-column.spec.ts",
+        "src/cdk/text-field/autofill.spec.ts",
+        "src/cdk/text-field/autofill.zone.spec.ts",
+        "src/cdk/text-field/autosize.spec.ts",
+        "src/cdk/tree/tree-using-legacy-key-manager.spec.ts",
+        "src/cdk/tree/tree-with-tree-control.spec.ts",
+        "src/cdk/tree/tree.spec.ts",
+        "src/components-examples/material/autocomplete/autocomplete-harness/autocomplete-harness-example.spec.ts",
+        "src/components-examples/material/bottom-sheet/bottom-sheet-harness/bottom-sheet-harness-example.spec.ts",
+        "src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts",
+        "src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts",
+        "src/components-examples/material/expansion/expansion-harness/expansion-harness-example.spec.ts",
+        "src/components-examples/material/form-field/form-field-harness/form-field-harness-example.spec.ts",
+        "src/components-examples/material/grid-list/grid-list-harness/grid-list-harness-example.spec.ts",
+        "src/components-examples/material/icon/icon-harness/icon-harness-example.spec.ts",
+        "src/components-examples/material/input/input-harness/input-harness-example.spec.ts",
+        "src/components-examples/material/menu/menu-harness/menu-harness-example.spec.ts",
+        "src/components-examples/material/paginator/paginator-harness/paginator-harness-example.spec.ts",
+        "src/components-examples/material/select/select-harness/select-harness-example.spec.ts",
+        "src/components-examples/material/sidenav/sidenav-harness/sidenav-harness-example.spec.ts",
+        "src/components-examples/material/slider/slider-harness/slider-harness-example.spec.ts",
+        "src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.spec.ts",
+        "src/components-examples/material/sort/sort-harness/sort-harness-example.spec.ts",
+        "src/components-examples/material/stepper/stepper-harness/stepper-harness-example.spec.ts",
+        "src/components-examples/material/tabs/tab-group-harness/tab-group-harness-example.spec.ts",
+        "src/components-examples/material/tooltip/tooltip-harness/tooltip-harness-example.spec.ts",
+        "src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts",
+        "src/material-experimental/column-resize/column-resize.spec.ts",
+        "src/material-experimental/menubar/menubar-item.spec.ts",
+        "src/material-experimental/menubar/menubar.spec.ts",
+        "src/material-experimental/popover-edit/popover-edit.spec.ts",
+        "src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts",
+        "src/material-moment-adapter/adapter/moment-date-adapter.spec.ts",
         "src/material/autocomplete/autocomplete.spec.ts",
         "src/material/autocomplete/autocomplete.zone.spec.ts",
         "src/material/autocomplete/testing/autocomplete-harness.spec.ts",
@@ -18524,15 +18580,99 @@
         "src/material/tree/tree-using-tree-control.spec.ts",
         "src/material/tree/tree.spec.ts"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
-      "read_note_disposition": "unreviewed-on-21.x",
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline the upstream private fixture compilation cleanup. Its complete187-file patch removes302 TestBed compilation operations and51 async beforeEach modifiers, while preserving one compiler-availability assertion and four async hooks. All4486 static cases and690 hooks keep their full path/scope/mode/interleaving;21 callbacks change only at the recorded compiler boundary. Provider resets and overrides remain, and the disabled autocomplete case stays disabled. This does not establish compiler readiness, creation, rendering, error timing, overlay or lifecycle equivalence. Keep owned Material16 compilation and module-host fixture behavior, stable Eager strategy and explicit OnPush handling. The independent adapter API repair has already been qualified. No product or consumer structure/style/API port follows from this private test preference; actual artifact/native/minimum tests remain required.",
+      "read_note_disposition": "individual-source-judgment-only",
       "affected_branches": [
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": null
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-wide-fixture-4718718e3f66e0de2341c9f46bae59be1470b971.json",
+      "source_check": {
+        "kind": "individual-complete-original-fixture-source-review",
+        "diff_sha256": "9da15660f514e093c5c72c0e5afac05c3900c1ed91432f7e4132f0b6a1d342ef",
+        "evidence_report_sha256": "a028442c28f591ef8b9ef2cf4ba0347de52b4fb91bab6791caf24a181103c65c"
+      },
+      "recorded_at_utc": "2026-10-16T20:18:26.598627+00:00",
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "9da15660f514e093c5c72c0e5afac05c3900c1ed91432f7e4132f0b6a1d342ef",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "21.x"
+        ],
+        "decision": "Decline the upstream private fixture compilation cleanup. Its complete187-file patch removes302 TestBed compilation operations and51 async beforeEach modifiers, while preserving one compiler-availability assertion and four async hooks. All4486 static cases and690 hooks keep their full path/scope/mode/interleaving;21 callbacks change only at the recorded compiler boundary. Provider resets and overrides remain, and the disabled autocomplete case stays disabled. This does not establish compiler readiness, creation, rendering, error timing, overlay or lifecycle equivalence. Keep owned Material16 compilation and module-host fixture behavior, stable Eager strategy and explicit OnPush handling. The independent adapter API repair has already been qualified. No product or consumer structure/style/API port follows from this private test preference; actual artifact/native/minimum tests remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-wide-fixture-source-review.mjs",
+            "sha256": "0555144c22434a3e8cafdbe2bf7c0e412d7501b8db424ba15558f591eddecc1f"
+          },
+          {
+            "path": "tests/spec_wide_fixture_source_probe.mjs",
+            "sha256": "b572af3b69cd69d43e386e0f355f2869c43c2e5bde52a9fa89598fcf27d9df55"
+          },
+          {
+            "path": "tests/test_spec_wide_fixture_source.py",
+            "sha256": "095e987a6d0bb1ab6151ef96f370c84d5b7854d322f3639e539ac1cd95650d86"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-wide-fixture-originals.py",
+            "sha256": "b44054599c79a0981bced031374033b121339709e9315989e6dbf7b1ba8f3dda"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-subjects.json.gz",
+            "sha256": "d30ee5178c58491a79e61978870fabf375ab6bcd0e3ab97dcba7c84e13dd7038"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-acquisition.json.gz",
+            "sha256": "7f5483254461edae793199cd91fbe3eac8f655932298cc8e54aaea1ee55d7454"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-prior.json.gz",
+            "sha256": "dc1f9235e13ea42b0c5bc007b3b4a9e215875fdc55310b1826c97ff8bb443542"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-review.json.gz",
+            "sha256": "1899beb54b99654c777dc1d6a2ea0a0d63c840d14485fd72cd491c030e485333"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-controls.json",
+            "sha256": "b6fd738a6e267c88db1bcb0bfa93a85760928e8169a27ff056da6c915ae0e8d8"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-checkpoint.json",
+            "sha256": "c245c5949557facbcd2c47925f3845c70e3e127ff5d17bc2c989ca618f2d0dc8"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+            "sha256": "803c57ebb85011bc9d479bb9c5fc28ae456a842a647cbbd9ff205ea7963aab44"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-replay-checkpoint.json",
+            "sha256": "3e50920ac797ba6a9418ef73f23ce7d4d228c6a937a1be24e70afa4f54d38b57"
+          },
+          {
+            "path": "testing/legacy-runner/adapt-spec.mjs",
+            "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-cyph-sanity.json",
+            "sha256": "55ab6c6d4ddd2057fa9a6341ad05dcf649792090cd11364b272c1c334d07fa69"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "d22a24d667a16c39d4a4ec5f59b248f990fa029e",
@@ -24895,6 +25035,10 @@
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): clean up standalone flags (#30189)",
       "files": [
+        "src/cdk-experimental/combobox/combobox.spec.ts",
+        "src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts",
+        "src/cdk-experimental/selection/selection.spec.ts",
+        "src/cdk-experimental/table-scroll-container/table-scroll-container.spec.ts",
         "src/cdk/a11y/aria-describer/aria-describer.spec.ts",
         "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
         "src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts",
@@ -24903,7 +25047,27 @@
         "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
         "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
         "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+        "src/cdk/accordion/accordion-item.spec.ts",
+        "src/cdk/accordion/accordion.spec.ts",
         "src/cdk/bidi/directionality.spec.ts",
+        "src/cdk/clipboard/copy-to-clipboard.spec.ts",
+        "src/cdk/dialog/dialog.spec.ts",
+        "src/cdk/drag-drop/directives/drop-list-shared.spec.ts",
+        "src/cdk/drag-drop/directives/mixed-drop-list.spec.ts",
+        "src/cdk/drag-drop/directives/standalone-drag.spec.ts",
+        "src/cdk/drag-drop/directives/standalone-drag.zone.spec.ts",
+        "src/cdk/drag-drop/drag-drop-registry.spec.ts",
+        "src/cdk/drag-drop/drag-drop.spec.ts",
+        "src/cdk/menu/menu-bar.spec.ts",
+        "src/cdk/menu/menu-group.spec.ts",
+        "src/cdk/menu/menu-item-checkbox.spec.ts",
+        "src/cdk/menu/menu-item-radio.spec.ts",
+        "src/cdk/menu/menu-item.spec.ts",
+        "src/cdk/menu/menu-stack.spec.ts",
+        "src/cdk/menu/menu.spec.ts",
+        "src/cdk/menu/pointer-focus-tracker.spec.ts",
+        "src/cdk/observers/observe-content.spec.ts",
+        "src/cdk/observers/private/shared-resize-observer.spec.ts",
         "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts",
         "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts",
         "src/cdk/overlay/fullscreen-overlay-container.spec.ts",
@@ -24924,6 +25088,28 @@
         "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
         "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts",
         "src/cdk/table/text-column.spec.ts",
+        "src/cdk/text-field/autofill.spec.ts",
+        "src/cdk/text-field/autofill.zone.spec.ts",
+        "src/cdk/text-field/autosize.spec.ts",
+        "src/google-maps/deprecated-map-marker-clusterer/deprecated-map-marker-clusterer.spec.ts",
+        "src/google-maps/google-map/google-map.spec.ts",
+        "src/google-maps/map-advanced-marker/map-advanced-marker.spec.ts",
+        "src/google-maps/map-bicycling-layer/map-bicycling-layer.spec.ts",
+        "src/google-maps/map-circle/map-circle.spec.ts",
+        "src/google-maps/map-directions-renderer/map-directions-renderer.spec.ts",
+        "src/google-maps/map-ground-overlay/map-ground-overlay.spec.ts",
+        "src/google-maps/map-heatmap-layer/map-heatmap-layer.spec.ts",
+        "src/google-maps/map-info-window/map-info-window.spec.ts",
+        "src/google-maps/map-kml-layer/map-kml-layer.spec.ts",
+        "src/google-maps/map-marker-clusterer/map-marker-clusterer.spec.ts",
+        "src/google-maps/map-marker/map-marker.spec.ts",
+        "src/google-maps/map-polygon/map-polygon.spec.ts",
+        "src/google-maps/map-polyline/map-polyline.spec.ts",
+        "src/google-maps/map-rectangle/map-rectangle.spec.ts",
+        "src/google-maps/map-traffic-layer/map-traffic-layer.spec.ts",
+        "src/google-maps/map-transit-layer/map-transit-layer.spec.ts",
+        "src/material-experimental/menubar/menubar-item.spec.ts",
+        "src/material-experimental/menubar/menubar.spec.ts",
         "src/material/autocomplete/testing/autocomplete-harness.spec.ts",
         "src/material/badge/badge.spec.ts",
         "src/material/badge/testing/badge-harness.spec.ts",
@@ -25013,22 +25199,111 @@
         "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
         "src/material/tabs/testing/tab-group-harness.spec.ts",
         "src/material/tabs/testing/tab-nav-bar-harness.spec.ts",
+        "src/material/timepicker/testing/timepicker-harness.spec.ts",
+        "src/material/timepicker/testing/timepicker-input-harness.spec.ts",
+        "src/material/timepicker/testing/timepicker-toggle-harness.spec.ts",
+        "src/material/timepicker/timepicker.spec.ts",
         "src/material/toolbar/testing/toolbar-harness.spec.ts",
         "src/material/toolbar/toolbar.spec.ts",
         "src/material/tooltip/testing/tooltip-harness.spec.ts",
         "src/material/tooltip/tooltip.spec.ts",
         "src/material/tooltip/tooltip.zone.spec.ts",
-        "src/material/tree/testing/tree-harness.spec.ts"
+        "src/material/tree/testing/tree-harness.spec.ts",
+        "src/youtube-player/youtube-player.spec.ts"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
-      "read_note_disposition": "unreviewed-on-21.x",
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline the upstream private fixture standalone-default cleanup. Its complete175-file patch removes553 explicit standalone:true metadata properties from543 public core Component and10 Directive decorators. All3633 static cases and526 hooks keep their full path/scope/mode/interleaving;three callbacks change only through local host decorator metadata. All other operations, predicates, explicit false values, templates and styles remain. Removing true flags relies on a younger framework default and proves no compiler, injector, lifecycle or rendering equivalence. Keep owned Material16 module-host fixtures, explicit production standalone flags and the stable strategy adapter. No product or consumer structure/style/API port follows from this private test preference; supported-minimum/native/consumer tests remain required.",
+      "read_note_disposition": "individual-source-judgment-only",
       "affected_branches": [
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": null
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-wide-fixture-209176990ce1d70e904a3169460d18f081e26b76.json",
+      "source_check": {
+        "kind": "individual-complete-original-fixture-source-review",
+        "diff_sha256": "f6e83309cae1f6214c26b2834f39726066676bce9f542a90ea30cf2c0bbf6aac",
+        "evidence_report_sha256": "5572c49cc61208facfbe193ef497fa7cfa6b35362353976cb0ded48c742932f0"
+      },
+      "recorded_at_utc": "2026-10-16T20:18:26.604450+00:00",
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "f6e83309cae1f6214c26b2834f39726066676bce9f542a90ea30cf2c0bbf6aac",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "21.x"
+        ],
+        "decision": "Decline the upstream private fixture standalone-default cleanup. Its complete175-file patch removes553 explicit standalone:true metadata properties from543 public core Component and10 Directive decorators. All3633 static cases and526 hooks keep their full path/scope/mode/interleaving;three callbacks change only through local host decorator metadata. All other operations, predicates, explicit false values, templates and styles remain. Removing true flags relies on a younger framework default and proves no compiler, injector, lifecycle or rendering equivalence. Keep owned Material16 module-host fixtures, explicit production standalone flags and the stable strategy adapter. No product or consumer structure/style/API port follows from this private test preference; supported-minimum/native/consumer tests remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-wide-fixture-source-review.mjs",
+            "sha256": "0555144c22434a3e8cafdbe2bf7c0e412d7501b8db424ba15558f591eddecc1f"
+          },
+          {
+            "path": "tests/spec_wide_fixture_source_probe.mjs",
+            "sha256": "b572af3b69cd69d43e386e0f355f2869c43c2e5bde52a9fa89598fcf27d9df55"
+          },
+          {
+            "path": "tests/test_spec_wide_fixture_source.py",
+            "sha256": "095e987a6d0bb1ab6151ef96f370c84d5b7854d322f3639e539ac1cd95650d86"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-wide-fixture-originals.py",
+            "sha256": "b44054599c79a0981bced031374033b121339709e9315989e6dbf7b1ba8f3dda"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-subjects.json.gz",
+            "sha256": "d30ee5178c58491a79e61978870fabf375ab6bcd0e3ab97dcba7c84e13dd7038"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-acquisition.json.gz",
+            "sha256": "7f5483254461edae793199cd91fbe3eac8f655932298cc8e54aaea1ee55d7454"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-prior.json.gz",
+            "sha256": "dc1f9235e13ea42b0c5bc007b3b4a9e215875fdc55310b1826c97ff8bb443542"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-review.json.gz",
+            "sha256": "1899beb54b99654c777dc1d6a2ea0a0d63c840d14485fd72cd491c030e485333"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-controls.json",
+            "sha256": "b6fd738a6e267c88db1bcb0bfa93a85760928e8169a27ff056da6c915ae0e8d8"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-checkpoint.json",
+            "sha256": "c245c5949557facbcd2c47925f3845c70e3e127ff5d17bc2c989ca618f2d0dc8"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+            "sha256": "803c57ebb85011bc9d479bb9c5fc28ae456a842a647cbbd9ff205ea7963aab44"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-adapter-replay-checkpoint.json",
+            "sha256": "3e50920ac797ba6a9418ef73f23ce7d4d228c6a937a1be24e70afa4f54d38b57"
+          },
+          {
+            "path": "testing/legacy-runner/adapt-spec.mjs",
+            "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+          },
+          {
+            "path": "compatibility/rc/spec-wide-fixture-source-cyph-sanity.json",
+            "sha256": "55ab6c6d4ddd2057fa9a6341ad05dcf649792090cd11364b272c1c334d07fa69"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "b924e869c548850caf9d511a5fa56ab402d435bb",

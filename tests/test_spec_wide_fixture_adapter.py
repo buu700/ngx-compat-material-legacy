@@ -28,7 +28,7 @@ class WideFixtureAdapterTests(unittest.TestCase):
         self.assertFalse(report['actual_Angular_native_artifact_or_floor_qualified'])
 
     def test_original_validators_and_bounded_source_binding_transition(self):
-        result = subprocess.run(['node', 'tests/spec_wide_fixture_adapter_qualification_probe.mjs'],
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'wide-fixture-adapter-context'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])
