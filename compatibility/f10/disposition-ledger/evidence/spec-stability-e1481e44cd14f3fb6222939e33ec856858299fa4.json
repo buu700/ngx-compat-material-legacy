@@ -1,0 +1,526 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "e1481e44cd14f3fb6222939e33ec856858299fa4",
+  "subject": "test: attempt to resolve flaky tests (#33166)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/drag-drop/directives/drop-list-shared.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "4c99c3bd728f13d667b3fa8a4c01ad32666e1bab",
+      "after_blob": "cc6005e156f7fbbebc6df2517454e2c4e84bd9a9"
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a57f80b294be712dab8e2c2090a4cee7e18ca76e",
+      "after_blob": "b0e091e328b853f7e033fdd034f671255c5329c6"
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a02732999d86eb0a371f816cac18cc53f3d4eef4",
+      "after_blob": "7d12b2f40fa288e6856caf412ee17ea4c52aa868"
+    }
+  ],
+  "original_files": 3,
+  "original_hunks": 26,
+  "raw_commit_sha256": "590edec4daddc48de0fee5f283ce954bb1f87cb33f5f3d582705aaacd1044787",
+  "original_sources": [
+    {
+      "path": "src/cdk/drag-drop/directives/drop-list-shared.spec.ts",
+      "before": {
+        "git_blob": "4c99c3bd728f13d667b3fa8a4c01ad32666e1bab",
+        "sha256": "d874f749e87fc19f249f8bd633f384eec98261167c699054f2c8dd58a5ca9e45",
+        "bytes": 231162
+      },
+      "after": {
+        "git_blob": "cc6005e156f7fbbebc6df2517454e2c4e84bd9a9",
+        "sha256": "45c20faa922607b0e486033755452390c3ccaa67639e9d00411955d7b9387a83",
+        "bytes": 231164
+      }
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "before": {
+        "git_blob": "a57f80b294be712dab8e2c2090a4cee7e18ca76e",
+        "sha256": "431aece8037e27fe9f121f8d312859b2b6cd58dd67f62b3cf19a3a9e03b11147",
+        "bytes": 49636
+      },
+      "after": {
+        "git_blob": "b0e091e328b853f7e033fdd034f671255c5329c6",
+        "sha256": "c30848cef71c08c69a692ed5c6e109612c80779b9c57f1ed7320b758744e5bcb",
+        "bytes": 49661
+      }
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "before": {
+        "git_blob": "a02732999d86eb0a371f816cac18cc53f3d4eef4",
+        "sha256": "6753a9d303ce4b925de85bb995aa410167f89812117cf4837bb3df813c585663",
+        "bytes": 63088
+      },
+      "after": {
+        "git_blob": "7d12b2f40fa288e6856caf412ee17ea4c52aa868",
+        "sha256": "3d64cf9d1492360b71b4fc79425d29f6fb78fbd39c7eac081dc1b31a9f554d94",
+        "bytes": 63124
+      }
+    }
+  ],
+  "diff": "diff --git a/src/cdk/drag-drop/directives/drop-list-shared.spec.ts b/src/cdk/drag-drop/directives/drop-list-shared.spec.ts\nindex 4c99c3bd728f13d667b3fa8a4c01ad32666e1bab..cc6005e156f7fbbebc6df2517454e2c4e84bd9a9 100644\n--- a/src/cdk/drag-drop/directives/drop-list-shared.spec.ts\n+++ b/src/cdk/drag-drop/directives/drop-list-shared.spec.ts\n@@ -2733,7 +2733,7 @@ export function defineCommonDropListTests(config: {\n       startDraggingViaMouse(fixture, item);\n       dispatchMouseEvent(document, 'mousemove', listRect.left + listRect.width / 2, 0);\n       fixture.detectChanges();\n-      await wait(10);\n+      await wait(100);\n \n       expect(viewportRuler.getViewportScrollPosition().top).toBe(initialScrollDistance);\n       expect(list.scrollTop).toBeLessThan(50);\n@@ -2770,7 +2770,7 @@ export function defineCommonDropListTests(config: {\n       startDraggingViaMouse(fixture, item);\n       dispatchMouseEvent(document, 'mousemove', listRect.left + listRect.width / 2, 0);\n       fixture.detectChanges();\n-      await wait(10);\n+      await wait(100);\n \n       expect(viewportRuler.getViewportScrollPosition().top).toBeLessThan(initialScrollDistance);\n       expect(list.scrollTop).toBe(0);\ndiff --git a/src/material/sidenav/drawer.spec.ts b/src/material/sidenav/drawer.spec.ts\nindex a57f80b294be712dab8e2c2090a4cee7e18ca76e..b0e091e328b853f7e033fdd034f671255c5329c6 100644\n--- a/src/material/sidenav/drawer.spec.ts\n+++ b/src/material/sidenav/drawer.spec.ts\n@@ -45,7 +45,7 @@ describe('MatDrawer', () => {\n       expect(testComponent.openStartCount).toBe(0);\n       expect(container.classList).not.toContain('mat-drawer-container-has-open');\n \n-      await wait(20);\n+      await wait(100);\n       expect(testComponent.openStartCount).toBe(1);\n       fixture.detectChanges();\n \n@@ -72,7 +72,7 @@ describe('MatDrawer', () => {\n       expect(testComponent.closeCount).toBe(0);\n       expect(testComponent.closeStartCount).toBe(0);\n \n-      await wait(20);\n+      await wait(100);\n       expect(testComponent.closeStartCount).toBeGreaterThanOrEqual(1);\n       fixture.detectChanges();\n \n@@ -181,7 +181,7 @@ describe('MatDrawer', () => {\n \n       drawer.componentInstance.open();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n \n       expect(testComponent.openCount).withContext('Expected one open event.').toBe(1);\n       expect(testComponent.openStartCount).withContext('Expected one open start event.').toBe(1);\n@@ -190,7 +190,7 @@ describe('MatDrawer', () => {\n \n       const event = dispatchKeyboardEvent(drawer.nativeElement, 'keydown', ESCAPE);\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n \n       expect(testComponent.closeCount).withContext('Expected one close event.').toBe(1);\n       expect(testComponent.closeStartCount).withContext('Expected one close start event.').toBe(1);\n@@ -228,7 +228,7 @@ describe('MatDrawer', () => {\n       const fixture = TestBed.createComponent(DrawerSetToOpenedTrue);\n \n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n \n       expect(fixture.componentInstance.openCallback).toHaveBeenCalledTimes(1);\n     });\n@@ -280,7 +280,7 @@ describe('MatDrawer', () => {\n       openButton.focus();\n       drawer.open();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n       fixture.detectChanges();\n \n       const backdrop = fixture.nativeElement.querySelector('.mat-drawer-backdrop');\n@@ -294,7 +294,7 @@ describe('MatDrawer', () => {\n \n       backdrop.click();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n \n       expect(document.activeElement)\n         .withContext('Expected focus to be restored to the open button on close.')\n@@ -313,13 +313,13 @@ describe('MatDrawer', () => {\n       openButton.focus();\n       drawer.open();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n       fixture.detectChanges();\n       drawerButton.focus();\n \n       drawer.close();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n \n       expect(document.activeElement)\n         .withContext('Expected focus to be restored to the open button on close.')\n@@ -337,13 +337,13 @@ describe('MatDrawer', () => {\n       svg.focus();\n       drawer.open();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n       fixture.detectChanges();\n       drawerButton.focus();\n \n       drawer.close();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n \n       expect(document.activeElement)\n         .withContext('Expected focus to be restored to the SVG element on close.')\n@@ -496,7 +496,7 @@ describe('MatDrawer', () => {\n \n       drawer.open();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n \n       expect(fixture.componentInstance.isOpen).toBe(true);\n     });\n@@ -546,7 +546,7 @@ describe('MatDrawer', () => {\n \n       drawer.open();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n       fixture.detectChanges();\n \n       expect(document.activeElement).toBe(firstFocusableElement);\n@@ -560,7 +560,7 @@ describe('MatDrawer', () => {\n \n       drawer.open();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n       fixture.detectChanges();\n \n       expect(document.activeElement).toBe(firstFocusableElement);\n@@ -575,7 +575,7 @@ describe('MatDrawer', () => {\n \n       drawer.open();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n       fixture.detectChanges();\n \n       expect(document.activeElement).toBe(firstFocusableElement);\n@@ -618,7 +618,7 @@ describe('MatDrawer', () => {\n \n       drawer.open();\n       fixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n       fixture.detectChanges();\n \n       expect(document.activeElement).toBe(firstFocusableElement);\n@@ -633,7 +633,7 @@ describe('MatDrawer', () => {\n \n       drawerEl.componentInstance.open();\n       nonFocusableFixture.detectChanges();\n-      await wait(20);\n+      await wait(100);\n       nonFocusableFixture.detectChanges();\n \n       expect(document.activeElement).toBe(drawerEl.nativeElement);\n@@ -904,7 +904,7 @@ describe('MatDrawerContainer', () => {\n \n     fixture.componentInstance.drawer.open();\n     fixture.detectChanges();\n-    await wait(20);\n+    await wait(100);\n     fixture.detectChanges();\n \n     expect(parseInt(contentElement.style.marginLeft)).toBeGreaterThan(0);\n@@ -916,7 +916,7 @@ describe('MatDrawerContainer', () => {\n     fixture.detectChanges();\n     fixture.componentInstance.drawer.open();\n     fixture.detectChanges();\n-    await wait(20);\n+    await wait(100);\n     fixture.detectChanges();\n \n     const contentElement = fixture.debugElement.nativeElement.querySelector('.mat-drawer-content');\n@@ -938,7 +938,7 @@ describe('MatDrawerContainer', () => {\n     fixture.detectChanges();\n     fixture.componentInstance.drawer.open();\n     fixture.detectChanges();\n-    await wait(20);\n+    await wait(100);\n     fixture.detectChanges();\n \n     const contentElement = fixture.debugElement.nativeElement.querySelector('.mat-drawer-content');\n@@ -959,7 +959,7 @@ describe('MatDrawerContainer', () => {\n     fixture.detectChanges();\n     fixture.componentInstance.drawer.open();\n     fixture.detectChanges();\n-    await wait(20);\n+    await wait(100);\n     fixture.detectChanges();\n \n     const contentElement = fixture.debugElement.nativeElement.querySelector('.mat-drawer-content');\n@@ -998,7 +998,7 @@ describe('MatDrawerContainer', () => {\n     fixture.nativeElement.querySelector('.mat-drawer').style.width = 'auto';\n     fixture.componentInstance.drawer.open();\n     fixture.detectChanges();\n-    await wait(20);\n+    await wait(100);\n     fixture.detectChanges();\n \n     const contentEl = fixture.debugElement.nativeElement.querySelector('.mat-drawer-content');\n@@ -1009,7 +1009,7 @@ describe('MatDrawerContainer', () => {\n     fixture.componentInstance.fillerWidth = 200;\n     fixture.changeDetectorRef.markForCheck();\n     fixture.detectChanges();\n-    await wait(20);\n+    await wait(100);\n     fixture.detectChanges();\n \n     expect(parseInt(contentEl.style.marginLeft)).toBeGreaterThan(initialMargin);\n@@ -1027,7 +1027,7 @@ describe('MatDrawerContainer', () => {\n     // Open the drawer and resolve the open animation.\n     fixture.componentInstance.drawer.open();\n     fixture.detectChanges();\n-    await wait(20);\n+    await wait(100);\n     fixture.detectChanges();\n \n     expect(content.style.marginLeft).not.toBe('', 'Margin should be present when drawer is open');\n@@ -1035,7 +1035,7 @@ describe('MatDrawerContainer', () => {\n     // Close the drawer and resolve the close animation.\n     fixture.componentInstance.drawer.close();\n     fixture.detectChanges();\n-    await wait(20);\n+    await wait(100);\n     fixture.detectChanges();\n \n     expect(content.style.marginLeft)\ndiff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts\nindex a02732999d86eb0a371f816cac18cc53f3d4eef4..7d12b2f40fa288e6856caf412ee17ea4c52aa868 100644\n--- a/src/material/tooltip/tooltip.spec.ts\n+++ b/src/material/tooltip/tooltip.spec.ts\n@@ -1277,12 +1277,13 @@ describe('MatTooltip', () => {\n \n       dispatchFakeEvent(button, 'touchstart');\n       fixture.detectChanges();\n-      await wait(250); // Halfway through the dela.\n+      await wait(250); // Halfway through the delay.\n \n       assertTooltipInstance(fixture.componentInstance.tooltip, false);\n \n-      await wait(500); // Finish the dela.\n+      await wait(600); // Finish the delay.\n       fixture.detectChanges();\n+      await fixture.whenStable();\n       finishCurrentTooltipAnimation(overlayContainerElement, true); // Finish the animation.\n \n       assertTooltipInstance(fixture.componentInstance.tooltip, true);\n",
+  "diff_sha256": "c4e8e66590dbcb5a1b6a393b0054773903b19fb26d1ce527506f360fb90af2c7",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/drag-drop/directives/drop-list-shared.spec.ts",
+      "header": "@@ -2733,7 +2733,7 @@ export function defineCommonDropListTests(config: {",
+      "sha256": "3372cb6b36d0ef0b4341ff8238ea532593d3ff600d269a2376c37c407a7104fd",
+      "judgment": "Two shared auto-scroll callbacks widen10ms waits to100ms; whole callback checks retain viewport/list scroll assertions and all other operations. Static shared-function registrations are not runtime executions. Decline private timing changes without forking CDK or claiming inherited behavior.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/cdk/drag-drop/directives/drop-list-shared.spec.ts",
+      "header": "@@ -2770,7 +2770,7 @@ export function defineCommonDropListTests(config: {",
+      "sha256": "50e1878d346486cc25ad79410af4b92fe11d7a7204cf1dc538badfa8e85ad514",
+      "judgment": "Two shared auto-scroll callbacks widen10ms waits to100ms; whole callback checks retain viewport/list scroll assertions and all other operations. Static shared-function registrations are not runtime executions. Decline private timing changes without forking CDK or claiming inherited behavior.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -45,7 +45,7 @@ describe('MatDrawer', () => {",
+      "sha256": "5c2801f830b52e63483191812475c3cad6691a3d8733646702a59a9096442c2e",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -72,7 +72,7 @@ describe('MatDrawer', () => {",
+      "sha256": "5c0cb11b3e2b4432aef44fdb4cbe340afeec3772082e2a610036059a22b35c70",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -181,7 +181,7 @@ describe('MatDrawer', () => {",
+      "sha256": "fcc262edf61d88cffcb0af5bf11dee6101b68ae9f4d0c220dd23547e37166dbb",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -190,7 +190,7 @@ describe('MatDrawer', () => {",
+      "sha256": "f4988fefb5352773f591b881fbd5ac7685e03f795d616a1ecf2e8b170539797f",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -228,7 +228,7 @@ describe('MatDrawer', () => {",
+      "sha256": "9c4e0dbeddbb20aae62699d610ced5dbf67ad20635a1097b721ed29e61f7afca",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -280,7 +280,7 @@ describe('MatDrawer', () => {",
+      "sha256": "e4febd20bd07a746eb34118e796f444af34ef7042cee5ca368f393e7d1d06009",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -294,7 +294,7 @@ describe('MatDrawer', () => {",
+      "sha256": "ebafb973d90e0480155aeb8d3c8ff64a122e0db22f08cfc4d0fb4b1cd9232c87",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -313,13 +313,13 @@ describe('MatDrawer', () => {",
+      "sha256": "0ca57cc5db972209685ac02a35edf7a25aa4c9b61024e3b7833f4a73cd5b63e4",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -337,13 +337,13 @@ describe('MatDrawer', () => {",
+      "sha256": "8fa874f089390083221c861fb9fbe8c5b00ffda44d3ffc9f49f011a561858871",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -496,7 +496,7 @@ describe('MatDrawer', () => {",
+      "sha256": "2a4401e95cf3c1f76d43e7c6c96e4e00c5b4fbedd96e5d87744e6e356dac25b0",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -546,7 +546,7 @@ describe('MatDrawer', () => {",
+      "sha256": "037c189ed73768011fe6c46e7af83e280f10c8afb1d7d79e14cf8de2ad2581e5",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -560,7 +560,7 @@ describe('MatDrawer', () => {",
+      "sha256": "a6c7e8b2a4d848e3cc9432d67c52947e11e1d81225a4a3260cdd0ee341094bf3",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -575,7 +575,7 @@ describe('MatDrawer', () => {",
+      "sha256": "6f7375e706f59ec88a7dae96adea6177257244a226300f2fe95e1f3f77ecb6f0",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -618,7 +618,7 @@ describe('MatDrawer', () => {",
+      "sha256": "4044a963ce32da8b060bec86097afcfc8ac1983a9deb7a314e188776c6128895",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -633,7 +633,7 @@ describe('MatDrawer', () => {",
+      "sha256": "ee3a886dd2174e32446d513892bdec219e62e61bc09ef48473bc24459073fa15",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -904,7 +904,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "36bcfb993fa11dae8dff91fbbddbe325b50767575c911c22f512c285dfbf7e81",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -916,7 +916,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "e4181e1a410a6b0bc50875fba85d3edc3e5271a3a5752dd73764c2cc2d4cccb0",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -938,7 +938,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "fca50397a8120e5456f5125c4ce3846034859f6d40e976d872dca9314407fa4d",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -959,7 +959,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "f19284f34820a1bbc9e6d3477241d85c47401ce35bc5d0ec213fa09f0e830c1a",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -998,7 +998,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "34405868c260a581f09dc8878a402ec7f357e6c1e1b76e9d3a392515f3ad36b1",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1009,7 +1009,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "97027e80478aa57c1fb61c78d23fbdf1db5fb34d189d41ce160bc5034eca07c8",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1027,7 +1027,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "16db9141aa104503dfa5f7d90fbbe394af1685980713f71f7bd7bdcbf5a21948",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1035,7 +1035,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "220f011bd03da0d8382a2edcaa1773058d415e14979d67fa9c73184b375c8d20",
+      "judgment": "25 waits widen20ms to100ms across19 callbacks, including event counts, escape/backdrop closure, button/SVG focus restoration, focus trapping/autofocus, two-way opened state and content margin/resize observations. Whole callback comparison preserves every other operation and assertion; longer observation windows are not deadline or lifecycle equivalence. Decline private wait preference without an ordinary drawer fork.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1277,12 +1277,13 @@ describe('MatTooltip', () => {",
+      "sha256": "ab29dbbd97886457b7ae71cd678a29e625c142c7f1e12b5479ced6ecb0d45cf1",
+      "judgment": "Retain the250ms absence helper assertion; widen the following500ms wait to600ms and add fixture.whenStable after detection before finishing animation and asserting presence. Correct two comment spellings. These changed deadlines and scheduling are not equivalent to the owned legacy fakeAsync250/500ms test, which remains unchanged.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    }
+  ],
+  "stability_semantics": {
+    "sha": "e1481e44cd14f3fb6222939e33ec856858299fa4",
+    "complete_original_files": 3,
+    "complete_original_hunks": 26,
+    "before_static_occurrences": 302,
+    "after_static_occurrences": 302,
+    "full_ordered_path_suite_mode_occurrence_pairing": true,
+    "removed": [],
+    "added": [],
+    "programs": [
+      {
+        "path": "src/cdk/drag-drop/directives/drop-list-shared.spec.ts",
+        "all_other_noncase_operations_and_metadata_equal": true
+      },
+      {
+        "path": "src/material/sidenav/drawer.spec.ts",
+        "all_other_noncase_operations_and_metadata_equal": true
+      },
+      {
+        "path": "src/material/tooltip/tooltip.spec.ts",
+        "all_other_noncase_operations_and_metadata_equal": true
+      }
+    ],
+    "fixtureChanges": [],
+    "callback_identity_is_not_fixture_or_peer_behavior_equivalence": true,
+    "actual_original_or_owned_Angular_native_or_floor_tests_executed": false,
+    "complete_ordered_case_pairs_and_program_reviews": {
+      "path": "compatibility/rc/spec-stability-source-review.json.gz",
+      "sha256": "3e6bb57402e224b8cac352ce832add049c669e35266a471d6c4a9f413ab1f116"
+    }
+  },
+  "decision": "The complete three-file26-hunk wait adjustment retains302 static registrations,280 unchanged callbacks and22 changed callbacks. Whole callback comparison, including helper assertions and variable declaration kinds, accounts for28 changed wait durations: two CDK auto-scroll waits10 to100ms,25 drawer waits20 to100ms across19 callbacks, and one tooltip wait500 to600ms plus a new fixture.whenStable. The tooltip still observes absence after250ms and presence after finishing animation, but the later observation time and added stabilization are not scheduling or deadline equivalence. The comment-only dela correction is recorded separately. Decline these private wait widenings; retain owned legacy tooltip fakeAsync250/500ms observations, focus/overlay/form assertions and all existing source cases. Current public CDK/Material dependencies remain reachable: no drag/drop or drawer fork, absent-peer waiver, inherited runtime pass or weakened golden. No owned HTML/CSS/SCSS or template changes. Actual browser/native/packed, zoneful/zoneless and supported-floor gates remain open.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "c4e8e66590dbcb5a1b6a393b0054773903b19fb26d1ce527506f360fb90af2c7",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "The complete three-file26-hunk wait adjustment retains302 static registrations,280 unchanged callbacks and22 changed callbacks. Whole callback comparison, including helper assertions and variable declaration kinds, accounts for28 changed wait durations: two CDK auto-scroll waits10 to100ms,25 drawer waits20 to100ms across19 callbacks, and one tooltip wait500 to600ms plus a new fixture.whenStable. The tooltip still observes absence after250ms and presence after finishing animation, but the later observation time and added stabilization are not scheduling or deadline equivalence. The comment-only dela correction is recorded separately. Decline these private wait widenings; retain owned legacy tooltip fakeAsync250/500ms observations, focus/overlay/form assertions and all existing source cases. Current public CDK/Material dependencies remain reachable: no drag/drop or drawer fork, absent-peer waiver, inherited runtime pass or weakened golden. No owned HTML/CSS/SCSS or template changes. Actual browser/native/packed, zoneful/zoneless and supported-floor gates remain open.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-stability-source-review.mjs",
+        "sha256": "7a69a7fc852bbd0fa39d121f44ecbcb95fb578e07a9774d196b67acdd86b8981"
+      },
+      {
+        "path": "tests/spec_stability_source_probe.mjs",
+        "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-subjects.json.gz",
+        "sha256": "5342753190e2b85262558c4b04c454559e510779561d60438ad7338729f28539"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-acquisition.json.gz",
+        "sha256": "5626aae055fee214d4cca5982ca4fedb631340d315cf6214c7ad44c09ec78dce"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-controls.json",
+        "sha256": "8aacd2200e00f7b3b004eaa7c1cca99606b0423681bab3b429b24a9a083d3b9c"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-review.json.gz",
+        "sha256": "3e6bb57402e224b8cac352ce832add049c669e35266a471d6c4a9f413ab1f116"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-python.log.gz",
+        "sha256": "2a0a504c10fecd048d77f9bc08cd1b0a9b8f56b5395ee1acf5fcf30b4c5f38bd"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-cyph-sanity.json",
+        "sha256": "77007e75d0ab7f8f70ee16f1aee7dcfd10049346073d42799857f46ee374fbb5"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "tests/spec_stability_chip_probe.mjs",
+        "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+        "sha256": "cb2855f4aaa572bba3346d066a9d70281f50e28cf96980bca8935d84a472dd8f"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+        "sha256": "7be945fb436c1b4df1bcf782a9dd8a2fd1e285469eff461f32d59ca9550fce3e"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-replay-checkpoint.json",
+        "sha256": "eabef4f1803ed8d98361442fd028d7a8cc638b8bccfa5279eddf4ee407a66d3e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "413601de7ed5123e022613374e79680c492653fe2e2491a4f5b03db40b0d1b2a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+        "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+        "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "e1481e44cd14f3fb6222939e33ec856858299fa4",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test: attempt to resolve flaky tests (#33166)",
+    "files": [
+      "src/material/sidenav/drawer.spec.ts",
+      "src/material/tooltip/tooltip.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-stability-source-prior.json.gz",
+    "sha256": "f0b7e8e8a9ace1822155ce537049a3eef9410cdb7495563028bf9220e5a42975"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-stability-source-review.mjs",
+      "sha256": "7a69a7fc852bbd0fa39d121f44ecbcb95fb578e07a9774d196b67acdd86b8981"
+    },
+    {
+      "path": "tests/spec_stability_source_probe.mjs",
+      "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-subjects.json.gz",
+      "sha256": "5342753190e2b85262558c4b04c454559e510779561d60438ad7338729f28539"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-acquisition.json.gz",
+      "sha256": "5626aae055fee214d4cca5982ca4fedb631340d315cf6214c7ad44c09ec78dce"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-controls.json",
+      "sha256": "8aacd2200e00f7b3b004eaa7c1cca99606b0423681bab3b429b24a9a083d3b9c"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-review.json.gz",
+      "sha256": "3e6bb57402e224b8cac352ce832add049c669e35266a471d6c4a9f413ab1f116"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-python.log.gz",
+      "sha256": "2a0a504c10fecd048d77f9bc08cd1b0a9b8f56b5395ee1acf5fcf30b4c5f38bd"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-cyph-sanity.json",
+      "sha256": "77007e75d0ab7f8f70ee16f1aee7dcfd10049346073d42799857f46ee374fbb5"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "tests/spec_stability_chip_probe.mjs",
+      "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+      "sha256": "cb2855f4aaa572bba3346d066a9d70281f50e28cf96980bca8935d84a472dd8f"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+      "sha256": "7be945fb436c1b4df1bcf782a9dd8a2fd1e285469eff461f32d59ca9550fce3e"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-replay-checkpoint.json",
+      "sha256": "eabef4f1803ed8d98361442fd028d7a8cc638b8bccfa5279eddf4ee407a66d3e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "sha256": "413601de7ed5123e022613374e79680c492653fe2e2491a4f5b03db40b0d1b2a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+      "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+    }
+  ],
+  "all_other1693_rows_unchanged": true,
+  "new_owned_Angular_chip_case_executed": false,
+  "production_changes_in_this_source_decision": 0,
+  "preceding_owned_chip_two_file_repair": false,
+  "actual_Angular_native_artifact_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

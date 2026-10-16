@@ -1,0 +1,449 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "88b24e0296bfadcac4bc47c823b47890eeda7a6b",
+  "subject": "test(material/chips): fix flakes and re-enable test (#33426)",
+  "status": "reviewed",
+  "final_disposition": "adapt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "ba85583bb7b4c6129220f71d030ae6526a3658b4",
+      "after_blob": "28f0156d8b5e27de713867423019cd3f966cc7ba"
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "308ee515b2e1cf9f9a147a6c95196d6cce186661",
+      "after_blob": "592c7ca66b9857296dfb3f77ae406b26126b66f9"
+    }
+  ],
+  "original_files": 2,
+  "original_hunks": 14,
+  "raw_commit_sha256": "f8e9bd550f0d0b0e1c0bcc26c12c4741ca5e066b692f752edb75db238af486de",
+  "original_sources": [
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "before": {
+        "git_blob": "ba85583bb7b4c6129220f71d030ae6526a3658b4",
+        "sha256": "613175d6a90485dbfb9f6ab479ca9ba544a4fb0adf68b3f0295e71f6d1d3b964",
+        "bytes": 45713
+      },
+      "after": {
+        "git_blob": "28f0156d8b5e27de713867423019cd3f966cc7ba",
+        "sha256": "cd69774838d4117c3fcbf7ce39540f69fa46577e22f03b136d526ddf90216cf0",
+        "bytes": 45892
+      }
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "before": {
+        "git_blob": "308ee515b2e1cf9f9a147a6c95196d6cce186661",
+        "sha256": "2d788e4f6c33068bdd44076e3e7a6b05d19e9754d5ba7f278108299eb7a34fe1",
+        "bytes": 41318
+      },
+      "after": {
+        "git_blob": "592c7ca66b9857296dfb3f77ae406b26126b66f9",
+        "sha256": "fe4dd93637099fc866b3fc58519e5d2b1104c4ba8b28a9e7c9664ff77371c7bd",
+        "bytes": 41254
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/chips/chip-grid.spec.ts b/src/material/chips/chip-grid.spec.ts\nindex ba85583bb7b4c6129220f71d030ae6526a3658b4..28f0156d8b5e27de713867423019cd3f966cc7ba 100644\n--- a/src/material/chips/chip-grid.spec.ts\n+++ b/src/material/chips/chip-grid.spec.ts\n@@ -180,23 +180,23 @@ describe('MatChipGrid', () => {\n         expect(chipGridNativeElement.getAttribute('tabindex')).toBe('-1');\n       });\n \n-      // TODO: re-enable this test.\n-      // it('should clear the active item in key manager when the last focused chip is destroyed', fakeAsync(() => {\n-      //   const fixture = createComponent(StandardChipGrid);\n-      //   fixture.detectChanges();\n+      it('should clear the active item in key manager when the last focused chip is destroyed', async () => {\n+        const fixture = createComponent(InputChipGrid);\n+        patchElementFocus(primaryActions[0]);\n+        fixture.detectChanges();\n \n-      //   // Focus a chip\n-      //   chips.first.focus();\n-      //   fixture.detectChanges();\n+        // Focus a chip\n+        chips.first.focus();\n+        fixture.detectChanges();\n \n-      //   // Remove ALL chips\n-      //   fixture.componentInstance.foods = []; // Clear the bound data array\n-      //   fixture.detectChanges();\n-      //   flush();\n+        // Remove ALL chips\n+        fixture.componentInstance.foods.set([]); // Clear the bound data array\n+        fixture.detectChanges();\n+        await fixture.whenStable();\n \n-      //   // Verify key manager is reset to prevent stale references\n-      //   expect(chipGridInstance._keyManager.activeItemIndex).toBe(-1);\n-      // }));\n+        // Verify key manager is reset to prevent stale references\n+        expect((chipGridInstance as any)._keyManager.activeItemIndex).toBe(-1);\n+      });\n \n       describe('on chip destroy', () => {\n         it('should focus the next item', () => {\n@@ -872,7 +872,7 @@ describe('MatChipGrid', () => {\n       }\n \n       nativeInput.focus();\n-      expect(fixture.componentInstance.foods)\n+      expect(fixture.componentInstance.foods())\n         .withContext('Expected all chips to be removed.')\n         .toEqual([]);\n       expect(document.activeElement).withContext('Expected input to be focused.').toBe(nativeInput);\n@@ -1172,7 +1172,7 @@ class FormFieldChipGrid {\n     <mat-form-field>\n       <mat-label>New food...</mat-label>\n       <mat-chip-grid #chipGrid placeholder=\"Food\" [formControl]=\"control\">\n-        @for (food of foods; track food) {\n+        @for (food of foods(); track food) {\n           <mat-chip-row [value]=\"food.value\" (removed)=\"remove(food)\">\n             {{ food.viewValue }}\n           </mat-chip-row>\n@@ -1189,7 +1189,7 @@ class FormFieldChipGrid {\n   changeDetection: ChangeDetectionStrategy.Eager,\n })\n class InputChipGrid {\n-  foods: any[] = [\n+  readonly foods = signal([\n     {value: 'steak-0', viewValue: 'Steak'},\n     {value: 'pizza-1', viewValue: 'Pizza'},\n     {value: 'tacos-2', viewValue: 'Tacos', disabled: true},\n@@ -1198,7 +1198,7 @@ class InputChipGrid {\n     {value: 'eggs-5', viewValue: 'Eggs'},\n     {value: 'pasta-6', viewValue: 'Pasta'},\n     {value: 'sushi-7', viewValue: 'Sushi'},\n-  ];\n+  ]);\n   control = new FormControl<string | null>(null);\n \n   separatorKeyCodes = [ENTER, SPACE];\n@@ -1209,10 +1209,13 @@ class InputChipGrid {\n \n     // Add our foods\n     if (value) {\n-      this.foods.push({\n-        value: `${value.toLowerCase()}-${this.foods.length}`,\n-        viewValue: value,\n-      });\n+      this.foods.update(current => [\n+        ...current,\n+        {\n+          value: `${value.toLowerCase()}-${current.length}`,\n+          viewValue: value,\n+        },\n+      ]);\n     }\n \n     // Reset the input value\n@@ -1220,10 +1223,14 @@ class InputChipGrid {\n   }\n \n   remove(food: any): void {\n-    const index = this.foods.indexOf(food);\n+    const index = this.foods().indexOf(food);\n \n     if (index > -1) {\n-      this.foods.splice(index, 1);\n+      this.foods.update(current => {\n+        const newValue = current.slice();\n+        newValue.splice(index, 1);\n+        return newValue;\n+      });\n     }\n   }\n \ndiff --git a/src/material/chips/chip-listbox.spec.ts b/src/material/chips/chip-listbox.spec.ts\nindex 308ee515b2e1cf9f9a147a6c95196d6cce186661..592c7ca66b9857296dfb3f77ae406b26126b66f9 100644\n--- a/src/material/chips/chip-listbox.spec.ts\n+++ b/src/material/chips/chip-listbox.spec.ts\n@@ -35,6 +35,10 @@ describe('MatChipListbox', () => {\n   let directionality: WritableSignal<Direction>;\n   let primaryActions: NodeListOf<HTMLElement>;\n \n+  function wait(milliseconds: number) {\n+    return new Promise(resolve => setTimeout(resolve, milliseconds));\n+  }\n+\n   describe('StandardChipList', () => {\n     describe('basic behaviors', () => {\n       beforeEach(() => {\n@@ -384,7 +388,7 @@ describe('MatChipListbox', () => {\n             .withContext('Expected tabIndex to be set to -1 temporarily.')\n             .toBe(-1);\n \n-          await new Promise(r => setTimeout(r, 0));\n+          await wait(0);\n \n           expect(chipListboxNativeElement.tabIndex)\n             .withContext('Expected tabIndex to be reset back to 0')\n@@ -407,7 +411,7 @@ describe('MatChipListbox', () => {\n             .withContext('Expected tabIndex to be set to -1 temporarily.')\n             .toBe(-1);\n \n-          await new Promise(r => setTimeout(r, 0));\n+          await wait(0);\n \n           expect(chipListboxNativeElement.tabIndex)\n             .withContext('Expected tabIndex to be reset back to 4')\n@@ -690,7 +694,7 @@ describe('MatChipListbox', () => {\n             By.css('mat-chip-listbox'),\n           )!.nativeElement;\n           dispatchFakeEvent(nativeChipListbox, 'blur');\n-          await new Promise(r => setTimeout(r, 0));\n+          await wait(0);\n \n           expect(fixture.componentInstance.control.touched)\n             .withContext('Expected the control to be touched.')\n@@ -707,7 +711,7 @@ describe('MatChipListbox', () => {\n             By.css('mat-chip-listbox'),\n           )!.nativeElement;\n           dispatchFakeEvent(nativeChipListbox, 'blur');\n-          await new Promise(r => setTimeout(r, 0));\n+          await wait(0);\n \n           expect(fixture.componentInstance.control.touched)\n             .withContext('Expected the control to stay untouched.')\n@@ -863,16 +867,16 @@ describe('MatChipListbox', () => {\n             initFixture.componentInstance.control = new FormControl(['tutorial-1', 'tutorial-2']);\n           });\n           fixture.detectChanges();\n-\n-          await new Promise(r => setTimeout(r, 400));\n+          await wait(400);\n           fixture.detectChanges();\n \n           let array = fixture.componentInstance.chips.toArray();\n \n           expect(array.length).withContext('Expect chips not to be rendered yet').toBe(0);\n \n-          await new Promise(r => setTimeout(r, 100));\n+          await wait(100);\n           fixture.detectChanges();\n+          await fixture.whenStable();\n \n           array = fixture.componentInstance.chips.toArray();\n \n@@ -891,13 +895,13 @@ describe('MatChipListbox', () => {\n           fixture.detectChanges();\n           await fixture.whenStable();\n \n-          await new Promise(r => setTimeout(r, 500));\n+          await wait(500);\n           fixture.detectChanges();\n \n           fixture.componentInstance.control.setValue(['tutorial-4']);\n           fixture.componentInstance.updateChips(['tutorial-3', 'tutorial-4']);\n \n-          await new Promise(r => setTimeout(r, 500));\n+          await wait(500);\n           fixture.detectChanges();\n           await fixture.whenStable();\n \n",
+  "diff_sha256": "29552abd8a1ddc561165178cb0a435647bf3941f2cad09bd8cbd184b827047d1",
+  "hunk_reviews": [
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -180,23 +180,23 @@ describe('MatChipGrid', () => {",
+      "sha256": "7543cc3eb6aefcf0ccff06927e711f32bd1190a775cc1f5cd65854ae08b56379",
+      "judgment": "Activate the commented chip destruction test with InputChipGrid and signal.set([]); change the retained empty-food observer to a signal call; change the @for template, eight-value array declaration and add/remove methods to readonly signal fresh-array updates. The complete pinned class and the added test are reviewed separately from callback identity. Adapt only the destroyed active-item purpose to the owned legacy array fixture and narrow reset; no modern grid/signal or template adoption.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -872,7 +872,7 @@ describe('MatChipGrid', () => {",
+      "sha256": "dbd7e636dad599cf4ae342b7a66b577c15c6524e9b762473d12dd4ac62e94000",
+      "judgment": "Activate the commented chip destruction test with InputChipGrid and signal.set([]); change the retained empty-food observer to a signal call; change the @for template, eight-value array declaration and add/remove methods to readonly signal fresh-array updates. The complete pinned class and the added test are reviewed separately from callback identity. Adapt only the destroyed active-item purpose to the owned legacy array fixture and narrow reset; no modern grid/signal or template adoption.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -1172,7 +1172,7 @@ class FormFieldChipGrid {",
+      "sha256": "171c820f8ac83031d950e31ee35cad4635cfe8ab18d8bc2dd85056387a33a1ee",
+      "judgment": "Activate the commented chip destruction test with InputChipGrid and signal.set([]); change the retained empty-food observer to a signal call; change the @for template, eight-value array declaration and add/remove methods to readonly signal fresh-array updates. The complete pinned class and the added test are reviewed separately from callback identity. Adapt only the destroyed active-item purpose to the owned legacy array fixture and narrow reset; no modern grid/signal or template adoption.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -1189,7 +1189,7 @@ class FormFieldChipGrid {",
+      "sha256": "4e2a2539210047632dbae6d8b22f2837fc585f9ad46463e6aaf472fb0861caa9",
+      "judgment": "Activate the commented chip destruction test with InputChipGrid and signal.set([]); change the retained empty-food observer to a signal call; change the @for template, eight-value array declaration and add/remove methods to readonly signal fresh-array updates. The complete pinned class and the added test are reviewed separately from callback identity. Adapt only the destroyed active-item purpose to the owned legacy array fixture and narrow reset; no modern grid/signal or template adoption.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -1198,7 +1198,7 @@ class InputChipGrid {",
+      "sha256": "364aff7f187dd21b2831c6413f2db342c5fb7cdb91515aefddc56eb846504372",
+      "judgment": "Activate the commented chip destruction test with InputChipGrid and signal.set([]); change the retained empty-food observer to a signal call; change the @for template, eight-value array declaration and add/remove methods to readonly signal fresh-array updates. The complete pinned class and the added test are reviewed separately from callback identity. Adapt only the destroyed active-item purpose to the owned legacy array fixture and narrow reset; no modern grid/signal or template adoption.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -1209,10 +1209,13 @@ class InputChipGrid {",
+      "sha256": "0bd4e1f6db45295ce65a28028031f61c234a7c9a5087de07a9b30275ba90f84b",
+      "judgment": "Activate the commented chip destruction test with InputChipGrid and signal.set([]); change the retained empty-food observer to a signal call; change the @for template, eight-value array declaration and add/remove methods to readonly signal fresh-array updates. The complete pinned class and the added test are reviewed separately from callback identity. Adapt only the destroyed active-item purpose to the owned legacy array fixture and narrow reset; no modern grid/signal or template adoption.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -1220,10 +1223,14 @@ class InputChipGrid {",
+      "sha256": "29b4a46b12205a7319d0e42c4e2ecc97ebb30a06e9b1705d48c2b51396a806ec",
+      "judgment": "Activate the commented chip destruction test with InputChipGrid and signal.set([]); change the retained empty-food observer to a signal call; change the @for template, eight-value array declaration and add/remove methods to readonly signal fresh-array updates. The complete pinned class and the added test are reviewed separately from callback identity. Adapt only the destroyed active-item purpose to the owned legacy array fixture and narrow reset; no modern grid/signal or template adoption.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -35,6 +35,10 @@ describe('MatChipListbox', () => {",
+      "sha256": "c75d001b8a76e601b0dbc77f39d094aeacdc82e7b4eaf956b8507d8d3b15c673",
+      "judgment": "Extract the exact Promise/setTimeout wait helper. Eight timer calls across six callbacks preserve their numeric delays (four zero,400/100,500/500); the initial async case also adds fixture.whenStable after detection and before reading chips. Whole callbacks preserve all other operations/assertions. This source accounting is not Angular scheduling equivalence and the private fixture/helper preference is declined.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -384,7 +388,7 @@ describe('MatChipListbox', () => {",
+      "sha256": "a45ef7291e109ece4296fdf47b4cae91c293907f3071c6e448d44415848def74",
+      "judgment": "Extract the exact Promise/setTimeout wait helper. Eight timer calls across six callbacks preserve their numeric delays (four zero,400/100,500/500); the initial async case also adds fixture.whenStable after detection and before reading chips. Whole callbacks preserve all other operations/assertions. This source accounting is not Angular scheduling equivalence and the private fixture/helper preference is declined.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -407,7 +411,7 @@ describe('MatChipListbox', () => {",
+      "sha256": "259653f9cdc039f39dc3f5400fb4ddb638b00f11793bf9873f422722085b67d4",
+      "judgment": "Extract the exact Promise/setTimeout wait helper. Eight timer calls across six callbacks preserve their numeric delays (four zero,400/100,500/500); the initial async case also adds fixture.whenStable after detection and before reading chips. Whole callbacks preserve all other operations/assertions. This source accounting is not Angular scheduling equivalence and the private fixture/helper preference is declined.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -690,7 +694,7 @@ describe('MatChipListbox', () => {",
+      "sha256": "f1ef8359df18d42b9b4124ad230efaba3b7b8e3877b8efd0cb67dcf9a57e6f0f",
+      "judgment": "Extract the exact Promise/setTimeout wait helper. Eight timer calls across six callbacks preserve their numeric delays (four zero,400/100,500/500); the initial async case also adds fixture.whenStable after detection and before reading chips. Whole callbacks preserve all other operations/assertions. This source accounting is not Angular scheduling equivalence and the private fixture/helper preference is declined.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -707,7 +711,7 @@ describe('MatChipListbox', () => {",
+      "sha256": "cb4ee2877534da78bdf4031c497574339cc0f8174f8ea97073f51d007ba4d441",
+      "judgment": "Extract the exact Promise/setTimeout wait helper. Eight timer calls across six callbacks preserve their numeric delays (four zero,400/100,500/500); the initial async case also adds fixture.whenStable after detection and before reading chips. Whole callbacks preserve all other operations/assertions. This source accounting is not Angular scheduling equivalence and the private fixture/helper preference is declined.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -863,16 +867,16 @@ describe('MatChipListbox', () => {",
+      "sha256": "2b5ddb8b5bd74a13d6bd4e1256c9d32fb2130f44c2d33b1200de7af581734af3",
+      "judgment": "Extract the exact Promise/setTimeout wait helper. Eight timer calls across six callbacks preserve their numeric delays (four zero,400/100,500/500); the initial async case also adds fixture.whenStable after detection and before reading chips. Whole callbacks preserve all other operations/assertions. This source accounting is not Angular scheduling equivalence and the private fixture/helper preference is declined.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -891,13 +895,13 @@ describe('MatChipListbox', () => {",
+      "sha256": "e131e2b6bde13ae2fd8a9809d6c9b2d7058df5d78773a3601f6e1ed7a1fa31c6",
+      "judgment": "Extract the exact Promise/setTimeout wait helper. Eight timer calls across six callbacks preserve their numeric delays (four zero,400/100,500/500); the initial async case also adds fixture.whenStable after detection and before reading chips. Whole callbacks preserve all other operations/assertions. This source accounting is not Angular scheduling equivalence and the private fixture/helper preference is declined.",
+      "review_basis": "Authenticated complete original, ordered suite/path/mode occurrence pairing, whole callbacks including helper assertions and declaration kinds, exact private fixture changes. No scheduling/native/floor equivalence claim."
+    }
+  ],
+  "stability_semantics": {
+    "sha": "88b24e0296bfadcac4bc47c823b47890eeda7a6b",
+    "complete_original_files": 2,
+    "complete_original_hunks": 14,
+    "before_static_occurrences": 119,
+    "after_static_occurrences": 120,
+    "full_ordered_path_suite_mode_occurrence_pairing": true,
+    "removed": [],
+    "added": [
+      {
+        "path": "src/material/chips/chip-grid.spec.ts",
+        "suites": [
+          "'MatChipGrid'",
+          "'StandardChipGrid'",
+          "'focus behaviors'"
+        ],
+        "name": "'should clear the active item in key manager when the last focused chip is destroyed'",
+        "sha256": "144de86f007ce71d27b763125eef461753f99a463b600a27969003a171457aa8",
+        "kind": "previously-commented-chip-destruction-registration-activated",
+        "legacy_purpose_adapted_without_signal_or_grid_fork": true
+      }
+    ],
+    "programs": [
+      {
+        "path": "src/material/chips/chip-grid.spec.ts",
+        "all_other_noncase_operations_and_metadata_equal": true
+      },
+      {
+        "path": "src/material/chips/chip-listbox.spec.ts",
+        "all_other_noncase_operations_and_metadata_equal": true
+      }
+    ],
+    "fixtureChanges": [
+      {
+        "path": "src/material/chips/chip-grid.spec.ts",
+        "name": "InputChipGrid",
+        "before_sha256": "400a4bd799a9077a504f085a1c362f3961bca35c0af843fce39b5e1438efe51e",
+        "after_sha256": "a5e910f07540b20bf471a3a666dc748f5da57aceb7dbb04dca0ffe47572db560",
+        "kind": "private-mutable-array-fixture-to-readonly-signal",
+        "original_values_and_order": 8,
+        "add_uses_fresh_array_update": true,
+        "remove_copies_then_splices": true,
+        "mutation_notification_identity_or_render_equivalence_proved": false,
+        "owned_fixture_changed": false
+      },
+      {
+        "path": "src/material/chips/chip-listbox.spec.ts",
+        "kind": "wait-helper-extracted",
+        "parameters_and_Promise_setTimeout_operations_checked": true,
+        "actual_Angular_native_scheduling_equivalence_proved": false
+      }
+    ],
+    "callback_identity_is_not_fixture_or_peer_behavior_equivalence": true,
+    "actual_original_or_owned_Angular_native_or_floor_tests_executed": false,
+    "complete_ordered_case_pairs_and_program_reviews": {
+      "path": "compatibility/rc/spec-stability-source-review.json.gz",
+      "sha256": "3e6bb57402e224b8cac352ce832add049c669e35266a471d6c4a9f413ab1f116"
+    }
+  },
+  "decision": "The complete two-file14-hunk chip test change activates one previously commented destruction registration, not an xit. It creates InputChipGrid, patches focus, empties a signal and checks activeItemIndex after stability. Of119 retained static cases112 callback semantics are unchanged and seven changes are individually accounted for: one array observer becomes a signal read; six listbox callbacks extract eight identical-duration timer operations, including one added fixture.whenStable before inspecting initial async chips. InputChipGrid changes its eight-value mutable array, add/remove identity and @for binding into a readonly signal with fresh-array updates; these notifications and rendering are not declared equivalent. Adapt only the destruction purpose to the owned legacy MatChipList. A demonstrated stale reference is repaired by updateActiveItem(-1) for an empty QueryList, preserving neighbor/refocus behavior; append one lifecycle regression covering destruction, repopulation and fresh focus while preserving all2222 old cases and all production HTML/CSS/SCSS. The isolated actual-method controls use public QueryList/FocusKeyManager with fake chips, not a full Angular component or21.x floor. Its source context83/native bindings20/generic records13/import receipts27 has been qualified and original programs retained through immutable replay. Decline the modern grid/signal fixture migration. The new real Angular case and packed/browser/both-floor execution remain mandatory and unexecuted.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "29552abd8a1ddc561165178cb0a435647bf3941f2cad09bd8cbd184b827047d1",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "The complete two-file14-hunk chip test change activates one previously commented destruction registration, not an xit. It creates InputChipGrid, patches focus, empties a signal and checks activeItemIndex after stability. Of119 retained static cases112 callback semantics are unchanged and seven changes are individually accounted for: one array observer becomes a signal read; six listbox callbacks extract eight identical-duration timer operations, including one added fixture.whenStable before inspecting initial async chips. InputChipGrid changes its eight-value mutable array, add/remove identity and @for binding into a readonly signal with fresh-array updates; these notifications and rendering are not declared equivalent. Adapt only the destruction purpose to the owned legacy MatChipList. A demonstrated stale reference is repaired by updateActiveItem(-1) for an empty QueryList, preserving neighbor/refocus behavior; append one lifecycle regression covering destruction, repopulation and fresh focus while preserving all2222 old cases and all production HTML/CSS/SCSS. The isolated actual-method controls use public QueryList/FocusKeyManager with fake chips, not a full Angular component or21.x floor. Its source context83/native bindings20/generic records13/import receipts27 has been qualified and original programs retained through immutable replay. Decline the modern grid/signal fixture migration. The new real Angular case and packed/browser/both-floor execution remain mandatory and unexecuted.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-stability-source-review.mjs",
+        "sha256": "7a69a7fc852bbd0fa39d121f44ecbcb95fb578e07a9774d196b67acdd86b8981"
+      },
+      {
+        "path": "tests/spec_stability_source_probe.mjs",
+        "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-subjects.json.gz",
+        "sha256": "5342753190e2b85262558c4b04c454559e510779561d60438ad7338729f28539"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-acquisition.json.gz",
+        "sha256": "5626aae055fee214d4cca5982ca4fedb631340d315cf6214c7ad44c09ec78dce"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-controls.json",
+        "sha256": "8aacd2200e00f7b3b004eaa7c1cca99606b0423681bab3b429b24a9a083d3b9c"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-review.json.gz",
+        "sha256": "3e6bb57402e224b8cac352ce832add049c669e35266a471d6c4a9f413ab1f116"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-python.log.gz",
+        "sha256": "2a0a504c10fecd048d77f9bc08cd1b0a9b8f56b5395ee1acf5fcf30b4c5f38bd"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-cyph-sanity.json",
+        "sha256": "77007e75d0ab7f8f70ee16f1aee7dcfd10049346073d42799857f46ee374fbb5"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "tests/spec_stability_chip_probe.mjs",
+        "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+        "sha256": "cb2855f4aaa572bba3346d066a9d70281f50e28cf96980bca8935d84a472dd8f"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+        "sha256": "7be945fb436c1b4df1bcf782a9dd8a2fd1e285469eff461f32d59ca9550fce3e"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-replay-checkpoint.json",
+        "sha256": "eabef4f1803ed8d98361442fd028d7a8cc638b8bccfa5279eddf4ee407a66d3e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "413601de7ed5123e022613374e79680c492653fe2e2491a4f5b03db40b0d1b2a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+        "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+        "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "88b24e0296bfadcac4bc47c823b47890eeda7a6b",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/chips): fix flakes and re-enable test (#33426)",
+    "files": [
+      "src/material/chips/chip-grid.spec.ts",
+      "src/material/chips/chip-listbox.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-stability-source-prior.json.gz",
+    "sha256": "f0b7e8e8a9ace1822155ce537049a3eef9410cdb7495563028bf9220e5a42975"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-stability-source-review.mjs",
+      "sha256": "7a69a7fc852bbd0fa39d121f44ecbcb95fb578e07a9774d196b67acdd86b8981"
+    },
+    {
+      "path": "tests/spec_stability_source_probe.mjs",
+      "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-subjects.json.gz",
+      "sha256": "5342753190e2b85262558c4b04c454559e510779561d60438ad7338729f28539"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-acquisition.json.gz",
+      "sha256": "5626aae055fee214d4cca5982ca4fedb631340d315cf6214c7ad44c09ec78dce"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-controls.json",
+      "sha256": "8aacd2200e00f7b3b004eaa7c1cca99606b0423681bab3b429b24a9a083d3b9c"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-review.json.gz",
+      "sha256": "3e6bb57402e224b8cac352ce832add049c669e35266a471d6c4a9f413ab1f116"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-python.log.gz",
+      "sha256": "2a0a504c10fecd048d77f9bc08cd1b0a9b8f56b5395ee1acf5fcf30b4c5f38bd"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-cyph-sanity.json",
+      "sha256": "77007e75d0ab7f8f70ee16f1aee7dcfd10049346073d42799857f46ee374fbb5"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "tests/spec_stability_chip_probe.mjs",
+      "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+      "sha256": "cb2855f4aaa572bba3346d066a9d70281f50e28cf96980bca8935d84a472dd8f"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+      "sha256": "7be945fb436c1b4df1bcf782a9dd8a2fd1e285469eff461f32d59ca9550fce3e"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-replay-checkpoint.json",
+      "sha256": "eabef4f1803ed8d98361442fd028d7a8cc638b8bccfa5279eddf4ee407a66d3e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "sha256": "413601de7ed5123e022613374e79680c492653fe2e2491a4f5b03db40b0d1b2a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+      "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+    }
+  ],
+  "all_other1693_rows_unchanged": true,
+  "new_owned_Angular_chip_case_executed": false,
+  "production_changes_in_this_source_decision": 0,
+  "preceding_owned_chip_two_file_repair": true,
+  "actual_Angular_native_artifact_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
