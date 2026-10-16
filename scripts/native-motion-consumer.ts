@@ -1,4 +1,4 @@
-/*ZONE_IMPORT*/import {Component, NgModule, ViewChild/*ZONE_NAMED*/} from '@angular/core';
+/*ZONE_IMPORT*/import {Component, NgModule, ViewChild, signal/*ZONE_NAMED*/} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
@@ -58,10 +58,16 @@ export class DialogBody {}
           <mat-option value="a">Alpha</mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-tab-group [animationDuration]="tabDuration">
+      <mat-tab-group [animationDuration]="tabDuration" [dynamicHeight]="tabOriginDynamicHeight()">
+        @if (tabOriginLeft()) {
+          <mat-tab label="OriginLeft"><div style="height:90px">OriginLeft</div></mat-tab>
+        }
         <mat-tab label="One">One</mat-tab>
         <mat-tab label="Two">Two</mat-tab>
         <mat-tab label="Three">Three</mat-tab>
+        @if (tabOriginRight()) {
+          <mat-tab label="OriginRight"><div style="height:90px">OriginRight</div></mat-tab>
+        }
       </mat-tab-group>
       <button id="tip" type="button" #tip="matTooltip" matTooltip="Hello">Tip</button>
       <button *ngIf="showGone" id="tip-gone" type="button" #tipGone="matTooltip" matTooltip="Gone">Gone</button>
@@ -72,6 +78,9 @@ export class DialogBody {}
 export class MotionRoot {
   name = new FormControl('');
   tabDuration = '500ms';
+  tabOriginLeft = signal(false);
+  tabOriginRight = signal(false);
+  tabOriginDynamicHeight = signal(false);
   showGone = true;
   showSurfaces = false;
   @ViewChild(MatLegacyMenuTrigger) menuTrigger!: MatLegacyMenuTrigger;
@@ -355,8 +364,9 @@ export class MotionRoot {
     }, 1500);
     // The historical centered output is asynchronous. Flush the initial selection before observing.
     await this.wait(20);
-    const target = document.querySelectorAll<HTMLElement>('mat-tab-body .mat-tab-body-content')[1];
-    if (!target?.isConnected) throw new Error('Incoming tab content shell missing');
+    const shells = document.querySelectorAll<HTMLElement>('mat-tab-body .mat-tab-body-content');
+    const target = shells[1], outgoing = shells[0];
+    if (!outgoing?.isConnected || !target?.isConnected) throw new Error('Incoming tab content shell missing');
     const started = performance.now();
     let notifications = 0;
     let firstCompletionAt: number | null = null;
@@ -365,8 +375,24 @@ export class MotionRoot {
     const onTransition = (event: TransitionEvent) => transitions.push({type: event.type, trusted: event.isTrusted,
       property: event.propertyName, same_target: event.target === target, connected: target.isConnected,
       at_ms: performance.now() - started, elapsed_ms: event.elapsedTime * 1000});
+    const departures: typeof transitions = [];
+    let departureRendered = false, departureContentPresent = false;
+    const onDeparture = (event: TransitionEvent) => {
+      departures.push({type: event.type, trusted: event.isTrusted, property: event.propertyName,
+        same_target: event.target === outgoing, connected: outgoing.isConnected,
+        at_ms: performance.now() - started, elapsed_ms: event.elapsedTime * 1000});
+      if (event.isTrusted && event.type === 'transitionstart' && event.target === outgoing &&
+        event.propertyName === 'transform') {
+        const style = getComputedStyle(outgoing), box = outgoing.getBoundingClientRect();
+        departureRendered = style.display !== 'none' && style.visibility !== 'hidden' && box.width > 0 && box.height > 0;
+        departureContentPresent = (outgoing.textContent || '').includes('One');
+      }
+    };
     const transitionNames = ['transitionstart', 'transitionend', 'transitioncancel'] as const;
-    for (const name of transitionNames) target.addEventListener(name, onTransition);
+    for (const name of transitionNames) {
+      target.addEventListener(name, onTransition);
+      outgoing.addEventListener(name, onDeparture, true);
+    }
     const cleanup = {subscription_closed: false, listeners_removed: false};
     const sub = this.tabs.animationDone.subscribe(() => {
       notifications += 1;
@@ -383,11 +409,29 @@ export class MotionRoot {
       }, limit);
       const el = document.querySelector('.mat-tab-body-active .mat-tab-body-content') as HTMLElement | null;
       // Duplicate native completion events after settling must not produce a second group output.
-      for (let i = 0; i < 2; i++) el?.dispatchEvent(new TransitionEvent('transitionend', {
+      for (const node of [el, outgoing]) for (let i = 0; i < 2; i++) node?.dispatchEvent(new TransitionEvent('transitionend', {
         bubbles: true, propertyName: 'transform',
       }));
       await this.wait(20);
       const mode = zero ? 'zero' : this.mode();
+      // Freeze this selection before the independent new-body origin probes change it.
+      const departure = {
+        same_target_after: document.querySelectorAll('mat-tab-body .mat-tab-body-content')[0] === outgoing && outgoing.isConnected,
+        duration_ms: this.duration(outgoing, 'transition-duration'),
+        rendered_at_start: departureRendered, content_at_start: departureContentPresent,
+        final_hidden: getComputedStyle(outgoing).display === 'none' && getComputedStyle(outgoing).visibility === 'hidden',
+        content_detached: !(outgoing.textContent || '').trim(),
+        trusted_events: departures.filter(event => event.trusted).map(event => ({...event})),
+        duplicate_end_controls: departures.filter(event => !event.trusted).map(event => ({...event})),
+        cleanup,
+      };
+      sub.unsubscribe();
+      cleanup.subscription_closed = sub.closed === true;
+      for (const name of transitionNames) {
+        target.removeEventListener(name, onTransition);
+        outgoing.removeEventListener(name, onDeparture, true);
+      }
+      cleanup.listeners_removed = true;
       const observation = {
         selector: el && el.classList.contains('mat-tab-body-content') ? '.mat-tab-body-content' : '',
         selectorMatches: !!el && el.classList.contains('mat-tab-body-content'),
@@ -402,16 +446,96 @@ export class MotionRoot {
           duplicate_end_controls: transitions.filter(event => !event.trusted).map(event => ({...event})),
           cleanup,
         },
+        native_departure: departure,
+        origins: {left: await this.measureTabOrigin('left', zero), right: await this.measureTabOrigin('right', zero)},
         detectChangesCalls: 0,
       };
       return {key: `tabs/${mode}`, observation, notify: {key: `tabs/animationDone/${mode}`, observation}};
     } finally {
       sub.unsubscribe();
       cleanup.subscription_closed = sub.closed === true;
-      for (const name of transitionNames) target.removeEventListener(name, onTransition);
+      for (const name of transitionNames) {
+        target.removeEventListener(name, onTransition);
+        outgoing.removeEventListener(name, onDeparture, true);
+      }
       cleanup.listeners_removed = true;
       this.tabs.selectedIndex = 0;
       this.tabDuration = '500ms';
+    }
+  }
+
+  private async measureTabOrigin(direction: 'left' | 'right', zero: boolean): Promise<unknown> {
+    this.tabOriginLeft.set(false);
+    this.tabOriginRight.set(false);
+    this.tabOriginDynamicHeight.set(true);
+    this.tabDuration = zero ? '0ms' : '500ms';
+    const initial = direction === 'left' ? 'Three' : 'One';
+    this.clickTab(initial);
+    await this.waitFor(() => {
+      const node = document.querySelector('.mat-tab-body-active .mat-tab-body-content');
+      return !!node && (node.textContent || '').trim() === initial && !document.querySelector('.mat-tab-body-animating');
+    }, 1500);
+    await this.wait(20);
+    const wrapper = document.querySelector<HTMLElement>('.mat-tab-body-wrapper');
+    if (!wrapper?.isConnected) throw new Error('Tab origin wrapper missing');
+    const label = direction === 'left' ? 'OriginLeft' : 'OriginRight';
+    if (Array.from(wrapper.querySelectorAll('.mat-tab-body-content')).some(node => (node.textContent || '').includes(label))) {
+      throw new Error('Origin body already exists');
+    }
+    const started = performance.now();
+    let target: HTMLElement | null = null, notifications = 0, completionAt: number | null = null;
+    let renderedAtStart = false, heightAtStart: number | null = null;
+    const transitions: {type: string; trusted: boolean; property: string; same_target: boolean;
+      connected: boolean; at_ms: number; elapsed_ms: number}[] = [];
+    const onTransition = (event: TransitionEvent) => {
+      const node = event.target as HTMLElement | null;
+      if (!node?.classList.contains('mat-tab-body-content') || (node.textContent || '').trim() !== label) return;
+      target ??= node;
+      transitions.push({type: event.type, trusted: event.isTrusted, property: event.propertyName,
+        same_target: node === target, connected: node.isConnected, at_ms: performance.now() - started,
+        elapsed_ms: event.elapsedTime * 1000});
+      if (event.isTrusted && event.type === 'transitionstart' && event.propertyName === 'transform') {
+        const style = getComputedStyle(node), box = node.getBoundingClientRect();
+        renderedAtStart = style.display !== 'none' && style.visibility !== 'hidden' && box.width > 0 && box.height > 0;
+        heightAtStart = parseFloat(wrapper.style.height);
+      }
+    };
+    const names = ['transitionstart', 'transitionend', 'transitioncancel'] as const;
+    for (const name of names) wrapper.addEventListener(name, onTransition, true);
+    const cleanup = {subscription_closed: false, listeners_removed: false};
+    const sub = this.tabs.animationDone.subscribe(() => {
+      notifications++;
+      if (completionAt === null) completionAt = performance.now() - started;
+    });
+    try {
+      // Signal insertion plus the public selection input schedules both Angular modes.
+      (direction === 'left' ? this.tabOriginLeft : this.tabOriginRight).set(true);
+      this.tabs.selectedIndex = direction === 'left' ? 0 : 3;
+      await this.waitFor(() => {
+        const node = document.querySelector('.mat-tab-body-active .mat-tab-body-content');
+        return !!node && (node.textContent || '').trim() === label && getComputedStyle(node).visibility !== 'hidden' &&
+          !document.querySelector('.mat-tab-body-animating') && notifications > 0;
+      }, zero || this.mode() !== 'enabled' ? 500 : 1500);
+      const el = document.querySelector<HTMLElement>('.mat-tab-body-active .mat-tab-body-content');
+      target ??= el;
+      for (let i = 0; i < 2; i++) el?.dispatchEvent(new TransitionEvent('transitionend', {bubbles: true, propertyName: 'transform'}));
+      await this.wait(20);
+      return {direction, created_after_observation: true, same_target_after: !!el && target === el && el.isConnected,
+        final_visible: !!el && (el.textContent || '').trim() === label && getComputedStyle(el).visibility !== 'hidden',
+        duration_ms: el ? this.duration(el, 'transition-duration') : 0, notifications, completion_at_ms: completionAt,
+        rendered_at_start: renderedAtStart, wrapper_height_at_start: heightAtStart,
+        final_wrapper_height: wrapper.getBoundingClientRect().height,
+        trusted_events: transitions.filter(event => event.trusted).map(event => ({...event})),
+        duplicate_end_controls: transitions.filter(event => !event.trusted).map(event => ({...event})), cleanup};
+    } finally {
+      sub.unsubscribe();
+      cleanup.subscription_closed = sub.closed === true;
+      for (const name of names) wrapper.removeEventListener(name, onTransition, true);
+      cleanup.listeners_removed = true;
+      this.tabOriginLeft.set(false);
+      this.tabOriginRight.set(false);
+      this.tabOriginDynamicHeight.set(false);
+      this.tabs.selectedIndex = 0;
     }
   }
 

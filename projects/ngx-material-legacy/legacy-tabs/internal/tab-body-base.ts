@@ -71,6 +71,8 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
   private _initialized = false;
   private _destroyed = false;
   private _pendingTransition: LegacyTabTransitionEvent | undefined;
+  private _deferredCentering: LegacyTabTransitionEvent | undefined;
+  private _originTransition: LegacyTabTransitionEvent | undefined;
   private readonly _ngZone = tabBodyNgZone();
 
   /** Tab body position state. */
@@ -157,9 +159,65 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
     this._initialized = true;
   }
 
+  /** Initial origin content is not available through the view query in ngOnInit. */
+  ngAfterViewInit(): void {
+    const transition = this._pendingTransition;
+    const content = this._contentElement?.nativeElement;
+    if (this._destroyed || !transition || !content) {
+      return;
+    }
+    if (transition.fromState === 'void' && this._originTransition !== transition &&
+      (transition.toState === 'left-origin-center' || transition.toState === 'right-origin-center') &&
+      !this._cssAnimationsDisabled() && typeof content.getBoundingClientRect === 'function') {
+      this._originTransition = transition;
+      const style = content.style;
+      const properties = ['transition-duration', 'transform'];
+      const previous = properties.map(name => ({
+        name, value: style.getPropertyValue(name), priority: style.getPropertyPriority(name),
+      }));
+      style.setProperty('transition-duration', '0ms');
+      style.setProperty('transform', transition.toState === 'left-origin-center'
+        ? 'translate3d(-100%, 0, 0)' : 'translate3d(100%, 0, 0)');
+      const temporary = properties.map(name => style.getPropertyValue(name));
+      try {
+        // Render the tagged origin transform before restoring the centered CSS state.
+        content.getBoundingClientRect();
+      } finally {
+        previous.forEach(({name, value, priority}, index) => {
+          // A layout callback may have replaced a phase or supplied its own style.
+          if (style.getPropertyValue(name) === temporary[index] && !style.getPropertyPriority(name)) {
+            if (value) {
+              style.setProperty(name, value, priority);
+            } else {
+              style.removeProperty(name);
+            }
+          }
+        });
+      }
+      if (this._pendingTransition !== transition || this._destroyed) {
+        return;
+      }
+      // Start the missing-event deadline at the actual origin layout, not ngOnInit.
+      this._scheduleTransitionDone(transition);
+    }
+    if (this._deferredCentering === transition && this._pendingTransition === transition &&
+      !this._destroyed) {
+      this._deferredCentering = undefined;
+      this._onCentering.emit(this._elementRef.nativeElement.clientHeight);
+    }
+  }
+
+  /** Keep a departing pane rendered until its transform completes. */
+  get _contentIsVisible(): boolean {
+    return this._isCenterPosition(this._position) || !!this._pendingTransition &&
+      this._isCenterPosition(this._pendingTransition.fromState);
+  }
+
   ngOnDestroy() {
     this._destroyed = true;
     this._pendingTransition = undefined;
+    this._deferredCentering = undefined;
+    this._originTransition = undefined;
     if (this._fallbackTimer !== undefined) {
       clearTimeout(this._fallbackTimer);
       this._fallbackTimer = undefined;
@@ -203,9 +261,11 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       this._fallbackTimer = undefined;
     }
     const transition = this._pendingTransition = {
-      fromState: this._previousPosition || 'void',
+      fromState: this._initialized ? this._previousPosition || 'void' : 'void',
       toState: this._position,
     };
+    this._deferredCentering = undefined;
+    this._originTransition = undefined;
     // Keep the departing content visible with the existing historical selector
     // while its transform changes; completion removes this class.
     this._elementRef.nativeElement.classList.add('mat-tab-body-animating');
@@ -226,7 +286,11 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       if (this._pendingTransition !== transition || this._destroyed) {
         return;
       }
-      this._onCentering.emit(this._elementRef.nativeElement.clientHeight);
+      if (content) {
+        this._onCentering.emit(this._elementRef.nativeElement.clientHeight);
+      } else {
+        this._deferredCentering = transition;
+      }
     }
     if (this._pendingTransition === transition && !this._destroyed) {
       this._scheduleTransitionDone(transition);
@@ -242,16 +306,26 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       this._fallbackTimer = undefined;
     }
     this._pendingTransition = undefined;
+    this._deferredCentering = undefined;
+    this._originTransition = undefined;
+    if (!this._isCenterPosition(transition.toState)) {
+      this._contentElement?.nativeElement.style.setProperty('visibility', 'hidden');
+    }
     this._elementRef.nativeElement.classList.remove('mat-tab-body-animating');
     this._translateTabComplete.next(transition);
   }
 
   private _scheduleTransitionDone(transition: LegacyTabTransitionEvent): void {
+    if (this._fallbackTimer !== undefined) {
+      clearTimeout(this._fallbackTimer);
+      this._fallbackTimer = undefined;
+    }
     // A native transitionend normally completes the phase. Allow its configured
     // duration plus a small delivery buffer before the missing-event fallback.
     const duration = this._animationDurationInput.trim().match(/^(\d*\.?\d+)(ms|s)$/);
     const milliseconds = duration ? Number(duration[1]) * (duration[2] === 's' ? 1000 : 1) : 500;
-    const delay = this._cssAnimationsDisabled() ? 0 : milliseconds + 100;
+    const initialCenter = transition.fromState === 'void' && transition.toState === 'center';
+    const delay = this._cssAnimationsDisabled() || initialCenter ? 0 : milliseconds + 100;
     const run = () => {
       if (this._ngZone) {
         this._ngZone.run(() => this._finishTransition(transition));
