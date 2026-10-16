@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SpecStandaloneEnvironmentSourceTests(unittest.TestCase):
     def test_originals_predicates_templates_lifecycle_witness_and_owned_boundaries(self):
-        result = subprocess.run(['node', 'tests/spec_standalone_environment_source_probe.mjs'],
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'standalone-environment-source'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])

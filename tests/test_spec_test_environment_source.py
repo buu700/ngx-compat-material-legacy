@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SpecTestEnvironmentSourceTests(unittest.TestCase):
     def test_originals_case_bijection_individual_changes_and_owned_boundaries(self):
-        result = subprocess.run(['node', 'tests/spec_test_environment_source_probe.mjs'], cwd=ROOT,
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'test-environment-zone-source'], cwd=ROOT,
                                 capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])

@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SpecRenderSetupSourceTests(unittest.TestCase):
     def test_complete_originals_owned_observations_and_peer_sources(self):
-        result = subprocess.run(['node', 'tests/spec_render_setup_source_probe.mjs'], cwd=ROOT,
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'render-setup-source'], cwd=ROOT,
                                 capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])

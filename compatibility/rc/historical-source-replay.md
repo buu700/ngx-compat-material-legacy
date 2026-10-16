@@ -21,6 +21,11 @@ The finite source-review probes below describe specific historical source popula
 | `followup-spec-source` | `tests/spec_followup_source_probe.mjs` |
 | `peer-spec-source` | `tests/spec_peer_test_source_probe.mjs` |
 | `control-case-context` | `tests/spec_control_context_probe.mjs` |
+| `control-test-source` | `tests/spec_control_test_source_probe.mjs` |
+| `render-setup-source` | `tests/spec_render_setup_source_probe.mjs` |
+| `theme-date-source` | `tests/spec_theme_date_source_probe.mjs` |
+| `test-environment-zone-source` | `tests/spec_test_environment_source_probe.mjs` |
+| `standalone-environment-source` | `tests/spec_standalone_environment_source_probe.mjs` |
 
 Run one with the already prepared workspace dependencies:
 
@@ -31,9 +36,9 @@ node scripts/run-historical-source-probe.mjs historical-menu-import \
 
 The registry in `compatibility/rc/historical-source-replay-inputs.json` pins each line's historical commit, Git tree, complete tree listing and original program SHA256. Before execution, the runner checks the current registered source graph. It accepts exactly the recorded Python command substitutions and leaves the worksheet and session-handoff progress documents mutable. Altered current subjects, authentic older review/caller bytes, changed wrapper assertions and added product files fail this guard. The original read helpers retain their before-hash and unrelated-path behavior.
 
-The current source context includes the complete upstream change census, fourteen individual complete-original spec source decisions, and two appended retained regressions for leading-zero table sorting and closing an autocomplete with no options. The latter repair preserves all 2220 earlier case identities, bodies, names and ordering and all production HTML/CSS/SCSS. Its separate context qualification refreshes 83 source scopes, 20 native source bindings and ten earlier generic source-reference sets while preserving every SHA disposition and authored-use status. All 20 actual native execution requirements remain pending; source checks do not qualify actual animated-host, focus or other product gates.
+The current source context includes the complete upstream change census, thirty individually reviewed genuine spec-only commits and the two retained table/autocomplete regressions. The current chip lifecycle investigation is still open; it has not changed product files, source83/native20 bindings, SHA dispositions or authored-use status. Current coherence is a source-identity guard, not a current source or runtime admission result.
 
-All thirteen original JavaScript programs remain unchanged. The original nine historical entries and seven wrapper records remain fixed. The small-spec, follow-up and peer source programs use their qualified pre-regression graphs; the control-case context program uses its immutable committed 128-control qualification graph. Eleven Python wrappers contain only their registered command substitutions and the existing generic argument plumbing; all original assertions and timeouts remain exact. The separate replay guard has 60 current graph, corruption and exact-wrapper controls.
+All eighteen original JavaScript programs remain unchanged. The prior thirteen registered frames and eleven wrapper records remain exact. Five newly registered complete-original review programs use their individually committed control-test, render-setup, theme/date, zone and standalone qualification frames. Sixteen Python wrappers contain only their registered command substitutions; their original assertions and timeouts remain exact. The replay guard preserves the prior60 controls by exact report comparison and adds15 controls for the five new programs/wrappers and exact command substitutions. All20 actual native execution requirements remain pending.
 
 The six replay-tool files listed in `current_head_tooling_paths` are checked against the caller's committed HEAD rather than their older versions in the source context. This covers the registry, verifier, CLI, guard test, guard wrapper and this document. All six must match their actual Git bytes; uncommitted changes fail. This avoids requiring the registry and verifier to contain their own hashes. It admits no product file, receipt or original historical program through the tooling route. Their qualified source-frame checks remain mandatory. Wrapper before-bytes come from the fixed original reference commit or an explicitly pinned per-wrapper reference where the program was introduced later, even when the newer source context already contains the registered substitutions.
 

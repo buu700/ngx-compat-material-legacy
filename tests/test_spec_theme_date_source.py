@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SpecThemeDateSourceTests(unittest.TestCase):
     def test_complete_originals_normalization_and_owned_boundaries(self):
-        result = subprocess.run(['node', 'tests/spec_theme_date_source_probe.mjs'], cwd=ROOT,
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'theme-date-source'], cwd=ROOT,
                                 capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])

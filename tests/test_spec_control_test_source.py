@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SpecControlTestSourceTests(unittest.TestCase):
     def test_complete_originals_retained_regressions_and_floor_source(self):
-        result = subprocess.run(['node', 'tests/spec_control_test_source_probe.mjs'], cwd=ROOT,
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'control-test-source'], cwd=ROOT,
                                 capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])
