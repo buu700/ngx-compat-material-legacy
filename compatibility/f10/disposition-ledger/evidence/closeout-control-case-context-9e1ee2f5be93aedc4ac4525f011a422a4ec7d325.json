@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "9e1ee2f5be93aedc4ac4525f011a422a4ec7d325",
+  "subject": "test(material/chips): remove unnecessary animations test",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a4a67b84961b51258f9bff92424cdf92a1fdd322",
+      "after_blob": "6865f4e49565a68bc431a32233523e0ecb716e56"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 4,
+  "original_sources": [
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "before": {
+        "git_blob": "a4a67b84961b51258f9bff92424cdf92a1fdd322",
+        "sha256": "30634cd304d41181bbab6c927ebd2be408002d71b91388cf0b7191b21b120753",
+        "bytes": 43044
+      },
+      "after": {
+        "git_blob": "6865f4e49565a68bc431a32233523e0ecb716e56",
+        "sha256": "1d69e7343e36debcc88149f59c32ac59a710a9ae2e0dd5834f63de7cdf17f3a1",
+        "bytes": 41442
+      }
+    }
+  ],
+  "raw_commit_sha256": "fcf37dda5d9f0298804ea1f20cbd0f3c0bafd0707b2e6e7d755bd86b6098e372",
+  "diff": "diff --git a/src/material/chips/chip-grid.spec.ts b/src/material/chips/chip-grid.spec.ts\nindex a4a67b84961b51258f9bff92424cdf92a1fdd322..6865f4e49565a68bc431a32233523e0ecb716e56 100644\n--- a/src/material/chips/chip-grid.spec.ts\n+++ b/src/material/chips/chip-grid.spec.ts\n@@ -1,4 +1,3 @@\n-import {animate, style, transition, trigger} from '@angular/animations';\n import {Direction, Directionality} from '@angular/cdk/bidi';\n import {\n   BACKSPACE,\n@@ -122,9 +121,7 @@ describe('MatChipGrid', () => {\n     });\n \n     describe('focus behaviors', () => {\n-      let fixture:\n-        | ComponentFixture<StandardChipGrid>\n-        | ComponentFixture<StandardChipGridWithAnimations>;\n+      let fixture: ComponentFixture<StandardChipGrid>;\n \n       beforeEach(() => {\n         fixture = createComponent(StandardChipGrid);\n@@ -232,23 +229,6 @@ describe('MatChipGrid', () => {\n \n           expect(chipGridInstance.focus).toHaveBeenCalled();\n         });\n-\n-        it('should move focus to the last chip when the focused chip was deleted inside a component with animations', fakeAsync(() => {\n-          fixture.destroy();\n-          TestBed.resetTestingModule();\n-\n-          fixture = createComponent(StandardChipGridWithAnimations, BrowserAnimationsModule);\n-\n-          patchElementFocus(chips.last.primaryAction!._elementRef.nativeElement);\n-          chips.last.focus();\n-          fixture.detectChanges();\n-\n-          dispatchKeyboardEvent(chips.last._elementRef.nativeElement, 'keydown', BACKSPACE);\n-          fixture.detectChanges();\n-          tick(500);\n-\n-          expect(document.activeElement).toBe(primaryActions[primaryActions.length - 2]);\n-        }));\n       });\n \n       it('should have a focus indicator', () => {\n@@ -1218,35 +1198,6 @@ class ChipGridWithFormErrorMessages {\n   }\n }\n \n-@Component({\n-  template: `\n-    <mat-chip-grid #chipGrid>\n-      @for (i of numbers; track i) {\n-        <mat-chip-row (removed)=\"remove(i)\">{{i}}</mat-chip-row>\n-      }\n-      <input name=\"test\" [matChipInputFor]=\"chipGrid\"/>\n-    </mat-chip-grid>`,\n-  animations: [\n-    // For the case we're testing this animation doesn't\n-    // have to be used anywhere, it just has to be defined.\n-    trigger('dummyAnimation', [\n-      transition(':leave', [style({opacity: 0}), animate('500ms', style({opacity: 1}))]),\n-    ]),\n-  ],\n-  standalone: false,\n-})\n-class StandardChipGridWithAnimations {\n-  numbers = [0, 1, 2, 3, 4];\n-\n-  remove(item: number): void {\n-    const index = this.numbers.indexOf(item);\n-\n-    if (index > -1) {\n-      this.numbers.splice(index, 1);\n-    }\n-  }\n-}\n-\n @Component({\n   template: `\n     <mat-form-field>\n",
+  "diff_sha256": "cce067bb9aefc618027d26a95ec16c7275ee35f621a06eac53cb630ea1f05573",
+  "hunk_reviews": [
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -1,4 +1,3 @@",
+      "sha256": "ac241f21d6265b3ee9c1cc19a387ad9395ddcb0b37bdf8afcc601470be0dbec9",
+      "judgment": "The angular/animations animate/style/transition/trigger import is removed together with its modern fixture. This supplies no authority to delete retained legacy focus coverage or add a deprecated runtime animation dependency."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -122,9 +121,7 @@ describe('MatChipGrid', () => {",
+      "sha256": "7e05f93c5f8a534a0815aa0edb5552dea428abb49bca7f8cbfc7beeff01c639d",
+      "judgment": "The local focus-suite fixture union narrows to StandardChipGrid after deleting its animated alternative. This type edit is reviewed in the context of the removed runtime test, not classified as an independent harmless cleanup."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -232,23 +229,6 @@ describe('MatChipGrid', () => {",
+      "sha256": "2eab23cd1ada12648af740ee1bc87d5b79dc88d0301264e41824679879e042c5",
+      "judgment": "The removed case destroys/resets the test fixture, instantiates the animated grid, focuses the final chip, dispatches BACKSPACE, ticks500 and checks the prior primary action receives focus. The complete owned legacy analogue retains the deletion and key-manager assertions. The engine-free current fixture is explicitly not real animated-host evidence."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -1218,35 +1198,6 @@ class ChipGridWithFormErrorMessages {",
+      "sha256": "06d404106dad0cfe0e3ebd769480c20b2d3b428c63ebcd1b1f311bb145eeb32e",
+      "judgment": "The deleted fixture has a dummy leave animation, modern @for chip rows, input and an array-splice removal method. The untouched legacy tag contains an analogous real trigger, while the current legacy fixture uses *ngFor and synchronous engine-free removal. Preserve the current fixture and record that distinction; no genuine engine or CSS-animation-host qualification is claimed by this source exclusion."
+    }
+  ],
+  "semantics": {
+    "kind": "modern-chip-grid-animation-regression-removal",
+    "removed_case": "'should move focus to the last chip when the focused chip was deleted inside a component with animations'",
+    "removed_fixture": "StandardChipGridWithAnimations",
+    "removed_assertions": 1,
+    "animation_import_and_union_type_removed": true,
+    "not_type_only": true,
+    "before_cases": 59,
+    "after_cases": 58,
+    "before_assertions": 111,
+    "after_assertions": 110
+  },
+  "decision": "The complete four-hunk modern chip-grid patch removes one animation-host focus regression, its fixture, an animation import and a fixture union member. It deletes an actual focus assertion and is not type-only. The corresponding retained legacy chip-list regression and StandardChipListWithAnimations class remain present and unchanged. The tagged fixture really declared dummyAnimation; the current engine-free fixture declares no trigger, and LEGACY_ENABLED_ANIMATIONS publishes a token without loading the animation engine. Keeping that source case therefore does not prove a real animation-engine host interaction or native focus behavior. Reject the modern test deletion, retain the legacy key-manager/focus/removal coverage, and keep actual animation-context/native/artifact qualification as an explicit full-plan obligation. No animation engine fork or consumer style change is introduced.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "cce067bb9aefc618027d26a95ec16c7275ee35f621a06eac53cb630ea1f05573",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "The complete four-hunk modern chip-grid patch removes one animation-host focus regression, its fixture, an animation import and a fixture union member. It deletes an actual focus assertion and is not type-only. The corresponding retained legacy chip-list regression and StandardChipListWithAnimations class remain present and unchanged. The tagged fixture really declared dummyAnimation; the current engine-free fixture declares no trigger, and LEGACY_ENABLED_ANIMATIONS publishes a token without loading the animation engine. Keeping that source case therefore does not prove a real animation-engine host interaction or native focus behavior. Reject the modern test deletion, retain the legacy key-manager/focus/removal coverage, and keep actual animation-context/native/artifact qualification as an explicit full-plan obligation. No animation engine fork or consumer style change is introduced.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-spec-followup-originals.py",
+        "sha256": "7f42c8b7a42389f5379df617f7992cf065189c6348809239d82e916bf4320abf"
+      },
+      {
+        "path": "scripts/spec-followup-source-review.mjs",
+        "sha256": "026f9ff25b9495d95bef110ef0964f23b6df92d72fdcdfad29da099bc9f17ee6"
+      },
+      {
+        "path": "tests/spec_followup_source_probe.mjs",
+        "sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-subjects.json.gz",
+        "sha256": "8b3c61b0a41b00743aa7783f83d071f462b6bba248d14f5f72a18e0b0cdbf1f5"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-acquisition.json.gz",
+        "sha256": "2e3b3d4d1868e0bcceb2420458087014cd7ccec7f2a8bb326390433ca082de08"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-controls.json",
+        "sha256": "623a8a14e977f3a355656ce7df483eb7eaa92d94194ac021204e71943a8d0988"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-review.json",
+        "sha256": "46f1a4b840b1fec325c195ee401b416c1b18dae11ebe18b417bdb44e5b2e3da5"
+      },
+      {
+        "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+        "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+      },
+      {
+        "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+        "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+        "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+        "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+        "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+        "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "14d0d2ebb8c3f78a04b1c93becd6ce4b79400381af97d0ccfe7df93cfc228030"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false,
+    "current_source_context": {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "21cc8dfa42197436dae5abda6c37b181cb8f232a66848be412267d6610cbbddf"
+    }
+  },
+  "prior_entry": {
+    "sha": "9e1ee2f5be93aedc4ac4525f011a422a4ec7d325",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/chips): remove unnecessary animations test",
+    "files": [
+      "src/material/chips/chip-grid.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-spec-followup-originals.py",
+      "sha256": "7f42c8b7a42389f5379df617f7992cf065189c6348809239d82e916bf4320abf"
+    },
+    {
+      "path": "scripts/spec-followup-source-review.mjs",
+      "sha256": "026f9ff25b9495d95bef110ef0964f23b6df92d72fdcdfad29da099bc9f17ee6"
+    },
+    {
+      "path": "tests/spec_followup_source_probe.mjs",
+      "sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-subjects.json.gz",
+      "sha256": "8b3c61b0a41b00743aa7783f83d071f462b6bba248d14f5f72a18e0b0cdbf1f5"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-acquisition.json.gz",
+      "sha256": "2e3b3d4d1868e0bcceb2420458087014cd7ccec7f2a8bb326390433ca082de08"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-controls.json",
+      "sha256": "623a8a14e977f3a355656ce7df483eb7eaa92d94194ac021204e71943a8d0988"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-review.json",
+      "sha256": "46f1a4b840b1fec325c195ee401b416c1b18dae11ebe18b417bdb44e5b2e3da5"
+    },
+    {
+      "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+      "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+    },
+    {
+      "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+      "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+    },
+    {
+      "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+      "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+      "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+      "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+      "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "14d0d2ebb8c3f78a04b1c93becd6ce4b79400381af97d0ccfe7df93cfc228030"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "21cc8dfa42197436dae5abda6c37b181cb8f232a66848be412267d6610cbbddf"
+    }
+  ],
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "remaining_runtime_obligation": "Retained engine-free deletion/focus source does not qualify a real animation-engine or native animated host. Resolve the full-plan lifecycle/host/focus verification with actual artifact observations; no source-only waiver.",
+  "control_case_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "e1f0d83fe9477279cc7400d41c0304972d62bdbc",
+    "qualified_reference_parent": "58a2faabf1216f6b271f1c688c8861504f55489e",
+    "inputs": {
+      "path": "compatibility/rc/spec-control-context-inputs.json",
+      "sha256": "802868cd4c19cbad3bd7e037c4b95702c3a1b9e778b296e98deb5e1129cf7239"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+        "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54",
+        "current_sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "c6869cf4cb9bf3dccb409899130d3dc231512f783b8f7e177dfaad6a9a3687df",
+        "current_sha256": "cb1935def422492f26410e71c150dd174ef190403242ad7fd73cf7d08f8052d1"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "7e8cf166761529583a0c5dadd958e69f36d01ff9eb5a5f4d7484cb7697ef5459"
+    },
+    "unchanged_other_product_members": 1139,
+    "original_cases_preserved": 2220,
+    "additional_cases": 2,
+    "current_case_cells": 2227,
+    "all_original_hunks_decisions_and_runtime_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only two appended candidate cases and their exact two-row inventory update differ. Preserve every prior case/body/template, all production resources and all original source judgments. This is source-context qualification, never actual Angular/native/packed/floor or complete G11 admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "21cc8dfa42197436dae5abda6c37b181cb8f232a66848be412267d6610cbbddf"
+    },
+    "prior_entry": {
+      "sha": "9e1ee2f5be93aedc4ac4525f011a422a4ec7d325",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "58a2faabf1216f6b271f1c688c8861504f55489e",
+      "entry_sha256": "2f16bbeaee80e0413ae140e9c0e7afae5469102b6490dedd43ad9292fef07ae3"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-followup-9e1ee2f5be93aedc4ac4525f011a422a4ec7d325.json",
+      "sha256": "1414fe63948fee38e9d10546c46874d59547e5faf7f1f14ad36e95ba2c6a5555"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  }
+}
