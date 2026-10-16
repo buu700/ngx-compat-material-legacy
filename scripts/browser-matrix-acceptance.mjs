@@ -13,6 +13,7 @@ import {resolveLibraryFromRun} from './resolve-run-library.mjs';
 import {coordinatorRequest} from './packed-consumer-evidence.mjs';
 import {runRippleHydrationReplay} from './ripple-hydration-replay.mjs';
 import {legacyCoreHighContrastOkay} from './legacy-core-high-contrast-contract.mjs';
+import {progressCspStyleOkay} from './progress-csp-style-contract.mjs';
 import {loadMainReleaseRoster, observationProblems} from './browser-matrix-roster.mjs';
 import {executeIds, fixtureQualificationDefects, fixtureQualificationDefectsFromTarball} from './browser-required-cells.mjs';
 
@@ -107,16 +108,32 @@ export function qualifyRelease({expectedIds, outcomes, defects}) {
   };
 }
 
-/** Separate zoneful diagnostic; never writes or credits release assertions. */
-function runCloseoutDiagnostic(request, library, launch) {
+/** Supplemental guards add no release cells. Both runtime observations must
+ * belong to a successful native child using this run's exact packed library. */
+export function qualifyCloseoutDiagnostic({detail, exitCode, digest, zoneless}) {
+  const bound = /^[0-9a-f]{64}$/.test(digest ?? '') && detail?.tarball_sha256 === digest;
+  const runtime = bound && typeof zoneless === 'boolean' && detail.schema_version === 1 && detail.error === null
+    && /^(?:Headless)?Chrome\//.test(detail.browser ?? '') && detail.zoneless === zoneless
+    && detail.bundle_has_zone === !zoneless
+    && detail.zone_global === (zoneless ? 'undefined' : 'function')
+    && detail.angular_zone_entered === !zoneless;
+  const executed = exitCode === 0 && runtime;
+  return {status: executed ? 'executed' : 'failed', exit_code: exitCode,
+    artifact_bound: bound, runtime_passed: Boolean(runtime), acceptance_credit: false,
+    core_high_contrast_passed: executed && legacyCoreHighContrastOkay(detail?.core_high_contrast),
+    progress_csp_passed: executed && progressCspStyleOkay(detail?.progress_csp)};
+}
+
+/** Separate native diagnostic; its observations are bound to the owned report. */
+function runCloseoutDiagnostic(request, library, launch, zoneless) {
   if (!request || request.error || !library || !launch.chrome) return null;
-  const out = join(request.runDir, 'reports', 'closeout-browser-diagnostics.json');
+  const out = join(request.runDir, 'reports', `closeout-browser-diagnostics${zoneless ? '-zoneless' : ''}.json`);
   if (existsSync(out)) {
     console.log('closeout browser diagnostic: not run; output already exists');
     return {status:'not-run',error:'fresh diagnostic output required',acceptance_credit:false};
   }
   const child = spawnSync(process.execPath, [join(root,'scripts/browser-surface-families.mjs'),
-    '--tarball',library.tarball,'--out',out], {
+    '--tarball',library.tarball,'--out',out,...(zoneless ? ['--zoneless'] : [])], {
     cwd:root,encoding:'utf8',timeout:300000,
     env:{...process.env,CHROME_BIN:launch.chrome,NODE_OPTIONS:'',NODE_PATH:''},
   });
@@ -124,16 +141,14 @@ function runCloseoutDiagnostic(request, library, launch) {
   if (existsSync(out)) {
     try { detail=JSON.parse(readFileSync(out,'utf8')); } catch { /* Report unreadable stays unexecuted. */ }
   }
-  const bound=detail?.tarball_sha256===library.digest;
-  const observation={status:child.status===0&&bound?'executed':'failed',exit_code:child.status,
-    artifact_bound:bound,acceptance_credit:false,report:relative(request.runDir,out),
-    core_high_contrast_passed:bound&&legacyCoreHighContrastOkay(detail?.core_high_contrast),
-    ...(child.status!==0||!bound?{stderr_tail:(child.stderr||child.error?.message||'').slice(-1000)}:{})};
+  const checks=qualifyCloseoutDiagnostic({detail,exitCode:child.status,digest:library.digest,zoneless});
+  const observation={...checks,report:relative(request.runDir,out),
+    ...(checks.status!=='executed'?{stderr_tail:(child.stderr||child.error?.message||'').slice(-1000)}:{})};
   console.log('closeout browser diagnostic (no acceptance credit): '+JSON.stringify(observation));
-  if (bound) for (const key of ['peer_media_matcher','progress_csp','peer_form_hover','core_high_contrast']) {
+  if (checks.artifact_bound) for (const key of ['peer_media_matcher','progress_csp','peer_form_hover','core_high_contrast']) {
     console.log('closeout '+key+' diagnostic (no acceptance credit): '+JSON.stringify(detail[key]??null));
   }
-  return observation;
+  return {...observation,observation:detail};
 }
 
 export async function runAcceptance({tarball, runPath}) {
@@ -183,8 +198,14 @@ export async function runAcceptance({tarball, runPath}) {
     } catch (error) {hydrationReplay = {ok:false,error:String(error)};}
   }
   if (hydrationReplay?.ok !== true) qualificationDefects.push('genuine packed Angular hydration replay missing or failed');
-  const closeoutDiagnostic=runCloseoutDiagnostic(request,library,launch);
-  if(!closeoutDiagnostic?.core_high_contrast_passed)qualificationDefects.push('legacy core high contrast/ripple native guard missing or failed');
+  const closeoutDiagnostics={
+    zoneful:runCloseoutDiagnostic(request,library,launch,false),
+    zoneless:runCloseoutDiagnostic(request,library,launch,true),
+  };
+  for(const [runtime,diagnostic] of Object.entries(closeoutDiagnostics)) {
+    if(!diagnostic?.core_high_contrast_passed)qualificationDefects.push(`${runtime} legacy core high contrast/ripple native guard missing or failed`);
+    if(!diagnostic?.progress_csp_passed)qualificationDefects.push(`${runtime} progress CSP native guard missing or failed`);
+  }
   const observed = observationProblems({
     requiredIds: roster.ids,
     outcomes,
@@ -226,7 +247,8 @@ export async function runAcceptance({tarball, runPath}) {
   writeDetail({
     schema_version: 1,
     role: 'diagnostic browser-matrix detail; acceptance is the coordinator report',
-    closeout_diagnostic:closeoutDiagnostic,
+    closeout_diagnostic:closeoutDiagnostics.zoneful,
+    closeout_diagnostics:closeoutDiagnostics,
     hydration_replay:hydrationReplay,
     check_id: 'browser-matrix',
     result: accepted ? 'pass' : 'fail',
@@ -245,6 +267,7 @@ export async function runAcceptance({tarball, runPath}) {
   }
   const assertion = {
     kind: 'browser-matrix-observations',
+    closeout_diagnostics:closeoutDiagnostics,
     hydration_replay:hydrationReplay,
     check_id: 'browser-matrix',
     run_id: request.runId,
