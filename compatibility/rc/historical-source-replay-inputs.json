@@ -1,12 +1,12 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "line": "21.x",
   "scope": "Finite original historical source probes only. Current-source coherence is mandatory; historical execution never admits current source, runtime, compiler, peer floors or G11.",
   "current_frame": {
-    "commit": "f038f8a03423382637cfe6528ccb0213fe1dc7e1",
-    "tree": "df1b97e17452f07a6a1eea4730cb35fc15b558b0",
-    "tree_listing_sha256": "957fa9ee5ea9cdceb890a26a38ee90b1cad779bd1b4033d52d3b8137ec3b202e",
-    "members": 6035
+    "commit": "9dfde222b6a56723a539fcfff8354aaf384fb7ce",
+    "tree": "c815e1645457d5ec66ed47e3bb00d5b94ceb8257",
+    "tree_listing_sha256": "f0da667b10fcfa6ef46a11cb2154cbfd1d87984e8806ca15384f647d5baff4c5",
+    "members": 6094
   },
   "mutable_progress_paths": [
     "compatibility/rc/remaining-native-admission-worksheet.json",
@@ -85,6 +85,45 @@
       },
       "timeout_ms": 120000,
       "report_option": "--out"
+    },
+    {
+      "id": "native-individual-source",
+      "probe": "tests/remaining_native_individual_source_probe.mjs",
+      "probe_sha256": "34adbf6cdb3be9845232ad9ca80a63335c315d1e43eb71958678d29dc7b00848",
+      "frame": {
+        "commit": "c0d81221a4bbc5073e26a770c40f29b6c85f7dc2",
+        "tree": "0012f299ffd8ee4640676bd761deab2e60437627",
+        "tree_listing_sha256": "ed893522b4792f9cc2659948c2e98e52b6d57280ee568d204a2bca55b12a913b",
+        "members": 6046
+      },
+      "timeout_ms": 60000,
+      "report_option": "--out"
+    },
+    {
+      "id": "native-individual-admission",
+      "probe": "tests/upstream/remaining-native-individual-admission.mjs",
+      "probe_sha256": "ba34718db4acdd81268087c55c24a1cf64d97a70aae05eac4bcd89099f867620",
+      "frame": {
+        "commit": "c0d81221a4bbc5073e26a770c40f29b6c85f7dc2",
+        "tree": "0012f299ffd8ee4640676bd761deab2e60437627",
+        "tree_listing_sha256": "ed893522b4792f9cc2659948c2e98e52b6d57280ee568d204a2bca55b12a913b",
+        "members": 6046
+      },
+      "timeout_ms": 180000,
+      "report_option": "--out"
+    },
+    {
+      "id": "spec-fixture-context",
+      "probe": "tests/spec_small_context_probe.mjs",
+      "probe_sha256": "a8a70bae9712c43f4b88c6e60f7cf96cb2a582fd8460541e02a8dd12672c41ef",
+      "frame": {
+        "commit": "9dfde222b6a56723a539fcfff8354aaf384fb7ce",
+        "tree": "c815e1645457d5ec66ed47e3bb00d5b94ceb8257",
+        "tree_listing_sha256": "f0da667b10fcfa6ef46a11cb2154cbfd1d87984e8806ca15384f647d5baff4c5",
+        "members": 6094
+      },
+      "timeout_ms": 120000,
+      "report_option": "--out"
     }
   ],
   "wrapper_edits": [
@@ -146,6 +185,42 @@
           "after": "['node', 'scripts/run-historical-source-probe.mjs', 'tab-lifecycle-source']"
         }
       ]
+    },
+    {
+      "path": "tests/test_remaining_native_individual_source.py",
+      "reference_commit": "c0d81221a4bbc5073e26a770c40f29b6c85f7dc2",
+      "before_sha256": "488fa35b02154366ce01d14f037cca9e714c791163ef0b74018860e32ead701f",
+      "after_sha256": "0de9c99f0464e5c4ad207307e87bdedf35a6a8105e4f84694b3d792063fb67fc",
+      "edits": [
+        {
+          "before": "def run_probe(self, name, timeout=60):",
+          "after": "def run_probe(self, name, timeout=60, *arguments):"
+        },
+        {
+          "before": "subprocess.run(['node', name], cwd=ROOT, capture_output=True,",
+          "after": "subprocess.run(['node', name, *arguments], cwd=ROOT, capture_output=True,"
+        },
+        {
+          "before": "self.run_probe('tests/remaining_native_individual_source_probe.mjs')",
+          "after": "self.run_probe('scripts/run-historical-source-probe.mjs', 60, 'native-individual-source')"
+        },
+        {
+          "before": "self.run_probe('tests/upstream/remaining-native-individual-admission.mjs', 180)",
+          "after": "self.run_probe('scripts/run-historical-source-probe.mjs', 180, 'native-individual-admission')"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_spec_small_context.py",
+      "reference_commit": "9dfde222b6a56723a539fcfff8354aaf384fb7ce",
+      "before_sha256": "7ef1e0345bea5a003d6e0721f5f7c6face69438d97a47b50844fd8fbee6d6a38",
+      "after_sha256": "b769e30c1a9829a9505458bd698b2f50cb56464d93747adbd5435e84f789d45a",
+      "edits": [
+        {
+          "before": "['node', 'tests/spec_small_context_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'spec-fixture-context']"
+        }
+      ]
     }
   ],
   "source_phase_reports": {
@@ -154,7 +229,9 @@
     "current_status": "compatibility/rc/remaining-native-admission-tab-requalified-checkpoint.json",
     "individual_source_decisions": "compatibility/rc/remaining-native-admission-individual-source-proof.json",
     "individual_source_controls": "compatibility/rc/remaining-native-admission-individual-source-controls.json",
-    "individual_current_status": "compatibility/rc/remaining-native-admission-individual-checkpoint.json"
+    "individual_current_status": "compatibility/rc/remaining-native-admission-individual-checkpoint.json",
+    "fixture_current_context": "compatibility/rc/spec-small-context-proof.json",
+    "fixture_current_status": "compatibility/rc/spec-small-context-checkpoint.json"
   },
   "no_install_build_publish_or_remote_operations": true,
   "original_js_programs_and_assertions_unchanged": true,
