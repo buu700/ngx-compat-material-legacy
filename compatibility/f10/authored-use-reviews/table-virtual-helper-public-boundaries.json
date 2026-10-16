@@ -1,0 +1,517 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "recorded_at_utc": "2026-10-16T00:52:04.240026+00:00",
+  "source_checkpoint": "38b1861820faea1939ca59497848e8ccff19e807",
+  "criteria": "Exactly seven public import roles in the already tested table parent-construction helper. Actual packed/native/floor behavior remains mandatory.",
+  "prior_open_use_records": [
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/cdk/scrolling",
+      "symbol": "CDK_VIRTUAL_SCROLL_VIEWPORT",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "CDK_VIRTUAL_SCROLL_VIEWPORT",
+          "type_only": false,
+          "line": 11
+        }
+      ],
+      "status": "unreviewed-current-use",
+      "disposition": "open",
+      "review_requirement": "New constructor-context import. Public-export, type/runtime and behavior review remains required; native viewport rendering is a separate mandatory artifact-family case."
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/cdk/table",
+      "symbol": "CdkTable",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "CdkTable",
+          "type_only": false,
+          "line": 10
+        }
+      ],
+      "status": "unreviewed-current-use",
+      "disposition": "open",
+      "review_requirement": "New constructor-context import. Public-export, type/runtime and behavior review remains required; native viewport rendering is a separate mandatory artifact-family case."
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "InjectOptions",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "InjectOptions",
+          "type_only": true,
+          "line": 9
+        }
+      ],
+      "status": "unreviewed-current-use",
+      "disposition": "open",
+      "review_requirement": "New constructor-context import. Public-export, type/runtime and behavior review remains required; native viewport rendering is a separate mandatory artifact-family case."
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "Injector",
+          "type_only": false,
+          "line": 9
+        }
+      ],
+      "status": "unreviewed-current-use",
+      "disposition": "open",
+      "review_requirement": "New constructor-context import. Public-export, type/runtime and behavior review remains required; native viewport rendering is a separate mandatory artifact-family case."
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "ProviderToken",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "ProviderToken",
+          "type_only": true,
+          "line": 9
+        }
+      ],
+      "status": "unreviewed-current-use",
+      "disposition": "open",
+      "review_requirement": "New constructor-context import. Public-export, type/runtime and behavior review remains required; native viewport rendering is a separate mandatory artifact-family case."
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "inject",
+          "type_only": false,
+          "line": 9
+        }
+      ],
+      "status": "unreviewed-current-use",
+      "disposition": "open",
+      "review_requirement": "New constructor-context import. Public-export, type/runtime and behavior review remains required; native viewport rendering is a separate mandatory artifact-family case."
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "runInInjectionContext",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "runInInjectionContext",
+          "type_only": false,
+          "line": 9
+        }
+      ],
+      "status": "unreviewed-current-use",
+      "disposition": "open",
+      "review_requirement": "New constructor-context import. Public-export, type/runtime and behavior review remains required; native viewport rendering is a separate mandatory artifact-family case."
+    }
+  ],
+  "reviews": [
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/cdk/scrolling",
+      "symbol": "CDK_VIRTUAL_SCROLL_VIEWPORT",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The exact public scrolling root exports this InjectionToken at both advertised minimum CDK versions; its complete declaration has no private, deprecated or experimental marker. The helper compares the token object by identity and returns null only during the real parent construction. A different token with the same description reaches the borrowed parent with unchanged fallback/options. The new complete-helper tests use the genuine public scrolling token with both minimum Core namespaces; the retained actual CdkTable node-constructor tests also show that later node lookups, consumer fields and projected/embedded content retain the ancestor viewport. No consumer provider is installed or changed. This closes only this source-bound public import role. Parent/service protocols and borrowed TypeScript6/Node22/RxJS7 diagnostics do not qualify a complete legacy view, real viewport/browser, compiler21, packed artifact, supported toolchain/RxJS floor, upstream SHA or whole G11. Required current rendering and full floor tests remain pending. No product HTML, CSS, SCSS or consumer files changed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-inputs.json",
+          "sha256": "c70ee1b8b6b82ff0a2a2edd8993a885ea6c17d7ba0f3c60c53fe4af759ff6faf"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-diagnostic.json",
+          "sha256": "c57dbf5867e5cf91e2d7d48d317934cfc1e5b55571649554b49c7d1500629183"
+        },
+        {
+          "path": "tests/table_virtual_helper_use_probe.mjs",
+          "sha256": "831b74511fd684c67857df9795abbe940078b98a63242a804c1aef0ca79c3074"
+        },
+        {
+          "path": "tests/test_table_virtual_helper_use.py",
+          "sha256": "6b127af4bd41dd4850469489a65dd993f75972a2e5a735f28b2cdd1aa7ff782a"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-onpush-constructor-requalification.json",
+          "sha256": "8a7444f8f963eb415d968bd42a231ad6c565b7091a1370ede85996a4204b9721"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "compatibility/rc/menu-item-public-subjects.json",
+          "sha256": "4c2782e32c576959b6b36d999565f0205abf4ed44d0ba4b36a9aade625ab445f"
+        },
+        {
+          "path": "scripts/menu-item-public-subjects.mjs",
+          "sha256": "f532d320ca23ecd47fc749c2f8309251d827e2b8e9227af1c0515ede92cb2f3c"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/cdk/table",
+      "symbol": "CdkTable",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The helper uses the stable public CdkTable class as the constructor Proxy target. Both authenticated minimum public table declarations export it and the complete runtime constructor accepts zero arguments. The 21.x declaration's ignored rest-argument compatibility placeholder is recorded but unused: owned MatLegacyTable calls super() and explicitly rejects manual arguments before parent construction. The helper preserves Reflect.construct's original new.target, direct instance prototype and derived fields; no render or data-source method is replaced. The retained genuine minimum node-DI tests execute the real CdkTable constructor and focused Angular22 full/partial AOT factories. The separate OnPush review still requires current packed rendering. This closes only this source-bound public import role. Parent/service protocols and borrowed TypeScript6/Node22/RxJS7 diagnostics do not qualify a complete legacy view, real viewport/browser, compiler21, packed artifact, supported toolchain/RxJS floor, upstream SHA or whole G11. Required current rendering and full floor tests remain pending. No product HTML, CSS, SCSS or consumer files changed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-inputs.json",
+          "sha256": "c70ee1b8b6b82ff0a2a2edd8993a885ea6c17d7ba0f3c60c53fe4af759ff6faf"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-diagnostic.json",
+          "sha256": "c57dbf5867e5cf91e2d7d48d317934cfc1e5b55571649554b49c7d1500629183"
+        },
+        {
+          "path": "tests/table_virtual_helper_use_probe.mjs",
+          "sha256": "831b74511fd684c67857df9795abbe940078b98a63242a804c1aef0ca79c3074"
+        },
+        {
+          "path": "tests/test_table_virtual_helper_use.py",
+          "sha256": "6b127af4bd41dd4850469489a65dd993f75972a2e5a735f28b2cdd1aa7ff782a"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-onpush-constructor-requalification.json",
+          "sha256": "8a7444f8f963eb415d968bd42a231ad6c565b7091a1370ede85996a4204b9721"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "compatibility/rc/menu-item-public-subjects.json",
+          "sha256": "4c2782e32c576959b6b36d999565f0205abf4ed44d0ba4b36a9aade625ab445f"
+        },
+        {
+          "path": "scripts/menu-item-public-subjects.mjs",
+          "sha256": "f532d320ca23ecd47fc749c2f8309251d827e2b8e9227af1c0515ede92cb2f3c"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "InjectOptions",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "This type-only stable public Core interface describes optional, self, skipSelf and host as optional booleans at both advertised minima. The owned Injector.get annotation accepts this object and forwards its original identity without cloning, converting to numeric flags or deciding lookup semantics. Strict minimum Core declaration checks select a nondeprecated get overload and reject string-valued options; the complete helper forwards all sixteen flag combinations plus undefined for three distinct non-viewport tokens. The flag matrix tests argument preservation through a protocol, while the retained genuine CdkTable node-DI comparison separately checks the actual parent's token/options sequence. The annotation erases from executable code. This closes only this source-bound public import role. Parent/service protocols and borrowed TypeScript6/Node22/RxJS7 diagnostics do not qualify a complete legacy view, real viewport/browser, compiler21, packed artifact, supported toolchain/RxJS floor, upstream SHA or whole G11. Required current rendering and full floor tests remain pending. No product HTML, CSS, SCSS or consumer files changed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-inputs.json",
+          "sha256": "c70ee1b8b6b82ff0a2a2edd8993a885ea6c17d7ba0f3c60c53fe4af759ff6faf"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-diagnostic.json",
+          "sha256": "c57dbf5867e5cf91e2d7d48d317934cfc1e5b55571649554b49c7d1500629183"
+        },
+        {
+          "path": "tests/table_virtual_helper_use_probe.mjs",
+          "sha256": "831b74511fd684c67857df9795abbe940078b98a63242a804c1aef0ca79c3074"
+        },
+        {
+          "path": "tests/test_table_virtual_helper_use.py",
+          "sha256": "6b127af4bd41dd4850469489a65dd993f75972a2e5a735f28b2cdd1aa7ff782a"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-onpush-constructor-requalification.json",
+          "sha256": "8a7444f8f963eb415d968bd42a231ad6c565b7091a1370ede85996a4204b9721"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "compatibility/rc/menu-item-public-subjects.json",
+          "sha256": "4c2782e32c576959b6b36d999565f0205abf4ed44d0ba4b36a9aade625ab445f"
+        },
+        {
+          "path": "scripts/menu-item-public-subjects.mjs",
+          "sha256": "f532d320ca23ecd47fc749c2f8309251d827e2b8e9227af1c0515ede92cb2f3c"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public abstract Injector is subclassed only to borrow the already active node injector and intercept the exact viewport token during parent construction. For all other tokens, get returns the original parent.get result and preserves token, fallback and options. It creates no owning child/application, registers no providers and invokes no destruction hook. The complete helper tests prove lookup/value identity and that only the external injector owner destroys its registered value. The retained actual minimum constructor evidence additionally forwards the original node services, including ChangeDetectorRef and later Injector lookups; the helper never substitutes an environment injector for that node. This closes only this source-bound public import role. Parent/service protocols and borrowed TypeScript6/Node22/RxJS7 diagnostics do not qualify a complete legacy view, real viewport/browser, compiler21, packed artifact, supported toolchain/RxJS floor, upstream SHA or whole G11. Required current rendering and full floor tests remain pending. No product HTML, CSS, SCSS or consumer files changed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-inputs.json",
+          "sha256": "c70ee1b8b6b82ff0a2a2edd8993a885ea6c17d7ba0f3c60c53fe4af759ff6faf"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-diagnostic.json",
+          "sha256": "c57dbf5867e5cf91e2d7d48d317934cfc1e5b55571649554b49c7d1500629183"
+        },
+        {
+          "path": "tests/table_virtual_helper_use_probe.mjs",
+          "sha256": "831b74511fd684c67857df9795abbe940078b98a63242a804c1aef0ca79c3074"
+        },
+        {
+          "path": "tests/test_table_virtual_helper_use.py",
+          "sha256": "6b127af4bd41dd4850469489a65dd993f75972a2e5a735f28b2cdd1aa7ff782a"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-onpush-constructor-requalification.json",
+          "sha256": "8a7444f8f963eb415d968bd42a231ad6c565b7091a1370ede85996a4204b9721"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "compatibility/rc/menu-item-public-subjects.json",
+          "sha256": "4c2782e32c576959b6b36d999565f0205abf4ed44d0ba4b36a9aade625ab445f"
+        },
+        {
+          "path": "scripts/menu-item-public-subjects.mjs",
+          "sha256": "f532d320ca23ecd47fc749c2f8309251d827e2b8e9227af1c0515ede92cb2f3c"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "ProviderToken",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public type alias is Type<T> | AbstractType<T> | InjectionToken<T> at both minimum Core versions. The helper's type-only ProviderToken<unknown> parameter supplies the public token domain for its get override, avoiding an untyped deprecated fallback signature. Strict declaration checks of the same Core portion of the owned helper resolve this.parent.get to the stable generic overload and reject arbitrary object tokens. Exact prior whole-helper compilations at the real minimum CDK/Core declarations are retained independently, and executable complete-helper tests preserve class and InjectionToken identities. The token annotation introduces no runtime import or lookup conversion. This closes only this source-bound public import role. Parent/service protocols and borrowed TypeScript6/Node22/RxJS7 diagnostics do not qualify a complete legacy view, real viewport/browser, compiler21, packed artifact, supported toolchain/RxJS floor, upstream SHA or whole G11. Required current rendering and full floor tests remain pending. No product HTML, CSS, SCSS or consumer files changed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-inputs.json",
+          "sha256": "c70ee1b8b6b82ff0a2a2edd8993a885ea6c17d7ba0f3c60c53fe4af759ff6faf"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-diagnostic.json",
+          "sha256": "c57dbf5867e5cf91e2d7d48d317934cfc1e5b55571649554b49c7d1500629183"
+        },
+        {
+          "path": "tests/table_virtual_helper_use_probe.mjs",
+          "sha256": "831b74511fd684c67857df9795abbe940078b98a63242a804c1aef0ca79c3074"
+        },
+        {
+          "path": "tests/test_table_virtual_helper_use.py",
+          "sha256": "6b127af4bd41dd4850469489a65dd993f75972a2e5a735f28b2cdd1aa7ff782a"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-onpush-constructor-requalification.json",
+          "sha256": "8a7444f8f963eb415d968bd42a231ad6c565b7091a1370ede85996a4204b9721"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "compatibility/rc/menu-item-public-subjects.json",
+          "sha256": "4c2782e32c576959b6b36d999565f0205abf4ed44d0ba4b36a9aade625ab445f"
+        },
+        {
+          "path": "scripts/menu-item-public-subjects.mjs",
+          "sha256": "f532d320ca23ecd47fc749c2f8309251d827e2b8e9227af1c0515ede92cb2f3c"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The helper calls the stable public inject(Injector) signature synchronously while the owned table's super target is being constructed in Angular's original node context. It requests the existing Injector token before entering the temporary borrowed context, with no options or compatibility flags. Strict minimum Core checks resolve the stable generic public overload, and the retained actual minimum CdkTable node-DI receipts verify the original node/services and the same parent token/options sequence after the narrowly specified viewport normalization. The complete-helper tests independently prove that the borrowed injector remains available after super, consumer fields run in the original context, and out-of-context injection still fails normally. This closes only this source-bound public import role. Parent/service protocols and borrowed TypeScript6/Node22/RxJS7 diagnostics do not qualify a complete legacy view, real viewport/browser, compiler21, packed artifact, supported toolchain/RxJS floor, upstream SHA or whole G11. Required current rendering and full floor tests remain pending. No product HTML, CSS, SCSS or consumer files changed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-inputs.json",
+          "sha256": "c70ee1b8b6b82ff0a2a2edd8993a885ea6c17d7ba0f3c60c53fe4af759ff6faf"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-diagnostic.json",
+          "sha256": "c57dbf5867e5cf91e2d7d48d317934cfc1e5b55571649554b49c7d1500629183"
+        },
+        {
+          "path": "tests/table_virtual_helper_use_probe.mjs",
+          "sha256": "831b74511fd684c67857df9795abbe940078b98a63242a804c1aef0ca79c3074"
+        },
+        {
+          "path": "tests/test_table_virtual_helper_use.py",
+          "sha256": "6b127af4bd41dd4850469489a65dd993f75972a2e5a735f28b2cdd1aa7ff782a"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-onpush-constructor-requalification.json",
+          "sha256": "8a7444f8f963eb415d968bd42a231ad6c565b7091a1370ede85996a4204b9721"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "compatibility/rc/menu-item-public-subjects.json",
+          "sha256": "4c2782e32c576959b6b36d999565f0205abf4ed44d0ba4b36a9aade625ab445f"
+        },
+        {
+          "path": "scripts/menu-item-public-subjects.mjs",
+          "sha256": "f532d320ca23ecd47fc749c2f8309251d827e2b8e9227af1c0515ede92cb2f3c"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "runInInjectionContext",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public Core function scopes only Reflect.construct(parent, args, newTarget) to the borrowed masking injector. Strict declarations select its nondeprecated generic callback signature at both minima. Complete-helper tests under both genuine Core namespaces preserve outer lookup identity after a successful parent, a nested independent context and an exception; injection outside the context still fails. Mutations that omit the scoped call, lose constructor arguments or discard new.target are rejected. The prior real minimum CdkTable node-constructor receipts and focused Angular22 factories support the same boundary without replacing the original parent or creating an Angular application inside the legacy component. This closes only this source-bound public import role. Parent/service protocols and borrowed TypeScript6/Node22/RxJS7 diagnostics do not qualify a complete legacy view, real viewport/browser, compiler21, packed artifact, supported toolchain/RxJS floor, upstream SHA or whole G11. Required current rendering and full floor tests remain pending. No product HTML, CSS, SCSS or consumer files changed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-inputs.json",
+          "sha256": "c70ee1b8b6b82ff0a2a2edd8993a885ea6c17d7ba0f3c60c53fe4af759ff6faf"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-helper-use-diagnostic.json",
+          "sha256": "c57dbf5867e5cf91e2d7d48d317934cfc1e5b55571649554b49c7d1500629183"
+        },
+        {
+          "path": "tests/table_virtual_helper_use_probe.mjs",
+          "sha256": "831b74511fd684c67857df9795abbe940078b98a63242a804c1aef0ca79c3074"
+        },
+        {
+          "path": "tests/test_table_virtual_helper_use.py",
+          "sha256": "6b127af4bd41dd4850469489a65dd993f75972a2e5a735f28b2cdd1aa7ff782a"
+        },
+        {
+          "path": "compatibility/rc/table-virtual-context-source-proof.json",
+          "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+        },
+        {
+          "path": "compatibility/rc/table-public-module-import-source-proof.json",
+          "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+        },
+        {
+          "path": "compatibility/rc/table-onpush-constructor-requalification.json",
+          "sha256": "8a7444f8f963eb415d968bd42a231ad6c565b7091a1370ede85996a4204b9721"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "compatibility/rc/menu-item-public-subjects.json",
+          "sha256": "4c2782e32c576959b6b36d999565f0205abf4ed44d0ba4b36a9aade625ab445f"
+        },
+        {
+          "path": "scripts/menu-item-public-subjects.mjs",
+          "sha256": "f532d320ca23ecd47fc749c2f8309251d827e2b8e9227af1c0515ede92cb2f3c"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        }
+      ]
+    }
+  ],
+  "g11_claim": "not-passed"
+}
