@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "69e1369c99df0d28a8f305a64fe90d5b58dd8b6a",
+  "subject": "refactor(material/divider): fix strict property initialization errors",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/divider/divider.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "b0197e5e59293feda4474ad88025d52fa0f6df45",
+      "after_blob": "b64417fb1145bde45cdc885f52e95a7c2a19c124"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 1,
+  "raw_commit_sha256": "1d5d86cc5e9323a9248e20c419e512bf2e452087f998dbfa4150ded171fef5dd",
+  "original_sources": [
+    {
+      "path": "src/material/divider/divider.spec.ts",
+      "before": {
+        "git_blob": "b0197e5e59293feda4474ad88025d52fa0f6df45",
+        "sha256": "1a255e0a7f6b82d07021b394750bea8a2e1e3bb0212c876723a755cc1d5215a9",
+        "bytes": 2513
+      },
+      "after": {
+        "git_blob": "b64417fb1145bde45cdc885f52e95a7c2a19c124",
+        "sha256": "adc302f6e6f3f8609c72666ed3b2efb7bb4548748f6b71be7ec0a6f6d13b551e",
+        "bytes": 2511
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/divider/divider.spec.ts b/src/material/divider/divider.spec.ts\nindex b0197e5e59293feda4474ad88025d52fa0f6df45..b64417fb1145bde45cdc885f52e95a7c2a19c124 100644\n--- a/src/material/divider/divider.spec.ts\n+++ b/src/material/divider/divider.spec.ts\n@@ -62,6 +62,6 @@ describe('MatDivider', () => {\n   imports: [MatDividerModule],\n })\n class MatDividerTestComponent {\n-  vertical: boolean;\n-  inset: boolean;\n+  vertical = false;\n+  inset = false;\n }\n",
+  "diff_sha256": "ccdae267f2f2c9beb78d82a2b2de1bc8acb05d340ff11485a8dfcfa4b25e099f",
+  "hunk_reviews": [
+    {
+      "path": "src/material/divider/divider.spec.ts",
+      "header": "@@ -62,6 +62,6 @@ describe('MatDivider', () => {",
+      "sha256": "674c5634a0baeaedf09c0ebe697c7feabd613da8882bcfa2107a0fcd50938e7f",
+      "judgment": "The only hunk replaces two uninitialized boolean fields with false initializers. Complete source confirms the fixture template binds those fields; undefined-to-false is a real test input change. Current list public module/harness imports are retained and hashed in the review. Only this private upstream fixture is excluded; ordinary divider theming and public compatibility are not exempted."
+    }
+  ],
+  "semantics": {
+    "kind": "fixture-runtime-default-initialization",
+    "before_values": "undefined",
+    "after_values": false,
+    "emitted_runtime_change": true,
+    "ordinary_type_only_cleanup": false
+  },
+  "decision": "The complete original divider patch initializes the private MatDividerTestComponent vertical and inset fields to false instead of leaving them undefined. This changes emitted runtime values and is not a type-only strictness annotation. The owned package has no such fixture. It does use the stable public MatDividerModule in its list module and MatDividerHarness in its list harness, so divider is reachable and remains subject to peer compatibility. The patch changes no divider implementation, public declaration, selector, style or Sass. Do not copy the private fixture or alter the public dependency to mirror these unrelated private defaults.",
+  "prior_entry": {
+    "sha": "69e1369c99df0d28a8f305a64fe90d5b58dd8b6a",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/divider): fix strict property initialization errors",
+    "files": [
+      "src/material/divider/divider.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "ccdae267f2f2c9beb78d82a2b2de1bc8acb05d340ff11485a8dfcfa4b25e099f",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "The complete original divider patch initializes the private MatDividerTestComponent vertical and inset fields to false instead of leaving them undefined. This changes emitted runtime values and is not a type-only strictness annotation. The owned package has no such fixture. It does use the stable public MatDividerModule in its list module and MatDividerHarness in its list harness, so divider is reachable and remains subject to peer compatibility. The patch changes no divider implementation, public declaration, selector, style or Sass. Do not copy the private fixture or alter the public dependency to mirror these unrelated private defaults.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-small-source-review.mjs",
+        "sha256": "a3f8c6ea65db0588648675819751fc76df41001b0ac160099b87de6ae00e3b16"
+      },
+      {
+        "path": "tests/spec_small_source_probe.mjs",
+        "sha256": "385b82de643416a5c54c82016a79367cd4b84c2f3ec548d0bdb19b2056f36f62"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-subjects.json.gz",
+        "sha256": "055c40ba3907191e258676b4ebff84ea5d233fb5c00bb877eac0f525dcf5ccfd"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-acquisition.json.gz",
+        "sha256": "f71a905296710e45c15a2e6bfb3766a741061aebb39b8d55e7aa7d48fa6a8200"
+      },
+      {
+        "path": "compatibility/rc/spec-small-fixture-prior.json.gz",
+        "sha256": "da83db9d7a07c2cc3f1dcf89a5fd312f433966b3486ceebf5b05d9d45bf1c9fc"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-controls.json",
+        "sha256": "745522c6f8e1a4d0f358bc93e1006353698d82a708c175fa1bddcc137813d835"
+      },
+      {
+        "path": "compatibility/rc/spec-small-context-proof.json",
+        "sha256": "011533399904f0dff41c7ed4c2c883400c61f8f5824efe50c0a0ea2e8d4d1a80"
+      },
+      {
+        "path": "compatibility/rc/spec-small-context-checkpoint.json",
+        "sha256": "93d4faaf5cc32986a4f32b1a02428be09b9ca17d836bb40c68dfe53b44485300"
+      },
+      {
+        "path": "compatibility/rc/historical-source-replay-fixture-context-checkpoint.json",
+        "sha256": "52104999873044603a1ac41c3553a4e8809e5fbd406d3c6bdda06b1564a2788c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+        "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+        "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+        "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+        "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "14d0d2ebb8c3f78a04b1c93becd6ce4b79400381af97d0ccfe7df93cfc228030"
+      },
+      {
+        "path": "projects/ngx-material-legacy/ng-package.json",
+        "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33"
+      },
+      {
+        "path": "testing/legacy-runner/adapt-spec.mjs",
+        "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "c6869cf4cb9bf3dccb409899130d3dc231512f783b8f7e177dfaad6a9a3687df"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-small-individual-source-proof.json",
+      "sha256": "3d5b6b0db2bba5b7cd91c1f278b6103e74f17aad5a70407fe0e4c974611b8c05"
+    },
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "compatibility/rc/spec-small-individual-source-proof.json",
+      "sha256": "3d5b6b0db2bba5b7cd91c1f278b6103e74f17aad5a70407fe0e4c974611b8c05"
+    },
+    {
+      "path": "scripts/spec-small-source-review.mjs",
+      "sha256": "a3f8c6ea65db0588648675819751fc76df41001b0ac160099b87de6ae00e3b16"
+    },
+    {
+      "path": "tests/spec_small_source_probe.mjs",
+      "sha256": "385b82de643416a5c54c82016a79367cd4b84c2f3ec548d0bdb19b2056f36f62"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-subjects.json.gz",
+      "sha256": "055c40ba3907191e258676b4ebff84ea5d233fb5c00bb877eac0f525dcf5ccfd"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-acquisition.json.gz",
+      "sha256": "f71a905296710e45c15a2e6bfb3766a741061aebb39b8d55e7aa7d48fa6a8200"
+    },
+    {
+      "path": "compatibility/rc/spec-small-fixture-prior.json.gz",
+      "sha256": "da83db9d7a07c2cc3f1dcf89a5fd312f433966b3486ceebf5b05d9d45bf1c9fc"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-controls.json",
+      "sha256": "745522c6f8e1a4d0f358bc93e1006353698d82a708c175fa1bddcc137813d835"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-proof.json",
+      "sha256": "011533399904f0dff41c7ed4c2c883400c61f8f5824efe50c0a0ea2e8d4d1a80"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-checkpoint.json",
+      "sha256": "93d4faaf5cc32986a4f32b1a02428be09b9ca17d836bb40c68dfe53b44485300"
+    },
+    {
+      "path": "compatibility/rc/historical-source-replay-fixture-context-checkpoint.json",
+      "sha256": "52104999873044603a1ac41c3553a4e8809e5fbd406d3c6bdda06b1564a2788c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+      "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+      "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "14d0d2ebb8c3f78a04b1c93becd6ce4b79400381af97d0ccfe7df93cfc228030"
+    },
+    {
+      "path": "projects/ngx-material-legacy/ng-package.json",
+      "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33"
+    },
+    {
+      "path": "testing/legacy-runner/adapt-spec.mjs",
+      "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "c6869cf4cb9bf3dccb409899130d3dc231512f783b8f7e177dfaad6a9a3687df"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
