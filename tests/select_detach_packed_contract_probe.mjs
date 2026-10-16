@@ -17,10 +17,13 @@ import {fileURLToPath} from 'node:url';
 import {SELECT_DETACH_CASE_ID,packedSelectDetachCase} from '../scripts/select-detach-packed-contract.mjs';
 import {packedMenuItemTokenCase} from '../scripts/menu-item-token-packed-contract.mjs';
 import {packedSelectFocusClickCase} from '../scripts/select-focus-click-packed-contract.mjs';
+import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from '../scripts/chip-menu-tooltip-packed-contract.mjs';
 import {selectDetachPackedFixture} from '../scripts/select-detach-packed-fixture.mjs';
 import {SELECT_DETACH_PACKED_PREIMAGES,SELECT_DETACH_PACKED_EDITS,reverseSelectDetachPackedSource as reverseOldSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
 import {reverseMenuItemTokenPackedSource as reverseOldMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
-import {reverseSelectFocusClickPackedSource} from '../scripts/select-focus-click-packed-source-requalification.mjs';
+import {reverseSelectFocusClickPackedSource as reversePreviousSelectFocusClickPackedSource} from '../scripts/select-focus-click-packed-source-requalification.mjs';
+import {reverseChipMenuTooltipPackedSource} from '../scripts/chip-menu-tooltip-packed-source-requalification.mjs';
+const reverseSelectFocusClickPackedSource=(path,raw,line)=>reversePreviousSelectFocusClickPackedSource(path,reverseChipMenuTooltipPackedSource(path,raw,line),line);
 const reverseMenuItemTokenPackedSource=(path,raw,line)=>reverseOldMenuItemTokenPackedSource(path,reverseSelectFocusClickPackedSource(path,raw,line),line);
 const reverseSelectDetachPackedSource=(path,raw,line)=>reverseOldSelectDetachPackedSource(path,reverseMenuItemTokenPackedSource(path,raw,line),line);
 import {packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-contract.mjs';
@@ -48,8 +51,8 @@ const sample={execution:'packed-angular-testbed-dom',error:null,tokens_distinct:
 assert.equal(packedSelectDetachCase(sample).result,'pass');
 const producerPath='scripts/packed-consumer-aot-smoke.mjs',raw=read(producerPath),sf=ts.createSourceFile(producerPath,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);assert.equal(sf.parseDiagnostics.length,0);
 const source=sf.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases').getText(sf);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase',text+';return collectAcceptanceCases;')(
- declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')(
+ declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);
 const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,106);assert.equal(new Set(expected).size,106);
 const observe=(value,fn=load(source))=>{const rows=fn({harness:{status:'ok',result:{selectScrollDetach:value}}},keys,'/tmp/consumer','/tmp/source').filter(row=>row.case_id===SELECT_DETACH_CASE_ID);assert.equal(rows.length,1);return rows[0];};
 assert.equal(observe(sample).result,'pass');
