@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "d69de974a469d6ad5a3a81f60bbee54f88d0ffff",
+  "subject": "test(cdk/overlay): change how renders are counted in test (#30712)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "87658b891cbf5176d18c7fa5416debe70266b161",
+      "after_blob": "5b2af9d39c3592df09cee775e283997f746b7510"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 4,
+  "raw_commit_sha256": "384399e3eea1749e419c17cbf3c3540ad400292e60f76db24582cb5bb842d363",
+  "original_sources": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts",
+      "before": {
+        "git_blob": "87658b891cbf5176d18c7fa5416debe70266b161",
+        "sha256": "60da5bacbcdc15d56e35999737cb6128223035f24ee9af810933d103482370f5",
+        "bytes": 14448
+      },
+      "after": {
+        "git_blob": "5b2af9d39c3592df09cee775e283997f746b7510",
+        "sha256": "364577c1f2a8ca9e6e3ceb8f003f1ccd5e1b20bbac3e4f6a0ca737429fff2cc5",
+        "bytes": 14510
+      }
+    }
+  ],
+  "diff": "diff --git a/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts b/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts\nindex 87658b891cbf5176d18c7fa5416debe70266b161..5b2af9d39c3592df09cee775e283997f746b7510 100644\n--- a/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts\n+++ b/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts\n@@ -1,10 +1,10 @@\n+import {ApplicationRef, Component} from '@angular/core';\n import {TestBed, inject} from '@angular/core/testing';\n-import {ApplicationRef, Component, afterRender} from '@angular/core';\n+import {filter, take} from 'rxjs/operators';\n+import {ComponentPortal} from '../../portal';\n import {dispatchFakeEvent, dispatchMouseEvent} from '../../testing/private';\n-import {OverlayModule, Overlay} from '../index';\n+import {Overlay, OverlayModule} from '../index';\n import {OverlayOutsideClickDispatcher} from './overlay-outside-click-dispatcher';\n-import {ComponentPortal} from '../../portal';\n-import {filter, take} from 'rxjs/operators';\n \n describe('OverlayOutsideClickDispatcher', () => {\n   let appRef: ApplicationRef;\n@@ -388,11 +388,13 @@ describe('OverlayOutsideClickDispatcher', () => {\n \n     it('should run change detection if the click was made outside the overlay and there are `outsidePointerEvents` observers', async () => {\n       let renders = 0;\n-      TestBed.runInInjectionContext(() => {\n-        afterRender(() => {\n+      @Component({template: '{{increment()}}'})\n+      class Counter {\n+        increment() {\n           renders++;\n-        });\n-      });\n+        }\n+      }\n+      TestBed.createComponent(Counter);\n       function stablePromise() {\n         return TestBed.inject(ApplicationRef)\n           .isStable.pipe(\n@@ -402,7 +404,8 @@ describe('OverlayOutsideClickDispatcher', () => {\n           .toPromise();\n       }\n       await stablePromise();\n-      expect(renders).toEqual(1);\n+      renders = 0;\n+      expect(renders).toEqual(0);\n       const portal = new ComponentPortal(TestComponent);\n       const overlayRef = overlay.create();\n       overlayRef.attach(portal);\n@@ -412,16 +415,16 @@ describe('OverlayOutsideClickDispatcher', () => {\n       document.body.appendChild(context);\n \n       await stablePromise();\n-      expect(renders).toEqual(2);\n+      expect(renders).toEqual(1);\n       dispatchMouseEvent(context, 'click');\n       await stablePromise();\n-      expect(renders).toEqual(2);\n+      expect(renders).toEqual(1);\n \n       overlayRef.outsidePointerEvents().subscribe();\n \n       dispatchMouseEvent(context, 'click');\n       await stablePromise();\n-      expect(renders).toEqual(2);\n+      expect(renders).toEqual(1);\n     });\n   });\n });\n",
+  "diff_sha256": "170459b243fb50fe6083de264838f56dd47b874ddfe084eb2bfcb2436e2dd828",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts",
+      "header": "@@ -1,10 +1,10 @@",
+      "sha256": "490179e9f3db8c6cfaf08e8bab84bd08cecb0edee3f3b8754acc53afd99387b7",
+      "judgment": "The first hunk removes the afterRender import and reorders existing public Component/ApplicationRef, RxJS and portal/overlay imports. That test-import change does not authorize importing a compatibility-only hook or changing owned afterEveryRender lifecycle subscriptions."
+    },
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts",
+      "header": "@@ -388,11 +388,13 @@ describe('OverlayOutsideClickDispatcher', () => {",
+      "sha256": "a3b1c55ce04069ee14bc4f41f8145b6f9e96468ced5ed2f9b69affea09444c0e",
+      "judgment": "The second hunk replaces TestBed.runInInjectionContext plus afterRender with a local Counter component and TestBed.createComponent. The observer now measures interpolation calls, not the previous application render hook. Do not assert cross-observer equivalence from its variable name."
+    },
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts",
+      "header": "@@ -402,7 +404,8 @@ describe('OverlayOutsideClickDispatcher', () => {",
+      "sha256": "dc461cd08b4fe217ede532562cbc0452e4a109b8284c51d02623a21bc776f488",
+      "judgment": "The third hunk resets renders to0 after stability and changes the baseline assertion from1 to0. This is an explicit expectation/baseline change, not an unchanged semantic oracle."
+    },
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts",
+      "header": "@@ -412,16 +415,16 @@ describe('OverlayOutsideClickDispatcher', () => {",
+      "sha256": "42a7f58648b63dda2cda7bd9d599a86b9f81930edbdfcf423c0b29b9840a2ea1",
+      "judgment": "The fourth hunk changes all three subsequent expectations2 to1, including the subscribed outside-pointer click. The full case still attaches/registers the overlay, performs both outside clicks and subscribes once. It does not require a final increment and does not establish actual owned change-detection behavior. Keep the public consumer and lifecycle checks separate."
+    }
+  ],
+  "semantics": {
+    "kind": "outside-pointer-test-render-observer-replacement",
+    "old_hook": "afterRender",
+    "new_observer": "template increment method",
+    "old_counts": [
+      1,
+      2,
+      2,
+      2
+    ],
+    "new_counts": [
+      0,
+      1,
+      1,
+      1
+    ],
+    "last_expectation_requires_additional_render_after_subscribe": false,
+    "neither_counter_proves_actual_owned_change_detection": true,
+    "before_cases": 19,
+    "after_cases": 19,
+    "before_assertions": 30,
+    "after_assertions": 30
+  },
+  "decision": "The complete four-hunk outside-pointer test patch replaces an afterRender hook counter with a nested Counter component whose interpolated method increments a variable, then resets the baseline and changes expected counts1/2/2/2 to0/1/1/1. These are different observations, not a type-only or equivalent rendering proof. In particular the final expectation still requires no additional count after the subscribed click, despite the case title mentioning change detection. The owned tooltip uses public outsidePointerEvents, while owned form-field/render helpers have their own stable public afterEveryRender/afterNextRender subscriptions and cleanup. No removed afterRender import or dispatcher fork exists in the owned source. Retain those lifecycle protocols and actual runtime obligations; do not replace them with the private upstream test counter or infer a production fix.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "170459b243fb50fe6083de264838f56dd47b874ddfe084eb2bfcb2436e2dd828",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete four-hunk outside-pointer test patch replaces an afterRender hook counter with a nested Counter component whose interpolated method increments a variable, then resets the baseline and changes expected counts1/2/2/2 to0/1/1/1. These are different observations, not a type-only or equivalent rendering proof. In particular the final expectation still requires no additional count after the subscribed click, despite the case title mentioning change detection. The owned tooltip uses public outsidePointerEvents, while owned form-field/render helpers have their own stable public afterEveryRender/afterNextRender subscriptions and cleanup. No removed afterRender import or dispatcher fork exists in the owned source. Retain those lifecycle protocols and actual runtime obligations; do not replace them with the private upstream test counter or infer a production fix.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-peer-test-source-review.mjs",
+        "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+      },
+      {
+        "path": "tests/spec_peer_test_source_probe.mjs",
+        "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+        "sha256": "23ca9d18b86e2d40c4c0fd953ff55b26383de028ab17023eac5b07e1ad8ba71f"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+        "sha256": "e69744b2ab59336779d5189bc865bc19d63641a0fa71d5d0da9d9def85bbaeae"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-controls.json",
+        "sha256": "4f0735fbdcb2568310ae32ac318d4de7080e4c613a7cf678ec864330ce981be3"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-review.json",
+        "sha256": "360eca8ee166009b69483f1e476686bcb34bb16037b10f26fd94bbcb99d73044"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+        "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+        "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+        "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+        "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "d69de974a469d6ad5a3a81f60bbee54f88d0ffff",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(cdk/overlay): change how renders are counted in test (#30712)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=4f651db913ef6d2898a15443cb115e94ecd6ad598473d8007e5aa4af33f1076a, bytes=2641). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/d69de974a469d6ad5a3a81f60bbee54f88d0ffff.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "4f651db913ef6d2898a15443cb115e94ecd6ad598473d8007e5aa4af33f1076a"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-peer-test-source-review.mjs",
+      "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+    },
+    {
+      "path": "tests/spec_peer_test_source_probe.mjs",
+      "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+      "sha256": "23ca9d18b86e2d40c4c0fd953ff55b26383de028ab17023eac5b07e1ad8ba71f"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+      "sha256": "e69744b2ab59336779d5189bc865bc19d63641a0fa71d5d0da9d9def85bbaeae"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-controls.json",
+      "sha256": "4f0735fbdcb2568310ae32ac318d4de7080e4c613a7cf678ec864330ce981be3"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-review.json",
+      "sha256": "360eca8ee166009b69483f1e476686bcb34bb16037b10f26fd94bbcb99d73044"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+      "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+      "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+      "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+      "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    }
+  ],
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

@@ -24734,17 +24734,93 @@
       "sha": "9cd1d30839a737c2fc929f32e20242f180bc3828",
       "bucket": "test-only-batch-candidate",
       "subject": "test: fix failing test",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=31792f03cb94ebdb410d2cf5998db37023fc348b30aea0878001c227eaa78cbd, bytes=850). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "not-applicable",
+      "reason": "The complete original keyboard-dispatcher patch changes two private test spy expectations: addEventListener capture false becomes undefined, and removeEventListener gains explicit undefined options. It changes no dispatcher implementation or public API. Owned autocomplete/menu/dialog code reaches keyboard events through public CDK overlay APIs, so the dependency is reachable; it is not an absent-package exclusion. The owned package defines no OverlayKeyboardDispatcher fork or matching listener-spy spec. Keep its current public overlay subscriptions and real teardown/keyboard obligations. Do not copy an upstream private spy-arity expectation into product code or claim inherited listener behavior from this test-only patch.",
+      "read_note_disposition": "individual complete-original source conclusion; no public peer behavior/floor or full-G11 admission",
       "files": [
         "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/9cd1d30839a737c2fc929f32e20242f180bc3828.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-peer-test-9cd1d30839a737c2fc929f32e20242f180bc3828.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "31792f03cb94ebdb410d2cf5998db37023fc348b30aea0878001c227eaa78cbd"
+      "patch_sha256": "31792f03cb94ebdb410d2cf5998db37023fc348b30aea0878001c227eaa78cbd",
+      "affected_branches": [
+        "main"
+      ],
+      "diff_sha256": "6aafdf1fcb3ea8dc9dddb2411e1ee6530b22d6286593c99b2e7087b76f4026ce",
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "6aafdf1fcb3ea8dc9dddb2411e1ee6530b22d6286593c99b2e7087b76f4026ce",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete original keyboard-dispatcher patch changes two private test spy expectations: addEventListener capture false becomes undefined, and removeEventListener gains explicit undefined options. It changes no dispatcher implementation or public API. Owned autocomplete/menu/dialog code reaches keyboard events through public CDK overlay APIs, so the dependency is reachable; it is not an absent-package exclusion. The owned package defines no OverlayKeyboardDispatcher fork or matching listener-spy spec. Keep its current public overlay subscriptions and real teardown/keyboard obligations. Do not copy an upstream private spy-arity expectation into product code or claim inherited listener behavior from this test-only patch.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-peer-test-source-review.mjs",
+            "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+          },
+          {
+            "path": "tests/spec_peer_test_source_probe.mjs",
+            "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+            "sha256": "23ca9d18b86e2d40c4c0fd953ff55b26383de028ab17023eac5b07e1ad8ba71f"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+            "sha256": "e69744b2ab59336779d5189bc865bc19d63641a0fa71d5d0da9d9def85bbaeae"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-controls.json",
+            "sha256": "4f0735fbdcb2568310ae32ac318d4de7080e4c613a7cf678ec864330ce981be3"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-review.json",
+            "sha256": "360eca8ee166009b69483f1e476686bcb34bb16037b10f26fd94bbcb99d73044"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+            "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+            "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+            "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+            "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "Both exact spy argument edits are confined to the same listener registration/disposal test. The listener event name and function matchers remain; the expectations distinguish omitted, false and explicit undefined arguments. The complete remaining test file is exact. This patch provides no runtime dispatch, event-capture or teardown execution evidence for either supported peer.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "da8b1f9aacd826060372d46e528658cc789122c6",
@@ -24974,17 +25050,93 @@
       "sha": "d69de974a469d6ad5a3a81f60bbee54f88d0ffff",
       "bucket": "test-only-batch-candidate",
       "subject": "test(cdk/overlay): change how renders are counted in test (#30712)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=4f651db913ef6d2898a15443cb115e94ecd6ad598473d8007e5aa4af33f1076a, bytes=2641). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The complete four-hunk outside-pointer test patch replaces an afterRender hook counter with a nested Counter component whose interpolated method increments a variable, then resets the baseline and changes expected counts1/2/2/2 to0/1/1/1. These are different observations, not a type-only or equivalent rendering proof. In particular the final expectation still requires no additional count after the subscribed click, despite the case title mentioning change detection. The owned tooltip uses public outsidePointerEvents, while owned form-field/render helpers have their own stable public afterEveryRender/afterNextRender subscriptions and cleanup. No removed afterRender import or dispatcher fork exists in the owned source. Retain those lifecycle protocols and actual runtime obligations; do not replace them with the private upstream test counter or infer a production fix.",
+      "read_note_disposition": "individual complete-original source conclusion; no public peer behavior/floor or full-G11 admission",
       "files": [
         "src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/d69de974a469d6ad5a3a81f60bbee54f88d0ffff.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-peer-test-d69de974a469d6ad5a3a81f60bbee54f88d0ffff.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "4f651db913ef6d2898a15443cb115e94ecd6ad598473d8007e5aa4af33f1076a"
+      "patch_sha256": "4f651db913ef6d2898a15443cb115e94ecd6ad598473d8007e5aa4af33f1076a",
+      "affected_branches": [
+        "main"
+      ],
+      "diff_sha256": "170459b243fb50fe6083de264838f56dd47b874ddfe084eb2bfcb2436e2dd828",
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "170459b243fb50fe6083de264838f56dd47b874ddfe084eb2bfcb2436e2dd828",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete four-hunk outside-pointer test patch replaces an afterRender hook counter with a nested Counter component whose interpolated method increments a variable, then resets the baseline and changes expected counts1/2/2/2 to0/1/1/1. These are different observations, not a type-only or equivalent rendering proof. In particular the final expectation still requires no additional count after the subscribed click, despite the case title mentioning change detection. The owned tooltip uses public outsidePointerEvents, while owned form-field/render helpers have their own stable public afterEveryRender/afterNextRender subscriptions and cleanup. No removed afterRender import or dispatcher fork exists in the owned source. Retain those lifecycle protocols and actual runtime obligations; do not replace them with the private upstream test counter or infer a production fix.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-peer-test-source-review.mjs",
+            "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+          },
+          {
+            "path": "tests/spec_peer_test_source_probe.mjs",
+            "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+            "sha256": "23ca9d18b86e2d40c4c0fd953ff55b26383de028ab17023eac5b07e1ad8ba71f"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+            "sha256": "e69744b2ab59336779d5189bc865bc19d63641a0fa71d5d0da9d9def85bbaeae"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-controls.json",
+            "sha256": "4f0735fbdcb2568310ae32ac318d4de7080e4c613a7cf678ec864330ce981be3"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-review.json",
+            "sha256": "360eca8ee166009b69483f1e476686bcb34bb16037b10f26fd94bbcb99d73044"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+            "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+            "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+            "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+            "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "The first hunk removes the afterRender import and reorders existing public Component/ApplicationRef, RxJS and portal/overlay imports. That test-import change does not authorize importing a compatibility-only hook or changing owned afterEveryRender lifecycle subscriptions. The second hunk replaces TestBed.runInInjectionContext plus afterRender with a local Counter component and TestBed.createComponent. The observer now measures interpolation calls, not the previous application render hook. Do not assert cross-observer equivalence from its variable name. The third hunk resets renders to0 after stability and changes the baseline assertion from1 to0. This is an explicit expectation/baseline change, not an unchanged semantic oracle. The fourth hunk changes all three subsequent expectations2 to1, including the subscribed outside-pointer click. The full case still attaches/registers the overlay, performs both outside clicks and subscribes once. It does not require a final increment and does not establish actual owned change-detection behavior. Keep the public consumer and lifecycle checks separate.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "86a5ab09440815c360adcae82d8662c718ba9974",
@@ -25259,17 +25411,93 @@
       "sha": "905835c0ba1cf0eb495fbab2cba0dd188f6956db",
       "bucket": "test-only-batch-candidate",
       "subject": "test(cdk/scrolling): Change test spying on tick (#31247)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=3336464fc54381a368e0ff9b0cb18d5822785f8159e54c5a90757a1fcd93ab7a, bytes=1370). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/scrolling/virtual-scroll-viewport.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The complete two-hunk viewport patch removes ApplicationRef test setup and changes the regression from no global tick without viewChange listeners to no viewChange.next emission without listeners. It also renames that case. Event emission and application change detection are distinct contracts; passing the new expectation would not prove the old one. The owned table tests use the stable public CdkVirtualScrollViewport and CDK_VIRTUAL_SCROLL_VIEWPORT token in a consumer fixture; no viewport or virtual-for implementation is owned. Retain that fixture and its row/layout/injection checks. Do not import the modern private virtualForOf instrumentation or treat the replaced assertion as evidence that current public peer rendering is compatible. Actual artifact/browser/floor checks remain required.",
+      "read_note_disposition": "individual complete-original source conclusion; no public peer behavior/floor or full-G11 admission",
       "files": [
         "src/cdk/scrolling/virtual-scroll-viewport.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/905835c0ba1cf0eb495fbab2cba0dd188f6956db.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-peer-test-905835c0ba1cf0eb495fbab2cba0dd188f6956db.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "3336464fc54381a368e0ff9b0cb18d5822785f8159e54c5a90757a1fcd93ab7a"
+      "patch_sha256": "3336464fc54381a368e0ff9b0cb18d5822785f8159e54c5a90757a1fcd93ab7a",
+      "affected_branches": [
+        "main"
+      ],
+      "diff_sha256": "43fa35df817d51643f1a1503ba36ef1e2876e48d0a17ddb6f02e4cafc7fd745f",
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "43fa35df817d51643f1a1503ba36ef1e2876e48d0a17ddb6f02e4cafc7fd745f",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete two-hunk viewport patch removes ApplicationRef test setup and changes the regression from no global tick without viewChange listeners to no viewChange.next emission without listeners. It also renames that case. Event emission and application change detection are distinct contracts; passing the new expectation would not prove the old one. The owned table tests use the stable public CdkVirtualScrollViewport and CDK_VIRTUAL_SCROLL_VIEWPORT token in a consumer fixture; no viewport or virtual-for implementation is owned. Retain that fixture and its row/layout/injection checks. Do not import the modern private virtualForOf instrumentation or treat the replaced assertion as evidence that current public peer rendering is compatible. Actual artifact/browser/floor checks remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-peer-test-source-review.mjs",
+            "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+          },
+          {
+            "path": "tests/spec_peer_test_source_probe.mjs",
+            "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+            "sha256": "23ca9d18b86e2d40c4c0fd953ff55b26383de028ab17023eac5b07e1ad8ba71f"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+            "sha256": "e69744b2ab59336779d5189bc865bc19d63641a0fa71d5d0da9d9def85bbaeae"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-controls.json",
+            "sha256": "4f0735fbdcb2568310ae32ac318d4de7080e4c613a7cf678ec864330ce981be3"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-review.json",
+            "sha256": "360eca8ee166009b69483f1e476686bcb34bb16037b10f26fd94bbcb99d73044"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+            "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+            "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+            "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+            "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "The first hunk removes only ApplicationRef from imports because the private test no longer inspects the application tick method. No production provider or public API is changed. The second hunk removes the appRef variable/beforeEach/global tick spy, adds a viewChange.next spy before initialization, renames the case and replaces its final assertion. Both versions still initialize, set ten items, mark/render/flush, scroll to index5 and trigger scrolling. The changed observation is explicitly not equivalent to global render suppression. The add-on public viewport consumer remains intact.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "409948f39781c74dc2f69c1501180a17b10492a2",
@@ -25345,17 +25573,93 @@
       "sha": "b382b60f58db8357bf93f3f45e78cdfa3c5f28d9",
       "bucket": "test-only-batch-candidate",
       "subject": "test(material/icon): account for API changes",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=cc94b9fdb71ef2297966f80697abe1fac812bd1e8c064e3c672ed18d03424ad8, bytes=5576). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/icon/icon.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "not-applicable",
+      "reason": "The complete fifteen-hunk icon patch migrates private HTTP test setup from HttpClientTestingModule imports to provideHttpClientTesting and deletes the missing-HTTP-provider error regression plus its nested SVG fixture. It also removes private error helper imports; it is not just an API spelling cleanup or an icon implementation fix. The add-on uses public MatIconModule/MatIconHarness in its retained chip/button harness fixtures and owns icon Sass, but defines no MatIcon or MatIconRegistry fork and does not import this upstream private spec. Keep those public dependencies and Sass/native obligations. Do not transplant the removed error assertion, modern HTTP fixture/provider assumptions or private helper. No HTTP/provider error-contract, constructor, SVG trust behavior or inherited peer fix is approved by this source exclusion.",
+      "read_note_disposition": "individual complete-original source conclusion; no public peer behavior/floor or full-G11 admission",
       "files": [
         "src/material/icon/icon.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/b382b60f58db8357bf93f3f45e78cdfa3c5f28d9.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-peer-test-b382b60f58db8357bf93f3f45e78cdfa3c5f28d9.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "cc94b9fdb71ef2297966f80697abe1fac812bd1e8c064e3c672ed18d03424ad8"
+      "patch_sha256": "cc94b9fdb71ef2297966f80697abe1fac812bd1e8c064e3c672ed18d03424ad8",
+      "affected_branches": [
+        "main"
+      ],
+      "diff_sha256": "2b797f2bdc1267361d19dfa3cd07fb996e7a42858b1aedb4887ef1c9e743a372",
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "2b797f2bdc1267361d19dfa3cd07fb996e7a42858b1aedb4887ef1c9e743a372",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete fifteen-hunk icon patch migrates private HTTP test setup from HttpClientTestingModule imports to provideHttpClientTesting and deletes the missing-HTTP-provider error regression plus its nested SVG fixture. It also removes private error helper imports; it is not just an API spelling cleanup or an icon implementation fix. The add-on uses public MatIconModule/MatIconHarness in its retained chip/button harness fixtures and owns icon Sass, but defines no MatIcon or MatIconRegistry fork and does not import this upstream private spec. Keep those public dependencies and Sass/native obligations. Do not transplant the removed error assertion, modern HTTP fixture/provider assumptions or private helper. No HTTP/provider error-contract, constructor, SVG trust behavior or inherited peer fix is approved by this source exclusion.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-peer-test-source-review.mjs",
+            "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+          },
+          {
+            "path": "tests/spec_peer_test_source_probe.mjs",
+            "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+            "sha256": "23ca9d18b86e2d40c4c0fd953ff55b26383de028ab17023eac5b07e1ad8ba71f"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+            "sha256": "e69744b2ab59336779d5189bc865bc19d63641a0fa71d5d0da9d9def85bbaeae"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-controls.json",
+            "sha256": "4f0735fbdcb2568310ae32ac318d4de7080e4c613a7cf678ec864330ce981be3"
+          },
+          {
+            "path": "compatibility/rc/spec-peer-test-source-review.json",
+            "sha256": "360eca8ee166009b69483f1e476686bcb34bb16037b10f26fd94bbcb99d73044"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+            "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+            "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+            "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+            "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "The first hunk removes the private wrappedErrorMessage import and replaces HttpClientTestingModule with the public provideHttpClientTesting test-provider import. No product service, HTTP request or sanitization implementation changes. The second hunk removes the private getMatIconNoHttpProviderError import while retaining MatIconRegistry. Its old use belongs to the later deleted negative test; no locally owned error helper is deleted. The third hunk removes HttpClientTestingModule from the root test imports array. All other imported icon fixtures and MatIconModule remain. This alone does not prove HTTP providers are available in every consumer. The fourth hunk adds one provideHttpClientTesting call in the root providers array and preserves the location/default setup. This is an upstream private fixture setup change, not an add-on peer-minimum update. The fifth hunk removes the complete MatIcon without HttpClientModule describe block, its scoped IconFromSvgName component, setup and one throw assertion. It previously registered a trusted resource URL, instantiated the SVG fixture and expected the named missing-provider error. The retained remaining before/after case population differs by exactly this one case. No actual provider/error or SVG behavior equivalence is inferred. The sixth hunk removes HttpClientTestingModule from IconWithLigature imports while retaining MatIconModule, its interpolation template and field. The seventh hunk makes the same import-array change for IconWithLigatureByAttribute, preserving its fontIcon binding and fixture data. The eighth hunk removes only that testing module from IconWithColor; the color input template and field remain unchanged. The ninth hunk removes it from IconWithCustomFontCss while preserving both fontSet/fontIcon bindings and fields. The tenth hunk removes it from the global IconFromSvgName fixture imports; its svgIcon template and value remain. This surviving global class is distinct from the deleted nested class in the missing-provider describe block. The eleventh hunk covers two adjacent fixtures: IconWithAriaHiddenFalse and IconWithBindingAndNgIf both retain MatIconModule and their exact templates while dropping HttpClientTestingModule. Neither aria semantics nor modern @if behavior is imported into an owned legacy component. The twelfth hunk removes the testing module from InlineIcon only; its inline template input and false default remain. The thirteenth hunk removes it from SvgIconWithUserContent imports, retaining the SVG binding and projected div content unchanged. No source claim about SVG trust/rendering execution follows. The fourteenth hunk removes it from IconWithLigatureAndSvgBinding imports while preserving the mixed SVG/ligature template and iconName declaration. The fifteenth hunk removes it from BlankIcon imports and retains MatIconModule plus the MatIcon ViewChild. Across the patch twelve import arrays change (root plus eleven fixtures), one provider call is added and one negative test/assertion is removed; no production icon code changes.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "1c605257faf3f2bb2f19ce31ef26be55794c834a",

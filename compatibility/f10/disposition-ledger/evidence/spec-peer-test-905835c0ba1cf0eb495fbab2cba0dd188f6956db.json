@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "905835c0ba1cf0eb495fbab2cba0dd188f6956db",
+  "subject": "test(cdk/scrolling): Change test spying on tick (#31247)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a023cb7184390c78b65f6f07f84445016b2e80d5",
+      "after_blob": "2357db6d4f2930d75a2a2af04e7e947c2da255ba"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 2,
+  "raw_commit_sha256": "aaf0f01abf8a575278403674322642a70c590012f2305a1993fe489a97c80ef6",
+  "original_sources": [
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "before": {
+        "git_blob": "a023cb7184390c78b65f6f07f84445016b2e80d5",
+        "sha256": "727b3322021c69239bf464ca10286b3afd362a5442c7ad65858a046d66d242cb",
+        "bytes": 50881
+      },
+      "after": {
+        "git_blob": "2357db6d4f2930d75a2a2af04e7e947c2da255ba",
+        "sha256": "2abacf2e036114c17a252612ed4ecefd11f7710cb5b914da13ea9e9977bd1418",
+        "bytes": 50780
+      }
+    }
+  ],
+  "diff": "diff --git a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts\nindex a023cb7184390c78b65f6f07f84445016b2e80d5..2357db6d4f2930d75a2a2af04e7e947c2da255ba 100644\n--- a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts\n+++ b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts\n@@ -7,7 +7,6 @@ import {\n   ScrollingModule,\n } from '../scrolling';\n import {\n-  ApplicationRef,\n   Component,\n   Directive,\n   TrackByFunction,\n@@ -814,25 +813,17 @@ describe('CdkVirtualScrollViewport', () => {\n     }));\n \n     describe('viewChange change detection behavior', () => {\n-      let appRef: ApplicationRef;\n-\n-      beforeEach(() => {\n-        appRef = TestBed.inject(ApplicationRef);\n-      });\n-\n-      it('should not run change detection if there are no viewChange listeners', fakeAsync(() => {\n+      it('should not emit viewChange if there are no listeners', fakeAsync(() => {\n+        const viewChangeSpy = spyOn(testComponent.virtualForOf.viewChange, 'next');\n         finishInit(fixture);\n         testComponent.items = Array(10).fill(0);\n         fixture.changeDetectorRef.markForCheck();\n         fixture.detectChanges();\n         flush();\n \n-        spyOn(appRef, 'tick');\n-\n         viewport.scrollToIndex(5);\n         triggerScroll(viewport);\n-\n-        expect(appRef.tick).not.toHaveBeenCalled();\n+        expect(viewChangeSpy).not.toHaveBeenCalled();\n       }));\n     });\n   });\n",
+  "diff_sha256": "43fa35df817d51643f1a1503ba36ef1e2876e48d0a17ddb6f02e4cafc7fd745f",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -7,7 +7,6 @@ import {",
+      "sha256": "0b18ca9a29998a6a64a26bc6d6fc90d713e6711a6ae1df80d7120302235a202a",
+      "judgment": "The first hunk removes only ApplicationRef from imports because the private test no longer inspects the application tick method. No production provider or public API is changed."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -814,25 +813,17 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "9d963d45eb7ccc5ab31a0422259f24f440e37275c957ca5f1e96ec82fff36d7e",
+      "judgment": "The second hunk removes the appRef variable/beforeEach/global tick spy, adds a viewChange.next spy before initialization, renames the case and replaces its final assertion. Both versions still initialize, set ten items, mark/render/flush, scroll to index5 and trigger scrolling. The changed observation is explicitly not equivalent to global render suppression. The add-on public viewport consumer remains intact."
+    }
+  ],
+  "semantics": {
+    "kind": "viewport-global-render-assertion-replaced-by-event-assertion",
+    "old_observation": "ApplicationRef.tick",
+    "new_observation": "virtualForOf.viewChange.next",
+    "behavioral_assertions_equivalent": false,
+    "production_viewport_code_changed": false,
+    "before_cases": 68,
+    "after_cases": 68,
+    "before_assertions": 111,
+    "after_assertions": 111
+  },
+  "decision": "The complete two-hunk viewport patch removes ApplicationRef test setup and changes the regression from no global tick without viewChange listeners to no viewChange.next emission without listeners. It also renames that case. Event emission and application change detection are distinct contracts; passing the new expectation would not prove the old one. The owned table tests use the stable public CdkVirtualScrollViewport and CDK_VIRTUAL_SCROLL_VIEWPORT token in a consumer fixture; no viewport or virtual-for implementation is owned. Retain that fixture and its row/layout/injection checks. Do not import the modern private virtualForOf instrumentation or treat the replaced assertion as evidence that current public peer rendering is compatible. Actual artifact/browser/floor checks remain required.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "43fa35df817d51643f1a1503ba36ef1e2876e48d0a17ddb6f02e4cafc7fd745f",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete two-hunk viewport patch removes ApplicationRef test setup and changes the regression from no global tick without viewChange listeners to no viewChange.next emission without listeners. It also renames that case. Event emission and application change detection are distinct contracts; passing the new expectation would not prove the old one. The owned table tests use the stable public CdkVirtualScrollViewport and CDK_VIRTUAL_SCROLL_VIEWPORT token in a consumer fixture; no viewport or virtual-for implementation is owned. Retain that fixture and its row/layout/injection checks. Do not import the modern private virtualForOf instrumentation or treat the replaced assertion as evidence that current public peer rendering is compatible. Actual artifact/browser/floor checks remain required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-peer-test-source-review.mjs",
+        "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+      },
+      {
+        "path": "tests/spec_peer_test_source_probe.mjs",
+        "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+        "sha256": "23ca9d18b86e2d40c4c0fd953ff55b26383de028ab17023eac5b07e1ad8ba71f"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+        "sha256": "e69744b2ab59336779d5189bc865bc19d63641a0fa71d5d0da9d9def85bbaeae"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-controls.json",
+        "sha256": "4f0735fbdcb2568310ae32ac318d4de7080e4c613a7cf678ec864330ce981be3"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-review.json",
+        "sha256": "360eca8ee166009b69483f1e476686bcb34bb16037b10f26fd94bbcb99d73044"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+        "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+        "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+        "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+        "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "905835c0ba1cf0eb495fbab2cba0dd188f6956db",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(cdk/scrolling): Change test spying on tick (#31247)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=3336464fc54381a368e0ff9b0cb18d5822785f8159e54c5a90757a1fcd93ab7a, bytes=1370). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/scrolling/virtual-scroll-viewport.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/cdk/scrolling/virtual-scroll-viewport.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/905835c0ba1cf0eb495fbab2cba0dd188f6956db.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "3336464fc54381a368e0ff9b0cb18d5822785f8159e54c5a90757a1fcd93ab7a"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-peer-test-source-review.mjs",
+      "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+    },
+    {
+      "path": "tests/spec_peer_test_source_probe.mjs",
+      "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+      "sha256": "23ca9d18b86e2d40c4c0fd953ff55b26383de028ab17023eac5b07e1ad8ba71f"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+      "sha256": "e69744b2ab59336779d5189bc865bc19d63641a0fa71d5d0da9d9def85bbaeae"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-controls.json",
+      "sha256": "4f0735fbdcb2568310ae32ac318d4de7080e4c613a7cf678ec864330ce981be3"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-review.json",
+      "sha256": "360eca8ee166009b69483f1e476686bcb34bb16037b10f26fd94bbcb99d73044"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+      "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+      "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+      "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+      "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    }
+  ],
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

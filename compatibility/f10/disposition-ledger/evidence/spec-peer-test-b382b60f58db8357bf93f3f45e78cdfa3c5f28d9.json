@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "b382b60f58db8357bf93f3f45e78cdfa3c5f28d9",
+  "subject": "test(material/icon): account for API changes",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "9f2ac51ea8e8b72c3cf294d39d321aed2799dbff",
+      "after_blob": "c90c6dfdf25c6f9492dfef985db3f3082702e245"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 15,
+  "raw_commit_sha256": "a8e6a6df96c4a6e7290ff64fef16abc90bb93efddaf6e20860a2dd7e67eece59",
+  "original_sources": [
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "before": {
+        "git_blob": "9f2ac51ea8e8b72c3cf294d39d321aed2799dbff",
+        "sha256": "f15358ca21d8b057a168946a80c3cbe59d18c44719b5bbb3505d3ce273c86d12",
+        "bytes": 59978
+      },
+      "after": {
+        "git_blob": "c90c6dfdf25c6f9492dfef985db3f3082702e245",
+        "sha256": "144ce4441c26a632a16737f41e1cf9737252c088ea768b0fc95057639d75a947",
+        "bytes": 58667
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/icon/icon.spec.ts b/src/material/icon/icon.spec.ts\nindex 9f2ac51ea8e8b72c3cf294d39d321aed2799dbff..c90c6dfdf25c6f9492dfef985db3f3082702e245 100644\n--- a/src/material/icon/icon.spec.ts\n+++ b/src/material/icon/icon.spec.ts\n@@ -1,6 +1,5 @@\n-import {wrappedErrorMessage} from '@angular/cdk/testing/private';\n import {\n-  HttpClientTestingModule,\n+  provideHttpClientTesting,\n   HttpTestingController,\n   TestRequest,\n } from '@angular/common/http/testing';\n@@ -9,7 +8,7 @@ import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';\n import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';\n import {FAKE_SVGS} from './fake-svgs';\n import {MatIcon} from './icon';\n-import {MatIconRegistry, getMatIconNoHttpProviderError} from './icon-registry';\n+import {MatIconRegistry} from './icon-registry';\n import {MAT_ICON_DEFAULT_OPTIONS, MAT_ICON_LOCATION, MatIconModule} from './index';\n \n /** Returns the CSS classes assigned to an element as a sorted array. */\n@@ -65,7 +64,6 @@ describe('MatIcon', () => {\n \n     TestBed.configureTestingModule({\n       imports: [\n-        HttpClientTestingModule,\n         MatIconModule,\n         IconWithColor,\n         IconWithLigature,\n@@ -80,6 +78,7 @@ describe('MatIcon', () => {\n         BlankIcon,\n       ],\n       providers: [\n+        provideHttpClientTesting(),\n         {\n           provide: MAT_ICON_LOCATION,\n           useValue: {getPathname: () => fakePath},\n@@ -1358,38 +1357,6 @@ describe('MatIcon', () => {\n   }\n });\n \n-describe('MatIcon without HttpClientModule', () => {\n-  let iconRegistry: MatIconRegistry;\n-  let sanitizer: DomSanitizer;\n-\n-  @Component({\n-    template: `<mat-icon [svgIcon]=\"iconName\"></mat-icon>`,\n-    imports: [MatIcon],\n-  })\n-  class IconFromSvgName {\n-    iconName: string | undefined = '';\n-  }\n-\n-  beforeEach(waitForAsync(() => {\n-    iconRegistry = TestBed.inject(MatIconRegistry);\n-    sanitizer = TestBed.inject(DomSanitizer);\n-  }));\n-\n-  it('should throw an error when trying to load a remote icon', () => {\n-    const expectedError = wrappedErrorMessage(getMatIconNoHttpProviderError());\n-\n-    expect(() => {\n-      iconRegistry.addSvgIcon('fido', sanitizer.bypassSecurityTrustResourceUrl('dog.svg'));\n-\n-      const fixture = TestBed.createComponent(IconFromSvgName);\n-\n-      fixture.componentInstance.iconName = 'fido';\n-      fixture.changeDetectorRef.markForCheck();\n-      fixture.detectChanges();\n-    }).toThrowError(expectedError);\n-  });\n-});\n-\n describe('MatIcon with default options', () => {\n   it('should be able to configure color globally', fakeAsync(() => {\n     const fixture = createComponent(IconWithLigature, [\n@@ -1457,7 +1424,7 @@ describe('MatIcon with default options', () => {\n \n @Component({\n   template: `<mat-icon>{{iconName}}</mat-icon>`,\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class IconWithLigature {\n   iconName = '';\n@@ -1465,7 +1432,7 @@ class IconWithLigature {\n \n @Component({\n   template: `<mat-icon [fontIcon]=\"iconName\"></mat-icon>`,\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class IconWithLigatureByAttribute {\n   iconName = '';\n@@ -1473,7 +1440,7 @@ class IconWithLigatureByAttribute {\n \n @Component({\n   template: `<mat-icon [color]=\"iconColor\">{{iconName}}</mat-icon>`,\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class IconWithColor {\n   iconName = '';\n@@ -1482,7 +1449,7 @@ class IconWithColor {\n \n @Component({\n   template: `<mat-icon [fontSet]=\"fontSet\" [fontIcon]=\"fontIcon\"></mat-icon>`,\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class IconWithCustomFontCss {\n   fontSet = '';\n@@ -1491,7 +1458,7 @@ class IconWithCustomFontCss {\n \n @Component({\n   template: `<mat-icon [svgIcon]=\"iconName\"></mat-icon>`,\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class IconFromSvgName {\n   iconName: string | undefined = '';\n@@ -1499,13 +1466,13 @@ class IconFromSvgName {\n \n @Component({\n   template: '<mat-icon aria-hidden=\"false\">face</mat-icon>',\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class IconWithAriaHiddenFalse {}\n \n @Component({\n   template: `@if (showIcon) {<mat-icon [svgIcon]=\"iconName\">{{iconName}}</mat-icon>}`,\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class IconWithBindingAndNgIf {\n   iconName = 'fluffy';\n@@ -1514,7 +1481,7 @@ class IconWithBindingAndNgIf {\n \n @Component({\n   template: `<mat-icon [inline]=\"inline\">{{iconName}}</mat-icon>`,\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class InlineIcon {\n   inline = false;\n@@ -1522,7 +1489,7 @@ class InlineIcon {\n \n @Component({\n   template: `<mat-icon [svgIcon]=\"iconName\"><div>Hello</div></mat-icon>`,\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class SvgIconWithUserContent {\n   iconName: string | undefined = '';\n@@ -1530,7 +1497,7 @@ class SvgIconWithUserContent {\n \n @Component({\n   template: '<mat-icon [svgIcon]=\"iconName\">house</mat-icon>',\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class IconWithLigatureAndSvgBinding {\n   iconName: string | undefined;\n@@ -1538,7 +1505,7 @@ class IconWithLigatureAndSvgBinding {\n \n @Component({\n   template: `<mat-icon></mat-icon>`,\n-  imports: [HttpClientTestingModule, MatIconModule],\n+  imports: [MatIconModule],\n })\n class BlankIcon {\n   @ViewChild(MatIcon) icon: MatIcon;\n",
+  "diff_sha256": "2b797f2bdc1267361d19dfa3cd07fb996e7a42858b1aedb4887ef1c9e743a372",
+  "hunk_reviews": [
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1,6 +1,5 @@",
+      "sha256": "736e3e9cfd7324c4a07c148e46a613944c9ba908c5cefdc8084b20399e3a94a9",
+      "judgment": "The first hunk removes the private wrappedErrorMessage import and replaces HttpClientTestingModule with the public provideHttpClientTesting test-provider import. No product service, HTTP request or sanitization implementation changes."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -9,7 +8,7 @@ import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';",
+      "sha256": "24a1afc7ae2464dad62fcb0b7fb9b70c50499b4ab5d236d9b249eee1be30748f",
+      "judgment": "The second hunk removes the private getMatIconNoHttpProviderError import while retaining MatIconRegistry. Its old use belongs to the later deleted negative test; no locally owned error helper is deleted."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -65,7 +64,6 @@ describe('MatIcon', () => {",
+      "sha256": "0ec2d3ed9199968abd57718cdfe655beebb973514492a937e3a41d6d2ec1f4bf",
+      "judgment": "The third hunk removes HttpClientTestingModule from the root test imports array. All other imported icon fixtures and MatIconModule remain. This alone does not prove HTTP providers are available in every consumer."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -80,6 +78,7 @@ describe('MatIcon', () => {",
+      "sha256": "7457be58f82627bfd167d5984e48bfb12010c97fd4c50fd09d3537392ed91140",
+      "judgment": "The fourth hunk adds one provideHttpClientTesting call in the root providers array and preserves the location/default setup. This is an upstream private fixture setup change, not an add-on peer-minimum update."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1358,38 +1357,6 @@ describe('MatIcon', () => {",
+      "sha256": "7f6d8e74b04151aae660660ec0231d272a11980ca98233739f8f389e024fd3ba",
+      "judgment": "The fifth hunk removes the complete MatIcon without HttpClientModule describe block, its scoped IconFromSvgName component, setup and one throw assertion. It previously registered a trusted resource URL, instantiated the SVG fixture and expected the named missing-provider error. The retained remaining before/after case population differs by exactly this one case. No actual provider/error or SVG behavior equivalence is inferred."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1457,7 +1424,7 @@ describe('MatIcon with default options', () => {",
+      "sha256": "b24a21fe683aeaca1981beddd45b15e2a555ff7847f67b0295c71790e6ef67a0",
+      "judgment": "The sixth hunk removes HttpClientTestingModule from IconWithLigature imports while retaining MatIconModule, its interpolation template and field."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1465,7 +1432,7 @@ class IconWithLigature {",
+      "sha256": "6dc268a24a4304d770d19536d8930c2fea018820985a869505dc56c95f5137ce",
+      "judgment": "The seventh hunk makes the same import-array change for IconWithLigatureByAttribute, preserving its fontIcon binding and fixture data."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1473,7 +1440,7 @@ class IconWithLigatureByAttribute {",
+      "sha256": "e5fafdb3f6695ab877f494774cf09577de221343760dd2fc144901661907e19e",
+      "judgment": "The eighth hunk removes only that testing module from IconWithColor; the color input template and field remain unchanged."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1482,7 +1449,7 @@ class IconWithColor {",
+      "sha256": "3f24a3c97694172ead26af3086989e7dfaa8e436de2100caa47fd2d0e533b897",
+      "judgment": "The ninth hunk removes it from IconWithCustomFontCss while preserving both fontSet/fontIcon bindings and fields."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1491,7 +1458,7 @@ class IconWithCustomFontCss {",
+      "sha256": "13dcbe3eef4d7590ca301250e97a193b371f1a0839818f5fbb72573c1d67d31d",
+      "judgment": "The tenth hunk removes it from the global IconFromSvgName fixture imports; its svgIcon template and value remain. This surviving global class is distinct from the deleted nested class in the missing-provider describe block."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1499,13 +1466,13 @@ class IconFromSvgName {",
+      "sha256": "71927a29d58a1f44221b1886ef48c8cf9af29ecd0c095c92147f2eb445753c46",
+      "judgment": "The eleventh hunk covers two adjacent fixtures: IconWithAriaHiddenFalse and IconWithBindingAndNgIf both retain MatIconModule and their exact templates while dropping HttpClientTestingModule. Neither aria semantics nor modern @if behavior is imported into an owned legacy component."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1514,7 +1481,7 @@ class IconWithBindingAndNgIf {",
+      "sha256": "0cdd073d47f6d809d40a2fd6dd4c647d203bdd3c70ee83123c30b8aac879b0ea",
+      "judgment": "The twelfth hunk removes the testing module from InlineIcon only; its inline template input and false default remain."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1522,7 +1489,7 @@ class InlineIcon {",
+      "sha256": "90ea48394625f9417563643ea242e582632f88322d716159e350c0b35a108326",
+      "judgment": "The thirteenth hunk removes it from SvgIconWithUserContent imports, retaining the SVG binding and projected div content unchanged. No source claim about SVG trust/rendering execution follows."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1530,7 +1497,7 @@ class SvgIconWithUserContent {",
+      "sha256": "765705e967b1b3ccb97e33541ac9bd68fa66f67419b3cecdf95fa797ad83fa4e",
+      "judgment": "The fourteenth hunk removes it from IconWithLigatureAndSvgBinding imports while preserving the mixed SVG/ligature template and iconName declaration."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1538,7 +1505,7 @@ class IconWithLigatureAndSvgBinding {",
+      "sha256": "ccac11fccd109672d1488804e0f408aa97a58f4bf07830dfa2476767fdd3c3d9",
+      "judgment": "The fifteenth hunk removes it from BlankIcon imports and retains MatIconModule plus the MatIcon ViewChild. Across the patch twelve import arrays change (root plus eleven fixtures), one provider call is added and one negative test/assertion is removed; no production icon code changes."
+    }
+  ],
+  "semantics": {
+    "kind": "icon-private-test-http-provider-migration-and-error-regression-removal",
+    "removed_error_case": "'should throw an error when trying to load a remote icon'",
+    "removed_assertions": 1,
+    "old_http_testing_import_arrays": 12,
+    "new_http_testing_provider_calls": 1,
+    "also_removes_nested_svg_fixture": true,
+    "not_an_icon_runtime_fix": true,
+    "before_cases": 61,
+    "after_cases": 60,
+    "before_assertions": 120,
+    "after_assertions": 119
+  },
+  "decision": "The complete fifteen-hunk icon patch migrates private HTTP test setup from HttpClientTestingModule imports to provideHttpClientTesting and deletes the missing-HTTP-provider error regression plus its nested SVG fixture. It also removes private error helper imports; it is not just an API spelling cleanup or an icon implementation fix. The add-on uses public MatIconModule/MatIconHarness in its retained chip/button harness fixtures and owns icon Sass, but defines no MatIcon or MatIconRegistry fork and does not import this upstream private spec. Keep those public dependencies and Sass/native obligations. Do not transplant the removed error assertion, modern HTTP fixture/provider assumptions or private helper. No HTTP/provider error-contract, constructor, SVG trust behavior or inherited peer fix is approved by this source exclusion.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "2b797f2bdc1267361d19dfa3cd07fb996e7a42858b1aedb4887ef1c9e743a372",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete fifteen-hunk icon patch migrates private HTTP test setup from HttpClientTestingModule imports to provideHttpClientTesting and deletes the missing-HTTP-provider error regression plus its nested SVG fixture. It also removes private error helper imports; it is not just an API spelling cleanup or an icon implementation fix. The add-on uses public MatIconModule/MatIconHarness in its retained chip/button harness fixtures and owns icon Sass, but defines no MatIcon or MatIconRegistry fork and does not import this upstream private spec. Keep those public dependencies and Sass/native obligations. Do not transplant the removed error assertion, modern HTTP fixture/provider assumptions or private helper. No HTTP/provider error-contract, constructor, SVG trust behavior or inherited peer fix is approved by this source exclusion.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-peer-test-source-review.mjs",
+        "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+      },
+      {
+        "path": "tests/spec_peer_test_source_probe.mjs",
+        "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+        "sha256": "23ca9d18b86e2d40c4c0fd953ff55b26383de028ab17023eac5b07e1ad8ba71f"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+        "sha256": "e69744b2ab59336779d5189bc865bc19d63641a0fa71d5d0da9d9def85bbaeae"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-controls.json",
+        "sha256": "4f0735fbdcb2568310ae32ac318d4de7080e4c613a7cf678ec864330ce981be3"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-review.json",
+        "sha256": "360eca8ee166009b69483f1e476686bcb34bb16037b10f26fd94bbcb99d73044"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+        "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+        "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+        "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+        "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "b382b60f58db8357bf93f3f45e78cdfa3c5f28d9",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/icon): account for API changes",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=cc94b9fdb71ef2297966f80697abe1fac812bd1e8c064e3c672ed18d03424ad8, bytes=5576). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/icon/icon.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/icon/icon.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/b382b60f58db8357bf93f3f45e78cdfa3c5f28d9.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "cc94b9fdb71ef2297966f80697abe1fac812bd1e8c064e3c672ed18d03424ad8"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-peer-test-source-review.mjs",
+      "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+    },
+    {
+      "path": "tests/spec_peer_test_source_probe.mjs",
+      "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+      "sha256": "23ca9d18b86e2d40c4c0fd953ff55b26383de028ab17023eac5b07e1ad8ba71f"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+      "sha256": "e69744b2ab59336779d5189bc865bc19d63641a0fa71d5d0da9d9def85bbaeae"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-controls.json",
+      "sha256": "4f0735fbdcb2568310ae32ac318d4de7080e4c613a7cf678ec864330ce981be3"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-review.json",
+      "sha256": "360eca8ee166009b69483f1e476686bcb34bb16037b10f26fd94bbcb99d73044"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+      "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+      "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+      "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+      "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    }
+  ],
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
