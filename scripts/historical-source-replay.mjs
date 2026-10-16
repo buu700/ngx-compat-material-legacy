@@ -16,8 +16,15 @@ import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export const HISTORICAL_REPLAY_INPUTS='compatibility/rc/historical-source-replay-inputs.json';
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'8daef14d8f8b92a689720959d48db0b9222fdcee266d578a79c4ab3b44d51240','21.x':'04610412cda4a9df9b75463d54a1e062a6acc39d69ebcecdff09fefbf0f72bbc'};
-const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source'];
+const pins={main:'e3fea6a36bd50ade0236f3785efe20d2522871df01fb75646acb19971dfb7df3','21.x':'98ea0981086004cb9d26b1fcb55bd5fbf5171d0edc7b83427d556c481837c527'};
+const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source'];
+// These six versioned replay-tool members are checked against the caller HEAD,
+// separately from the qualified product/review context. Comparing the registry
+// and its own verifier to that older context would require self-referential hashes.
+// They remain mandatory clean Git subjects; no product, receipt or original probe
+// is admitted through this tooling-only route.
+const toolingPaths=['scripts/historical-source-replay.mjs','scripts/run-historical-source-probe.mjs',HISTORICAL_REPLAY_INPUTS,
+ 'tests/historical_source_replay_probe.mjs','tests/test_historical_source_replay.py','compatibility/rc/historical-source-replay.md'];
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const blobHash=bytes=>createHash('sha1').update('blob '+bytes.length+'\0').update(bytes).digest('hex');
 function environment(){
@@ -31,8 +38,9 @@ function relativePath(path){assert.equal(typeof path,'string');assert.ok(!path.i
 export function historicalReplayInputs({root=rootDefault,readMember}={}){
  const read=readMember||((path)=>readFileSync(resolve(root,path))),bytes=read(HISTORICAL_REPLAY_INPUTS),data=JSON.parse(bytes);
  assert.ok(Object.hasOwn(pins,data.line),'unregistered historical line');assert.equal(hash(bytes),pins[data.line],'historical replay input changed');
- assert.equal(data.schema_version,1);assert.deepEqual(data.entries.map(row=>row.id),ids);assert.equal(new Set(data.entries.map(row=>row.probe)).size,5);
+ assert.equal(data.schema_version,2);assert.deepEqual(data.entries.map(row=>row.id),ids);assert.equal(new Set(data.entries.map(row=>row.probe)).size,6);
  assert.deepEqual(data.mutable_progress_paths,['compatibility/rc/remaining-native-admission-worksheet.json','compatibility/rc/session-handoff.json']);
+ assert.deepEqual(data.current_head_tooling_paths,toolingPaths);
  assert.equal(data.original_js_programs_and_assertions_unchanged,true);assert.equal(data.new_sha_or_authored_use_closures,0);
  return data;
 }
@@ -55,23 +63,31 @@ function sourceFiles(root,prefix){
 }
 export function verifyHistoricalCurrentSubjects({root=rootDefault,data,members,readMember,productPaths}={}){
  const read=readMember||((path)=>{let cursor=root;assert.ok(lstatSync(root).isDirectory()&&!lstatSync(root).isSymbolicLink());for(const part of path.split('/')){cursor=join(cursor,part);assert.ok(!lstatSync(cursor).isSymbolicLink(),'symlink in current source route '+path);}assert.ok(lstatSync(cursor).isFile());return readFileSync(cursor);}),mutable=new Set(data.mutable_progress_paths),wrappers=new Map(data.wrapper_edits.map(row=>[row.path,row]));
- const currentByPath=new Map(members.map(row=>[row.path,row]));let guarded=0;
+ const currentByPath=new Map(members.map(row=>[row.path,row])),tooling=new Set(toolingPaths);let guarded=0;
  for(const member of members){
-  if(mutable.has(member.path))continue;
+  if(mutable.has(member.path)||tooling.has(member.path))continue;
   const bytes=read(member.path),wrapper=wrappers.get(member.path);
   if(wrapper){
-   const original=git(root,['show',data.current_frame.commit+':'+member.path]);assert.equal(blobHash(original),member.blob);assert.equal(hash(original),wrapper.before_sha256);
+   const original=git(root,['show',data.wrapper_reference_commit+':'+member.path]);assert.equal(hash(original),wrapper.before_sha256);
    let proposed=original.toString();for(const edit of wrapper.edits){assert.equal(proposed.split(edit.before).length,2,'wrapper edit not exact');proposed=proposed.replace(edit.before,edit.after);}
    assert.equal(hash(proposed),wrapper.after_sha256);
+   assert.ok([blobHash(original),blobHash(Buffer.from(proposed))].includes(member.blob),'registered wrapper base changed');
    assert.ok(hash(bytes)===wrapper.before_sha256||hash(bytes)===wrapper.after_sha256,'current historical-replay wrapper changed '+member.path);
   }else assert.equal(blobHash(bytes),member.blob,'current historical-replay subject changed '+member.path);
   guarded++;
+ }
+ const toolingCommit=git(root,['rev-parse','HEAD']).toString().trim(),toolingTree=git(root,['rev-parse',toolingCommit+'^{tree}']).toString().trim();
+ for(const path of toolingPaths){
+  assert.ok(currentByPath.has(path),'registered tooling member missing from source frame');
+  const original=git(root,['show',toolingCommit+':'+path]);
+  assert.ok(read(path).equals(original),'current historical-replay tooling changed '+path);guarded++;
  }
  for(const wrapper of wrappers.keys())assert.ok(currentByPath.has(wrapper));
  const product=members.filter(row=>row.path.startsWith('projects/ngx-material-legacy/')).map(row=>row.path).sort();
  assert.deepEqual(productPaths||sourceFiles(root,'projects/ngx-material-legacy'),product,'current product membership changed');
  for(const entry of data.entries){assert.equal(hash(read(entry.probe)),entry.probe_sha256,'original historical probe changed');assert.ok(currentByPath.has(entry.probe));}
  return {line:data.line,guarded_current_members:guarded,current_product_members:product.length,
+  current_tooling_members:toolingPaths.length,tooling_reference:{commit:toolingCommit,tree:toolingTree},
   exact_wrapper_edits_only:true,mutable_progress_paths:[...mutable],current_source_qualification:false,current_native_or_packed_qualification:false};
 }
 export function inspectHistoricalReplayCurrent({root=rootDefault,readMember,productPaths}={}){

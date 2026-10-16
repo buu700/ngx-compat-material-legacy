@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class TabRepairRequalificationTests(unittest.TestCase):
     def test_actual_pipeline_and_cached_before_proposed_controls(self):
-        result = subprocess.run(['node', 'tests/remaining_native_tab_requalification_probe.mjs'],
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'tab-lifecycle-source'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])
