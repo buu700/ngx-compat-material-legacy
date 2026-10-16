@@ -1,12 +1,12 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "line": "21.x",
   "scope": "Finite original historical source probes only. Current-source coherence is mandatory; historical execution never admits current source, runtime, compiler, peer floors or G11.",
   "current_frame": {
-    "commit": "e56b1d2612b58f7c5b88dcc4b7e228290a530c32",
-    "tree": "9017fdbc26999a82421548d1ebd13b87731ed168",
-    "tree_listing_sha256": "9f9c8b27c726670408fd4337367d4077051007dde7a2a74e17c9066e82c17474",
-    "members": 6484
+    "commit": "471306ba07ceee2c57e2c1d04d56b24126a92f6e",
+    "tree": "50b04a7137e3080c283d4a8924649edb17f60ec1",
+    "tree_listing_sha256": "66fbb6c33c20a1b61aec1d8408dece7cc2e3f0e360a3ecf9aff1ca9b90c0aef2",
+    "members": 6524
   },
   "mutable_progress_paths": [
     "compatibility/rc/remaining-native-admission-worksheet.json",
@@ -280,6 +280,18 @@
       },
       "timeout_ms": 60000,
       "report_source": "stdout-json"
+    },
+    {
+      "id": "historical-native-admission",
+      "probe": "tests/upstream/historical-behavior-admission.mjs",
+      "probe_sha256": "51edcfb0987e9f57c586d98732c6e42696bb6f3d7d4c8905c82ed8f03ac0fde0",
+      "frame": {
+        "commit": "e257d3a38a76aec511baaa3f0e9b90cfd38e5b00",
+        "tree": "276c89b171078f095b3caba3853a99084af19b22",
+        "tree_listing_sha256": "d006bae7f5e46b6b8537021594e443a0d3fe8d0d87ab4fd687665f2a8293eb58",
+        "members": 5776
+      },
+      "timeout_ms": 180000
     }
   ],
   "wrapper_edits": [
@@ -519,6 +531,18 @@
         {
           "before": "['node', 'tests/spec_wide_fixture_adapter_qualification_probe.mjs']",
           "after": "['node', 'scripts/run-historical-source-probe.mjs', 'wide-fixture-adapter-context']"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_upstream_historical_behavior.py",
+      "reference_commit": "e257d3a38a76aec511baaa3f0e9b90cfd38e5b00",
+      "before_sha256": "07a52ab7d9832236ed0ec250421525621d82df384959037e2210185368c2fa33",
+      "after_sha256": "9dbc6222b45861095138c79914b323a437e18815d883e3e4415676a8167a6a77",
+      "edits": [
+        {
+          "before": "['node', 'tests/upstream/historical-behavior-admission.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'historical-native-admission']"
         }
       ]
     }
