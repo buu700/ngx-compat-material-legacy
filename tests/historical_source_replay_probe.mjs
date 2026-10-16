@@ -15,6 +15,7 @@ import {fileURLToPath} from 'node:url';
 import {HISTORICAL_REPLAY_INPUTS,historicalReplayInputs,historicalFrameMembers,inspectHistoricalReplayCurrent,verifyHistoricalCurrentSubjects} from '../scripts/historical-source-replay.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=path=>readFileSync(resolve(root,path)),hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const result=inspectHistoricalReplayCurrent({root}),{data,members,guard}=result,cache=new Map(members.filter(row=>!data.mutable_progress_paths.includes(row.path)).map(row=>[row.path,read(row.path)]));
+const originalEntries=data.entries.slice(0,13),originalWrappers=data.wrapper_edits.slice(0,11);
 const productPaths=members.filter(row=>row.path.startsWith('projects/ngx-material-legacy/')).map(row=>row.path).sort(),cases=[];
 const cached=path=>cache.get(path)||read(path),inspect=readMember=>verifyHistoricalCurrentSubjects({root,data,members,readMember,productPaths});
 assert.deepEqual(inspect(cached),guard);
@@ -31,8 +32,8 @@ for(const path of [
  'compatibility/f10/authored-dependency-dispositions.json',
  'compatibility/f10/authored-dependency-current-dispositions.json',
  'compatibility/rc/remaining-native-admission-tab-repair-source-context-proof.json',
- ...data.entries.map(row=>row.probe),
- ...data.wrapper_edits.map(row=>row.path),
+ ...originalEntries.map(row=>row.probe),
+ ...originalWrappers.map(row=>row.path),
  ...data.current_head_tooling_paths,
 ]){
  const before=cached(path),changed=Buffer.concat([before,Buffer.from('\n// unreviewed caller data\n')]);
@@ -43,7 +44,7 @@ for(const path of ['projects/ngx-material-legacy/legacy-tabs/internal/tab-body-b
  const older=git(['show',data.entries[0].frame.commit+':'+path]);assert.notDeepEqual(older,cached(path));
  assert.throws(()=>inspect(name=>name===path?older:cached(name)),/changed/);cases.push({id:'authentic-old-caller-subject-is-not-replaced-'+path,result:'rejected'});
 }
-for(const wrapper of data.wrapper_edits){
+for(const wrapper of originalWrappers){
  const before=git(['show',(wrapper.reference_commit||data.wrapper_reference_commit)+':'+wrapper.path]);assert.deepEqual(inspect(name=>name===wrapper.path?before:cached(name)),guard);
  let next=before.toString();for(const edit of wrapper.edits)next=next.replace(edit.before,edit.after);
  assert.deepEqual(inspect(name=>name===wrapper.path?Buffer.from(next):cached(name)),guard);cases.push({id:'exact-before-and-command-only-wrapper-'+wrapper.path,result:'pass'});
@@ -57,6 +58,17 @@ for(const field of ['tree','tree_listing_sha256','members']){
 }
 const invalid=spawnSync(process.execPath,['scripts/run-historical-source-probe.mjs','unregistered'],{cwd:root,encoding:'utf8'});
 assert.equal(invalid.status,1);assert.match(invalid.stderr,/unregistered historical probe/);cases.push({id:'actual-cli-rejects-unregistered-probe',result:'rejected'});
-const report={schema_version:4,line:data.line,scope:'Actual current coherence guard and exact wrapper/reference checks with cached original bytes. No historical program, build, installer, peer, browser or runtime qualification in these controls.',current_guard:guard,registered_original_programs:13,controls:cases.length,cases,inputs_sha256:hash(read(HISTORICAL_REPLAY_INPUTS)),helper_sha256:hash(read('scripts/historical-source-replay.mjs')),cli_sha256:hash(read('scripts/run-historical-source-probe.mjs')),producer_sha256:hash(read('tests/historical_source_replay_probe.mjs')),actual_current_source_or_native_or_packed_qualified:false,g11_claim:'not-passed'};
+assert.equal(cases.length,60);
+assert.deepEqual(cases,JSON.parse(read('compatibility/rc/historical-source-replay-control-cases-controls.json')).cases,'prior60 controls changed');
+for(const path of [...data.entries.slice(13).map(row=>row.probe),...data.wrapper_edits.slice(11).map(row=>row.path)]){
+ const changed=Buffer.concat([cached(path),Buffer.from('\n// unreviewed new replay subject\n')]);
+ assert.throws(()=>inspect(name=>name===path?changed:cached(name)),/changed/,path);cases.push({id:'added-frame-changed-subject-'+path,result:'rejected'});
+}
+for(const wrapper of data.wrapper_edits.slice(11)){
+ const before=git(['show',wrapper.reference_commit+':'+wrapper.path]);assert.deepEqual(inspect(name=>name===wrapper.path?before:cached(name)),guard);
+ let after=before.toString();for(const edit of wrapper.edits)after=after.replace(edit.before,edit.after);
+ assert.deepEqual(inspect(name=>name===wrapper.path?Buffer.from(after):cached(name)),guard);cases.push({id:'added-frame-exact-command-only-wrapper-'+wrapper.path,result:'pass'});
+}
+const report={schema_version:5,line:data.line,scope:'Actual current coherence guard and exact wrapper/reference checks with cached original bytes. No historical program, build, installer, peer, browser or runtime qualification in these controls.',current_guard:guard,registered_original_programs:18,controls:cases.length,cases,inputs_sha256:hash(read(HISTORICAL_REPLAY_INPUTS)),helper_sha256:hash(read('scripts/historical-source-replay.mjs')),cli_sha256:hash(read('scripts/run-historical-source-probe.mjs')),producer_sha256:hash(read('tests/historical_source_replay_probe.mjs')),actual_current_source_or_native_or_packed_qualified:false,g11_claim:'not-passed'};
 const out=process.argv.indexOf('--out');if(out>=0)writeFileSync(process.argv[out+1],JSON.stringify(report,null,2)+'\n',{flag:'wx'});
 console.log(JSON.stringify({line:data.line,controls:cases.length,current_members:guard.guarded_current_members,current_product_members:guard.current_product_members,historical_probes_executed:0,actual_current_native_or_packed_qualified:false}));
