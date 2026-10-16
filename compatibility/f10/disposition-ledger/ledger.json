@@ -29192,19 +29192,130 @@
       "sha": "0affe5aaa704fa0bf923b1be3266515e41d5e350",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/datepicker): switch tests away from fakeAsync (#32903)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=24915c0a2520b1e3f54d84d6e887f71c65705929157fd70f36e2baabce9e9bc2, bytes=101601). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/datepicker/date-range-input.spec.ts, src/material/datepicker/datepicker-actions.spec.ts, src/material/datepicker/datepicker.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private datepicker scheduler migration after individual review of all135 hunks in three complete files. All195 cases and33 hooks pair in full file/suite/mode/occurrence and registration order;89 callback bodies retain complete semantics and106 change. Every timing/detection/wrapper/await boundary is explicitly recorded. Two focus cases remove the explicit pane-open truthiness assertion and move final matcher messages; the focus-inside and restored/disabled-restoration predicates remain. Native50ms opening/200ms closing observations do not prove the old simulated deadlines or focus lifecycle. The ALT+DOWN no-datepicker nonthrow observer differs only in its nested timing boundary after the finite projection. All37 fixture classes and36 template/style properties remain raw-byte identical. Preserve the owned historical M2 datepicker Sass and actual public-peer integration with legacy form/input controls. Cyph imports MatDatepickerModule and renders datepicker/toggle controls alongside retained legacy inputs. Absence of an owned datepicker TypeScript implementation is not an exclusion or inherited runtime pass. No component fork, API/HTML/selector/CSS/SCSS change or consumer edit is justified. Actual public-peer focus, dismissal, forms, mixed theme, packed/browser and minimum-floor gates remain required.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/material/datepicker/date-range-input.spec.ts",
         "src/material/datepicker/datepicker-actions.spec.ts",
         "src/material/datepicker/datepicker.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0affe5aaa704fa0bf923b1be3266515e41d5e350.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-0affe5aaa704fa0bf923b1be3266515e41d5e350.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T21:45:34.572273+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "24915c0a2520b1e3f54d84d6e887f71c65705929157fd70f36e2baabce9e9bc2"
+      "patch_sha256": "24915c0a2520b1e3f54d84d6e887f71c65705929157fd70f36e2baabce9e9bc2",
+      "source_check": {
+        "kind": "individual-complete-original-date-tooltip-slider-fixture-source-review",
+        "diff_sha256": "e23855b20aa8d34737e8d1622f6059046ccc6b501dded221b0cbe55d7f8a3c77",
+        "evidence_report_sha256": "2b39a90aaafc187a9918a6b7e084ff2975c9bc2eeba2cd2a23324c4e1d9f5c0c"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "e23855b20aa8d34737e8d1622f6059046ccc6b501dded221b0cbe55d7f8a3c77",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private datepicker scheduler migration after individual review of all135 hunks in three complete files. All195 cases and33 hooks pair in full file/suite/mode/occurrence and registration order;89 callback bodies retain complete semantics and106 change. Every timing/detection/wrapper/await boundary is explicitly recorded. Two focus cases remove the explicit pane-open truthiness assertion and move final matcher messages; the focus-inside and restored/disabled-restoration predicates remain. Native50ms opening/200ms closing observations do not prove the old simulated deadlines or focus lifecycle. The ALT+DOWN no-datepicker nonthrow observer differs only in its nested timing boundary after the finite projection. All37 fixture classes and36 template/style properties remain raw-byte identical. Preserve the owned historical M2 datepicker Sass and actual public-peer integration with legacy form/input controls. Cyph imports MatDatepickerModule and renders datepicker/toggle controls alongside retained legacy inputs. Absence of an owned datepicker TypeScript implementation is not an exclusion or inherited runtime pass. No component fork, API/HTML/selector/CSS/SCSS change or consumer edit is justified. Actual public-peer focus, dismissal, forms, mixed theme, packed/browser and minimum-floor gates remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-date-tooltip-slider-source-review.mjs",
+            "sha256": "cd01bbfbe2eab5210e869164edf7382fcb47cc8249c9a24f44b51d7828410a72"
+          },
+          {
+            "path": "tests/spec_date_tooltip_slider_source_probe.mjs",
+            "sha256": "e0085698046c9b2d3b6252ad24e3a63cb8c0b5554c91674de259b973b127f757"
+          },
+          {
+            "path": "tests/test_spec_date_tooltip_slider_source.py",
+            "sha256": "2734e9242bc9dc052b88f5f653e1a2608cd834e716a3cfeafe2915d51f300f8e"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-qualification-inspector.py",
+            "sha256": "fd616bb0e9d9b100830cc42a86c68e0cce3bba40e67d8462406da7357358b1d9"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz",
+            "sha256": "c198d23bd997dda6fa5115f413eeed2863abee04a3357075d6a86fae3e317960"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-acquisition.json.gz",
+            "sha256": "f05338b6b7912c26bd66fd217455f3edb9993e5dfcfddabf64ebff8a6fb0b3f1"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-observation-pins.json",
+            "sha256": "2285c73f7df75fdec78233c659d350f055a5e168db453b9d5a665aee6846f199"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-prior.json.gz",
+            "sha256": "c544e47e26adb67f191bec7b499762cf8397f6be4a8f8d911dfe7893b74006eb"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-review.json.gz",
+            "sha256": "d2ea0e9c6f766e4381441a178801675e9c36c5c4ddba6f76343a8ddff3a599ac"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-controls.json",
+            "sha256": "954ddb3348be4bf6e743bb9471b245b6c9643e956f5269af3533976879b16443"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-python.log.gz",
+            "sha256": "01554f16ebcbbad82ff3841c8c4ed609ef287ce95326acb2602ab8ad3b66ac86"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-cyph-sanity.json",
+            "sha256": "10f008c37068891eeb270d28a122ccfd927e5bc82817beddfaa3dfba49442d62"
+          },
+          {
+            "path": "compatibility/rc/spec-overlay-async-source-checkpoint.json",
+            "sha256": "13f66ee75f6e43e60feae59dacf703aaa04b84460ce1113020fa9a5486ec794b"
+          },
+          {
+            "path": "compatibility/rc/spec-overlay-async-source-replay-checkpoint.json",
+            "sha256": "e000db87affaea3f5cb759d67ba9865483a1f97ce22ff88f5ed44136594ac729"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+            "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+            "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+            "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+            "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/datepicker/_datepicker-theme.scss",
+            "sha256": "eb040074a9659058b64e4594018400e855a546d0d94ef040fff6e9e8fc77b948"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "1597a2d85049e53e67eabdaa7f37efd1cfaad93e",
@@ -29557,18 +29668,129 @@
       "sha": "5ad259a25e4b6d6346ee62954fe461f4500c9cee",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/slider): switch tests away from fakeAsync (#32952)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=f4ba703d330d685f3073131c44b3ba7385dd9d21780920212e34e2db463709b6, bytes=48928). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/slider/slider.spec.ts, src/material/slider/testing/slider-harness.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/material/slider/slider.spec.ts",
         "src/material/slider/testing/slider-harness.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/5ad259a25e4b6d6346ee62954fe461f4500c9cee.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-5ad259a25e4b6d6346ee62954fe461f4500c9cee.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T21:45:34.573649+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "f4ba703d330d685f3073131c44b3ba7385dd9d21780920212e34e2db463709b6"
+      "patch_sha256": "f4ba703d330d685f3073131c44b3ba7385dd9d21780920212e34e2db463709b6",
+      "source_check": {
+        "kind": "individual-complete-original-date-tooltip-slider-fixture-source-review",
+        "diff_sha256": "5da01039cdf98b22f163c51ddeb69bed795c9da542451d4e1e2602fc114ae4de",
+        "evidence_report_sha256": "0050bee15a673ebb082129799a4fc7e589adbce47c06d9ae331cf42ebbb4496f"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "5da01039cdf98b22f163c51ddeb69bed795c9da542451d4e1e2602fc114ae4de",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-date-tooltip-slider-source-review.mjs",
+            "sha256": "cd01bbfbe2eab5210e869164edf7382fcb47cc8249c9a24f44b51d7828410a72"
+          },
+          {
+            "path": "tests/spec_date_tooltip_slider_source_probe.mjs",
+            "sha256": "e0085698046c9b2d3b6252ad24e3a63cb8c0b5554c91674de259b973b127f757"
+          },
+          {
+            "path": "tests/test_spec_date_tooltip_slider_source.py",
+            "sha256": "2734e9242bc9dc052b88f5f653e1a2608cd834e716a3cfeafe2915d51f300f8e"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-qualification-inspector.py",
+            "sha256": "fd616bb0e9d9b100830cc42a86c68e0cce3bba40e67d8462406da7357358b1d9"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz",
+            "sha256": "c198d23bd997dda6fa5115f413eeed2863abee04a3357075d6a86fae3e317960"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-acquisition.json.gz",
+            "sha256": "f05338b6b7912c26bd66fd217455f3edb9993e5dfcfddabf64ebff8a6fb0b3f1"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-observation-pins.json",
+            "sha256": "2285c73f7df75fdec78233c659d350f055a5e168db453b9d5a665aee6846f199"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-prior.json.gz",
+            "sha256": "c544e47e26adb67f191bec7b499762cf8397f6be4a8f8d911dfe7893b74006eb"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-review.json.gz",
+            "sha256": "d2ea0e9c6f766e4381441a178801675e9c36c5c4ddba6f76343a8ddff3a599ac"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-controls.json",
+            "sha256": "954ddb3348be4bf6e743bb9471b245b6c9643e956f5269af3533976879b16443"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-python.log.gz",
+            "sha256": "01554f16ebcbbad82ff3841c8c4ed609ef287ce95326acb2602ab8ad3b66ac86"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-cyph-sanity.json",
+            "sha256": "10f008c37068891eeb270d28a122ccfd927e5bc82817beddfaa3dfba49442d62"
+          },
+          {
+            "path": "compatibility/rc/spec-overlay-async-source-checkpoint.json",
+            "sha256": "13f66ee75f6e43e60feae59dacf703aaa04b84460ce1113020fa9a5486ec794b"
+          },
+          {
+            "path": "compatibility/rc/spec-overlay-async-source-replay-checkpoint.json",
+            "sha256": "e000db87affaea3f5cb759d67ba9865483a1f97ce22ff88f5ed44136594ac729"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+            "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+            "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+            "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+            "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/datepicker/_datepicker-theme.scss",
+            "sha256": "eb040074a9659058b64e4594018400e855a546d0d94ef040fff6e9e8fc77b948"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "75ef78451f2ae49b916c494d7a898707d7051acf",
@@ -30041,18 +30263,129 @@
       "sha": "39b0f5521960f93af96943968961f1ba3e241307",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/tooltip): switch tests away from fakeAsync (#33100)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=128b3a7199b925d8f7868b2d9c0c9534d4fdd50f839dfbbb4122f3fdb44dda31, bytes=49247). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/tooltip/tooltip.spec.ts, src/material/tooltip/tooltip.zone.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/material/tooltip/tooltip.spec.ts",
         "src/material/tooltip/tooltip.zone.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/39b0f5521960f93af96943968961f1ba3e241307.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-39b0f5521960f93af96943968961f1ba3e241307.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T21:45:34.573030+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "128b3a7199b925d8f7868b2d9c0c9534d4fdd50f839dfbbb4122f3fdb44dda31"
+      "patch_sha256": "128b3a7199b925d8f7868b2d9c0c9534d4fdd50f839dfbbb4122f3fdb44dda31",
+      "source_check": {
+        "kind": "individual-complete-original-date-tooltip-slider-fixture-source-review",
+        "diff_sha256": "cac83ee0420a613e7e1afcd21211b9c1e6b2763edca066c2850fb3f134e7415b",
+        "evidence_report_sha256": "16923c98a41358cfbc913687ba380c789eb302c4f2353d215a0af670da83dcd4"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "cac83ee0420a613e7e1afcd21211b9c1e6b2763edca066c2850fb3f134e7415b",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-date-tooltip-slider-source-review.mjs",
+            "sha256": "cd01bbfbe2eab5210e869164edf7382fcb47cc8249c9a24f44b51d7828410a72"
+          },
+          {
+            "path": "tests/spec_date_tooltip_slider_source_probe.mjs",
+            "sha256": "e0085698046c9b2d3b6252ad24e3a63cb8c0b5554c91674de259b973b127f757"
+          },
+          {
+            "path": "tests/test_spec_date_tooltip_slider_source.py",
+            "sha256": "2734e9242bc9dc052b88f5f653e1a2608cd834e716a3cfeafe2915d51f300f8e"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-qualification-inspector.py",
+            "sha256": "fd616bb0e9d9b100830cc42a86c68e0cce3bba40e67d8462406da7357358b1d9"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz",
+            "sha256": "c198d23bd997dda6fa5115f413eeed2863abee04a3357075d6a86fae3e317960"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-acquisition.json.gz",
+            "sha256": "f05338b6b7912c26bd66fd217455f3edb9993e5dfcfddabf64ebff8a6fb0b3f1"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-observation-pins.json",
+            "sha256": "2285c73f7df75fdec78233c659d350f055a5e168db453b9d5a665aee6846f199"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-prior.json.gz",
+            "sha256": "c544e47e26adb67f191bec7b499762cf8397f6be4a8f8d911dfe7893b74006eb"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-review.json.gz",
+            "sha256": "d2ea0e9c6f766e4381441a178801675e9c36c5c4ddba6f76343a8ddff3a599ac"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-controls.json",
+            "sha256": "954ddb3348be4bf6e743bb9471b245b6c9643e956f5269af3533976879b16443"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-python.log.gz",
+            "sha256": "01554f16ebcbbad82ff3841c8c4ed609ef287ce95326acb2602ab8ad3b66ac86"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-cyph-sanity.json",
+            "sha256": "10f008c37068891eeb270d28a122ccfd927e5bc82817beddfaa3dfba49442d62"
+          },
+          {
+            "path": "compatibility/rc/spec-overlay-async-source-checkpoint.json",
+            "sha256": "13f66ee75f6e43e60feae59dacf703aaa04b84460ce1113020fa9a5486ec794b"
+          },
+          {
+            "path": "compatibility/rc/spec-overlay-async-source-replay-checkpoint.json",
+            "sha256": "e000db87affaea3f5cb759d67ba9865483a1f97ce22ff88f5ed44136594ac729"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+            "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+            "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+            "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+            "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/datepicker/_datepicker-theme.scss",
+            "sha256": "eb040074a9659058b64e4594018400e855a546d0d94ef040fff6e9e8fc77b948"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "b04751caf2ec3f0b8f8d8ef17dd6e5a8c34adfd6",
