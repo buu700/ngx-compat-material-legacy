@@ -11,6 +11,7 @@ import {readEvidenceMember, validatePackedConsumerRun} from './upstream-packed-r
 import {SELECT_FOCUS_CLICK_CASE_ID, packedSelectFocusClickCase} from './select-focus-click-packed-contract.mjs';
 import {SELECT_DETACH_CASE_ID, packedSelectDetachCase} from './select-detach-packed-contract.mjs';
 import {TABLE_ONPUSH_CASE_ID, packedTableOnPushCase} from './table-onpush-packed-contract.mjs';
+import {CHIP_DISABLED_CASE_ID,MENU_LAZY_CASE_ID,TOOLTIP_CONTAINER_CASE_ID,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-packed-contract.mjs';
 
 export const ARTIFACT_BEHAVIOR_KIND = 'artifact-required-individual-behavior';
 export const SELECT_FOCUS_SHA = '1b6db8c89b00ace8aaa0e0824866acec5369635f';
@@ -22,6 +23,8 @@ export const SELECT_FOCUS_MEMBERS = Object.freeze([
   'projects/ngx-material-legacy/legacy-form-field/form-field.html',
   'scripts/packed-consumer-aot-smoke.mjs',
   'scripts/packed-consumer-evidence.mjs',
+  'scripts/chip-menu-tooltip-packed-contract.mjs',
+  'scripts/upstream-artifact-behavior-evidence.mjs',
   'scripts/select-focus-click-packed-fixture.mjs',
   'scripts/select-focus-click-packed-contract.mjs',
   'compatibility/rc/matrices/library-exports.json',
@@ -33,6 +36,7 @@ export const TABLE_ONPUSH_SHA = 'ca9c490ee30dbf7c9c147079197d0dbc0abcd611';
 export const TABLE_ONPUSH_PATCH = '3630c1798278c09cfd65afa8a4d5853034cfd2a0bd67eff9dc2edd6aa4d8808f';
 const producerMembers = [
   'scripts/packed-consumer-aot-smoke.mjs', 'scripts/packed-consumer-evidence.mjs',
+  'scripts/chip-menu-tooltip-packed-contract.mjs', 'scripts/upstream-artifact-behavior-evidence.mjs',
   'compatibility/rc/matrices/library-exports.json', 'compatibility/rc/matrices/full-verify.json',
 ];
 export const SELECT_DETACH_MEMBERS = Object.freeze([
@@ -52,6 +56,50 @@ export const TABLE_ONPUSH_MEMBERS = Object.freeze([
   'compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs',
   'compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs', ...producerMembers,
 ]);
+export const CHIP_DISABLED_SHA='86ebb9bfd55e637be1e6d0117a10e290c5247ebd';
+export const CHIP_DISABLED_PATCH='d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21';
+export const CHIP_DISABLED_MEMBERS=Object.freeze([
+  'projects/ngx-material-legacy/legacy-chips/chip.ts',
+  'projects/ngx-material-legacy/legacy-chips/chip-list.ts',
+  'projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts',
+  'reference/material-16.2.14/chips-keyboard-sources/chip.ts',
+  'reference/material-16.2.14/chip-blur-sources/chip-list.ts', ...producerMembers,
+]);
+export const MENU_LAZY_SHA='86a96c9290e3896485c6b6c0d039873652f543df';
+export const MENU_LAZY_PATCH='43ed5d9c6e88c0275fd0acd049ddeb31a34f56e1268806db5c5b65371afa9c29';
+export const MENU_LAZY_MEMBERS=Object.freeze([
+  'projects/ngx-material-legacy/legacy-menu/menu.ts',
+  'projects/ngx-material-legacy/legacy-menu/menu-trigger.ts',
+  'projects/ngx-material-legacy/legacy-menu/menu-content.ts',
+  'projects/ngx-material-legacy/legacy-menu/menu.html',
+  'projects/ngx-material-legacy/legacy-menu/menu.scss',
+  'projects/ngx-material-legacy/legacy-menu/menu.spec.ts',
+  'projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts',
+  'projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts',
+  'projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts',
+  'projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts',
+  'projects/ngx-material-legacy/legacy-core/internal/motion-event.ts',
+  'compatibility/rc/menu-overlay-exit-original-trigger.ts.gz',
+  'compatibility/rc/menu-overlay-exit-original-animations.ts.gz',
+  'compatibility/rc/menu-overlay-exit-source-proof.json',
+  'compatibility/rc/menu-overlay-exit-accepted-protocol.json',
+  'compatibility/rc/menu-overlay-exit-native-accepted.json',
+  'scripts/native-motion-consumer.ts','scripts/native-motion-roster.mjs', ...producerMembers,
+]);
+export const TOOLTIP_CONTAINER_SHA='68b267dd59f3addf92a3b9f8ce9e8baa479df7f4';
+export const TOOLTIP_CONTAINER_PATCH='18b8d7b47b2f26e04cf1d50df6cc26d773af0cb8760c9f1015487e4af356cd90';
+export const TOOLTIP_CONTAINER_MEMBERS=Object.freeze([
+  'projects/ngx-material-legacy/legacy-tooltip/tooltip.ts',
+  'projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts',
+  'projects/ngx-material-legacy/legacy-tooltip/tooltip.html',
+  'projects/ngx-material-legacy/legacy-tooltip/tooltip.scss',
+  'projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts',
+  'reference/material-16.2.14/tooltip-render-sources/tooltip.ts',
+  'compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-portal.mjs',
+  'compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-_portal-directives-chunk.d.ts',
+  'compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-portal.mjs',
+  'compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-_portal-directives-chunk.d.ts', ...producerMembers,
+]);
 const scopes = new Map([
   [SELECT_FOCUS_SHA, {patch: SELECT_FOCUS_PATCH, kind: 'select-focus-before-click', members: SELECT_FOCUS_MEMBERS,
     caseId: SELECT_FOCUS_CLICK_CASE_ID, harness: 'selectFocusClick', evaluate: packedSelectFocusClickCase}],
@@ -59,7 +107,19 @@ const scopes = new Map([
     caseId: SELECT_DETACH_CASE_ID, harness: 'selectScrollDetach', evaluate: packedSelectDetachCase}],
   [TABLE_ONPUSH_SHA, {patch: TABLE_ONPUSH_PATCH, kind: 'table-no-data-row-on-push', members: TABLE_ONPUSH_MEMBERS,
     caseId: TABLE_ONPUSH_CASE_ID, harness: 'tableOnPushRendering', evaluate: packedTableOnPushCase}],
+  [CHIP_DISABLED_SHA,{patch:CHIP_DISABLED_PATCH,kind:'chip-disabled-own-input-isolation',members:CHIP_DISABLED_MEMBERS,
+    caseId:CHIP_DISABLED_CASE_ID,harness:'chipDisabledObservation',legacyField:'chipDisabledIsolation',evaluate:packedChipDisabledCase}],
+  [MENU_LAZY_SHA,{patch:MENU_LAZY_PATCH,kind:'menu-lazy-owned-view-detach',members:MENU_LAZY_MEMBERS,
+    caseId:MENU_LAZY_CASE_ID,harness:'menuLazyObservation',legacyField:'lazyMenuLifecycle',evaluate:packedMenuLazyCase}],
+  [TOOLTIP_CONTAINER_SHA,{patch:TOOLTIP_CONTAINER_PATCH,kind:'tooltip-eager-view-container',members:TOOLTIP_CONTAINER_MEMBERS,
+    caseId:TOOLTIP_CONTAINER_CASE_ID,harness:'tooltipContainerObservation',legacyField:'tooltipOriginalEagerDependencies',evaluate:packedTooltipContainerCase}],
 ]);
+/** Read-only finite metadata for individual source review and focused validation. */
+export function artifactBehaviorRequirements(sha){
+  const row=scopes.get(sha);
+  return row?{sha,patch:row.patch,kind:row.kind,case_ids:[row.caseId],members:[...row.members],
+    harness:row.harness,legacy_field:row.legacyField||null}:null;
+}
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const demand = (value, message) => { if (!value) throw new Error(message); };
 const sameIds = (actual, expected) => Array.isArray(actual) && actual.length === expected.length
@@ -105,6 +165,10 @@ export function validateArtifactBehavior({root, entry, proof, request}) {
       demand(selected?.legacy_harness_passed === true && harness?.selectOpened === true && harness.selectClosed === true
         && harness.viewportShared === true && isDeepStrictEqual(harness.selectFocusClick, selected.observation)
         && packedSelectFocusClickCase(selected.observation).result === 'pass', 'insufficient select focus/click observations');
+    } else if (registered.legacyField) {
+      demand(selected?.legacy_harness_passed === true && harness?.[registered.legacyField] === true
+        && isDeepStrictEqual(harness?.[registered.harness], selected.observation)
+        && registered.evaluate(selected.observation).result === 'pass', 'insufficient ' + registered.kind + ' observations');
     } else {
       demand(selected && isDeepStrictEqual(harness?.[registered.harness], selected.observation)
         && registered.evaluate(selected.observation).result === 'pass', 'insufficient ' + registered.kind + ' observations');
