@@ -1,0 +1,408 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "8e091797f8664cf99af86a5c7c4d5615734fcaf1",
+  "subject": "build: fix failing test (#30443)",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a1ea6491643678c1221e59a9f7f826f905b7b4af",
+      "after_blob": "6a0f4d610fbdcb4c525229689269ed5833a4a8f7"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 1,
+  "raw_commit_sha256": "b2cf6c434b85620a3c0c526886edc41f57fe0ebaea53f9e9e099869686cbee3b",
+  "original_sources": [
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "before": {
+        "git_blob": "a1ea6491643678c1221e59a9f7f826f905b7b4af",
+        "sha256": "4b3ea597faa3ce42ee656e18a23d8338275eda4a21c18fa8616f2a8606603bef",
+        "bytes": 40665
+      },
+      "after": {
+        "git_blob": "6a0f4d610fbdcb4c525229689269ed5833a4a8f7",
+        "sha256": "740696fd09b5f7e6a42f733788ca8ecc04c564a6a6541dbac5bb4b361b448461",
+        "bytes": 40686
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/chips/chip-listbox.spec.ts b/src/material/chips/chip-listbox.spec.ts\nindex a1ea6491643678c1221e59a9f7f826f905b7b4af..6a0f4d610fbdcb4c525229689269ed5833a4a8f7 100644\n--- a/src/material/chips/chip-listbox.spec.ts\n+++ b/src/material/chips/chip-listbox.spec.ts\n@@ -1050,6 +1050,7 @@ class MultiSelectionChipListbox {\n         </mat-chip-option>\n       </mat-chip-listbox>\n   `,\n+  standalone: false,\n })\n class AsyncMultiSelectionChipListbox {\n   private _chipsSubject = new BehaviorSubject(['tutorial-1', 'tutorial-2', 'tutorial-3']);\n",
+  "diff_sha256": "fd4b410c3cd8c5b71315f1e656a9df1d88ddc58b27b4cb5f87049fde03c6b142",
+  "hunk_reviews": [
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -1050,6 +1050,7 @@ class MultiSelectionChipListbox {",
+      "sha256": "d160cacac2faad6e4526fe0f8030498dd01169cdaa8e5cfcbe5613c6ccd41fcc",
+      "judgment": "The sole decorator hunk adds standalone:false to AsyncMultiSelectionChipListbox and leaves the complete remaining file unchanged. Component metadata changes must be reviewed as such. Current source absence and actual adapter behavior address this particular test declaration; no standalone default or chip runtime equivalence is inferred across all Angular versions."
+    }
+  ],
+  "semantics": {
+    "kind": "fixture-ngmodule-metadata-repair",
+    "metadata_default_changes": true,
+    "all_other_source_bytes_preserved": true,
+    "ordinary_type_only_cleanup": false
+  },
+  "decision": "The complete original patch adds standalone:false to the private modern AsyncMultiSelectionChipListbox fixture. It changes Angular component metadata and is not type-only. That class and the modern chip-listbox fixture are absent from the owned historical chip suite. The actual historical test adapter already inserts standalone:false only when metadata omits standalone, and preserves explicit true and false; three executed source adapter controls cover those cases. Keep the independently owned legacy chip list and existing adapter. This conclusion neither imports the modern fixture nor proves actual Angular forms/chip behavior or compiler/peer floors.",
+  "prior_entry": {
+    "sha": "8e091797f8664cf99af86a5c7c4d5615734fcaf1",
+    "bucket": "test-only-batch-candidate",
+    "subject": "build: fix failing test (#30443)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=ea6ca035de473f34fe3408e15c490b8733452e3e81d529307040baaf6a02aa9c, bytes=496). Changed paths are only unit specs (src/material/chips/chip-listbox.spec.ts). Subject prefix is 'build', but the patch body has no production runtime, style, public API, harness implementation, or config hunks. This package does not ship or depend on upstream Material unit-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/chips/chip-listbox.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/8e091797f8664cf99af86a5c7c4d5615734fcaf1.json",
+    "batch_id": "test-only-residual-needs-triage-docs-2026-10-01",
+    "recorded_at_utc": "2026-10-01T19:02:59Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "ea6ca035de473f34fe3408e15c490b8733452e3e81d529307040baaf6a02aa9c"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "fd4b410c3cd8c5b71315f1e656a9df1d88ddc58b27b4cb5f87049fde03c6b142",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete original patch adds standalone:false to the private modern AsyncMultiSelectionChipListbox fixture. It changes Angular component metadata and is not type-only. That class and the modern chip-listbox fixture are absent from the owned historical chip suite. The actual historical test adapter already inserts standalone:false only when metadata omits standalone, and preserves explicit true and false; three executed source adapter controls cover those cases. Keep the independently owned legacy chip list and existing adapter. This conclusion neither imports the modern fixture nor proves actual Angular forms/chip behavior or compiler/peer floors.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-small-source-review.mjs",
+        "sha256": "a3f8c6ea65db0588648675819751fc76df41001b0ac160099b87de6ae00e3b16"
+      },
+      {
+        "path": "tests/spec_small_source_probe.mjs",
+        "sha256": "385b82de643416a5c54c82016a79367cd4b84c2f3ec548d0bdb19b2056f36f62"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-subjects.json.gz",
+        "sha256": "055c40ba3907191e258676b4ebff84ea5d233fb5c00bb877eac0f525dcf5ccfd"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-acquisition.json.gz",
+        "sha256": "f71a905296710e45c15a2e6bfb3766a741061aebb39b8d55e7aa7d48fa6a8200"
+      },
+      {
+        "path": "compatibility/rc/spec-small-fixture-prior.json.gz",
+        "sha256": "da83db9d7a07c2cc3f1dcf89a5fd312f433966b3486ceebf5b05d9d45bf1c9fc"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-controls.json",
+        "sha256": "b81aa3d32cbce32f51164dcc63776ada5c1e7e63537ae150c8693783b6d666ba"
+      },
+      {
+        "path": "compatibility/rc/spec-small-context-proof.json",
+        "sha256": "835ff94c0a8ffdd4c49f6e3816bb908c35f6464c8a5017c76b9e4fcaeca91888"
+      },
+      {
+        "path": "compatibility/rc/spec-small-context-checkpoint.json",
+        "sha256": "686dc5ec22f4fc6e2cb557c65d8c206f33ee605b30fbd87476598932322d85fa"
+      },
+      {
+        "path": "compatibility/rc/historical-source-replay-fixture-context-checkpoint.json",
+        "sha256": "c5ef2627c3f93f029af03036f3a8f9b2c9f453cdf610332ea935885f0271c4cd"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+        "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+        "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+        "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+        "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+      },
+      {
+        "path": "projects/ngx-material-legacy/ng-package.json",
+        "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33"
+      },
+      {
+        "path": "testing/legacy-runner/adapt-spec.mjs",
+        "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-small-individual-source-proof.json",
+      "sha256": "ca245ae0e159e9e089203c79978a620fe1bb0e402a1940061fab79d28cc4ab23"
+    },
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "current_source_context": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "compatibility/rc/spec-small-individual-source-proof.json",
+      "sha256": "ca245ae0e159e9e089203c79978a620fe1bb0e402a1940061fab79d28cc4ab23"
+    },
+    {
+      "path": "scripts/spec-small-source-review.mjs",
+      "sha256": "a3f8c6ea65db0588648675819751fc76df41001b0ac160099b87de6ae00e3b16"
+    },
+    {
+      "path": "tests/spec_small_source_probe.mjs",
+      "sha256": "385b82de643416a5c54c82016a79367cd4b84c2f3ec548d0bdb19b2056f36f62"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-subjects.json.gz",
+      "sha256": "055c40ba3907191e258676b4ebff84ea5d233fb5c00bb877eac0f525dcf5ccfd"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-acquisition.json.gz",
+      "sha256": "f71a905296710e45c15a2e6bfb3766a741061aebb39b8d55e7aa7d48fa6a8200"
+    },
+    {
+      "path": "compatibility/rc/spec-small-fixture-prior.json.gz",
+      "sha256": "da83db9d7a07c2cc3f1dcf89a5fd312f433966b3486ceebf5b05d9d45bf1c9fc"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-controls.json",
+      "sha256": "b81aa3d32cbce32f51164dcc63776ada5c1e7e63537ae150c8693783b6d666ba"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-proof.json",
+      "sha256": "835ff94c0a8ffdd4c49f6e3816bb908c35f6464c8a5017c76b9e4fcaeca91888"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-checkpoint.json",
+      "sha256": "686dc5ec22f4fc6e2cb557c65d8c206f33ee605b30fbd87476598932322d85fa"
+    },
+    {
+      "path": "compatibility/rc/historical-source-replay-fixture-context-checkpoint.json",
+      "sha256": "c5ef2627c3f93f029af03036f3a8f9b2c9f453cdf610332ea935885f0271c4cd"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+      "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+      "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+    },
+    {
+      "path": "projects/ngx-material-legacy/ng-package.json",
+      "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33"
+    },
+    {
+      "path": "testing/legacy-runner/adapt-spec.mjs",
+      "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "control_case_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "05500bf4d60693c715030349d818440465c57b6d",
+    "qualified_reference_parent": "804b5c68b177c8eff2ed0fdac92caa73d5e9aaf1",
+    "inputs": {
+      "path": "compatibility/rc/spec-control-context-inputs.json",
+      "sha256": "c68029f9ff43fb4c47f58cfa21c9924400f1fbdd142c54c37457399272685fbb"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+        "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54",
+        "current_sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a",
+        "current_sha256": "766c955ca56694fcf3c82ab00296194103bb0fac812cd22571bf89a960f1d9c7"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+    },
+    "unchanged_other_product_members": 1139,
+    "original_cases_preserved": 2220,
+    "additional_cases": 2,
+    "current_case_cells": 2227,
+    "all_original_hunks_decisions_and_runtime_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only two appended candidate cases and their exact two-row inventory update differ. Preserve every prior case/body/template, all production resources and all original source judgments. This is source-context qualification, never actual Angular/native/packed/floor or complete G11 admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    "prior_entry": {
+      "sha": "8e091797f8664cf99af86a5c7c4d5615734fcaf1",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "804b5c68b177c8eff2ed0fdac92caa73d5e9aaf1",
+      "entry_sha256": "addbd5cf571d4b33b417e6fe16f869bd349c9c933a1145feb05acddf6b667d90"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-small-8e091797f8664cf99af86a5c7c4d5615734fcaf1.json",
+      "sha256": "cb9a2a2ef85a39a565c9dae1fc93e42753a02d817d1e0a575c4c4e9c4836a5b3"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "chip_empty_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "e89625fa8145b1d746f24728a83ba25bbfe81871",
+    "qualified_reference_parent": "00fd476b50ad0eb6777e709d13b990e22a785717",
+    "inputs": {
+      "path": "compatibility/rc/spec-stability-context-inputs.json",
+      "sha256": "7259c44866d5e9f1d7c69a8685ad4682c6a0cfbb26eb9330a10879ac6a2b6638"
+    },
+    "prequalified_wrapper_receipt_transitions": [
+      {
+        "path": "tests/test_spec_standalone_environment_source.py",
+        "reference_commit": "a95969e7b493b70141ffa25e5c98f8b9499ace7a",
+        "before_sha256": "3e74aaee57ff849163758989b2f59f588fc975d95504ca3f6cb3ce0ce32923d9",
+        "after_sha256": "7717141028f282aeb800a7e045b7f6a1009fd4ed60974d1cab3c26e553ef23c8",
+        "edits": [
+          {
+            "before": "['node', 'tests/spec_standalone_environment_source_probe.mjs']",
+            "after": "['node', 'scripts/run-historical-source-probe.mjs', 'standalone-environment-source']"
+          }
+        ],
+        "affected_shas": [
+          "31077c2eae76b0bc0bc348ee2bd2801864aa409a",
+          "83006db94a2912fa3cd3b7e1f1dcca9be064d183"
+        ],
+        "qualification": {
+          "path": "compatibility/rc/historical-stability-source-replay-checkpoint.json",
+          "sha256": "7af49a12a6dcda906fc1a8fbf21817a60bf3cee09550ef38074b6e61c282dde1"
+        }
+      }
+    ],
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "before_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "current_sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "before_sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+        "current_sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "766c955ca56694fcf3c82ab00296194103bb0fac812cd22571bf89a960f1d9c7",
+        "current_sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-source-proof.json",
+      "sha256": "f6ea8843244aee5e2eb3a20632ad8d30c27627e151ab912d61ad7272564d3506"
+    },
+    "original_cases_preserved": 2222,
+    "additional_cases": 1,
+    "current_case_cells": 2228,
+    "all_original_branch_hunk_verdicts_and_native_requirement_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only the authenticated chip empty-query reset, one appended Angular lifecycle case and exact inventory refresh differ. Current API call details are qualified against both fixed public minima; every prior verdict and actual native/packed/compiler/floor requirement remains. No source-only runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    },
+    "prior_entry": {
+      "sha": "8e091797f8664cf99af86a5c7c4d5615734fcaf1",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "00fd476b50ad0eb6777e709d13b990e22a785717",
+      "entry_sha256": "f466657152d3ac8a44ca516c13aefd17077b4eee87e9fbc580e0c1adab22d3af"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-control-case-context-8e091797f8664cf99af86a5c7c4d5615734fcaf1.json",
+      "sha256": "8486a39a6d6d3bf878ee39563d5403e06e1db5ac0d7b64f991ee1e87ff8221d8"
+    },
+    "original_judgments_preserved": true
+  }
+}
