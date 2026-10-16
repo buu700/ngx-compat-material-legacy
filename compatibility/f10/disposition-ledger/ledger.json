@@ -26991,17 +26991,85 @@
       "sha": "c5f9a60e524466a4f6098df9f081bc3c8d63ea3b",
       "bucket": "test-only-batch-candidate",
       "subject": "test(material/menu): remove NoopAnimationsModule usage (#31800)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=c8a8b4cfb646d5427f948543955b541abad645b45be306a55017adac161a8a43, bytes=2383). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/menu/menu.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The four-hunk menu patch removes a private NoopAnimationsModule reset, then replaces two document.activeElement assertions with a forced private _hasFocus result and a spy assertion that the next item focus method was called. It adds a QueryList only to support that instrumentation. The retained legacy regression already tests opening focus on the first actual item and real focus on its successor after removal, using the owned token provider and legacy host selectors. A focus-call spy is not equivalent to actual browser focus; do not weaken those assertions or copy private state stubs. The retained item _hasFocus reads the actual document active element. Decline this private test rewrite; actual native focus/removal behavior, animation timing and supported-floor execution remain required.",
+      "read_note_disposition": "individual complete-original source conclusion; current product/floor and G11 gates remain separate",
       "files": [
         "src/material/menu/menu.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/c5f9a60e524466a4f6098df9f081bc3c8d63ea3b.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-render-setup-c5f9a60e524466a4f6098df9f081bc3c8d63ea3b.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "c8a8b4cfb646d5427f948543955b541abad645b45be306a55017adac161a8a43"
+      "patch_sha256": "c8a8b4cfb646d5427f948543955b541abad645b45be306a55017adac161a8a43",
+      "diff_sha256": "b3efc3e49fcf2597933bdd6ccdc4cde10c967ef196fcf6cd527688d98e86e15e",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "b3efc3e49fcf2597933bdd6ccdc4cde10c967ef196fcf6cd527688d98e86e15e",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The four-hunk menu patch removes a private NoopAnimationsModule reset, then replaces two document.activeElement assertions with a forced private _hasFocus result and a spy assertion that the next item focus method was called. It adds a QueryList only to support that instrumentation. The retained legacy regression already tests opening focus on the first actual item and real focus on its successor after removal, using the owned token provider and legacy host selectors. A focus-call spy is not equivalent to actual browser focus; do not weaken those assertions or copy private state stubs. The retained item _hasFocus reads the actual document active element. Decline this private test rewrite; actual native focus/removal behavior, animation timing and supported-floor execution remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-render-setup-source-review.mjs",
+            "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+          },
+          {
+            "path": "tests/spec_render_setup_source_probe.mjs",
+            "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+            "sha256": "790eee4edcd29a7d0d6e84002ddcf99398de9d8259f4b1fba9e514406ee2d5cf"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+            "sha256": "72dd57980b92c1094273deff03b4c73140317391bf2740bd3442301c9f53ddca"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-controls.json",
+            "sha256": "351711f8b0013ac17346ce7e2c58dd060adb9d9dcd146163b9a531cddf817d80"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-review.json",
+            "sha256": "6e7df6f9dfc75268f3c5f93a02aa4bc3da40aafbe4b28bb0a7585b5aa49f8140"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+            "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+            "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368"
+          },
+          {
+            "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+            "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "Removes the private NoopAnimationsModule import; the owned menu spec already uses the public core token provider instead of that engine module. Removes the TODO, local TestBed reset/module import and overlay-container re-injection from the removal-focus test. Retain the owned createComponent setup and actual focus regression. Adds an HTMLElement query type, stubs itemInstances.first._hasFocus to true and replaces two activeElement assertions with one next-item focus-call expectation. Those observations are not equivalent. Preserve the owned actual first/successor active-element checks. Adds ViewChildren(MatMenuItem) itemInstances to the repeated-items private fixture for the stub. The owned fixture requires no private focus-state instrumentation or template/API change.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "8f7292fb972ce8576f0e680b50ead7840d989729",
@@ -27036,36 +27104,224 @@
       "sha": "14479d47cbf77c52fe52b5e5fd8511a8d7f18c82",
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): remove checks for popover from test (#32622)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=020e478d9db248b18fe0f389ff7ef14c447beab2a8575b72e313b87aa47dd952, bytes=5636). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts, src/material/autocomplete/autocomplete.spec.ts, src/material/select/select.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all ten hunks across all three original files. Four public-CDK private position tests lose browser-feature early returns; modern autocomplete/select helpers drop OverlayContainer fallback queries and assume inline popover descendants. The owned legacy specs retain real OverlayContainer, bounding-box/pane/backdrop and legacy panel queries, and their product paths reach the public overlay service/directive. Exact minimum CDK21.2.14/22.1.7 source enables popovers by default when supported and falls back without support, so the popover path is reachable and must not be excluded. Do not transplant modern inline-popover-only test selectors or erase legacy container/style expectations. This source-only decision declines the private helper rewrite; it neither disables popovers nor certifies existing DOM/style compatibility. Actual supported-browser, overlay structure, no-required-consumer-CSS and focus validation remains mandatory and may justify a narrow owned configuration repair.",
+      "read_note_disposition": "individual complete-original source conclusion; current product/floor and G11 gates remain separate",
       "files": [
         "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
         "src/material/autocomplete/autocomplete.spec.ts",
         "src/material/select/select.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/14479d47cbf77c52fe52b5e5fd8511a8d7f18c82.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-render-setup-14479d47cbf77c52fe52b5e5fd8511a8d7f18c82.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "020e478d9db248b18fe0f389ff7ef14c447beab2a8575b72e313b87aa47dd952"
+      "patch_sha256": "020e478d9db248b18fe0f389ff7ef14c447beab2a8575b72e313b87aa47dd952",
+      "diff_sha256": "46b7b93a7daead16632ebc2e3e5a0a9a41f67e54cd55610272419b00f630dae4",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "46b7b93a7daead16632ebc2e3e5a0a9a41f67e54cd55610272419b00f630dae4",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all ten hunks across all three original files. Four public-CDK private position tests lose browser-feature early returns; modern autocomplete/select helpers drop OverlayContainer fallback queries and assume inline popover descendants. The owned legacy specs retain real OverlayContainer, bounding-box/pane/backdrop and legacy panel queries, and their product paths reach the public overlay service/directive. Exact minimum CDK21.2.14/22.1.7 source enables popovers by default when supported and falls back without support, so the popover path is reachable and must not be excluded. Do not transplant modern inline-popover-only test selectors or erase legacy container/style expectations. This source-only decision declines the private helper rewrite; it neither disables popovers nor certifies existing DOM/style compatibility. Actual supported-browser, overlay structure, no-required-consumer-CSS and focus validation remains mandatory and may justify a narrow owned configuration repair.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-render-setup-source-review.mjs",
+            "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+          },
+          {
+            "path": "tests/spec_render_setup_source_probe.mjs",
+            "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+            "sha256": "790eee4edcd29a7d0d6e84002ddcf99398de9d8259f4b1fba9e514406ee2d5cf"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+            "sha256": "72dd57980b92c1094273deff03b4c73140317391bf2740bd3442301c9f53ddca"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-controls.json",
+            "sha256": "351711f8b0013ac17346ce7e2c58dd060adb9d9dcd146163b9a531cddf817d80"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-review.json",
+            "sha256": "6e7df6f9dfc75268f3c5f93a02aa4bc3da40aafbe4b28bb0a7585b5aa49f8140"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          },
+          {
+            "path": "compatibility/rc/material-public-subjects.json",
+            "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+          },
+          {
+            "path": "compatibility/rc/autocomplete-landscape-cdk-sources/identities.json",
+            "sha256": "6d7675f22f6b93c4a8ed00f9a8de5c814944f5685e965bb7046fa4b957c1aa3d"
+          },
+          {
+            "path": "compatibility/rc/framework-enum-sources/22.1.7/types/core.d.ts",
+            "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+          },
+          {
+            "path": "compatibility/rc/autocomplete-landscape-cdk-sources/22.1.7/fesm2022/_overlay-module-chunk.mjs.gz",
+            "sha256": "664062571b7ab43c4bec8d80595fc055fe0e7587bd4133debd91a92ad39d28fa"
+          },
+          {
+            "path": "compatibility/rc/framework-enum-sources/21.2.23/types/core.d.ts",
+            "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+          },
+          {
+            "path": "compatibility/rc/autocomplete-landscape-cdk-sources/21.2.14/fesm2022/_overlay-module-chunk.mjs.gz",
+            "sha256": "e926a3c082f478550b9a68dd72addd8f101bf393d4323c3ed505f5cce39b6ba0"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "Removes the showPopover unsupported-browser early return from adjacent-popover placement. It changes private test eligibility, not product placement; preserve real legacy overlay structure requirements. Removes the corresponding guard from popover reattachment beside the origin. Exact floor overlay routing is reachable and actual placement remains pending. Removes the feature guard from custom-parent placement. Do not infer custom parent/legacy CSS compatibility from this source edit. Removes the feature guard from origin-child placement. No production strategy code is changed; supported-browser coverage remains required. Drops OverlayContainer from modern autocomplete test imports. The owned test still needs its actual container queries and keeps the public import. Removes the modern autocomplete supportsPopover flag and container variable. Keep owned legacy panel/container assertions; do not treat current popover support as unreachable. Removes modern autocomplete container setup/fallback host and backdrop query branches in favor of inline popover descendants. This changes test observation/location assumptions; retain legacy structure expectations and require actual native qualification. Drops OverlayContainer from modern select test imports. Keep the owned public container import and legacy pane/backdrop queries. Removes the modern select supportsPopover flag. Minimum public CDK still distinguishes supported and unsupported browser routing, which remains a native verification obligation. Changes modern select host/backdrop helpers to fixture descendant queries, deleting container fallback lookups. Preserve owned legacy selectors/styles. The complete patch changes no select or overlay implementation.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "d33deadf7ab3abc61eae1ea524def317120503d7",
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): remove usage of deprecated API",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=239e19d2f693efb52e8f9184be690c68feb077d7772ef4fa28b26909e6ddc83a, bytes=1472). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/bottom-sheet/bottom-sheet.spec.ts, src/material/dialog/dialog.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "already-adapted",
+      "reason": "The complete two-file four-hunk patch replaces only the createNgModuleRef import and call identifier with createNgModule in private bottom-sheet and dialog module-bound fixtures. It preserves the module type, parent injector, resulting module injector and test assertions. The owned legacy dialog already imports/calls createNgModule with its parent injector and passes ngModuleRef.injector into its dialog open operation; no owned Core import of createNgModuleRef exists. Authenticated exact Core21.2.23/22.1.7 declarations expose createNgModule publicly without a deprecation tag. Record that narrow source adaptation as already present; no API, fixture, public bottom-sheet fork or consumer change follows. This does not qualify module lifetime, injection behavior, actual Angular or the supported floors.",
+      "read_note_disposition": "individual complete-original source conclusion; current product/floor and G11 gates remain separate",
       "files": [
         "src/material/bottom-sheet/bottom-sheet.spec.ts",
         "src/material/dialog/dialog.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/d33deadf7ab3abc61eae1ea524def317120503d7.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-render-setup-d33deadf7ab3abc61eae1ea524def317120503d7.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "239e19d2f693efb52e8f9184be690c68feb077d7772ef4fa28b26909e6ddc83a"
+      "patch_sha256": "239e19d2f693efb52e8f9184be690c68feb077d7772ef4fa28b26909e6ddc83a",
+      "diff_sha256": "48db89a0869ed15e9b52b27844b630c8919ac1c6d5873357b958ad27f6d5519f",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "48db89a0869ed15e9b52b27844b630c8919ac1c6d5873357b958ad27f6d5519f",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete two-file four-hunk patch replaces only the createNgModuleRef import and call identifier with createNgModule in private bottom-sheet and dialog module-bound fixtures. It preserves the module type, parent injector, resulting module injector and test assertions. The owned legacy dialog already imports/calls createNgModule with its parent injector and passes ngModuleRef.injector into its dialog open operation; no owned Core import of createNgModuleRef exists. Authenticated exact Core21.2.23/22.1.7 declarations expose createNgModule publicly without a deprecation tag. Record that narrow source adaptation as already present; no API, fixture, public bottom-sheet fork or consumer change follows. This does not qualify module lifetime, injection behavior, actual Angular or the supported floors.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-render-setup-source-review.mjs",
+            "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+          },
+          {
+            "path": "tests/spec_render_setup_source_probe.mjs",
+            "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+            "sha256": "790eee4edcd29a7d0d6e84002ddcf99398de9d8259f4b1fba9e514406ee2d5cf"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+            "sha256": "72dd57980b92c1094273deff03b4c73140317391bf2740bd3442301c9f53ddca"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-controls.json",
+            "sha256": "351711f8b0013ac17346ce7e2c58dd060adb9d9dcd146163b9a531cddf817d80"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-review.json",
+            "sha256": "6e7df6f9dfc75268f3c5f93a02aa4bc3da40aafbe4b28bb0a7585b5aa49f8140"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+            "sha256": "dfc5961661c06ae15f186d25846f4a40f61880ac2c09e9975e0d9faabbbdea2b"
+          },
+          {
+            "path": "testing/legacy-runner/adapt-spec.mjs",
+            "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+          },
+          {
+            "path": "compatibility/rc/material-public-subjects.json",
+            "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+          },
+          {
+            "path": "compatibility/rc/autocomplete-landscape-cdk-sources/identities.json",
+            "sha256": "6d7675f22f6b93c4a8ed00f9a8de5c814944f5685e965bb7046fa4b957c1aa3d"
+          },
+          {
+            "path": "compatibility/rc/framework-enum-sources/22.1.7/types/core.d.ts",
+            "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+          },
+          {
+            "path": "compatibility/rc/autocomplete-landscape-cdk-sources/22.1.7/fesm2022/_overlay-module-chunk.mjs.gz",
+            "sha256": "664062571b7ab43c4bec8d80595fc055fe0e7587bd4133debd91a92ad39d28fa"
+          },
+          {
+            "path": "compatibility/rc/framework-enum-sources/21.2.23/types/core.d.ts",
+            "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+          },
+          {
+            "path": "compatibility/rc/autocomplete-landscape-cdk-sources/21.2.14/fesm2022/_overlay-module-chunk.mjs.gz",
+            "sha256": "e926a3c082f478550b9a68dd72addd8f101bf393d4323c3ed505f5cce39b6ba0"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "Renames the private bottom-sheet fixture Core import createNgModuleRef to createNgModule; this is the deprecated alias replacement, not a wait/render API change. Renames the bottom-sheet module-creation call while retaining module type, parent injector and resulting injector. The add-on owns no ordinary bottom-sheet component implementation. Renames the private dialog fixture Core import to createNgModule. The owned dialog spec already imports that public nondeprecated minimum API. Renames the dialog module-creation call without changing arguments or injector use. The owned parent fixture already uses the corresponding replacement; lifetime and actual injection execution remain pending.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "ad5fba32ac21e4fb32ba75591dfa1273f692d58a",
@@ -27662,17 +27918,81 @@
       "sha": "2f4a2b4c003594f64f6e9b17bf38b929739fd535",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(cdk/table): remove explicit change detection",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=fea0579c0a3cb0dcc4268e91e77decaa39b3c27f35e65b0b3394bf8a9201efc3, bytes=388). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/table/table.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The single original hunk removes ChangeDetectionStrategy.OnPush from the private CDK NativeHtmlTableAppOnPush component decorator. The class name and surrounding assertions remain, but the fixture now uses default change detection, so the assertion text does not establish equivalence of rendering coverage. The owned table suite has its own NativeHtmlTableApp and public CdkTable/CdkTableModule consumer fixtures; it has no NativeHtmlTableAppOnPush counterpart to rewrite. The public CDK remains reachable and is not treated as an absent dependency. Decline this private test-environment change and preserve every owned fixture/rendering assertion and production change-detection setting. Actual table rendering, native row-group structure, nested ownership, viewport behavior and both supported peer floors remain required.",
+      "read_note_disposition": "individual complete-original source conclusion; current product/floor and G11 gates remain separate",
       "files": [
         "src/cdk/table/table.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/2f4a2b4c003594f64f6e9b17bf38b929739fd535.json",
-      "batch_id": "test-only-refactor-wave2-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-render-setup-2f4a2b4c003594f64f6e9b17bf38b929739fd535.json",
       "recorded_at_utc": "2026-10-01T18:47:11Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "fea0579c0a3cb0dcc4268e91e77decaa39b3c27f35e65b0b3394bf8a9201efc3"
+      "patch_sha256": "fea0579c0a3cb0dcc4268e91e77decaa39b3c27f35e65b0b3394bf8a9201efc3",
+      "diff_sha256": "a940dde88669104d6549638830c320e8618966183570e1719a01ba5a8c45cff5",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "a940dde88669104d6549638830c320e8618966183570e1719a01ba5a8c45cff5",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The single original hunk removes ChangeDetectionStrategy.OnPush from the private CDK NativeHtmlTableAppOnPush component decorator. The class name and surrounding assertions remain, but the fixture now uses default change detection, so the assertion text does not establish equivalence of rendering coverage. The owned table suite has its own NativeHtmlTableApp and public CdkTable/CdkTableModule consumer fixtures; it has no NativeHtmlTableAppOnPush counterpart to rewrite. The public CDK remains reachable and is not treated as an absent dependency. Decline this private test-environment change and preserve every owned fixture/rendering assertion and production change-detection setting. Actual table rendering, native row-group structure, nested ownership, viewport behavior and both supported peer floors remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-render-setup-source-review.mjs",
+            "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+          },
+          {
+            "path": "tests/spec_render_setup_source_probe.mjs",
+            "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+            "sha256": "790eee4edcd29a7d0d6e84002ddcf99398de9d8259f4b1fba9e514406ee2d5cf"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+            "sha256": "72dd57980b92c1094273deff03b4c73140317391bf2740bd3442301c9f53ddca"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-controls.json",
+            "sha256": "351711f8b0013ac17346ce7e2c58dd060adb9d9dcd146163b9a531cddf817d80"
+          },
+          {
+            "path": "compatibility/rc/spec-render-setup-source-review.json",
+            "sha256": "6e7df6f9dfc75268f3c5f93a02aa4bc3da40aafbe4b28bb0a7585b5aa49f8140"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+            "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+            "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "Removes only the OnPush field from the decorator on NativeHtmlTableAppOnPush, leaving its name and assertions intact. This changes test rendering mode. Keep the separate owned NativeHtmlTableApp/public-CDK fixtures and all their assertions; no product rendering fix is inferred.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "658952712df682e26130b754fa19c041712ad747",

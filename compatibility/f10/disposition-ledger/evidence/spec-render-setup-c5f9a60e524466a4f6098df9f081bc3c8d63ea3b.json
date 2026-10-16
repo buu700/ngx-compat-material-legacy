@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "c5f9a60e524466a4f6098df9f081bc3c8d63ea3b",
+  "subject": "test(material/menu): remove NoopAnimationsModule usage (#31800)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "310658e0f69090a27d332438bb7f51161fec7494",
+      "after_blob": "75478ddc58384422b7467600505077b2a0aa1bbe"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 4,
+  "raw_commit_sha256": "4b95f4edef6c36756d1b41d64f91669faf26218ada9428650c9e9d383fb78ad6",
+  "original_sources": [
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "before": {
+        "git_blob": "310658e0f69090a27d332438bb7f51161fec7494",
+        "sha256": "c01f4db1c45ccd0d72f8ee526b8f76eb50756e82c630ded9e712e275889d1fa7",
+        "bytes": 108275
+      },
+      "after": {
+        "git_blob": "75478ddc58384422b7467600505077b2a0aa1bbe",
+        "sha256": "0e014ee9e1e3c8c309acc32a62983866dd5820be8793867078d961ce75779e28",
+        "bytes": 108131
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts\nindex 310658e0f69090a27d332438bb7f51161fec7494..75478ddc58384422b7467600505077b2a0aa1bbe 100644\n--- a/src/material/menu/menu.spec.ts\n+++ b/src/material/menu/menu.spec.ts\n@@ -30,7 +30,6 @@ import {\n } from '@angular/core';\n import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';\n import {By} from '@angular/platform-browser';\n-import {NoopAnimationsModule} from '@angular/platform-browser/animations';\n import {Subject} from 'rxjs';\n import {\n   createKeyboardEvent,\n@@ -256,10 +255,6 @@ describe('MatMenu', () => {\n   }));\n \n   it('should move focus to another item if the active item is destroyed', fakeAsync(() => {\n-    // TODO(crisbeto): figure out why NoopAnimationsModule is necessary\n-    // here and our token isn't enough. Likely indicates an issue.\n-    TestBed.resetTestingModule().configureTestingModule({imports: [NoopAnimationsModule]});\n-    overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();\n     const fixture = TestBed.createComponent(MenuWithRepeatedItems);\n     fixture.detectChanges();\n     const triggerEl = fixture.componentInstance.triggerEl.nativeElement;\n@@ -268,17 +263,19 @@ describe('MatMenu', () => {\n     fixture.detectChanges();\n     tick(500);\n \n-    const items = overlayContainerElement.querySelectorAll(\n+    const items = overlayContainerElement.querySelectorAll<HTMLElement>(\n       '.mat-mdc-menu-panel .mat-mdc-menu-item',\n     );\n \n-    expect(document.activeElement).toBe(items[0]);\n+    // Stub out the `_hasFocus` method since it's hard to move focus reliably within the test.\n+    spyOn(fixture.componentInstance.itemInstances.first, '_hasFocus').and.callFake(() => true);\n+    const spy = spyOn(items[1], 'focus');\n \n     fixture.componentInstance.items.shift();\n     fixture.detectChanges();\n     tick(500);\n \n-    expect(document.activeElement).toBe(items[1]);\n+    expect(spy).toHaveBeenCalled();\n   }));\n \n   it('should be able to set a custom class on the backdrop', fakeAsync(() => {\n@@ -3027,5 +3024,6 @@ class MenuWithRepeatedItems {\n   @ViewChild(MatMenuTrigger, {static: false}) trigger: MatMenuTrigger;\n   @ViewChild('triggerEl', {static: false}) triggerEl: ElementRef<HTMLElement>;\n   @ViewChild(MatMenu, {static: false}) menu: MatMenu;\n+  @ViewChildren(MatMenuItem) itemInstances: QueryList<MatMenuItem>;\n   items = ['One', 'Two', 'Three'];\n }\n",
+  "diff_sha256": "b3efc3e49fcf2597933bdd6ccdc4cde10c967ef196fcf6cd527688d98e86e15e",
+  "hunk_reviews": [
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "header": "@@ -30,7 +30,6 @@ import {",
+      "sha256": "6b86537adbc1f6de6edf0a12a90782c10db87be2c3ffd3896eceacc6bd2c8def",
+      "judgment": "Removes the private NoopAnimationsModule import; the owned menu spec already uses the public core token provider instead of that engine module."
+    },
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "header": "@@ -256,10 +255,6 @@ describe('MatMenu', () => {",
+      "sha256": "108b33ba042c6df2345c8f20c91dd61e2e67c87f0d7ae15231b2a039f7324600",
+      "judgment": "Removes the TODO, local TestBed reset/module import and overlay-container re-injection from the removal-focus test. Retain the owned createComponent setup and actual focus regression."
+    },
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "header": "@@ -268,17 +263,19 @@ describe('MatMenu', () => {",
+      "sha256": "5e3a920a3878e7c6891ba0a1d4d5a568597eed6c23ffab0ab4b063f20b92952d",
+      "judgment": "Adds an HTMLElement query type, stubs itemInstances.first._hasFocus to true and replaces two activeElement assertions with one next-item focus-call expectation. Those observations are not equivalent. Preserve the owned actual first/successor active-element checks."
+    },
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "header": "@@ -3027,5 +3024,6 @@ class MenuWithRepeatedItems {",
+      "sha256": "fcc68eb4977464f9c4fd87bbb689755cdf4fd605bf99bfd4c00b13abf715405e",
+      "judgment": "Adds ViewChildren(MatMenuItem) itemInstances to the repeated-items private fixture for the stub. The owned fixture requires no private focus-state instrumentation or template/API change."
+    }
+  ],
+  "semantics": [
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "kind": "replace-real-menu-focus-with-private-state-and-focus-call-spies",
+      "actual_active_element_assertions_removed": 2,
+      "private_focus_state_stub_added": 1,
+      "focus_call_assertion_added": 1,
+      "observations_equivalent": false
+    }
+  ],
+  "decision": "The four-hunk menu patch removes a private NoopAnimationsModule reset, then replaces two document.activeElement assertions with a forced private _hasFocus result and a spy assertion that the next item focus method was called. It adds a QueryList only to support that instrumentation. The retained legacy regression already tests opening focus on the first actual item and real focus on its successor after removal, using the owned token provider and legacy host selectors. A focus-call spy is not equivalent to actual browser focus; do not weaken those assertions or copy private state stubs. The retained item _hasFocus reads the actual document active element. Decline this private test rewrite; actual native focus/removal behavior, animation timing and supported-floor execution remain required.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "b3efc3e49fcf2597933bdd6ccdc4cde10c967ef196fcf6cd527688d98e86e15e",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The four-hunk menu patch removes a private NoopAnimationsModule reset, then replaces two document.activeElement assertions with a forced private _hasFocus result and a spy assertion that the next item focus method was called. It adds a QueryList only to support that instrumentation. The retained legacy regression already tests opening focus on the first actual item and real focus on its successor after removal, using the owned token provider and legacy host selectors. A focus-call spy is not equivalent to actual browser focus; do not weaken those assertions or copy private state stubs. The retained item _hasFocus reads the actual document active element. Decline this private test rewrite; actual native focus/removal behavior, animation timing and supported-floor execution remain required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-render-setup-source-review.mjs",
+        "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+      },
+      {
+        "path": "tests/spec_render_setup_source_probe.mjs",
+        "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+        "sha256": "790eee4edcd29a7d0d6e84002ddcf99398de9d8259f4b1fba9e514406ee2d5cf"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+        "sha256": "72dd57980b92c1094273deff03b4c73140317391bf2740bd3442301c9f53ddca"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-controls.json",
+        "sha256": "351711f8b0013ac17346ce7e2c58dd060adb9d9dcd146163b9a531cddf817d80"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-review.json",
+        "sha256": "6e7df6f9dfc75268f3c5f93a02aa4bc3da40aafbe4b28bb0a7585b5aa49f8140"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+        "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+        "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "c5f9a60e524466a4f6098df9f081bc3c8d63ea3b",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/menu): remove NoopAnimationsModule usage (#31800)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=c8a8b4cfb646d5427f948543955b541abad645b45be306a55017adac161a8a43, bytes=2383). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/menu/menu.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/menu/menu.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/c5f9a60e524466a4f6098df9f081bc3c8d63ea3b.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "c8a8b4cfb646d5427f948543955b541abad645b45be306a55017adac161a8a43"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-render-setup-source-prior.json.gz",
+    "sha256": "e1572fa80f82bb0286501a7a62ecf6e161e792d1da00768f7aceca1398d1aab9"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-render-setup-source-review.mjs",
+      "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+    },
+    {
+      "path": "tests/spec_render_setup_source_probe.mjs",
+      "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+      "sha256": "790eee4edcd29a7d0d6e84002ddcf99398de9d8259f4b1fba9e514406ee2d5cf"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+      "sha256": "72dd57980b92c1094273deff03b4c73140317391bf2740bd3442301c9f53ddca"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-controls.json",
+      "sha256": "351711f8b0013ac17346ce7e2c58dd060adb9d9dcd146163b9a531cddf817d80"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-review.json",
+      "sha256": "6e7df6f9dfc75268f3c5f93a02aa4bc3da40aafbe4b28bb0a7585b5aa49f8140"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+      "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+      "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368"
+    },
+    {
+      "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+      "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+    }
+  ],
+  "production_HTML_CSS_SCSS_or_TS_changed_in_this_review": false,
+  "popover_current_behavior_executed": false,
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
