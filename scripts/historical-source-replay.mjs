@@ -16,12 +16,12 @@ import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export const HISTORICAL_REPLAY_INPUTS='compatibility/rc/historical-source-replay-inputs.json';
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'45abd34e991c3b71945a4b276249d7fe45908e167c2f231584cc4f03477b51da','21.x':'33b173772b079139d3f7db3afeca87ae53d46c0abfd72349bba6d46616fde026'};
+const pins={main:'5592a0d88ea6385f82ca96e92a137c1f5d1883d4d0e9e5165ccf151046c88c88','21.x':'918bc1e9b5082d020cb155fc385bb3c08fc3642e353afa81031bcc0363308e16'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
  'native-individual-source','native-individual-admission','spec-fixture-context',
  'small-spec-source','followup-spec-source','peer-spec-source','control-case-context',
  'control-test-source','render-setup-source','theme-date-source','test-environment-zone-source','standalone-environment-source',
- 'stability-chip-method','stability-chip-context'];
+ 'stability-chip-method','stability-chip-context','wide-fixture-adapter-context'];
 // These six versioned replay-tool members are checked against the caller HEAD,
 // separately from the qualified product/review context. Comparing the registry
 // and its own verifier to that older context would require self-referential hashes.
@@ -42,11 +42,11 @@ function relativePath(path){assert.equal(typeof path,'string');assert.ok(!path.i
 export function historicalReplayInputs({root=rootDefault,readMember}={}){
  const read=readMember||((path)=>readFileSync(resolve(root,path))),bytes=read(HISTORICAL_REPLAY_INPUTS),data=JSON.parse(bytes);
  assert.ok(Object.hasOwn(pins,data.line),'unregistered historical line');assert.equal(hash(bytes),pins[data.line],'historical replay input changed');
- assert.equal(data.schema_version,6);assert.deepEqual(data.entries.map(row=>row.id),ids);assert.equal(new Set(data.entries.map(row=>row.probe)).size,20);
+ assert.equal(data.schema_version,7);assert.deepEqual(data.entries.map(row=>row.id),ids);assert.equal(new Set(data.entries.map(row=>row.probe)).size,21);
  assert.deepEqual(data.mutable_progress_paths,['compatibility/rc/remaining-native-admission-worksheet.json','compatibility/rc/session-handoff.json']);
  assert.deepEqual(data.current_head_tooling_paths,toolingPaths);
  for(const entry of data.entries)assert.equal(entry.report_option,['tab-lifecycle-source','native-individual-source','native-individual-admission','spec-fixture-context','small-spec-source','followup-spec-source','peer-spec-source','control-case-context','control-test-source','render-setup-source','theme-date-source','test-environment-zone-source','standalone-environment-source','stability-chip-method','stability-chip-context'].includes(entry.id)?'--out':undefined,'historical report invocation changed');
- assert.equal(data.wrapper_edits.length,18);assert.equal(new Set(data.wrapper_edits.map(row=>row.path)).size,18);
+ assert.equal(data.wrapper_edits.length,19);assert.equal(new Set(data.wrapper_edits.map(row=>row.path)).size,19);
  assert.match(data.wrapper_reference_commit,/^[0-9a-f]{40}$/);for(const wrapper of data.wrapper_edits)if(wrapper.reference_commit!==undefined)assert.match(wrapper.reference_commit,/^[0-9a-f]{40}$/);
  assert.equal(data.original_js_programs_and_assertions_unchanged,true);assert.equal(data.new_sha_or_authored_use_closures,0);
  return data;

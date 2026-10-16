@@ -71,15 +71,28 @@ for(const wrapper of data.wrapper_edits.slice(11,16)){
 }
 assert.equal(cases.length,75);
 assert.deepEqual(cases,JSON.parse(read('compatibility/rc/historical-stability-source-replay-controls.json')).cases,'prior75 controls changed');
-for(const path of [...data.entries.slice(18).map(row=>row.probe),...data.wrapper_edits.slice(16).map(row=>row.path)]){
+for(const path of [...data.entries.slice(18,20).map(row=>row.probe),...data.wrapper_edits.slice(16,18).map(row=>row.path)]){
  const changed=Buffer.concat([cached(path),Buffer.from('\n// unreviewed chip replay subject\n')]);
  assert.throws(()=>inspect(name=>name===path?changed:cached(name)),/changed/,path);cases.push({id:'chip-frame-changed-subject-'+path,result:'rejected'});
 }
-for(const wrapper of data.wrapper_edits.slice(16)){
+for(const wrapper of data.wrapper_edits.slice(16,18)){
  const before=git(['show',wrapper.reference_commit+':'+wrapper.path]);assert.deepEqual(inspect(name=>name===wrapper.path?before:cached(name)),guard);
  let after=before.toString();for(const edit of wrapper.edits)after=after.replace(edit.before,edit.after);
  assert.deepEqual(inspect(name=>name===wrapper.path?Buffer.from(after):cached(name)),guard);cases.push({id:'chip-frame-exact-command-only-wrapper-'+wrapper.path,result:'pass'});
 }
-const report={schema_version:6,line:data.line,scope:'Actual current coherence guard and exact wrapper/reference checks with cached original bytes. No historical program, build, installer, peer, browser or runtime qualification in these controls.',current_guard:guard,registered_original_programs:20,controls:cases.length,cases,inputs_sha256:hash(read(HISTORICAL_REPLAY_INPUTS)),helper_sha256:hash(read('scripts/historical-source-replay.mjs')),cli_sha256:hash(read('scripts/run-historical-source-probe.mjs')),producer_sha256:hash(read('tests/historical_source_replay_probe.mjs')),actual_current_source_or_native_or_packed_qualified:false,g11_claim:'not-passed'};
+assert.equal(cases.length,81);
+assert.deepEqual(cases,JSON.parse(read('compatibility/rc/spec-wide-fixture-source-adapter-replay-controls.json')).cases,'prior81 controls changed');
+assert.equal(data.entries.slice(20).length,1);assert.equal(data.wrapper_edits.slice(18).length,1);
+for(const path of [...data.entries.slice(20).map(row=>row.probe),...data.wrapper_edits.slice(18).map(row=>row.path)]){
+ const changed=Buffer.concat([cached(path),Buffer.from('\n// unreviewed adapter replay subject\n')]);
+ assert.throws(()=>inspect(name=>name===path?changed:cached(name)),/changed/,path);cases.push({id:'adapter-frame-changed-subject-'+path,result:'rejected'});
+}
+for(const wrapper of data.wrapper_edits.slice(18)){
+ const before=git(['show',wrapper.reference_commit+':'+wrapper.path]);assert.deepEqual(inspect(name=>name===wrapper.path?before:cached(name)),guard);
+ let after=before.toString();for(const edit of wrapper.edits)after=after.replace(edit.before,edit.after);
+ assert.deepEqual(inspect(name=>name===wrapper.path?Buffer.from(after):cached(name)),guard);cases.push({id:'adapter-frame-exact-command-only-wrapper-'+wrapper.path,result:'pass'});
+}
+assert.equal(cases.length,84);
+const report={schema_version:7,line:data.line,scope:'Actual current coherence guard and exact wrapper/reference checks with cached original bytes. No historical program, build, installer, peer, browser or runtime qualification in these controls.',current_guard:guard,registered_original_programs:21,controls:cases.length,cases,inputs_sha256:hash(read(HISTORICAL_REPLAY_INPUTS)),helper_sha256:hash(read('scripts/historical-source-replay.mjs')),cli_sha256:hash(read('scripts/run-historical-source-probe.mjs')),producer_sha256:hash(read('tests/historical_source_replay_probe.mjs')),actual_current_source_or_native_or_packed_qualified:false,g11_claim:'not-passed'};
 const out=process.argv.indexOf('--out');if(out>=0)writeFileSync(process.argv[out+1],JSON.stringify(report,null,2)+'\n',{flag:'wx'});
 console.log(JSON.stringify({line:data.line,controls:cases.length,current_members:guard.guarded_current_members,current_product_members:guard.current_product_members,historical_probes_executed:0,actual_current_native_or_packed_qualified:false}));
