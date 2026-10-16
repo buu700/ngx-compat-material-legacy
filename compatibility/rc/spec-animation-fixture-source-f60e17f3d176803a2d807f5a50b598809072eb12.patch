@@ -1,0 +1,1888 @@
+diff --git a/src/cdk/text-field/autosize.spec.ts b/src/cdk/text-field/autosize.spec.ts
+index 5e9ae7cb59ba589bd60f72bd69d6bb63fdd22cf2..42cdd1cd72ec6b8e6091b0a0514df98a8520e604 100644
+--- a/src/cdk/text-field/autosize.spec.ts
++++ b/src/cdk/text-field/autosize.spec.ts
+@@ -9,7 +9,6 @@ import {
+ } from '@angular/core/testing';
+ import {FormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {dispatchFakeEvent} from '../testing/private';
+ import {CdkTextareaAutosize} from './autosize';
+ import {TextFieldModule} from './text-field-module';
+@@ -24,7 +23,6 @@ describe('CdkTextareaAutosize', () => {
+       imports: [
+         FormsModule,
+         TextFieldModule,
+-        NoopAnimationsModule,
+         AutosizeTextAreaWithContent,
+         AutosizeTextAreaWithValue,
+         AutosizeTextareaWithNgModel,
+diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts
+index 63f062d90f487ab2934eee3fd81c3bad05cba532..126b9ec7c9eb3f47c6501cf6945751b16ab41241 100644
+--- a/src/material/autocomplete/autocomplete.spec.ts
++++ b/src/material/autocomplete/autocomplete.spec.ts
+@@ -35,10 +35,9 @@ import {
+ } from '@angular/core/testing';
+ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {EMPTY, Observable, Subject, Subscription} from 'rxjs';
+ import {map, startWith} from 'rxjs/operators';
+-import {MatOption, MatOptionSelectionChange} from '../core';
++import {MATERIAL_ANIMATIONS, MatOption, MatOptionSelectionChange} from '../core';
+ import {MatFormField, MatFormFieldModule} from '../form-field';
+ import {MatInputModule} from '../input';
+ import {
+@@ -65,10 +64,12 @@ describe('MatAutocomplete', () => {
+         MatInputModule,
+         FormsModule,
+         ReactiveFormsModule,
+-        NoopAnimationsModule,
+         OverlayModule,
+       ],
+-      providers,
++      providers: [
++        ...providers,
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++      ],
+       declarations: [component],
+     });
+ 
+diff --git a/src/material/autocomplete/autocomplete.zone.spec.ts b/src/material/autocomplete/autocomplete.zone.spec.ts
+index b9b369d5b51c36f6981437b6d1b8c5f9e6391e46..7db6661f9b77b267078f100ffddd205b07080ac0 100644
+--- a/src/material/autocomplete/autocomplete.zone.spec.ts
++++ b/src/material/autocomplete/autocomplete.zone.spec.ts
+@@ -13,9 +13,8 @@ import {
+ } from '@angular/core';
+ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subscription} from 'rxjs';
+-import {MatOption} from '../core';
++import {MATERIAL_ANIMATIONS, MatOption} from '../core';
+ import {MatFormField, MatFormFieldModule} from '../form-field';
+ import {MatInputModule} from '../input';
+ import {MatAutocomplete} from './autocomplete';
+@@ -32,10 +31,13 @@ describe('MatAutocomplete Zone.js integration', () => {
+         MatInputModule,
+         FormsModule,
+         ReactiveFormsModule,
+-        NoopAnimationsModule,
+         OverlayModule,
+       ],
+-      providers: [provideZoneChangeDetection(), ...providers],
++      providers: [
++        provideZoneChangeDetection(),
++        ...providers,
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++      ],
+       declarations: [component],
+     });
+ 
+diff --git a/src/material/autocomplete/testing/autocomplete-harness.spec.ts b/src/material/autocomplete/testing/autocomplete-harness.spec.ts
+index 57e2a73c66c09bdcb99d5e48f89225971334dc4a..7183416796c4e08c3931ee31c520cf23c005ae93 100644
+--- a/src/material/autocomplete/testing/autocomplete-harness.spec.ts
++++ b/src/material/autocomplete/testing/autocomplete-harness.spec.ts
+@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
+ import {MatAutocompleteModule} from '../module';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatAutocompleteHarness} from './autocomplete-harness';
+ 
+@@ -11,10 +10,6 @@ describe('MatAutocompleteHarness', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [NoopAnimationsModule, MatAutocompleteModule, AutocompleteHarnessTest],
+-    });
+-
+     fixture = TestBed.createComponent(AutocompleteHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/bottom-sheet/bottom-sheet.spec.ts b/src/material/bottom-sheet/bottom-sheet.spec.ts
+index 1ba7af4a3917888bfa1241d633195da7c9ef13d6..16fcd939b9c4cf9d05fc796cf9a10386f2ee7a04 100644
+--- a/src/material/bottom-sheet/bottom-sheet.spec.ts
++++ b/src/material/bottom-sheet/bottom-sheet.spec.ts
+@@ -30,12 +30,12 @@ import {
+   tick,
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ 
+ import {MAT_BOTTOM_SHEET_DEFAULT_OPTIONS, MatBottomSheet} from './bottom-sheet';
+ import {MAT_BOTTOM_SHEET_DATA, MatBottomSheetConfig} from './bottom-sheet-config';
+ import {MatBottomSheetModule} from './bottom-sheet-module';
+ import {MatBottomSheetRef} from './bottom-sheet-ref';
++import {MATERIAL_ANIMATIONS} from '../core';
+ 
+ describe('MatBottomSheet', () => {
+   let bottomSheet: MatBottomSheet;
+@@ -50,7 +50,6 @@ describe('MatBottomSheet', () => {
+     TestBed.configureTestingModule({
+       imports: [
+         MatBottomSheetModule,
+-        NoopAnimationsModule,
+         ComponentWithChildViewContainer,
+         ComponentWithTemplateRef,
+         ContentElementDialog,
+@@ -60,7 +59,10 @@ describe('MatBottomSheet', () => {
+         BottomSheetWithInjectedData,
+         ShadowDomComponent,
+       ],
+-      providers: [{provide: Location, useClass: SpyLocation}],
++      providers: [
++        {provide: Location, useClass: SpyLocation},
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++      ],
+     });
+ 
+     bottomSheet = TestBed.inject(MatBottomSheet);
+@@ -877,7 +879,8 @@ describe('MatBottomSheet with parent MatBottomSheet', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatBottomSheetModule, NoopAnimationsModule, ComponentThatProvidesMatBottomSheet],
++      imports: [MatBottomSheetModule, ComponentThatProvidesMatBottomSheet],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+ 
+     parentBottomSheet = TestBed.inject(MatBottomSheet);
+@@ -957,13 +960,11 @@ describe('MatBottomSheet with default options', () => {
+     };
+ 
+     TestBed.configureTestingModule({
+-      imports: [
+-        MatBottomSheetModule,
+-        NoopAnimationsModule,
+-        ComponentWithChildViewContainer,
+-        DirectiveWithViewContainer,
++      imports: [MatBottomSheetModule, ComponentWithChildViewContainer, DirectiveWithViewContainer],
++      providers: [
++        {provide: MAT_BOTTOM_SHEET_DEFAULT_OPTIONS, useValue: defaultConfig},
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+-      providers: [{provide: MAT_BOTTOM_SHEET_DEFAULT_OPTIONS, useValue: defaultConfig}],
+     });
+ 
+     bottomSheet = TestBed.inject(MatBottomSheet);
+diff --git a/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts b/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts
+index c7951159a8947fed8c4f01d09bb51fc2bc75713a..19357c6355d59b3a7b4b67c95a7701b354a86eb8 100644
+--- a/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts
++++ b/src/material/bottom-sheet/testing/bottom-sheet-harness.spec.ts
+@@ -3,7 +3,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatBottomSheet, MatBottomSheetConfig, MatBottomSheetModule} from '../../bottom-sheet';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatBottomSheetHarness} from './bottom-sheet-harness';
+ 
+ describe('MatBottomSheetHarness', () => {
+@@ -11,10 +10,6 @@ describe('MatBottomSheetHarness', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatBottomSheetModule, NoopAnimationsModule, BottomSheetHarnessTest],
+-    });
+-
+     fixture = TestBed.createComponent(BottomSheetHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+diff --git a/src/material/chips/chip-grid.spec.ts b/src/material/chips/chip-grid.spec.ts
+index 7b9357f6b2b5c3b4497d6396335d82d895598926..f11f2691735d0eba12b5d37287ec3ad72df9af9d 100644
+--- a/src/material/chips/chip-grid.spec.ts
++++ b/src/material/chips/chip-grid.spec.ts
+@@ -38,6 +38,7 @@ import {MatFormFieldModule} from '../form-field';
+ import {MatInputModule} from '../input';
+ import {By} from '@angular/platform-browser';
+ import {MatChipEvent, MatChipGrid, MatChipInputEvent, MatChipRow, MatChipsModule} from './index';
++import {MATERIAL_ANIMATIONS} from '../core';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ 
+ describe('MatChipGrid', () => {
+@@ -121,13 +122,8 @@ describe('MatChipGrid', () => {
+     });
+ 
+     describe('focus behaviors', () => {
+-      let fixture: ComponentFixture<StandardChipGrid>;
+-
+-      beforeEach(() => {
+-        fixture = createComponent(StandardChipGrid);
+-      });
+-
+       it('should focus the first chip on focus', () => {
++        const fixture = createComponent(StandardChipGrid);
+         chipGridInstance.focus();
+         fixture.detectChanges();
+ 
+@@ -135,6 +131,7 @@ describe('MatChipGrid', () => {
+       });
+ 
+       it('should focus the primary action when calling the `focus` method', () => {
++        const fixture = createComponent(StandardChipGrid);
+         chips.last.focus();
+         fixture.detectChanges();
+ 
+@@ -142,6 +139,8 @@ describe('MatChipGrid', () => {
+       });
+ 
+       it('should not be able to become focused when disabled', () => {
++        const fixture = createComponent(StandardChipGrid);
++
+         expect(chipGridInstance.focused)
+           .withContext('Expected grid to not be focused.')
+           .toBe(false);
+@@ -159,6 +158,7 @@ describe('MatChipGrid', () => {
+       });
+ 
+       it('should remove the tabindex from the grid if it is disabled', () => {
++        const fixture = createComponent(StandardChipGrid);
+         expect(chipGridNativeElement.getAttribute('tabindex')).toBe('0');
+ 
+         chipGridInstance.disabled = true;
+@@ -170,6 +170,9 @@ describe('MatChipGrid', () => {
+ 
+       describe('on chip destroy', () => {
+         it('should focus the next item', () => {
++          // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.
++          // It can indicate a deeper issue with the chips.
++          const fixture = createComponent(StandardChipGrid, undefined, [NoopAnimationsModule]);
+           const midItem = chips.get(2)!;
+ 
+           // Focus the middle item
+@@ -185,6 +188,9 @@ describe('MatChipGrid', () => {
+         });
+ 
+         it('should focus the previous item', () => {
++          // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.
++          // It can indicate a deeper issue with the chips.
++          const fixture = createComponent(StandardChipGrid, undefined, [NoopAnimationsModule]);
+           // Focus the last item
+           chips.last.focus();
+ 
+@@ -198,6 +204,9 @@ describe('MatChipGrid', () => {
+         });
+ 
+         it('should not focus if chip grid is not focused', fakeAsync(() => {
++          // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.
++          // It can indicate a deeper issue with the chips.
++          const fixture = createComponent(StandardChipGrid, undefined, [NoopAnimationsModule]);
+           const midItem = chips.get(2)!;
+ 
+           // Focus and blur the middle item
+@@ -216,6 +225,9 @@ describe('MatChipGrid', () => {
+         }));
+ 
+         it('should focus the grid if the last focused item is removed', () => {
++          // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.
++          // It can indicate a deeper issue with the chips.
++          const fixture = createComponent(StandardChipGrid, undefined, [NoopAnimationsModule]);
+           testComponent.chips = [0];
+           fixture.changeDetectorRef.markForCheck();
+ 
+@@ -232,6 +244,7 @@ describe('MatChipGrid', () => {
+       });
+ 
+       it('should have a focus indicator', () => {
++        createComponent(StandardChipGrid, undefined, [NoopAnimationsModule]);
+         const focusIndicators = chipGridNativeElement.querySelectorAll(
+           '.mat-mdc-chip-primary-focus-indicator',
+         );
+@@ -488,14 +501,11 @@ describe('MatChipGrid', () => {
+   });
+ 
+   describe('FormFieldChipGrid', () => {
+-    let fixture: ComponentFixture<FormFieldChipGrid>;
+-
+-    beforeEach(() => {
+-      fixture = createComponent(FormFieldChipGrid);
+-    });
+-
+     describe('keyboard behavior', () => {
+       it('should maintain focus if the active chip is deleted', () => {
++        // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.
++        // It can indicate a deeper issue with the chips.
++        const fixture = createComponent(FormFieldChipGrid, undefined, [NoopAnimationsModule]);
+         const secondChip = fixture.nativeElement.querySelectorAll('.mat-mdc-chip')[1];
+         const secondChipAction = secondChip.querySelector('.mdc-evolution-chip__action--primary');
+ 
+@@ -512,6 +522,7 @@ describe('MatChipGrid', () => {
+ 
+       describe('when the input has focus', () => {
+         it('should not focus the last chip when press DELETE', () => {
++          const fixture = createComponent(FormFieldChipGrid);
+           let nativeInput = fixture.nativeElement.querySelector('input');
+ 
+           // Focus the input
+@@ -527,6 +538,7 @@ describe('MatChipGrid', () => {
+         });
+ 
+         it('should focus the last chip when press BACKSPACE', () => {
++          const fixture = createComponent(FormFieldChipGrid);
+           let nativeInput = fixture.nativeElement.querySelector('input');
+ 
+           // Focus the input
+@@ -542,6 +554,7 @@ describe('MatChipGrid', () => {
+         });
+ 
+         it('should not focus the last chip when pressing BACKSPACE on a non-empty input', () => {
++          const fixture = createComponent(FormFieldChipGrid);
+           const nativeInput = fixture.nativeElement.querySelector('input');
+           nativeInput.value = 'hello';
+           nativeInput.focus();
+@@ -558,6 +571,7 @@ describe('MatChipGrid', () => {
+     });
+ 
+     it('should complete the stateChanges stream on destroy', () => {
++      const fixture = createComponent(FormFieldChipGrid);
+       const spy = jasmine.createSpy('stateChanges complete');
+       const subscription = chipGridInstance.stateChanges.subscribe({complete: spy});
+ 
+@@ -568,18 +582,14 @@ describe('MatChipGrid', () => {
+   });
+ 
+   describe('with chip remove', () => {
+-    let fixture: ComponentFixture<ChipGridWithRemove>;
+-    let trailingActions: NodeListOf<HTMLElement>;
+-
+-    beforeEach(fakeAsync(() => {
+-      fixture = createComponent(ChipGridWithRemove);
++    it('should properly focus next item if chip is removed through click', fakeAsync(() => {
++      // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.
++      // It can indicate a deeper issue with the chips.
++      const fixture = createComponent(ChipGridWithRemove, undefined, [NoopAnimationsModule]);
+       flush();
+-      trailingActions = chipGridNativeElement.querySelectorAll(
++      const trailingActions = chipGridNativeElement.querySelectorAll<HTMLElement>(
+         '.mdc-evolution-chip__action--trailing',
+       );
+-    }));
+-
+-    it('should properly focus next item if chip is removed through click', fakeAsync(() => {
+       const chip = chips.get(2)!;
+       chip.focus();
+       fixture.detectChanges();
+@@ -1018,6 +1028,7 @@ describe('MatChipGrid', () => {
+   function createComponent<T>(
+     component: Type<T>,
+     direction: Direction = 'ltr',
++    additionalImports: Type<unknown>[] = [],
+   ): ComponentFixture<T> {
+     directionality = {
+       value: direction,
+@@ -1031,9 +1042,12 @@ describe('MatChipGrid', () => {
+         MatChipsModule,
+         MatFormFieldModule,
+         MatInputModule,
+-        NoopAnimationsModule,
++        ...additionalImports,
++      ],
++      providers: [
++        {provide: Directionality, useValue: directionality},
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+-      providers: [{provide: Directionality, useValue: directionality}],
+       declarations: [component],
+     });
+ 
+diff --git a/src/material/chips/chip-input.spec.ts b/src/material/chips/chip-input.spec.ts
+index 36033b9e38e0824eff3c02f3902e6c436c135273..02944f92c2bee5eec48fa5b1d2831f058f774fbc 100644
+--- a/src/material/chips/chip-input.spec.ts
++++ b/src/material/chips/chip-input.spec.ts
+@@ -10,7 +10,6 @@ import {Component, DebugElement, ViewChild} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush, waitForAsync} from '@angular/core/testing';
+ import {MatFormFieldModule} from '../form-field';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
+ import {
+   MAT_CHIPS_DEFAULT_OPTIONS,
+@@ -20,6 +19,7 @@ import {
+   MatChipsDefaultOptions,
+   MatChipsModule,
+ } from './index';
++import {MATERIAL_ANIMATIONS} from '../core';
+ 
+ describe('MatChipInput', () => {
+   let fixture: ComponentFixture<TestChipInput>;
+@@ -31,7 +31,7 @@ describe('MatChipInput', () => {
+ 
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [PlatformModule, MatChipsModule, MatFormFieldModule, NoopAnimationsModule],
++      imports: [PlatformModule, MatChipsModule, MatFormFieldModule],
+       providers: [
+         {
+           provide: Directionality,
+@@ -42,6 +42,7 @@ describe('MatChipInput', () => {
+             };
+           },
+         },
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+       declarations: [TestChipInput],
+     });
+@@ -216,13 +217,14 @@ describe('MatChipInput', () => {
+       fixture.destroy();
+ 
+       TestBed.resetTestingModule().configureTestingModule({
+-        imports: [MatChipsModule, MatFormFieldModule, PlatformModule, NoopAnimationsModule],
++        imports: [MatChipsModule, MatFormFieldModule, PlatformModule],
+         declarations: [TestChipInput],
+         providers: [
+           {
+             provide: MAT_CHIPS_DEFAULT_OPTIONS,
+             useValue: {separatorKeyCodes: [COMMA]} as MatChipsDefaultOptions,
+           },
++          {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+         ],
+       });
+ 
+diff --git a/src/material/core/ripple/ripple.spec.ts b/src/material/core/ripple/ripple.spec.ts
+index cf04a674a4a44b0036aae49c4d506e662f121bfa..56cb5786d11e838e22c074bc888fbbfeab900c53 100644
+--- a/src/material/core/ripple/ripple.spec.ts
++++ b/src/material/core/ripple/ripple.spec.ts
+@@ -7,9 +7,8 @@ import {
+   dispatchMouseEvent,
+   dispatchTouchEvent,
+ } from '@angular/cdk/testing/private';
+-import {Component, ViewChild, ViewEncapsulation} from '@angular/core';
++import {Component, Provider, ViewChild, ViewEncapsulation} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {
+   MAT_RIPPLE_GLOBAL_OPTIONS,
+   MatRipple,
+@@ -18,6 +17,7 @@ import {
+   RippleGlobalOptions,
+   RippleState,
+ } from './index';
++import {MATERIAL_ANIMATIONS} from '../animation/animation';
+ 
+ describe('MatRipple', () => {
+   let fixture: ComponentFixture<any>;
+@@ -494,14 +494,17 @@ describe('MatRipple', () => {
+     function createTestComponent(
+       rippleConfig: RippleGlobalOptions,
+       testComponent: any = BasicRippleContainer,
+-      extraImports: any[] = [],
++      extraProviders: Provider[] = [],
+     ) {
+       // Reset the previously configured testing module to be able set new providers.
+       // The testing module has been initialized in the root describe group for the ripples.
+       TestBed.resetTestingModule();
+       TestBed.configureTestingModule({
+-        imports: [MatRippleModule, ...extraImports, testComponent],
+-        providers: [{provide: MAT_RIPPLE_GLOBAL_OPTIONS, useValue: rippleConfig}],
++        imports: [MatRippleModule, testComponent],
++        providers: [
++          {provide: MAT_RIPPLE_GLOBAL_OPTIONS, useValue: rippleConfig},
++          ...extraProviders,
++        ],
+       });
+ 
+       fixture = TestBed.createComponent(testComponent);
+@@ -585,10 +588,12 @@ describe('MatRipple', () => {
+       expect(rippleTarget.querySelectorAll('.mat-ripple-element').length).toBe(0);
+     });
+ 
+-    it('should not mutate the global options when NoopAnimationsModule is present', () => {
++    it('should not mutate the global options when animations are disabled', () => {
+       const options: RippleGlobalOptions = {};
+ 
+-      createTestComponent(options, RippleContainerWithoutBindings, [NoopAnimationsModule]);
++      createTestComponent(options, RippleContainerWithoutBindings, [
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++      ]);
+ 
+       expect(options.animation).toBeFalsy();
+     });
+@@ -600,7 +605,8 @@ describe('MatRipple', () => {
+     beforeEach(() => {
+       TestBed.resetTestingModule();
+       TestBed.configureTestingModule({
+-        imports: [NoopAnimationsModule, MatRippleModule, BasicRippleContainer],
++        imports: [MatRippleModule, BasicRippleContainer],
++        providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+       });
+ 
+       fixture = TestBed.createComponent(BasicRippleContainer);
+diff --git a/src/material/datepicker/date-range-input.spec.ts b/src/material/datepicker/date-range-input.spec.ts
+index de0eea56fc81ca925b2646f43bb9e16aea3739d2..4a62ea7edc5d95c06e8e45336a5182f6933a332d 100644
+--- a/src/material/datepicker/date-range-input.spec.ts
++++ b/src/material/datepicker/date-range-input.spec.ts
+@@ -15,9 +15,8 @@ import {
+   Validator,
+   Validators,
+ } from '@angular/forms';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subscription} from 'rxjs';
+-import {ErrorStateMatcher, MatNativeDateModule} from '../core';
++import {ErrorStateMatcher, MATERIAL_ANIMATIONS, MatNativeDateModule} from '../core';
+ import {MatFormField, MatFormFieldModule, MatLabel} from '../form-field';
+ import {MatInputModule} from '../input';
+ import {MatDateRangeInput} from './date-range-input';
+@@ -33,12 +32,14 @@ describe('MatDateRangeInput', () => {
+         MatDatepickerModule,
+         MatFormFieldModule,
+         MatInputModule,
+-        NoopAnimationsModule,
+         ReactiveFormsModule,
+         MatNativeDateModule,
+         component,
+       ],
+-      providers,
++      providers: [
++        ...providers,
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++      ],
+     });
+ 
+     return TestBed.createComponent(component);
+diff --git a/src/material/datepicker/datepicker-actions.spec.ts b/src/material/datepicker/datepicker-actions.spec.ts
+index bfc90c87a351778a451b39e4d7c54b93ba7d26e4..a513b7440efa875e22ff8572fcc6ab9e5ac7950b 100644
+--- a/src/material/datepicker/datepicker-actions.spec.ts
++++ b/src/material/datepicker/datepicker-actions.spec.ts
+@@ -1,10 +1,9 @@
+ import {Component, ElementRef, Type, ViewChild} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+-import {MatNativeDateModule} from '../core';
++import {MATERIAL_ANIMATIONS, MatNativeDateModule} from '../core';
+ import {MatFormFieldModule} from '../form-field';
+ import {MatInputModule} from '../input';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatDatepicker} from './datepicker';
+ import {MatDatepickerModule} from './datepicker-module';
+ 
+@@ -17,10 +16,10 @@ describe('MatDatepickerActions', () => {
+         MatDatepickerModule,
+         MatFormFieldModule,
+         MatInputModule,
+-        NoopAnimationsModule,
+         ReactiveFormsModule,
+         MatNativeDateModule,
+       ],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+ 
+     return TestBed.createComponent(component);
+diff --git a/src/material/datepicker/datepicker.spec.ts b/src/material/datepicker/datepicker.spec.ts
+index 3c54d7b4220c8515bffbed81323849ba97b6849c..54be77ddf40efc186092b59b38323189d61504ce 100644
+--- a/src/material/datepicker/datepicker.spec.ts
++++ b/src/material/datepicker/datepicker.spec.ts
+@@ -30,11 +30,10 @@ import {
+   ReactiveFormsModule,
+   Validator,
+ } from '@angular/forms';
+-import {MAT_DATE_LOCALE, MatNativeDateModule, NativeDateModule} from '../core';
++import {MAT_DATE_LOCALE, MATERIAL_ANIMATIONS, MatNativeDateModule, NativeDateModule} from '../core';
+ import {MatFormField, MatFormFieldModule} from '../form-field';
+ import {MatInputModule} from '../input';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
+ import {DEC, JAN, JUL, JUN, SEP} from '../testing';
+ import {MatDatepicker} from './datepicker';
+@@ -64,11 +63,13 @@ describe('MatDatepicker', () => {
+         MatDatepickerModule,
+         MatFormFieldModule,
+         MatInputModule,
+-        NoopAnimationsModule,
+         ReactiveFormsModule,
+         ...imports,
+       ],
+-      providers,
++      providers: [
++        ...providers,
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++      ],
+       declarations: [component, ...declarations],
+     });
+ 
+diff --git a/src/material/datepicker/testing/date-range-input-harness.spec.ts b/src/material/datepicker/testing/date-range-input-harness.spec.ts
+index e3822e0b55e315da1594168047fd248f87e5a1c1..5396975fe711bdf714446b73b35a01850ca49fbe 100644
+--- a/src/material/datepicker/testing/date-range-input-harness.spec.ts
++++ b/src/material/datepicker/testing/date-range-input-harness.spec.ts
+@@ -3,15 +3,14 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {Component} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {FormsModule} from '@angular/forms';
+-import {MatNativeDateModule} from '../../core';
++import {MATERIAL_ANIMATIONS, MatNativeDateModule} from '../../core';
+ import {
++  MatDatepickerModule,
+   MatDateRangeInput,
+   MatDateRangePicker,
+-  MatDatepickerModule,
+   MatEndDate,
+   MatStartDate,
+ } from '../../datepicker';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatCalendarHarness} from './calendar-harness';
+ import {
+   MatDateRangeInputHarness,
+@@ -25,15 +24,9 @@ describe('matDateRangeInputHarness', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        NoopAnimationsModule,
+-        MatNativeDateModule,
+-        MatDatepickerModule,
+-        FormsModule,
+-        DateRangeInputHarnessTest,
+-      ],
++      imports: [MatNativeDateModule, MatDatepickerModule, FormsModule, DateRangeInputHarnessTest],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+-
+     fixture = TestBed.createComponent(DateRangeInputHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/datepicker/testing/datepicker-input-harness.spec.ts b/src/material/datepicker/testing/datepicker-input-harness.spec.ts
+index 27a1e7d70a87a3d523e0e5a8cebb0f12ca442c0a..8cf8739c62a880f405c53291c781ccdbca6ad793 100644
+--- a/src/material/datepicker/testing/datepicker-input-harness.spec.ts
++++ b/src/material/datepicker/testing/datepicker-input-harness.spec.ts
+@@ -3,9 +3,8 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {Component} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {FormsModule} from '@angular/forms';
+-import {DateAdapter, MatNativeDateModule} from '../../core';
++import {DateAdapter, MATERIAL_ANIMATIONS, MatNativeDateModule} from '../../core';
+ import {MatDatepickerModule} from '../../datepicker';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatCalendarHarness} from './calendar-harness';
+ import {MatDatepickerInputHarness} from './datepicker-input-harness';
+ 
+@@ -15,15 +14,9 @@ describe('MatDatepickerInputHarness', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        NoopAnimationsModule,
+-        MatNativeDateModule,
+-        MatDatepickerModule,
+-        FormsModule,
+-        DatepickerInputHarnessTest,
+-      ],
++      imports: [MatNativeDateModule],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+-
+     fixture = TestBed.createComponent(DatepickerInputHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts b/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
+index 93bd4830507024b8736de7911d8ebeaeea30737d..bf102c2f1d0f4d6fc3ee4dd4e5134ee501aba728 100644
+--- a/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
++++ b/src/material/datepicker/testing/datepicker-toggle-harness.spec.ts
+@@ -2,9 +2,8 @@ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {Component} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {MatNativeDateModule} from '../../core';
++import {MATERIAL_ANIMATIONS, MatNativeDateModule} from '../../core';
+ import {MatDatepickerModule} from '../../datepicker';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatCalendarHarness} from './calendar-harness';
+ import {MatDatepickerToggleHarness} from './datepicker-toggle-harness';
+ 
+@@ -14,14 +13,9 @@ describe('MatDatepickerToggleHarness', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        NoopAnimationsModule,
+-        MatNativeDateModule,
+-        MatDatepickerModule,
+-        DatepickerToggleHarnessTest,
+-      ],
++      imports: [MatNativeDateModule],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+-
+     fixture = TestBed.createComponent(DatepickerToggleHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index 8c2f3991f3c188b4ae33be9f08fd96f42f9023de..1abfc6b387e0ad178a0d79ba97aec7e66c04c183 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -38,7 +38,6 @@ import {
+   tick,
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
+ import {CLOSE_ANIMATION_DURATION, OPEN_ANIMATION_DURATION} from './dialog-container';
+ import {
+@@ -53,6 +52,7 @@ import {
+   MatDialogState,
+   MatDialogTitle,
+ } from './index';
++import {MATERIAL_ANIMATIONS} from '../core';
+ 
+ describe('MatDialog', () => {
+   let dialog: MatDialog;
+@@ -68,7 +68,6 @@ describe('MatDialog', () => {
+     TestBed.configureTestingModule({
+       imports: [
+         MatDialogModule,
+-        NoopAnimationsModule,
+         ComponentWithChildViewContainer,
+         ComponentWithTemplateRef,
+         PizzaMsg,
+@@ -80,6 +79,7 @@ describe('MatDialog', () => {
+       ],
+       providers: [
+         {provide: Location, useClass: SpyLocation},
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+         {
+           provide: ScrollDispatcher,
+           useFactory: () => ({
+@@ -1871,7 +1871,7 @@ describe('MatDialog with a parent MatDialog', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatDialogModule, NoopAnimationsModule, ComponentThatProvidesMatDialog],
++      imports: [MatDialogModule, ComponentThatProvidesMatDialog],
+       providers: [
+         {
+           provide: OverlayContainer,
+@@ -1881,6 +1881,7 @@ describe('MatDialog with a parent MatDialog', () => {
+           },
+         },
+         {provide: Location, useClass: SpyLocation},
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+     });
+ 
+@@ -1979,13 +1980,11 @@ describe('MatDialog with default options', () => {
+     };
+ 
+     TestBed.configureTestingModule({
+-      imports: [
+-        MatDialogModule,
+-        NoopAnimationsModule,
+-        ComponentWithChildViewContainer,
+-        DirectiveWithViewContainer,
++      imports: [MatDialogModule, ComponentWithChildViewContainer, DirectiveWithViewContainer],
++      providers: [
++        {provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: defaultConfig},
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+-      providers: [{provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: defaultConfig}],
+     });
+ 
+     dialog = TestBed.inject(MatDialog);
+diff --git a/src/material/dialog/dialog.zone.spec.ts b/src/material/dialog/dialog.zone.spec.ts
+index 0c945017dadeb1bfdf4045d30a7d153bb36d8ede..75f9ec1e787080eb1cf0b1c2f47407f1d0bbb785 100644
+--- a/src/material/dialog/dialog.zone.spec.ts
++++ b/src/material/dialog/dialog.zone.spec.ts
+@@ -13,8 +13,8 @@ import {
+ } from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush} from '@angular/core/testing';
+ import {MatDialog, MatDialogModule, MatDialogRef} from '../dialog';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
++import {MATERIAL_ANIMATIONS} from '../core';
+ 
+ describe('MatDialog', () => {
+   let dialog: MatDialog;
+@@ -28,7 +28,6 @@ describe('MatDialog', () => {
+     TestBed.configureTestingModule({
+       imports: [
+         MatDialogModule,
+-        NoopAnimationsModule,
+         ComponentWithChildViewContainer,
+         PizzaMsg,
+         DirectiveWithViewContainer,
+@@ -36,6 +35,7 @@ describe('MatDialog', () => {
+       providers: [
+         provideZoneChangeDetection(),
+         {provide: Location, useClass: SpyLocation},
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+         {
+           provide: ScrollDispatcher,
+           useFactory: () => ({
+diff --git a/src/material/dialog/testing/dialog-harness.spec.ts b/src/material/dialog/testing/dialog-harness.spec.ts
+index fe12ab6382d68942c470b4ca614900eeb7e18d82..56b9c6ff2bebe5e6caa8fe5423c07343799616dc 100644
+--- a/src/material/dialog/testing/dialog-harness.spec.ts
++++ b/src/material/dialog/testing/dialog-harness.spec.ts
+@@ -9,8 +9,8 @@ import {
+   MatDialogContent,
+   MatDialogTitle,
+ } from '../../dialog';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatDialogHarness} from './dialog-harness';
++import {MATERIAL_ANIMATIONS} from '../../core';
+ 
+ describe('MatDialogHarness', () => {
+   let fixture: ComponentFixture<DialogHarnessTest>;
+@@ -18,7 +18,7 @@ describe('MatDialogHarness', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [NoopAnimationsModule],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+ 
+     fixture = TestBed.createComponent(DialogHarnessTest);
+diff --git a/src/material/dialog/testing/dialog-opener.spec.ts b/src/material/dialog/testing/dialog-opener.spec.ts
+index 670fc28bb6a60b93207afb73dccd75536e23a555..7f8877f310ba5b0e9d66ff316c763526c53b605f 100644
+--- a/src/material/dialog/testing/dialog-opener.spec.ts
++++ b/src/material/dialog/testing/dialog-opener.spec.ts
+@@ -1,16 +1,9 @@
+ import {Component, inject} from '@angular/core';
+ import {TestBed, fakeAsync, flush} from '@angular/core/testing';
+ import {MAT_DIALOG_DATA, MatDialogRef, MatDialogState} from '../../dialog';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+-import {MatTestDialogOpener, MatTestDialogOpenerModule} from './dialog-opener';
++import {MatTestDialogOpener} from './dialog-opener';
+ 
+ describe('MatTestDialogOpener', () => {
+-  beforeEach(fakeAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatTestDialogOpenerModule, NoopAnimationsModule, ExampleComponent],
+-    });
+-  }));
+-
+   it('should open a dialog when created', fakeAsync(() => {
+     const fixture = TestBed.createComponent(MatTestDialogOpener.withComponent(ExampleComponent));
+     flush();
+diff --git a/src/material/expansion/expansion.spec.ts b/src/material/expansion/expansion.spec.ts
+index 2fedd3188d8ad8382ac08078b9630d39c8c06229..9eb562d9d8a0f28f79da6f29874c7eb91e852b69 100644
+--- a/src/material/expansion/expansion.spec.ts
++++ b/src/material/expansion/expansion.spec.ts
+@@ -14,20 +14,19 @@ import {
+   waitForAsync,
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {
+   MAT_EXPANSION_PANEL_DEFAULT_OPTIONS,
+   MatExpansionModule,
+   MatExpansionPanel,
+   MatExpansionPanelHeader,
+ } from './index';
++import {MATERIAL_ANIMATIONS} from '../core';
+ 
+ describe('MatExpansionPanel', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [
+         MatExpansionModule,
+-        NoopAnimationsModule,
+         PanelWithContent,
+         PanelWithContentInNgIf,
+         PanelWithCustomMargin,
+@@ -37,6 +36,12 @@ describe('MatExpansionPanel', () => {
+         PanelWithHeaderTabindex,
+         NestedLazyPanelWithContent,
+       ],
++      providers: [
++        {
++          provide: MATERIAL_ANIMATIONS,
++          useValue: {animationsDisabled: true},
++        },
++      ],
+     });
+   }));
+ 
+@@ -383,7 +388,7 @@ describe('MatExpansionPanel', () => {
+ 
+   it('should be able to set the default options through the injection token', () => {
+     TestBed.resetTestingModule().configureTestingModule({
+-      imports: [MatExpansionModule, NoopAnimationsModule],
++      imports: [MatExpansionModule],
+       providers: [
+         {
+           provide: MAT_EXPANSION_PANEL_DEFAULT_OPTIONS,
+diff --git a/src/material/expansion/testing/expansion-harness.spec.ts b/src/material/expansion/testing/expansion-harness.spec.ts
+index f6e73173ed49a7b35e46f2a039b4338b8959b180..5f33a95c5f151375a1d8908a92d2086683cde930 100644
+--- a/src/material/expansion/testing/expansion-harness.spec.ts
++++ b/src/material/expansion/testing/expansion-harness.spec.ts
+@@ -3,7 +3,6 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {Component} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {MatAccordionTogglePosition, MatExpansionModule} from '../../expansion';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatAccordionHarness} from './accordion-harness';
+ import {MatExpansionPanelHarness} from './expansion-harness';
+ 
+@@ -12,10 +11,6 @@ describe('MatExpansionHarness', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatExpansionModule, NoopAnimationsModule, ExpansionHarnessTestComponent],
+-    });
+-
+     fixture = TestBed.createComponent(ExpansionHarnessTestComponent);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/form-field/testing/form-field-harness.spec.ts b/src/material/form-field/testing/form-field-harness.spec.ts
+index 25ab06c3302ea34aa954a5717ec7037faf612731..dba8e01df2e7387fbb29935894a81b1aa7c53430 100644
+--- a/src/material/form-field/testing/form-field-harness.spec.ts
++++ b/src/material/form-field/testing/form-field-harness.spec.ts
+@@ -4,12 +4,11 @@ import {ComponentHarness, HarnessLoader, HarnessPredicate, parallel} from '@angu
+ import {createFakeEvent, dispatchFakeEvent} from '@angular/cdk/testing/private';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatError, MatFormField, MatHint, MatLabel, MatPrefix, MatSuffix} from '../../form-field';
+ import {MatAutocomplete, MatAutocompleteTrigger} from '../../autocomplete';
+ import {MatInput} from '../../input';
+ import {MatSelect} from '../../select';
+-import {MatNativeDateModule, MatOption} from '../../core';
++import {MATERIAL_ANIMATIONS, MatNativeDateModule, MatOption} from '../../core';
+ import {
+   MatDateRangeInput,
+   MatDateRangePicker,
+@@ -31,12 +30,8 @@ describe('MatFormFieldHarness', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        NoopAnimationsModule,
+-        MatNativeDateModule,
+-        FormFieldHarnessTest,
+-        MatDatepickerModule,
+-      ],
++      imports: [MatNativeDateModule, FormFieldHarnessTest, MatDatepickerModule],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+ 
+     fixture = TestBed.createComponent(FormFieldHarnessTest);
+diff --git a/src/material/grid-list/testing/grid-list-harness.spec.ts b/src/material/grid-list/testing/grid-list-harness.spec.ts
+index f6c70b23d4feafc93cfc6da88ef5ecd5b0c2c5ed..937afa3f13931d256ed240ab7a1bd99a914e1c11 100644
+--- a/src/material/grid-list/testing/grid-list-harness.spec.ts
++++ b/src/material/grid-list/testing/grid-list-harness.spec.ts
+@@ -2,7 +2,6 @@ import {Component, signal} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatGridListModule} from '../../grid-list';
+ import {MatGridListHarness} from './grid-list-harness';
+ import {MatGridTileHarness} from './grid-tile-harness';
+@@ -12,10 +11,6 @@ describe('MatGridListHarness', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatGridListModule, NoopAnimationsModule, GridListHarnessTest],
+-    });
+-
+     fixture = TestBed.createComponent(GridListHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+diff --git a/src/material/input/testing/input-harness.spec.ts b/src/material/input/testing/input-harness.spec.ts
+index e2e1e9b6f2703cee7ec4ae657ed155e53e69bb19..e4d95ee6f4de6ffcf998447db67e4382008887d0 100644
+--- a/src/material/input/testing/input-harness.spec.ts
++++ b/src/material/input/testing/input-harness.spec.ts
+@@ -5,7 +5,6 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {FormsModule} from '@angular/forms';
+ import {MatInputModule} from '../module';
+ import {getSupportedInputTypes} from '@angular/cdk/platform';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatInputHarness} from './input-harness';
+ 
+ describe('MatInputHarness', () => {
+@@ -13,10 +12,6 @@ describe('MatInputHarness', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [NoopAnimationsModule, MatInputModule, FormsModule, InputHarnessTest],
+-    });
+-
+     fixture = TestBed.createComponent(InputHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/input/testing/native-select-harness.spec.ts b/src/material/input/testing/native-select-harness.spec.ts
+index acf2349d8abee77606b4e839a25645e7f16850ec..856b3c2739efbaf25e2e5abdb7f013dfdc490317 100644
+--- a/src/material/input/testing/native-select-harness.spec.ts
++++ b/src/material/input/testing/native-select-harness.spec.ts
+@@ -4,7 +4,6 @@ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {FormsModule} from '@angular/forms';
+ import {MatInputModule} from '../module';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatNativeSelectHarness} from './native-select-harness';
+ 
+ describe('MatNativeSelectHarness', () => {
+@@ -12,10 +11,6 @@ describe('MatNativeSelectHarness', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [NoopAnimationsModule, MatInputModule, FormsModule, SelectHarnessTest],
+-    });
+-
+     fixture = TestBed.createComponent(SelectHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts
+index 8b990c7ddf3f445a7705b0702f7034177f01cace..ee8f79e6acfff749ae37fe5f53677a4bdce6411a 100644
+--- a/src/material/menu/menu.spec.ts
++++ b/src/material/menu/menu.spec.ts
+@@ -29,7 +29,7 @@ import {
+   ViewChildren,
+ } from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+-import {MatRipple} from '../core';
++import {MATERIAL_ANIMATIONS, MatRipple} from '../core';
+ import {By} from '@angular/platform-browser';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
+@@ -63,10 +63,14 @@ describe('MatMenu', () => {
+     component: Type<T>,
+     providers: Provider[] = [],
+     declarations: any[] = [],
++    imports: Type<unknown>[] = [],
+   ): ComponentFixture<T> {
+     TestBed.configureTestingModule({
+-      providers,
+-      imports: [MatMenuModule, NoopAnimationsModule],
++      providers: [
++        ...providers,
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++      ],
++      imports: [MatMenuModule, ...imports],
+       declarations: [component, ...declarations],
+     });
+ 
+@@ -262,7 +266,9 @@ describe('MatMenu', () => {
+   }));
+ 
+   it('should move focus to another item if the active item is destroyed', fakeAsync(() => {
+-    const fixture = createComponent(MenuWithRepeatedItems, [], [FakeIcon]);
++    // TODO(crisbeto): figure out why NoopAnimationsModule is necessary
++    // here and our token isn't enough. Likely indicates an issue.
++    const fixture = createComponent(MenuWithRepeatedItems, [], [FakeIcon], [NoopAnimationsModule]);
+     fixture.detectChanges();
+     const triggerEl = fixture.componentInstance.triggerEl.nativeElement;
+ 
+@@ -2582,12 +2588,13 @@ describe('MatMenu', () => {
+ describe('MatMenu default overrides', () => {
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatMenuModule, NoopAnimationsModule],
++      imports: [MatMenuModule],
+       providers: [
+         {
+           provide: MAT_MENU_DEFAULT_OPTIONS,
+           useValue: {overlapTrigger: true, xPosition: 'before', yPosition: 'above'},
+         },
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+       declarations: [SimpleMenu, FakeIcon],
+     });
+diff --git a/src/material/menu/testing/menu-harness.spec.ts b/src/material/menu/testing/menu-harness.spec.ts
+index 3d2898ce8d425fee5bae9aa5773a42401274ad7e..356aecea7f8eee0107a81414eb91ad34378c743d 100644
+--- a/src/material/menu/testing/menu-harness.spec.ts
++++ b/src/material/menu/testing/menu-harness.spec.ts
+@@ -3,7 +3,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatMenuModule} from '../module';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatMenuHarness} from './menu-harness';
+ 
+ describe('MatMenuHarness', () => {
+@@ -12,10 +11,6 @@ describe('MatMenuHarness', () => {
+     let loader: HarnessLoader;
+ 
+     beforeEach(() => {
+-      TestBed.configureTestingModule({
+-        imports: [MatMenuModule, NoopAnimationsModule, MenuHarnessTest],
+-      });
+-
+       fixture = TestBed.createComponent(MenuHarnessTest);
+       fixture.detectChanges();
+       loader = TestbedHarnessEnvironment.loader(fixture);
+@@ -92,10 +87,6 @@ describe('MatMenuHarness', () => {
+     let loader: HarnessLoader;
+ 
+     beforeEach(() => {
+-      TestBed.configureTestingModule({
+-        imports: [MatMenuModule, NoopAnimationsModule, NestedMenuHarnessTest],
+-      });
+-
+       fixture = TestBed.createComponent(NestedMenuHarnessTest);
+       fixture.detectChanges();
+       loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/paginator/paginator.spec.ts b/src/material/paginator/paginator.spec.ts
+index 2908327759b0c04ecfc3dccc8641a1c11d1c2415..b39927b72d15986a20f809f484437a128128e6e7 100644
+--- a/src/material/paginator/paginator.spec.ts
++++ b/src/material/paginator/paginator.spec.ts
+@@ -3,7 +3,6 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
+ import {ThemePalette} from '../core';
+ import {MatSelect} from '../select';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {
+   MatPaginator,
+   MatPaginatorIntl,
+@@ -15,7 +14,7 @@ import {MAT_PAGINATOR_DEFAULT_OPTIONS, MatPaginatorDefaultOptions} from './pagin
+ describe('MatPaginator', () => {
+   function createComponent<T>(type: Type<T>, providers: Provider[] = []): ComponentFixture<T> {
+     TestBed.configureTestingModule({
+-      imports: [MatPaginatorModule, NoopAnimationsModule],
++      imports: [MatPaginatorModule],
+       providers: [MatPaginatorIntl, ...providers],
+       declarations: [type],
+     });
+diff --git a/src/material/paginator/testing/paginator-harness.spec.ts b/src/material/paginator/testing/paginator-harness.spec.ts
+index f26d892abd8410d249adff0bfdc02c0e01e28bb4..c298481e222564be308660c1ed51f05648182a12 100644
+--- a/src/material/paginator/testing/paginator-harness.spec.ts
++++ b/src/material/paginator/testing/paginator-harness.spec.ts
+@@ -2,7 +2,6 @@ import {Component, signal} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatPaginatorModule, PageEvent} from '../../paginator';
+ import {MatPaginatorHarness} from './paginator-harness';
+ 
+@@ -12,10 +11,6 @@ describe('MatPaginatorHarness', () => {
+   let instance: PaginatorHarnessTest;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatPaginatorModule, NoopAnimationsModule, PaginatorHarnessTest],
+-    });
+-
+     fixture = TestBed.createComponent(PaginatorHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/select/select.spec.ts b/src/material/select/select.spec.ts
+index 9c232cd14edd4f6c9424f87de4e9ad08d21ea491..30d9916a751a34179757fc2071f63285e043f600 100644
+--- a/src/material/select/select.spec.ts
++++ b/src/material/select/select.spec.ts
+@@ -57,10 +57,9 @@ import {
+   Validators,
+ } from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {EMPTY, Observable, Subject, Subscription} from 'rxjs';
+ import {map} from 'rxjs/operators';
+-import {ErrorStateMatcher, MatOption, MatOptionSelectionChange} from '../core';
++import {ErrorStateMatcher, MATERIAL_ANIMATIONS, MatOption, MatOptionSelectionChange} from '../core';
+ import {FloatLabelType, MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule} from '../form-field';
+ import {MAT_SELECT_CONFIG, MatSelectConfig} from '../select';
+ import {MatSelectModule} from './index';
+@@ -93,10 +92,10 @@ describe('MatSelect', () => {
+         MatSelectModule,
+         ReactiveFormsModule,
+         FormsModule,
+-        NoopAnimationsModule,
+         OverlayModule,
+       ],
+       providers: [
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+         {provide: Directionality, useFactory: () => (dir = {value: 'ltr', change: EMPTY})},
+         {
+           provide: ScrollDispatcher,
+@@ -2940,13 +2939,7 @@ describe('MatSelect', () => {
+     it('should default to global floating label type', () => {
+       TestBed.resetTestingModule();
+       TestBed.configureTestingModule({
+-        imports: [
+-          MatFormFieldModule,
+-          MatSelectModule,
+-          ReactiveFormsModule,
+-          FormsModule,
+-          NoopAnimationsModule,
+-        ],
++        imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, FormsModule],
+         providers: [{provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {floatLabel: 'always'}}],
+         declarations: [FloatLabelSelect],
+       });
+@@ -3330,7 +3323,7 @@ describe('MatSelect', () => {
+       fixture.destroy();
+ 
+       TestBed.resetTestingModule().configureTestingModule({
+-        imports: [MatSelectModule, ReactiveFormsModule, FormsModule, NoopAnimationsModule],
++        imports: [MatSelectModule, ReactiveFormsModule, FormsModule],
+         declarations: [SelectInsideFormGroup],
+         providers: [{provide: ErrorStateMatcher, useValue: errorStateMatcher}],
+       });
+diff --git a/src/material/select/testing/select-harness.spec.ts b/src/material/select/testing/select-harness.spec.ts
+index 18e1e66ff73819cc798a0c8fd032af7998e7de1f..df198b2eade427a496439b5ae73f95c39fe70e63 100644
+--- a/src/material/select/testing/select-harness.spec.ts
++++ b/src/material/select/testing/select-harness.spec.ts
+@@ -4,9 +4,9 @@ import {OverlayContainer} from '@angular/cdk/overlay';
+ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
++import {MATERIAL_ANIMATIONS} from '../../core';
+ import {MatFormFieldModule} from '../../form-field';
+ import {MatSelectModule} from '../module';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatSelectHarness} from './select-harness';
+ 
+ describe('MatSelectHarness', () => {
+@@ -16,15 +16,8 @@ describe('MatSelectHarness', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        MatSelectModule,
+-        MatFormFieldModule,
+-        NoopAnimationsModule,
+-        ReactiveFormsModule,
+-        SelectHarnessTest,
+-      ],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+-
+     fixture = TestBed.createComponent(SelectHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/sidenav/drawer.spec.ts b/src/material/sidenav/drawer.spec.ts
+index 7e21171f5b973c9648b7bee7211a9b8064ef2d96..d02766ae3ea6a4e56ac629f519686d74bd60c692 100644
+--- a/src/material/sidenav/drawer.spec.ts
++++ b/src/material/sidenav/drawer.spec.ts
+@@ -18,16 +18,16 @@ import {
+   waitForAsync,
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatDrawer, MatDrawerContainer, MatSidenavModule} from './index';
++import {MATERIAL_ANIMATIONS} from '../core';
+ 
+ describe('MatDrawer', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+       imports: [
+         MatSidenavModule,
+         A11yModule,
+-        NoopAnimationsModule,
+         BasicTestApp,
+         DrawerContainerNoDrawerTestApp,
+         DrawerSetToOpenedFalse,
+@@ -894,7 +894,6 @@ describe('MatDrawerContainer', () => {
+       imports: [
+         MatSidenavModule,
+         A11yModule,
+-        NoopAnimationsModule,
+         DrawerContainerTwoDrawerTestApp,
+         DrawerDelayed,
+         DrawerSetToOpenedTrue,
+diff --git a/src/material/sidenav/sidenav.spec.ts b/src/material/sidenav/sidenav.spec.ts
+index d325d20a51ad3cc4613602cd35e16a31793ecd4f..f711e135e42f81d0f65171223f52239843f2ce3a 100644
+--- a/src/material/sidenav/sidenav.spec.ts
++++ b/src/material/sidenav/sidenav.spec.ts
+@@ -1,7 +1,6 @@
+ import {Component, ViewChild} from '@angular/core';
+ import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatSidenav, MatSidenavContainer, MatSidenavModule} from './index';
+ 
+ describe('MatSidenav', () => {
+@@ -9,7 +8,6 @@ describe('MatSidenav', () => {
+     TestBed.configureTestingModule({
+       imports: [
+         MatSidenavModule,
+-        NoopAnimationsModule,
+         SidenavWithFixedPosition,
+         IndirectDescendantSidenav,
+         NestedSidenavContainers,
+diff --git a/src/material/sidenav/testing/sidenav-harness.spec.ts b/src/material/sidenav/testing/sidenav-harness.spec.ts
+index f96ced26dba1f11ae920cb14277f70180774657a..abe8d3ac42766a88fc379e6610b021fa8d089c46 100644
+--- a/src/material/sidenav/testing/sidenav-harness.spec.ts
++++ b/src/material/sidenav/testing/sidenav-harness.spec.ts
+@@ -3,7 +3,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatSidenavModule} from '../../sidenav';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatDrawerContainerHarness} from './drawer-container-harness';
+ import {MatDrawerContentHarness} from './drawer-content-harness';
+ import {MatDrawerHarness} from './drawer-harness';
+@@ -17,10 +16,6 @@ describe('MatSidenavHarness', () => {
+     let loader: HarnessLoader;
+ 
+     beforeEach(() => {
+-      TestBed.configureTestingModule({
+-        imports: [MatSidenavModule, NoopAnimationsModule, DrawerHarnessTest],
+-      });
+-
+       fixture = TestBed.createComponent(DrawerHarnessTest);
+       fixture.detectChanges();
+       loader = TestbedHarnessEnvironment.loader(fixture);
+@@ -109,10 +104,6 @@ describe('MatSidenavHarness', () => {
+     let loader: HarnessLoader;
+ 
+     beforeEach(() => {
+-      TestBed.configureTestingModule({
+-        imports: [MatSidenavModule, NoopAnimationsModule, SidenavHarnessTest],
+-      });
+-
+       fixture = TestBed.createComponent(SidenavHarnessTest);
+       fixture.detectChanges();
+       loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/snack-bar/snack-bar.spec.ts b/src/material/snack-bar/snack-bar.spec.ts
+index 242722ddae20612de8917ad35f965f2200bd1169..44de56f3084f30b2cd1d9c2558df57b33a58e032 100644
+--- a/src/material/snack-bar/snack-bar.spec.ts
++++ b/src/material/snack-bar/snack-bar.spec.ts
+@@ -12,7 +12,6 @@ import {
+   inject,
+ } from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {
+   MAT_SNACK_BAR_DATA,
+   MatSnackBar,
+@@ -22,6 +21,7 @@ import {
+   SimpleSnackBar,
+ } from './index';
+ import {MAT_SNACK_BAR_DEFAULT_OPTIONS} from './snack-bar';
++import {MATERIAL_ANIMATIONS} from '../core';
+ 
+ describe('MatSnackBar', () => {
+   let snackBar: MatSnackBar;
+@@ -41,11 +41,11 @@ describe('MatSnackBar', () => {
+     TestBed.configureTestingModule({
+       imports: [
+         MatSnackBarModule,
+-        NoopAnimationsModule,
+         ComponentWithChildViewContainer,
+         BurritosNotification,
+         DirectiveWithViewContainer,
+       ],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+ 
+     snackBar = TestBed.inject(MatSnackBar);
+@@ -515,12 +515,10 @@ describe('MatSnackBar', () => {
+   it('should be able to override the default config', fakeAsync(() => {
+     viewContainerFixture.destroy();
+ 
+-    TestBed.resetTestingModule()
+-      .overrideProvider(MAT_SNACK_BAR_DEFAULT_OPTIONS, {
+-        deps: [],
+-        useFactory: () => ({panelClass: 'custom-class'}),
+-      })
+-      .configureTestingModule({imports: [MatSnackBarModule, NoopAnimationsModule]});
++    TestBed.resetTestingModule().overrideProvider(MAT_SNACK_BAR_DEFAULT_OPTIONS, {
++      deps: [],
++      useFactory: () => ({panelClass: 'custom-class'}),
++    });
+ 
+     snackBar = TestBed.inject(MatSnackBar);
+     overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();
+@@ -674,12 +672,7 @@ describe('MatSnackBar with parent MatSnackBar', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        MatSnackBarModule,
+-        NoopAnimationsModule,
+-        ComponentThatProvidesMatSnackBar,
+-        DirectiveWithViewContainer,
+-      ],
++      imports: [MatSnackBarModule, ComponentThatProvidesMatSnackBar, DirectiveWithViewContainer],
+     });
+ 
+     parentSnackBar = TestBed.inject(MatSnackBar);
+@@ -749,12 +742,7 @@ describe('MatSnackBar Positioning', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        MatSnackBarModule,
+-        NoopAnimationsModule,
+-        ComponentWithChildViewContainer,
+-        DirectiveWithViewContainer,
+-      ],
++      imports: [MatSnackBarModule, ComponentWithChildViewContainer, DirectiveWithViewContainer],
+     });
+ 
+     snackBar = TestBed.inject(MatSnackBar);
+diff --git a/src/material/snack-bar/snack-bar.zone.spec.ts b/src/material/snack-bar/snack-bar.zone.spec.ts
+index 1db0ee44e13501af9709980df4c4548995b685d8..6a2cffb81c0a9a24f348f69c599f1bd0ef16c856 100644
+--- a/src/material/snack-bar/snack-bar.zone.spec.ts
++++ b/src/material/snack-bar/snack-bar.zone.spec.ts
+@@ -9,10 +9,10 @@ import {
+   inject,
+ } from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatSnackBarModule} from './module';
+ import {MatSnackBar} from './snack-bar';
+ import {MatSnackBarConfig} from './snack-bar-config';
++import {MATERIAL_ANIMATIONS} from '../core';
+ 
+ describe('MatSnackBar Zone.js integration', () => {
+   let snackBar: MatSnackBar;
+@@ -20,13 +20,11 @@ describe('MatSnackBar Zone.js integration', () => {
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [
+-        MatSnackBarModule,
+-        NoopAnimationsModule,
+-        ComponentWithChildViewContainer,
+-        DirectiveWithViewContainer,
++      imports: [MatSnackBarModule, ComponentWithChildViewContainer, DirectiveWithViewContainer],
++      providers: [
++        provideZoneChangeDetection(),
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+-      providers: [provideZoneChangeDetection()],
+     });
+ 
+     snackBar = TestBed.inject(MatSnackBar);
+diff --git a/src/material/snack-bar/testing/snack-bar-harness.spec.ts b/src/material/snack-bar/testing/snack-bar-harness.spec.ts
+index 1d0d709f3508e0ee73ff64a635a91ed390c0d939..cb116f52c3b9d21b9fbf26ee3e659d9c63ed0cc6 100644
+--- a/src/material/snack-bar/testing/snack-bar-harness.spec.ts
++++ b/src/material/snack-bar/testing/snack-bar-harness.spec.ts
+@@ -9,8 +9,8 @@ import {
+   MatSnackBarConfig,
+   MatSnackBarLabel,
+ } from '../../snack-bar';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatSnackBarHarness} from './snack-bar-harness';
++import {MATERIAL_ANIMATIONS} from '../../core';
+ 
+ describe('MatSnackBarHarness', () => {
+   let fixture: ComponentFixture<SnackbarHarnessTest>;
+@@ -18,7 +18,7 @@ describe('MatSnackBarHarness', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [NoopAnimationsModule],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+ 
+     fixture = TestBed.createComponent(SnackbarHarnessTest);
+diff --git a/src/material/sort/sort.spec.ts b/src/material/sort/sort.spec.ts
+index 9828dc91d32430dda7bfb77c60993961eefdc676..1153f43ee5da0282db66624d9884d778ffcb6735 100644
+--- a/src/material/sort/sort.spec.ts
++++ b/src/material/sort/sort.spec.ts
+@@ -5,7 +5,6 @@ import {Component, ElementRef, ViewChild, inject} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {MatTableModule} from '../table';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Observable} from 'rxjs';
+ import {map} from 'rxjs/operators';
+ import {
+@@ -34,7 +33,6 @@ describe('MatSort', () => {
+           MatSortModule,
+           MatTableModule,
+           CdkTableModule,
+-          NoopAnimationsModule,
+           SimpleMatSortApp,
+           CdkTableMatSortApp,
+           MatTableMatSortApp,
+@@ -359,13 +357,7 @@ describe('MatSort', () => {
+ 
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+-        imports: [
+-          MatSortModule,
+-          MatTableModule,
+-          CdkTableModule,
+-          NoopAnimationsModule,
+-          MatSortWithoutExplicitInputs,
+-        ],
++        imports: [MatSortModule, MatTableModule, CdkTableModule, MatSortWithoutExplicitInputs],
+         providers: [
+           {
+             provide: MAT_SORT_DEFAULT_OPTIONS,
+@@ -398,13 +390,7 @@ describe('MatSort', () => {
+ 
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+-        imports: [
+-          MatSortModule,
+-          MatTableModule,
+-          CdkTableModule,
+-          NoopAnimationsModule,
+-          MatSortWithoutInputs,
+-        ],
++        imports: [MatSortModule, MatTableModule, CdkTableModule, MatSortWithoutInputs],
+         providers: [
+           {
+             provide: MAT_SORT_DEFAULT_OPTIONS,
+diff --git a/src/material/sort/testing/sort-harness.spec.ts b/src/material/sort/testing/sort-harness.spec.ts
+index 057c2716a2e0db5a56914b8f847b0af281e433cc..ab36834c920f8835f0ea2b9258b22f4d4a04c211 100644
+--- a/src/material/sort/testing/sort-harness.spec.ts
++++ b/src/material/sort/testing/sort-harness.spec.ts
+@@ -3,7 +3,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatSortModule, Sort} from '../../sort';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatSortHarness} from './sort-harness';
+ 
+ describe('MatSortHarness', () => {
+@@ -11,10 +10,6 @@ describe('MatSortHarness', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatSortModule, NoopAnimationsModule, SortHarnessTest],
+-    });
+-
+     fixture = TestBed.createComponent(SortHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/stepper/stepper.spec.ts b/src/material/stepper/stepper.spec.ts
+index 287f9dcb23270365b71fba20daa61eb526acd9f0..959e36d93a3ef5589ba3e3ad5fc8991de6965245 100644
+--- a/src/material/stepper/stepper.spec.ts
++++ b/src/material/stepper/stepper.spec.ts
+@@ -45,11 +45,10 @@ import {
+   ValidationErrors,
+   Validators,
+ } from '@angular/forms';
+-import {MatRipple, ThemePalette} from '../core';
++import {MATERIAL_ANIMATIONS, MatRipple, ThemePalette} from '../core';
+ import {MatFormFieldModule} from '../form-field';
+ import {MatInputModule} from '../input';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Observable, Subject, merge} from 'rxjs';
+ import {map, take} from 'rxjs/operators';
+ import {MatStepHeader, MatStepperModule} from './index';
+@@ -1828,8 +1827,12 @@ function createComponent<T>(
+   declarations = [component],
+ ): ComponentFixture<T> {
+   TestBed.configureTestingModule({
+-    imports: [MatStepperModule, NoopAnimationsModule, ReactiveFormsModule, ...imports],
+-    providers: [{provide: Directionality, useFactory: () => dir}, ...providers],
++    imports: [MatStepperModule, ReactiveFormsModule, ...imports],
++    providers: [
++      {provide: Directionality, useFactory: () => dir},
++      {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++      ...providers,
++    ],
+     declarations,
+   });
+ 
+diff --git a/src/material/stepper/testing/stepper-harness.spec.ts b/src/material/stepper/testing/stepper-harness.spec.ts
+index 0627dcd39abb9afe0296273b3184832d6a6dec74..8b34bcbec63c25b11e5311c00545a3e70adf5e2d 100644
+--- a/src/material/stepper/testing/stepper-harness.spec.ts
++++ b/src/material/stepper/testing/stepper-harness.spec.ts
+@@ -5,7 +5,6 @@ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatStepperModule} from '../../stepper';
+ import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatStepperHarness} from './stepper-harness';
+ import {MatStepperNextHarness, MatStepperPreviousHarness} from './stepper-button-harnesses';
+ import {StepperOrientation} from './step-harness-filters';
+@@ -16,7 +15,6 @@ describe('MatStepperHarness', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatStepperModule, NoopAnimationsModule, ReactiveFormsModule, StepperHarnessTest],
+       providers: [
+         {
+           provide: STEPPER_GLOBAL_OPTIONS,
+diff --git a/src/material/table/table.spec.ts b/src/material/table/table.spec.ts
+index 6dfee1ccceb868b979d10876024d5ebe2791ac73..20debc1c261cdbf0276cb2a960071b27f197d423 100644
+--- a/src/material/table/table.spec.ts
++++ b/src/material/table/table.spec.ts
+@@ -12,7 +12,6 @@ import {DataSource} from '@angular/cdk/table';
+ import {BehaviorSubject, Observable} from 'rxjs';
+ import {MatSort, MatSortHeader, MatSortModule} from '../sort';
+ import {MatPaginator, MatPaginatorModule} from '../paginator';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ 
+ describe('MatTable', () => {
+   beforeEach(waitForAsync(() => {
+@@ -21,7 +20,6 @@ describe('MatTable', () => {
+         MatTableModule,
+         MatPaginatorModule,
+         MatSortModule,
+-        NoopAnimationsModule,
+         MatTableApp,
+         MatTableWithWhenRowApp,
+         ArrayDataSourceMatTableApp,
+diff --git a/src/material/tabs/tab-body.spec.ts b/src/material/tabs/tab-body.spec.ts
+index 8cf271e1665cd775049dd3f7006dcdf8c2bda8d3..08b8dc206ccf307f404218f1a94dc6771935d14b 100644
+--- a/src/material/tabs/tab-body.spec.ts
++++ b/src/material/tabs/tab-body.spec.ts
+@@ -13,7 +13,6 @@ import {
+ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {MatRippleModule} from '../core';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
+ import {MatTabBody, MatTabBodyPortal} from './tab-body';
+ 
+@@ -24,14 +23,7 @@ describe('MatTabBody', () => {
+   beforeEach(waitForAsync(() => {
+     dir = 'ltr';
+     TestBed.configureTestingModule({
+-      imports: [
+-        PortalModule,
+-        MatRippleModule,
+-        NoopAnimationsModule,
+-        MatTabBody,
+-        MatTabBodyPortal,
+-        SimpleTabBodyApp,
+-      ],
++      imports: [PortalModule, MatRippleModule, MatTabBody, MatTabBodyPortal, SimpleTabBodyApp],
+       providers: [{provide: Directionality, useFactory: () => ({value: dir, change: dirChange})}],
+     });
+   }));
+@@ -130,13 +122,7 @@ describe('MatTabBody', () => {
+ 
+   it('should mark the tab body content as a scrollable container', () => {
+     TestBed.resetTestingModule().configureTestingModule({
+-      imports: [
+-        PortalModule,
+-        MatRippleModule,
+-        NoopAnimationsModule,
+-        ScrollingModule,
+-        SimpleTabBodyApp,
+-      ],
++      imports: [PortalModule, MatRippleModule, ScrollingModule, SimpleTabBodyApp],
+     });
+ 
+     const fixture = TestBed.createComponent(SimpleTabBodyApp);
+diff --git a/src/material/tabs/tab-group.spec.ts b/src/material/tabs/tab-group.spec.ts
+index 9110f76ebc9b6bcc0cec5352308b979cba9a602e..dee6686d6af72007438f2b5022dc4fd9e5c890ca 100644
+--- a/src/material/tabs/tab-group.spec.ts
++++ b/src/material/tabs/tab-group.spec.ts
+@@ -11,7 +11,6 @@ import {
+   waitForAsync,
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Observable} from 'rxjs';
+ import {
+   MAT_TABS_CONFIG,
+@@ -21,13 +20,13 @@ import {
+   MatTabHeaderPosition,
+   MatTabsModule,
+ } from './index';
++import {MATERIAL_ANIMATIONS} from '../core';
+ 
+ describe('MatTabGroup', () => {
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [
+         MatTabsModule,
+-        NoopAnimationsModule,
+         SimpleTabsTestApp,
+         SimpleDynamicTabsTestApp,
+         BindedTabsTestApp,
+@@ -43,6 +42,7 @@ describe('MatTabGroup', () => {
+         NestedTabGroupWithLabel,
+         TabsWithClassesTestApp,
+       ],
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+   }));
+ 
+diff --git a/src/material/tabs/testing/tab-group-harness.spec.ts b/src/material/tabs/testing/tab-group-harness.spec.ts
+index 5a55e068aaad369f8e975882debd7e46bffafd41..def87325d161029dec2a5fa88b9f33afaa3f7c8d 100644
+--- a/src/material/tabs/testing/tab-group-harness.spec.ts
++++ b/src/material/tabs/testing/tab-group-harness.spec.ts
+@@ -3,7 +3,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {ComponentHarness, HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatTabsModule} from '../module';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatTabGroupHarness} from './tab-group-harness';
+ import {MatTabHarness} from './tab-harness';
+ 
+@@ -12,10 +11,6 @@ describe('MatTabGroupHarness', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatTabsModule, NoopAnimationsModule, TabGroupHarnessTest],
+-    });
+-
+     fixture = TestBed.createComponent(TabGroupHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/tabs/testing/tab-nav-bar-harness.spec.ts b/src/material/tabs/testing/tab-nav-bar-harness.spec.ts
+index e55eec2b2eec1cd323b2d4f9873ffef87bbf49b2..f04c8b18e72bbc436649b8c1aeb75ed566f3e7e3 100644
+--- a/src/material/tabs/testing/tab-nav-bar-harness.spec.ts
++++ b/src/material/tabs/testing/tab-nav-bar-harness.spec.ts
+@@ -3,7 +3,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatTabsModule} from '../module';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatTabNavBarHarness} from './tab-nav-bar-harness';
+ 
+ describe('MatTabNavBarHarness', () => {
+@@ -11,10 +10,6 @@ describe('MatTabNavBarHarness', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatTabsModule, NoopAnimationsModule, TabNavBarHarnessTest],
+-    });
+-
+     fixture = TestBed.createComponent(TabNavBarHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/timepicker/testing/timepicker-harness.spec.ts b/src/material/timepicker/testing/timepicker-harness.spec.ts
+index 70b5674d7c600ad14b246b6092bd86ccfa1d2ad1..1cb42db51707ddc0cf1f67a9d630f591f28e1ba0 100644
+--- a/src/material/timepicker/testing/timepicker-harness.spec.ts
++++ b/src/material/timepicker/testing/timepicker-harness.spec.ts
+@@ -1,9 +1,8 @@
+ import {Component, signal} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+-import {DateAdapter, provideNativeDateAdapter} from '../../core';
++import {DateAdapter, MATERIAL_ANIMATIONS, provideNativeDateAdapter} from '../../core';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatTimepicker, MatTimepickerInput} from '../../timepicker';
+ import {MatTimepickerHarness} from './timepicker-harness';
+ import {MatTimepickerInputHarness} from './timepicker-input-harness';
+@@ -14,10 +13,11 @@ describe('MatTimepickerHarness', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      providers: [provideNativeDateAdapter()],
+-      imports: [NoopAnimationsModule, TimepickerHarnessTest],
++      providers: [
++        provideNativeDateAdapter(),
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++      ],
+     });
+-
+     const adapter = TestBed.inject(DateAdapter);
+     adapter.setLocale('en-US');
+     fixture = TestBed.createComponent(TimepickerHarnessTest);
+diff --git a/src/material/timepicker/testing/timepicker-input-harness.spec.ts b/src/material/timepicker/testing/timepicker-input-harness.spec.ts
+index 1d3c6c6d448317c319849858278b7e6f8070c741..0e1f3af58cb93e25c419f552212a698b8786ff74 100644
+--- a/src/material/timepicker/testing/timepicker-input-harness.spec.ts
++++ b/src/material/timepicker/testing/timepicker-input-harness.spec.ts
+@@ -2,7 +2,6 @@ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {Component, signal} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {DateAdapter, provideNativeDateAdapter} from '../../core';
+ import {MatTimepicker, MatTimepickerInput} from '../../timepicker';
+ import {MatTimepickerHarness} from './timepicker-harness';
+@@ -14,11 +13,7 @@ describe('MatTimepickerInputHarness', () => {
+   let adapter: DateAdapter<Date>;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideNativeDateAdapter()],
+-      imports: [NoopAnimationsModule, TimepickerInputHarnessTest],
+-    });
+-
++    TestBed.configureTestingModule({providers: [provideNativeDateAdapter()]});
+     adapter = TestBed.inject(DateAdapter);
+     adapter.setLocale('en-US');
+     fixture = TestBed.createComponent(TimepickerInputHarnessTest);
+diff --git a/src/material/timepicker/testing/timepicker-toggle-harness.spec.ts b/src/material/timepicker/testing/timepicker-toggle-harness.spec.ts
+index 310f87a10184568be6691772d5b257fb868ab33d..7e2ad1dbf053c854de5fd7a44b60368fa4d2661f 100644
+--- a/src/material/timepicker/testing/timepicker-toggle-harness.spec.ts
++++ b/src/material/timepicker/testing/timepicker-toggle-harness.spec.ts
+@@ -3,7 +3,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+ import {DateAdapter, provideNativeDateAdapter} from '../../core';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatTimepicker, MatTimepickerInput, MatTimepickerToggle} from '../../timepicker';
+ import {MatTimepickerToggleHarness} from './timepicker-toggle-harness';
+ 
+@@ -12,11 +11,7 @@ describe('MatTimepickerToggleHarness', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideNativeDateAdapter()],
+-      imports: [NoopAnimationsModule, TimepickerHarnessTest],
+-    });
+-
++    TestBed.configureTestingModule({providers: [provideNativeDateAdapter()]});
+     const adapter = TestBed.inject(DateAdapter);
+     adapter.setLocale('en-US');
+     fixture = TestBed.createComponent(TimepickerHarnessTest);
+diff --git a/src/material/timepicker/timepicker.spec.ts b/src/material/timepicker/timepicker.spec.ts
+index 078fffa50be7fdee130ac48eaca271c31d1be4c0..06d2f04d922ed1bd6b6ebf77ff656d50e15c1a6d 100644
+--- a/src/material/timepicker/timepicker.spec.ts
++++ b/src/material/timepicker/timepicker.spec.ts
+@@ -1,7 +1,6 @@
+ import {Component, inject, Provider, signal, ViewChild, ViewEncapsulation} from '@angular/core';
+ import {ComponentFixture, fakeAsync, flush, TestBed} from '@angular/core/testing';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+-import {DateAdapter, provideNativeDateAdapter} from '../core';
++import {DateAdapter, MATERIAL_ANIMATIONS, provideNativeDateAdapter} from '../core';
+ import {
+   clearElement,
+   dispatchFakeEvent,
+@@ -1274,8 +1273,11 @@ describe('MatTimepicker', () => {
+ 
+   function configureTestingModule(additionalProviders: Provider[] = []): void {
+     TestBed.configureTestingModule({
+-      imports: [NoopAnimationsModule],
+-      providers: [provideNativeDateAdapter(), ...additionalProviders],
++      providers: [
++        provideNativeDateAdapter(),
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++        ...additionalProviders,
++      ],
+     });
+     adapter = TestBed.inject(DateAdapter);
+     adapter.setLocale('en-US');
+diff --git a/src/material/tooltip/testing/tooltip-harness.spec.ts b/src/material/tooltip/testing/tooltip-harness.spec.ts
+index c4334ea9eab3041c3b06ad105713794f136f3147..bf0cd57505ebb651553c5ae9300e108c8fda0ca8 100644
+--- a/src/material/tooltip/testing/tooltip-harness.spec.ts
++++ b/src/material/tooltip/testing/tooltip-harness.spec.ts
+@@ -3,7 +3,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {MatTooltipModule} from '../module';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatTooltipHarness} from './tooltip-harness';
+ 
+ describe('MatTooltipHarness', () => {
+@@ -16,10 +15,6 @@ describe('MatTooltipHarness', () => {
+   });
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatTooltipModule, NoopAnimationsModule, TooltipHarnessTest],
+-    });
+-
+     fixture = TestBed.createComponent(TooltipHarnessTest);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts
+index 4e22c64eead3067ef32efceb7ded593c8913f3df..d8b60d5d8cb9aeeaad9179c1d0fb4316ffff495a 100644
+--- a/src/material/tooltip/tooltip.spec.ts
++++ b/src/material/tooltip/tooltip.spec.ts
+@@ -29,7 +29,6 @@ import {
+   waitForAsync,
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
+ import {
+   MAT_TOOLTIP_DEFAULT_OPTIONS,
+@@ -351,7 +350,7 @@ describe('MatTooltip', () => {
+ 
+     it('should be able to disable tooltip interactivity', fakeAsync(() => {
+       TestBed.resetTestingModule().configureTestingModule({
+-        imports: [MatTooltipModule, OverlayModule, NoopAnimationsModule],
++        imports: [MatTooltipModule, OverlayModule],
+         declarations: [TooltipDemoWithoutPositionBinding],
+         providers: [
+           {
