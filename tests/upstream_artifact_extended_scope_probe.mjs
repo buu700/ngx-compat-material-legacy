@@ -9,6 +9,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
+import {gunzipSync} from 'node:zlib';
 import {readFileSync, writeFileSync, mkdirSync} from 'node:fs';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -47,7 +48,27 @@ assert.equal(focusPredicate(read('scripts/upstream-artifact-behavior-evidence.mj
 const focusEntry = json('compatibility/f10/disposition-ledger/ledger.json').entries.find(row => row.sha === SELECT_FOCUS_SHA);
 const focusReview = json(focusEntry.evidence_report), prior = focusReview.prior_source_judgment;
 assert.equal(hash(read(prior.path)), prior.sha256); assert.equal(hash(read(preimagePath)), focusReview.admission_refactor_review.exact_before_helper.sha256);
-assert.deepEqual(focusReview.reviewed_source_members, json(prior.path).reviewed_source_members);
+const precedingFocusMembers = structuredClone(json(prior.path).reviewed_source_members);
+if (focusReview.historical_branch_matrix_requalification) {
+  const inputPath = 'compatibility/rc/historical-branch-admission-inputs.json', bytes = read(inputPath);
+  assert.equal(hash(bytes), {main: 'c9c81f831e4140f3a02c7c7b6b95fe284771da940f8efcee365f54267ac3c904',
+    '21.x': '0fca9a08785217834aa5a5777738f7a09b81a62408311338eac7f51da9ea34d7'}[line]);
+  const inputs = JSON.parse(bytes), packed = read(inputs.prior_contexts.path);
+  assert.equal(hash(packed), inputs.prior_contexts.sha256);
+  const raw = gunzipSync(packed); assert.equal(hash(raw), inputs.prior_contexts.raw_sha256);
+  const retained = JSON.parse(raw), member = retained.members.find(row => row.path === 'compatibility/rc/matrices/full-verify.json');
+  assert.equal(hash(member.text), member.sha256);
+  const context = focusReview.historical_branch_matrix_requalification.source_proof;
+  assert.equal(hash(read(context.path)), context.sha256);
+  const sourceProof = json(context.path), currentMatrix = json(member.path), recovered = structuredClone(currentMatrix), oldMatrix = JSON.parse(member.text);
+  assert.equal(sourceProof.old_matrix_sha256, member.sha256); assert.equal(sourceProof.current_matrix_sha256, hash(read(member.path)));
+  recovered.checks.find(row => row.check_id === 'historical-legacy-artifact').acceptance.cases_by_line[line]
+    = oldMatrix.checks.find(row => row.check_id === 'historical-legacy-artifact').acceptance.cases_by_line[line];
+  assert.deepEqual(recovered, oldMatrix, 'matrix requalification changed an unrelated gate');
+  const priorMember = precedingFocusMembers.find(row => row.path === member.path);
+  assert.equal(priorMember.sha256, member.sha256); priorMember.sha256 = hash(read(member.path));
+}
+assert.deepEqual(focusReview.reviewed_source_members, precedingFocusMembers);
 assert.deepEqual(focusReview.hunk_reviews, json(prior.path).hunk_reviews); assert.equal(focusReview.semantic_pass, false);
 
 // Reuse only known synthetic sample declarations from the original collector
