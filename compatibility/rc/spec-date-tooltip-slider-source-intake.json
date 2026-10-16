@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "Semantic intake only; all three individual decisions remain pending finite source checks, mutation controls and owned/peer/Cyph qualification. No ledger closure.",
+  "originals": {
+    "path": "compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz",
+    "sha256": "c198d23bd997dda6fa5115f413eeed2863abee04a3357075d6a86fae3e317960"
+  },
+  "acquisition": {
+    "path": "compatibility/rc/spec-date-tooltip-slider-source-acquisition.json.gz",
+    "sha256": "f05338b6b7912c26bd66fd217455f3edb9993e5dfcfddabf64ebff8a6fb0b3f1"
+  },
+  "before_cases": 413,
+  "after_cases": 413,
+  "paired_identities_without_addition_deletion_or_rename": 413,
+  "unchanged_complete_callbacks": 177,
+  "changed_callbacks": 236,
+  "fixture_classes_unchanged": 74,
+  "all98_template_style_properties_unchanged": true,
+  "subjects": [
+    {
+      "sha": "0affe5aaa704fa0bf923b1be3266515e41d5e350",
+      "before_cases": 195,
+      "after_cases": 195,
+      "unchanged_complete_callbacks": 89,
+      "changed_callbacks": 106,
+      "hooks_before": 33,
+      "hooks_after": 33,
+      "raw_predicate_difference_cases": [
+        {
+          "path": "src/material/datepicker/datepicker.spec.ts",
+          "suites": [
+            "'MatDatepicker'",
+            "'with native adapter'",
+            "'datepicker that is assigned to input at a later point'"
+          ],
+          "name": "'should not throw on ALT + DOWN_ARROW for input without datepicker'",
+          "before_sha256": "2379b406bf9b8d680763c1b6791ee59f1d8839b89a4c76c8620292a52a56a4ab",
+          "after_sha256": "83bba5b4e66dac4f51638e4915a3d8e64f16624e27834b716955a007f18b8104"
+        },
+        {
+          "path": "src/material/datepicker/datepicker.spec.ts",
+          "suites": [
+            "'MatDatepicker'",
+            "'with native adapter'",
+            "'datepicker with mat-datepicker-toggle'"
+          ],
+          "name": "'should restore focus to the toggle after the calendar is closed'",
+          "before_sha256": "f83e2c52e7578a14c73bb0f31478128a622deecf3c637d5946d0ec56f18d7eab",
+          "after_sha256": "b784548ae709897f88a493f0c925742eb6e85891464eaa364934a8237fe44e0f"
+        },
+        {
+          "path": "src/material/datepicker/datepicker.spec.ts",
+          "suites": [
+            "'MatDatepicker'",
+            "'with native adapter'",
+            "'datepicker with mat-datepicker-toggle'"
+          ],
+          "name": "'should allow for focus restoration to be disabled'",
+          "before_sha256": "efd9394aab0935c213019c506b69111e662d1df8c9eecec0dc242f87e373eeb5",
+          "after_sha256": "16d8d1db966cbe45c399eb139f9d63d2a79f6366de082035889f7409742c8ca6"
+        }
+      ],
+      "notes": "Two datepicker focus cases remove the explicit pane-open truthiness assertion and move final focus matcher messages; focus-inside and restored/disabled-restoration predicates remain. Opening now samples after50ms and closing after200ms native waits. This is not the earlier dialog immediate-closing-phase focus assertion removal. The ALT+DOWN nonthrow observer differs in its nested scheduler boundary only."
+    },
+    {
+      "sha": "39b0f5521960f93af96943968961f1ba3e241307",
+      "before_cases": 75,
+      "after_cases": 75,
+      "unchanged_complete_callbacks": 19,
+      "changed_callbacks": 56,
+      "hooks_before": 8,
+      "hooks_after": 8,
+      "raw_predicate_difference_cases": [
+        {
+          "path": "src/material/tooltip/tooltip.spec.ts",
+          "suites": [
+            "'MatTooltip'",
+            "'basic usage'"
+          ],
+          "name": "'should not throw when updating the position for a closed tooltip'",
+          "before_sha256": "d44431cb11fdee356ebe2fb10c79cde48112b13e2dd1f6d9ff32e18b8d9d7c56",
+          "after_sha256": "d0060dcb9d0f805c9ae6179734d66d59bc0ed501d34ced0f3c335b3dfbfdc9e8"
+        }
+      ],
+      "notes": "Six exact tooltip cases change delay configuration, commonly1000ms to10ms and global1337/7331ms to10/20ms. Predicate identity does not preserve these deadline contracts. An inner position helper becomes async; SCROLL_THROTTLE_MS import is removed as its simulated boundary changes. Native/stability/frame equivalence is unproved. Two same-name show/hide cases have distinct scopes and must remain separate."
+    },
+    {
+      "sha": "5ad259a25e4b6d6346ee62954fe461f4500c9cee",
+      "before_cases": 143,
+      "after_cases": 143,
+      "unchanged_complete_callbacks": 69,
+      "changed_callbacks": 74,
+      "hooks_before": 26,
+      "hooks_after": 26,
+      "raw_predicate_difference_cases": [],
+      "notes": "All143 slider cases and unchanged fixture class/template/style bodies pair. Two fixture bindings move from hook-local initialization into enclosing scopes for async access; setValueByClick/slideToValue become async and add explicit zero-ms native waits. Existing commented-out page-layout tests remain comments and are not coverage. Geometry helper arithmetic/arguments must be independently preserved; no owned slider DOM/style/API change or range-feature mirror is authorized."
+    }
+  ],
+  "diagnostic_execution_line": "main",
+  "borrowed_runtime": {
+    "node": "22.23.3",
+    "typescript": "6.0.3",
+    "canonical_or_floor_qualified": false
+  },
+  "semantic_reviews_pending": 3,
+  "product_and_consumer_files_changed": 0,
+  "required_consumer_CSS_SCSS_changes": 0,
+  "actual_native_artifact_or_floor_qualified": false,
+  "ready_for_Actions": false,
+  "g11_claim": "not-passed",
+  "next_work": [
+    "Do not reuse broad temporary timing-strip diagnostics as qualification. Enumerate exact boundary/await and literal delay changes; pair all setup/cleanup callbacks and registration interleaving.",
+    "Individually review the two datepicker observer rewrites and six tooltip literal/config changes. Prove slider fixture-binding promotion and async helper changes finite; keep geometry arithmetic, selectors, templates and disabled/comment-only coverage distinctions.",
+    "Keep all1141 product/2223 owned cases and2228 actual historical contract, source83/native20/authored obligations and22 fixed historical programs/20 wrappers/87 controls. Only after full qualification close these three source rows and preserve other1694 entries."
+  ]
+}
