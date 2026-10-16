@@ -16,7 +16,7 @@ import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export const HISTORICAL_REPLAY_INPUTS='compatibility/rc/historical-source-replay-inputs.json';
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'e3fea6a36bd50ade0236f3785efe20d2522871df01fb75646acb19971dfb7df3','21.x':'98ea0981086004cb9d26b1fcb55bd5fbf5171d0edc7b83427d556c481837c527'};
+const pins={main:'85a133eef02f8ea6b5ce9b19ccac683714ae8860521331257fa1ebccccb26741','21.x':'f79dc3dbca2786b47ac388c28a27eaa240ea2698044e6416a202b97e353f8454'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source'];
 // These six versioned replay-tool members are checked against the caller HEAD,
 // separately from the qualified product/review context. Comparing the registry
@@ -41,6 +41,7 @@ export function historicalReplayInputs({root=rootDefault,readMember}={}){
  assert.equal(data.schema_version,2);assert.deepEqual(data.entries.map(row=>row.id),ids);assert.equal(new Set(data.entries.map(row=>row.probe)).size,6);
  assert.deepEqual(data.mutable_progress_paths,['compatibility/rc/remaining-native-admission-worksheet.json','compatibility/rc/session-handoff.json']);
  assert.deepEqual(data.current_head_tooling_paths,toolingPaths);
+ for(const entry of data.entries)assert.equal(entry.report_option,entry.id==='tab-lifecycle-source'?'--out':undefined,'historical report invocation changed');
  assert.equal(data.original_js_programs_and_assertions_unchanged,true);assert.equal(data.new_sha_or_authored_use_closures,0);
  return data;
 }
@@ -133,7 +134,7 @@ export async function runHistoricalSourceProbe({root=rootDefault,id,reportPath}=
   assert.equal(git(checkout,['status','--porcelain','--untracked-files=all']).toString(),'','historical graph is dirty before execution');
   const diagnostic=join(parent,'original-report.json'),env=environment();
   env.NODE_PATH=[join(root,'node_modules'),...(env.NODE_PATH||'').split(delimiter).filter(Boolean)].join(delimiter);
-  const child=spawn(process.execPath,[entry.probe,diagnostic],{cwd:checkout,env,stdio:['ignore','pipe','pipe']});let stdout='',stderr='',timedOut=false;
+  const child=spawn(process.execPath,[entry.probe,...(entry.report_option?[entry.report_option]:[]),diagnostic],{cwd:checkout,env,stdio:['ignore','pipe','pipe']});let stdout='',stderr='',timedOut=false;
   child.stdout.on('data',bytes=>{stdout+=bytes;if(stdout.length>4*1024*1024)child.kill('SIGTERM');});child.stderr.on('data',bytes=>{stderr=(stderr+bytes).slice(-4*1024*1024);});
   const timer=setTimeout(()=>{timedOut=true;child.kill('SIGTERM');},entry.timeout_ms);
   let finished;try{finished=await completion(child);}finally{clearTimeout(timer);}
