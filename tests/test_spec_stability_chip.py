@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SpecStabilityChipTests(unittest.TestCase):
     def test_actual_owned_method_public_query_key_manager_and_exact_source_delta(self):
-        result = subprocess.run(['node', 'tests/spec_stability_chip_probe.mjs'], cwd=ROOT,
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'stability-chip-method'], cwd=ROOT,
                                 capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])
