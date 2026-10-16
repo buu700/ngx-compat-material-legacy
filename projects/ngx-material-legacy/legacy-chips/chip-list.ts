@@ -585,6 +585,11 @@ export class MatLegacyChipList
    * key manager state and focus the next closest chip.
    */
   protected _updateFocusForDestroyedChips() {
+    // Empty lists must not retain a reference to a destroyed chip.
+    if (this.chips.length === 0) {
+      this._keyManager.updateActiveItem(-1);
+    }
+
     // Move focus to the closest chip. If no other chips remain, focus the chip-list itself.
     if (this._lastDestroyedChipIndex != null) {
       if (this.chips.length) {
