@@ -1,0 +1,667 @@
+diff --git a/src/material/list/selection-list.spec.ts b/src/material/list/selection-list.spec.ts
+index 63a3bf13f5bd5f338de6c2b473af390ffb4770af..6fdd4ef6f296a6fd2dd1d815ca819e7aa56cae5a 100644
+--- a/src/material/list/selection-list.spec.ts
++++ b/src/material/list/selection-list.spec.ts
+@@ -1339,6 +1339,7 @@ describe('MatSelectionList with forms', () => {
+         .toBe(false);
+     });
+ 
++    // TODO: this seems tricky to switch away from `fakeAsync` for some reason.
+     it('should remove a selected option from the value on destroy', fakeAsync(() => {
+       listOptions[1].selected = true;
+       listOptions[2].selected = true;
+diff --git a/src/material/menu/context-menu-trigger.spec.ts b/src/material/menu/context-menu-trigger.spec.ts
+index 14a7e253fc5fe9e413a301599cda7dd687c55f94..a97259a53099698714a072a3eb3eb963be34410d 100644
+--- a/src/material/menu/context-menu-trigger.spec.ts
++++ b/src/material/menu/context-menu-trigger.spec.ts
+@@ -1,5 +1,6 @@
+ import {Component, signal, ViewChild, ChangeDetectionStrategy} from '@angular/core';
+-import {ComponentFixture, fakeAsync, flush, TestBed} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {MATERIAL_ANIMATIONS} from '../core';
+ import {MatContextMenuTrigger} from './context-menu-trigger';
+ import {MatMenu} from './menu';
+ import {MatMenuItem} from './menu-item';
+@@ -8,6 +9,10 @@ import {dispatchFakeEvent, dispatchMouseEvent} from '@angular/cdk/testing/privat
+ describe('context menu trigger', () => {
+   let fixture: ComponentFixture<ContextMenuTest>;
+ 
++  function wait(milliseconds: number) {
++    return new Promise(resolve => setTimeout(resolve, milliseconds));
++  }
++
+   function getTrigger(): HTMLElement {
+     return fixture.nativeElement.querySelector('.area');
+   }
+@@ -21,6 +26,9 @@ describe('context menu trigger', () => {
+   }
+ 
+   beforeEach(() => {
++    TestBed.configureTestingModule({
++      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
++    });
+     fixture = TestBed.createComponent(ContextMenuTest);
+     fixture.detectChanges();
+   });
+@@ -32,16 +40,16 @@ describe('context menu trigger', () => {
+     expect(getMenu()).toBeTruthy();
+   });
+ 
+-  it('should close the menu when clicking outside the trigger', fakeAsync(() => {
++  it('should close the menu when clicking outside the trigger', async () => {
+     dispatchMouseEvent(getTrigger(), 'contextmenu', 10, 10);
+     fixture.detectChanges();
+     expect(getMenu()).toBeTruthy();
+ 
+     document.body.click();
+     fixture.detectChanges();
+-    flush();
++    await wait(50);
+     expect(getMenu()).toBe(null);
+-  }));
++  });
+ 
+   it('should reposition the menu when right-clicking within the area', () => {
+     dispatchMouseEvent(getTrigger(), 'contextmenu', 10, 10);
+@@ -57,43 +65,43 @@ describe('context menu trigger', () => {
+     expect(menuRect.left).toBe(50);
+   });
+ 
+-  it('should ignore the first auxclick after opening', fakeAsync(() => {
++  it('should ignore the first auxclick after opening', async () => {
+     dispatchMouseEvent(getTrigger(), 'contextmenu', 10, 10);
+     fixture.detectChanges();
+     expect(getMenu()).toBeTruthy();
+ 
+     dispatchMouseEvent(document.body, 'auxclick');
+     fixture.detectChanges();
+-    flush();
++    await wait(50);
+     expect(getMenu()).toBeTruthy();
+ 
+     dispatchMouseEvent(document.body, 'auxclick');
+     fixture.detectChanges();
+-    flush();
++    await wait(50);
+     expect(getMenu()).toBe(null);
+-  }));
++  });
+ 
+-  it('should close on `contextmenu` events outside the trigger', fakeAsync(() => {
++  it('should close on `contextmenu` events outside the trigger', async () => {
+     dispatchMouseEvent(getTrigger(), 'contextmenu', 10, 10);
+     fixture.detectChanges();
+     expect(getMenu()).toBeTruthy();
+ 
+     dispatchMouseEvent(document.body, 'contextmenu');
+     fixture.detectChanges();
+-    flush();
++    await wait(50);
+     expect(getMenu()).toBe(null);
+-  }));
++  });
+ 
+-  it('should not close on `contextmenu` events from inside the menu', fakeAsync(() => {
++  it('should not close on `contextmenu` events from inside the menu', async () => {
+     dispatchMouseEvent(getTrigger(), 'contextmenu', 10, 10);
+     fixture.detectChanges();
+     expect(getMenu()).toBeTruthy();
+ 
+     dispatchMouseEvent(getMenu()!, 'contextmenu');
+     fixture.detectChanges();
+-    flush();
++    await wait(50);
+     expect(getMenu()).toBeTruthy();
+-  }));
++  });
+ 
+   it('should set aria-controls on the trigger while the menu is open', () => {
+     expect(getTrigger().getAttribute('aria-controls')).toBe(null);
+@@ -124,7 +132,7 @@ describe('context menu trigger', () => {
+     scroller.remove();
+   });
+ 
+-  it('should emit events when the menu is opened and closed', fakeAsync(() => {
++  it('should emit events when the menu is opened and closed', async () => {
+     const {opened, closed} = fixture.componentInstance;
+     expect(opened).toHaveBeenCalledTimes(0);
+     expect(closed).toHaveBeenCalledTimes(0);
+@@ -136,21 +144,21 @@ describe('context menu trigger', () => {
+ 
+     document.body.click();
+     fixture.detectChanges();
+-    flush();
++    await wait(50);
+     expect(opened).toHaveBeenCalledTimes(1);
+     expect(closed).toHaveBeenCalledTimes(1);
+-  }));
++  });
+ 
+-  it('should close the menu if the trigger is destroyed', fakeAsync(() => {
++  it('should close the menu if the trigger is destroyed', async () => {
+     dispatchMouseEvent(getTrigger(), 'contextmenu', 10, 10);
+     fixture.detectChanges();
+     expect(getMenu()).toBeTruthy();
+ 
+     fixture.componentInstance.showTrigger.set(false);
+     fixture.detectChanges();
+-    flush();
++    await wait(50);
+     expect(getMenu()).toBe(null);
+-  }));
++  });
+ 
+   it('should not open when clicking on a disabled context menu trigger', () => {
+     fixture.componentInstance.disabled.set(true);
+diff --git a/src/material/paginator/paginator.spec.ts b/src/material/paginator/paginator.spec.ts
+index 4fa53ae27350079b86cab9c959349dc2a4c4daeb..55506d2da74ec2673dd01bd2969ecdb3704888af 100644
+--- a/src/material/paginator/paginator.spec.ts
++++ b/src/material/paginator/paginator.spec.ts
+@@ -7,7 +7,7 @@ import {
+   inject,
+   ChangeDetectionStrategy,
+ } from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {ThemePalette} from '../core';
+ import {MatSelect} from '../select';
+ import {By} from '@angular/platform-browser';
+@@ -205,16 +205,15 @@ describe('MatPaginator', () => {
+     expect(getLastButton(fixture)).withContext('Expected last button to be rendered.').toBeTruthy();
+   });
+ 
+-  it('should mark itself as initialized', fakeAsync(() => {
++  it('should mark itself as initialized', () => {
+     const fixture = createComponent(MatPaginatorApp);
+     const component = fixture.componentInstance;
+     const paginator = component.paginator;
+     let isMarkedInitialized = false;
+     paginator.initialized.subscribe(() => (isMarkedInitialized = true));
+ 
+-    tick();
+     expect(isMarkedInitialized).toBeTruthy();
+-  }));
++  });
+ 
+   it('should not allow a negative pageSize', () => {
+     const fixture = createComponent(MatPaginatorApp);
+diff --git a/src/material/radio/radio.spec.ts b/src/material/radio/radio.spec.ts
+index 3a3d8a220cbd6541a905d0d25412bd84c28c41f1..d4a1e796944585663897b1d29a4dbccc54f7e304 100644
+--- a/src/material/radio/radio.spec.ts
++++ b/src/material/radio/radio.spec.ts
+@@ -1,6 +1,6 @@
+ import {dispatchFakeEvent} from '@angular/cdk/testing/private';
+ import {Component, DebugElement, ViewChild, ChangeDetectionStrategy} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
++import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {FormControl, FormsModule, NgModel, ReactiveFormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+ import {
+@@ -442,8 +442,8 @@ describe('MatRadio', () => {
+     });
+ 
+     it('should have a focus indicator', () => {
+-      const radioRippleNativeElements = radioNativeElements.map(
+-        element => element.querySelector('.mat-radio-ripple')!,
++      const radioRippleNativeElements = radioNativeElements.map(element =>
++        element.querySelector('.mat-radio-ripple')!,
+       );
+ 
+       expect(
+@@ -610,17 +610,17 @@ describe('MatRadio', () => {
+       expect(groupNgModel.touched).toBe(true);
+     });
+ 
+-    it('should write to the radio button based on ngModel', fakeAsync(() => {
++    it('should write to the radio button based on ngModel', async () => {
+       testComponent.modelValue = 'chocolate';
+       fixture.changeDetectorRef.markForCheck();
+ 
+       fixture.detectChanges();
+-      tick();
++      await fixture.whenStable();
+       fixture.detectChanges();
+ 
+       expect(innerRadios[1].nativeElement.checked).toBe(true);
+       expect(radioInstances[1].checked).toBe(true);
+-    }));
++    });
+ 
+     it('should update the ngModel value when selecting a radio button', () => {
+       dispatchFakeEvent(innerRadios[1].nativeElement, 'change');
+diff --git a/src/material/table/table-data-source.spec.ts b/src/material/table/table-data-source.spec.ts
+index 774d2dd4bafedf4c21862e3f289c173088977ebe..5be1df436ba42102dd4679abf306a8dd6851f8fb 100644
+--- a/src/material/table/table-data-source.spec.ts
++++ b/src/material/table/table-data-source.spec.ts
+@@ -1,11 +1,11 @@
+ import {MatTableDataSource} from './table-data-source';
+-import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {MatSort, MatSortModule} from '@angular/material/sort';
+ import {Component, ViewChild, ChangeDetectionStrategy} from '@angular/core';
+ 
+ describe('MatTableDataSource', () => {
+   describe('sort', () => {
+-    let dataSource: MatTableDataSource<{'prop': string | number}>;
++    let dataSource: MatTableDataSource<{prop: string | number}>;
+     let fixture: ComponentFixture<MatSortApp>;
+     let sort: MatSort;
+ 
+@@ -23,7 +23,7 @@ describe('MatTableDataSource', () => {
+       // the sort should be performed over a particular key.
+       // Map the values into an array of objects where each value is keyed by "prop"
+       // e.g. [0, 1, 2] -> [{prop: 0}, {prop: 1}, {prop: 2}]
+-      const data = values.map(v => ({'prop': v}));
++      const data = values.map(v => ({prop: v}));
+ 
+       // Set the active sort to be on the "prop" key
+       sort.active = 'prop';
+@@ -73,45 +73,43 @@ describe('MatTableDataSource', () => {
+     });
+ 
+     it('should update filteredData even if the data source is disconnected', () => {
+-      dataSource.data = [{'prop': 1}, {'prop': 2}, {'prop': 3}];
+-      expect(dataSource.filteredData).toEqual([{'prop': 1}, {'prop': 2}, {'prop': 3}]);
++      dataSource.data = [{prop: 1}, {prop: 2}, {prop: 3}];
++      expect(dataSource.filteredData).toEqual([{prop: 1}, {prop: 2}, {prop: 3}]);
+ 
+       dataSource.disconnect();
+-      dataSource.data = [{'prop': 3}, {'prop': 2}, {'prop': 1}];
+-      expect(dataSource.filteredData).toEqual([{'prop': 3}, {'prop': 2}, {'prop': 1}]);
++      dataSource.data = [{prop: 3}, {prop: 2}, {prop: 1}];
++      expect(dataSource.filteredData).toEqual([{prop: 3}, {prop: 2}, {prop: 1}]);
+     });
+ 
+     it('should filter data', () => {
+-      dataSource.data = [{'prop': 1}, {'prop': 'foo'}, {'prop': 'banana'}];
++      dataSource.data = [{prop: 1}, {prop: 'foo'}, {prop: 'banana'}];
+       dataSource.filter = 'b';
+-      expect(dataSource.filteredData).toEqual([{'prop': 'banana'}]);
++      expect(dataSource.filteredData).toEqual([{prop: 'banana'}]);
+     });
+ 
+-    it('does not warn in non-dev mode when filtering non-object data', fakeAsync(() => {
++    it('does not warn in non-dev mode when filtering non-object data', () => {
+       const warnSpy = spyOn(console, 'warn');
+       (window as any).ngDevMode = null;
+-      dataSource.data = [1, 2, 3, 4, 5] as unknown as {'prop': number}[];
++      dataSource.data = [1, 2, 3, 4, 5] as unknown as {prop: number}[];
+ 
+       dataSource.filter = '1';
+-      tick();
+ 
+       expect(warnSpy).not.toHaveBeenCalled();
+       expect(dataSource.filteredData).toEqual([]);
+-    }));
++    });
+ 
+-    it('displays the warning in dev mode when filtering non-object data', fakeAsync(() => {
++    it('displays the warning in dev mode when filtering non-object data', () => {
+       const warnSpy = spyOn(console, 'warn');
+       (window as any).ngDevMode = {};
+-      dataSource.data = [1, 2, 3, 4, 5] as unknown as {'prop': number}[];
++      dataSource.data = [1, 2, 3, 4, 5] as unknown as {prop: number}[];
+ 
+       dataSource.filter = '1';
+-      tick();
+ 
+       expect(warnSpy).toHaveBeenCalledWith(
+         jasmine.stringContaining('requires data to be a non-null object'),
+       );
+       expect(dataSource.filteredData).toEqual([]);
+-    }));
++    });
+   });
+ });
+ 
+diff --git a/src/material/table/table.spec.ts b/src/material/table/table.spec.ts
+index fe8ba5725eaa15bfdebe2526f1123f30c5dc9214..b7645c4f23decb8aa485faf7adac06adb9ce61a7 100644
+--- a/src/material/table/table.spec.ts
++++ b/src/material/table/table.spec.ts
+@@ -1,5 +1,5 @@
+ import {AfterViewInit, Component, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
+-import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
++import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
+ import {MatTable, MatTableDataSource, MatTableModule} from './index';
+ import {DataSource} from '@angular/cdk/table';
+ import {BehaviorSubject, Observable} from 'rxjs';
+@@ -179,14 +179,13 @@ describe('MatTable', () => {
+     ]);
+   });
+ 
+-  it('should apply custom sticky CSS class to sticky cells', fakeAsync(() => {
++  it('should apply custom sticky CSS class to sticky cells', async () => {
+     let fixture = TestBed.createComponent(StickyTableApp);
+     fixture.detectChanges();
+-    flushMicrotasks();
+ 
+     const stuckCellElement = fixture.nativeElement.querySelector('table th')!;
+     expect(stuckCellElement.classList).toContain('mat-mdc-table-sticky');
+-  }));
++  });
+ 
+   // Note: needs to be fakeAsync so it catches the error.
+   it('should not throw when a row definition is on an ng-container', fakeAsync(() => {
+@@ -259,13 +258,11 @@ describe('MatTable', () => {
+       ]);
+     });
+ 
+-    it('should update the page index when switching to a smaller data set from a page', fakeAsync(() => {
++    it('should update the page index when switching to a smaller data set from a page', () => {
+       // Add 20 rows so we can switch pages.
+       for (let i = 0; i < 20; i++) {
+         component.underlyingDataSource.addData();
+         fixture.detectChanges();
+-        tick();
+-        fixture.detectChanges();
+       }
+ 
+       // Go to the last page.
+@@ -275,20 +272,18 @@ describe('MatTable', () => {
+       // Switch to a smaller data set.
+       dataSource.data = [{a: 'a_0', b: 'b_0', c: 'c_0'}];
+       fixture.detectChanges();
+-      tick();
+-      fixture.detectChanges();
+ 
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+         ['a_0', 'b_0', 'c_0'],
+         ['Footer A', 'Footer B', 'Footer C'],
+       ]);
+-    }));
++    });
+ 
+-    it('should be able to filter the table contents', fakeAsync(() => {
++    it('should be able to filter the table contents', async () => {
+       // Change filter to a_1, should match one row
+       dataSource.filter = 'a_1';
+-      flushMicrotasks(); // Resolve promise that updates paginator's length
++      await fixture.whenStable(); // Resolve promise that updates paginator's length
+       fixture.detectChanges();
+       expect(dataSource.filteredData.length).toBe(1);
+       expect(dataSource.filteredData[0]).toBe(dataSource.data[0]);
+@@ -302,7 +297,6 @@ describe('MatTable', () => {
+ 
+       // Change filter to '  A_2  ', should match one row (ignores case and whitespace)
+       dataSource.filter = '  A_2  ';
+-      flushMicrotasks();
+       fixture.detectChanges();
+       expect(dataSource.filteredData.length).toBe(1);
+       expect(dataSource.filteredData[0]).toBe(dataSource.data[1]);
+@@ -314,7 +308,6 @@ describe('MatTable', () => {
+ 
+       // Change filter to empty string, should match all rows
+       dataSource.filter = '';
+-      flushMicrotasks();
+       fixture.detectChanges();
+       expect(dataSource.filteredData.length).toBe(3);
+       expect(dataSource.filteredData[0]).toBe(dataSource.data[0]);
+@@ -348,7 +341,6 @@ describe('MatTable', () => {
+         return dataStr.indexOf(filter) != -1;
+       };
+       dataSource.filter = 'zebra';
+-      flushMicrotasks();
+       fixture.detectChanges();
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+@@ -358,26 +350,24 @@ describe('MatTable', () => {
+ 
+       // Change the filter to a falsy value that might come in from the view.
+       dataSource.filter = 0 as unknown as string;
+-      flushMicrotasks();
+       fixture.detectChanges();
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+         ['Footer A', 'Footer B', 'Footer C'],
+       ]);
+-    }));
++    });
+ 
+-    it('should not match concatenated words', fakeAsync(() => {
++    it('should not match concatenated words', () => {
+       // Set the value to the last character of the first
+       // column plus the first character of the second column.
+       dataSource.filter = '1b';
+-      flushMicrotasks();
+       fixture.detectChanges();
+       expect(dataSource.filteredData.length).toBe(0);
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+         ['Footer A', 'Footer B', 'Footer C'],
+       ]);
+-    }));
++    });
+ 
+     it('should be able to sort the table contents', () => {
+       // Activate column A sort
+@@ -510,13 +500,14 @@ describe('MatTable', () => {
+       ]);
+     });
+ 
+-    it('should be able to page the table contents', fakeAsync(() => {
++    it('should be able to page the table contents', async () => {
+       // Add 100 rows, should only display first 5 since page length is 5
+       for (let i = 0; i < 100; i++) {
+         component.underlyingDataSource.addData();
+       }
+       fixture.detectChanges();
+-      flushMicrotasks(); // Resolve promise that updates paginator's length
++      await fixture.whenStable();
++
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+         ['a_1', 'b_1', 'c_1'],
+@@ -539,7 +530,7 @@ describe('MatTable', () => {
+         ['a_10', 'b_10', 'c_10'],
+         ['Footer A', 'Footer B', 'Footer C'],
+       ]);
+-    }));
++    });
+ 
+     it('should sort strings with numbers larger than MAX_SAFE_INTEGER correctly', () => {
+       const large = '9563256840123535';
+diff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts
+index 14d35e1128334277162f9522111a9e455c767a2b..ff2e61183cc005374fd4a18f5174a1290002ef3a 100644
+--- a/src/material/tooltip/tooltip.spec.ts
++++ b/src/material/tooltip/tooltip.spec.ts
+@@ -23,7 +23,7 @@ import {
+   ViewChild,
+   WritableSignal,
+ } from '@angular/core';
+-import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {
+   MAT_TOOLTIP_DEFAULT_OPTIONS,
+@@ -979,33 +979,6 @@ describe('MatTooltip', () => {
+       expect(classList).toContain('mat-mdc-tooltip-panel-left');
+     });
+ 
+-    it('should clear the show timeout on destroy', async () => {
+-      assertTooltipInstance(tooltipDirective, false);
+-
+-      tooltipDirective.show(1000);
+-      fixture.detectChanges();
+-
+-      // Note that we aren't asserting anything, but `fakeAsync` will
+-      // throw if we have any timers by the end of the test.
+-      fixture.destroy();
+-    });
+-
+-    it('should clear the hide timeout on destroy', async () => {
+-      assertTooltipInstance(tooltipDirective, false);
+-
+-      tooltipDirective.show();
+-      await wait(0);
+-      fixture.detectChanges();
+-      await wait(0);
+-
+-      tooltipDirective.hide(1000);
+-      fixture.detectChanges();
+-
+-      // Note that we aren't asserting anything, but `fakeAsync` will
+-      // throw if we have any timers by the end of the test.
+-      fixture.destroy();
+-    });
+-
+     it('should set the multiline class on tooltips with messages that overflow', async () => {
+       fixture.componentInstance.message =
+         'This is a very long message that should cause the' +
+@@ -1270,25 +1243,26 @@ describe('MatTooltip', () => {
+       platform.ANDROID = true;
+     });
+ 
+-    // Note: switching this test away from `fakeAsync` causes it to fail only on CI.
+-    it('should have a delay when showing on touchstart', fakeAsync(() => {
++    afterEach(() => {
++      jasmine.clock().uninstall();
++    });
++
++    it('should have a delay when showing on touchstart', async () => {
+       const fixture = TestBed.createComponent(BasicTooltipDemo);
+       fixture.detectChanges();
+       const button: HTMLButtonElement = fixture.nativeElement.querySelector('button');
+ 
+       dispatchFakeEvent(button, 'touchstart');
+       fixture.detectChanges();
+-      tick(250); // Halfway through the delay.
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, false);
+ 
+-      tick(500); // Finish the delay.
++      await wait(500); // Finish the delay.
+       fixture.detectChanges();
+       finishCurrentTooltipAnimation(overlayContainerElement, true); // Finish the animation.
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, true);
+-      flush();
+-    }));
++    });
+ 
+     it('should be able to disable opening on touch', async () => {
+       const fixture = TestBed.createComponent(BasicTooltipDemo);
+@@ -1298,7 +1272,7 @@ describe('MatTooltip', () => {
+ 
+       dispatchFakeEvent(button, 'touchstart');
+       fixture.detectChanges();
+-      await wait(10); // Just wait a bit to ensure no timer firs
++      await wait(10); // Just wait a bit to ensure no timer fires
+       fixture.detectChanges();
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, false);
+@@ -1314,55 +1288,59 @@ describe('MatTooltip', () => {
+       expect(event.defaultPrevented).toBe(false);
+     });
+ 
+-    it('should close on touchend with a delay', fakeAsync(() => {
++    it('should close on touchend with a delay', () => {
++      jasmine.clock().install();
+       const fixture = TestBed.createComponent(BasicTooltipDemo);
+       fixture.detectChanges();
+       const button: HTMLButtonElement = fixture.nativeElement.querySelector('button');
+ 
+       dispatchFakeEvent(button, 'touchstart');
+       fixture.detectChanges();
+-      tick(500); // Finish the open delay.
++      jasmine.clock().tick(500); // Finish the open delay.
++      jasmine.clock().tick(0); // Finish the show delay.
+       fixture.detectChanges();
+       finishCurrentTooltipAnimation(overlayContainerElement, true); // Finish the animation.
+       assertTooltipInstance(fixture.componentInstance.tooltip, true);
+ 
+       dispatchFakeEvent(button, 'touchend');
+       fixture.detectChanges();
+-      tick(1000); // 2/3 through the delay
++      jasmine.clock().tick(1000); // 2/3 through the delay
+       assertTooltipInstance(fixture.componentInstance.tooltip, true);
+ 
+-      tick(500); // Finish the delay.
++      jasmine.clock().tick(500); // Finish the delay.
+       fixture.detectChanges();
+       finishCurrentTooltipAnimation(overlayContainerElement, false); // Finish the exit animation.
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, false);
+-      flush();
+-    }));
++      jasmine.clock().uninstall();
++    });
+ 
+-    it('should close on touchcancel with a delay', fakeAsync(() => {
++    it('should close on touchcancel with a delay', () => {
++      jasmine.clock().install();
+       const fixture = TestBed.createComponent(BasicTooltipDemo);
+       fixture.detectChanges();
+       const button: HTMLButtonElement = fixture.nativeElement.querySelector('button');
+ 
+       dispatchFakeEvent(button, 'touchstart');
+       fixture.detectChanges();
+-      tick(500); // Finish the open delay.
++      jasmine.clock().tick(500); // Finish the open delay.
++      jasmine.clock().tick(0); // Finish the show delay.
+       fixture.detectChanges();
+       finishCurrentTooltipAnimation(overlayContainerElement, true); // Finish the animation.
+       assertTooltipInstance(fixture.componentInstance.tooltip, true);
+ 
+       dispatchFakeEvent(button, 'touchcancel');
+       fixture.detectChanges();
+-      tick(1000); // 2/3 through the delay
++      jasmine.clock().tick(1000); // 2/3 through the delay
+       assertTooltipInstance(fixture.componentInstance.tooltip, true);
+ 
+-      tick(500); // Finish the delay.
++      jasmine.clock().tick(500); // Finish the delay.
+       fixture.detectChanges();
+       finishCurrentTooltipAnimation(overlayContainerElement, false); // Finish the exit animation.
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, false);
+-      flush();
+-    }));
++      jasmine.clock().uninstall();
++    });
+ 
+     it('should disable native touch interactions', () => {
+       const fixture = TestBed.createComponent(BasicTooltipDemo);
+@@ -1476,7 +1454,7 @@ describe('MatTooltip', () => {
+   });
+ 
+   describe('mouse wheel handling', () => {
+-    it('should close when a wheel event causes the cursor to leave the trigger', fakeAsync(() => {
++    it('should close when a wheel event causes the cursor to leave the trigger', async () => {
+       // We don't bind wheel events on mobile devices.
+       if (platform.IOS || platform.ANDROID) {
+         return;
+@@ -1488,7 +1466,7 @@ describe('MatTooltip', () => {
+ 
+       dispatchFakeEvent(button, 'mouseenter');
+       fixture.detectChanges();
+-      tick(500); // Finish the open delay.
++      await wait(0); // Finish the open delay.
+       fixture.detectChanges();
+       finishCurrentTooltipAnimation(overlayContainerElement, true);
+       assertTooltipInstance(fixture.componentInstance.tooltip, true);
+@@ -1502,13 +1480,12 @@ describe('MatTooltip', () => {
+ 
+       dispatchEvent(button, wheelEvent);
+       fixture.detectChanges();
+-      tick(1500); // Finish the delay.
++      await wait(0); // Finish the delay.
+       fixture.detectChanges();
+       finishCurrentTooltipAnimation(overlayContainerElement, false);
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, false);
+-      flush();
+-    }));
++    });
+ 
+     it('should not close if the cursor is over the trigger after a wheel event', async () => {
+       // We don't bind wheel events on mobile devices.
+@@ -1522,7 +1499,7 @@ describe('MatTooltip', () => {
+ 
+       dispatchFakeEvent(button, 'mouseenter');
+       fixture.detectChanges();
+-      await wait(500); // Finish the open dela.
++      await wait(0); // Finish the open delay.
+       fixture.detectChanges();
+       finishCurrentTooltipAnimation(overlayContainerElement, true);
+       assertTooltipInstance(fixture.componentInstance.tooltip, true);
