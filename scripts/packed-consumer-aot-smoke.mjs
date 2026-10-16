@@ -47,6 +47,7 @@ import {menuItemTokenPackedFixture} from './menu-item-token-packed-fixture.mjs';
 import {packedMenuItemTokenCase} from './menu-item-token-packed-contract.mjs';
 import {selectFocusClickPackedFixture} from './select-focus-click-packed-fixture.mjs';
 import {packedSelectFocusClickCase} from './select-focus-click-packed-contract.mjs';
+import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-packed-contract.mjs';
 import {assertEngineFreeConsumer, assertEngineFreeHarnessInputs} from './consumer-animation-engine.mjs';
 import {
   allConsumerCaseIds,
@@ -482,6 +483,10 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
   const selectDetachCase = packedSelectDetachCase(parsed.selectScrollDetach);
   const menuItemTokenCase = packedMenuItemTokenCase(parsed.menuItemToken);
   const selectFocusClickCase = packedSelectFocusClickCase(parsed.selectFocusClick);
+  const detailedBehaviorCases = new Map([
+    packedChipDisabledCase(parsed.chipDisabledObservation),packedMenuLazyCase(parsed.menuLazyObservation),
+    packedTooltipContainerCase(parsed.tooltipContainerObservation),
+  ].map(row => [row.case_id,row]));
   const harnessMap = {
     'packed-consumer/harness/legacy-button': parsed.buttonText === 'Go',
     'packed-consumer/harness/legacy-select': parsed.selectOpened === true && parsed.selectClosed === true && parsed.viewportShared === true,
@@ -550,6 +555,12 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
       return {...selectFocusClickCase, result: ok ? 'pass' : 'fail',
         legacy_harness_passed: harnessMap[caseId] === true,
         failure: ok ? null : selectFocusClickCase.failure || 'Original select harness conditions failed'};
+    }
+    if (detailedBehaviorCases.has(caseId)) {
+      const row = detailedBehaviorCases.get(caseId);
+      const ok = harnessMap[caseId] === true && row.result === 'pass';
+      return {...row,result:ok?'pass':'fail',legacy_harness_passed:harnessMap[caseId] === true,
+        failure:ok?null:row.failure || 'Original harness conditions failed'};
     }
     const ok = harnessMap[caseId] === true;
     return {case_id: caseId, result: ok ? 'pass' : 'fail', failure: ok ? null : 'harness behavior did not match the reviewed fixture'};
@@ -908,6 +919,7 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
     writeFileSync(join(consumer, 'src/menu-item-token-contract.mjs'), readFileSync(join(root, 'scripts/menu-item-token-packed-contract.mjs')));
     writeFileSync(join(consumer, 'src/select-focus-click-probe.ts'), selectFocusClickPackedFixture());
     writeFileSync(join(consumer, 'src/select-focus-click-contract.mjs'), readFileSync(join(root, 'scripts/select-focus-click-packed-contract.mjs')));
+    writeFileSync(join(consumer, 'src/chip-menu-tooltip-contract.mjs'), readFileSync(join(root, 'scripts/chip-menu-tooltip-packed-contract.mjs')));
     writeFileSync(
       join(consumer, 'src/harness-runtime.ts'),
       `import {JSDOM} from 'jsdom';
@@ -951,7 +963,7 @@ import 'zone.js';
 import '@angular/compiler';
 import {Component, Directive, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector, IterableDiffers, SimpleChange, runInInjectionContext} from '@angular/core';
 import {Subject} from 'rxjs';
-import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule, NgModel, Validators} from '@angular/forms';
 import {observePackedValueAccessors} from './value-accessor-probe';
 import {PackedOnPushTableHost, observePackedTableOnPush} from './table-onpush-probe';
 import {PackedRadioIdentityHost, observePackedRadioIdentity} from './radio-identity-probe';
@@ -959,10 +971,11 @@ import {GENERATED_IDENTITY_IMPORTS, observePackedGeneratedIdentity} from './gene
 import {SELECT_DETACH_IMPORTS, observePackedSelectDetach} from './select-detach-probe';
 import {MENU_ITEM_TOKEN_IMPORTS, observePackedMenuItemToken} from './menu-item-token-probe';
 import {SELECT_FOCUS_CLICK_IMPORTS, observePackedSelectFocusClick} from './select-focus-click-probe';
+import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-contract.mjs';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {MatTabContent,MatTabLabel} from '@angular/material/tabs';
 import {_LegacyViewport} from '@ngx-compat/material-legacy/legacy-core';
-import {CdkPortal} from '@angular/cdk/portal';
+import {CdkPortal,ComponentPortal} from '@angular/cdk/portal';
 import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout';
 import {AriaDescriber, FocusMonitor, HighContrastMode, HighContrastModeDetector} from '@angular/cdk/a11y';
 import {
@@ -986,12 +999,12 @@ import {MatLegacySelectModule} from '@ngx-compat/material-legacy/legacy-select';
 import {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';
 import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
 import {MatLegacyDialogHarness} from '@ngx-compat/material-legacy/legacy-dialog/testing';
-import {MatLegacyMenuModule,MatLegacyMenu,MatLegacyMenuItem,MAT_LEGACY_MENU_PANEL} from '@ngx-compat/material-legacy/legacy-menu';
+import {MatLegacyMenuModule,MatLegacyMenu,MatLegacyMenuItem,MatLegacyMenuTrigger,MAT_LEGACY_MENU_PANEL} from '@ngx-compat/material-legacy/legacy-menu';
 import {MatMenuItem} from '@angular/material/menu';
 import {MatLegacyMenuHarness} from '@ngx-compat/material-legacy/legacy-menu/testing';
 import {MatLegacySnackBar, MatLegacySnackBarModule} from '@ngx-compat/material-legacy/legacy-snack-bar';
 import {MatLegacySnackBarHarness} from '@ngx-compat/material-legacy/legacy-snack-bar/testing';
-import {MatLegacyTooltip, MatLegacyTooltipModule, MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY, MAT_LEGACY_TOOLTIP_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-tooltip';
+import {MatLegacyTooltip, LegacyTooltipComponent, MatLegacyTooltipModule, MAT_LEGACY_TOOLTIP_SCROLL_STRATEGY, MAT_LEGACY_TOOLTIP_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-tooltip';
 import {MatLegacyTooltipHarness} from '@ngx-compat/material-legacy/legacy-tooltip/testing';
 import {MatLegacyTabsModule, MatLegacyTabLink, MatLegacyTabContent, MatLegacyTabLabel, MatLegacyTab, MAT_LEGACY_TAB} from '@ngx-compat/material-legacy/legacy-tabs';
 import {MatLegacyCheckbox, MatLegacyCheckboxModule, MAT_LEGACY_CHECKBOX_DEFAULT_OPTIONS} from '@ngx-compat/material-legacy/legacy-checkbox';
@@ -1118,6 +1131,7 @@ class SmokeDialogContent {}
       <button mat-menu-item disableRipple id="menu-no-ripple">No ripple</button>
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="lazyMenu" id="lazy-menu-trigger">Lazy menu</button>
+    <button mat-button [matMenuTriggerFor]="lazyMenu" id="lazy-menu-other-trigger">Other lazy owner</button>
     <mat-menu #lazyMenu="matMenu">
       <ng-template matMenuContent>
         <button mat-menu-item legacyMenuDestroyProbe>Lazy one</button>
@@ -1659,20 +1673,55 @@ async function main() {
   const lazyMenu=await loader.getHarness(MatLegacyMenuHarness.with({selector:'#lazy-menu-trigger'}));
   const lazyState=fixture.componentInstance.lazyMenuLifetime;
   const lazyInitial=fixture.componentInstance.lazyMenu.items.length===0&&lazyState.created===0&&lazyState.destroyed===0;
+  const lazyTrigger=fixture.debugElement.query(By.css('#lazy-menu-trigger')).injector.get(MatLegacyMenuTrigger);
+  const otherLazyTrigger=fixture.debugElement.query(By.css('#lazy-menu-other-trigger')).injector.get(MatLegacyMenuTrigger);
+  const menuLazyObservation={execution:'packed-angular-testbed-dom',
+    public_menu:fixture.componentInstance.lazyMenu instanceof MatLegacyMenu,
+    public_triggers:lazyTrigger instanceof MatLegacyMenuTrigger&&otherLazyTrigger instanceof MatLegacyMenuTrigger,
+    phases:[] as any[],first_events:[] as boolean[],second_events:[] as boolean[],
+    recreated_items:false,transferred_items_recreated:false,subscriptions_closed:false};
+  const menuSubscriptions=[lazyTrigger.menuOpened.subscribe(()=>menuLazyObservation.first_events.push(true)),
+    lazyTrigger.menuClosed.subscribe(()=>menuLazyObservation.first_events.push(false)),
+    otherLazyTrigger.menuOpened.subscribe(()=>menuLazyObservation.second_events.push(true)),
+    otherLazyTrigger.menuClosed.subscribe(()=>menuLazyObservation.second_events.push(false))];
+  const menuSnapshot=(phase:string)=>({phase,items:fixture.componentInstance.lazyMenu.items.length,
+    created:lazyState.created,destroyed:lazyState.destroyed,
+    connected_items:fixture.componentInstance.lazyMenu.items.filter(item=>item._getHostElement().isConnected).length,
+    first_open:lazyTrigger.menuOpen,second_open:otherLazyTrigger.menuOpen,
+    panel_connected:document.getElementById(fixture.componentInstance.lazyMenu.panelId)?.isConnected===true});
+  menuLazyObservation.phases.push(menuSnapshot('initial'));
   await lazyMenu.open();fixture.detectChanges();await fixture.whenStable();
   const firstLazyItem=fixture.componentInstance.lazyMenu.items.first;
   const lazyFirstOpen=await lazyMenu.isOpen()&&fixture.componentInstance.lazyMenu.items.length===2
     &&lazyState.created===2&&lazyState.destroyed===0;
+  menuLazyObservation.phases.push(menuSnapshot('first-open'));
   await lazyMenu.close();fixture.detectChanges();await fixture.whenStable();
   const lazyFirstClose=!(await lazyMenu.isOpen())&&fixture.componentInstance.lazyMenu.items.length===0
     &&lazyState.created===2&&lazyState.destroyed===2;
+  menuLazyObservation.phases.push(menuSnapshot('first-close'));
   await lazyMenu.open();fixture.detectChanges();await fixture.whenStable();
   const lazyReopen=await lazyMenu.isOpen()&&fixture.componentInstance.lazyMenu.items.length===2
     &&fixture.componentInstance.lazyMenu.items.first!==firstLazyItem&&lazyState.created===4&&lazyState.destroyed===2;
+  menuLazyObservation.recreated_items=fixture.componentInstance.lazyMenu.items.first!==firstLazyItem;
+  menuLazyObservation.phases.push(menuSnapshot('reopen'));
   await lazyMenu.close();fixture.detectChanges();await fixture.whenStable();
   const lazySecondClose=!(await lazyMenu.isOpen())&&fixture.componentInstance.lazyMenu.items.length===0
     &&lazyState.created===4&&lazyState.destroyed===4;
   const lazyMenuLifecycle=lazyInitial&&lazyFirstOpen&&lazyFirstClose&&lazyReopen&&lazySecondClose;
+  menuLazyObservation.phases.push(menuSnapshot('second-close'));
+  await lazyMenu.open();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();
+  const beforeTransferItems=fixture.componentInstance.lazyMenu.items.toArray();
+  menuLazyObservation.phases.push(menuSnapshot('transfer-before'));
+  otherLazyTrigger.openMenu();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();
+  menuLazyObservation.transferred_items_recreated=fixture.componentInstance.lazyMenu.items.toArray()
+    .every(item=>!beforeTransferItems.includes(item));
+  menuLazyObservation.phases.push(menuSnapshot('transfer-after'));
+  await fixture.whenStable();fixture.detectChanges();
+  menuLazyObservation.phases.push(menuSnapshot('transfer-settled'));
+  otherLazyTrigger.closeMenu();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();
+  menuLazyObservation.phases.push(menuSnapshot('transfer-close'));
+  for(const subscription of menuSubscriptions)subscription.unsubscribe();
+  menuLazyObservation.subscriptions_closed=menuSubscriptions.every(subscription=>subscription.closed);
 
   // Snack-bar open under NoopAnimations.
   fixture.componentInstance.openSnack();
@@ -1685,15 +1734,36 @@ async function main() {
   fixture.detectChanges();
   await sleep(40);
 
-  // Tooltip show via harness.
+  // Record the actual owned directive's eager container before any show().
   const tip = await loader.getHarness(MatLegacyTooltipHarness.with({selector: '#tip'}));
-  await tip.show();
-  fixture.detectChanges();
-  await sleep(20);
-  const tipVisible = await tip.isOpen();
-  const tipText = tipVisible ? await tip.getTooltipText() : '';
-  await tip.hide();
-  fixture.detectChanges();
+  const tipNode=fixture.debugElement.query(By.css('#tip'));
+  const actualTooltip=tipNode.injector.get(MatLegacyTooltip),tipFields=actualTooltip as any;
+  const eagerTipContainer=tipFields._viewContainerRef as ViewContainerRef;
+  const tooltipContainerObservation={execution:'packed-angular-testbed-dom',eager:tooltipEagerObservation,
+    public_directive:actualTooltip instanceof MatLegacyTooltip,
+    eager_before_show:!!eagerTipContainer&&tipFields._portal==null&&tipFields._overlayRef==null&&tipFields._tooltipInstance==null,
+    eager_node_container:eagerTipContainer instanceof ViewContainerRef&&eagerTipContainer.element.nativeElement===tipNode.nativeElement,
+    initial_container_views:eagerTipContainer.length,cycles:[] as any[],same_host_after_cycles:false};
+  let firstTipPortal:any,firstTipOverlay:any,tipVisible=false,tipText='';
+  for(let cycle=0;cycle<2;cycle++){
+    await tip.show();fixture.detectChanges();await sleep(20);fixture.detectChanges();
+    const portal=tipFields._portal,overlay=tipFields._overlayRef,instance=tipFields._tooltipInstance;
+    if(cycle===0){firstTipPortal=portal;firstTipOverlay=overlay;}
+    const tooltipElement=overlay.overlayElement.querySelector('.mat-tooltip') as HTMLElement|null;
+    const visible=await tip.isOpen(),text=visible?await tip.getTooltipText():'';
+    if(cycle===0){tipVisible=visible;tipText=text;}
+    const shown={public_portal:portal instanceof ComponentPortal,public_component:instance instanceof LegacyTooltipComponent,
+      same_eager_container:portal.viewContainerRef===eagerTipContainer&&tipFields._viewContainerRef===eagerTipContainer,
+      same_portal:portal===firstTipPortal,same_overlay:overlay===firstTipOverlay,
+      container_views:eagerTipContainer.length,overlay_attached:overlay.hasAttached(),overlay_connected:overlay.overlayElement.isConnected,
+      tooltip_connected:tooltipElement?.isConnected===true,visible,text};
+    await tip.hide();fixture.detectChanges();await sleep(250);fixture.detectChanges();
+    const hidden={overlay_attached:overlay.hasAttached(),tooltip_connected:tooltipElement?.isConnected===true,
+      instance_released:tipFields._tooltipInstance===null,visible:await tip.isOpen(),
+      container_views:eagerTipContainer.length,same_eager_container:tipFields._viewContainerRef===eagerTipContainer};
+    tooltipContainerObservation.cycles.push({cycle,shown,hidden});
+  }
+  tooltipContainerObservation.same_host_after_cycles=fixture.debugElement.query(By.css('#tip')).nativeElement===tipNode.nativeElement;
 
   const tabGroup = await loader.getHarness(MatLegacyTabGroupHarness);
   const tabCount = (await tabGroup.getTabs()).length;
@@ -1733,10 +1803,29 @@ async function main() {
   const inheritedChip=fixture.debugElement.query(By.css('#disabled-inherited-chip')).injector.get(MatLegacyChip);
   const disabledList=fixture.debugElement.query(By.css('#disabled-reactive-list')).injector.get(MatLegacyChipList);
   const chipDisabledInitial=templateChip.disabled&&individualChip.disabled&&!inheritedChip.disabled;
+  const chipNodes=['#disabled-template-chip','#disabled-individual-chip','#disabled-inherited-chip']
+    .map(selector=>fixture.nativeElement.querySelector(selector) as HTMLElement);
+  const templateListNode=fixture.debugElement.query(By.css('#disabled-template-list'));
+  const templateList=templateListNode.injector.get(MatLegacyChipList);
+  const chipDisabledObservation={execution:'packed-angular-testbed-dom',phases:[] as any[],
+    public_chips:[templateChip,individualChip,inheritedChip].every(chip=>chip instanceof MatLegacyChip),
+    public_lists:templateList instanceof MatLegacyChipList&&disabledList instanceof MatLegacyChipList,
+    template_value_accessor:templateListNode.injector.get(NgModel).valueAccessor===templateList,
+    reactive_value_accessor:disabledList.ngControl?.valueAccessor===disabledList,same_nodes_after_cycles:false};
+  const chipSnapshot=(phase:string)=>({phase,template_disabled:templateChip.disabled,individual_disabled:individualChip.disabled,
+    inherited_disabled:inheritedChip.disabled,list_disabled:disabledList.disabled,
+    form_disabled:fixture.componentInstance.disabledChipControl.disabled,
+    template_aria:chipNodes[0].getAttribute('aria-disabled'),individual_aria:chipNodes[1].getAttribute('aria-disabled'),
+    inherited_aria:chipNodes[2].getAttribute('aria-disabled')});
+  chipDisabledObservation.phases.push(chipSnapshot('initial'));
   fixture.componentInstance.disabledChipControl.disable();fixture.detectChanges();
   const chipDisabledDuring=individualChip.disabled&&inheritedChip.disabled&&disabledList.disabled;
+  chipDisabledObservation.phases.push(chipSnapshot('form-disabled'));
   fixture.componentInstance.disabledChipControl.enable();fixture.detectChanges();
   const chipDisabledAfter=individualChip.disabled&&!inheritedChip.disabled&&!disabledList.disabled;
+  chipDisabledObservation.phases.push(chipSnapshot('form-enabled'));
+  chipDisabledObservation.same_nodes_after_cycles=['#disabled-template-chip','#disabled-individual-chip','#disabled-inherited-chip']
+    .every((selector,index)=>fixture.nativeElement.querySelector(selector)===chipNodes[index]&&chipNodes[index].isConnected);
   const chipDisabledDom=fixture.nativeElement.querySelector('#disabled-individual-chip').getAttribute('aria-disabled')==='true'
     &&fixture.nativeElement.querySelector('#disabled-inherited-chip').getAttribute('aria-disabled')==='false';
   const chipDisabledIsolation=chipDisabledInitial&&chipDisabledDuring&&chipDisabledAfter&&chipDisabledDom;
@@ -1956,7 +2045,11 @@ async function main() {
     &&(!checksEnabled||sanityWarnings[0].includes('Current document does not have a doctype.'));
   const valueAccessors=await observePackedValueAccessors();
   const tableOnPush=await observePackedTableOnPush();
+  const detailedPackedBehaviorsOkay=[packedChipDisabledCase(chipDisabledObservation),
+    packedMenuLazyCase(menuLazyObservation),packedTooltipContainerCase(tooltipContainerObservation)]
+    .every(row=>row.result==='pass');
   const out = {
+    chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,
     valueAccessorRegistration:valueAccessors.rows,
     tableOnPushRendering:tableOnPush.observed,
     radioIdentity:radioIdentity.observed,
@@ -1965,7 +2058,7 @@ async function main() {
     menuItemToken:menuItemToken.observed,
     selectFocusClick:selectFocusClick.observed,
     ok:
-      text === 'Go' &&
+      detailedPackedBehaviorsOkay && text === 'Go' &&
       isOpen === false &&
       dialogText.includes('Hello dialog') &&
       dialogsAfter.length === 0 &&

@@ -23,11 +23,14 @@ import {packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-
 import {packedSelectDetachCase} from '../scripts/select-detach-packed-contract.mjs';
 import {packedMenuItemTokenCase} from '../scripts/menu-item-token-packed-contract.mjs';
 import {packedSelectFocusClickCase} from '../scripts/select-focus-click-packed-contract.mjs';
+import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from '../scripts/chip-menu-tooltip-packed-contract.mjs';
 import {reverseRadioIdentityPackedSource} from '../scripts/radio-identity-packed-source-requalification.mjs';
 import {reverseGeneratedIdentityPackedSource} from '../scripts/generated-identity-packed-source-requalification.mjs';
 import {reverseSelectDetachPackedSource as reverseOldSelectDetachPackedSource} from '../scripts/select-detach-packed-source-requalification.mjs';
 import {reverseMenuItemTokenPackedSource as reverseOldMenuItemTokenPackedSource} from '../scripts/menu-item-token-packed-source-requalification.mjs';
-import {reverseSelectFocusClickPackedSource} from '../scripts/select-focus-click-packed-source-requalification.mjs';
+import {reverseSelectFocusClickPackedSource as reversePreviousSelectFocusClickPackedSource} from '../scripts/select-focus-click-packed-source-requalification.mjs';
+import {reverseChipMenuTooltipPackedSource} from '../scripts/chip-menu-tooltip-packed-source-requalification.mjs';
+const reverseSelectFocusClickPackedSource=(path,raw,line)=>reversePreviousSelectFocusClickPackedSource(path,reverseChipMenuTooltipPackedSource(path,raw,line),line);
 const reverseMenuItemTokenPackedSource=(path,raw,line)=>reverseOldMenuItemTokenPackedSource(path,reverseSelectFocusClickPackedSource(path,raw,line),line);
 const reverseSelectDetachPackedSource=(path,raw,line)=>reverseOldSelectDetachPackedSource(path,reverseMenuItemTokenPackedSource(path,raw,line),line);
 const reverseTableOnPushPackedSource=(path,raw,line)=>reverseOldTableOnPushPackedSource(path,reverseRadioIdentityPackedSource(path,reverseGeneratedIdentityPackedSource(path,reverseSelectDetachPackedSource(path,raw,line),line),line),line);
@@ -44,8 +47,8 @@ const sample={execution:'packed-angular-testbed-dom',error:null,parent_detection
 const path='scripts/packed-consumer-aot-smoke.mjs',raw=read(path),sf=ts.createSourceFile(path,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
 assert.equal(sf.parseDiagnostics.length,0);
 const source=sf.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='collectAcceptanceCases').getText(sf);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase',text+';return collectAcceptanceCases;')
-  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')
+  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);
 const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,106);
 const observe=(input,collector=load(source))=>{
   const rows=collector({harness:{status:'ok',result:{tableOnPushRendering:input}}},keys,'/tmp/consumer','/tmp/source').filter(row=>row.case_id===TABLE_ONPUSH_CASE_ID);

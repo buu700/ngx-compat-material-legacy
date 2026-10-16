@@ -20,6 +20,8 @@ import {packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-
 import {packedSelectDetachCase} from '../scripts/select-detach-packed-contract.mjs';
 import {packedMenuItemTokenCase} from '../scripts/menu-item-token-packed-contract.mjs';
 import {packedSelectFocusClickCase} from '../scripts/select-focus-click-packed-contract.mjs';
+import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from '../scripts/chip-menu-tooltip-packed-contract.mjs';
+import {chipMenuTooltipPackedSamples} from './chip_menu_tooltip_packed_samples.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),ts=createRequire(import.meta.url)('typescript');
 const contracts={table:{id:'packed-consumer/harness/table-angular-di-construction',field:'tableAngularDiConstruction'},
  chip:{id:'packed-consumer/harness/chip-individual-disabled-form-isolation',field:'chipDisabledIsolation'},
@@ -32,7 +34,7 @@ export function probeRequiredPackedContract(name){
  const {id,field}=contracts[name]||{};assert.ok(id,'unknown finite contract');
  const path='scripts/packed-consumer-aot-smoke.mjs',raw=readFileSync(join(root,path),'utf8'),file=ts.createSourceFile(path,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);assert.equal(file.parseDiagnostics.length,0);
  const node=file.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases');assert.ok(node);const source=node.getText(file),keys=loadExportKeys();
- const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase);
+ const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);
  const expected=allConsumerCaseIds(keys);assert.equal(new Set(expected).size,expected.length);assert.ok(expected.includes(id));
  const manifest=JSON.parse(readFileSync(join(root,'projects/ngx-material-legacy/package.json'))),line=manifest.version.startsWith('21.')?'21.x':'main';
  const matrix=JSON.parse(readFileSync(join(root,'compatibility/rc/matrices/full-verify.json')));
@@ -40,7 +42,7 @@ export function probeRequiredPackedContract(name){
  const visit=value=>{if(!value||typeof value!=='object')return;if(value.check_id==='packed-consumer'||value.id==='packed-consumer')roster=value.acceptance?.cases_by_line?.[line];for(const child of Object.values(value))if(typeof child==='object')visit(child);};visit(rows);
  assert.ok(roster,'actual line packed roster missing');assert.deepEqual(Object.values(roster).flat().sort(),[...expected].sort());
  const cases=[],mutants=[];
- const observations=fn=>[true,false,undefined,0,1,'true'].map(value=>{const rows=fn({harness:{status:'ok',result:{[field]:value}}},keys,'/tmp/consumer','/tmp/source'),matches=rows.filter(r=>r.case_id===id);assert.equal(matches.length,1,'required contract missing');assert.equal(matches[0].result,value===true?'pass':'fail','explicit observed boolean required');return {input:value===undefined?'omitted':value,result:matches[0].result};});
+ const observations=fn=>[true,false,undefined,0,1,'true'].map(value=>{const rows=fn({harness:{status:'ok',result:{[field]:value,chipDisabledObservation:chipMenuTooltipPackedSamples.chip,menuLazyObservation:chipMenuTooltipPackedSamples.menu,tooltipContainerObservation:chipMenuTooltipPackedSamples.tooltip}}},keys,'/tmp/consumer','/tmp/source'),matches=rows.filter(r=>r.case_id===id);assert.equal(matches.length,1,'required contract missing');assert.equal(matches[0].result,value===true?'pass':'fail','explicit observed boolean required');return {input:value===undefined?'omitted':value,result:matches[0].result};});
  cases.push(...observations(load(source)));
  for(const [name,from,to] of [['unconditional-pass',`parsed.${field} === true`,'true'],['omitted-observation',`    '${id}': parsed.${field} === true,`,'']]){assert.ok(source.includes(from));assert.throws(()=>observations(load(source.replace(from,to))));mutants.push({id:name,rejected:true});}
  const scratch=mkdtempSync(join(tmpdir(),'packed-contract-admission-'));

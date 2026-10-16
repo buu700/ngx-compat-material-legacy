@@ -21,6 +21,7 @@ import {packedGeneratedIdentityCase} from '../scripts/generated-identity-packed-
 import {packedSelectDetachCase} from '../scripts/select-detach-packed-contract.mjs';
 import {packedMenuItemTokenCase} from '../scripts/menu-item-token-packed-contract.mjs';
 import {packedSelectFocusClickCase} from '../scripts/select-focus-click-packed-contract.mjs';
+import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from '../scripts/chip-menu-tooltip-packed-contract.mjs';
 import {allConsumerCaseIds,declarationObservations,declarationKeys,librarySpec,harnessCaseIds,loadExportKeys,writeAcceptanceReport} from '../scripts/packed-consumer-evidence.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),ts=createRequire(import.meta.url)('typescript');
 const definitions=[
@@ -44,8 +45,8 @@ assert.equal(file.parseDiagnostics.length,0);
 const node=file.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases');assert.ok(node);
 const source=node.getText(file),keys=loadExportKeys(),expected=allConsumerCaseIds(keys),manifest=JSON.parse(readFileSync(join(root,'projects/ngx-material-legacy/package.json')));
 const line=manifest.version.startsWith('21.')?'21.x':'main';assert.equal(expected.length,106);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase',text+';return collectAcceptanceCases;')
- (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')
+ (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);
 const collect=load(source),observations=rows=>collect({harness:{status:'ok',result:{valueAccessorRegistration:rows}}},keys,'/tmp/consumer','/tmp/source')
  .filter(row=>VALUE_ACCESSOR_CASE_IDS.includes(row.case_id));
 assert.deepEqual(observations(samples).map(row=>row.result),Array(6).fill('pass'));
