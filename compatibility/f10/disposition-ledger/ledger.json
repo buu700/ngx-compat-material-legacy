@@ -28659,17 +28659,125 @@
       "sha": "2ad427438e903cb9f40666207287b13b132a2bc1",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/input): switch tests away from fakeAsync (#32938)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=30d592f8bdaf0dda17481d176a063181cac3be19a27d753806171c6b58dba9bb, bytes=45156). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/input/input.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all81 hunks of the complete input spec migration. Pair102 static cases through exactly two top-level MatMdcInput to MatInput suite renames; no registration is added, lost, reordered or disabled.21 callbacks retain complete semantics;81 fakeAsync wrappers become ordinary callbacks, including two native async cases. All102 predicate expressions remain identical, while ten flush operations disappear, one fixture.whenStable is added for the zero-valued control, and three simulated16ms ticks in the private MDC notch test become native16ms waits through a new local Promise/setTimeout helper. The error-message beforeEach also loses its fakeAsync boundary. Full nonboundary callback comparison, ordered timing records, two setup hooks and50 byte-identical fixture classes account for the whole file; they do not prove scheduler, injector, real frame or rendering equivalence. Decline this private testing preference. Retain the owned legacy input programmatic/OnPush and outline-gap tests using the actual .mat-form-field-outline-start/gap structure; do not copy a .mdc-notched-outline__notch observer or add required consumer CSS/SCSS changes. All1141 current product members and2223 existing case bodies remain exact. Actual packed/native/zone and both supported-floor executions remain open.",
+      "read_note_disposition": "individual complete-original source conclusion; actual product/floor and G11 gates remain separate",
       "files": [
         "src/material/input/input.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/2ad427438e903cb9f40666207287b13b132a2bc1.json",
-      "batch_id": "test-only-refactor-wave2-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-form-async-2ad427438e903cb9f40666207287b13b132a2bc1.json",
       "recorded_at_utc": "2026-10-01T18:47:11Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "30d592f8bdaf0dda17481d176a063181cac3be19a27d753806171c6b58dba9bb"
+      "patch_sha256": "30d592f8bdaf0dda17481d176a063181cac3be19a27d753806171c6b58dba9bb",
+      "diff_sha256": "f013aa68517a4577d68cc9300aa5d08318209a04b94c8df206ff1fa39a407d72",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "f013aa68517a4577d68cc9300aa5d08318209a04b94c8df206ff1fa39a407d72",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all81 hunks of the complete input spec migration. Pair102 static cases through exactly two top-level MatMdcInput to MatInput suite renames; no registration is added, lost, reordered or disabled.21 callbacks retain complete semantics;81 fakeAsync wrappers become ordinary callbacks, including two native async cases. All102 predicate expressions remain identical, while ten flush operations disappear, one fixture.whenStable is added for the zero-valued control, and three simulated16ms ticks in the private MDC notch test become native16ms waits through a new local Promise/setTimeout helper. The error-message beforeEach also loses its fakeAsync boundary. Full nonboundary callback comparison, ordered timing records, two setup hooks and50 byte-identical fixture classes account for the whole file; they do not prove scheduler, injector, real frame or rendering equivalence. Decline this private testing preference. Retain the owned legacy input programmatic/OnPush and outline-gap tests using the actual .mat-form-field-outline-start/gap structure; do not copy a .mdc-notched-outline__notch observer or add required consumer CSS/SCSS changes. All1141 current product members and2223 existing case bodies remain exact. Actual packed/native/zone and both supported-floor executions remain open.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-form-async-source-review.mjs",
+            "sha256": "7b98b91d0edaac2481d0c0f34e722bfe6963bd29ee33d39971f652acc7a35bff"
+          },
+          {
+            "path": "tests/spec_form_async_source_probe.mjs",
+            "sha256": "1debdbc26dfb366bf487e00d1206e949365a49df9c1fdfd60c3e1505b5085886"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-subjects.json.gz",
+            "sha256": "a9f029dda3b1a55d113c0c1d98753c2425c573dfca25446158ab300cc6a9a5bb"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-acquisition.json.gz",
+            "sha256": "f5d3981376bf00ae012b39c23555efaf856cae3334b7909adc9cbb004e1a04ee"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-review.json.gz",
+            "sha256": "5f95644a4ec0081e81b81d6c37195d5188b99c59c3d0cd5af3b3320fb18f5f12"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-controls.json",
+            "sha256": "b78ba3a1355b68c0536d9c17705dc6c56c58820e007b6a4931bfdfbdda9a3748"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-python.log.gz",
+            "sha256": "6311deb0b38987360af7b1bf9284cb134a8641ba9db65799fa3e3d73b56c2da3"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-cyph-sanity.json",
+            "sha256": "18bdf35f412ec43c26ccdacbf6322d00be266a991c85e63742eb120df06dc286"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-checkpoint.json",
+            "sha256": "cd70fe9bb54c7aebc4adc34e818566bae09b5db2da9d8337bc7cfcbafbbea9ea"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+            "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.spec.ts",
+            "sha256": "8d4e12acb4e0a65ea96ec687dfa78c703af3b6790c400649b4d5358aa08cc5d7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+            "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field-outline.scss",
+            "sha256": "14ab7d5a327fb1ef1617fd40d529428dc23415060a9528be81cf73b805328e76"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/bottom-sheet/_bottom-sheet-theme.scss",
+            "sha256": "53f9fd5f7ecb4355080a72380697ca9c2c5b4471205fc56c4925e34691ae3503"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false
+      },
+      "source_check": "Authenticated all81 original hunks and complete before/after program; paired102 static cases and all setup hooks. Every boundary/declaration/assertion/class change is accounted for without actual scheduler/native/artifact/floor admission.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "dba28ae0ac585cede26b3846e87c0e1169a4ce73",
@@ -28723,49 +28831,373 @@
       "sha": "75ef78451f2ae49b916c494d7a898707d7051acf",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/checkbox): switch tests away from fakeAsync (#32960)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=4d00d2188efa8854bc6e6fecfd38f9ae8461ef409f98f31bd27f953b0249823f, bytes=34171). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/checkbox/checkbox.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all51 hunks of the complete checkbox spec migration. Pair all74 static cases;17 callbacks retain complete semantics and57 fakeAsync wrappers are removed (five become native async).37 flush operations and one flushMicrotasks disappear, eight fixture.whenStable calls are added across five cases, and the97 explicit detection calls remain.73 full predicate expressions remain identical. The focused-disable not.toThrow subject changes because it stops draining its flush inside the expectation; that exact original pair is individually pinned and is not declared exception/lifetime equivalent. The ten setup hooks and18 fixture class bodies/templates remain exact, and all other nonboundary operations match. Decline the private upstream async migration. The owned legacy focused-disable regression deliberately drains nested FocusMonitor timeouts and then microtasks within its not.toThrow scope; retain it together with blur/touched, OnPush, indeterminate, checked and forms observations. No product, TypeScript API, HTML, CSS or SCSS change is needed for this source conclusion. Real Angular/public-peer scheduling and artifact/floor gates remain unexecuted.",
+      "read_note_disposition": "individual complete-original source conclusion; actual product/floor and G11 gates remain separate",
       "files": [
         "src/material/checkbox/checkbox.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/75ef78451f2ae49b916c494d7a898707d7051acf.json",
-      "batch_id": "test-only-refactor-wave2-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-form-async-75ef78451f2ae49b916c494d7a898707d7051acf.json",
       "recorded_at_utc": "2026-10-01T18:47:11Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "4d00d2188efa8854bc6e6fecfd38f9ae8461ef409f98f31bd27f953b0249823f"
+      "patch_sha256": "4d00d2188efa8854bc6e6fecfd38f9ae8461ef409f98f31bd27f953b0249823f",
+      "diff_sha256": "d7576bea87b10b85383497a0b131c3496b8622e93b52c29e5b268d8dcf688efb",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "d7576bea87b10b85383497a0b131c3496b8622e93b52c29e5b268d8dcf688efb",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all51 hunks of the complete checkbox spec migration. Pair all74 static cases;17 callbacks retain complete semantics and57 fakeAsync wrappers are removed (five become native async).37 flush operations and one flushMicrotasks disappear, eight fixture.whenStable calls are added across five cases, and the97 explicit detection calls remain.73 full predicate expressions remain identical. The focused-disable not.toThrow subject changes because it stops draining its flush inside the expectation; that exact original pair is individually pinned and is not declared exception/lifetime equivalent. The ten setup hooks and18 fixture class bodies/templates remain exact, and all other nonboundary operations match. Decline the private upstream async migration. The owned legacy focused-disable regression deliberately drains nested FocusMonitor timeouts and then microtasks within its not.toThrow scope; retain it together with blur/touched, OnPush, indeterminate, checked and forms observations. No product, TypeScript API, HTML, CSS or SCSS change is needed for this source conclusion. Real Angular/public-peer scheduling and artifact/floor gates remain unexecuted.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-form-async-source-review.mjs",
+            "sha256": "7b98b91d0edaac2481d0c0f34e722bfe6963bd29ee33d39971f652acc7a35bff"
+          },
+          {
+            "path": "tests/spec_form_async_source_probe.mjs",
+            "sha256": "1debdbc26dfb366bf487e00d1206e949365a49df9c1fdfd60c3e1505b5085886"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-subjects.json.gz",
+            "sha256": "a9f029dda3b1a55d113c0c1d98753c2425c573dfca25446158ab300cc6a9a5bb"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-acquisition.json.gz",
+            "sha256": "f5d3981376bf00ae012b39c23555efaf856cae3334b7909adc9cbb004e1a04ee"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-review.json.gz",
+            "sha256": "5f95644a4ec0081e81b81d6c37195d5188b99c59c3d0cd5af3b3320fb18f5f12"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-controls.json",
+            "sha256": "b78ba3a1355b68c0536d9c17705dc6c56c58820e007b6a4931bfdfbdda9a3748"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-python.log.gz",
+            "sha256": "6311deb0b38987360af7b1bf9284cb134a8641ba9db65799fa3e3d73b56c2da3"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-cyph-sanity.json",
+            "sha256": "18bdf35f412ec43c26ccdacbf6322d00be266a991c85e63742eb120df06dc286"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-checkpoint.json",
+            "sha256": "cd70fe9bb54c7aebc4adc34e818566bae09b5db2da9d8337bc7cfcbafbbea9ea"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+            "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.spec.ts",
+            "sha256": "8d4e12acb4e0a65ea96ec687dfa78c703af3b6790c400649b4d5358aa08cc5d7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+            "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field-outline.scss",
+            "sha256": "14ab7d5a327fb1ef1617fd40d529428dc23415060a9528be81cf73b805328e76"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/bottom-sheet/_bottom-sheet-theme.scss",
+            "sha256": "53f9fd5f7ecb4355080a72380697ca9c2c5b4471205fc56c4925e34691ae3503"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false
+      },
+      "source_check": "Authenticated all51 original hunks and complete before/after program; paired74 static cases and all setup hooks. Every boundary/declaration/assertion/class change is accounted for without actual scheduler/native/artifact/floor admission.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "046e1a2789c2a18cc14707d7a78a0efab6a2fdd0",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/slide-toggle): switch tests away from fakeAsync (#33033)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=388945e6a32c1f76c897cea9048c59bd6f8eeb39955adf0825d38d7234b067c4, bytes=23138). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/slide-toggle/slide-toggle.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "read_note_disposition": "individual complete-original source conclusion; actual product/floor and G11 gates remain separate",
       "files": [
         "src/material/slide-toggle/slide-toggle.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/046e1a2789c2a18cc14707d7a78a0efab6a2fdd0.json",
-      "batch_id": "test-only-refactor-wave2-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-form-async-046e1a2789c2a18cc14707d7a78a0efab6a2fdd0.json",
       "recorded_at_utc": "2026-10-01T18:47:11Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "388945e6a32c1f76c897cea9048c59bd6f8eeb39955adf0825d38d7234b067c4"
+      "patch_sha256": "388945e6a32c1f76c897cea9048c59bd6f8eeb39955adf0825d38d7234b067c4",
+      "diff_sha256": "72623632a2d84e5e7ff1ef84f317666fc1cef3388464f02787ed5184f416e3dc",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "72623632a2d84e5e7ff1ef84f317666fc1cef3388464f02787ed5184f416e3dc",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-form-async-source-review.mjs",
+            "sha256": "7b98b91d0edaac2481d0c0f34e722bfe6963bd29ee33d39971f652acc7a35bff"
+          },
+          {
+            "path": "tests/spec_form_async_source_probe.mjs",
+            "sha256": "1debdbc26dfb366bf487e00d1206e949365a49df9c1fdfd60c3e1505b5085886"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-subjects.json.gz",
+            "sha256": "a9f029dda3b1a55d113c0c1d98753c2425c573dfca25446158ab300cc6a9a5bb"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-acquisition.json.gz",
+            "sha256": "f5d3981376bf00ae012b39c23555efaf856cae3334b7909adc9cbb004e1a04ee"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-review.json.gz",
+            "sha256": "5f95644a4ec0081e81b81d6c37195d5188b99c59c3d0cd5af3b3320fb18f5f12"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-controls.json",
+            "sha256": "b78ba3a1355b68c0536d9c17705dc6c56c58820e007b6a4931bfdfbdda9a3748"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-python.log.gz",
+            "sha256": "6311deb0b38987360af7b1bf9284cb134a8641ba9db65799fa3e3d73b56c2da3"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-cyph-sanity.json",
+            "sha256": "18bdf35f412ec43c26ccdacbf6322d00be266a991c85e63742eb120df06dc286"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-checkpoint.json",
+            "sha256": "cd70fe9bb54c7aebc4adc34e818566bae09b5db2da9d8337bc7cfcbafbbea9ea"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+            "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.spec.ts",
+            "sha256": "8d4e12acb4e0a65ea96ec687dfa78c703af3b6790c400649b4d5358aa08cc5d7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+            "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field-outline.scss",
+            "sha256": "14ab7d5a327fb1ef1617fd40d529428dc23415060a9528be81cf73b805328e76"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/bottom-sheet/_bottom-sheet-theme.scss",
+            "sha256": "53f9fd5f7ecb4355080a72380697ca9c2c5b4471205fc56c4925e34691ae3503"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false
+      },
+      "source_check": "Authenticated all31 original hunks and complete before/after program; paired49 static cases and all setup hooks. Every boundary/declaration/assertion/class change is accounted for without actual scheduler/native/artifact/floor admission.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "1afcedeaf622d300a1238823e1376d1633c50074",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/bottom-sheet): switch tests away from fakeAsync (#33108)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=8a24ae2d348eba746b015eeb6f9bd5c2f945c2734e939474f4a50a664594acf3, bytes=29672). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/bottom-sheet/bottom-sheet.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all42 hunks of the complete bottom-sheet spec migration. Pair58 static cases;23 callback semantics are unchanged and35 fakeAsync bodies become native async. The new exact Promise/setTimeout helper supplies26 zero-ms waits;17 viewContainerFixture.whenStable calls and15 extra detection calls are added.37 flush, four flushMicrotasks and11 tick operations (including four500ms and six1000ms waits) disappear.57 predicates remain exact; the quick-succession case removes its explicit not.toThrow scope around the three-open loop and flush, then waits for stability in an async body. This changed observation/error boundary is individually pinned, not called equivalent. Opening/dismissed streams, data, parent/child service ownership, backdrop/escape, focus restoration and focus moved during animation retain their recorded nonboundary operations with changed observation timing. Four setup callbacks also become async; all six hooks and14 fixture classes/templates are accounted for. Decline this private test-harness migration and preserve public peer interoperability without an ordinary component/animation fork. There is no owned legacy bottom-sheet TypeScript family; that is not a reachability exclusion: Cyph imports MatBottomSheetModule, opens sheets from its material-dialog service and dismisses MatBottomSheetRef from dialog-confirm. Keep the existing owned historical M2 bottom-sheet Sass and consumer structure; no API or CSS/SCSS change is required. Actual mixed peer/legacy consumer, focus/lifetime, packed/browser and both-floor evidence remains pending.",
+      "read_note_disposition": "individual complete-original source conclusion; actual product/floor and G11 gates remain separate",
       "files": [
         "src/material/bottom-sheet/bottom-sheet.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/1afcedeaf622d300a1238823e1376d1633c50074.json",
-      "batch_id": "test-only-refactor-wave2-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-form-async-1afcedeaf622d300a1238823e1376d1633c50074.json",
       "recorded_at_utc": "2026-10-01T18:47:11Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "8a24ae2d348eba746b015eeb6f9bd5c2f945c2734e939474f4a50a664594acf3"
+      "patch_sha256": "8a24ae2d348eba746b015eeb6f9bd5c2f945c2734e939474f4a50a664594acf3",
+      "diff_sha256": "fa966a5bd27520a892f60daaf8c3906066fcb105f4ecbd06b7f5738f42d31b96",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "fa966a5bd27520a892f60daaf8c3906066fcb105f4ecbd06b7f5738f42d31b96",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all42 hunks of the complete bottom-sheet spec migration. Pair58 static cases;23 callback semantics are unchanged and35 fakeAsync bodies become native async. The new exact Promise/setTimeout helper supplies26 zero-ms waits;17 viewContainerFixture.whenStable calls and15 extra detection calls are added.37 flush, four flushMicrotasks and11 tick operations (including four500ms and six1000ms waits) disappear.57 predicates remain exact; the quick-succession case removes its explicit not.toThrow scope around the three-open loop and flush, then waits for stability in an async body. This changed observation/error boundary is individually pinned, not called equivalent. Opening/dismissed streams, data, parent/child service ownership, backdrop/escape, focus restoration and focus moved during animation retain their recorded nonboundary operations with changed observation timing. Four setup callbacks also become async; all six hooks and14 fixture classes/templates are accounted for. Decline this private test-harness migration and preserve public peer interoperability without an ordinary component/animation fork. There is no owned legacy bottom-sheet TypeScript family; that is not a reachability exclusion: Cyph imports MatBottomSheetModule, opens sheets from its material-dialog service and dismisses MatBottomSheetRef from dialog-confirm. Keep the existing owned historical M2 bottom-sheet Sass and consumer structure; no API or CSS/SCSS change is required. Actual mixed peer/legacy consumer, focus/lifetime, packed/browser and both-floor evidence remains pending.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-form-async-source-review.mjs",
+            "sha256": "7b98b91d0edaac2481d0c0f34e722bfe6963bd29ee33d39971f652acc7a35bff"
+          },
+          {
+            "path": "tests/spec_form_async_source_probe.mjs",
+            "sha256": "1debdbc26dfb366bf487e00d1206e949365a49df9c1fdfd60c3e1505b5085886"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-subjects.json.gz",
+            "sha256": "a9f029dda3b1a55d113c0c1d98753c2425c573dfca25446158ab300cc6a9a5bb"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-acquisition.json.gz",
+            "sha256": "f5d3981376bf00ae012b39c23555efaf856cae3334b7909adc9cbb004e1a04ee"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-review.json.gz",
+            "sha256": "5f95644a4ec0081e81b81d6c37195d5188b99c59c3d0cd5af3b3320fb18f5f12"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-controls.json",
+            "sha256": "b78ba3a1355b68c0536d9c17705dc6c56c58820e007b6a4931bfdfbdda9a3748"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-python.log.gz",
+            "sha256": "6311deb0b38987360af7b1bf9284cb134a8641ba9db65799fa3e3d73b56c2da3"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-cyph-sanity.json",
+            "sha256": "18bdf35f412ec43c26ccdacbf6322d00be266a991c85e63742eb120df06dc286"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-source-checkpoint.json",
+            "sha256": "cd70fe9bb54c7aebc4adc34e818566bae09b5db2da9d8337bc7cfcbafbbea9ea"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+            "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+            "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.spec.ts",
+            "sha256": "8d4e12acb4e0a65ea96ec687dfa78c703af3b6790c400649b4d5358aa08cc5d7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+            "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field-outline.scss",
+            "sha256": "14ab7d5a327fb1ef1617fd40d529428dc23415060a9528be81cf73b805328e76"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/bottom-sheet/_bottom-sheet-theme.scss",
+            "sha256": "53f9fd5f7ecb4355080a72380697ca9c2c5b4471205fc56c4925e34691ae3503"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false
+      },
+      "source_check": "Authenticated all42 original hunks and complete before/after program; paired58 static cases and all setup hooks. Every boundary/declaration/assertion/class change is accounted for without actual scheduler/native/artifact/floor admission.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "a36374c4ff809ba5c181f74feb26fce232ebb068",

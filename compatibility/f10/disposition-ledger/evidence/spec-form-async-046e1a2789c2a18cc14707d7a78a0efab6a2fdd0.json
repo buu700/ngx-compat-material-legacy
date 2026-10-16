@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "046e1a2789c2a18cc14707d7a78a0efab6a2fdd0",
+  "subject": "refactor(material/slide-toggle): switch tests away from fakeAsync (#33033)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "75ab3f9d6177703704d161a9dc3da4ff86026411",
+      "after_blob": "9d8d2838f7311435c424616c008c69ddd1fdeac3"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 31,
+  "raw_commit_sha256": "e4397abe0d47d79a2fbd4e918914ae31f3e089efc4fd3b13a4b5e24f93c61f3c",
+  "original_sources": [
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "before": {
+        "git_blob": "75ab3f9d6177703704d161a9dc3da4ff86026411",
+        "sha256": "dbce1509b39f7db41760742f806fe6fe7d4a3130a993497b1d95aa751cbd2603",
+        "bytes": 35032
+      },
+      "after": {
+        "git_blob": "9d8d2838f7311435c424616c008c69ddd1fdeac3",
+        "sha256": "d593adc8b711091ca6806ca82d122e8d73a54b6fcdf84aa1afde65ff8f8e5243",
+        "bytes": 34474
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/slide-toggle/slide-toggle.spec.ts b/src/material/slide-toggle/slide-toggle.spec.ts\nindex 75ab3f9d6177703704d161a9dc3da4ff86026411..9d8d2838f7311435c424616c008c69ddd1fdeac3 100644\n--- a/src/material/slide-toggle/slide-toggle.spec.ts\n+++ b/src/material/slide-toggle/slide-toggle.spec.ts\n@@ -2,14 +2,7 @@ import {FocusMonitor} from '@angular/cdk/a11y';\n import {BidiModule, Direction} from '@angular/cdk/bidi';\n import {dispatchFakeEvent} from '@angular/cdk/testing/private';\n import {Component, ChangeDetectionStrategy} from '@angular/core';\n-import {\n-  ComponentFixture,\n-  TestBed,\n-  fakeAsync,\n-  flush,\n-  flushMicrotasks,\n-  tick,\n-} from '@angular/core/testing';\n+import {ComponentFixture, TestBed} from '@angular/core/testing';\n import {FormControl, FormsModule, NgModel, ReactiveFormsModule} from '@angular/forms';\n import {By} from '@angular/platform-browser';\n import {MatSlideToggle, MatSlideToggleChange, MatSlideToggleModule} from './index';\n@@ -80,21 +73,20 @@ describe('MatSlideToggle without forms', () => {\n       expect(buttonElement.getAttribute('aria-checked')).toBe('true');\n     });\n \n-    it('should set the toggle to checked on click', fakeAsync(() => {\n+    it('should set the toggle to checked on click', () => {\n       expect(slideToggle.checked).toBe(false);\n       expect(buttonElement.getAttribute('aria-checked')).toBe('false');\n       expect(slideToggleElement.classList).not.toContain('mat-mdc-slide-toggle-checked');\n \n       labelElement.click();\n       fixture.detectChanges();\n-      flush();\n \n       expect(slideToggleElement.classList).toContain('mat-mdc-slide-toggle-checked');\n       expect(slideToggle.checked).toBe(true);\n       expect(buttonElement.getAttribute('aria-checked')).toBe('true');\n-    }));\n+    });\n \n-    it('should not trigger the click event multiple times', fakeAsync(() => {\n+    it('should not trigger the click event multiple times', () => {\n       // By default, when clicking on a label element, a generated click will be dispatched\n       // on the associated button element.\n       // Since we're using a label element and a visual hidden button, this behavior can led\n@@ -105,25 +97,23 @@ describe('MatSlideToggle without forms', () => {\n \n       labelElement.click();\n       fixture.detectChanges();\n-      tick();\n \n       expect(slideToggleElement.classList).toContain('mat-mdc-slide-toggle-checked');\n       expect(slideToggle.checked).toBe(true);\n       expect(testComponent.onSlideClick).toHaveBeenCalledTimes(1);\n-    }));\n+    });\n \n-    it('should trigger the change event properly', fakeAsync(() => {\n+    it('should trigger the change event properly', () => {\n       expect(slideToggleElement.classList).not.toContain('mat-mdc-slide-toggle-checked');\n \n       labelElement.click();\n       fixture.detectChanges();\n-      flush();\n \n       expect(slideToggleElement.classList).toContain('mat-mdc-slide-toggle-checked');\n       expect(testComponent.onSlideChange).toHaveBeenCalledTimes(1);\n-    }));\n+    });\n \n-    it('should not trigger the change event by changing the native value', fakeAsync(() => {\n+    it('should not trigger the change event by changing the native value', () => {\n       expect(slideToggleElement.classList).not.toContain('mat-mdc-slide-toggle-checked');\n \n       testComponent.slideChecked = true;\n@@ -131,10 +121,9 @@ describe('MatSlideToggle without forms', () => {\n       fixture.detectChanges();\n \n       expect(slideToggleElement.classList).toContain('mat-mdc-slide-toggle-checked');\n-      tick();\n \n       expect(testComponent.onSlideChange).not.toHaveBeenCalled();\n-    }));\n+    });\n \n     it('should add a suffix to the element id', () => {\n       testComponent.slideId = 'myId';\n@@ -242,28 +231,26 @@ describe('MatSlideToggle without forms', () => {\n       expect(labelElement.getAttribute('for')).toBe(buttonElement.getAttribute('id'));\n     });\n \n-    it('should emit the new values properly', fakeAsync(() => {\n+    it('should emit the new values properly', () => {\n       labelElement.click();\n       fixture.detectChanges();\n-      tick();\n \n       // We're checking the arguments type / emitted value to be a boolean, because sometimes the\n       // emitted value can be a DOM Event, which is not valid.\n       // See angular/angular#4059\n       expect(testComponent.lastEvent.checked).toBe(true);\n-    }));\n+    });\n \n-    it('should support subscription on the change observable', fakeAsync(() => {\n+    it('should support subscription on the change observable', () => {\n       const spy = jasmine.createSpy('change spy');\n       const subscription = slideToggle.change.subscribe(spy);\n \n       labelElement.click();\n       fixture.detectChanges();\n-      tick();\n \n       expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({checked: true}));\n       subscription.unsubscribe();\n-    }));\n+    });\n \n     it('should forward the required attribute', () => {\n       testComponent.isRequired = true;\n@@ -279,32 +266,29 @@ describe('MatSlideToggle without forms', () => {\n       expect(buttonElement.getAttribute('aria-required')).toBe(null);\n     });\n \n-    it('should focus on underlying element when focus() is called', fakeAsync(() => {\n+    it('should focus on underlying element when focus() is called', () => {\n       expect(document.activeElement).not.toBe(buttonElement);\n \n       slideToggle.focus();\n       fixture.detectChanges();\n-      flush();\n \n       expect(document.activeElement).toBe(buttonElement);\n-    }));\n+    });\n \n-    it('should not manually move focus to underlying when focus comes from mouse or touch', fakeAsync(() => {\n+    it('should not manually move focus to underlying when focus comes from mouse or touch', () => {\n       const focusMonitor = TestBed.inject(FocusMonitor);\n       expect(document.activeElement).not.toBe(buttonElement);\n \n       focusMonitor.focusVia(slideToggleElement, 'mouse');\n       fixture.detectChanges();\n-      flush();\n       expect(document.activeElement).not.toBe(buttonElement);\n \n       focusMonitor.focusVia(slideToggleElement, 'touch');\n       fixture.detectChanges();\n-      flush();\n       expect(document.activeElement).not.toBe(buttonElement);\n-    }));\n+    });\n \n-    it('should set a element class if labelPosition is set to before', fakeAsync(() => {\n+    it('should set a element class if labelPosition is set to before', () => {\n       const formField = slideToggleElement.querySelector('.mdc-form-field')!;\n \n       expect(formField.classList).not.toContain('mdc-form-field--align-end');\n@@ -314,9 +298,9 @@ describe('MatSlideToggle without forms', () => {\n       fixture.detectChanges();\n \n       expect(formField.classList).toContain('mdc-form-field--align-end');\n-    }));\n+    });\n \n-    it('should show ripples', fakeAsync(() => {\n+    it('should show ripples', () => {\n       const rippleSelector = '.mat-ripple-element';\n       const switchElement = slideToggleElement.querySelector('.mdc-switch')!;\n \n@@ -326,10 +310,9 @@ describe('MatSlideToggle without forms', () => {\n       dispatchFakeEvent(switchElement, 'mouseup');\n \n       expect(slideToggleElement.querySelectorAll(rippleSelector).length).toBe(1);\n-      flush();\n-    }));\n+    });\n \n-    it('should not show ripples when disableRipple is set', fakeAsync(() => {\n+    it('should not show ripples when disableRipple is set', () => {\n       const switchElement = slideToggleElement.querySelector('.mdc-switch')!;\n       const rippleSelector = '.mat-ripple-element';\n       testComponent.disableRipple = true;\n@@ -342,15 +325,14 @@ describe('MatSlideToggle without forms', () => {\n       dispatchFakeEvent(switchElement, 'mouseup');\n \n       expect(slideToggleElement.querySelectorAll(rippleSelector).length).toBe(0);\n-      flush();\n-    }));\n+    });\n \n-    it('should have a focus indicator', fakeAsync(() => {\n+    it('should have a focus indicator', () => {\n       const rippleElement = slideToggleElement.querySelector('.mat-mdc-slide-toggle-ripple')!;\n       expect(rippleElement.classList).toContain('mat-focus-indicator');\n-    }));\n+    });\n \n-    it('should be able to hide the icon', fakeAsync(() => {\n+    it('should be able to hide the icon', () => {\n       expect(slideToggleElement.querySelector('.mdc-switch__icons')).toBeTruthy();\n \n       testComponent.hideIcon = true;\n@@ -358,9 +340,9 @@ describe('MatSlideToggle without forms', () => {\n       fixture.detectChanges();\n \n       expect(slideToggleElement.querySelector('.mdc-switch__icons')).toBeFalsy();\n-    }));\n+    });\n \n-    it('should be able to mark a slide toggle as interactive while it is disabled', fakeAsync(() => {\n+    it('should be able to mark a slide toggle as interactive while it is disabled', () => {\n       testComponent.isDisabled = true;\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n@@ -378,9 +360,9 @@ describe('MatSlideToggle without forms', () => {\n       expect(buttonElement.getAttribute('aria-disabled')).toBe('true');\n       expect(buttonElement.getAttribute('tabindex')).toBe('0');\n       expect(buttonElement.classList).toContain('mat-mdc-slide-toggle-disabled-interactive');\n-    }));\n+    });\n \n-    it('should not change its state when clicked while disabled and interactive', fakeAsync(() => {\n+    it('should not change its state when clicked while disabled and interactive', () => {\n       expect(slideToggle.checked).toBe(false);\n \n       testComponent.isDisabled = testComponent.disabledInteractive = true;\n@@ -389,14 +371,13 @@ describe('MatSlideToggle without forms', () => {\n \n       buttonElement.click();\n       fixture.detectChanges();\n-      tick();\n \n       expect(slideToggle.checked).toBe(false);\n-    }));\n+    });\n   });\n \n   describe('custom template', () => {\n-    it('should not trigger the change event on initialization', fakeAsync(() => {\n+    it('should not trigger the change event on initialization', () => {\n       const fixture = TestBed.createComponent(SlideToggleBasic);\n \n       fixture.componentInstance.slideChecked = true;\n@@ -404,9 +385,9 @@ describe('MatSlideToggle without forms', () => {\n       fixture.detectChanges();\n \n       expect(fixture.componentInstance.lastEvent).toBeFalsy();\n-    }));\n+    });\n \n-    it('should be able to set the tabindex via the native attribute', fakeAsync(() => {\n+    it('should be able to set the tabindex via the native attribute', () => {\n       const fixture = TestBed.createComponent(SlideToggleWithTabindexAttr);\n \n       fixture.detectChanges();\n@@ -417,34 +398,34 @@ describe('MatSlideToggle without forms', () => {\n       expect(slideToggle.tabIndex)\n         .withContext('Expected tabIndex property to have been set based on the native attribute')\n         .toBe(5);\n-    }));\n+    });\n \n-    it('should add the disabled class if disabled through attribute', fakeAsync(() => {\n+    it('should add the disabled class if disabled through attribute', () => {\n       const fixture = TestBed.createComponent(SlideToggleCheckedAndDisabledAttr);\n       fixture.detectChanges();\n \n       const switchEl = fixture.nativeElement.querySelector('.mdc-switch');\n       expect(switchEl.classList).toContain('mdc-switch--disabled');\n-    }));\n+    });\n \n-    it('should add the checked class if checked through attribute', fakeAsync(() => {\n+    it('should add the checked class if checked through attribute', () => {\n       const fixture = TestBed.createComponent(SlideToggleCheckedAndDisabledAttr);\n       fixture.detectChanges();\n \n       const switchEl = fixture.nativeElement.querySelector('.mdc-switch');\n       expect(switchEl.classList).toContain('mdc-switch--checked');\n-    }));\n+    });\n \n-    it('should remove the tabindex from the host node', fakeAsync(() => {\n+    it('should remove the tabindex from the host node', () => {\n       const fixture = TestBed.createComponent(SlideToggleWithTabindexAttr);\n \n       fixture.detectChanges();\n \n       const slideToggle = fixture.debugElement.query(By.directive(MatSlideToggle))!.nativeElement;\n       expect(slideToggle.hasAttribute('tabindex')).toBe(false);\n-    }));\n+    });\n \n-    it('should remove the tabindex from the host element when disabled', fakeAsync(() => {\n+    it('should remove the tabindex from the host element when disabled', () => {\n       const fixture = TestBed.createComponent(SlideToggleWithTabindexAttr);\n \n       fixture.componentInstance.disabled = true;\n@@ -453,13 +434,13 @@ describe('MatSlideToggle without forms', () => {\n \n       const slideToggle = fixture.debugElement.query(By.directive(MatSlideToggle))!.nativeElement;\n       expect(slideToggle.hasAttribute('tabindex')).toBe(false);\n-    }));\n+    });\n   });\n \n   it(\n     'should not change value on click when click action is noop when using custom a ' +\n       'action configuration',\n-    fakeAsync(() => {\n+    () => {\n       TestBed.resetTestingModule().configureTestingModule({\n         imports: [MatSlideToggleModule, SlideToggleBasic],\n         providers: [\n@@ -485,7 +466,6 @@ describe('MatSlideToggle without forms', () => {\n \n       labelElement.click();\n       fixture.detectChanges();\n-      tick();\n \n       expect(slideToggle.checked).withContext('Expect slide toggle value not changed').toBe(false);\n       expect(testComponent.toggleTriggered).withContext('Expect toggle once').toBe(1);\n@@ -493,12 +473,11 @@ describe('MatSlideToggle without forms', () => {\n \n       buttonElement.click();\n       fixture.detectChanges();\n-      tick();\n \n       expect(slideToggle.checked).withContext('Expect slide toggle value not changed').toBe(false);\n       expect(testComponent.toggleTriggered).withContext('Expect toggle twice').toBe(2);\n       expect(testComponent.dragTriggered).toBe(0);\n-    }),\n+    },\n   );\n \n   it('should be able to change the default color', () => {\n@@ -553,7 +532,7 @@ describe('MatSlideToggle with forms', () => {\n       expect(slideToggleElement.classList).not.toContain('ng-dirty');\n     });\n \n-    it('should update the model programmatically', fakeAsync(() => {\n+    it('should update the model programmatically', async () => {\n       expect(slideToggleElement.classList).not.toContain('mat-mdc-slide-toggle-checked');\n \n       testComponent.modelValue = true;\n@@ -561,13 +540,13 @@ describe('MatSlideToggle with forms', () => {\n       fixture.detectChanges();\n \n       // Flush the microtasks because the forms module updates the model state asynchronously.\n-      flushMicrotasks();\n+      await fixture.whenStable();\n \n       fixture.detectChanges();\n       expect(slideToggleElement.classList).toContain('mat-mdc-slide-toggle-checked');\n-    }));\n+    });\n \n-    it('should have the correct control state initially and after interaction', fakeAsync(() => {\n+    it('should have the correct control state initially and after interaction', async () => {\n       // The control should start off valid, pristine, and untouched.\n       expect(slideToggleModel.valid).toBe(true);\n       expect(slideToggleModel.pristine).toBe(true);\n@@ -579,7 +558,7 @@ describe('MatSlideToggle with forms', () => {\n \n       dispatchFakeEvent(buttonElement, 'focus');\n       buttonElement.click();\n-      flush();\n+      await fixture.whenStable();\n \n       expect(slideToggleModel.valid).toBe(true);\n       expect(slideToggleModel.pristine).toBe(false);\n@@ -589,29 +568,27 @@ describe('MatSlideToggle with forms', () => {\n       // also turn touched.\n       dispatchFakeEvent(buttonElement, 'blur');\n       fixture.detectChanges();\n-      flush();\n+      await fixture.whenStable();\n \n       expect(slideToggleModel.valid).toBe(true);\n       expect(slideToggleModel.pristine).toBe(false);\n       expect(slideToggleModel.touched).toBe(true);\n-    }));\n+    });\n \n-    it('should not throw an error when disabling while focused', fakeAsync(() => {\n+    it('should not throw an error when disabling while focused', () => {\n       expect(() => {\n         // Focus the button element because after disabling, the `blur` event should automatically\n         // fire and not result in a changed after checked exception. Related: #12323\n         buttonElement.focus();\n-        tick();\n+        fixture.detectChanges();\n \n         fixture.componentInstance.isDisabled = true;\n         fixture.changeDetectorRef.markForCheck();\n         fixture.detectChanges();\n-\n-        flush();\n       }).not.toThrow();\n-    }));\n+    });\n \n-    it('should not set the control to touched when changing the state programmatically', fakeAsync(() => {\n+    it('should not set the control to touched when changing the state programmatically', async () => {\n       // The control should start off with being untouched.\n       expect(slideToggleModel.touched).toBe(false);\n \n@@ -626,13 +603,13 @@ describe('MatSlideToggle with forms', () => {\n       // also turn touched.\n       dispatchFakeEvent(buttonElement, 'blur');\n       fixture.detectChanges();\n-      flush();\n+      await fixture.whenStable();\n \n       expect(slideToggleModel.touched).toBe(true);\n       expect(slideToggleElement.classList).toContain('mat-mdc-slide-toggle-checked');\n-    }));\n+    });\n \n-    it('should not set the control to touched when changing the model', fakeAsync(() => {\n+    it('should not set the control to touched when changing the model', async () => {\n       // The control should start off with being untouched.\n       expect(slideToggleModel.touched).toBe(false);\n \n@@ -641,7 +618,7 @@ describe('MatSlideToggle with forms', () => {\n       fixture.detectChanges();\n \n       // Flush the microtasks because the forms module updates the model state asynchronously.\n-      flushMicrotasks();\n+      await fixture.whenStable();\n \n       // The checked property has been updated from the model and now the view needs\n       // to reflect the state change.\n@@ -650,9 +627,9 @@ describe('MatSlideToggle with forms', () => {\n       expect(slideToggleModel.touched).toBe(false);\n       expect(slideToggle.checked).toBe(true);\n       expect(slideToggleElement.classList).toContain('mat-mdc-slide-toggle-checked');\n-    }));\n+    });\n \n-    it('should update checked state on click if control is checked initially', fakeAsync(() => {\n+    it('should update checked state on click if control is checked initially', async () => {\n       fixture = TestBed.createComponent(SlideToggleWithModel);\n       fixture.detectChanges();\n \n@@ -664,7 +641,7 @@ describe('MatSlideToggle with forms', () => {\n       fixture.detectChanges();\n \n       // Flush the microtasks because the forms module updates the model state asynchronously.\n-      flushMicrotasks();\n+      await fixture.whenStable();\n \n       // Now the new checked variable has been updated in the slide-toggle and the slide-toggle\n       // is marked for check because it still needs to update the underlying button.\n@@ -676,40 +653,35 @@ describe('MatSlideToggle with forms', () => {\n \n       labelElement.click();\n       fixture.detectChanges();\n-      tick();\n+      await fixture.whenStable();\n \n       expect(slideToggle.checked)\n         .withContext('Expected slide-toggle to be no longer checked after label click.')\n         .toBe(false);\n-    }));\n+    });\n \n-    it('should be pristine if initial value is set from NgModel', fakeAsync(() => {\n+    it('should be pristine if initial value is set from NgModel', () => {\n       fixture = TestBed.createComponent(SlideToggleWithModel);\n \n       fixture.componentInstance.modelValue = true;\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n-      flush();\n \n       const debugElement = fixture.debugElement.query(By.directive(MatSlideToggle))!;\n       const modelInstance = debugElement.injector.get<NgModel>(NgModel);\n \n       // Flush the microtasks because the forms module updates the model state asynchronously.\n-      flushMicrotasks();\n \n       expect(modelInstance.pristine).toBe(true);\n-    }));\n+    });\n \n-    it('should set the model value when toggling via the `toggle` method', fakeAsync(() => {\n+    it('should set the model value when toggling via the `toggle` method', () => {\n       expect(testComponent.modelValue).toBe(false);\n \n       fixture.debugElement.query(By.directive(MatSlideToggle))!.componentInstance.toggle();\n-      fixture.detectChanges();\n-      flushMicrotasks();\n-\n       fixture.detectChanges();\n       expect(testComponent.modelValue).toBe(true);\n-    }));\n+    });\n   });\n \n   describe('with a FormControl', () => {\n@@ -752,30 +724,29 @@ describe('MatSlideToggle with forms', () => {\n     let buttonElement: HTMLButtonElement;\n \n     // This initialization is async() because it needs to wait for ngModel to set the initial value.\n-    beforeEach(fakeAsync(() => {\n+    beforeEach(() => {\n       fixture = TestBed.createComponent(SlideToggleWithForm);\n       fixture.detectChanges();\n-      flush();\n \n       testComponent = fixture.debugElement.componentInstance;\n       buttonElement = fixture.debugElement.query(By.css('button'))!.nativeElement;\n-    }));\n+    });\n \n-    it('should not submit the form when clicked', fakeAsync(() => {\n+    it('should not submit the form when clicked', () => {\n       expect(testComponent.isSubmitted).toBe(false);\n \n       buttonElement.click();\n       fixture.detectChanges();\n-      flush();\n \n       expect(testComponent.isSubmitted).toBe(false);\n-    }));\n+    });\n \n-    it('should have proper invalid state if unchecked', fakeAsync(() => {\n+    it('should have proper invalid state if unchecked', async () => {\n       testComponent.isRequired = true;\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n-      flushMicrotasks();\n+      await fixture.whenStable();\n+      fixture.detectChanges();\n \n       const slideToggleEl = fixture.nativeElement.querySelector('.mat-mdc-slide-toggle');\n \n@@ -786,7 +757,7 @@ describe('MatSlideToggle with forms', () => {\n       // should become valid.\n       buttonElement.click();\n       fixture.detectChanges();\n-      flush();\n+      await fixture.whenStable();\n \n       expect(slideToggleEl.classList).not.toContain('ng-invalid');\n       expect(slideToggleEl.classList).toContain('ng-valid');\n@@ -795,11 +766,11 @@ describe('MatSlideToggle with forms', () => {\n       // should become invalid.\n       buttonElement.click();\n       fixture.detectChanges();\n-      flush();\n+      await fixture.whenStable();\n \n       expect(slideToggleEl.classList).toContain('ng-invalid');\n       expect(slideToggleEl.classList).not.toContain('ng-valid');\n-    }));\n+    });\n \n     it('should clear static name attribute from the slide toggle host node', () => {\n       const hostNode = fixture.nativeElement.querySelector('.mat-mdc-slide-toggle');\n@@ -809,7 +780,7 @@ describe('MatSlideToggle with forms', () => {\n   });\n \n   describe('with model and change event', () => {\n-    it('should report changes to NgModel before emitting change event', fakeAsync(() => {\n+    it('should report changes to NgModel before emitting change event', () => {\n       const fixture = TestBed.createComponent(SlideToggleWithModelAndChangeEvent);\n       fixture.detectChanges();\n \n@@ -822,10 +793,9 @@ describe('MatSlideToggle with forms', () => {\n       });\n \n       labelEl.click();\n-      flush();\n \n       expect(fixture.componentInstance.onChange).toHaveBeenCalledTimes(1);\n-    }));\n+    });\n   });\n });\n \n",
+  "diff_sha256": "72623632a2d84e5e7ff1ef84f317666fc1cef3388464f02787ed5184f416e3dc",
+  "hunk_reviews": [
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -2,14 +2,7 @@ import {FocusMonitor} from '@angular/cdk/a11y';",
+      "sha256": "0c1b5bd25820de684c4cc0191c6c2e42af3f8eaf20a80debe0439e3fa5447310",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -80,21 +73,20 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "5ef8b12413e1799285e33dbb9b5fd14dc6523dcd1881d5c0b28e3f399b5e3041",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -105,25 +97,23 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "b6efe3f350ac9f4f16e3220afe2e62ff590e59be5d3fb0c1dafe74469a5c6f9d",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -131,10 +121,9 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "b48e1b3a796d8dc12e069f949576ed05a58c0f213e648e605eedb02924bc01be",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -242,28 +231,26 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "70b1896dda15e72c8e67f41afe07044de29898669a5509247894579f268627e2",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -279,32 +266,29 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "066aad6fff5d7ad6f3d0a389eea52c675c3d7b575eebaabec41e8c28075650ef",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -314,9 +298,9 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "5ffa1dbe12eb5a1f9aaffe1682c654b8b489297f2c4bce13382a5335a1799328",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -326,10 +310,9 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "85ae85dc100f4bc06f2fe4c202fa09cfc926feea0f6561a8cf7b7d919ad6d5da",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -342,15 +325,14 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "275f67fc4f43ba6097302e6c7aaca6357e715556ff3d3ed4b2756e1fc32b4fc4",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -358,9 +340,9 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "a768460654757b4e221ccb46bf5de4f59aa3da4c7ff40613c6b0787b14235f63",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -378,9 +360,9 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "ae65432fa5e03933052eaf176322a5f7b114425976e7dfd91631b81f73957719",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -389,14 +371,13 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "c87679ac1da46424869a7b4124c603a4e0fa6172e0c7802d4fc690c21a296264",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -404,9 +385,9 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "570e2357e536bf658f7d56500ab65b02e8e81d7d185bcea8e62e7e344208bfa7",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -417,34 +398,34 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "c159b91578cca671d469cc4a3ca59215ac8fd9fb4e4e9d839a82668f2a68e060",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -453,13 +434,13 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "6f426df1317b736398393698a5bc932a5f9d654ef6e0a20a3c9e463791ea973d",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -485,7 +466,6 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "a34a1f38af6985595c2d94ad081da63c57f298ee46a81a684972903f6fb4c1e9",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -493,12 +473,11 @@ describe('MatSlideToggle without forms', () => {",
+      "sha256": "65db648a7f339e1281444781dbb44dc04b2cabc5630964316b6eeb625410ad3b",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -553,7 +532,7 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "3203b489809e7758b9627a21c9cd3b042215abdf50637e2aea4ef7fd727e999e",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -561,13 +540,13 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "86e010d40224790b6da7d35641e215f30e82fdbdce1dd11e36a4a279c5f24e09",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -579,7 +558,7 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "935f858ecd0c7e3c1a69e76c4a3107c2adb1b8fd8ec1a60df12d95f24062c1d0",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -589,29 +568,27 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "79dc6e40d6db638003a84504b34bcd9a588b687531e8acdc098a8b5ae75fcd42",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -626,13 +603,13 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "6534395973b80a8351cd64047cec778a17c5cc1ebbdabf3bbb814b7a0f96549c",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -641,7 +618,7 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "93534710c6c4c09603d309f72460e76e80496b3d659ed25a565cbf29071dcd41",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -650,9 +627,9 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "a3ca16982f21be144e8fa00776a585e6ae4e574d441500afe9b21252e76d3f5a",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -664,7 +641,7 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "d84a06b9d0fb75f3e2356d2002b7411bbaf147bc642033421a501fc668e956f3",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -676,40 +653,35 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "49619d1dc65379f85d9b5b2b4cc7870b7f2a0ff20e7a411c4177a0fa464bfd32",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -752,30 +724,29 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "ac0986899fcd0c9179a07a0267d14fb07feff08e35831c65317e86fc2abaedeb",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -786,7 +757,7 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "34a8ade3ee60500d6094faa9a2ffc400c74c6dc30c93ccbb5133313fd33df460",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -795,11 +766,11 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "eb1295425ebf59d8ab7d9fc362b141083421c119384c8e00ab64691dcf900e3c",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -809,7 +780,7 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "7b6929f2d0dd72b7612bfdef69c4084ccf95f36e64b69382e555ef3d768115f3",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "header": "@@ -822,10 +793,9 @@ describe('MatSlideToggle with forms', () => {",
+      "sha256": "0aa430fea557ac4066f8abde7e951f292a8b50b4e25206200c54fc4537070d9f",
+      "judgment": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+      "review_basis": "Whole authenticated original file/program; ordered full path/suite/mode/occurrence pairing with only two explicit input suite aliases; every recorded timing/detection/stability boundary, changed assertion subject and setup hook; raw fixture class/template/style identity. Projection does not prove scheduling/rendering/lifetime equivalence."
+    }
+  ],
+  "async_source_semantics": {
+    "sha": "046e1a2789c2a18cc14707d7a78a0efab6a2fdd0",
+    "complete_original_files": 1,
+    "complete_original_hunks": 31,
+    "full_ordered_case_pairing": true,
+    "static_occurrences_paired": 49,
+    "unchanged_complete_callback_semantics": 16,
+    "exact_predicate_expressions_equal": 48,
+    "whole_bodies_equal_after_only_recorded_boundary_changes": 49,
+    "fixtureClasses": [
+      {
+        "name": "SlideToggleBasic",
+        "raw_sha256": "36bc989c997b74110c8b634c39552409bd28e2d22238ed861a652e249f190662"
+      },
+      {
+        "name": "SlideToggleWithForm",
+        "raw_sha256": "225f33cf7bf43c6899bb91a5073da4458577d1149df2e0c98ceb0dcdeb27e038"
+      },
+      {
+        "name": "SlideToggleWithModel",
+        "raw_sha256": "4df6c60cc047d99788d109a6693c97fce1c8a11274f82a62883f856e3c2c2d42"
+      },
+      {
+        "name": "SlideToggleCheckedAndDisabledAttr",
+        "raw_sha256": "a255c6b4511109e6caf167860b886856d28f0f373d5bdb54efb82f8d77303c4b"
+      },
+      {
+        "name": "SlideToggleWithFormControl",
+        "raw_sha256": "e81a3e341b261822475f9d3ced04eeed41817dc23bdd573982e16177eb9183d9"
+      },
+      {
+        "name": "SlideToggleWithTabindexAttr",
+        "raw_sha256": "14eee75d68f155873a44573a57f603d71431d6ae1b102c6936e3bbdc40df492e"
+      },
+      {
+        "name": "SlideToggleWithModelAndChangeEvent",
+        "raw_sha256": "0cb1581edddf1dd0fcacd14cb6ad2f76676a291de191bda9ec79bed4c9484ef8"
+      },
+      {
+        "name": "SlideToggleWithStaticAriaAttributes",
+        "raw_sha256": "326658d3bb5190c9e2b1b0813bedfce84dd7d4e6310d33f7675cbc2bc3e76758"
+      }
+    ],
+    "removed_testing_imports": [
+      "fakeAsync",
+      "flush",
+      "flushMicrotasks",
+      "tick"
+    ],
+    "explicit_input_suite_renames": [],
+    "native_wait_helper_added": false,
+    "all_other_noncase_operations_and_metadata_equal": true,
+    "class_template_and_style_bytes_preserved": true,
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "complete_case_pairs_timing_positions_and_setup_hooks": {
+      "path": "compatibility/rc/spec-form-async-source-review.json.gz",
+      "sha256": "5f95644a4ec0081e81b81d6c37195d5188b99c59c3d0cd5af3b3320fb18f5f12"
+    }
+  },
+  "decision": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "72623632a2d84e5e7ff1ef84f317666fc1cef3388464f02787ed5184f416e3dc",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Review all31 hunks of the complete slide-toggle spec migration. Pair49 static cases;16 callback semantics are unchanged and33 fakeAsync wrappers are removed (six become native async). Cases remove16 flush, nine tick and six flushMicrotasks operations, add ten fixture.whenStable calls and add one detection.48 predicate expressions remain identical; the individually pinned focused-disable not.toThrow subject replaces its focus tick with detection and removes the later flush. A form-element beforeEach loses both its fakeAsync wrapper and flush, which changes the initialization boundary even though its remaining operations match. Four setup hooks and eight fixture classes/templates are fully accounted for without scheduler/creation equivalence. Decline the private migration and preserve the actual owned legacy input-based focused-disable regression, including nested FocusMonitor timer/microtask drains, plus initial/ngModel/touched/dirty/validity assertions. Do not copy the modern button fixture or its class selectors. All legacy production structure, public peer minima and consumer CSS/SCSS requirements remain intact; actual runtime and both-floor tests remain open.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-form-async-source-review.mjs",
+        "sha256": "7b98b91d0edaac2481d0c0f34e722bfe6963bd29ee33d39971f652acc7a35bff"
+      },
+      {
+        "path": "tests/spec_form_async_source_probe.mjs",
+        "sha256": "1debdbc26dfb366bf487e00d1206e949365a49df9c1fdfd60c3e1505b5085886"
+      },
+      {
+        "path": "compatibility/rc/spec-form-async-source-subjects.json.gz",
+        "sha256": "a9f029dda3b1a55d113c0c1d98753c2425c573dfca25446158ab300cc6a9a5bb"
+      },
+      {
+        "path": "compatibility/rc/spec-form-async-source-acquisition.json.gz",
+        "sha256": "f5d3981376bf00ae012b39c23555efaf856cae3334b7909adc9cbb004e1a04ee"
+      },
+      {
+        "path": "compatibility/rc/spec-form-async-source-review.json.gz",
+        "sha256": "5f95644a4ec0081e81b81d6c37195d5188b99c59c3d0cd5af3b3320fb18f5f12"
+      },
+      {
+        "path": "compatibility/rc/spec-form-async-source-controls.json",
+        "sha256": "b78ba3a1355b68c0536d9c17705dc6c56c58820e007b6a4931bfdfbdda9a3748"
+      },
+      {
+        "path": "compatibility/rc/spec-form-async-source-python.log.gz",
+        "sha256": "6311deb0b38987360af7b1bf9284cb134a8641ba9db65799fa3e3d73b56c2da3"
+      },
+      {
+        "path": "compatibility/rc/spec-form-async-source-cyph-sanity.json",
+        "sha256": "18bdf35f412ec43c26ccdacbf6322d00be266a991c85e63742eb120df06dc286"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+        "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-source-checkpoint.json",
+        "sha256": "cd70fe9bb54c7aebc4adc34e818566bae09b5db2da9d8337bc7cfcbafbbea9ea"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+        "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.spec.ts",
+        "sha256": "8d4e12acb4e0a65ea96ec687dfa78c703af3b6790c400649b4d5358aa08cc5d7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+        "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field-outline.scss",
+        "sha256": "14ab7d5a327fb1ef1617fd40d529428dc23415060a9528be81cf73b805328e76"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/bottom-sheet/_bottom-sheet-theme.scss",
+        "sha256": "53f9fd5f7ecb4355080a72380697ca9c2c5b4471205fc56c4925e34691ae3503"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "046e1a2789c2a18cc14707d7a78a0efab6a2fdd0",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/slide-toggle): switch tests away from fakeAsync (#33033)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=388945e6a32c1f76c897cea9048c59bd6f8eeb39955adf0825d38d7234b067c4, bytes=23138). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/slide-toggle/slide-toggle.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/slide-toggle/slide-toggle.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/046e1a2789c2a18cc14707d7a78a0efab6a2fdd0.json",
+    "batch_id": "test-only-refactor-wave2-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:47:11Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "388945e6a32c1f76c897cea9048c59bd6f8eeb39955adf0825d38d7234b067c4"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-form-async-source-prior.json.gz",
+    "sha256": "a35e580d3f7fac2a07ae94a8b2f53245f1af5bc04ca605467707e3f45f450793"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-form-async-source-review.mjs",
+      "sha256": "7b98b91d0edaac2481d0c0f34e722bfe6963bd29ee33d39971f652acc7a35bff"
+    },
+    {
+      "path": "tests/spec_form_async_source_probe.mjs",
+      "sha256": "1debdbc26dfb366bf487e00d1206e949365a49df9c1fdfd60c3e1505b5085886"
+    },
+    {
+      "path": "compatibility/rc/spec-form-async-source-subjects.json.gz",
+      "sha256": "a9f029dda3b1a55d113c0c1d98753c2425c573dfca25446158ab300cc6a9a5bb"
+    },
+    {
+      "path": "compatibility/rc/spec-form-async-source-acquisition.json.gz",
+      "sha256": "f5d3981376bf00ae012b39c23555efaf856cae3334b7909adc9cbb004e1a04ee"
+    },
+    {
+      "path": "compatibility/rc/spec-form-async-source-review.json.gz",
+      "sha256": "5f95644a4ec0081e81b81d6c37195d5188b99c59c3d0cd5af3b3320fb18f5f12"
+    },
+    {
+      "path": "compatibility/rc/spec-form-async-source-controls.json",
+      "sha256": "b78ba3a1355b68c0536d9c17705dc6c56c58820e007b6a4931bfdfbdda9a3748"
+    },
+    {
+      "path": "compatibility/rc/spec-form-async-source-python.log.gz",
+      "sha256": "6311deb0b38987360af7b1bf9284cb134a8641ba9db65799fa3e3d73b56c2da3"
+    },
+    {
+      "path": "compatibility/rc/spec-form-async-source-cyph-sanity.json",
+      "sha256": "18bdf35f412ec43c26ccdacbf6322d00be266a991c85e63742eb120df06dc286"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+      "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-source-checkpoint.json",
+      "sha256": "cd70fe9bb54c7aebc4adc34e818566bae09b5db2da9d8337bc7cfcbafbbea9ea"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+      "sha256": "ed4f565e8ee1b853e1f1d469468cd8db70730c7585693d654ada3f6f0cc394ba"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+      "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.spec.ts",
+      "sha256": "8d4e12acb4e0a65ea96ec687dfa78c703af3b6790c400649b4d5358aa08cc5d7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+      "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field-outline.scss",
+      "sha256": "14ab7d5a327fb1ef1617fd40d529428dc23415060a9528be81cf73b805328e76"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/bottom-sheet/_bottom-sheet-theme.scss",
+      "sha256": "53f9fd5f7ecb4355080a72380697ca9c2c5b4471205fc56c4925e34691ae3503"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+    }
+  ],
+  "all_other1693_rows_unchanged": true,
+  "product_or_consumer_files_changed": 0,
+  "new_owned_Angular_chip_case_executed": false,
+  "actual_Angular_native_artifact_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
