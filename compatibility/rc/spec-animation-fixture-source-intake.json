@@ -408,6 +408,7 @@
     "The first subject removes BrowserAnimationsModule fixtures and local animation options/signatures. Seven callback changes are import setup; chip-grid/input local helper changes need explicit binding/call-site review.",
     "The second subject introduces fixture-only MATERIAL_ANIMATIONS disabled providers, moves setup into chip cases, changes local helper signatures and renames one ripple case. Four fewer hooks and all provider/order/initialization/lifetime consequences require exact individual accounting.",
     "Seven modern chip-grid focus/destruction cases still explicitly pass NoopAnimationsModule, with upstream comments reporting failure without it. These comments are source evidence to investigate, not a validated owned-library defect or a blanket animation-engine-free guarantee.",
+    "The menu active-item destruction case also adds an explicit NoopAnimationsModule argument and an upstream failure comment. Its helper gains an optional imports parameter; account for this separately from the seven chip-grid cases. The renamed ripple case replaces an import argument with an animation-disable provider and changes its local helper from imports to providers. No current-token identity or native behavior equivalence is admitted.",
     "Preserve owned historical stronger tests and distinct local animation policy; use no current private/compatibility-only token and require no consumer CSS/SCSS change."
   ],
   "semantic_reviews_pending": 2,
