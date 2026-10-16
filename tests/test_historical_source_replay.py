@@ -18,7 +18,7 @@ class HistoricalSourceReplayTests(unittest.TestCase):
                                 cwd=ROOT, capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])
-        self.assertEqual(report['controls'], 32)
+        self.assertEqual(report['controls'], 41)
         self.assertEqual(report['current_product_members'], 1141)
         self.assertEqual(report['historical_probes_executed'], 0)
         self.assertFalse(report['actual_current_native_or_packed_qualified'])

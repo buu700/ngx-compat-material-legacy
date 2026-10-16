@@ -1,12 +1,12 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "line": "main",
   "scope": "Finite original historical source probes only. Current-source coherence is mandatory; historical execution never admits current source, runtime, compiler, peer floors or G11.",
   "current_frame": {
-    "commit": "2aec19ef9f23c00420495c639d25f215d5503bc7",
-    "tree": "ec5b0e624ce6ef8949c96556205e48de3ab1dc40",
-    "tree_listing_sha256": "cd46acc80c7689a65ca58c0cebd2571360b2ee85eafdbfce76ea444b2c1f6d30",
-    "members": 7320
+    "commit": "4091a9d034e9eebc71e14f3896625e1c71ff5fbd",
+    "tree": "5796231c3554b7e0f40b50e9c4095e9287d0c557",
+    "tree_listing_sha256": "26852dd3f7683d06c69b558852451ba95a96a0109fca2adcbb29c0532947d77b",
+    "members": 7352
   },
   "mutable_progress_paths": [
     "compatibility/rc/remaining-native-admission-worksheet.json",
@@ -72,6 +72,18 @@
         "members": 7293
       },
       "timeout_ms": 120000
+    },
+    {
+      "id": "tab-lifecycle-source",
+      "probe": "tests/remaining_native_tab_requalification_probe.mjs",
+      "probe_sha256": "e6b67be84e53079528d39271b943a6514721a954b333618857aba03593adc310",
+      "frame": {
+        "commit": "2aec19ef9f23c00420495c639d25f215d5503bc7",
+        "tree": "ec5b0e624ce6ef8949c96556205e48de3ab1dc40",
+        "tree_listing_sha256": "cd46acc80c7689a65ca58c0cebd2571360b2ee85eafdbfce76ea444b2c1f6d30",
+        "members": 7320
+      },
+      "timeout_ms": 120000
     }
   ],
   "wrapper_edits": [
@@ -122,14 +134,37 @@
           "after": "['node', 'scripts/run-historical-source-probe.mjs', 'native-admission-source']"
         }
       ]
+    },
+    {
+      "path": "tests/test_remaining_native_tab_requalification.py",
+      "before_sha256": "cce00339fc8459bfb7fb3318c69574b22dd91f8bbfe6bb57e6367e5ac65b982c",
+      "after_sha256": "a744e06785dc5b9955e21771b5d0262d2974de651f999708c351108171986fee",
+      "edits": [
+        {
+          "before": "['node', 'tests/remaining_native_tab_requalification_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'tab-lifecycle-source']"
+        }
+      ]
     }
   ],
   "source_phase_reports": {
     "bounded_current_review": "compatibility/rc/remaining-native-admission-tab-repair-source-controls.json",
     "current_requalification": "compatibility/rc/remaining-native-admission-tab-requalified-source-controls.json",
-    "current_status": "compatibility/rc/remaining-native-admission-tab-requalified-checkpoint.json"
+    "current_status": "compatibility/rc/remaining-native-admission-tab-requalified-checkpoint.json",
+    "individual_source_decisions": "compatibility/rc/remaining-native-admission-individual-source-proof.json",
+    "individual_source_controls": "compatibility/rc/remaining-native-admission-individual-source-controls.json",
+    "individual_current_status": "compatibility/rc/remaining-native-admission-individual-checkpoint.json"
   },
   "no_install_build_publish_or_remote_operations": true,
   "original_js_programs_and_assertions_unchanged": true,
-  "new_sha_or_authored_use_closures": 0
+  "new_sha_or_authored_use_closures": 0,
+  "wrapper_reference_commit": "2aec19ef9f23c00420495c639d25f215d5503bc7",
+  "current_head_tooling_paths": [
+    "scripts/historical-source-replay.mjs",
+    "scripts/run-historical-source-probe.mjs",
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "tests/historical_source_replay_probe.mjs",
+    "tests/test_historical_source_replay.py",
+    "compatibility/rc/historical-source-replay.md"
+  ]
 }

@@ -13,6 +13,7 @@ The finite source-review probes below describe specific historical source popula
 | `menu-exit-context` | `tests/menu_exit_context_requalification_probe.mjs` |
 | `selection-comparator-source` | `tests/selection_comparator_source_judgments_probe.mjs` |
 | `native-admission-source` | `tests/remaining_native_source_context_probe.mjs` |
+| `tab-lifecycle-source` | `tests/remaining_native_tab_requalification_probe.mjs` |
 
 Run one with the already prepared workspace dependencies:
 
@@ -22,6 +23,10 @@ node scripts/run-historical-source-probe.mjs historical-menu-import \
 ```
 
 The registry in `compatibility/rc/historical-source-replay-inputs.json` pins each line's historical commit, Git tree, complete tree listing and original program SHA256. Before execution, the runner checks the current registered source graph. It accepts exactly the recorded Python command substitutions and leaves the worksheet and session-handoff progress documents mutable. Altered current subjects, authentic older review/caller bytes, changed wrapper assertions and added product files fail this guard. The original read helpers retain their before-hash and unrelated-path behavior.
+
+The current source context now includes the three individual hover/tab/ripple decisions, their complete upstream provenance, current runtime bindings and rejection controls. The six original historical programs remain unchanged. The newly historical tab lifecycle source inspector runs in its exact previously qualified context. Five Python wrappers contain only the six registered command substitutions; their assertions and timeouts remain exact.
+
+The six replay-tool files listed in `current_head_tooling_paths` are checked against the caller's committed HEAD rather than their older versions in the source context. This covers the registry, verifier, CLI, guard test, guard wrapper and this document. All six must match their actual Git bytes; uncommitted changes fail. This avoids requiring the registry and verifier to contain their own hashes. It admits no product file, receipt or original historical program through the tooling route. Their qualified source-frame checks remain mandatory. Wrapper before-bytes come from the fixed original reference commit, even when the newer source context already contains the registered substitutions.
 
 The runner extracts every historical file into a fresh temporary directory, checks every Git blob and the complete file population, and creates private Git metadata with a detached historical HEAD and index. The object store is borrowed for reads. It runs only the selected original probe, using the existing workspace dependency runtime. It checks the historical graph remains clean and checks the current graph again after execution. Temporary files are removed. No installer, library build, remote operation, package publication or current worktree rewrite is performed.
 
