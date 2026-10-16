@@ -8,18 +8,32 @@
 import assert from 'node:assert/strict';
 import {observeHydrationReplay} from '../scripts/ripple-hydration-replay.mjs';
 import {rippleHydrationReplayOkay} from '../scripts/ripple-hydration-application.mjs';
+import {publicRippleReplaySample} from './ripple_public_replay_sample.mjs';
 function driver(variant) {
-  const calls=[];let clicks=0,started=false,cleaned=false,native=false,fault=false;
+  const calls=[];let clicks=0,started=false,cleaned=false,native=false,fault=false,publicPhase='before-bootstrap',publicLive=false;
   const event=(type,path_threw)=>({type,path_threw,target_id:'replay-peer',peer_present:true});
   const snapshot=()=>({clicks,deliveries:clicks===1?[event('mousedown',true),event('click',true)]
     :[event('mousedown',true),event('click',true),event('mousedown',false),event('click',false)],
     actual_peer_directive_present:true,actual_owned_renderer_present:true,owned_ripple_launches:clicks,peer_ripple_launches:clicks});
   return {calls,get cleaned(){return cleaned;},async pointerClick(point) {
+    if(point.x===30&&point.y===40){calls.push(started?'public-live-input':'public-early-input');
+      if(variant==='public-input-failed')throw Error('Public peer input unavailable');
+      if(started)publicLive=true;return;
+    }
     assert.deepEqual(point,{x:10,y:20});calls.push(native?(fault?'native-fault':'native-normal'):started?'live-input':'early-input');
     if(variant==='input-failed'&&!started)throw Error('Native input unavailable');
     if(variant==='native-failed'&&native)throw Error('Native-only input unavailable');
     if(started&&!native)clicks++;
   },async evaluate(expression) {
+    if(expression.includes("const host = document.getElementById('replay-native-peer')")){
+      calls.push('public-observe-server');return {selector:'#replay-native-peer',before_bootstrap:true,preexisting_ripples:0,point:{x:30,y:40}};
+    }
+    if(expression.includes('state.observer.disconnect()')){calls.push('public-cleanup');return {observer_disconnected:true,listeners_removed:true};}
+    if(expression.includes('state.phase = "replay"')){calls.push('public-mark-replay');publicPhase='replay';return true;}
+    if(expression.includes('state.phase = "live"')){calls.push('public-mark-live');publicPhase='live';return true;}
+    if(expression.includes('snapshot = window.__hydrationSnapshot()')){calls.push('public-snapshot-'+publicPhase);return publicRippleReplaySample()[publicPhase==='live'?'live':'replayed'];}
+    if(expression==='window.__hydrationSnapshot?.().native_replay_deliveries?.length === 3')return started&&!publicLive;
+    if(expression==='window.__hydrationSnapshot?.().native_replay_deliveries?.length === 6')return started&&publicLive;
     if(expression==='window.__hydrationFailure || ""')return '';
     if(expression==='window.__hydrationGateReady === true')return true;
     if(expression.includes('window.__hydrationNative = []')){calls.push('observe-server');return {before_bootstrap:true,server_hydration_metadata:true,point:{x:10,y:20}};}
@@ -43,10 +57,14 @@ function driver(variant) {
   }};
 }
 const positive=driver('live');assert.equal(rippleHydrationReplayOkay(await observeHydrationReplay(positive),'main'),true);
-assert.deepEqual(positive.calls,['observe-server','early-input','record-input','release-bootstrap','live-input',
+assert.deepEqual(positive.calls.filter(call=>!call.startsWith('public-')),['observe-server','early-input','record-input','release-bootstrap','live-input',
   'observe-native-peer','native-normal','begin-native-fault','native-fault','native-cleanup','destroy','finally-cleanup']);
 const failed=driver('input-failed');await assert.rejects(()=>observeHydrationReplay(failed),/Native input unavailable/);
 assert.equal(failed.cleaned,true);assert.ok(!failed.calls.includes('release-bootstrap'));
 const nativeFailed=driver('native-failed');await assert.rejects(()=>observeHydrationReplay(nativeFailed),/Native-only input unavailable/);
 assert.equal(nativeFailed.cleaned,true);assert.ok(nativeFailed.calls.includes('native-cleanup'));
-console.log(JSON.stringify({protocol_cases:3,failure_cleanup:true,native_or_angular_replay_executed:false}));
+const publicFailed=driver('public-input-failed');await assert.rejects(()=>observeHydrationReplay(publicFailed),/Public peer input unavailable/);
+assert.equal(publicFailed.cleaned,true);assert.ok(publicFailed.calls.includes('public-cleanup'));assert.ok(!publicFailed.calls.includes('release-bootstrap'));
+assert.deepEqual(positive.calls.filter(call=>call.startsWith('public-')),['public-observe-server','public-early-input','public-mark-replay',
+  'public-snapshot-replay','public-mark-live','public-live-input','public-snapshot-live','public-cleanup','public-cleanup']);
+console.log(JSON.stringify({protocol_cases:3,additional_public_route_protocol_cases:2,failure_cleanup:true,native_or_angular_replay_executed:false}));

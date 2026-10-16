@@ -10,6 +10,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {rippleHydrationApplication, rippleHydrationReplayOkay} from '../scripts/ripple-hydration-application.mjs';
+import {publicRippleReplaySample} from './ripple_public_replay_sample.mjs';
 const require = createRequire(import.meta.url), ts = require('typescript');
 const sha = value => createHash('sha256').update(value).digest('hex');
 let specifications = 0;
@@ -45,7 +46,8 @@ const snapshot = replay => ({clicks:replay?1:2,deliveries:replay?[event('mousedo
   actual_peer_directive_present:true,actual_owned_renderer_present:true,owned_ripple_launches:replay?1:2,peer_ripple_launches:replay?1:2});
 const positive = {server_hydration_metadata:true,before_bootstrap:true,
   captured_native:['mousedown','mouseup','click'].map(type=>({type,trusted:true,target_id:'replay-peer'})),
-  ssr_button_reused:true,window_errors:[],replayed:snapshot(true),live:snapshot(false),destroyed:true,remaining_ripple_nodes:0};
+  ssr_button_reused:true,window_errors:[],replayed:snapshot(true),live:snapshot(false),destroyed:true,remaining_ripple_nodes:0,
+  public_peer_replay:publicRippleReplaySample()};
 const nativeEvents = line => ({phase:'fault', normal_creations:1, fault_creations:line==='main'?1:0,
   normal_input:['mousedown','mouseup','click'].map(type=>({type,trusted:true,target_id:'native-peer'})),
   fault_input:['mousedown','mouseup','click'].map(type=>({type,trusted:true,target_id:'native-peer'})),
@@ -71,6 +73,7 @@ const mutants = [
 for(const mutate of mutants) {const row=structuredClone(positive);mutate(row);assert.equal(rippleHydrationReplayOkay(row,'main'),false);}
 assert.equal(rippleHydrationReplayOkay(positive,'21.x'),false);
 assert.equal(rippleHydrationReplayOkay(positive),false);
-console.log(JSON.stringify({specifications,negative_mutations:mutants.length,positive_contract:true,
+const missingRoute=structuredClone(positive);delete missingRoute.public_peer_replay;assert.equal(rippleHydrationReplayOkay(missingRoute,'main'),false);
+console.log(JSON.stringify({specifications,negative_mutations:mutants.length,positive_contract:true,public_route_required:true,
   source_sha256:sha(readFileSync(new URL('../scripts/ripple-hydration-application.mjs',import.meta.url))),
   native_or_packed_AOT_executed:false}));

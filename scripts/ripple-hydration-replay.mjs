@@ -17,6 +17,8 @@ import {parseLegacyArgs, resolveLibraryFromRun, sha256File} from './resolve-run-
 import {rippleHydrationApplication, rippleHydrationReplayOkay} from './ripple-hydration-application.mjs';
 import {observePublicRippleNativeEvents} from './ripple-native-event-probe.mjs';
 import {withChromium} from './browser-required-cells.mjs';
+import {installPublicRippleReplayObserver, markPublicRippleReplayPhase, snapshotPublicRippleReplayObserver,
+  cleanupPublicRippleReplayObserver} from './ripple-public-replay-probe.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const sleep = ms => new Promise(resolveWait => setTimeout(resolveWait, ms));
@@ -41,7 +43,7 @@ export async function observeHydrationReplay(driver) {
       if (window.__rippleNativeFaultActive !== true) window.__hydrationErrors.push(String(event.error || event.message));
     };
     window.addEventListener('error', window.__hydrationErrorListener);
-    window.__hydrationNativeListener = event => window.__hydrationNative.push({type:event.type, trusted:event.isTrusted, target_id:event.target.id});
+    window.__hydrationNativeListener = event => {if (event.target?.id === 'replay-peer') window.__hydrationNative.push({type:event.type, trusted:event.isTrusted, target_id:event.target.id});};
     ['mousedown','mouseup','click'].forEach(type => document.addEventListener(type, window.__hydrationNativeListener, true));
     window.__hydrationSSRButton = document.getElementById('replay-peer');
     const box = window.__hydrationSSRButton.getBoundingClientRect();
@@ -49,34 +51,47 @@ export async function observeHydrationReplay(driver) {
       server_hydration_metadata:!!document.querySelector('ripple-hydration-lab[ngh]') && !!document.getElementById('ng-state'),
       point:{x:box.x+box.width/2,y:box.y+box.height/2}};
   })()`);
+  const publicBefore = await installPublicRippleReplayObserver(driver);
   await pointerClick(before.point);
+  await pointerClick(publicBefore.point);
   const captured = await evaluate(`(() => {
     ['mousedown','mouseup','click'].forEach(type => document.removeEventListener(type, window.__hydrationNativeListener, true));
     return {events:window.__hydrationNative, still_before:window.__hydrationBootstrapped !== true};
   })()`);
+  await markPublicRippleReplayPhase(driver, 'replay');
   if (await evaluate('window.__startHydration()') !== true) throw Error('Bootstrap gate already released');
   await wait('window.__hydrationSnapshot?.().clicks === 1', 'Captured event was not replayed');
+  await wait('window.__hydrationSnapshot?.().native_replay_deliveries?.length === 3', 'Public peer Angular replay delivery missing');
   const replayed = await evaluate('window.__hydrationSnapshot()');
+  const publicReplayed = await snapshotPublicRippleReplayObserver(driver);
   const reused = await evaluate('window.__hydrationSSRButton === document.getElementById("replay-peer")');
   await pointerClick(before.point);
   await wait('window.__hydrationSnapshot?.().clicks === 2', 'Live interaction missing');
   const live = await evaluate('window.__hydrationSnapshot()');
+  await markPublicRippleReplayPhase(driver, 'live');
+  await pointerClick(publicBefore.point);
+  await wait('window.__hydrationSnapshot?.().native_replay_deliveries?.length === 6', 'Public peer live Angular delivery missing');
+  const publicLive = await snapshotPublicRippleReplayObserver(driver);
   const native_peer_events = await observePublicRippleNativeEvents(driver);
   await evaluate('window.__destroyHydration()');
   await wait('document.querySelectorAll(".mat-ripple-element").length === 0', 'Ripple nodes survived destruction');
+  const publicCleanup = await cleanupPublicRippleReplayObserver(driver);
   const cleanup = await evaluate(`(() => {
     window.removeEventListener('error', window.__hydrationErrorListener);
     return {destroyed:window.__hydrationDestroyed === true,
       remaining_ripple_nodes:document.querySelectorAll('.mat-ripple-element').length, window_errors:window.__hydrationErrors};
   })()`);
   return {...before, before_bootstrap:before.before_bootstrap && captured.still_before,
-    captured_native:captured.events, replayed, live, native_peer_events, ssr_button_reused:reused, ...cleanup};
+    captured_native:captured.events, replayed, live, native_peer_events, ssr_button_reused:reused,
+    public_peer_replay:{...publicBefore,replayed:publicReplayed,live:publicLive,...publicCleanup}, ...cleanup};
   } finally {
+    try {await cleanupPublicRippleReplayObserver(driver);} finally {
     await evaluate(`(() => {
       ['mousedown','mouseup','click'].forEach(type => document.removeEventListener(type, window.__hydrationNativeListener, true));
       if (window.__hydrationErrorListener) window.removeEventListener('error', window.__hydrationErrorListener);
       if (window.__destroyHydration && !window.__hydrationDestroyed) window.__destroyHydration();
     })()`);
+    }
   }
 }
 
@@ -134,7 +149,7 @@ export async function runRippleHydrationReplay({tarball, runId=null, reportPath}
   if (!line) throw Error('Unsupported packed peer line');
   const report = {schema_version:1, line, run_id:runId, tarball_sha256:sha256File(tarball),
     producer_sha256:sha256File(fileURLToPath(import.meta.url)), node:process.version, results:[],
-    scope:'Packed strict AOT public CLI SSR/client build at exact current peers and Rx7.5.5. Trusted Chromium pre-bootstrap input and genuine replay through the owned helper/renderer. Public MatRipple creation is separate from directive-only native input. A controlled native composedPath fault records the missing21 minimum guard; it does not qualify shared peer replay safety or clear10db3. No full Node/Rx/browser matrix or new release matrix cells.'};
+    scope:'Packed strict AOT public CLI SSR/client build at exact current peers and Rx7.5.5. Trusted Chromium pre-bootstrap input and genuine replay through the owned helper/renderer. Public MatRipple creation is separate from directive-only native input. A separate no-launch Angular-handler host distinguishes genuine public-peer replay from ordinary native capture. A controlled native composedPath fault records the missing21 minimum guard; no private inherited-fix claim or10db3 closure is made. No full Node/Rx/browser matrix or new release matrix cells.'};
   try {
     for (const runtime of ['zoneful','zoneless']) {
       const built = await build(tarball,line,runtime);
