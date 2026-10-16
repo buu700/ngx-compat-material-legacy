@@ -1,0 +1,681 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "b9eb57ef84b505f9f06f3f27f411df0c2da30f28",
+  "input_capsule_sha256": "de0bc627c5fd5be117c39f80d803c9f3e51d68d3f8cfee4b19aa708e47fb58d5",
+  "helper": {
+    "path": "projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts",
+    "sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771"
+  },
+  "uses": [
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/cdk/scrolling",
+      "symbol": "CDK_VIRTUAL_SCROLL_VIEWPORT",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "CDK_VIRTUAL_SCROLL_VIEWPORT",
+          "type_only": false,
+          "line": 11
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/cdk/table",
+      "symbol": "CdkTable",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "CdkTable",
+          "type_only": false,
+          "line": 10
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "InjectOptions",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "InjectOptions",
+          "type_only": true,
+          "line": 9
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "Injector",
+          "type_only": false,
+          "line": 9
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "ProviderToken",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "ProviderToken",
+          "type_only": true,
+          "line": 9
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "inject",
+          "type_only": false,
+          "line": 9
+        }
+      ]
+    },
+    {
+      "file": "legacy-table/internal/table-construction-context.ts",
+      "module": "@angular/core",
+      "symbol": "runInInjectionContext",
+      "candidate_source_sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "occurrences": [
+        {
+          "kind": "named-import",
+          "local_name": "runInInjectionContext",
+          "type_only": false,
+          "line": 9
+        }
+      ]
+    }
+  ],
+  "declarations": [
+    {
+      "line": "main",
+      "framework": "22.1.7",
+      "cdk": "22.1.7",
+      "imports": [
+        {
+          "module": "@angular/core",
+          "symbol": "Injector",
+          "type_only": false,
+          "path": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+          "member": "declare abstract class Injector {\n    static THROW_IF_NOT_FOUND: {};\n    static NULL: Injector;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: undefined, options: InjectOptions & {\n        optional?: false;\n    }): T;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: null | undefined, options: InjectOptions): T | null;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;\n    /**\n     * @deprecated from v4.0.0 use ProviderToken<T>\n     * @suppress {duplicate}\n     */\n    abstract get<T>(token: string | ProviderToken<T>, notFoundValue?: any): any;\n    /**\n     * @deprecated from v5 use the new signature Injector.create(options)\n     */\n    static create(providers: StaticProvider[], parent?: Injector): Injector;\n    /**\n     * Creates a new injector instance that provides one or more dependencies,\n     * according to a given type or types of `StaticProvider`.\n     *\n     * @param options An object with the following properties:\n     * * `providers`: An array of providers of the [StaticProvider type](api/core/StaticProvider).\n     * * `parent`: (optional) A parent injector.\n     * * `name`: (optional) A developer-defined identifying name for the new injector.\n     *\n     * @returns The new injector instance.\n     *\n     */\n    static create(options: {\n        providers: Array<Provider | StaticProvider>;\n        parent?: Injector;\n        name?: string;\n    }): DestroyableInjector;\n    /** @nocollapse */\n    static ɵprov: _angular_core.ɵɵInjectableDeclaration<Injector>;\n}",
+          "chain": [
+            {
+              "path": "@angular/core/types/core.d.ts",
+              "binding": "Injector",
+              "target": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+              "next": "Injector"
+            }
+          ],
+          "complete_overload_set": [
+            {
+              "declaration": "declare abstract class Injector {\n    static THROW_IF_NOT_FOUND: {};\n    static NULL: Injector;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: undefined, options: InjectOptions & {\n        optional?: false;\n    }): T;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: null | undefined, options: InjectOptions): T | null;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;\n    /**\n     * @deprecated from v4.0.0 use ProviderToken<T>\n     * @suppress {duplicate}\n     */\n    abstract get<T>(token: string | ProviderToken<T>, notFoundValue?: any): any;\n    /**\n     * @deprecated from v5 use the new signature Injector.create(options)\n     */\n    static create(providers: StaticProvider[], parent?: Injector): Injector;\n    /**\n     * Creates a new injector instance that provides one or more dependencies,\n     * according to a given type or types of `StaticProvider`.\n     *\n     * @param options An object with the following properties:\n     * * `providers`: An array of providers of the [StaticProvider type](api/core/StaticProvider).\n     * * `parent`: (optional) A parent injector.\n     * * `name`: (optional) A developer-defined identifying name for the new injector.\n     *\n     * @returns The new injector instance.\n     *\n     */\n    static create(options: {\n        providers: Array<Provider | StaticProvider>;\n        parent?: Injector;\n        name?: string;\n    }): DestroyableInjector;\n    /** @nocollapse */\n    static ɵprov: _angular_core.ɵɵInjectableDeclaration<Injector>;\n}",
+              "markers": [
+                "see",
+                "see",
+                "usageNotes",
+                "see",
+                "publicApi"
+              ]
+            }
+          ]
+        },
+        {
+          "module": "@angular/core",
+          "symbol": "inject",
+          "type_only": false,
+          "path": "@angular/core/types/core.d.ts",
+          "member": "declare function inject<T>(token: ProviderToken<T>): T;",
+          "chain": [],
+          "complete_overload_set": [
+            {
+              "declaration": "declare function inject<T>(token: ProviderToken<T>): T;",
+              "markers": [
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            },
+            {
+              "declaration": "declare function inject<T>(token: ProviderToken<T>, options: InjectOptions & {\n    optional?: false;\n}): T;",
+              "markers": [
+                "param",
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            },
+            {
+              "declaration": "declare function inject<T>(token: ProviderToken<T>, options: InjectOptions): T | null;",
+              "markers": [
+                "param",
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            },
+            {
+              "declaration": "declare function inject(token: HostAttributeToken): string;",
+              "markers": [
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            },
+            {
+              "declaration": "declare function inject(token: HostAttributeToken, options: {\n    optional: true;\n}): string | null;",
+              "markers": [
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            },
+            {
+              "declaration": "declare function inject(token: HostAttributeToken, options: {\n    optional: false;\n}): string;",
+              "markers": [
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            }
+          ]
+        },
+        {
+          "module": "@angular/core",
+          "symbol": "runInInjectionContext",
+          "type_only": false,
+          "path": "@angular/core/types/core.d.ts",
+          "member": "declare function runInInjectionContext<ReturnT>(injector: Injector, fn: () => ReturnT): ReturnT;",
+          "chain": [],
+          "complete_overload_set": [
+            {
+              "declaration": "declare function runInInjectionContext<ReturnT>(injector: Injector, fn: () => ReturnT): ReturnT;",
+              "markers": [
+                "see",
+                "param",
+                "param",
+                "returns",
+                "publicApi"
+              ]
+            }
+          ]
+        },
+        {
+          "module": "@angular/core",
+          "symbol": "InjectOptions",
+          "type_only": true,
+          "path": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+          "member": "interface InjectOptions {\n    /**\n     * Use optional injection, and return `null` if the requested token is not found.\n     */\n    optional?: boolean;\n    /**\n     * Start injection at the parent of the current injector.\n     */\n    skipSelf?: boolean;\n    /**\n     * Only query the current injector for the token, and don't fall back to the parent injector if\n     * it's not found.\n     */\n    self?: boolean;\n    /**\n     * Stop injection at the host component's injector. Only relevant when injecting from an element\n     * injector, and a no-op for environment injectors.\n     */\n    host?: boolean;\n}",
+          "chain": [
+            {
+              "path": "@angular/core/types/core.d.ts",
+              "binding": "InjectOptions",
+              "target": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+              "next": "InjectOptions"
+            }
+          ],
+          "complete_overload_set": [
+            {
+              "declaration": "interface InjectOptions {\n    /**\n     * Use optional injection, and return `null` if the requested token is not found.\n     */\n    optional?: boolean;\n    /**\n     * Start injection at the parent of the current injector.\n     */\n    skipSelf?: boolean;\n    /**\n     * Only query the current injector for the token, and don't fall back to the parent injector if\n     * it's not found.\n     */\n    self?: boolean;\n    /**\n     * Stop injection at the host component's injector. Only relevant when injecting from an element\n     * injector, and a no-op for environment injectors.\n     */\n    host?: boolean;\n}",
+              "markers": [
+                "publicApi"
+              ]
+            }
+          ]
+        },
+        {
+          "module": "@angular/core",
+          "symbol": "ProviderToken",
+          "type_only": true,
+          "path": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+          "member": "type ProviderToken<T> = Type<T> | AbstractType<T> | InjectionToken<T>;",
+          "chain": [
+            {
+              "path": "@angular/core/types/core.d.ts",
+              "binding": "ProviderToken",
+              "target": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+              "next": "ProviderToken"
+            }
+          ],
+          "complete_overload_set": [
+            {
+              "declaration": "type ProviderToken<T> = Type<T> | AbstractType<T> | InjectionToken<T>;",
+              "markers": [
+                "description",
+                "publicApi"
+              ]
+            }
+          ]
+        },
+        {
+          "module": "@angular/cdk/scrolling",
+          "symbol": "CDK_VIRTUAL_SCROLL_VIEWPORT",
+          "type_only": false,
+          "path": "@angular/cdk/types/_scrolling-module-chunk.d.ts",
+          "member": "CDK_VIRTUAL_SCROLL_VIEWPORT: InjectionToken<CdkVirtualScrollViewport>",
+          "chain": [
+            {
+              "path": "@angular/cdk/types/scrolling.d.ts",
+              "binding": "CDK_VIRTUAL_SCROLL_VIEWPORT",
+              "target": "@angular/cdk/types/_scrolling-module-chunk.d.ts",
+              "next": "CDK_VIRTUAL_SCROLL_VIEWPORT"
+            }
+          ],
+          "complete_overload_set": [
+            {
+              "declaration": "CDK_VIRTUAL_SCROLL_VIEWPORT: InjectionToken<CdkVirtualScrollViewport>",
+              "markers": []
+            }
+          ]
+        },
+        {
+          "module": "@angular/cdk/table",
+          "symbol": "CdkTable",
+          "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.d.ts",
+          "member_sha256": "a8f9235ee943a8061980ed447cc56b1626401e63674947b17458919c1c476cb8",
+          "public_constructor_declaration": "constructor();",
+          "public_zero_argument_call_supported": true,
+          "actual_constructor_parameters": 0,
+          "depends_on_ignored_compatibility_arguments": false,
+          "whole_declaration_member_sha256": "f1981ed3da13cccefbc8ad12a197d27fdbbe1d1712de3a00007224518fb841b5"
+        }
+      ]
+    },
+    {
+      "line": "21.x",
+      "framework": "21.2.23",
+      "cdk": "21.2.14",
+      "imports": [
+        {
+          "module": "@angular/core",
+          "symbol": "Injector",
+          "type_only": false,
+          "path": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+          "member": "declare abstract class Injector {\n    static THROW_IF_NOT_FOUND: {};\n    static NULL: Injector;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: undefined, options: InjectOptions & {\n        optional?: false;\n    }): T;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: null | undefined, options: InjectOptions): T | null;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;\n    /**\n     * @deprecated from v4.0.0 use ProviderToken<T>\n     * @suppress {duplicate}\n     */\n    abstract get<T>(token: string | ProviderToken<T>, notFoundValue?: any): any;\n    /**\n     * @deprecated from v5 use the new signature Injector.create(options)\n     */\n    static create(providers: StaticProvider[], parent?: Injector): Injector;\n    /**\n     * Creates a new injector instance that provides one or more dependencies,\n     * according to a given type or types of `StaticProvider`.\n     *\n     * @param options An object with the following properties:\n     * * `providers`: An array of providers of the [StaticProvider type](api/core/StaticProvider).\n     * * `parent`: (optional) A parent injector.\n     * * `name`: (optional) A developer-defined identifying name for the new injector.\n     *\n     * @returns The new injector instance.\n     *\n     */\n    static create(options: {\n        providers: Array<Provider | StaticProvider>;\n        parent?: Injector;\n        name?: string;\n    }): DestroyableInjector;\n    /** @nocollapse */\n    static ɵprov: _angular_core.ɵɵInjectableDeclaration<Injector>;\n}",
+          "chain": [
+            {
+              "path": "@angular/core/types/core.d.ts",
+              "binding": "Injector",
+              "target": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+              "next": "Injector"
+            }
+          ],
+          "complete_overload_set": [
+            {
+              "declaration": "declare abstract class Injector {\n    static THROW_IF_NOT_FOUND: {};\n    static NULL: Injector;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: undefined, options: InjectOptions & {\n        optional?: false;\n    }): T;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue: null | undefined, options: InjectOptions): T | null;\n    /**\n     * Retrieves an instance from the injector based on the provided token.\n     * @returns The instance from the injector if defined, otherwise the `notFoundValue`.\n     * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.\n     */\n    abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;\n    /**\n     * @deprecated from v4.0.0 use ProviderToken<T>\n     * @suppress {duplicate}\n     */\n    abstract get<T>(token: string | ProviderToken<T>, notFoundValue?: any): any;\n    /**\n     * @deprecated from v5 use the new signature Injector.create(options)\n     */\n    static create(providers: StaticProvider[], parent?: Injector): Injector;\n    /**\n     * Creates a new injector instance that provides one or more dependencies,\n     * according to a given type or types of `StaticProvider`.\n     *\n     * @param options An object with the following properties:\n     * * `providers`: An array of providers of the [StaticProvider type](api/core/StaticProvider).\n     * * `parent`: (optional) A parent injector.\n     * * `name`: (optional) A developer-defined identifying name for the new injector.\n     *\n     * @returns The new injector instance.\n     *\n     */\n    static create(options: {\n        providers: Array<Provider | StaticProvider>;\n        parent?: Injector;\n        name?: string;\n    }): DestroyableInjector;\n    /** @nocollapse */\n    static ɵprov: _angular_core.ɵɵInjectableDeclaration<Injector>;\n}",
+              "markers": [
+                "see",
+                "see",
+                "usageNotes",
+                "see",
+                "publicApi"
+              ]
+            }
+          ]
+        },
+        {
+          "module": "@angular/core",
+          "symbol": "inject",
+          "type_only": false,
+          "path": "@angular/core/types/core.d.ts",
+          "member": "declare function inject<T>(token: ProviderToken<T>): T;",
+          "chain": [],
+          "complete_overload_set": [
+            {
+              "declaration": "declare function inject<T>(token: ProviderToken<T>): T;",
+              "markers": [
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            },
+            {
+              "declaration": "declare function inject<T>(token: ProviderToken<T>, options: InjectOptions & {\n    optional?: false;\n}): T;",
+              "markers": [
+                "param",
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            },
+            {
+              "declaration": "declare function inject<T>(token: ProviderToken<T>, options: InjectOptions): T | null;",
+              "markers": [
+                "param",
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            },
+            {
+              "declaration": "declare function inject(token: HostAttributeToken): string;",
+              "markers": [
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            },
+            {
+              "declaration": "declare function inject(token: HostAttributeToken, options: {\n    optional: true;\n}): string | null;",
+              "markers": [
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            },
+            {
+              "declaration": "declare function inject(token: HostAttributeToken, options: {\n    optional: false;\n}): string;",
+              "markers": [
+                "param",
+                "returns",
+                "throws",
+                "publicApi"
+              ]
+            }
+          ]
+        },
+        {
+          "module": "@angular/core",
+          "symbol": "runInInjectionContext",
+          "type_only": false,
+          "path": "@angular/core/types/core.d.ts",
+          "member": "declare function runInInjectionContext<ReturnT>(injector: Injector, fn: () => ReturnT): ReturnT;",
+          "chain": [],
+          "complete_overload_set": [
+            {
+              "declaration": "declare function runInInjectionContext<ReturnT>(injector: Injector, fn: () => ReturnT): ReturnT;",
+              "markers": [
+                "see",
+                "param",
+                "param",
+                "returns",
+                "publicApi"
+              ]
+            }
+          ]
+        },
+        {
+          "module": "@angular/core",
+          "symbol": "InjectOptions",
+          "type_only": true,
+          "path": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+          "member": "interface InjectOptions {\n    /**\n     * Use optional injection, and return `null` if the requested token is not found.\n     */\n    optional?: boolean;\n    /**\n     * Start injection at the parent of the current injector.\n     */\n    skipSelf?: boolean;\n    /**\n     * Only query the current injector for the token, and don't fall back to the parent injector if\n     * it's not found.\n     */\n    self?: boolean;\n    /**\n     * Stop injection at the host component's injector. Only relevant when injecting from an element\n     * injector, and a no-op for environment injectors.\n     */\n    host?: boolean;\n}",
+          "chain": [
+            {
+              "path": "@angular/core/types/core.d.ts",
+              "binding": "InjectOptions",
+              "target": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+              "next": "InjectOptions"
+            }
+          ],
+          "complete_overload_set": [
+            {
+              "declaration": "interface InjectOptions {\n    /**\n     * Use optional injection, and return `null` if the requested token is not found.\n     */\n    optional?: boolean;\n    /**\n     * Start injection at the parent of the current injector.\n     */\n    skipSelf?: boolean;\n    /**\n     * Only query the current injector for the token, and don't fall back to the parent injector if\n     * it's not found.\n     */\n    self?: boolean;\n    /**\n     * Stop injection at the host component's injector. Only relevant when injecting from an element\n     * injector, and a no-op for environment injectors.\n     */\n    host?: boolean;\n}",
+              "markers": [
+                "publicApi"
+              ]
+            }
+          ]
+        },
+        {
+          "module": "@angular/core",
+          "symbol": "ProviderToken",
+          "type_only": true,
+          "path": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+          "member": "type ProviderToken<T> = Type<T> | AbstractType<T> | InjectionToken<T>;",
+          "chain": [
+            {
+              "path": "@angular/core/types/core.d.ts",
+              "binding": "ProviderToken",
+              "target": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+              "next": "ProviderToken"
+            }
+          ],
+          "complete_overload_set": [
+            {
+              "declaration": "type ProviderToken<T> = Type<T> | AbstractType<T> | InjectionToken<T>;",
+              "markers": [
+                "description",
+                "publicApi"
+              ]
+            }
+          ]
+        },
+        {
+          "module": "@angular/cdk/scrolling",
+          "symbol": "CDK_VIRTUAL_SCROLL_VIEWPORT",
+          "type_only": false,
+          "path": "@angular/cdk/types/_scrolling-module-chunk.d.ts",
+          "member": "CDK_VIRTUAL_SCROLL_VIEWPORT: InjectionToken<CdkVirtualScrollViewport>",
+          "chain": [
+            {
+              "path": "@angular/cdk/types/scrolling.d.ts",
+              "binding": "CDK_VIRTUAL_SCROLL_VIEWPORT",
+              "target": "@angular/cdk/types/_scrolling-module-chunk.d.ts",
+              "next": "CDK_VIRTUAL_SCROLL_VIEWPORT"
+            }
+          ],
+          "complete_overload_set": [
+            {
+              "declaration": "CDK_VIRTUAL_SCROLL_VIEWPORT: InjectionToken<CdkVirtualScrollViewport>",
+              "markers": []
+            }
+          ]
+        },
+        {
+          "module": "@angular/cdk/table",
+          "symbol": "CdkTable",
+          "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.d.ts",
+          "member_sha256": "715a8563b36a47679050afcde42363ed43c32d7c1cb5534888b4e8d56a2d0867",
+          "public_constructor_declaration": "constructor(...args: unknown[]);",
+          "public_zero_argument_call_supported": true,
+          "actual_constructor_parameters": 0,
+          "depends_on_ignored_compatibility_arguments": false,
+          "whole_declaration_member_sha256": "87da6f6b6bc01549d46dbd5333921b58b4ad160b1f209047f6c79dc510cb1d12"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "line": "main",
+      "compiler": "6.0.3",
+      "strict": true,
+      "skipLibCheck": false,
+      "negative_types": 2,
+      "selected_stable_core_signatures": [
+        {
+          "call": "this.parent.get",
+          "declaration": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+        },
+        {
+          "call": "inject",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        },
+        {
+          "call": "runInInjectionContext",
+          "declaration": "declare function runInInjectionContext<ReturnT>(injector: Injector, fn: () => ReturnT): ReturnT;"
+        }
+      ],
+      "cdk_dependencies_are_type_protocols": true,
+      "whole_actual_minimum_helper_compilation_retained_in": "compatibility/rc/table-virtual-context-source-proof.json"
+    },
+    {
+      "line": "21.x",
+      "compiler": "6.0.3",
+      "strict": true,
+      "skipLibCheck": false,
+      "negative_types": 2,
+      "selected_stable_core_signatures": [
+        {
+          "call": "this.parent.get",
+          "declaration": "abstract get<T>(token: ProviderToken<T>, notFoundValue?: T, options?: InjectOptions): T;"
+        },
+        {
+          "call": "inject",
+          "declaration": "declare function inject<T>(token: ProviderToken<T>): T;"
+        },
+        {
+          "call": "runInInjectionContext",
+          "declaration": "declare function runInInjectionContext<ReturnT>(injector: Injector, fn: () => ReturnT): ReturnT;"
+        }
+      ],
+      "cdk_dependencies_are_type_protocols": true,
+      "whole_actual_minimum_helper_compilation_retained_in": "compatibility/rc/table-virtual-context-source-proof.json"
+    }
+  ],
+  "results": [
+    {
+      "line": "main",
+      "direct_forwarding_cases": 51,
+      "same_description_token_forwarded": true,
+      "only_exact_viewport_masked": true,
+      "arguments_and_new_target_preserved": true,
+      "derived_fields_and_later_viewport_preserved": true,
+      "nested_and_throwing_contexts_restored": true,
+      "borrowed_value_owned_only_by_external_injector": true,
+      "parent_and_service_values_are_protocols": true,
+      "actual_legacy_rendering_executed": false
+    },
+    {
+      "line": "21.x",
+      "direct_forwarding_cases": 51,
+      "same_description_token_forwarded": true,
+      "only_exact_viewport_masked": true,
+      "arguments_and_new_target_preserved": true,
+      "derived_fields_and_later_viewport_preserved": true,
+      "nested_and_throwing_contexts_restored": true,
+      "borrowed_value_owned_only_by_external_injector": true,
+      "parent_and_service_values_are_protocols": true,
+      "actual_legacy_rendering_executed": false
+    }
+  ],
+  "mutants": [
+    {
+      "line": "main",
+      "id": "all-tokens-masked",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "token-description-instead-of-identity",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "fallback-lost",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "options-lost",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "borrowed-value-cloned",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "target-discarded",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "arguments-discarded",
+      "rejected": true
+    },
+    {
+      "line": "main",
+      "id": "constructor-context-omitted",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "all-tokens-masked",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "token-description-instead-of-identity",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "fallback-lost",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "options-lost",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "borrowed-value-cloned",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "target-discarded",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "arguments-discarded",
+      "rejected": true
+    },
+    {
+      "line": "21.x",
+      "id": "constructor-context-omitted",
+      "rejected": true
+    }
+  ],
+  "namespace_capsule_sha256": "4c2782e32c576959b6b36d999565f0205abf4ed44d0ba4b36a9aade625ab445f",
+  "base_namespace_capsule_sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3",
+  "producer_sha256": "831b74511fd684c67857df9795abbe940078b98a63242a804c1aef0ca79c3074",
+  "node": "v22.23.3",
+  "compiler": "6.0.3",
+  "retained_actual_constructor_evidence": {
+    "path": "compatibility/rc/table-virtual-context-source-proof.json",
+    "sha256": "3d8a441b642dfcbeea1e486c4b17ced5ac7e272f421e55ab79e3609ba2840b71"
+  },
+  "limits": [
+    "This finite import review executes the complete owned helper with genuine minimum Core and public scrolling token. Parent/service objects and CDK type placeholders in the new Core signature fixture are explicit protocols.",
+    "The exact preceding whole-helper/minimum declaration and genuine CdkTable node-constructor receipts retain their original limited scope. No new actual legacy view, actual viewport, compiler21, DOM/browser, packed artifact, minimum toolchain/RxJS floor, upstream SHA or whole G11 qualification."
+  ],
+  "actual_native_or_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
