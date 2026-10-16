@@ -16,6 +16,7 @@ import {deriveHistoricalRoster, rejectionReasons, discoveryNegativeResults, isRu
 import {HISTORICAL_BEHAVIOR_KIND, HISTORICAL_BEHAVIOR_SHAS, historicalBehaviorRequirements,
   requiresHistoricalBehavior, validateHistoricalBehavior} from '../../scripts/upstream-historical-behavior-evidence.mjs';
 import {createFixture, hash} from './artifact-behavior-fixture.mjs';
+import {stripProgressCspIntegration, precedingHistoricalContextMember} from './progress-csp-source-context.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const read = p => fs.readFileSync(path.join(root, p));
@@ -33,13 +34,13 @@ const historicalGuard = '  if (requiresHistoricalBehavior(entry, proof)) {\n    
 const historicalEnvironment = "  let historicalExecution;\n  if (process.env.RC_UPSTREAM_HISTORICAL !== undefined) {\n    try { historicalExecution = JSON.parse(process.env.RC_UPSTREAM_HISTORICAL); }\n    catch { return {error: 'RC_UPSTREAM_HISTORICAL is not JSON'}; }\n  }\n";
 const historicalCapture = "        env['RC_UPSTREAM_HISTORICAL'] = json.dumps({\n            'run_id': ACTIVE_RUN.manifest['run_id'],\n            'invocation_id': ACTIVE_RUN.invocations.get('historical-legacy-artifact'),\n            'exit_code': ACTIVE_RUN.exit_codes.get('historical-legacy-artifact'),\n        }, sort_keys=True)\n";
 const removeOnce = (text, part) => { assert.equal(text.split(part).length, 2); return text.replace(part, ''); };
-let checker = read('scripts/check-upstream-audit-disposition.mjs').toString();
+let checker = stripProgressCspIntegration(read('scripts/check-upstream-audit-disposition.mjs').toString(), 'checker');
 for (const added of [historicalImport, historicalGuard, historicalEnvironment]) checker = removeOnce(checker, added);
 assert.equal(checker.split('packedConsumerExecution, historicalExecution};').length, 2);
 assert.equal(checker.replace('packedConsumerExecution, historicalExecution};', 'packedConsumerExecution};'), before('scripts/check-upstream-audit-disposition.mjs'));
-assert.equal(removeOnce(read('scripts/rc-verify.py').toString(), historicalCapture), before('scripts/rc-verify.py'));
+assert.equal(removeOnce(stripProgressCspIntegration(read('scripts/rc-verify.py').toString(), 'coordinator'), historicalCapture), before('scripts/rc-verify.py'));
 for (const member of inputs.preceding_members.filter(row => !['scripts/check-upstream-audit-disposition.mjs', 'scripts/rc-verify.py'].includes(row.path))) {
-  assert.equal(hash(read(member.path)), member.sha256, 'prior validator/writer/fixture changed');
+  assert.equal(hash(precedingHistoricalContextMember(member.path, read)), member.sha256, 'prior validator/writer/fixture changed');
 }
 const roster = deriveHistoricalRoster(root);
 assert.equal(roster.ids.length + roster.discovery_negative_ids.length, 2225);
