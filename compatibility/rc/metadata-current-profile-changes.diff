@@ -1,0 +1,232 @@
+diff --git a/scripts/class-decorator-use-review.mjs b/scripts/class-decorator-use-review.mjs
+index de23396d4..40c0ad620 100644
+--- a/scripts/class-decorator-use-review.mjs
++++ b/scripts/class-decorator-use-review.mjs
+@@ -20,6 +20,8 @@ const hash = b => createHash('sha256').update(b).digest('hex'), moduleName = '@a
+ const seedHash = '3e059e3d9ba423b9f666fcf3ec960945cb43555750eb5fa3025a503d3cd8795b';
+ const names = ['Component', 'Directive', 'NgModule'];
+ const deltaKeys = ['legacy-core/internal/datetime/native-date-module.ts#NgModule', 'legacy-table/internal/definition-owner.ts#Directive', 'legacy-table/internal/table-outlet.ts#Directive', 'legacy-menu/internal/menu-item-base.ts#Directive'].sort();
++const currentDeltaKeys = [...deltaKeys, 'legacy-paginator/internal/page-size-options.ts#Directive', 'legacy-table/internal/column-classes.ts#Directive'].sort();
++const retiredClassUse = {file:'legacy-tabs/internal/tab-nav-bar-base.ts', module:moduleName, symbol:'Component'};
+ const historicalBaseClasses = ["_LegacyMenuItemBase", "MatPaginatedTabHeader", "_MatAutocompleteBase", "_MatAutocompleteOriginBase", "_MatAutocompleteTriggerBase", "_MatMenuBase", "_MatMenuContentBase", "_MatOptgroupBase", "_MatOptionBase", "_MatPaginatorBase", "_MatSelectBase", "_MatSnackBarBase", "_MatSnackBarContainerBase", "_MatTabBase", "_MatTabBodyBase", "_MatTabGroupBase", "_MatTabHeaderBase", "_MatTabLabelWrapperBase", "_MatTabLinkBase", "_MatTabNavBase", "_MatTestDialogOpenerBase", "_MatTooltipBase", "_TooltipComponentBase"];
+ const unusedFiles = ['legacy-core/option/option-base.ts', 'legacy-select/internal/select-base.ts', 'legacy-tabs/internal/tab-base.ts', 'legacy-tabs/internal/tab-group-base.ts', 'legacy-menu/internal/menu-base.ts'];
+ const printer = ts.createPrinter({removeComments: true}), print = (n, s) => printer.printNode(ts.EmitHint.Unspecified, n, s).trim();
+@@ -108,14 +110,23 @@ ${original?"// @ts-expect-error styleUrl did not exist on original Component.\nC
+ `;writeFileSync(file,code);const program=compiler.createProgram([file],{target:compiler.ScriptTarget.ES2022,module:compiler.ModuleKind.ESNext,moduleResolution:compiler.ModuleResolutionKind.Bundler,experimentalDecorators:true,strict:true,skipLibCheck:false,noEmit:true,lib:['lib.es2022.d.ts','lib.dom.d.ts']}),diagnostics=compiler.getPreEmitDiagnostics(program);assert.equal(diagnostics.length,0,compiler.formatDiagnostics(diagnostics,{getCanonicalFileName:p=>p,getCurrentDirectory:()=>dirname(file),getNewLine:()=> '\n'}));receipts.push({line:model.subject.line,negative_checks:6,fixture_sha256:hash(code)});}
+   return {compiler:compiler.version,compiler_source_sha256:hash(readFileSync(path)),subjects:receipts};
+ }
+-export async function reviewClassDecoratorUses({root=rootDefault,subjects,compilerRoot,readSource,skipDiagnostics=false,sourceFiles}={}){
++export async function reviewClassDecoratorUses({root=rootDefault,subjects,compilerRoot,readSource,skipDiagnostics=false,sourceFiles,population='captured'}={}){
++  assert.ok(['captured','current'].includes(population),'unknown class population');
++  const current=population==='current', delta=current?currentDeltaKeys:deltaKeys;
+   const seed=readFileSync(join(root,'compatibility/f10/authored-dependency-inventory-seed.json'));assert.equal(hash(seed),seedHash);const uses=JSON.parse(seed).symbol_uses.filter(u=>u.module===moduleName&&names.includes(u.symbol));assert.equal(uses.length,144);
+   const selected=sourceFiles?new Set(sourceFiles):null;
+-  if(selected){assert.ok(Array.isArray(sourceFiles)&&sourceFiles.length>0&&selected.size===sourceFiles.length,'empty/duplicate metadata selection');for(const file of selected)assert.ok(uses.some(use=>use.file===file),'unreviewed metadata selection');}
++  if(selected){assert.ok(Array.isArray(sourceFiles)&&sourceFiles.length>0&&selected.size===sourceFiles.length,'empty/duplicate metadata selection');for(const file of selected)assert.ok(uses.some(use=>use.file===file)||current&&delta.some(key=>key.split('#')[0]===file),'unreviewed metadata selection');}
+   const selectedUses=selected?uses.filter(use=>selected.has(use.file)):uses;
+   const own=!subjects,loaded=subjects??await classDecoratorSubjects(root),read=p=>readSource?readSource(p):readFileSync(join(root,p),'utf8');
+   try{
+-    const paths=execFileSync('rg',['--files','projects/ngx-material-legacy','-g','*.ts','-g','!*.spec.ts'],{cwd:root,encoding:'utf8'}).trim().split('\n'),actual=paths.filter(p=>(!selected||selected.has(p.slice('projects/ngx-material-legacy/'.length)))&&parse(p,read(p)).statements.some(n=>ts.isImportDeclaration(n)&&n.moduleSpecifier.text===moduleName&&n.importClause?.namedBindings&&ts.isNamedImports(n.importClause.namedBindings)&&n.importClause.namedBindings.elements.some(i=>names.includes((i.propertyName||i.name).text))));if(selected)assert.deepEqual(actual.map(p=>p.slice('projects/ngx-material-legacy/'.length)).sort(),[...selected].sort(),'missing selected metadata source');else assert.equal(actual.length,130);
++    const retired=current&&(!selected||selected.has(retiredClassUse.file))?[{...retiredClassUse}]:[];
++    for(const use of retired){
++      const path='projects/ngx-material-legacy/'+use.file,text=read(path),file=parse(path,text);
++      const visit=node=>{if(ts.isIdentifier(node)){assert.notEqual(node.text,'Component','retired class import or panel returned');if(node.text==='MatTabNavPanel')assert.ok(ts.isInterfaceDeclaration(node.parent)&&node.parent.name===node||ts.isTypeReferenceNode(node.parent)&&node.parent.typeName===node,'retired class import or panel returned');}ts.forEachChild(node,visit);};visit(file);
++      use.candidate_source_sha256=hash(text);use.scope='Explicit retained frozen obligation; current structural panel runtime and import are absent.';
++    }
++    const liveSelectedUses=selectedUses.filter(use=>!retired.some(old=>old.file===use.file&&old.symbol===use.symbol));
++    const paths=execFileSync('rg',['--files','projects/ngx-material-legacy','-g','*.ts','-g','!*.spec.ts'],{cwd:root,encoding:'utf8'}).trim().split('\n'),actual=paths.filter(p=>(!selected||selected.has(p.slice('projects/ngx-material-legacy/'.length)))&&parse(p,read(p)).statements.some(n=>ts.isImportDeclaration(n)&&n.moduleSpecifier.text===moduleName&&n.importClause?.namedBindings&&ts.isNamedImports(n.importClause.namedBindings)&&n.importClause.namedBindings.elements.some(i=>names.includes((i.propertyName||i.name).text))));if(selected)assert.deepEqual(actual.map(p=>p.slice('projects/ngx-material-legacy/'.length)).sort(),[...selected].sort(),'missing selected metadata source');else assert.equal(actual.length,current?132:130);
+     const options={noResolve:true,target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,experimentalDecorators:true},host=ts.createCompilerHost(options),originalRead=host.readFile.bind(host),authoredRoot=join(root,'projects/ngx-material-legacy');host.readFile=p=>p.startsWith(authoredRoot+'/')?read('projects/ngx-material-legacy/'+p.slice(authoredRoot.length+1)):originalRead(p);const program=ts.createProgram(actual.map(p=>join(root,p)),options,host),checker=program.getTypeChecker(),cases=[],applications=[];
+     for(const path of actual){const file=path.slice('projects/ngx-material-legacy/'.length),source=program.getSourceFile(join(root,path));for(const name of names){const imports=source.statements.filter(ts.isImportDeclaration).filter(n=>n.moduleSpecifier.text===moduleName&&n.importClause?.namedBindings&&ts.isNamedImports(n.importClause.namedBindings)).flatMap(n=>n.importClause.namedBindings.elements.filter(i=>(i.propertyName||i.name).text===name));if(!imports.length)continue;const imported=unique(imports,'missing/ambiguous class import'),symbol=checker.getSymbolAtLocation(imported.name);assert.ok(symbol.declarations.length===1&&symbol.declarations[0]===imported,'class import shadowed');const references=[];
+       function visit(node){if(ts.isIdentifier(node)&&node!==imported.name&&node!==imported.propertyName&&checker.getSymbolAtLocation(node)===symbol){assert.ok(!imported.isTypeOnly&&!imported.parent.parent.isTypeOnly,'runtime class decorator imported type only');const call=node.parent;assert.ok(ts.isCallExpression(call)&&call.expression===node&&!call.typeArguments&&ts.isDecorator(call.parent)&&ts.isClassDeclaration(call.parent.parent)&&call.parent.parent.name,'unreviewed class decorator role');assert.ok(call.arguments.length===1||name==='Directive'&&call.arguments.length===0,'class metadata arity');const cls=call.parent.parent;assert.ok(!cls.members.some(m=>m.modifiers?.some(x=>x.kind===ts.SyntaxKind.StaticKeyword)&&m.name?.getText(source)==='hasOwnProperty'),'nonordinary class ownership');const arg=call.arguments[0];if(arg)assert.ok(ts.isObjectLiteralExpression(arg),'class metadata must remain literal');const fields=(arg?.properties??[]).map(p=>{assert.ok(ts.isPropertyAssignment(p)&&ts.isIdentifier(p.name),'metadata spread/method/computed keys not admitted');const key=p.name.text;assert.ok(!['moduleId','interpolation','animations','jit','id','foreignImports'].includes(key),'removed/deprecated/unreviewed class option');const supported={Component:['standalone','selector','exportAs','host','templateUrl','styleUrls','inputs','encapsulation','changeDetection','providers','template','outputs','styleUrl'],Directive:['standalone','selector','host','providers','exportAs','inputs'],NgModule:['imports','exports','declarations','providers']}[name];assert.ok(supported.includes(key),'unreviewed class metadata field');return key;});
+@@ -123,11 +134,11 @@ export async function reviewClassDecoratorUses({root=rootDefault,subjects,compil
+         const record={line:source.getLineAndCharacterOfPosition(node.getStart(source)).line+1,expression:call.getText(source),target_class:cls.name.text,fields,standalone,historical_base_directive:name==='Directive'&&historicalBaseClasses.includes(cls.name.text)};references.push(record);applications.push({source,call,name,local_name:imported.name.text,file,...record});}ts.forEachChild(node,visit);}visit(source);let unused=null;
+       if(!references.length){assert.ok(name==='Component'&&unusedFiles.includes(file),'unexpected unused class import');const named=imported.parent,kept=named.elements.filter(e=>e!==imported),changed=source.text.slice(0,named.getStart(source))+'{'+kept.map(e=>e.getText(source)).join(', ')+(named.elements.hasTrailingComma?',':'')+'}'+source.text.slice(named.end),transpile=t=>ts.transpileModule(t,{compilerOptions:{...options,removeComments:true,emitDecoratorMetadata:false}}).outputText;assert.equal(hash(transpile(source.text)),hash(transpile(changed)));unused={emit_sha256:hash(transpile(source.text)),metadata_mode:false,emitter:ts.version};}
+       cases.push({file,module:moduleName,symbol:name,local_name:imported.name.text,frozen_use:uses.some(u=>u.file===file&&u.symbol===name),candidate_source_sha256:hash(source.text),references,unused_import_erasure:unused});}}
+-    const expectedDelta=selected?deltaKeys.filter(key=>selected.has(key.split('#')[0])):deltaKeys;
+-    assert.equal(cases.length,selectedUses.length+expectedDelta.length);assert.deepEqual(cases.filter(c=>!c.frozen_use).map(c=>c.file+'#'+c.symbol).sort(),expectedDelta);for(const use of selectedUses)assert.ok(cases.some(c=>c.file===use.file&&c.symbol===use.symbol));if(!selected)assert.equal(applications.length,183);
++    const expectedDelta=selected?delta.filter(key=>selected.has(key.split('#')[0])):delta;
++    assert.equal(cases.length,liveSelectedUses.length+expectedDelta.length);assert.deepEqual(cases.filter(c=>!c.frozen_use).map(c=>c.file+'#'+c.symbol).sort(),expectedDelta);for(const use of liveSelectedUses)assert.ok(cases.some(c=>c.file===use.file&&c.symbol===use.symbol));if(!selected)assert.equal(applications.length,current?184:183);
+     const behaviors=[],authored=[];if(!skipDiagnostics)for(const model of loaded.models){behaviors.push({line:model.subject.line,...exerciseClassDecorators(model.runtime)});const receipts=[];for(const app of applications){const identifiers=new Map();function collect(n){if(ts.isIdentifier(n)){const p=n.parent;if(!(ts.isPropertyAssignment(p)&&p.name===n)&&!(ts.isPropertyAccessExpression(p)&&p.name===n))identifiers.set(n.text,checker.getSymbolAtLocation(n));}ts.forEachChild(n,collect);}app.call.arguments.forEach(collect);const values=[];for(const [name,symbol]of identifiers){const imported=symbol?.declarations?.find(ts.isImportSpecifier),publicName=imported&&(imported.propertyName||imported.name).text;if(imported?.parent.parent.parent.moduleSpecifier.text===moduleName&&['ChangeDetectionStrategy','ViewEncapsulation','forwardRef','booleanAttribute'].includes(publicName))values.push(model.runtime[publicName]);else values.push(class ClassMetadataProtocol{});}
+       const expression='new '+app.call.getText(app.source),metadata=new Function(app.local_name,...identifiers.keys(),emit('return '+expression+';'))(model.runtime[app.name],...values);assert.equal(metadata.ngMetadataName,app.name);if(app.standalone!==null)assert.equal(metadata.standalone,app.standalone);for(const field of app.fields)assert.ok(Object.hasOwn(metadata,field),'actual metadata field lost');receipts.push({file:app.file,target_class:app.target_class,symbol:app.name,fields_preserved:true,standalone:app.standalone,metadata_constructor_only:true,external_references_are_protocol:true});}authored.push({line:model.subject.line,metadata_constructor_count:receipts.length,constructors:receipts});}
+     const manifest=JSON.parse(read('projects/ngx-material-legacy/package.json')),line=manifest.version.startsWith('21.')?'21.x':'main';assert.equal(manifest.peerDependencies[moduleName],'^'+loaded.models.find(m=>m.subject.line===line).subject.version);
+-    return {schema_version:1,line,frozen_uses:selectedUses.length,current_uses:cases.length,current_delta_uses:expectedDelta.length,source_selection:sourceFiles??null,whole_population_reviewed:!selected,node:process.version,binding_parser:ts.version,cases,behaviors,authored_metadata:authored,rxjs:loaded.rxjs,source_override_used:!!readSource,subjects:loaded.models.map(m=>({subject:{...m.subject,members:undefined},class_contract:{...m.class_contract,props:undefined,normalized_factory:undefined,props_sha256:hash(JSON.stringify(m.class_contract.props)),normalized_factory_sha256:hash(JSON.stringify(m.class_contract.normalized_factory))}})),type_compilation:skipDiagnostics?null:compileClassTypes(loaded.models,compilerRoot),limits:['Public class metadata constructors and genuine inline fixture decorator/hook registration only. No lazy compiler getter invoked; entire compiler/module/resource pipeline/native/AOT/rendering/full source classes remain open.','The captured full profile has 183 metadata expressions; explicit source selections use their smaller recorded roster. Constructor replay uses protocol external class/provider references; templates/styles remain strings, not executed/rendered. Historical base Directive metadata now explicitly standalone:false, matching the old native default. Native inheritance qualification remains separate.','Removed/deprecated metadata fields excluded from actual source. Component numeric default1 preserved; Eager used at minima, no current Default compatibility alias adoption.'],g11_claim:'not-passed'};
++    return {schema_version:1,line,population,retired_frozen_uses:retired,frozen_uses:selectedUses.length,current_uses:cases.length,current_delta_uses:expectedDelta.length,source_selection:sourceFiles??null,whole_population_reviewed:!selected,node:process.version,binding_parser:ts.version,cases,behaviors,authored_metadata:authored,rxjs:loaded.rxjs,source_override_used:!!readSource,subjects:loaded.models.map(m=>({subject:{...m.subject,members:undefined},class_contract:{...m.class_contract,props:undefined,normalized_factory:undefined,props_sha256:hash(JSON.stringify(m.class_contract.props)),normalized_factory_sha256:hash(JSON.stringify(m.class_contract.normalized_factory))}})),type_compilation:skipDiagnostics?null:compileClassTypes(loaded.models,compilerRoot),limits:['Public class metadata constructors and genuine inline fixture decorator/hook registration only. No lazy compiler getter invoked; entire compiler/module/resource pipeline/native/AOT/rendering/full source classes remain open.',`The ${population} full profile has ${current?184:183} metadata expressions; explicit source selections use their smaller recorded roster. Constructor replay uses protocol external class/provider references; templates/styles remain strings, not executed/rendered. Historical base Directive metadata now explicitly standalone:false, matching the old native default. Native inheritance qualification remains separate.`, 'Removed/deprecated metadata fields excluded from actual source. Component numeric default1 preserved; Eager used at minima, no current Default compatibility alias adoption.'],g11_claim:'not-passed'};
+   }finally{if(own)loaded.dispose();}
+ }
+diff --git a/scripts/framework-enum-use-review.mjs b/scripts/framework-enum-use-review.mjs
+index 55f543564..6dd74a0f1 100644
+--- a/scripts/framework-enum-use-review.mjs
++++ b/scripts/framework-enum-use-review.mjs
+@@ -7,6 +7,7 @@
+  */
+ /** Public enum values used in owned Component metadata, not framework behavior qualification. */
+ import assert from 'node:assert/strict';
++import {execFileSync} from 'node:child_process';
+ import {createRequire} from 'node:module';
+ import {readFileSync} from 'node:fs';
+ import {createHash} from 'node:crypto';
+@@ -111,7 +112,8 @@ function runtimeValues(binding) {
+   return {values, source, source_sha256: sha(source), pure_IIFE_executed: true};
+ }
+ 
+-export function reviewFrameworkEnumUses({root = rootDefault, readSource, subjectData} = {}) {
++export function reviewFrameworkEnumUses({root = rootDefault, readSource, subjectData, population = 'captured'} = {}) {
++  assert.ok(['captured','current'].includes(population),'unknown enum population');
+   const read = path => readSource ? readSource(path) : readFileSync(join(root, path), 'utf8');
+   const seed = readFileSync(join(root, seedPath)); assert.equal(sha(seed), seedSha);
+   const subjects = subjectData || JSON.parse(read('compatibility/rc/framework-enum-public-subjects.json'));
+@@ -138,7 +140,16 @@ export function reviewFrameworkEnumUses({root = rootDefault, readSource, subject
+     return {...subject, declarations, runtimes};
+   });
+   const original = models.find(model => model.line === 'original');
+-  const uses = JSON.parse(seed).symbol_uses.filter(row => row.module === '@angular/core' && names.includes(row.symbol));
++  const frozenUses = JSON.parse(seed).symbol_uses.filter(row => row.module === '@angular/core' && names.includes(row.symbol));
++  assert.equal(frozenUses.length,78);
++  const retired=population==='current'?frozenUses.filter(row=>row.file==='legacy-tabs/internal/tab-nav-bar-base.ts').map(row=>({...row})):[];
++  if(population==='current'){
++    assert.deepEqual(retired.map(row=>row.symbol).sort(),[...names].sort());
++    const path='projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts',text=read(path),file=parse(path,text);
++    const visit=node=>{if(ts.isIdentifier(node)){assert.ok(!names.includes(node.text),'retired enum import or panel returned');if(node.text==='MatTabNavPanel')assert.ok(ts.isInterfaceDeclaration(node.parent)&&node.parent.name===node||ts.isTypeReferenceNode(node.parent)&&node.parent.typeName===node,'retired enum import or panel returned');}ts.forEachChild(node,visit);};visit(file);
++    for(const row of retired){row.candidate_source_sha256=sha(text);row.scope='Explicit retained frozen obligation; current structural panel runtime and enum imports are absent.';}
++  }
++  const uses=frozenUses.filter(row=>!retired.some(old=>old.file===row.file&&old.symbol===row.symbol));
+   const paths = [...new Set(uses.map(row => row.file))], options = {noResolve: true, target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, experimentalDecorators: true};
+   const host = ts.createCompilerHost(options), hostRead = host.readFile.bind(host), sourceRoot = join(root, 'projects/ngx-material-legacy');
+   host.readFile = path => path.startsWith(sourceRoot + '/') ? read('projects/ngx-material-legacy/' + path.slice(sourceRoot.length + 1)) : hostRead(path);
+@@ -158,6 +169,7 @@ export function reviewFrameworkEnumUses({root = rootDefault, readSource, subject
+     const references = [];
+     function visit(node) {
+       if (ts.isIdentifier(node) && node !== binding.name && node !== binding.propertyName && checker.getSymbolAtLocation(node) === symbol) {
++        if(population==='current')assert.ok(!binding.isTypeOnly&&!binding.parent.parent.isTypeOnly,'runtime enum imported type only');
+         const access = node.parent; assert.ok(ts.isPropertyAccessExpression(access) && access.expression === node, 'unsupported enum reference');
+         const member = access.name.text, property = access.parent, expectedProperty = use.symbol === names[0] ? 'changeDetection' : 'encapsulation';
+         assert.ok(ts.isPropertyAssignment(property) && property.initializer === access && property.name.getText(file) === expectedProperty, 'enum reference outside metadata slot');
+@@ -187,5 +199,12 @@ export function reviewFrameworkEnumUses({root = rootDefault, readSource, subject
+     }
+     cases.push({...use, candidate_source_sha256: sha(file.text), local_name: binding.name.text, references, unused_import_erasure: unusedImportErasure});
+   }
+-  return {schema_version: 1, line, node: process.version, compiler: ts.version, seed_sha256: seedSha, models, cases, files: paths.length, limits: 'Exact public enum export/declaration and pure runtime IIFE identity, all authored direct Component metadata references. Eager replaces deprecated Default only at the identical numeric1 boundary. No full Angular runtime, change-detection behavior, encapsulation rendering, compiler/AOT, native/packed/floor or upstream SHA clearance.', g11_claim: 'not-passed'};
++  if(population==='current'){
++    const actual=execFileSync('rg',['--files','projects/ngx-material-legacy','-g','*.ts','-g','!*.spec.ts'],{cwd:root,encoding:'utf8'}).trim().split('\n').flatMap(path=>{
++      const file=parse(path,read(path));return file.statements.filter(node=>ts.isImportDeclaration(node)&&node.moduleSpecifier.text==='@angular/core'&&node.importClause?.namedBindings&&ts.isNamedImports(node.importClause.namedBindings))
++        .flatMap(node=>node.importClause.namedBindings.elements.filter(item=>names.includes((item.propertyName||item.name).text)).map(item=>path.slice('projects/ngx-material-legacy/'.length)+'#'+(item.propertyName||item.name).text));
++    });
++    assert.deepEqual(actual.sort(),uses.map(row=>row.file+'#'+row.symbol).sort(),'current enum population changed');
++  }
++  return {schema_version: 1, line, population, frozen_uses:frozenUses.length, retired_frozen_uses:retired, whole_current_population_reviewed:population==='current', node: process.version, compiler: ts.version, seed_sha256: seedSha, models, cases, files: paths.length, limits: 'Exact public enum export/declaration and pure runtime IIFE identity, all authored direct Component metadata references. Eager replaces deprecated Default only at the identical numeric1 boundary. No full Angular runtime, change-detection behavior, encapsulation rendering, compiler/AOT, native/packed/floor or upstream SHA clearance.', g11_claim: 'not-passed'};
+ }
+diff --git a/tests/class_decorator_use_probe.mjs b/tests/class_decorator_use_probe.mjs
+index 1b74308c6..49935c8a6 100644
+--- a/tests/class_decorator_use_probe.mjs
++++ b/tests/class_decorator_use_probe.mjs
+@@ -13,7 +13,10 @@ import {classDecoratorSubjects,exerciseClassDecorators,reviewClassDecoratorUses}
+ const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=p=>readFileSync(join(root,p),'utf8'),options={};const args=process.argv.slice(2);for(let i=0;i<args.length;i+=2){assert.ok(['--report','--compiler-root'].includes(args[i])&&args[i+1]);options[args[i]]=args[i+1];}
+ const subjects=await classDecoratorSubjects(root);
+ try{
+- const report=await reviewClassDecoratorUses({root,subjects,compilerRoot:options['--compiler-root']??process.env.CLOSEOUT_TYPESCRIPT_ROOT});assert.equal(report.frozen_uses,144);assert.equal(report.current_uses,148);assert.equal(report.source_override_used,false);assert.equal(report.current_delta_uses,4);assert.equal(report.cases.flatMap(c=>c.references).length,183);assert.equal(report.cases.filter(c=>c.unused_import_erasure).length,5);assert.deepEqual(report.authored_metadata.map(c=>c.metadata_constructor_count),[183,183,183]);assert.deepEqual(report.behaviors.map(c=>c.cases.length),[13,13,13]);assert.equal(report.cases.flatMap(c=>c.references).filter(c=>c.historical_base_directive).length,23);
++ const report=await reviewClassDecoratorUses({root,subjects,population:'current',compilerRoot:options['--compiler-root']??process.env.CLOSEOUT_TYPESCRIPT_ROOT});assert.equal(report.frozen_uses,144);assert.equal(report.current_uses,149);assert.equal(report.source_override_used,false);assert.equal(report.current_delta_uses,6);assert.equal(report.cases.flatMap(c=>c.references).length,184);assert.equal(report.cases.filter(c=>c.unused_import_erasure).length,5);assert.deepEqual(report.authored_metadata.map(c=>c.metadata_constructor_count),[184,184,184]);assert.deepEqual(report.behaviors.map(c=>c.cases.length),[13,13,13]);assert.equal(report.cases.flatMap(c=>c.references).filter(c=>c.historical_base_directive).length,23);
++ assert.equal(report.population,'current');assert.equal(report.retired_frozen_uses.length,1);
++ assert.deepEqual(report.retired_frozen_uses.map(row=>row.file+'#'+row.symbol),['legacy-tabs/internal/tab-nav-bar-base.ts#Component']);
++ assert.equal(report.frozen_uses-report.retired_frozen_uses.length+report.current_delta_uses,report.current_uses);
+  const mutations=[];
+  for(const model of subjects.models.filter(m=>m.subject.line!=='original')){
+   const core=model.runtime;
+@@ -32,14 +35,32 @@ try{
+   ['deprecated-animations',text.replace('standalone: false,','standalone: false, animations: [],'),/removed\/deprecated\/unreviewed class option/],
+   ['removed-interpolation',text.replace('standalone: false,',"standalone: false, interpolation: ['[[',']]'],"),/removed\/deprecated\/unreviewed class option/],
+   ['unreviewed-standalone-true',text.replace('standalone: false,','standalone: true,'),/unreviewed standalone true target/],
+- ]){assert.notEqual(changed,text);await assert.rejects(reviewClassDecoratorUses({root,subjects,skipDiagnostics:true,readSource:p=>p===file?changed:read(p)}),pattern);mutations.push({id,rejected:true});}
+- const baseFile='projects/ngx-material-legacy/legacy-core/option/option-base.ts',baseText=read(baseFile),implicit=baseText.replace('@Directive({standalone: false})','@Directive()');assert.notEqual(implicit,baseText);await assert.rejects(reviewClassDecoratorUses({root,subjects,skipDiagnostics:true,readSource:p=>p===baseFile?implicit:read(p)}),/historical standalone mode must be explicit/);mutations.push({id:'historical-base-standalone-omitted',rejected:true});
++ ]){assert.notEqual(changed,text);await assert.rejects(reviewClassDecoratorUses({root,subjects,population:'current',skipDiagnostics:true,readSource:p=>p===file?changed:read(p)}),pattern);mutations.push({id,rejected:true});}
++ const baseFile='projects/ngx-material-legacy/legacy-core/option/option-base.ts',baseText=read(baseFile),implicit=baseText.replace('@Directive({standalone: false})','@Directive()');assert.notEqual(implicit,baseText);await assert.rejects(reviewClassDecoratorUses({root,subjects,population:'current',skipDiagnostics:true,readSource:p=>p===baseFile?implicit:read(p)}),/historical standalone mode must be explicit/);mutations.push({id:'historical-base-standalone-omitted',rejected:true});
+  const ownedBase='projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts',ownedText=read(ownedBase);
+  for(const[id,changed,pattern]of[
+   ['owned-menu-base-standalone-omitted',ownedText.replace('@Directive({standalone: false})','@Directive()'),/historical standalone mode must be explicit/],
+   ['owned-menu-base-decorator-type-only',ownedText.replace('  Directive,','  type Directive,'),/runtime class decorator imported type only/],
+- ]){assert.notEqual(changed,ownedText);await assert.rejects(reviewClassDecoratorUses({root,subjects,skipDiagnostics:true,readSource:p=>p===ownedBase?changed:read(p)}),pattern);mutations.push({id,rejected:true});}
+- const alias=text.replace('  Component,','  Component as Declare,').replaceAll('@Component(','@Declare(');const aliased=await reviewClassDecoratorUses({root,subjects,skipDiagnostics:true,readSource:p=>p===file?alias:read(p)});assert.equal(aliased.cases.find(c=>c.file==='legacy-menu/menu-item.ts'&&c.symbol==='Component').local_name,'Declare');report.alias_positive=true;report.mutations=mutations;assert.equal(mutations.length,17);
++ ]){assert.notEqual(changed,ownedText);await assert.rejects(reviewClassDecoratorUses({root,subjects,population:'current',skipDiagnostics:true,readSource:p=>p===ownedBase?changed:read(p)}),pattern);mutations.push({id,rejected:true});}
++ const alias=text.replace('  Component,','  Component as Declare,').replaceAll('@Component(','@Declare(');const aliased=await reviewClassDecoratorUses({root,subjects,population:'current',skipDiagnostics:true,readSource:p=>p===file?alias:read(p)});assert.equal(aliased.cases.find(c=>c.file==='legacy-menu/menu-item.ts'&&c.symbol==='Component').local_name,'Declare');report.alias_positive=true;
++ for(const added of ['legacy-table/internal/column-classes.ts','legacy-paginator/internal/page-size-options.ts']){
++  const path='projects/ngx-material-legacy/'+added,before=read(path),role=report.cases.find(row=>row.file===added&&row.symbol==='Directive');
++  assert.equal(role.references.length,1);assert.equal(role.references[0].standalone,false);
++  for(const[id,changed,pattern]of [
++   ['standalone-omitted',before.replace('  standalone: false,',''),/historical standalone mode must be explicit/],
++   ['deprecated-option',before.replace('  standalone: false,','  standalone: false, animations: [],'),/removed\/deprecated\/unreviewed class option/],
++  ]){assert.notEqual(changed,before);await assert.rejects(reviewClassDecoratorUses({root,subjects,population:'current',skipDiagnostics:true,sourceFiles:[added],readSource:p=>p===path?changed:read(p)}),pattern);mutations.push({id:added+':'+id,rejected:true});}
++ }
++ const retiredPath='projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts',retired=read(retiredPath);
++ for(const[id,changed]of [
++  ['retired-import-returned',retired+"\nimport {Component} from '@angular/core';\n"],
++  ['retired-panel-runtime-returned',retired+'\nexport class MatTabNavPanel {}\n'],
++ ]){await assert.rejects(reviewClassDecoratorUses({root,subjects,population:'current',skipDiagnostics:true,readSource:p=>p===retiredPath?changed:read(p)}),/retired class import or panel returned/);mutations.push({id,rejected:true});}
++ await assert.rejects(reviewClassDecoratorUses({root,subjects,population:'unknown',skipDiagnostics:true}),/unknown class population/);mutations.push({id:'unknown-population',rejected:true});
++ await assert.rejects(reviewClassDecoratorUses({root,subjects,skipDiagnostics:true}),/132 !== 130/);mutations.push({id:'captured-profile-cannot-claim-current',rejected:true});
++ const outsidePath='projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts',outside=read(outsidePath)+"\nimport {Directive} from '@angular/core';\n";
++ await assert.rejects(reviewClassDecoratorUses({root,subjects,population:'current',skipDiagnostics:true,readSource:p=>p===outsidePath?outside:read(p)}),/133 !== 132/);mutations.push({id:'outside-current-population',rejected:true});
++ report.mutations=mutations;assert.equal(mutations.length,26);
+  if(options['--report']){assert.equal(existsSync(options['--report']),false);writeFileSync(options['--report'],JSON.stringify(report,null,2)+'\n');}
+- console.log(JSON.stringify({line:report.line,frozen_uses:144,current_uses:148,current_delta_uses:4,references:183,metadata_constructors_per_subject:183,historical_bases_repaired:23,unused_imports:5,subjects:3,controls_per_subject:13,mutations:17,compiler:report.type_compilation.compiler,native_executed:false}));
++ console.log(JSON.stringify({line:report.line,frozen_uses:144,current_uses:149,current_delta_uses:6,references:184,metadata_constructors_per_subject:184,historical_bases_repaired:23,unused_imports:5,subjects:3,controls_per_subject:13,mutations:26,compiler:report.type_compilation.compiler,native_executed:false}));
+ }finally{subjects.dispose();}
+diff --git a/tests/framework_enum_use_probe.mjs b/tests/framework_enum_use_probe.mjs
+index 17f892766..a48f4e187 100644
+--- a/tests/framework_enum_use_probe.mjs
++++ b/tests/framework_enum_use_probe.mjs
+@@ -14,15 +14,16 @@ import {reviewFrameworkEnumUses} from '../scripts/framework-enum-use-review.mjs'
+ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'), read = path => readFileSync(resolve(root, path), 'utf8');
+ const sha = source => createHash('sha256').update(source).digest('hex');
+ const subjects = JSON.parse(read('compatibility/rc/framework-enum-public-subjects.json'));
+-const report = reviewFrameworkEnumUses({root});
+-assert.equal(report.cases.length, 78); assert.equal(report.files, 39);
++const report = reviewFrameworkEnumUses({root, population: 'current'});
++assert.equal(report.cases.length, 76); assert.equal(report.files, 38);
++assert.equal(report.frozen_uses,78);assert.equal(report.retired_frozen_uses.length,2);assert.equal(report.whole_current_population_reviewed,true);
+ assert.equal(report.cases.flatMap(row => row.references).filter(row => row.member === 'Eager').length, 12);
+ assert.deepEqual([...new Set(report.cases.flatMap(row => row.references.map(reference => row.symbol + '.' + reference.member)))].sort(), ['ChangeDetectionStrategy.Eager', 'ChangeDetectionStrategy.OnPush', 'ViewEncapsulation.None']);
+ const eager = report.cases.find(row => row.references.some(reference => reference.member === 'Eager'));
+ const path = 'projects/ngx-material-legacy/' + eager.file, source = read(path);
+ report.mutations = [];
+ function reject(id, expected, changes = {}, subjectData = subjects) {
+-  assert.throws(() => reviewFrameworkEnumUses({root, subjectData, readSource: path => changes[path] ?? read(path)}), expected, id);
++  assert.throws(() => reviewFrameworkEnumUses({root, population: 'current', subjectData, readSource: path => changes[path] ?? read(path)}), expected, id);
+   report.mutations.push({id, rejected: true});
+ }
+ reject('deprecated-default-reintroduced', /deprecated authored enum member/, {[path]: source.replace('ChangeDetectionStrategy.Eager', 'ChangeDetectionStrategy.Default')});
+@@ -56,6 +57,14 @@ for (const line of ['main', '21.x']) {
+   changed('missing-public-runtime-export', {[runtime.path]: read(runtime.path).replace(/, ViewEncapsulation(?=,| \})/, '')}, /missing public runtime enum binding/);
+   reject(line + ':stale-member', /enum subject bytes changed/, {[declaration.path]: read(declaration.path) + '\n// unbound change\n'});
+ }
++reject('runtime-enum-import-type-only',/runtime enum imported type only/,{[path]:source.replace('ChangeDetectionStrategy,','type ChangeDetectionStrategy,')});
++const retiredPath='projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts',retired=read(retiredPath);
++for(const name of ['ChangeDetectionStrategy','ViewEncapsulation'])reject('retired-'+name+'-returned',/retired enum import or panel returned/,{[retiredPath]:retired+`\nimport {${name}} from '@angular/core';\n`});
++reject('retired-panel-runtime-returned',/retired enum import or panel returned/,{[retiredPath]:retired+'\nexport class MatTabNavPanel {}\n'});
++assert.throws(()=>reviewFrameworkEnumUses({root,population:'unknown'}),/unknown enum population/);report.mutations.push({id:'unknown-population',rejected:true});
++const outsidePath='projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts';
++reject('outside-current-population',/current enum population changed/,{[outsidePath]:read(outsidePath)+"\nimport {ViewEncapsulation} from '@angular/core';\n"});
++assert.equal(report.mutations.length,26);
+ const args = process.argv.slice(2);
+ assert.equal(args.length, 2); assert.equal(args[0], '--report'); assert.equal(existsSync(args[1]), false);
+ writeFileSync(args[1], JSON.stringify(report, null, 2) + '\n');
+diff --git a/tests/test_class_decorator_uses.py b/tests/test_class_decorator_uses.py
+index d85de7268..a0416014f 100644
+--- a/tests/test_class_decorator_uses.py
++++ b/tests/test_class_decorator_uses.py
+@@ -14,12 +14,12 @@ class ClassDecoratorUseTests(unittest.TestCase):
+         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+         report=json.loads(result.stdout)
+         self.assertEqual(report['frozen_uses'],144)
+-        self.assertEqual(report['current_uses'],148)
+-        self.assertEqual(report['current_delta_uses'],4)
+-        self.assertEqual(report['references'],183)
+-        self.assertEqual(report['metadata_constructors_per_subject'],183)
++        self.assertEqual(report['current_uses'],149)
++        self.assertEqual(report['current_delta_uses'],6)
++        self.assertEqual(report['references'],184)
++        self.assertEqual(report['metadata_constructors_per_subject'],184)
+         self.assertEqual(report['historical_bases_repaired'],23)
+         self.assertEqual(report['unused_imports'],5)
+         self.assertEqual(report['controls_per_subject'],13)
+-        self.assertEqual(report['mutations'],17)
++        self.assertEqual(report['mutations'],26)
+         self.assertFalse(report['native_executed'])
