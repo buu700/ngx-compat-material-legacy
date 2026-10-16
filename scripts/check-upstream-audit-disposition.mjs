@@ -33,6 +33,7 @@ import {SLIDER_TOKEN_SHA,SLIDER_TOKEN_ROLE,sliderTokenEvidenceOk} from './upstre
 import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
+import {requiresHistoricalBehavior,validateHistoricalBehavior} from './upstream-historical-behavior-evidence.mjs';
 import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
 import {SLIDER_THUMB_DESTROY_SHA, SLIDER_THUMB_DESTROY_ROLE, sliderThumbDestroyEvidenceOk} from './upstream-slider-thumb-destroy-scope.mjs';
 import {BAZEL_BUILD_SHAS, BAZEL_BUILD_ROLE, bazelBuildEvidenceOk} from './upstream-bazel-build-scope.mjs';
@@ -254,6 +255,11 @@ function individualProofOk(entry) {
   if (line && !proof.affected_branches.includes(line)) return false;
   if (typeof proof.decision !== 'string' || proof.decision.trim().length < 40) return false;
   if (proof.proof_kind === 'batch' || proof.proof_kind === 'ancestry' || proof.proof_kind === 'import') return false;
+  if (requiresHistoricalBehavior(entry, proof)) {
+    const result = validateHistoricalBehavior({root, entry, proof, request});
+    artifactBehaviorResults.set(entry.sha, result);
+    if (!result.ok) return false;
+  }
   if (requiresArtifactBehavior(entry, proof)) {
     const result = validateArtifactBehavior({root, entry, proof, request});
     artifactBehaviorResults.set(entry.sha, result);
@@ -467,7 +473,12 @@ function coordinatorRequest() {
     try { packedConsumerExecution = JSON.parse(process.env.RC_UPSTREAM_PACKED_CONSUMER); }
     catch { return {error: 'RC_UPSTREAM_PACKED_CONSUMER is not JSON'}; }
   }
-  return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line, packedConsumerExecution};
+  let historicalExecution;
+  if (process.env.RC_UPSTREAM_HISTORICAL !== undefined) {
+    try { historicalExecution = JSON.parse(process.env.RC_UPSTREAM_HISTORICAL); }
+    catch { return {error: 'RC_UPSTREAM_HISTORICAL is not JSON'}; }
+  }
+  return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line, packedConsumerExecution, historicalExecution};
 }
 
 const dependencyGroups = request ? JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'))
