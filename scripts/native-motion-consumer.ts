@@ -245,11 +245,47 @@ export class MotionRoot {
       notifications,
       detectChangesCalls: 0,
     };
-    this.menuTrigger.closeMenu();
-    await this.wait(250);
+    const exit = {
+      semanticClosed: false, retainedAtClose: false, nonInteractiveAtClose: false, removed: false,
+      trustedStarts: 0, trustedEnds: 0, startConnected: false, endConnected: false,
+      renderedAtStart: false, animationName: '', durationMs: 0,
+    };
+    const started = (event: AnimationEvent) => {
+      if (event.target === el && event.animationName === 'mat-legacy-menu-exit' && event.isTrusted) {
+        exit.trustedStarts++;
+        exit.startConnected = el.isConnected;
+        const style = getComputedStyle(el), box = el.getBoundingClientRect();
+        // Event delivery may lag compositor progress to opacity:0. Check the
+        // retained rendered box, without imposing a callback timing threshold.
+        exit.renderedAtStart = style.display !== 'none' && style.visibility !== 'hidden' && box.width > 0 && box.height > 0;
+        exit.animationName = getComputedStyle(el).animationName;
+        exit.durationMs = this.duration(el, 'animation-duration');
+      }
+    };
+    const ended = (event: AnimationEvent) => {
+      if (event.target === el && event.animationName === 'mat-legacy-menu-exit' && event.isTrusted) {
+        exit.trustedEnds++;
+        exit.endConnected = el.isConnected;
+      }
+    };
+    // Capture precedes the template's completion listener, which removes the
+    // overlay during this same trusted animationend dispatch.
+    el.addEventListener('animationstart', started, true);
+    el.addEventListener('animationend', ended, true);
+    try {
+      this.menuTrigger.closeMenu();
+      exit.semanticClosed = !this.menuTrigger.menuOpen;
+      exit.retainedAtClose = el.isConnected;
+      exit.nonInteractiveAtClose = getComputedStyle(el).pointerEvents === 'none';
+      await this.waitFor(() => !el.isConnected);
+      exit.removed = !el.isConnected;
+    } finally {
+      el.removeEventListener('animationstart', started, true);
+      el.removeEventListener('animationend', ended, true);
+    }
     return {
       key: `menu/${mode}`,
-      observation,
+      observation: {...observation, exit},
       notify: {key: `menu/menuOpened/${mode}`, observation: {notifications, detectChangesCalls: 0}},
     };
   }

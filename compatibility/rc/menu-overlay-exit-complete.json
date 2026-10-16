@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "baseline": false,
+  "cases": [
+    {
+      "id": "owned-exit-retains-overlay-and-lazy-until-void",
+      "result": "pass"
+    },
+    {
+      "id": "fallback-detaches-once",
+      "result": "pass"
+    },
+    {
+      "id": "disabled-exit-completes-in-microtask",
+      "result": "pass"
+    },
+    {
+      "id": "reopen-cancels-old-removal",
+      "result": "pass"
+    },
+    {
+      "id": "shared-menu-transfers-owner",
+      "result": "pass"
+    },
+    {
+      "id": "close-listener-reopens-before-exit-start",
+      "result": "pass"
+    },
+    {
+      "id": "reentrant-submenu-close-retains-latest-highlight",
+      "result": "pass"
+    },
+    {
+      "id": "focus-listener-reopens-before-exit-start",
+      "result": "pass"
+    },
+    {
+      "id": "destroy-cancels-removal-and-prevents-reopen",
+      "result": "pass"
+    },
+    {
+      "id": "input-replacement-does-not-borrow-new-lazy-content",
+      "result": "pass"
+    },
+    {
+      "id": "detach-callback-opens-new-owner-without-destroying-new-content",
+      "result": "pass"
+    },
+    {
+      "id": "close-listener-destroys-trigger-without-late-motion",
+      "result": "pass"
+    },
+    {
+      "id": "open-listener-closes-before-enter-start",
+      "result": "pass"
+    },
+    {
+      "id": "generic-panel-detaches-immediately",
+      "result": "pass"
+    }
+  ],
+  "failures": [],
+  "mutations": [
+    {
+      "id": "early-overlay-detach",
+      "intended_case": "owned-exit-retains-overlay-and-lazy-until-void",
+      "rejected": true,
+      "error": "overlay detached before CSS exit\n\nfalse !== true\n"
+    },
+    {
+      "id": "early-lazy-detach",
+      "intended_case": "owned-exit-retains-overlay-and-lazy-until-void",
+      "rejected": true,
+      "error": "Expected values to be strictly equal:\n\n2 !== 0\n"
+    },
+    {
+      "id": "retain-reopen-subscription",
+      "intended_case": "reopen-cancels-old-removal",
+      "rejected": true,
+      "error": "old removal subscription retained\n\n1 !== 0\n"
+    },
+    {
+      "id": "old-close-clobbers-new-open",
+      "intended_case": "close-listener-reopens-before-exit-start",
+      "rejected": true,
+      "error": "Expected values to be strictly equal:\n\n'void' !== 'enter'\n"
+    },
+    {
+      "id": "old-owner-detaches-new-lazy",
+      "intended_case": "detach-callback-opens-new-owner-without-destroying-new-content",
+      "rejected": true,
+      "error": "Expected values to be strictly equal:\n\n4 !== 2\n"
+    },
+    {
+      "id": "missing-owner-transfer",
+      "intended_case": "shared-menu-transfers-owner",
+      "rejected": true,
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "id": "enter-removes-exiting-panel",
+      "intended_case": "owned-exit-retains-overlay-and-lazy-until-void",
+      "rejected": true,
+      "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+    },
+    {
+      "id": "retain-completed-subscription",
+      "intended_case": "owned-exit-retains-overlay-and-lazy-until-void",
+      "rejected": true,
+      "error": "completed removal subscription retained\n\n1 !== 0\n"
+    },
+    {
+      "id": "late-submenu-highlight-write",
+      "intended_case": "reentrant-submenu-close-retains-latest-highlight",
+      "rejected": true,
+      "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+    },
+    {
+      "id": "late-enter-after-open-observer-closes",
+      "intended_case": "open-listener-closes-before-enter-start",
+      "rejected": true,
+      "error": "Expected values to be strictly equal:\n\n'enter' !== 'void'\n"
+    }
+  ],
+  "node": "v22.23.3",
+  "typescript": "6.0.3",
+  "borrowed_core": "22.1.7",
+  "borrowed_rxjs": "7.8.2",
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+      "sha256": "2abbae1a91b3cb61723a17b4338d332f5872505dc330406c3b2f1c4ef9abb51e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+      "sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+      "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667"
+    }
+  ],
+  "scope": "Complete actual owned menu and trigger constructors/methods with genuine public Core environment injection, EventEmitter/QueryList and RxJS; protocol overlays/lazy views/layout/focus/animation policy and deterministic timers. No Angular view, browser/CSS paint, artifact or floor qualification.",
+  "producer_sha256": "7f0bedd0fdabbd8d26928427a43e5dc1e279f05c2fea175401fd875580164099",
+  "native_or_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

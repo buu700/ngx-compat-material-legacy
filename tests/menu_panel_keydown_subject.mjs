@@ -14,7 +14,7 @@ import {DOCUMENT} from '@angular/common';
 import {OverlayKeyboardDispatcher} from '@angular/cdk/overlay';
 import {FocusKeyManager} from '@angular/cdk/a11y';
 import * as keycodes from '@angular/cdk/keycodes';
-import {Subject} from 'rxjs';
+import {Subject,Subscription} from 'rxjs';
 const payload=JSON.parse(readFileSync(new URL('./menu-keydown-payload.json',import.meta.url))),line=process.argv[2];
 function events(source){
  const result=parseTemplate(source,'menu-keydown-source.html',{});assert.equal(result.errors,null,JSON.stringify(result.errors));const rows=[];
@@ -49,7 +49,7 @@ if(line!=='original'){
    Object.assign(menu,{_keyManager:manager,parentMenu:parent?.menu,direction:'ltr',closed:{emit:reason=>{closed.push([name,reason]);dispatcher.remove(ref);}}});
    const actualHandler=menu._handleKeydown;menu._handleKeydown=function(event){trace.push([name,event]);return actualHandler.call(this,event);};
    const stream=new Subject(),ref={_keydownEvents:stream,keydownEvents:()=>stream.asObservable(),hasAttached:()=>true};refs.push(ref);
-   const trigger=Object.create(Trigger.prototype);Object.assign(trigger,{menu,_overlayRef:null,_getOverlayConfig:()=>({positionStrategy:{}}),_subscribeToPositions:()=>{},_overlay:{create:()=>{created++;return ref;}}});
+   const trigger=Object.create(Trigger.prototype);Object.assign(trigger,{menu,_overlayRef:null,_keydownSubscription:Subscription.EMPTY,_getOverlayConfig:()=>({positionStrategy:{}}),_subscribeToPositions:()=>{},_overlay:{create:()=>{created++;return ref;}}});
    assert.equal(trigger._createOverlay(menu),ref);assert.equal(trigger._createOverlay(menu),ref);assert.equal(stream.observers.length,1);
    return {menu,manager,focus,ref,trigger};
   };
