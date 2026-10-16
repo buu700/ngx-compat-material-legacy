@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "ef620d83d55275276d313be8ffc47fb5e282068e",
+  "subject": "test(material/sort): switch tests away from fakeAsync (#33716)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "aa68be8985db9a159fe7a7c3b33c36c3144be7af",
+      "after_blob": "48a0c7a62d4cba7ee949a940e12c94061ce3d8da"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 8,
+  "raw_commit_sha256": "d968c3f94a19d8d4cfe1cb0ae6a950230a84547be5cbf6a8766025ed8f563cc9",
+  "original_sources": [
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "before": {
+        "git_blob": "aa68be8985db9a159fe7a7c3b33c36c3144be7af",
+        "sha256": "260f53042960b07a4b5f17e8165717dff08b1d19e00a4a8c677bee7b13855085",
+        "bytes": 25155
+      },
+      "after": {
+        "git_blob": "48a0c7a62d4cba7ee949a940e12c94061ce3d8da",
+        "sha256": "c380b303fda7d079ab803755870513975c6622863a115b9ca6b21311b966a16d",
+        "bytes": 25141
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/sort/sort.spec.ts b/src/material/sort/sort.spec.ts\nindex aa68be8985db9a159fe7a7c3b33c36c3144be7af..48a0c7a62d4cba7ee949a940e12c94061ce3d8da 100644\n--- a/src/material/sort/sort.spec.ts\n+++ b/src/material/sort/sort.spec.ts\n@@ -2,7 +2,7 @@ import {CollectionViewer, DataSource} from '@angular/cdk/collections';\n import {CdkTableModule} from '@angular/cdk/table';\n import {dispatchMouseEvent, wrappedErrorMessage} from '@angular/cdk/testing/private';\n import {Component, ElementRef, ViewChild, inject, ChangeDetectionStrategy} from '@angular/core';\n-import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';\n+import {ComponentFixture, TestBed} from '@angular/core/testing';\n import {MatTableModule} from '../table';\n import {By} from '@angular/platform-browser';\n import {Observable} from 'rxjs';\n@@ -43,13 +43,13 @@ describe('MatSort', () => {\n       expect(sortables.size).toBe(0);\n     });\n \n-    it('should mark itself as initialized', fakeAsync(() => {\n+    it('should mark itself as initialized', async () => {\n       let isMarkedInitialized = false;\n       component.matSort.initialized.subscribe(() => (isMarkedInitialized = true));\n \n-      tick();\n+      await fixture.whenStable();\n       expect(isMarkedInitialized).toBeTruthy();\n-    }));\n+    });\n \n     it('should use the column definition if used within a cdk table', () => {\n       const cdkTableMatSortAppFixture = TestBed.createComponent(CdkTableMatSortApp);\n@@ -209,7 +209,7 @@ describe('MatSort', () => {\n       expect(sortHeaderElement.getAttribute('aria-sort')).toBe('none');\n     });\n \n-    it('should not render the arrow if sorting is disabled for that column', fakeAsync(() => {\n+    it('should not render the arrow if sorting is disabled for that column', async () => {\n       const sortHeaderElement = fixture.nativeElement.querySelector('#defaultA');\n \n       // Switch sorting to a different column before asserting.\n@@ -217,24 +217,24 @@ describe('MatSort', () => {\n       fixture.componentInstance.disabledColumnSort = true;\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n-      tick();\n+      await fixture.whenStable();\n       fixture.detectChanges();\n \n       expect(sortHeaderElement.querySelector('.mat-sort-header-arrow')).toBeFalsy();\n-    }));\n+    });\n \n-    it('should render the arrow if a disabled column is being sorted by', fakeAsync(() => {\n+    it('should render the arrow if a disabled column is being sorted by', async () => {\n       const sortHeaderElement = fixture.nativeElement.querySelector('#defaultA');\n \n       component.sort('defaultA');\n       fixture.componentInstance.disabledColumnSort = true;\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n-      tick();\n+      await fixture.whenStable();\n       fixture.detectChanges();\n \n       expect(sortHeaderElement.querySelector('.mat-sort-header-arrow')).toBeTruthy();\n-    }));\n+    });\n \n     it('should have a focus indicator', () => {\n       const headerNativeElement = fixture.debugElement.query(\n@@ -336,7 +336,7 @@ describe('MatSort', () => {\n     let fixture: ComponentFixture<MatSortWithoutExplicitInputs>;\n     let component: MatSortWithoutExplicitInputs;\n \n-    beforeEach(waitForAsync(() => {\n+    beforeEach(() => {\n       TestBed.configureTestingModule({\n         providers: [\n           {\n@@ -347,7 +347,7 @@ describe('MatSort', () => {\n           },\n         ],\n       });\n-    }));\n+    });\n \n     beforeEach(() => {\n       fixture = TestBed.createComponent(MatSortWithoutExplicitInputs);\n@@ -368,7 +368,7 @@ describe('MatSort', () => {\n   describe('with default arrowPosition', () => {\n     let fixture: ComponentFixture<MatSortWithoutInputs>;\n \n-    beforeEach(waitForAsync(() => {\n+    beforeEach(() => {\n       TestBed.configureTestingModule({\n         providers: [\n           {\n@@ -380,7 +380,7 @@ describe('MatSort', () => {\n           },\n         ],\n       });\n-    }));\n+    });\n \n     beforeEach(() => {\n       fixture = TestBed.createComponent(MatSortWithoutInputs);\n",
+  "diff_sha256": "621fce19700917f374a91f0b9813722bc1e084d3dc7c79554bb597632b05f2f1",
+  "hunk_reviews": [
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "header": "@@ -2,7 +2,7 @@ import {CollectionViewer, DataSource} from '@angular/cdk/collections';",
+      "sha256": "314bc6160ac9d3c70eddbe33d275de3f051b8da092331a372356f71db1e8b3c7",
+      "judgment": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "header": "@@ -43,13 +43,13 @@ describe('MatSort', () => {",
+      "sha256": "7abb26825da0303a7b6d3dac198a1c4c3446be57fe46b924d7c897ff84b3b9aa",
+      "judgment": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "header": "@@ -209,7 +209,7 @@ describe('MatSort', () => {",
+      "sha256": "d671321f08c30f6f175c328bf4b44a1288381ed5e7a83e0d0559d7c9eb3c0a92",
+      "judgment": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "header": "@@ -217,24 +217,24 @@ describe('MatSort', () => {",
+      "sha256": "5fd2f18b8f13a6a19efada843a43909548cfabbbe1be43dc5e8541bbed44f28f",
+      "judgment": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "header": "@@ -336,7 +336,7 @@ describe('MatSort', () => {",
+      "sha256": "3ec1995c55abbef63ef87791d20fc32866cfaeb63a0a23fbe3bfc34c8c7ac665",
+      "judgment": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "header": "@@ -347,7 +347,7 @@ describe('MatSort', () => {",
+      "sha256": "dfb754cf299df601d8eccff7dd99d60bbb17210de760ca75f3c35fc9dc7a0bf3",
+      "judgment": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "header": "@@ -368,7 +368,7 @@ describe('MatSort', () => {",
+      "sha256": "29cd6486271380531d58380acae4172b48bc8b695959b13cd58a36da9227894d",
+      "judgment": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "header": "@@ -380,7 +380,7 @@ describe('MatSort', () => {",
+      "sha256": "ca467188fc52091c215df6a7d309710dd35bbc844dd56b5a44ff13337cf44f26",
+      "judgment": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    }
+  ],
+  "async_source_semantics": {
+    "sha": "ef620d83d55275276d313be8ffc47fb5e282068e",
+    "complete_original_files": 1,
+    "complete_original_hunks": 8,
+    "static_occurrences_paired": 26,
+    "unchanged_complete_callback_semantics": 23,
+    "fixtureClasses": [
+      {
+        "name": "SimpleMatSortApp",
+        "raw_sha256": "93a282271ba1d585b62c407c4f0c06953d7c58ce7d7381b2e4a89c3a3f7b5321"
+      },
+      {
+        "name": "FakeDataSource",
+        "raw_sha256": "20e7abf9e3ca0f293abab36f1d6613d0632de8d8e171dca48523749391627b67"
+      },
+      {
+        "name": "CdkTableMatSortApp",
+        "raw_sha256": "b0e7365e259e6b0dcfad0929428b2e82ce8958daf40d7e60dc0250fdf19da7a9"
+      },
+      {
+        "name": "MatTableMatSortApp",
+        "raw_sha256": "584291e7632fc76735ddb438681eeb8398ec88999ebfb1aa982f515e79bcbbc3"
+      },
+      {
+        "name": "MatSortHeaderMissingMatSortApp",
+        "raw_sha256": "c36925acdbe0e4ed61f455bcc92411ee4c002e3f6db7bddaa34bfb27cb4ece4c"
+      },
+      {
+        "name": "MatSortDuplicateMatSortableIdsApp",
+        "raw_sha256": "28b64f4a6119946c30d7fd20efd5cf7eb67c79afb04470265926a6023fec86d2"
+      },
+      {
+        "name": "MatSortableMissingIdApp",
+        "raw_sha256": "4be230f2a9ab86f75f0a497466b7f84fa9d3252852f9a9e7683855572bac2e61"
+      },
+      {
+        "name": "MatSortableInvalidDirection",
+        "raw_sha256": "d9a518a758fcdc3a74bb5d30f8624b57e232a4c053aa764719e52c7e00892068"
+      },
+      {
+        "name": "MatSortWithoutExplicitInputs",
+        "raw_sha256": "ff05b76694969f73436c9ed7d51862f06d03f3c6a2ce8f8f90db6c692cb64f3e"
+      },
+      {
+        "name": "MatSortWithArrowPosition",
+        "raw_sha256": "b69da1cfaee3978133c3a0c1f6e4550d6bfda88da2bed8217f6fa53d6b60da70"
+      },
+      {
+        "name": "MatSortWithoutInputs",
+        "raw_sha256": "89b303c616333114c81bb6c0b922463e5388c792b246ce068002066e3bd5f56b"
+      }
+    ],
+    "removed_testing_imports": [
+      "fakeAsync",
+      "tick",
+      "waitForAsync"
+    ],
+    "native_wait_helper_added": false,
+    "all_other_noncase_helpers_and_metadata_equal": true,
+    "retained_expansion_waitForAsync_binding_and_setup": false,
+    "trustChecks": [],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "security_clearance": "not-passed",
+    "complete_case_pairs_boundary_positions_and_setup_hooks": {
+      "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+      "sha256": "81348dab85a92bf961c516a6fa1b885a2f22bfb2cbfa7919a622edca0d435763"
+    }
+  },
+  "decision": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "621fce19700917f374a91f0b9813722bc1e084d3dc7c79554bb597632b05f2f1",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-surface-async-source-review.mjs",
+        "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+      },
+      {
+        "path": "tests/spec_surface_async_source_probe.mjs",
+        "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+        "sha256": "8c1aaee79625c4473dcdece5428ad8b10f8bf74e02950a2b40a5fd67afeb079b"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+        "sha256": "d7903e0bba977dac5e5a1b476dbea5b2b6d108dab0b17525019f992fafc97b64"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+        "sha256": "81348dab85a92bf961c516a6fa1b885a2f22bfb2cbfa7919a622edca0d435763"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-controls.json",
+        "sha256": "4ad51081281a5f69d04c2aa273e322d04f6be1451a3e08865108582fd59041cb"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+        "sha256": "e6c24a2c136c60878dc58da278afe12168e5c7ff4762aaa64650a0402a101783"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+        "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+        "sha256": "7be945fb436c1b4df1bcf782a9dd8a2fd1e285469eff461f32d59ca9550fce3e"
+      },
+      {
+        "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+        "sha256": "2744cb3057c0d727b55554c687b7419cdc99b99ef849ebbb286bd6154bb24916"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+        "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+        "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+        "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+        "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+        "sha256": "3dfc8f81fa358b147d86fbc1fba409eec4409a9a80cc741f8e9d93b2c5894728"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+        "sha256": "e47d0786961bf4cd1365c795f159151a412c43e1f1566bf928be040f34f63cec"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+        "sha256": "e94e25372f4e17bfa41069cfdb59176da580f1ee92dc6e825b2559d264fd9bd7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+        "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+        "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "security_clearance": "not-passed"
+  },
+  "prior_entry": {
+    "sha": "ef620d83d55275276d313be8ffc47fb5e282068e",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/sort): switch tests away from fakeAsync (#33716)",
+    "files": [
+      "src/material/sort/sort.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-surface-async-source-prior.json.gz",
+    "sha256": "bdde6f84530f151c60befbf59ae8d28f4a4b982fd64b328eb41927687fed686a"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-surface-async-source-review.mjs",
+      "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+    },
+    {
+      "path": "tests/spec_surface_async_source_probe.mjs",
+      "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+      "sha256": "8c1aaee79625c4473dcdece5428ad8b10f8bf74e02950a2b40a5fd67afeb079b"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+      "sha256": "d7903e0bba977dac5e5a1b476dbea5b2b6d108dab0b17525019f992fafc97b64"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+      "sha256": "81348dab85a92bf961c516a6fa1b885a2f22bfb2cbfa7919a622edca0d435763"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-controls.json",
+      "sha256": "4ad51081281a5f69d04c2aa273e322d04f6be1451a3e08865108582fd59041cb"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+      "sha256": "e6c24a2c136c60878dc58da278afe12168e5c7ff4762aaa64650a0402a101783"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+      "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+      "sha256": "7be945fb436c1b4df1bcf782a9dd8a2fd1e285469eff461f32d59ca9550fce3e"
+    },
+    {
+      "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+      "sha256": "2744cb3057c0d727b55554c687b7419cdc99b99ef849ebbb286bd6154bb24916"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+      "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+      "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+      "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+      "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+      "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+      "sha256": "3dfc8f81fa358b147d86fbc1fba409eec4409a9a80cc741f8e9d93b2c5894728"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+      "sha256": "e47d0786961bf4cd1365c795f159151a412c43e1f1566bf928be040f34f63cec"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+      "sha256": "e94e25372f4e17bfa41069cfdb59176da580f1ee92dc6e825b2559d264fd9bd7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+      "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+      "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+    }
+  ],
+  "all_other1693_rows_unchanged": true,
+  "product_or_consumer_files_changed": 0,
+  "actual_new_Angular_chip_case_executed": false,
+  "actual_Angular_native_artifact_or_floor_qualified": false,
+  "security_clearance": "not-passed",
+  "g11_claim": "not-passed"
+}
