@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "5cbae18321d571193ec7025e9aa046b85579951b",
+  "ledger_before_sha256": "d4149904d37c82f05400666e1402ede89ea204015ffdece03e0a7484e1dc7201",
+  "prior": {
+    "path": "compatibility/rc/bidi-peer-admission-prior.json.gz",
+    "sha256": "5be311614a38c1a1b9bab650c06a79955adae70a365ae9cd2f589ad748659fe7",
+    "raw_sha256": "ba7520cd59cf764167483d4d0bab453607e412e4119840c6b21cdab0469f3394"
+  },
+  "new_subjects": [
+    "8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc",
+    "25f391a3c545a1b829a74584c4f9235ab8d18497"
+  ],
+  "contexts": [
+    "77ffdf98ba71c11d908b29e02b516dddf487ae0b",
+    "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+    "86ad5150110522873dae2801fd3c2957502949e7",
+    "cf3506adf1af1556d705dbb651e7e96a7141b81d",
+    "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
+    "938f478efdc96ef0de1217e806f98939beb027cd",
+    "ea0aed5a0cba3288d89e7448073e0a5556487313",
+    "69968510fb0222ee565f57171640a99768efa972"
+  ],
+  "originals": [
+    {
+      "sha": "8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc",
+      "path": "compatibility/f10/disposition-ledger/evidence/patches/8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc-bidi-full.patch",
+      "sha256": "b5b2f1fe9262a0764c4aefac3eec4920caf3a88965f52708130348cda8906a41",
+      "commit_object": "tree 17f0bd1d00f71e5939fd9fe5ae73eb069240de0e\nparent aa4f9622d6263983e3140040982f68ac301b4eea\nauthor Kristiyan Kostadinov <crisbeto@abv.bg> 1700468236 +0100\ncommitter Kristiyan Kostadinov <crisbeto@users.noreply.github.com> 1701101888 +0100\n\nrefactor(cdk/bidi): convert to standalone\n\nConverts `cdk/bidi` to standalone.\n",
+      "commit_object_sha256": "9892672ee35be89c0da2fd300c344ac3a4a55811a17f47dcb31121c290a9b41f"
+    },
+    {
+      "sha": "25f391a3c545a1b829a74584c4f9235ab8d18497",
+      "path": "compatibility/f10/disposition-ledger/evidence/patches/25f391a3c545a1b829a74584c4f9235ab8d18497-bidi-full.patch",
+      "sha256": "c059a453336395d30e1f19ee20ad5f2420f8ead0762ecec24087d218019697e1",
+      "commit_object": "tree 642fb34cf599f2d9d04bd984238e819109cb9b95\nparent 2085a1e9472ae380ea537d4d4cada01a0227dfe1\nauthor Kristiyan Kostadinov <crisbeto@abv.bg> 1765793401 +0200\ncommitter Kristiyan Kostadinov <crisbeto@users.noreply.github.com> 1765825631 +0200\n\nrefactor(cdk/bidi): fix strict property initialization errors\n\nUpdates the code to be compatible with strict property initialization.\n",
+      "commit_object_sha256": "365a9aaed394babafb4737c3da5cb3101f1e966422409b6ff17dd805f03a0623"
+    }
+  ],
+  "source_evidence": [
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    },
+    {
+      "path": "compatibility/rc/bidi-module-public-source-diagnostic.json",
+      "sha256": "8f8dd41d11362088db8bae8d8eba10ec4bca4baac3f5dbee2d61a3c10c542c95"
+    },
+    {
+      "path": "compatibility/rc/bidi-module-raw-default-source-diagnostic.json",
+      "sha256": "8b9f39e6dabb69ec7b978638d520d3d479a1889bd8cba37d933fab804b5a6598"
+    },
+    {
+      "path": "compatibility/rc/bidi-isolated-packed-controls.json",
+      "sha256": "e774914b7ef4f02ac81604dd158f7b10ad8955a3998b770f203127f3a0f5a099"
+    },
+    {
+      "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+      "sha256": "6c31a5a9483c17da1420559d530f8a39a3a8f4d90b55346d23ed2d099c5b57b8"
+    },
+    {
+      "path": "compatibility/rc/bidi-module-cyph-source-sanity.json",
+      "sha256": "d51b612087a73f028f95aec7953182a30c7e79e4e58e267f79767c37c6e0f05d"
+    }
+  ],
+  "source_changes": [
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "before_sha256": "968ed0b19d5088b8a58ad787b3867cfbac3a20121446dbdc9b9934f0c7b0bc35",
+      "current_sha256": "aabffa012b0fae2943641463fc94b9f4959df15814c34fde6f8495828f0f7fd6",
+      "edits": [
+        [
+          "",
+          "import {requiresBidiBehavior,validateBidiBehavior} from './upstream-bidi-evidence.mjs';\n"
+        ],
+        [
+          "",
+          "  if (requiresBidiBehavior(entry, proof)) {\n    const result = validateBidiBehavior({root, entry, proof, request});\n    artifactBehaviorResults.set(entry.sha, result);\n    if (!result.ok) return false;\n  }\n"
+        ],
+        [
+          "  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof);\n",
+          "  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof);\n"
+        ]
+      ]
+    },
+    {
+      "path": "tests/upstream/identity-source-context.mjs",
+      "before_sha256": "8acf80824111dcfdb3387f757c51fea02b950859957588d6b780aa2ba3471fd9",
+      "current_sha256": "8c59412ab4d5e44f5ae6d17761ab378404e06d5266b16784e052b5f1cc2643cf",
+      "edits": [
+        [
+          "",
+          "import {reverseBidiPeerChecker} from '../../scripts/bidi-peer-source-context.mjs';\n"
+        ],
+        [
+          "",
+          "  text = reverseBidiPeerChecker(text);\n"
+        ]
+      ]
+    },
+    {
+      "path": "tests/bidi_isolated_requalification_probe.mjs",
+      "before_sha256": "f4c54353da9e14a50c2e34f9e009f37356bd24672495321486655ab6bcc4fb9a",
+      "current_sha256": "30de1f8c0e8a5642ab60febd34384db53803f130489b29e27135992c3f4dff24",
+      "edits": [
+        [
+          "const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'), read = path => readFileSync(resolve(root, path));\n",
+          "import {readBidiPeerReviewSubject} from '../scripts/bidi-peer-source-context.mjs';\nconst root = resolve(dirname(fileURLToPath(import.meta.url)), '..'), rawRead = path => readFileSync(resolve(root, path));\nconst read = path => readBidiPeerReviewSubject(path, rawRead);\n"
+        ],
+        [
+          "const result = inspectBidiIsolatedRequalification({root});\n",
+          "const result = inspectBidiIsolatedRequalification({root, readMember: read});\n"
+        ]
+      ]
+    }
+  ]
+}

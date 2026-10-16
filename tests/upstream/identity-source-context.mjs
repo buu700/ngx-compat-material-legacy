@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import assert from 'node:assert/strict';
+import {reverseBidiPeerChecker} from '../../scripts/bidi-peer-source-context.mjs';
 export const IDENTITY_INTEGRATION = [
   ["import {requiresGeneratedIdentity,validateGeneratedIdentity} from './upstream-generated-identity-evidence.mjs';\n", ''],
   ['  if (requiresGeneratedIdentity(entry, proof)) {\n    const result = validateGeneratedIdentity({root, entry, proof, request});\n    artifactBehaviorResults.set(entry.sha, result);\n    if (!result.ok) return false;\n  }\n', ''],
@@ -13,6 +14,7 @@ export const IDENTITY_INTEGRATION = [
     '  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof);'],
 ];
 export function stripIdentityIntegration(text) {
+  text = reverseBidiPeerChecker(text);
   for (const [current, preceding] of IDENTITY_INTEGRATION) {
     assert.equal(text.split(current).length, 2, 'missing/duplicate finite generated identity integration');
     text = text.replace(current, () => preceding);

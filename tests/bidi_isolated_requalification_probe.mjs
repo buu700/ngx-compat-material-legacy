@@ -17,7 +17,9 @@ import {inspectBidiIsolatedRequalification} from '../scripts/bidi-isolated-packe
 import {artifactBehaviorRequirements} from '../scripts/upstream-artifact-behavior-evidence.mjs';
 import {generatedIdentityRequirements} from '../scripts/upstream-generated-identity-evidence.mjs';
 import {authoredUseReviewEvidence} from '../scripts/authored-use-inventory.mjs';
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'), read = path => readFileSync(resolve(root, path));
+import {readBidiPeerReviewSubject} from '../scripts/bidi-peer-source-context.mjs';
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'), rawRead = path => readFileSync(resolve(root, path));
+const read = path => readBidiPeerReviewSubject(path, rawRead);
 const hash = value => createHash('sha256').update(value).digest('hex');
 const inputPath = 'compatibility/rc/bidi-isolated-packed-source-inputs.json', input = JSON.parse(read(inputPath));
 const line = input.line, prior = JSON.parse(gunzipSync(read(input.prior.path)));
@@ -54,7 +56,7 @@ for (const row of prior.before_requirements) {
   }
 }
 assert.throws(() => bidiRequirementsBefore('0'.repeat(40), {}, line)); controls.push('foreign-sha');
-const result = inspectBidiIsolatedRequalification({root});
+const result = inspectBidiIsolatedRequalification({root, readMember: read});
 assert.equal(result.proof.complete_preceding_sources_recovered, prior.members.length);
 assert.equal(result.proof.original_runtime_validation_bodies_unchanged, true);
 assert.equal(result.proof.unchanged_product_members, 1141);
