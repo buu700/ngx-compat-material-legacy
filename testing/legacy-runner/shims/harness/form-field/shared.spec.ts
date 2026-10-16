@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {ComponentHarness, HarnessLoader, HarnessPredicate, parallel} from '@angular/cdk/testing';
 import {MatErrorHarness} from './error-harness';
 import {createFakeEvent, dispatchFakeEvent} from '../../../cdk/testing/private';
@@ -5,7 +12,7 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component, Type} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_NOOP_ANIMATIONS} from '../../../../../projects/ngx-material-legacy/internal/testing/owned-animation-modules';
 import {MatFormFieldHarness} from './form-field-harness';
 
 /** Shared tests to run on both the original and MDC-based form-field's. */
@@ -34,7 +41,8 @@ export function runHarnessTests(
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NoopAnimationsModule, ReactiveFormsModule, ...modules],
+      imports: [ReactiveFormsModule, ...modules],
+      providers: [LEGACY_NOOP_ANIMATIONS],
       declarations: [FormFieldHarnessTest],
     }).compileComponents();
 

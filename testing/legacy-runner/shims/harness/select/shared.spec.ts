@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {OverlayContainer} from '@angular/cdk/overlay';
 import {HarnessLoader, parallel} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
@@ -6,7 +13,7 @@ import {ComponentFixture, inject, TestBed} from '@angular/core/testing';
 import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_NOOP_ANIMATIONS} from '../../../../../projects/ngx-material-legacy/internal/testing/owned-animation-modules';
 import {MatSelectHarness} from './select-harness';
 
 /** Shared tests to run on both the original and MDC-based select. */
@@ -21,7 +28,8 @@ export function runHarnessTests(
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [selectModule, formFieldModule, NoopAnimationsModule, ReactiveFormsModule],
+      imports: [selectModule, formFieldModule, ReactiveFormsModule],
+      providers: [LEGACY_NOOP_ANIMATIONS],
       declarations: [SelectHarnessTest],
     }).compileComponents();
 

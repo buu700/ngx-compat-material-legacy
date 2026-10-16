@@ -1,9 +1,16 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatTabsModule} from '@angular/material/tabs';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_NOOP_ANIMATIONS} from '../../../../../projects/ngx-material-legacy/internal/testing/owned-animation-modules';
 import {MatTabNavBarHarness} from './tab-nav-bar-harness';
 
 /** Shared tests to run on both the original and MDC-based tab nav bars. */
@@ -16,7 +23,8 @@ export function runTabNavBarHarnessTests(
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [tabsModule, NoopAnimationsModule],
+      imports: [tabsModule],
+      providers: [LEGACY_NOOP_ANIMATIONS],
       declarations: [TabNavBarHarnessTest],
     }).compileComponents();
 

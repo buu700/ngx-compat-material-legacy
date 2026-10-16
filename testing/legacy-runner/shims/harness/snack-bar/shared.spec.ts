@@ -1,9 +1,16 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component, TemplateRef, ViewChild, Injector} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatSnackBar, MatSnackBarConfig, MatSnackBarModule} from '@angular/material/snack-bar';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_NOOP_ANIMATIONS} from '../../../../../projects/ngx-material-legacy/internal/testing/owned-animation-modules';
 import {MatSnackBarHarness} from './snack-bar-harness';
 
 /**
@@ -20,7 +27,8 @@ export function runHarnessTests(
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [snackBarModule, NoopAnimationsModule],
+      imports: [snackBarModule],
+      providers: [LEGACY_NOOP_ANIMATIONS],
       declarations: [SnackbarHarnessTest],
     }).compileComponents();
 
