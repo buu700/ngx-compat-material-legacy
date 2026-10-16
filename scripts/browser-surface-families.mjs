@@ -157,7 +157,7 @@ $dark-theme: legacy.define-dark-theme((color: (primary: $primary, accent: $accen
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ', provideZoneChangeDetection'}} from '@angular/core';
 import {BrowserModule, DomSanitizer} from '@angular/platform-browser';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {MediaMatcher} from '@angular/cdk/layout';
@@ -226,6 +226,7 @@ export class LabRoot {
   @ViewChild('rippleModern') rippleModern!:MatRipple;
   constructor() {
     const ngZone=inject(NgZone),platform=inject(Platform);
+    (window as any).__closeoutAngularZoneEntered=ngZone.run(() => NgZone.isInAngularZone());
     const refs: LegacyRippleRef[]=[];
     let fallback: LegacyRippleRef | null=null;
     const launch=() => {
@@ -295,7 +296,7 @@ export class LabRoot {
 })
 export class LabModule {}
 
-platformBrowserDynamic().bootstrapModule(LabModule).catch(err => {
+platformBrowserDynamic().bootstrapModule(LabModule${zoneless ? '' : ', {applicationProviders:[provideZoneChangeDetection()]}'}).catch(err => {
   const node = document.createElement('pre');
   node.id = 'bootstrap-error';
   node.textContent = String(err);
@@ -464,6 +465,7 @@ const families = {
 let error = null;
 let diagnostic = null;
 let zoneGlobal = null;
+let angularZoneEntered = null;
 let peerIconTt = null;
 let peerMediaMatcher = null;
 let progressCsp = null;
@@ -659,6 +661,7 @@ try {
   );
 
   zoneGlobal = await evaluate('typeof Zone === "undefined" ? "undefined" : typeof Zone');
+  angularZoneEntered = await evaluate('window.__closeoutAngularZoneEntered');
 } catch (err) {
   error = String(err);
 } finally {
@@ -677,8 +680,8 @@ const cells = [
   `pr/main/chromium/${runtime}/progress-spinner/default`,
 ];
 const zoneOk = zoneless
-  ? (zoneGlobal === 'undefined' && bundleHasZone === false)
-  : true;
+  ? (zoneGlobal === 'undefined' && bundleHasZone === false && angularZoneEntered === false)
+  : (zoneGlobal === 'function' && bundleHasZone === true && angularZoneEntered === true);
 const ok =
   !error
   && zoneOk
@@ -702,6 +705,7 @@ const report = {
   zoneless,
   bundle_has_zone: bundleHasZone,
   zone_global: zoneGlobal,
+  angular_zone_entered: angularZoneEntered,
   families,
   peer_icon_tt: peerIconTt,
   peer_media_matcher: peerMediaMatcher,
@@ -740,6 +744,7 @@ console.log(JSON.stringify({
   zoneless,
   bundle_has_zone: bundleHasZone,
   zone_global: zoneGlobal,
+  angular_zone_entered: angularZoneEntered,
   families,
   peer_icon_tt: peerIconTt,
   peer_media_matcher: peerMediaMatcher,

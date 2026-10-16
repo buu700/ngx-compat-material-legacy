@@ -48,7 +48,7 @@ async function run(scenario, functionSource = expression) {
     resolveLibraryFromRun: () => ({tarball: 'fixture-only.tgz', digest: 'd'.repeat(64), bytes: 1}),
     preflight: () => ({missing: [], notes: [], chrome: 'fixture-only'}),
     fixtureQualificationDefects: () => [], fixtureQualificationDefectsFromTarball: () => [],
-    runCloseoutDiagnostic: () => ({core_high_contrast_passed: true}), writeDetail: value => {detail = value;},
+    runCloseoutDiagnostic: () => ({core_high_contrast_passed: true, progress_csp_passed: true}), writeDetail: value => {detail = value;},
     runRippleHydrationReplay: async () => ({ok:scenario.hydration !== false, protocol_only:true}),
     executeIds: async () => {
       nativeStageReached = true;
