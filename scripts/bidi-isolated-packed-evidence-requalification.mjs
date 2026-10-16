@@ -16,6 +16,7 @@ import {dirname, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {reverseBidiIsolatedPackedSource, bidiRequirementsBefore} from './bidi-isolated-packed-source-requalification.mjs';
 import {artifactBehaviorRequirements} from './upstream-artifact-behavior-evidence.mjs';
+import {selectionRequirementsBefore} from './selection-comparator-packed-source-context.mjs';
 import {generatedIdentityRequirements} from './upstream-generated-identity-evidence.mjs';
 import {authoredUseReviewEvidence} from './authored-use-inventory.mjs';
 import {scanCurrentAuthoredUses, currentAuthoredUseAdmission} from './authored-current-use-inventory.mjs';
@@ -116,7 +117,8 @@ export function inspectBidiIsolatedRequalification({root = rootDefault, readMemb
   const entries = [];
   for (const previous of behavior.entries) {
     const current = structuredClone(previous), field = previous.individual_proof.artifact_behavior ? 'artifact_behavior' : 'generated_identity_behavior';
-    const definition = field === 'artifact_behavior' ? artifactBehaviorRequirements(previous.sha) : generatedIdentityRequirements(previous.sha);
+    const currentDefinition = field === 'artifact_behavior' ? artifactBehaviorRequirements(previous.sha) : generatedIdentityRequirements(previous.sha);
+    const definition = selectionRequirementsBefore(previous.sha, currentDefinition, line, {readMember: read});
     const previousDefinition = bidiRequirementsBefore(previous.sha, definition, line, {readMember: read});
     assert.deepEqual(previous.individual_proof[field].source_members.map(row => row.path), previousDefinition.members);
     for (const ref of previous.individual_proof[field].source_members) assert.equal(hash(oldRead(ref.path)), ref.sha256);

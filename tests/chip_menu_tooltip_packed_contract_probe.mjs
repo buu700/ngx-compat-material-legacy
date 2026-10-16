@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';
+import {packedSelectionComparatorCase} from '../scripts/selection-comparator-packed-contract.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
@@ -32,7 +33,7 @@ const path='scripts/packed-consumer-aot-smoke.mjs',raw=read(path),file=ts.create
 assert.equal(file.parseDiagnostics.length,0);const source=file.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases').getText(file);
 const dependencies={declarationObservations,declarationKeys,packagedSpec:librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,
  packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,
- packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase};
+ packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase,packedSelectionComparatorCase};
 const load=text=>new Function(...Object.keys(dependencies),text+';return collectAcceptanceCases;')(...Object.values(dependencies));
 const collect=load(source),keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,106);assert.equal(new Set(expected).size,106);
 const profiles={chip:{field:'chipDisabledObservation',legacy:'chipDisabledIsolation',evaluate:packedChipDisabledCase},

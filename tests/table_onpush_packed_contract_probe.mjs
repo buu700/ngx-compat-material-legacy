@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';
+import {packedSelectionComparatorCase} from '../scripts/selection-comparator-packed-contract.mjs';
 /** Synthetic admission and exact source controls; no Angular table is executed here. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -48,8 +49,8 @@ const sample={execution:'packed-angular-testbed-dom',error:null,parent_detection
 const path='scripts/packed-consumer-aot-smoke.mjs',raw=read(path),sf=ts.createSourceFile(path,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
 assert.equal(sf.parseDiagnostics.length,0);
 const source=sf.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='collectAcceptanceCases').getText(sf);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase',text+';return collectAcceptanceCases;')
-  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')
+  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);
 const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,106);
 const observe=(input,collector=load(source))=>{
   const rows=collector({harness:{status:'ok',result:{tableOnPushRendering:input}}},keys,'/tmp/consumer','/tmp/source').filter(row=>row.case_id===TABLE_ONPUSH_CASE_ID);

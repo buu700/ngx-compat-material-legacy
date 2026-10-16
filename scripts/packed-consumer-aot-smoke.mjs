@@ -50,6 +50,8 @@ import {packedSelectFocusClickCase} from './select-focus-click-packed-contract.m
 import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-packed-contract.mjs';
 import {bidiIsolatedPackedFixture} from './bidi-isolated-packed-fixture.mjs';
 import {packedLegacyBidiScopeCase} from './bidi-isolated-packed-contract.mjs';
+import {selectionComparatorPackedFixture} from './selection-comparator-packed-fixture.mjs';
+import {packedSelectionComparatorCase} from './selection-comparator-packed-contract.mjs';
 import {assertEngineFreeConsumer, assertEngineFreeHarnessInputs} from './consumer-animation-engine.mjs';
 import {
   allConsumerCaseIds,
@@ -488,6 +490,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
   const detailedBehaviorCases = new Map([
     packedChipDisabledCase(parsed.chipDisabledObservation),packedMenuLazyCase(parsed.menuLazyObservation),
     packedTooltipContainerCase(parsed.tooltipContainerObservation),packedLegacyBidiScopeCase(parsed.isolatedLegacyBidi),
+    packedSelectionComparatorCase(parsed.selectionComparatorObservation),
   ].map(row => [row.case_id,row]));
   const harnessMap = {
     'packed-consumer/harness/legacy-button': parsed.buttonText === 'Go',
@@ -924,6 +927,8 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
     writeFileSync(join(consumer, 'src/chip-menu-tooltip-contract.mjs'), readFileSync(join(root, 'scripts/chip-menu-tooltip-packed-contract.mjs')));
     writeFileSync(join(consumer, 'src/bidi-isolated-probe.ts'), bidiIsolatedPackedFixture());
     writeFileSync(join(consumer, 'src/bidi-isolated-contract.mjs'), readFileSync(join(root, 'scripts/bidi-isolated-packed-contract.mjs')));
+    writeFileSync(join(consumer, 'src/selection-comparator-probe.ts'), selectionComparatorPackedFixture());
+    writeFileSync(join(consumer, 'src/selection-comparator-contract.mjs'), readFileSync(join(root, 'scripts/selection-comparator-packed-contract.mjs')));
     writeFileSync(
       join(consumer, 'src/harness-runtime.ts'),
       `import {JSDOM} from 'jsdom';
@@ -978,6 +983,8 @@ import {SELECT_FOCUS_CLICK_IMPORTS, observePackedSelectFocusClick} from './selec
 import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-contract.mjs';
 import {PackedLegacyBidiScope,observePackedLegacyBidiScope} from './bidi-isolated-probe';
 import {packedLegacyBidiScopeCase} from './bidi-isolated-contract.mjs';
+import {observePackedSelectionComparator} from './selection-comparator-probe';
+import {packedSelectionComparatorCase} from './selection-comparator-contract.mjs';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {MatTabContent,MatTabLabel} from '@angular/material/tabs';
 import {_LegacyViewport} from '@ngx-compat/material-legacy/legacy-core';
@@ -1110,6 +1117,10 @@ class SmokeDialogContent {}
     <mat-selection-list id="selection-comparator-list" [multiple]="false">
       <mat-list-option value="one">Comparable one</mat-list-option>
       <mat-list-option value="two">Comparable two</mat-list-option>
+    </mat-selection-list>
+    <mat-selection-list id="selection-comparator-comparable-list" [multiple]="false">
+      <mat-list-option value="one">Other one</mat-list-option>
+      <mat-list-option value="two">Other two</mat-list-option>
     </mat-selection-list>
     <section id="bidi-legacy-scope" [dir]="legacyDirection" (dirChange)="legacyDirectionChanges=legacyDirectionChanges+1">
       <mat-form-field id="bidi-legacy-field">
@@ -1847,6 +1858,8 @@ async function main() {
     &&selectionList.selectedOptions.selected[0]===selectionOptions[0]
     &&selectionOptions[0].selected&&!selectionOptions[1].selected
     &&fixture.nativeElement.querySelector('#selection-comparator-list mat-list-option').getAttribute('aria-selected')==='true';
+  const comparableSelectionList=fixture.debugElement.query(By.css('#selection-comparator-comparable-list')).injector.get(MatLegacySelectionList);
+  const selectionComparator=await observePackedSelectionComparator(fixture,selectionList,comparableSelectionList);
   const bidiNode=fixture.debugElement.query(By.css('#bidi-legacy-scope'));
   const bidiField=fixture.debugElement.query(By.css('#bidi-legacy-field'));
   const bidiInput=bidiField.query(By.css('input'));
@@ -2054,10 +2067,11 @@ async function main() {
   const tableOnPush=await observePackedTableOnPush();
   const detailedPackedBehaviorsOkay=[packedChipDisabledCase(chipDisabledObservation),
     packedMenuLazyCase(menuLazyObservation),packedTooltipContainerCase(tooltipContainerObservation),
-    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed)]
+    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed),packedSelectionComparatorCase(selectionComparator.observed)]
     .every(row=>row.result==='pass');
   const out = {
     chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,isolatedLegacyBidi:isolatedLegacyBidi.observed,
+    selectionComparatorObservation:selectionComparator.observed,
     valueAccessorRegistration:valueAccessors.rows,
     tableOnPushRendering:tableOnPush.observed,
     radioIdentity:radioIdentity.observed,

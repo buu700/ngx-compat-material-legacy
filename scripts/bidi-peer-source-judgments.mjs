@@ -16,6 +16,7 @@ import {dirname, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {bidiPeerSourceContext, reverseBidiPeerSource} from './bidi-peer-source-context.mjs';
 import {readBidiIsolatedBefore} from './bidi-isolated-packed-source-requalification.mjs';
+import {readSelectionComparatorBefore, selectionRequirementsBefore} from './selection-comparator-packed-source-context.mjs';
 import {BIDI_BEHAVIOR_KIND, bidiBehaviorRequirements} from './upstream-bidi-evidence.mjs';
 import {reviewBidiModuleUses} from './bidi-module-use-review.mjs';
 import {candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
@@ -68,7 +69,8 @@ function replaceRows(text, property, updates, identify) {
   return Buffer.from(text);
 }
 export function inspectBidiPeerJudgments({root = rootDefault, readMember} = {}) {
-  const read = path => readMember ? readMember(path) : readFileSync(resolve(root, path));
+  const rawRead = path => readMember ? readMember(path) : readFileSync(resolve(root, path));
+  const read = path => readSelectionComparatorBefore(path, rawRead);
   const {inputs, prior} = bidiPeerSourceContext(read), line = inputs.line;
   const old = new Map([...prior.members, ...prior.review_subjects].map(row => {assert.equal(hash(row.text), row.sha256); return [row.path, Buffer.from(row.text)];}));
   for (const change of inputs.source_changes) {
@@ -90,7 +92,7 @@ export function inspectBidiPeerJudgments({root = rootDefault, readMember} = {}) 
   const uses = reviewBidiModuleUses({root, readSource: path => read(path).toString()}); assert.equal(uses.cases.length, 25);
   const capsule = JSON.parse(read('compatibility/rc/material-public-subjects.json')), minimumPeers = [];
   for (const peerLine of ['main', '21.x']) {
-    const subject = capsule.subjects.find(row => row.line === peerLine), definition = bidiBehaviorRequirements(inputs.new_subjects[0], peerLine);
+    const subject = capsule.subjects.find(row => row.line === peerLine), definition = selectionRequirementsBefore(inputs.new_subjects[0], bidiBehaviorRequirements(inputs.new_subjects[0], peerLine), peerLine, {readMember: rawRead});
     const members = subject.members.filter(row => row.package === '@angular/cdk' && ['fesm2022/bidi.mjs', 'fesm2022/_directionality-chunk.mjs', 'types/bidi.d.ts', 'types/_bidi-module-chunk.d.ts'].includes(row.module_path));
     assert.equal(members.length, 4); const sources = new Map();
     for (const row of members) {const stored = read(row.path); assert.equal(hash(stored), row.stored_sha256); const raw = gunzipSync(stored); assert.equal(raw.length, row.bytes); assert.equal(hash(raw), row.sha256); sources.set(row.module_path, raw.toString());}
@@ -104,7 +106,7 @@ export function inspectBidiPeerJudgments({root = rootDefault, readMember} = {}) 
   const originals = inputs.originals.map(row => {
     assert.equal(createHash('sha1').update('commit ' + Buffer.byteLength(row.commit_object) + '\0').update(row.commit_object).digest('hex'), row.sha);
     assert.equal(hash(row.commit_object), row.commit_object_sha256); assert.equal(hash(read(row.path)), row.sha256);
-    assert.equal(row.sha256, bidiBehaviorRequirements(row.sha, line).patch);
+    assert.equal(row.sha256, selectionRequirementsBefore(row.sha, bidiBehaviorRequirements(row.sha, line), line, {readMember: rawRead}).patch);
     const hunks = []; let file; for (const text of read(row.path).toString().split('\n')) {
       if (text.startsWith('diff --git ')) file = text.split(' b/')[1];
       if (text.startsWith('@@')) hunks.push({hunk: hunks.length + 1, file, header: text});
@@ -135,7 +137,7 @@ export function inspectBidiPeerJudgments({root = rootDefault, readMember} = {}) 
     const current = structuredClone(previous), before = JSON.parse(old.get(previous.evidence_report)), previousRef = {path: previous.evidence_report, sha256: hash(old.get(previous.evidence_report))};
     const profile = profiles[previous.sha]; let review, path;
     if (profile) {
-      const definition = bidiBehaviorRequirements(previous.sha, line), original = originals.find(row => row.sha === previous.sha);
+      const definition = selectionRequirementsBefore(previous.sha, bidiBehaviorRequirements(previous.sha, line), line, {readMember: rawRead}), original = originals.find(row => row.sha === previous.sha);
       current.final_disposition = 'inherited'; current.reason = profile.decision; current.files = [...new Set(original.hunks.map(row => row.file))]; current.affected_branches = [line];
       current.individual_proof = {proof_kind: BIDI_BEHAVIOR_KIND, diff_sha256: definition.patch, review_depth: 'individual-compatibility', affected_branches: [line], decision: profile.decision,
         bidi_behavior: {kind: definition.kind, case_ids: definition.case_ids, source_members: definition.members.map(path => ({path, sha256: hash(read(path))}))},

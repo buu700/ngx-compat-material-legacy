@@ -7,6 +7,8 @@
  */
 /** Exact reviewed source projection only; never product/runtime qualification. */
 import assert from 'node:assert/strict';
+import {reverseSelectionComparatorSource, selectionRequirementsBefore} from './selection-comparator-packed-source-context.mjs';
+import {readBidiPeerReviewSubject} from './bidi-peer-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
@@ -34,7 +36,11 @@ function load(line, readMember) {
  * subject and every exact edited span. No live file or expected hash is changed. */
 export function reverseBidiIsolatedPackedSource(path, text, line, options = {}) {
   const {data, before} = load(line, options.readMember), change = data.changes.find(row => row.path === path);
-  if (!change) return text;
+  if (!change) return text; // Unrelated paths retain the older finite reader's pass-through contract.
+  const original = change && before.members.find(row => row.path === path);
+  if (original && hash(text) === original.sha256) return text; // The older review already projected its own subject.
+  try {text = reverseSelectionComparatorSource(path, text, options);}
+  catch (cause) {throw new Error('unreviewed isolated bidi source change', {cause});}
   const previous = before.members.find(row => row.path === path); assert.ok(previous);
   if (hash(text) === previous.sha256) return text; // An already-authenticated earlier projection.
   assert.equal(hash(text), change.current_sha256, 'unreviewed isolated bidi source change');
@@ -56,6 +62,7 @@ export function readBidiIsolatedBefore(path, readMember) {
   return Buffer.from(reverseBidiIsolatedPackedSource(path, bytes.toString(), line, {readMember}));
 }
 export function bidiRequirementsBefore(sha, current, line, options = {}) {
+  current = selectionRequirementsBefore(sha, current, line, options);
   const {before} = load(line, options.readMember), row = before.before_requirements.find(row => row.sha === sha);
   assert.ok(row, 'unregistered preceding bidi-context requirement'); const previous = row.requirements;
   const reduced = {...current, members: current.members.filter(path => !newDependencies.includes(path))};
@@ -71,7 +78,15 @@ export function bidiChipSourceLedger(readMember) {
 /** Replay the earlier authored-use test's exact review subject. Current stores
  * may differ only by this worksheet's review pointer and one history receipt. */
 export function readBidiIsolatedReviewBefore(path, readMember) {
-  const bytes = readBidiIsolatedBefore(path, readMember);
+  const isStore = ['compatibility/f10/authored-dependency-dispositions.json',
+    'compatibility/f10/authored-dependency-current-dispositions.json'].includes(path);
+  const supplied = readMember(path);
+  // The older test also supplies its own freshly generated review subject and
+  // corruptions. Preserve those bytes so every original drift assertion runs.
+  const laterReview = isStore && JSON.parse(supplied).symbol_uses.some(row =>
+    ['compatibility/f10/authored-use-reviews/bidi-peer-source-context-requalified-boundaries.json',
+      'compatibility/f10/authored-use-reviews/selection-comparator-packed-requalified-boundaries.json'].includes(row.source_review?.path));
+  const bytes = laterReview ? readBidiPeerReviewSubject(path, readMember) : readBidiIsolatedBefore(path, readMember);
   if (!['compatibility/f10/authored-dependency-dispositions.json',
     'compatibility/f10/authored-dependency-current-dispositions.json'].includes(path)) return bytes;
   const pkg = JSON.parse(readMember('projects/ngx-material-legacy/package.json'));
