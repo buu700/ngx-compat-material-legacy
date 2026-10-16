@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class RemainingNativeSourceContextTests(unittest.TestCase):
     def test_real_source_requalification_and_subject_corruptions(self):
-        result = subprocess.run(['node', 'tests/remaining_native_source_context_probe.mjs'], cwd=ROOT,
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'native-admission-source'], cwd=ROOT,
                                 capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)

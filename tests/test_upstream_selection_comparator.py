@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class PublicSelectionAdmissionTests(unittest.TestCase):
     def test_exact_predecessor_and_individual_source_judgment_controls(self):
-        result = subprocess.run(['node', 'tests/selection_comparator_source_judgments_probe.mjs'], cwd=ROOT,
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'selection-comparator-source'], cwd=ROOT,
                                 capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout.strip().splitlines()[-1])
