@@ -29,6 +29,7 @@ The finite source-review probes below describe specific historical source popula
 | `stability-chip-method` | `tests/spec_stability_chip_probe.mjs` |
 | `stability-chip-context` | `tests/spec_stability_context_probe.mjs` |
 | `wide-fixture-adapter-context` | `tests/spec_wide_fixture_adapter_qualification_probe.mjs` |
+| `historical-native-admission` | `tests/upstream/historical-behavior-admission.mjs` |
 
 Run one with the already prepared workspace dependencies:
 
@@ -56,3 +57,7 @@ When the current source phase changes, requalify its source and receipt graph be
 The two wide fixture decisions authenticate362 complete file occurrences,724 original bodies and841 hunks, pairing8119 static cases and1216 setup/cleanup hooks. They account for302 removed compiler operations,51 async modifiers and553 standalone:true metadata properties, while preserving one compiler assertion, four async hooks, one disabled case and1441 template/style properties. Both private fixture preferences are declined. The separately owned adapter repair uses stable public Eager(value1) instead of deprecated Default(value1), preserving OnPush, standalone:false and all product source. Compiler, default, rendering, lifecycle and actual artifact/native/peer-floor equivalence remain runtime requirements.
 
 The fixed adapter-context original prints its complete diagnostic JSON on stdout. Only this pinned entry uses the finite `stdout-json` report channel; the runner requires its exact13/1684 scope and7+15 rejection controls, successful exit, clean historical graph, current guard before/after and an explicit false runtime claim. The previous twenty entries still require their original file reports. No original program, assertion, timeout or runtime admission rule changes.
+
+The complete current historical contract now requires2228 IDs: all2220 prior component IDs, five unchanged discovery negatives and the three retained table/autocomplete/chip regression IDs. All20 existing native definitions and their original seven named requirements remain exact; the historical validator additionally enforces the three regression names. Three synthetic positive writer/validator controls,69 rejection controls and seven source-scope controls qualify the finite protocol expansion, with all20 actual native runs still missing coordinator evidence.
+
+The twenty-second historical program preserves the earlier2225-case admission model, original seven named cases and original helper/12 CLI controls in its proven committed identity-source graph. Its JavaScript assertions and the twentieth Python wrapper assertions/timeouts remain unchanged; only the exact Python command is substituted. All21 previous frames/programs and19 wrapper records remain exact. The guard preserves all84 prior controls and adds three, for87 total. Current2228 admission uses the separately tested stronger validator; an old model replay supplies no current/native/floor pass.
