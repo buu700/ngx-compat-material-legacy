@@ -102,6 +102,36 @@ try {
       mutations.push(value => {value.native_transition.trusted_events[0].elapsed_ms = 1;}, value => {value.native_transition.trusted_events[1].elapsed_ms = 1;},
         value => {value.native_transition.trusted_events[1].elapsed_ms = 490;}, value => {value.native_transition.trusted_events[1].at_ms = 1;});
     } else mutations.push(value => {value.native_transition.trusted_events = structuredClone(tabCompletionMotionSample('enabled').native_transition.trusted_events);});
+    mutations.push(value => {value.origins = null;});
+    for (const path of [['native_departure'], ['origins', 'left'], ['origins', 'right']]) {
+      const get = value => path.reduce((object, key) => object[key], value);
+      mutations.push(value => {const parent = path.slice(0, -1).reduce((object, key) => object[key], value); parent[path.at(-1)] = null;});
+      for (const [field, wrong] of [['same_target_after', false], ['duration_ms', mode === 'enabled' ? 0 : 500]])
+        mutations.push(value => {get(value)[field] = wrong;});
+      for (const key of ['subscription_closed', 'listeners_removed']) mutations.push(value => {get(value).cleanup[key] = false;});
+      mutations.push(value => {get(value).duplicate_end_controls.pop();});
+      for (let index = 0; index < 2; index++) for (const [field, wrong] of [['type', 'transitioncancel'], ['trusted', true], ['property', 'opacity'],
+        ['same_target', false], ['connected', false], ['at_ms', -1], ['elapsed_ms', 1]])
+        mutations.push(value => {get(value).duplicate_end_controls[index][field] = wrong;});
+      if (mode === 'enabled') {
+        mutations.push(value => {get(value).trusted_events = [];}, value => {get(value).trusted_events.reverse();},
+          value => {get(value).rendered_at_start = false;}, value => {get(value).duration_ms = 450;});
+        for (let index = 0; index < 2; index++) for (const [field, wrong] of [['type', 'transitioncancel'], ['trusted', false], ['property', 'opacity'],
+          ['same_target', false], ['connected', false], ['at_ms', -1]]) mutations.push(value => {get(value).trusted_events[index][field] = wrong;});
+        mutations.push(value => {get(value).trusted_events[0].elapsed_ms = 1;}, value => {get(value).trusted_events[1].elapsed_ms = 1;},
+          value => {get(value).trusted_events[1].elapsed_ms = 490;}, value => {get(value).trusted_events[1].at_ms = 1;});
+      } else mutations.push(value => {get(value).trusted_events = structuredClone(tabCompletionMotionSample('enabled').native_transition.trusted_events);});
+      if (path[0] === 'native_departure') {
+        for (const key of ['final_hidden', 'content_detached']) mutations.push(value => {get(value)[key] = false;});
+        if (mode === 'enabled') mutations.push(value => {get(value).content_at_start = false;});
+      } else {
+        for (const [field, wrong] of [['direction', path[1] === 'left' ? 'right' : 'left'], ['created_after_observation', false],
+          ['final_visible', false], ['notifications', 2], ['completion_at_ms', -1], ['final_wrapper_height', 0]])
+          mutations.push(value => {get(value)[field] = wrong;});
+        if (mode === 'enabled') for (const [field, wrong] of [['wrapper_height_at_start', 0], ['wrapper_height_at_start', null], ['completion_at_ms', 1], ['completion_at_ms', 400]])
+          mutations.push(value => {get(value)[field] = wrong;});
+      }
+    }
     for (const mutate of mutations) {
       reset(false); mutatePair(id, mutate);
       assert.equal(tabCompletionObservedOkay(native.observation.cases, line), false); assert.equal(cached().ok, false); tabCases++;
@@ -152,6 +182,10 @@ try {
   negative('duplicate-raw-case', () => {native.observation.cases[0] = native.observation.cases[1];}, /raw native-motion/);
   negative('rehashed-marker', () => {native.observation.cases[0].observation = true;}, /raw native-motion/);
   negative('rehashed-early-completion', () => {mutatePair(motionIds[0], value => {value.native_transition.completion_at_ms = 1;});}, /tab completion native/);
+  negative('rehashed-missing-departure', () => {mutatePair(motionIds[0], value => {delete value.native_departure;});}, /tab completion native/);
+  negative('rehashed-missing-left-origin', () => {mutatePair(motionIds[0], value => {delete value.origins.left;});}, /tab completion native/);
+  negative('rehashed-missing-right-origin', () => {mutatePair(motionIds[0], value => {delete value.origins.right;});}, /tab completion native/);
+  negative('rehashed-zero-initial-origin-height', () => {mutatePair(motionIds[0], value => {value.origins.left.wrapper_height_at_start = 0;});}, /tab completion native/);
   negative('cross-event-pair', () => {native.observation.cases.find(row => row.case_id === motionIds[0]).observation.native_transition.completion_at_ms += 0.5;}, /tab completion native/);
   for (const engine of ['chromium', 'firefox', 'webkit']) negative('missing-engine-' + engine, () => {delete native.observation.engines[engine];}, /engine\/coverage/);
   negative('Safari-claim', () => {native.observation.safari_certification = true;}, /engine\/coverage/);

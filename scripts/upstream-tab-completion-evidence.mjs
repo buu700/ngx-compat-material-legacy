@@ -55,24 +55,45 @@ export function requiresTabCompletion(entry, proof) {
 const finite = value => typeof value === 'number' && Number.isFinite(value) && value >= 0;
 const eventOkay = (event, trusted, type) => object(event) && event.type === type && event.trusted === trusted
   && event.property === 'transform' && event.same_target === true && event.connected === true && finite(event.at_ms) && finite(event.elapsed_ms);
-/** Default enabled motion must actually reach a trusted native end before its
- * public completion. The two deliberately synthetic duplicate ends stay separate. */
+function controlsOkay(trace, completionAt) {
+  return object(trace) && trace.same_target_after === true && finite(completionAt)
+    && trace.cleanup?.subscription_closed === true && trace.cleanup?.listeners_removed === true
+    && Array.isArray(trace.duplicate_end_controls) && trace.duplicate_end_controls.length === 2
+    && trace.duplicate_end_controls.every(event => eventOkay(event, false, 'transitionend')
+      && event.elapsed_ms === 0 && event.at_ms >= completionAt) && Array.isArray(trace.trusted_events);
+}
+function nativeMotionOkay(trace, duration, mode, completionAt = null) {
+  if (!finite(duration)) return false;
+  if (mode !== 'enabled') return duration === 0 && trace.trusted_events.length === 0;
+  const [start, end] = trace.trusted_events;
+  return Math.abs(duration - 500) <= 2 && trace.trusted_events.length === 2 && eventOkay(start, true, 'transitionstart')
+    && eventOkay(end, true, 'transitionend') && start.elapsed_ms === 0 && end.elapsed_ms >= 400
+    && Math.abs(end.elapsed_ms - duration) <= 2 && end.at_ms >= start.at_ms
+    && (completionAt === null || completionAt >= 400 && completionAt >= end.at_ms);
+}
+export function tabCompletionDepartureOkay(trace, mode, completionAt) {
+  return modes.includes(mode) && controlsOkay(trace, completionAt) && trace.final_hidden === true && trace.content_detached === true
+    && (mode !== 'enabled' || trace.rendered_at_start === true && trace.content_at_start === true)
+    && nativeMotionOkay(trace, trace.duration_ms, mode);
+}
+export function tabCompletionOriginOkay(trace, mode, direction) {
+  return modes.includes(mode) && ['left', 'right'].includes(direction) && controlsOkay(trace, trace?.completion_at_ms)
+    && trace.direction === direction && trace.created_after_observation === true && trace.final_visible === true
+    && trace.notifications === 1 && finite(trace.final_wrapper_height) && Math.abs(trace.final_wrapper_height - 90) <= 1
+    && (mode !== 'enabled' || trace.rendered_at_start === true && finite(trace.wrapper_height_at_start)
+      && Math.abs(trace.wrapper_height_at_start - 90) <= 1)
+    && nativeMotionOkay(trace, trace.duration_ms, mode, trace.completion_at_ms);
+}
+/** All enabled paths require their own trusted native end; fallback-only completion
+ * and deliberately synthetic duplicate ends cannot qualify motion. */
 export function tabCompletionMotionOkay(observed, mode) {
   if (!modes.includes(mode) || !object(observed) || observed.selector !== '.mat-tab-body-content' || observed.selectorMatches !== true
     || observed.finalState !== 'visible' || observed.notifications !== 1 || observed.detectChangesCalls !== 0
     || observed.duplicateEndEventsDispatched !== true || !finite(observed.durationMs)) return false;
   const trace = observed.native_transition;
-  if (!object(trace) || trace.same_target_after !== true || !finite(trace.completion_at_ms)
-    || trace.cleanup?.subscription_closed !== true || trace.cleanup?.listeners_removed !== true
-    || !Array.isArray(trace.duplicate_end_controls) || trace.duplicate_end_controls.length !== 2
-    || !trace.duplicate_end_controls.every(event => eventOkay(event, false, 'transitionend')
-      && event.elapsed_ms === 0 && event.at_ms >= trace.completion_at_ms) || !Array.isArray(trace.trusted_events)) return false;
-  if (mode !== 'enabled') return observed.durationMs === 0 && trace.trusted_events.length === 0;
-  const [start, end] = trace.trusted_events;
-  return observed.durationMs >= 400 && trace.trusted_events.length === 2 && eventOkay(start, true, 'transitionstart')
-    && eventOkay(end, true, 'transitionend') && start.elapsed_ms === 0 && end.elapsed_ms >= 400
-    && Math.abs(end.elapsed_ms - observed.durationMs) <= 2 && end.at_ms >= start.at_ms
-    && trace.completion_at_ms >= 400 && trace.completion_at_ms >= end.at_ms;
+  return controlsOkay(trace, trace?.completion_at_ms) && nativeMotionOkay(trace, observed.durationMs, mode, trace.completion_at_ms)
+    && tabCompletionDepartureOkay(observed.native_departure, mode, trace.completion_at_ms)
+    && tabCompletionOriginOkay(observed.origins?.left, mode, 'left') && tabCompletionOriginOkay(observed.origins?.right, mode, 'right');
 }
 export function tabCompletionObservedOkay(rows, line) {
   if (!Object.hasOwn(peers, line) || !Array.isArray(rows)) return false;
@@ -105,7 +126,7 @@ export function validateTabCompletion({root, entry, proof, request}) {
     const raw = gunzipSync(stored); demand(raw.length === peer.bytes && hash(raw) === peer.sha256, 'wrong tab completion peer source');
     const native = validateNativeMotionRun({root, request}); demand(native.ok, native.detail);
     demand(tabCompletionObservedOkay(native.observation.cases, line), 'insufficient tab completion native observations');
-    return {ok: true, detail: 'All54 tab motion/completion/reversal cells passed in the full306 same-run native matrix, with trusted enabled transition ends before completion, duplicate-end suppression, matched raw notification states and observer cleanup. Full floors and G11 remain separate.',
+    return {ok: true, detail: 'All54 tab motion/completion/reversal cells passed in the full306 same-run native matrix, with trusted incoming/departing and both newly created origin transitions, dynamic-height observations, duplicate-end suppression, matched raw notification states and observer cleanup. Full floors and G11 remain separate.',
       invocation_id: native.invocation_id, output: native.output, library: native.library, packed_consumer: native.packed_consumer,
       required_cases: registered.case_ids};
   } catch (error) {return {ok: false, detail: error.message};}
