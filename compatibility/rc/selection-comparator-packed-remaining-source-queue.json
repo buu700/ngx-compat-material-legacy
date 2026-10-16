@@ -1,0 +1,121 @@
+{
+  "line": "main",
+  "remaining_pending_source_entries": 3,
+  "pending_entries": [
+    {
+      "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): don't toggle hover state over subscript (#27683)",
+      "final_disposition": "needs-individual-review",
+      "reason": "Main claimed already-adapted but its actual owned helper retains the tagged parent-hover selector.21 copied the modern wrapper-hover selector and differs in four complete custom field mixin outputs. The original helper is now restored on21 with only two approved vendor module relocations; no binding/value/selector golden or exception is changed. Read the entire upstream modern patch; its source structure and token-slot implementation differ from the owned16 helper. Required fresh CSS/current-peer scope review remains open rather than treating source presence or an issue number as adaptation proof.",
+      "read_note_disposition": "not-applied",
+      "files": [
+        "src/material/form-field/_form-field-focus-overlay.scss"
+      ],
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-form-field-hover-source-review.json",
+      "source_check": "styles/form-field/_form-field-focus-overlay.scss text-field-wrapper:hover",
+      "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+      "recorded_at_utc": "2026-10-06T23:48:52.659657+00:00",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": true,
+      "prior_dispositions": [
+        {
+          "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/form-field): don't toggle hover state over subscript (#27683)",
+          "final_disposition": "already-adapted",
+          "reason": "Adapted focus-overlay hover to .mat-mdc-text-field-wrapper:hover so subscript hover no longer shows the field hover state.",
+          "read_note_disposition": "not-applied",
+          "files": [
+            "src/material/form-field/_form-field-focus-overlay.scss"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "styles/form-field/_form-field-focus-overlay.scss text-field-wrapper:hover",
+          "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+          "recorded_at_utc": "2026-10-01T17:10:57Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "product_adaptation": true
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main",
+        "21.x"
+      ]
+    },
+    {
+      "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/tabs): remove IE animation workaround (#29899)",
+      "final_disposition": "needs-individual-review",
+      "reason": "Source review proposes retaining the Material16 completion filter; exact original/candidate outputs match and removing it changes behavior. Native/floor and independent admission remain pending. Prior contradictory adaptation claim is preserved in the individual source review.",
+      "read_note_disposition": "owned-retained-source-reviewed-native-pending",
+      "files": [
+        "src/material/tabs/tab-body.ts"
+      ],
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-tab-completion-source-review.json",
+      "source_check": "legacy-tabs/internal/tab-body-base.ts retains distinctUntilChanged on fromState/toState; public animationDone is now required by the producer and branch roster.",
+      "batch_id": "product-adapt-residual-2026-10-01-k",
+      "recorded_at_utc": "2026-10-09T16:17:17.722946+00:00",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": false
+    },
+    {
+      "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+      "bucket": "behavior-semantic",
+      "subject": "fix(cdk/platform): account for composedPath error during event replay (#33409)",
+      "files": [
+        "src/cdk/platform/features/shadow-dom.ts"
+      ],
+      "diff_sha256": "c5a3cab8777ece5990a5e00eaa506a871971176c33e8ade45277d7a2a169b037",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-ripple-event-floor-review.json",
+      "batch_id": "unread-seed-content-review-2026-10-02",
+      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "g11_claim": "not-passed",
+      "final_disposition": "needs-individual-review",
+      "read_note_disposition": "individual source-floor provenance; native and final applicability pending",
+      "reason": "Exact main22.1.7 private event-target source contains a try/catch fallback. Exact21.2.14 and original16.2.14 do not. Both current public MatRipple implementations delegate native document-capture events through their private RippleEventManager and the CDK helper. The existing hydration peer_ripple_launches counts manual public launch() calls from the component; that public API does not receive the replay event. Those counts do not prove shared peer event-target error handling, and21 must not be called inherited-fixed. Packed AOT/client native execution, genuine supported replay reachability, the21 public-peer applicability decision and final10db3 disposition are still pending. Controlled failure is diagnostic evidence, not a risk exception or compatibility pass. No product/consumer API, HTML, CSS or SCSS change; no source-baseline increase, G11 clearance, push or Actions dispatch.",
+      "current_owned_repair": {
+        "path": "compatibility/rc/ripple-event-manager-source-proof.json",
+        "sha256": "440ebc7b3bdd92b354dcb47eae97c3c9d24841aa3d548cadc8a811110d64c8d0"
+      },
+      "prior_dispositions": [
+        {
+          "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+          "bucket": "behavior-semantic",
+          "subject": "fix(cdk/platform): account for composedPath error during event replay (#33409)",
+          "files": [
+            "src/cdk/platform/features/shadow-dom.ts"
+          ],
+          "diff_sha256": "27c2f81acfe97b71173499f4e73810b4e8f621c189fab74d88f27732d6da1445",
+          "evidence_report": "compatibility/rc/ripple-event-replay-upstream-correction.json",
+          "batch_id": "unread-seed-content-review-2026-10-02",
+          "recorded_at_utc": "2026-10-02T18:49:16Z",
+          "g11_claim": "not-passed",
+          "final_disposition": "needs-individual-review",
+          "read_note_disposition": "inherited",
+          "reason": "The original main inherited rationale cites an unrelated normalizePassiveListenerOptions import in slider.ts. That call does not delegate this event-target behavior. Current source has an owned public event-target helper and an owned ripple manager using composed paths; both need contextual review. The new owned repair does not prove shared public MatRipple at both floors or genuine native replay/hydration. Complete exact floor private-member provenance through genuine public callers and packed/native controlled event plus actual hydration/replay qualification. Keep SHA open; a pending item is not an audit pass. The new public NgZone import admission is a separate finite boundary.",
+          "peer_floor": {
+            "package": "@angular/cdk",
+            "installed": "22.1.7",
+            "peer_commit": "e950f29dcfbda93c13bff0d1a632465364488249",
+            "delegation": "@angular/cdk/platform imported by projects/ngx-material-legacy/legacy-slider/slider.ts"
+          },
+          "current_owned_repair": {
+            "path": "compatibility/rc/ripple-event-manager-source-proof.json",
+            "sha256": "440ebc7b3bdd92b354dcb47eae97c3c9d24841aa3d548cadc8a811110d64c8d0"
+          }
+        }
+      ],
+      "public_peer_source_floor_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/closeout-ripple-event-floor-review.json",
+        "sha256": "468bd1b9d1880186e463967f692149402ea6ff6c21251451d1a388e5947334e0"
+      }
+    }
+  ],
+  "runtime_qualified": false,
+  "g11_claim": "not-passed"
+}

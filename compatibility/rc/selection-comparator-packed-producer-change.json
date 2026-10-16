@@ -1,0 +1,42 @@
+{
+  "line": "main",
+  "path": "scripts/packed-consumer-aot-smoke.mjs",
+  "before_sha256": "1d20e22829931f4111af911ba4e1b61eba9ae41a3f1c2e4877ad466f3593d74f",
+  "current_sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591",
+  "edits": [
+    [
+      "import {packedLegacyBidiScopeCase} from './bidi-isolated-packed-contract.mjs';\n",
+      "import {packedLegacyBidiScopeCase} from './bidi-isolated-packed-contract.mjs';\nimport {selectionComparatorPackedFixture} from './selection-comparator-packed-fixture.mjs';\nimport {packedSelectionComparatorCase} from './selection-comparator-packed-contract.mjs';\n"
+    ],
+    [
+      "packedTooltipContainerCase(parsed.tooltipContainerObservation),packedLegacyBidiScopeCase(parsed.isolatedLegacyBidi),",
+      "packedTooltipContainerCase(parsed.tooltipContainerObservation),packedLegacyBidiScopeCase(parsed.isolatedLegacyBidi),\n    packedSelectionComparatorCase(parsed.selectionComparatorObservation),"
+    ],
+    [
+      "    writeFileSync(join(consumer, 'src/bidi-isolated-contract.mjs'), readFileSync(join(root, 'scripts/bidi-isolated-packed-contract.mjs')));\n",
+      "    writeFileSync(join(consumer, 'src/bidi-isolated-contract.mjs'), readFileSync(join(root, 'scripts/bidi-isolated-packed-contract.mjs')));\n    writeFileSync(join(consumer, 'src/selection-comparator-probe.ts'), selectionComparatorPackedFixture());\n    writeFileSync(join(consumer, 'src/selection-comparator-contract.mjs'), readFileSync(join(root, 'scripts/selection-comparator-packed-contract.mjs')));\n"
+    ],
+    [
+      "import {packedLegacyBidiScopeCase} from './bidi-isolated-contract.mjs';\n",
+      "import {packedLegacyBidiScopeCase} from './bidi-isolated-contract.mjs';\nimport {observePackedSelectionComparator} from './selection-comparator-probe';\nimport {packedSelectionComparatorCase} from './selection-comparator-contract.mjs';\n"
+    ],
+    [
+      "    <mat-selection-list id=\"selection-comparator-list\" [multiple]=\"false\">\n      <mat-list-option value=\"one\">Comparable one</mat-list-option>\n      <mat-list-option value=\"two\">Comparable two</mat-list-option>\n    </mat-selection-list>\n",
+      "    <mat-selection-list id=\"selection-comparator-list\" [multiple]=\"false\">\n      <mat-list-option value=\"one\">Comparable one</mat-list-option>\n      <mat-list-option value=\"two\">Comparable two</mat-list-option>\n    </mat-selection-list>\n    <mat-selection-list id=\"selection-comparator-comparable-list\" [multiple]=\"false\">\n      <mat-list-option value=\"one\">Other one</mat-list-option>\n      <mat-list-option value=\"two\">Other two</mat-list-option>\n    </mat-selection-list>\n"
+    ],
+    [
+      "    &&fixture.nativeElement.querySelector('#selection-comparator-list mat-list-option').getAttribute('aria-selected')==='true';\n",
+      "    &&fixture.nativeElement.querySelector('#selection-comparator-list mat-list-option').getAttribute('aria-selected')==='true';\n  const comparableSelectionList=fixture.debugElement.query(By.css('#selection-comparator-comparable-list')).injector.get(MatLegacySelectionList);\n  const selectionComparator=await observePackedSelectionComparator(fixture,selectionList,comparableSelectionList);\n"
+    ],
+    [
+      "    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed)]",
+      "    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed),packedSelectionComparatorCase(selectionComparator.observed)]"
+    ],
+    [
+      "    chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,isolatedLegacyBidi:isolatedLegacyBidi.observed,",
+      "    chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,isolatedLegacyBidi:isolatedLegacyBidi.observed,\n    selectionComparatorObservation:selectionComparator.observed,"
+    ]
+  ],
+  "original_two_calls_and_concrete_option_assertion_retained": true,
+  "full_roster_unchanged": 106
+}

@@ -7,6 +7,7 @@
  */
 /** Exact additive dispatch projection for earlier immutable source reviews. */
 import assert from 'node:assert/strict';
+import {reverseSelectionComparatorSource, readSelectionComparatorBefore} from './selection-comparator-packed-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
@@ -36,6 +37,7 @@ export function reverseBidiPeerSource(path, text, readMember) {
   const {inputs, prior} = bidiPeerSourceContext(readMember), row = inputs.source_changes.find(row => row.path === path);
   assert.ok(row, 'foreign public bidi context path'); const before = prior.members.find(row => row.path === path); assert.ok(before);
   if (hash(text) === before.sha256) return text;
+  text = reverseSelectionComparatorSource(path, text, {readMember});
   assert.equal(hash(text), row.current_sha256, 'unreviewed public bidi context change');
   let result = text;
   for (const [old, current] of [...row.edits].reverse()) {
@@ -49,10 +51,11 @@ export function reverseBidiPeerChecker(text, options = {}) {
 /** Only for replaying the previous write-once source review's own subject.
  * Current production/CLI readers are tested separately against current files. */
 export function readBidiPeerReviewSubject(path, readMember) {
-  if (!reviewSubjectPaths.has(path)) return readMember(path);
-  const {inputs, prior} = bidiPeerSourceContext(readMember);
+  const precedingRead = target => readSelectionComparatorBefore(target, readMember);
+  if (!reviewSubjectPaths.has(path)) return precedingRead(path);
+  const {inputs, prior} = bidiPeerSourceContext(precedingRead);
   const subject = prior.review_subjects.find(row => row.path === path);
   if (subject) {assert.equal(hash(subject.text), subject.sha256); return Buffer.from(subject.text);}
-  const bytes = readMember(path);
-  return inputs.source_changes.some(row => row.path === path) ? Buffer.from(reverseBidiPeerSource(path, bytes.toString(), readMember)) : bytes;
+  const bytes = precedingRead(path);
+  return inputs.source_changes.some(row => row.path === path) ? Buffer.from(reverseBidiPeerSource(path, bytes.toString(), precedingRead)) : bytes;
 }

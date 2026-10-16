@@ -1,0 +1,645 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "judgment_stage": "source-complete-runtime-required",
+  "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+  "final_disposition": "inherited",
+  "source_parent": "731e0bed9521c8838b60fcebe591d306b91b948f",
+  "diff_sha256": "3630c1798278c09cfd65afa8a4d5853034cfd2a0bd67eff9dc2edd6aa4d8808f",
+  "patch_file": "compatibility/rc/table-onpush-original.patch",
+  "complete_original_files": [
+    "src/cdk/table/table.spec.ts",
+    "src/cdk/table/table.ts"
+  ],
+  "complete_original_hunks": 8,
+  "original_patch_has_test_hunk": true,
+  "source_conclusion": "The complete no-data OnPush fix is inherited through the actual public CdkTable parent on this branch. Both authenticated minimum renderer implementations mark the owning view after no-data visibility transitions; owned MatLegacyTable overrides neither renderer nor render subscription, and its public datasource/outlet/no-data routes reach that parent. The earlier marker/replay-only inheritance statement remains historical. Qualification requires the exact current packed Angular OnPush case, not ancestry or a mark-call spy. No packed/native, G11 or security pass is asserted here. Constructor-source requalification: the only owned table edits add a local class decorator/import. Its exact reviewed helper constructs the genuine public CdkTable with the original new.target and node services, suppressing only the optional viewport during parent construction. The change-detector request is forwarded to the original node context, and no render/data-source/no-data method is overridden. Existing table metadata, outlets and rendering bodies are unchanged. This preserves the source delegation claim; real current packed OnPush rendering remains mandatory.",
+  "hunk_reviews": [
+    {
+      "hunk": 1,
+      "file": "src/cdk/table/table.spec.ts",
+      "judgment": "The ChangeDetectionStrategy import enables the added OnPush test component; it has no runtime library effect."
+    },
+    {
+      "hunk": 2,
+      "file": "src/cdk/table/table.spec.ts",
+      "judgment": "The new regression keeps the child datasource input object stable, empties its data through the parent and requires a bound colspan value. The mandatory legacy case preserves that trigger and parent-only detection, adding restored/repeated-empty states, class/text assertions and teardown."
+    },
+    {
+      "hunk": 3,
+      "file": "src/cdk/table/table.spec.ts",
+      "judgment": "The new parent/OnPush child creates the real change-detection boundary. The legacy case uses actual owned/public table and no-data provider identities. Its dynamic colspan is on the native td alongside interpolation within the same no-data embedded view, preserving valid legacy cell structure while requiring view update. A static row or mark-call spy cannot satisfy this case."
+    },
+    {
+      "hunk": 4,
+      "file": "src/cdk/table/table.ts",
+      "judgment": "The data outlet constructor is reformatted only. The ViewContainerRef/ElementRef parameter order, public parameter properties and empty constructor body remain unchanged; this hunk introduces no behavior or compatibility requirement."
+    },
+    {
+      "hunk": 5,
+      "file": "src/cdk/table/table.ts",
+      "judgment": "The header outlet constructor is reformatted only. The ViewContainerRef/ElementRef parameter order, public parameter properties and empty constructor body remain unchanged; this hunk introduces no behavior or compatibility requirement."
+    },
+    {
+      "hunk": 6,
+      "file": "src/cdk/table/table.ts",
+      "judgment": "The footer outlet constructor is reformatted only. The ViewContainerRef/ElementRef parameter order, public parameter properties and empty constructor body remain unchanged; this hunk introduces no behavior or compatibility requirement."
+    },
+    {
+      "hunk": 7,
+      "file": "src/cdk/table/table.ts",
+      "judgment": "The no-data outlet constructor is reformatted only. The ViewContainerRef/ElementRef parameter order, public parameter properties and empty constructor body remain unchanged; this hunk introduces no behavior or compatibility requirement."
+    },
+    {
+      "hunk": 8,
+      "file": "src/cdk/table/table.ts",
+      "judgment": "The only runtime addition marks the owning change detector after no-data visibility state changes. Both exact minimum public CdkTable implementations retain it. The datasource subscription calls renderRows; both changed and unchanged render paths call _updateNoDataRow. That inherited method creates/clears the no-data view then marks the owner. MatLegacyTable overrides none of these methods. Its outlet adapter supplies public view/element references and its no-data provider supplies the same owned directive to public parent queries. Actual Angular OnPush child checking remains a mandatory artifact requirement."
+    }
+  ],
+  "branch_review": {
+    "source_line": "main",
+    "minimum_cdk": "22.1.7",
+    "minimum_framework": "22.1.7",
+    "basis": "Own source and authenticated minimum implementations/caller routes; no ancestry or cross-line execution attribution."
+  },
+  "reviewed_source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts",
+      "sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/row.ts",
+      "sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table-module.ts",
+      "sha256": "be102d89a290d5028da2e1f2a6a19dd8a1d543a68e57861fb22b35ff4c8e2818"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table-data-source.ts",
+      "sha256": "b8c35487e4234549a48563b64665b9d38e0ac0f90310d3957b7f31e8084f7904"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+      "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+    },
+    {
+      "path": "scripts/table-onpush-packed-fixture.mjs",
+      "sha256": "df1660fb53c824d02bf2b2403b895ed548146dfb86b10d348744456e5b9f9312"
+    },
+    {
+      "path": "scripts/table-onpush-packed-contract.mjs",
+      "sha256": "5d38b3fbc3d3e30a412827f24a2a12b578fdca1ed124304737e16e07548f4a65"
+    },
+    {
+      "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+      "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4"
+    },
+    {
+      "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+      "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11"
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591"
+    },
+    {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+    },
+    {
+      "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+      "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+    },
+    {
+      "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+      "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-contract.mjs",
+      "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-fixture.mjs",
+      "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-contract.mjs",
+      "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-fixture.mjs",
+      "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+    },
+    {
+      "path": "compatibility/rc/matrices/library-exports.json",
+      "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+    }
+  ],
+  "installed_member": {
+    "package": "@angular/cdk",
+    "version": "22.1.7",
+    "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+    "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+    "member": "CdkTable._updateNoDataRow"
+  },
+  "caller_flow": [
+    "owned MatLegacyTableDataSource data setter -> _renderData stream",
+    "public CdkTable connection -> _observeRenderChanges -> renderRows",
+    "inherited _updateNoDataRow -> owned outlet/no-data template identity -> view create/clear -> markForCheck",
+    "required actual Angular OnPush child binding assertion; not yet executed"
+  ],
+  "independent_evidence": [
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-packed-pending.json",
+      "sha256": "a4b3d553776162c32a984fe57104b4b816f024d66195237eef21bebf6fdd9741"
+    },
+    {
+      "path": "compatibility/rc/dual-behavior-source-authentication.json",
+      "sha256": "43f9036dcc463efcd35b734008d98b0349793e20be40646e105ae7ea90716615"
+    },
+    {
+      "path": "compatibility/rc/table-public-module-import-source-proof.json",
+      "sha256": "6cfaf221c717ad37831d701817e8d3bf64f386c6bae370847a1cd6721e5d3ae6"
+    },
+    {
+      "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+      "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+    },
+    {
+      "path": "compatibility/rc/table-no-data-cell-source-proof.json",
+      "sha256": "2c724b3f09a3527e57b3fee7d71be6e8e8c6d0f323c7968364e9cdbb77331c22"
+    },
+    {
+      "path": "compatibility/rc/table-onpush-packed-admission-diagnostic.json",
+      "sha256": "693e6d91df3bd0bbec7c3a7ba564f82a602c9deae78166e4aed03c8e798c2cf9"
+    },
+    {
+      "path": "scripts/table-onpush-packed-fixture.mjs",
+      "sha256": "df1660fb53c824d02bf2b2403b895ed548146dfb86b10d348744456e5b9f9312"
+    },
+    {
+      "path": "scripts/table-onpush-packed-contract.mjs",
+      "sha256": "5d38b3fbc3d3e30a412827f24a2a12b578fdca1ed124304737e16e07548f4a65"
+    },
+    {
+      "path": "tests/table_onpush_packed_contract_probe.mjs",
+      "sha256": "1b44c359ed3c283fb0695e93a5077ad6437584733a3ab245682c69031283ffb8"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+      "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-outlet.ts",
+      "sha256": "522c2133fd03d68e669c521a029e060754d1c2de92cf1a500b33993f7cd31a8e"
+    },
+    {
+      "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+      "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+    },
+    {
+      "path": "scripts/upstream-packed-run-evidence.mjs",
+      "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+    },
+    {
+      "path": "compatibility/rc/table-virtual-context-source-proof.json",
+      "sha256": "d9e678d371977e7a10d6439d0b53280108439f352b053fd85e412de91d1b7602"
+    },
+    {
+      "path": "compatibility/rc/table-virtual-context-evidence-requalification.json",
+      "sha256": "44f20e3047f0f424f2f252e90e3abea92dba164e1d3a79180325efec25b75418"
+    },
+    {
+      "path": "compatibility/rc/table-virtual-context-evidence-controls.json",
+      "sha256": "26b17cd0c67a320f690e575f5c09f64f851e24da985fd3ee906646f0ac4dee62"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts",
+      "sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-inputs.json",
+      "sha256": "c9c81f831e4140f3a02c7c7b6b95fe284771da940f8efcee365f54267ac3c904"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-source-proof.json",
+      "sha256": "838c79484309b382a82d5913c1bcb2e7fb2b96ccdabf58225440f5881f0bf9e5"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-registration-controls.json",
+      "sha256": "ad784b891d15ff4e75a8e22c9a95a6bc9d2c5d4728dc308164e0b544bf9e26e8"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-writer-controls.json",
+      "sha256": "d4ea49b231e90bcbb12db752163ea8ea02657ffa4fb4aea5ba6be39d4a46b561"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-current-roster.json",
+      "sha256": "17c637460a1fdb855fe3b3de44f9a8858ccf11483b4c8f8b777a573b8b6e85d6"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-prior-contexts.json.gz",
+      "sha256": "1dcd3af155e17faf1931495e402dbd4944b3a57efae68428efa1e0ae3ac47132"
+    },
+    {
+      "path": "tests/upstream_artifact_extended_scope_probe.mjs",
+      "sha256": "456c00f80f7f8667adb3c01428d9fd7b99636ea44f5d01042a12a8ea09653aaf"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-source-judgment.json",
+      "sha256": "aa22c443e9c54166f48fc999c971e6256e2ed531482972a272d0a9b75c7dbd8b"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-checkpoint.json",
+      "sha256": "a0f261f7480b32e8d9de34f2734809bd3f21e1f1a6a012d2a295fa6a64f022cc"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-controls.json",
+      "sha256": "ebbf6c2af3755372225e5265e508f30d213746a3cfdde18240181d4c717a3b3f"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-source-inputs.json",
+      "sha256": "4147ee11af9affe20cf5611544bada1d3e0181310d31bf17b9d21de779bc9638"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-dependency-proof.json",
+      "sha256": "93b7d5ad8afcdc68e9e34e30c9b07582898567b2bdbac886d1a167e09670f3c7"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-final-g11.json.gz",
+      "sha256": "fc370ecbae4cf65d8a2ccb3d43f95c4f37871110c5dbbb9ef36a0d039bf25c73"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-source-proof.json",
+      "sha256": "0e69bb997557932c551f1ac596d93c5521af8b7e4e6334cecab882af287cf84a"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-menu-tooltip-table-context-source-judgment.json",
+      "sha256": "c149e6bf87690f7e290911b72ea39c1833313895e0a340480111186da108cf4e"
+    },
+    {
+      "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+      "sha256": "402a2af8c924ee04b650da5c7470cbf7b7bd5c4a665e89fe89b1ea88f9618b23"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-contract.mjs",
+      "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-fixture.mjs",
+      "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-source-requalification.mjs",
+      "sha256": "8af454d84a753f57d57af6df261527dfbabc9c940f06410080d614d3fa28e266"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-evidence-requalification.mjs",
+      "sha256": "ebe0e1614336e5fcf4b088a83f4f2968b52400808d7b975f6605a701ebce1333"
+    },
+    {
+      "path": "tests/bidi_isolated_packed_sample.mjs",
+      "sha256": "460a9ae10da400dc743f5f05238b2ac97b0b8783a9e9fbfb9d31bc2ab9c2af94"
+    },
+    {
+      "path": "tests/bidi_isolated_packed_probe.mjs",
+      "sha256": "6b5a1ff2b2cffea149930970dac2e8b9ac5e0d48a4115b28ca71bf1af8e01f77"
+    },
+    {
+      "path": "tests/bidi_isolated_requalification_probe.mjs",
+      "sha256": "30de1f8c0e8a5642ab60febd34384db53803f130489b29e27135992c3f4dff24"
+    },
+    {
+      "path": "tests/test_bidi_isolated_requalification.py",
+      "sha256": "6bccc20589803ac755b21664920e6be9f83fd43c37e6ca5bea24c16db508c1af"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-ca9c490ee30dbf7c9c147079197d0dbc0abcd611.json",
+      "sha256": "87ac8fcd834d347c818930c5182d10a09a208f316018070c03f7f17c8930f96d"
+    },
+    {
+      "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+      "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+    },
+    {
+      "path": "scripts/selection-comparator-source-judgments.mjs",
+      "sha256": "75e7e1714918123085897d39692cd586f997ad14ef38a7e68d055fb61119d473"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-source-context.mjs",
+      "sha256": "d1fc5106e9591c48f0118eec4fb06503390369e68499b0315ddc049dd94cc512"
+    },
+    {
+      "path": "scripts/upstream-selection-evidence.mjs",
+      "sha256": "ad26403d8e4b2ebfa8b9d98aaa6e3ef844e8cebaeee56ce6f3432fec0d226fb2"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-contract.mjs",
+      "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-fixture.mjs",
+      "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+    }
+  ],
+  "prior_entry": {
+    "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+    "bucket": "behavior-semantic",
+    "subject": "fix(cdk/table): the CdkNoDataRow directive does not render in the OnPush strategy (#27687)",
+    "final_disposition": "needs-individual-review",
+    "reason": "Original hunk and complete packed OnPush regression reviewed/prepared. Existing protocol replay does not establish actual Angular bound-row rendering. This SHA remains pending the mandatory extracted-artifact execution; no inheritance or G11 pass is claimed.",
+    "read_note_disposition": "not-owned",
+    "files": [
+      "src/cdk/table/table.ts",
+      "src/cdk/table/table.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-packed-pending.json",
+    "peer_floor": {
+      "package": "@angular/cdk",
+      "advertised_range": "^22.1.7",
+      "installed_version": "22.1.7",
+      "contains_fix_tag": "v22.1.7",
+      "sha_is_ancestor_of_tag": true,
+      "cdk_modules": [
+        "table"
+      ],
+      "owned_import_intersection": [
+        "table"
+      ]
+    },
+    "recorded_at_utc": "2026-10-01T16:49:17Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+  },
+  "prior_pending_record": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-packed-pending.json",
+    "sha256": "a4b3d553776162c32a984fe57104b4b816f024d66195237eef21bebf6fdd9741"
+  },
+  "runtime_qualification": {
+    "required": true,
+    "qualified_by_this_document": false,
+    "check": "packed-consumer",
+    "case_ids": [
+      "packed-consumer/harness/table-no-data-row-on-push-rendering"
+    ],
+    "contract": "A current successful coordinator-observed packed invocation, complete106-case branch report, matching source/line/run/artifact, hashed owned assertion and re-evaluated complete structured case/raw harness observation are required. Source inheritance and marker fields are conditional requirements, never observations of earlier execution."
+  },
+  "consumer": {
+    "cyph_read_only": true,
+    "visible_related_files_rehashed": 16,
+    "consumer_build_executed": false,
+    "required_consumer_HTML_CSS_SCSS_changes": false,
+    "TS_API_changed": false
+  },
+  "actual_packed_or_native_executed": false,
+  "actual_packed_table_executed": false,
+  "semantic_pass": false,
+  "security_clearance": "not-passed",
+  "g11_claim": "not-passed",
+  "constructor_context_review": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "30b8210c4bc8e117d6d00bf58658d69a6f7cdbaa",
+    "prior_contexts": {
+      "path": "compatibility/rc/table-onpush-constructor-prior-contexts.json.gz",
+      "sha256": "eab44cd01e0348ab4aa0fcd46a05e49dd62c68128a4ae8a30bf253b82b2c9d42",
+      "raw_sha256": "703193a3285b312fe75213c6562729193666d204749cdee776a02ba071b27c7f"
+    },
+    "shared_guard_before_sha256": "15a5155eaaf3276e8204652dc706baa5535e4a9f997f9f0af39a2ab46e142d89",
+    "shared_guard_current_sha256": "06deea33059729448f3b095be0e14bf1ea10c8bf1f9f3e0a522129d5a75af52b",
+    "complete_guard_recovered_by_removing_only_helper_member": true,
+    "reviewed_table_source_members": 14,
+    "whole_preceding_table_recovered": true,
+    "owned_renderer_overrides": [],
+    "detector_node_lookup_forwarded": true,
+    "actual_minimum_constructor_namespaces": [
+      {
+        "framework": "22.1.7",
+        "cdk": "22.1.7",
+        "node": "v22.23.3"
+      },
+      {
+        "framework": "21.2.23",
+        "cdk": "21.2.14",
+        "node": "v22.23.3"
+      }
+    ],
+    "minimum_renderer_modules": [
+      {
+        "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+        "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+        "version": "22.1.7",
+        "methods": [
+          {
+            "name": "renderRows",
+            "sha256": "d4a15a7f60cc5acef448a4f7cd05b534fbbd78d8e0403c5203a56fe6e46f59c7"
+          },
+          {
+            "name": "_observeRenderChanges",
+            "sha256": "c7b67b142da6e984c2b1046f6199ef0ceb59eaa5635a68c174ab7e2a4ac240cb"
+          },
+          {
+            "name": "_updateNoDataRow",
+            "sha256": "f8d51c0877f69ef7bf3d1237d39f910a4f70c226f6afa01470cfeee75d33db3a"
+          },
+          {
+            "name": "_switchDataSource",
+            "sha256": "d0e567895f80a53a92b223b112290ec742179a6bfca3dec6117e45ef6d211cfb"
+          }
+        ],
+        "no_data_visibility_mark_retained": true
+      },
+      {
+        "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+        "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+        "version": "21.2.14",
+        "methods": [
+          {
+            "name": "renderRows",
+            "sha256": "c0c6678790c8360d77f0399b2fb96d035b8d4799550b0887ee847395da016f8f"
+          },
+          {
+            "name": "_observeRenderChanges",
+            "sha256": "c7b67b142da6e984c2b1046f6199ef0ceb59eaa5635a68c174ab7e2a4ac240cb"
+          },
+          {
+            "name": "_updateNoDataRow",
+            "sha256": "f8d51c0877f69ef7bf3d1237d39f910a4f70c226f6afa01470cfeee75d33db3a"
+          },
+          {
+            "name": "_switchDataSource",
+            "sha256": "d0e567895f80a53a92b223b112290ec742179a6bfca3dec6117e45ef6d211cfb"
+          }
+        ],
+        "no_data_visibility_mark_retained": true
+      }
+    ],
+    "complete_original_files": 2,
+    "complete_original_hunks": 8,
+    "constructor_diagnostic_scope": "Genuine minimum public CdkTable constructors/node DI with renderer/viewport/service protocols and lifecycle substitutions; focused Angular22 full/partial AOT fixture. Not a full legacy view, compiler21, packed/native or floor pass.",
+    "source_only": true,
+    "semantic_pass": false,
+    "g11_claim": "not-passed"
+  },
+  "shared_guard_source_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "30b8210c4bc8e117d6d00bf58658d69a6f7cdbaa",
+    "prior_contexts": {
+      "path": "compatibility/rc/table-onpush-constructor-prior-contexts.json.gz",
+      "sha256": "eab44cd01e0348ab4aa0fcd46a05e49dd62c68128a4ae8a30bf253b82b2c9d42",
+      "raw_sha256": "703193a3285b312fe75213c6562729193666d204749cdee776a02ba071b27c7f"
+    },
+    "shared_guard_before_sha256": "15a5155eaaf3276e8204652dc706baa5535e4a9f997f9f0af39a2ab46e142d89",
+    "shared_guard_current_sha256": "06deea33059729448f3b095be0e14bf1ea10c8bf1f9f3e0a522129d5a75af52b",
+    "complete_guard_recovered_by_removing_only_helper_member": true,
+    "reviewed_table_source_members": 14,
+    "whole_preceding_table_recovered": true,
+    "owned_renderer_overrides": [],
+    "detector_node_lookup_forwarded": true,
+    "actual_minimum_constructor_namespaces": [
+      {
+        "framework": "22.1.7",
+        "cdk": "22.1.7",
+        "node": "v22.23.3"
+      },
+      {
+        "framework": "21.2.23",
+        "cdk": "21.2.14",
+        "node": "v22.23.3"
+      }
+    ],
+    "minimum_renderer_modules": [
+      {
+        "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+        "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+        "version": "22.1.7",
+        "methods": [
+          {
+            "name": "renderRows",
+            "sha256": "d4a15a7f60cc5acef448a4f7cd05b534fbbd78d8e0403c5203a56fe6e46f59c7"
+          },
+          {
+            "name": "_observeRenderChanges",
+            "sha256": "c7b67b142da6e984c2b1046f6199ef0ceb59eaa5635a68c174ab7e2a4ac240cb"
+          },
+          {
+            "name": "_updateNoDataRow",
+            "sha256": "f8d51c0877f69ef7bf3d1237d39f910a4f70c226f6afa01470cfeee75d33db3a"
+          },
+          {
+            "name": "_switchDataSource",
+            "sha256": "d0e567895f80a53a92b223b112290ec742179a6bfca3dec6117e45ef6d211cfb"
+          }
+        ],
+        "no_data_visibility_mark_retained": true
+      },
+      {
+        "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+        "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+        "version": "21.2.14",
+        "methods": [
+          {
+            "name": "renderRows",
+            "sha256": "c0c6678790c8360d77f0399b2fb96d035b8d4799550b0887ee847395da016f8f"
+          },
+          {
+            "name": "_observeRenderChanges",
+            "sha256": "c7b67b142da6e984c2b1046f6199ef0ceb59eaa5635a68c174ab7e2a4ac240cb"
+          },
+          {
+            "name": "_updateNoDataRow",
+            "sha256": "f8d51c0877f69ef7bf3d1237d39f910a4f70c226f6afa01470cfeee75d33db3a"
+          },
+          {
+            "name": "_switchDataSource",
+            "sha256": "d0e567895f80a53a92b223b112290ec742179a6bfca3dec6117e45ef6d211cfb"
+          }
+        ],
+        "no_data_visibility_mark_retained": true
+      }
+    ],
+    "complete_original_files": 2,
+    "complete_original_hunks": 8,
+    "constructor_diagnostic_scope": "Genuine minimum public CdkTable constructors/node DI with renderer/viewport/service protocols and lifecycle substitutions; focused Angular22 full/partial AOT fixture. Not a full legacy view, compiler21, packed/native or floor pass.",
+    "source_only": true,
+    "semantic_pass": false,
+    "g11_claim": "not-passed"
+  },
+  "historical_branch_matrix_requalification": {
+    "source_proof": {
+      "path": "compatibility/rc/historical-branch-admission-source-proof.json",
+      "sha256": "838c79484309b382a82d5913c1bcb2e7fb2b96ccdabf58225440f5881f0bf9e5"
+    },
+    "scope": "Only current-line historical native matrix requirements expand by68, with every2157 preceding case identity retained. Finite dialog/table registration is resolved and actual Jasmine registration fixtures agree; own branch literal guard behavior and complete historical writer semantics are preserved. All product source, packed106 identities/predicates and shared same-run validators remain unchanged. This updates only the matrix identity used by the existing source review; actual current packed behavior and full native qualification remain mandatory."
+  },
+  "producer_context_source_conclusion": "The OnPush fixture, owned table construction helper and both complete minimum public CdkTable sources are unchanged. The required no-data/input/view lifecycle case and installed-member/delegation predicates remain exact. The stricter producer aggregate adds three unrelated required outcomes and binds their pure helper plus the finite guard explicitly; no table renderer, source population or inherited behavior conclusion is altered.",
+  "chip_menu_tooltip_context_requalification": {
+    "source_parent": "731e0bed9521c8838b60fcebe591d306b91b948f",
+    "subject_sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+    "preceding_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-source-judgment.json",
+      "sha256": "aa22c443e9c54166f48fc999c971e6256e2ed531482972a272d0a9b75c7dbd8b"
+    },
+    "inputs": {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-inputs.json",
+      "sha256": "be081b35365d33367f0295dfdb52c750cdaea4efe836899eeacc1a4d66561b56"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-source-proof.json",
+      "sha256": "0e69bb997557932c551f1ac596d93c5521af8b7e4e6334cecab882af287cf84a"
+    },
+    "guard_change": {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-guard-change.json",
+      "sha256": "f4ae34add84911483faf58a1102e99b0eb8eb174a6587e3b2aa021ebb6187284"
+    },
+    "added_source_members": [
+      {
+        "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+        "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+      },
+      {
+        "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+        "sha256": "75835d3151a185ef0cf4e85c3e695b1b8a07081c4cfb7c56331446591ee74875"
+      }
+    ],
+    "original_hunks_and_prior_source_conclusions_retained": true,
+    "actual_runtime_qualified": false
+  },
+  "bidi_isolated_source_context": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-menu-tooltip-table-context-source-judgment.json",
+      "sha256": "c149e6bf87690f7e290911b72ea39c1833313895e0a340480111186da108cf4e"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+      "sha256": "402a2af8c924ee04b650da5c7470cbf7b7bd5c4a665e89fe89b1ea88f9618b23"
+    },
+    "original_hunk_decisions_retained": true,
+    "runtime_validation_bodies_unchanged": true,
+    "actual_runtime_qualified": false
+  },
+  "selection_comparator_context_requalification": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-ca9c490ee30dbf7c9c147079197d0dbc0abcd611.json",
+      "sha256": "87ac8fcd834d347c818930c5182d10a09a208f316018070c03f7f17c8930f96d"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+      "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+    },
+    "complete_preceding_source_and_scope_recovered": true,
+    "original_runtime_predicate_and_hunk_decisions_retained": true,
+    "actual_runtime_qualified": false
+  }
+}

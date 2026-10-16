@@ -41,6 +41,7 @@ const executable = guard.statements.filter(node => !ts.isImportDeclaration(node)
 let helperCases = 0, semanticCases = 0, cliCases = 0, sourceCases = 0;
 for (const sha of BIDI_BEHAVIOR_SHAS) {
   const entry = structuredClone(judgments.entries.find(row => row.sha === sha)), review = JSON.parse(judgments.writes.get(entry.evidence_report));
+  entry.individual_proof.bidi_behavior.source_members=bidiBehaviorRequirements(sha,line).members.map(path=>({path,sha256:hash(read(path))}));
   entry.individual_proof.artifact_behavior = {source_members: entry.individual_proof.bidi_behavior.source_members};
   const f = createFixture(root, {entry, review}); delete f.entry.individual_proof.artifact_behavior;
   const selected = () => f.observation.cases.find(row => row.case_id === BIDI_SCOPE_CASE_ID);

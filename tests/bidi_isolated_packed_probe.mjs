@@ -15,6 +15,8 @@ import {join, resolve, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {runInNewContext} from 'node:vm';
 import {BIDI_SCOPE_CASE_ID, packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';
+import {packedSelectionComparatorCase} from '../scripts/selection-comparator-packed-contract.mjs';
+import {reverseSelectionComparatorSource} from '../scripts/selection-comparator-packed-source-context.mjs';
 import {bidiIsolatedPackedFixture} from '../scripts/bidi-isolated-packed-fixture.mjs';
 import {packedValueAccessorCases} from '../scripts/value-accessor-packed-contract.mjs';
 import {packedTableOnPushCase} from '../scripts/table-onpush-packed-contract.mjs';
@@ -43,10 +45,10 @@ const declaration = source.statements.find(node => ts.isFunctionDeclaration(node
 const collectorText = declaration.getText(source);
 const load = text => new Function('declarationObservations', 'declarationKeys', 'packagedSpec', 'harnessCaseIds', 'packedValueAccessorCases',
   'packedTableOnPushCase', 'packedRadioIdentityCase', 'packedGeneratedIdentityCase', 'packedSelectDetachCase', 'packedMenuItemTokenCase',
-  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase',
+  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',
   text + ';return collectAcceptanceCases;')(declarationObservations, declarationKeys, librarySpec, harnessCaseIds, packedValueAccessorCases,
   packedTableOnPushCase, packedRadioIdentityCase, packedGeneratedIdentityCase, packedSelectDetachCase, packedMenuItemTokenCase,
-  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase);
+  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase);
 const keys = loadExportKeys(), expected = allConsumerCaseIds(keys), currentCollector = load(collectorText);
 assert.equal(expected.length, 106); assert.equal(expected.filter(id => id === BIDI_SCOPE_CASE_ID).length, 1);
 const observed = (value, legacy = true, collector = currentCollector) => {
@@ -126,7 +128,8 @@ for (const values of [[true, true, 1, true, true], [false, true, 1, true, false]
   assert.equal(runInNewContext(aggregate, {bidiInitial, bidiUpdated, fixture: {componentInstance: {legacyDirectionChanges: count}}, isolatedLegacyBidi: {okay}}), expected);
 }
 const change = JSON.parse(read('compatibility/rc/bidi-isolated-packed-producer-change.json'));
-assert.equal(hash(raw), change.current_sha256); let recovered = raw;
+const precedingRaw = reverseSelectionComparatorSource('scripts/packed-consumer-aot-smoke.mjs', raw);
+assert.equal(hash(precedingRaw), change.current_sha256); let recovered = precedingRaw;
 for (const [before, after] of [...change.edits].reverse()) {assert.equal(recovered.split(after).length, 2); recovered = recovered.replace(after, () => before);}
 assert.equal(hash(recovered), change.before_sha256);
 const result = {schema_version: 1, line, semantic_and_actual_collector_defects_rejected: mutations.length + 6,

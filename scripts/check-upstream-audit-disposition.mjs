@@ -37,6 +37,7 @@ import {requiresHistoricalBehavior,validateHistoricalBehavior} from './upstream-
 import {requiresProgressCsp,validateProgressCsp} from './upstream-progress-csp-evidence.mjs';
 import {requiresGeneratedIdentity,validateGeneratedIdentity} from './upstream-generated-identity-evidence.mjs';
 import {requiresBidiBehavior,validateBidiBehavior} from './upstream-bidi-evidence.mjs';
+import {requiresSelectionBehavior,validateSelectionBehavior} from './upstream-selection-evidence.mjs';
 import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
 import {SLIDER_THUMB_DESTROY_SHA, SLIDER_THUMB_DESTROY_ROLE, sliderThumbDestroyEvidenceOk} from './upstream-slider-thumb-destroy-scope.mjs';
 import {BAZEL_BUILD_SHAS, BAZEL_BUILD_ROLE, bazelBuildEvidenceOk} from './upstream-bazel-build-scope.mjs';
@@ -268,6 +269,11 @@ function individualProofOk(entry) {
     artifactBehaviorResults.set(entry.sha, result);
     if (!result.ok) return false;
   }
+  if (requiresSelectionBehavior(entry, proof)) {
+    const result = validateSelectionBehavior({root, entry, proof, request});
+    artifactBehaviorResults.set(entry.sha, result);
+    if (!result.ok) return false;
+  }
   if (requiresProgressCsp(entry, proof)) {
     const result = validateProgressCsp({root, entry, proof, request});
     artifactBehaviorResults.set(entry.sha, result);
@@ -329,7 +335,7 @@ for (const entry of ledgerBySha.values()) {
     missingEvidence.push(entry.sha);
     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});
   }
-  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof);
+  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof);
   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);
   if (needsIndividual && !individualProofOk(entry)) {
     if (sensitive) insufficientSensitive.push(entry.sha);
