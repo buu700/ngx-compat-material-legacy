@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {readBidiIsolatedBefore,bidiRequirementsBefore} from './bidi-isolated-packed-source-requalification.mjs';
 /** Individual source decisions with mandatory, independently checked runtime evidence. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -115,7 +116,7 @@ function replaceEntries(text,entries){
  }assert.equal(edits.length,6);for(const e of edits.reverse())text=text.slice(0,e.start)+e.text+text.slice(e.end);return text;
 }
 export function inspectChipMenuTooltipJudgments({root=rootDefault,readMember}={}){
- const read=p=>readMember?readMember(p):readFileSync(resolve(root,p)),pkg=JSON.parse(read('projects/ngx-material-legacy/package.json'));
+ const rawRead=p=>readMember?readMember(p):readFileSync(resolve(root,p)),read=p=>readBidiIsolatedBefore(p,rawRead),pkg=JSON.parse(read('projects/ngx-material-legacy/package.json'));
  const line=pkg.version.startsWith('21.')?'21.x':'main',input=read(inputPath);assert.equal(hash(input),pins[line],'admission source input changed');const inputs=JSON.parse(input);
  const stored=read(inputs.prior.path);assert.equal(hash(stored),inputs.prior.sha256,'prior source archive changed');const raw=gunzipSync(stored);assert.equal(hash(raw),inputs.prior.raw_sha256);const prior=JSON.parse(raw);assert.equal(prior.line,line);assert.equal(prior.entries.length,6);
  const old=new Map(prior.members.map(m=>{assert.equal(hash(m.text),m.sha256);return [m.path,Buffer.from(m.text)];}));
@@ -132,13 +133,13 @@ export function inspectChipMenuTooltipJudgments({root=rootDefault,readMember}={}
  const originals=[];
  for(const entry of prior.entries.slice(3)){
   const doc=JSON.parse(old.get(entry.evidence_report));assert.equal(doc.sha,entry.sha);assert.equal(gitObject('commit',doc.upstream_commit_object),entry.sha);
-  const patch=read(doc.patch_file);assert.equal(hash(patch),doc.diff_sha256);assert.equal(doc.diff_sha256,artifactBehaviorRequirements(entry.sha).patch);
+  const patch=read(doc.patch_file);assert.equal(hash(patch),doc.diff_sha256);assert.equal(doc.diff_sha256,bidiRequirementsBefore(entry.sha,artifactBehaviorRequirements(entry.sha),line,{readMember:rawRead}).patch);
   const hunks=[];let file;
   for(const row of patch.toString().split('\n')){if(row.startsWith('diff --git '))file=row.split(' b/')[1];if(row.startsWith('@@'))hunks.push({hunk:hunks.length+1,file,header:row});}
   assert.equal(hunks.length,cases[entry.sha].hunks.length);originals.push({sha:entry.sha,patch_file:doc.patch_file,diff_sha256:doc.diff_sha256,
    upstream_commit_object_sha256:hash(doc.upstream_commit_object),paths:[...new Set(hunks.map(h=>h.file))],hunks});
  }
- const scopes=inputs.sha_ids.map(sha=>{const r=artifactBehaviorRequirements(sha);assert.ok(r);return {...r,source_members:r.members.map(path=>({path,sha256:hash(read(path))}))};});
+ const scopes=inputs.sha_ids.map(sha=>{const r=bidiRequirementsBefore(sha,artifactBehaviorRequirements(sha),line,{readMember:rawRead});assert.ok(r);return {...r,source_members:r.members.map(path=>({path,sha256:hash(read(path))}))};});
  const cyph=inputs.cyph_snapshot;assert.equal(cyph.read_only,true);assert.equal(cyph.consumer_build_executed,false);assert.equal(cyph.members.length,3);
  const historical=historicalRoles(read);
  const base={schema_version:1,line,source_parent:inputs.source_parent,input:{path:inputPath,sha256:hash(input)},prior:inputs.prior,guard_comparison:comparison,probe_change:inputs.probe_change,all_prior_extended_probe_assertions_retained:true,

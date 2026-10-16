@@ -15,6 +15,7 @@ const members = [
   'scripts/upstream-packed-run-evidence.mjs', 'scripts/packed-consumer-evidence.mjs',
   'scripts/packed-consumer-aot-smoke.mjs', 'scripts/generated-identity-packed-fixture.mjs',
   'scripts/generated-identity-packed-contract.mjs', 'compatibility/rc/matrices/full-verify.json',
+  'scripts/bidi-isolated-packed-contract.mjs', 'scripts/bidi-isolated-packed-fixture.mjs',
   'compatibility/rc/matrices/library-exports.json', 'projects/ngx-material-legacy/package.json',
   'projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts',
   'projects/ngx-material-legacy/legacy-menu/menu.ts', 'projects/ngx-material-legacy/legacy-menu/menu.html',

@@ -1,0 +1,505 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "b0606c4815388a5c765582a7cd0aee7123d7bfb6",
+  "prior": {
+    "path": "compatibility/rc/bidi-isolated-packed-source-prior.json.gz",
+    "sha256": "713dda33497b575a92b29778b5aaa37cbf332e1525d957facfba9bfd40adc55c",
+    "raw_sha256": "2c4600a929030ddea330e3d235835920f090cde9ad5d7f8e522f6520c84a739f"
+  },
+  "new_dependencies": [
+    "scripts/bidi-isolated-packed-contract.mjs",
+    "scripts/bidi-isolated-packed-fixture.mjs"
+  ],
+  "changes": [
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "before_sha256": "00cb4ea227b819dce3befe1005ebcfa6d440dbcd1cc6f2a9280e38c28e7a68df",
+      "current_sha256": "1d20e22829931f4111af911ba4e1b61eba9ae41a3f1c2e4877ad466f3593d74f",
+      "edits": [
+        {
+          "start": 2463,
+          "end": 2620,
+          "before": "",
+          "after": "import {bidiIsolatedPackedFixture} from './bidi-isolated-packed-fixture.mjs';\nimport {packedLegacyBidiScopeCase} from './bidi-isolated-packed-contract.mjs';\n"
+        },
+        {
+          "start": 19250,
+          "end": 19371,
+          "before": "    packedTooltipContainerCase(parsed.tooltipContainerObservation),\n",
+          "after": "    packedTooltipContainerCase(parsed.tooltipContainerObservation),packedLegacyBidiScopeCase(parsed.isolatedLegacyBidi),\n"
+        },
+        {
+          "start": 41777,
+          "end": 42011,
+          "before": "",
+          "after": "    writeFileSync(join(consumer, 'src/bidi-isolated-probe.ts'), bidiIsolatedPackedFixture());\n    writeFileSync(join(consumer, 'src/bidi-isolated-contract.mjs'), readFileSync(join(root, 'scripts/bidi-isolated-packed-contract.mjs')));\n"
+        },
+        {
+          "start": 44763,
+          "end": 44925,
+          "before": "",
+          "after": "import {PackedLegacyBidiScope,observePackedLegacyBidiScope} from './bidi-isolated-probe';\nimport {packedLegacyBidiScopeCase} from './bidi-isolated-contract.mjs';\n"
+        },
+        {
+          "start": 64419,
+          "end": 64705,
+          "before": "    imports: [HarnessHost, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule, PackedOnPushTableHost, PackedRadioIdentityHost, ...GENERATED_IDENTITY_IMPORTS, ...SELECT_DETACH_IMPORTS, ...MENU_ITEM_TOKEN_IMPORTS, ...SELECT_FOCUS_CLICK_IMPORTS],\n",
+          "after": "    imports: [HarnessHost, PackedLegacyBidiScope, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule, PackedOnPushTableHost, PackedRadioIdentityHost, ...GENERATED_IDENTITY_IMPORTS, ...SELECT_DETACH_IMPORTS, ...MENU_ITEM_TOKEN_IMPORTS, ...SELECT_FOCUS_CLICK_IMPORTS],\n"
+        },
+        {
+          "start": 66897,
+          "end": 66964,
+          "before": "",
+          "after": "  const isolatedLegacyBidi = await observePackedLegacyBidiScope();\n"
+        },
+        {
+          "start": 105298,
+          "end": 105427,
+          "before": "  const legacyBidiScope=bidiInitial&&bidiUpdated&&fixture.componentInstance.legacyDirectionChanges===1;\n",
+          "after": "  const legacyBidiScope=bidiInitial&&bidiUpdated&&fixture.componentInstance.legacyDirectionChanges===1&&isolatedLegacyBidi.okay;\n"
+        },
+        {
+          "start": 119197,
+          "end": 119358,
+          "before": "    packedMenuLazyCase(menuLazyObservation),packedTooltipContainerCase(tooltipContainerObservation)]\n",
+          "after": "    packedMenuLazyCase(menuLazyObservation),packedTooltipContainerCase(tooltipContainerObservation),\n    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed)]\n"
+        },
+        {
+          "start": 119412,
+          "end": 119536,
+          "before": "    chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,\n",
+          "after": "    chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,isolatedLegacyBidi:isolatedLegacyBidi.observed,\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+      "before_sha256": "75835d3151a185ef0cf4e85c3e695b1b8a07081c4cfb7c56331446591ee74875",
+      "current_sha256": "03d031f7301fd2891e3d6b4063dfbf8177aa214f6177df4d443f6acf48abfefd",
+      "edits": [
+        {
+          "start": 1621,
+          "end": 1712,
+          "before": "",
+          "after": "  'scripts/bidi-isolated-packed-contract.mjs', 'scripts/bidi-isolated-packed-fixture.mjs',\n"
+        },
+        {
+          "start": 2541,
+          "end": 2632,
+          "before": "",
+          "after": "  'scripts/bidi-isolated-packed-contract.mjs', 'scripts/bidi-isolated-packed-fixture.mjs',\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-generated-identity-evidence.mjs",
+      "before_sha256": "2d9b474e22a4192f87c4710ca191142910cb976805e97cbcd55cce3470960a1d",
+      "current_sha256": "62066c7dd836ece35c1194295dbb2f6f2c37b022f51fd32971bdb2b4d89b9f6b",
+      "edits": [
+        {
+          "start": 1015,
+          "end": 1106,
+          "before": "",
+          "after": "  'scripts/bidi-isolated-packed-contract.mjs', 'scripts/bidi-isolated-packed-fixture.mjs',\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/chip-menu-tooltip-packed-source-requalification.mjs",
+      "before_sha256": "27d498832b243c356a52771ab6b9baf148704b0c299bb1c736c942ee86607bed",
+      "current_sha256": "3a8d9a15efedc7593ff95afbb96d4d7a8faf81111431a09f25a2bd66c416d03d",
+      "edits": [
+        {
+          "start": 234,
+          "end": 333,
+          "before": "",
+          "after": "import {reverseBidiIsolatedPackedSource} from './bidi-isolated-packed-source-requalification.mjs';\n"
+        },
+        {
+          "start": 1198,
+          "end": 1266,
+          "before": "",
+          "after": " raw=reverseBidiIsolatedPackedSource(member,raw,line,{readMember});\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/chip-menu-tooltip-admission-source-judgments.mjs",
+      "before_sha256": "ed2ff5feb87d580dd8e49c26f40727c423af9f99c485e9e928305e6713540dd0",
+      "current_sha256": "1f064d6c18dcbe9601c440f9b334570fd4d9df3f5322d6f97a7253c871e24bc2",
+      "edits": [
+        {
+          "start": 234,
+          "end": 347,
+          "before": "",
+          "after": "import {readBidiIsolatedBefore,bidiRequirementsBefore} from './bidi-isolated-packed-source-requalification.mjs';\n"
+        },
+        {
+          "start": 16974,
+          "end": 17156,
+          "before": " const read=p=>readMember?readMember(p):readFileSync(resolve(root,p)),pkg=JSON.parse(read('projects/ngx-material-legacy/package.json'));\n",
+          "after": " const rawRead=p=>readMember?readMember(p):readFileSync(resolve(root,p)),read=p=>readBidiIsolatedBefore(p,rawRead),pkg=JSON.parse(read('projects/ngx-material-legacy/package.json'));\n"
+        },
+        {
+          "start": 19591,
+          "end": 19805,
+          "before": "  const patch=read(doc.patch_file);assert.equal(hash(patch),doc.diff_sha256);assert.equal(doc.diff_sha256,artifactBehaviorRequirements(entry.sha).patch);\n",
+          "after": "  const patch=read(doc.patch_file);assert.equal(hash(patch),doc.diff_sha256);assert.equal(doc.diff_sha256,bidiRequirementsBefore(entry.sha,artifactBehaviorRequirements(entry.sha),line,{readMember:rawRead}).patch);\n"
+        },
+        {
+          "start": 20278,
+          "end": 20513,
+          "before": " const scopes=inputs.sha_ids.map(sha=>{const r=artifactBehaviorRequirements(sha);assert.ok(r);return {...r,source_members:r.members.map(path=>({path,sha256:hash(read(path))}))};});\n",
+          "after": " const scopes=inputs.sha_ids.map(sha=>{const r=bidiRequirementsBefore(sha,artifactBehaviorRequirements(sha),line,{readMember:rawRead});assert.ok(r);return {...r,source_members:r.members.map(path=>({path,sha256:hash(read(path))}))};});\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/identity-source-judgments.mjs",
+      "before_sha256": "287871c5bbf659719ca296be18923aaaa610dbcff2db3129e172c4287e2f429e",
+      "current_sha256": "42135be5404bdc69c1c04b7c952189635e4b06c55f0875af428c30cc4a6bd8a3",
+      "edits": [
+        {
+          "start": 234,
+          "end": 347,
+          "before": "",
+          "after": "import {readBidiIsolatedBefore,bidiRequirementsBefore} from './bidi-isolated-packed-source-requalification.mjs';\n"
+        },
+        {
+          "start": 9645,
+          "end": 9800,
+          "before": "  const read = path => readMember ? readMember(path) : readFileSync(resolve(root, path));\n",
+          "after": "  const rawRead = path => readMember ? readMember(path) : readFileSync(resolve(root, path));\n  const read = path => readBidiIsolatedBefore(path, rawRead);\n"
+        },
+        {
+          "start": 14138,
+          "end": 14341,
+          "before": "    const bytes = read(row.path); assert.equal(hash(bytes), row.sha256); assert.equal(row.sha256, generatedIdentityRequirements(row.sha).patch);\n",
+          "after": "    const bytes = read(row.path); assert.equal(hash(bytes), row.sha256); assert.equal(row.sha256, bidiRequirementsBefore(row.sha,generatedIdentityRequirements(row.sha),line,{readMember:rawRead}).patch);\n"
+        },
+        {
+          "start": 16235,
+          "end": 16428,
+          "before": "      const definition = generatedIdentityRequirements(previous.sha), original = originals.find(row => row.sha === previous.sha);\n",
+          "after": "      const definition = bidiRequirementsBefore(previous.sha,generatedIdentityRequirements(previous.sha),line,{readMember:rawRead}), original = originals.find(row => row.sha === previous.sha);\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/progress-csp-source-judgments.mjs",
+      "before_sha256": "655a7d8aa9c366635339938365c79ccbfbd1d6aeae40a495cd9ea7bf2bc2c49a",
+      "current_sha256": "d75f52502349f5a5c80c7bad95d1e714124c9657570b30edbcd413fdcf36c2e7",
+      "edits": [
+        {
+          "start": 234,
+          "end": 324,
+          "before": "",
+          "after": "import {readBidiIsolatedBefore} from './bidi-isolated-packed-source-requalification.mjs';\n"
+        },
+        {
+          "start": 8139,
+          "end": 8294,
+          "before": "  const read = path => readMember ? readMember(path) : readFileSync(resolve(root, path));\n",
+          "after": "  const rawRead = path => readMember ? readMember(path) : readFileSync(resolve(root, path));\n  const read = path => readBidiIsolatedBefore(path, rawRead);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/upstream/progress-csp-source-context.mjs",
+      "before_sha256": "29d7911fa86081780de4fdccaf1f8b6f6001f333671271a41a6d892491194c52",
+      "current_sha256": "ac5b5312ba2f24a003f60dee2973d221b86c6f4045d8922087f57e82fff2d635",
+      "edits": [
+        {
+          "start": 234,
+          "end": 336,
+          "before": "",
+          "after": "import {readBidiIsolatedBefore} from '../../scripts/bidi-isolated-packed-source-requalification.mjs';\n"
+        },
+        {
+          "start": 2536,
+          "end": 2587,
+          "before": "  const bytes = read(path);\n",
+          "after": "  const bytes = readBidiIsolatedBefore(path,read);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/upstream/chip-menu-tooltip-artifact-admission.mjs",
+      "before_sha256": "c2a36c734c4ddf05c1d4a7e2a73778e0a52591d40b40846be0001e7c37d1863e",
+      "current_sha256": "fe14a49a06972d60a834a308d7e86f30d6ba28e9257442b035d9bfb89c869e03",
+      "edits": [
+        {
+          "start": 234,
+          "end": 357,
+          "before": "",
+          "after": "import {readBidiIsolatedBefore,bidiChipSourceLedger} from '../../scripts/bidi-isolated-packed-source-requalification.mjs';\n"
+        },
+        {
+          "start": 1170,
+          "end": 1600,
+          "before": "const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..'),read=p=>readFileSync(join(root,p)),json=p=>JSON.parse(read(p));\nconst prefix='compatibility/rc/chip-menu-tooltip-admission-',inputs=json(prefix+'inputs.json'),result=inspectChipMenuTooltipJudgments({root});\n",
+          "after": "const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..'),actualRead=p=>readFileSync(join(root,p)),read=p=>p==='compatibility/f10/disposition-ledger/ledger.json'?bidiChipSourceLedger(actualRead):readBidiIsolatedBefore(p,actualRead),json=p=>JSON.parse(read(p));\nconst prefix='compatibility/rc/chip-menu-tooltip-admission-',inputs=json(prefix+'inputs.json'),result=inspectChipMenuTooltipJudgments({root,readMember:read});\n"
+        },
+        {
+          "start": 4825,
+          "end": 5059,
+          "before": " const f=createFixture(root,{entry,review});\n",
+          "after": " const currentEntry=structuredClone(entry);\n currentEntry.individual_proof.artifact_behavior.source_members=required.members.map(path=>({path,sha256:hash(actualRead(path))}));\n const f=createFixture(root,{entry:currentEntry,review});\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/upstream/identity-artifact-admission.mjs",
+      "before_sha256": "d258c874487e983ce87024feb9c069b70b6fa855e8b79a68abb3e43e4fca3bfe",
+      "current_sha256": "44a43229ba7cd93256591532efa735d08f4ff096d3c70bcf6166723911cd6f31",
+      "edits": [
+        {
+          "start": 3842,
+          "end": 3998,
+          "before": "",
+          "after": "  entry.individual_proof.generated_identity_behavior.source_members=generatedIdentityRequirements(sha).members.map(path=>({path,sha256:hash(read(path))}));\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/chip_menu_tooltip_packed_contract_probe.mjs",
+      "before_sha256": "0676cdd65c2b78ec52c1278a8c4b39763ac5f70ad86d01544be658f0ab0da9ba",
+      "current_sha256": "b0abb2ac6cf74701b77856e98a4ae6f6936cfdd8976ed23cd4fa898b964e9ef0",
+      "edits": [
+        {
+          "start": 234,
+          "end": 322,
+          "before": "",
+          "after": "import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';\n"
+        },
+        {
+          "start": 2770,
+          "end": 2868,
+          "before": " packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase};\n",
+          "after": " packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase};\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/generated_identity_packed_contract_probe.mjs",
+      "before_sha256": "214b5314f2abe665e087ee72ba9a16ae94b20e78c293b0641d969e23e10785a0",
+      "current_sha256": "25576288c0f67df563ff2f79cfb79d58e34b19385363be4a240ba659ecde4fc1",
+      "edits": [
+        {
+          "start": 234,
+          "end": 322,
+          "before": "",
+          "after": "import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';\n"
+        },
+        {
+          "start": 8559,
+          "end": 9339,
+          "before": "const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')(\n  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);\n",
+          "after": "const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase',text+';return collectAcceptanceCases;')(\n  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/menu_item_token_packed_contract_probe.mjs",
+      "before_sha256": "e4cb353602d49c22e7a95b2f8b518998fb356823ec032b9d207dad2539901683",
+      "current_sha256": "f41456db025f949c9e3c14963c130c0218c15a99f9a6b6a2d28a606f734322e1",
+      "edits": [
+        {
+          "start": 234,
+          "end": 322,
+          "before": "",
+          "after": "import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5310,
+          "end": 6085,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/packed_required_contract_admission.mjs",
+      "before_sha256": "fbe8bdef6c8d209603d25939545a05bd7caa76e8ea03663bb6333fa28fb52fc5",
+      "current_sha256": "53d6869a5a061c87caf39f26ee272f1f02dd2464be055544979fba33e0ebb631",
+      "edits": [
+        {
+          "start": 234,
+          "end": 398,
+          "before": "",
+          "after": "import {isolatedBidiPackedSample} from './bidi_isolated_packed_sample.mjs';\nimport {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';\n"
+        },
+        {
+          "start": 2995,
+          "end": 3769,
+          "before": " const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);\n",
+          "after": " const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase);\n"
+        },
+        {
+          "start": 4640,
+          "end": 5302,
+          "before": " const observations=fn=>[true,false,undefined,0,1,'true'].map(value=>{const rows=fn({harness:{status:'ok',result:{[field]:value,chipDisabledObservation:chipMenuTooltipPackedSamples.chip,menuLazyObservation:chipMenuTooltipPackedSamples.menu,tooltipContainerObservation:chipMenuTooltipPackedSamples.tooltip}}},keys,'/tmp/consumer','/tmp/source'),matches=rows.filter(r=>r.case_id===id);assert.equal(matches.length,1,'required contract missing');assert.equal(matches[0].result,value===true?'pass':'fail','explicit observed boolean required');return {input:value===undefined?'omitted':value,result:matches[0].result};});\n",
+          "after": " const observations=fn=>[true,false,undefined,0,1,'true'].map(value=>{const rows=fn({harness:{status:'ok',result:{[field]:value,isolatedLegacyBidi:isolatedBidiPackedSample(),chipDisabledObservation:chipMenuTooltipPackedSamples.chip,menuLazyObservation:chipMenuTooltipPackedSamples.menu,tooltipContainerObservation:chipMenuTooltipPackedSamples.tooltip}}},keys,'/tmp/consumer','/tmp/source'),matches=rows.filter(r=>r.case_id===id);assert.equal(matches.length,1,'required contract missing');assert.equal(matches[0].result,value===true?'pass':'fail','explicit observed boolean required');return {input:value===undefined?'omitted':value,result:matches[0].result};});\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/radio_identity_packed_contract_probe.mjs",
+      "before_sha256": "e48f8ba03f22e47ccdc5241b84732fd997c0be9d2ed843cd5b542d74be5bb4fe",
+      "current_sha256": "f4aa2cbb42abafa4036843c80659ed0ec210cb03d02f2067a453da022db574a2",
+      "edits": [
+        {
+          "start": 234,
+          "end": 322,
+          "before": "",
+          "after": "import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5581,
+          "end": 6354,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/select_detach_packed_contract_probe.mjs",
+      "before_sha256": "60d737debaf04a47cc2ce71f8c1c5a1bfa64f7d75402aeb0693134f2dd608380",
+      "current_sha256": "a953976b77bfd969f8c7fa82203a4119d5630b7bb8d9b838b44b7ed440cbdde7",
+      "edits": [
+        {
+          "start": 234,
+          "end": 322,
+          "before": "",
+          "after": "import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5102,
+          "end": 5877,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/select_focus_click_packed_contract_probe.mjs",
+      "before_sha256": "a27e64728f235e1f9bd84fe61793eaa4ad159cc6f9777aee59e93ea14ed4d83c",
+      "current_sha256": "c270c20412b456096f1c4e88152a5e12e6c6545fafd18f365520c09fc6f024da",
+      "edits": [
+        {
+          "start": 234,
+          "end": 322,
+          "before": "",
+          "after": "import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';\n"
+        },
+        {
+          "start": 4836,
+          "end": 5611,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/table_onpush_packed_contract_probe.mjs",
+      "before_sha256": "e5e53bc26e08d33dc84fcb95fe853412adcb78277533ecf178f769fc7bfc7d44",
+      "current_sha256": "7f38efa1094f7e7f5f6a9e4b23d0ab8515326a64c4ce939ead80160d2521ff5e",
+      "edits": [
+        {
+          "start": 234,
+          "end": 322,
+          "before": "",
+          "after": "import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';\n"
+        },
+        {
+          "start": 4959,
+          "end": 5735,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')\n  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase',text+';return collectAcceptanceCases;')\n  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/value_accessor_packed_contract_probe.mjs",
+      "before_sha256": "335e499c32e99ff996ed67b0310410fd3b30ee91ccd8797a22a5183486f60d64",
+      "current_sha256": "35b8ac9387f542fa8bb63d562bb99924db7e54a4b05652fd591e6b74ae4ed7a5",
+      "edits": [
+        {
+          "start": 234,
+          "end": 322,
+          "before": "",
+          "after": "import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';\n"
+        },
+        {
+          "start": 3664,
+          "end": 4439,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')\n (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase',text+';return collectAcceptanceCases;')\n (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/chip_menu_tooltip_packed_evidence_probe.mjs",
+      "before_sha256": "4978a2f4c853223c58d2365cbf293eb041d8f178c83e9cc48e0793f72d4d308e",
+      "current_sha256": "806f35ad9187dda57becc4ad9ccc65de5a768b994d6105b32fb0e0e35cdd4fc0",
+      "edits": [
+        {
+          "start": 642,
+          "end": 909,
+          "before": "const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=p=>readFileSync(resolve(root,p));\n",
+          "after": "import {readBidiIsolatedReviewBefore} from '../scripts/bidi-isolated-packed-source-requalification.mjs';\nconst root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),rawRead=p=>readFileSync(resolve(root,p));\nconst read=p=>readBidiIsolatedReviewBefore(p,rawRead);\n"
+        },
+        {
+          "start": 969,
+          "end": 1099,
+          "before": "const result=inspectPackedToolingEvidence({root});assert.equal(result.proof.unchanged_role_judgments.length,167);\n",
+          "after": "const result=inspectPackedToolingEvidence({root,readMember:read});assert.equal(result.proof.unchanged_role_judgments.length,167);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/upstream_artifact_extended_scope_probe.mjs",
+      "before_sha256": "dfd4b6a112600c700dfb90b4a097e20f8769ba11dff4b7457e740097a05bc07f",
+      "current_sha256": "456c00f80f7f8667adb3c01428d9fd7b99636ea44f5d01042a12a8ea09653aaf",
+      "edits": [
+        {
+          "start": 1058,
+          "end": 1181,
+          "before": "",
+          "after": "import {readBidiIsolatedBefore, bidiRequirementsBefore} from '../scripts/bidi-isolated-packed-source-requalification.mjs';\n"
+        },
+        {
+          "start": 3747,
+          "end": 4154,
+          "before": "const focusReview = json(focusEntry.evidence_report), prior = focusReview.prior_source_judgment;\n",
+          "after": "const liveFocusReview = json(focusEntry.evidence_report), bidiContext = liveFocusReview.bidi_isolated_source_context;\nif (bidiContext) for (const ref of [bidiContext.previous_source_review, bidiContext.source_proof]) assert.equal(hash(read(ref.path)), ref.sha256);\nconst focusReview = bidiContext ? json(bidiContext.previous_source_review.path) : liveFocusReview, prior = focusReview.prior_source_judgment;\n"
+        },
+        {
+          "start": 7324,
+          "end": 7398,
+          "before": "    assert.equal(hash(read(row.path)),row.sha256);\n",
+          "after": "    assert.equal(hash(readBidiIsolatedBefore(row.path,read)),row.sha256);\n"
+        },
+        {
+          "start": 7592,
+          "end": 7856,
+          "before": "  for(const row of context.added_source_members){assert.equal(hash(read(row.path)),row.sha256);precedingFocusMembers.push(row);}\n  const paths=artifactBehaviorRequirements(focusEntry.sha).members;\n",
+          "after": "  for(const row of context.added_source_members){assert.equal(hash(readBidiIsolatedBefore(row.path,read)),row.sha256);precedingFocusMembers.push(row);}\n  const paths=bidiRequirementsBefore(focusEntry.sha,artifactBehaviorRequirements(focusEntry.sha),line).members;\n"
+        }
+      ]
+    }
+  ],
+  "scope": "Finite isolated bidi consumer fixture/collector, evaluator bindings and exact preceding-source context; no runtime or product qualification.",
+  "roles": {
+    "path": "compatibility/rc/bidi-isolated-packed-role-prior.json.gz",
+    "sha256": "6480ba9db406b942d5c4120298b458462f58f599198235af533e21da5b8f37a1",
+    "raw_sha256": "f7f31152b5e5d838dd90dbcb132aad2469aea099ace3e64e1b25ba6206e1a693",
+    "affected_uses": 167,
+    "review_files": 1
+  },
+  "behavior_inputs": {
+    "path": "compatibility/rc/bidi-isolated-packed-inputs.json",
+    "sha256": "b03c82015fa4ad2b736fb86b887e1f411093a3ce32628e27d90b2948572ed897"
+  }
+}

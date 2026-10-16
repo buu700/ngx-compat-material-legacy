@@ -48,6 +48,8 @@ import {packedMenuItemTokenCase} from './menu-item-token-packed-contract.mjs';
 import {selectFocusClickPackedFixture} from './select-focus-click-packed-fixture.mjs';
 import {packedSelectFocusClickCase} from './select-focus-click-packed-contract.mjs';
 import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-packed-contract.mjs';
+import {bidiIsolatedPackedFixture} from './bidi-isolated-packed-fixture.mjs';
+import {packedLegacyBidiScopeCase} from './bidi-isolated-packed-contract.mjs';
 import {assertEngineFreeConsumer, assertEngineFreeHarnessInputs} from './consumer-animation-engine.mjs';
 import {
   allConsumerCaseIds,
@@ -486,7 +488,7 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
   const selectFocusClickCase = packedSelectFocusClickCase(parsed.selectFocusClick);
   const detailedBehaviorCases = new Map([
     packedChipDisabledCase(parsed.chipDisabledObservation),packedMenuLazyCase(parsed.menuLazyObservation),
-    packedTooltipContainerCase(parsed.tooltipContainerObservation),
+    packedTooltipContainerCase(parsed.tooltipContainerObservation),packedLegacyBidiScopeCase(parsed.isolatedLegacyBidi),
   ].map(row => [row.case_id,row]));
   const harnessMap = {
     'packed-consumer/harness/legacy-button': parsed.buttonText === 'Go',
@@ -922,6 +924,8 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
     writeFileSync(join(consumer, 'src/select-focus-click-probe.ts'), selectFocusClickPackedFixture());
     writeFileSync(join(consumer, 'src/select-focus-click-contract.mjs'), readFileSync(join(root, 'scripts/select-focus-click-packed-contract.mjs')));
     writeFileSync(join(consumer, 'src/chip-menu-tooltip-contract.mjs'), readFileSync(join(root, 'scripts/chip-menu-tooltip-packed-contract.mjs')));
+    writeFileSync(join(consumer, 'src/bidi-isolated-probe.ts'), bidiIsolatedPackedFixture());
+    writeFileSync(join(consumer, 'src/bidi-isolated-contract.mjs'), readFileSync(join(root, 'scripts/bidi-isolated-packed-contract.mjs')));
     writeFileSync(
       join(consumer, 'src/harness-runtime.ts'),
       `import {JSDOM} from 'jsdom';
@@ -974,6 +978,8 @@ import {SELECT_DETACH_IMPORTS, observePackedSelectDetach} from './select-detach-
 import {MENU_ITEM_TOKEN_IMPORTS, observePackedMenuItemToken} from './menu-item-token-probe';
 import {SELECT_FOCUS_CLICK_IMPORTS, observePackedSelectFocusClick} from './select-focus-click-probe';
 import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-contract.mjs';
+import {PackedLegacyBidiScope,observePackedLegacyBidiScope} from './bidi-isolated-probe';
+import {packedLegacyBidiScopeCase} from './bidi-isolated-contract.mjs';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {MatTabContent,MatTabLabel} from '@angular/material/tabs';
 import {_LegacyViewport} from '@ngx-compat/material-legacy/legacy-core';
@@ -1289,7 +1295,7 @@ async function main() {
     }]}});
   }
   TestBed.configureTestingModule({
-    imports: [HarnessHost, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule, PackedOnPushTableHost, PackedRadioIdentityHost, ...GENERATED_IDENTITY_IMPORTS, ...SELECT_DETACH_IMPORTS, ...MENU_ITEM_TOKEN_IMPORTS, ...SELECT_FOCUS_CLICK_IMPORTS],
+    imports: [HarnessHost, PackedLegacyBidiScope, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule, PackedOnPushTableHost, PackedRadioIdentityHost, ...GENERATED_IDENTITY_IMPORTS, ...SELECT_DETACH_IMPORTS, ...MENU_ITEM_TOKEN_IMPORTS, ...SELECT_FOCUS_CLICK_IMPORTS],
     providers: [
       {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
       // Preserve historical constructor-mode checks without installing an engine.
@@ -1322,6 +1328,7 @@ async function main() {
   const selectScrollDetach=await observePackedSelectDetach();
   const menuItemToken=await observePackedMenuItemToken();
   const selectFocusClick=await observePackedSelectFocusClick();
+  const isolatedLegacyBidi = await observePackedLegacyBidiScope();
   const fixture = TestBed.createComponent(HarnessHost);
   fixture.detectChanges();
   const cellDefinitionObservation=[];
@@ -1854,7 +1861,7 @@ async function main() {
     &&bidiField.injector.get(Directionality).value==='ltr'&&bidiInput.injector.get(Directionality).value==='ltr'
     &&fixture.componentInstance.legacyDirectionChanges===1;
   fixture.detectChanges();
-  const legacyBidiScope=bidiInitial&&bidiUpdated&&fixture.componentInstance.legacyDirectionChanges===1;
+  const legacyBidiScope=bidiInitial&&bidiUpdated&&fixture.componentInstance.legacyDirectionChanges===1&&isolatedLegacyBidi.okay;
   const chipTabIndex = (fixture.nativeElement.querySelector('#attribute-chip') as HTMLElement).tabIndex;
   const radioTabIndex = (fixture.nativeElement.querySelector('#attribute-radio input') as HTMLInputElement).tabIndex;
   const liveDefault=fixture.nativeElement.querySelector('#error-live-default') as HTMLElement;
@@ -2048,10 +2055,11 @@ async function main() {
   const valueAccessors=await observePackedValueAccessors();
   const tableOnPush=await observePackedTableOnPush();
   const detailedPackedBehaviorsOkay=[packedChipDisabledCase(chipDisabledObservation),
-    packedMenuLazyCase(menuLazyObservation),packedTooltipContainerCase(tooltipContainerObservation)]
+    packedMenuLazyCase(menuLazyObservation),packedTooltipContainerCase(tooltipContainerObservation),
+    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed)]
     .every(row=>row.result==='pass');
   const out = {
-    chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,
+    chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,isolatedLegacyBidi:isolatedLegacyBidi.observed,
     valueAccessorRegistration:valueAccessors.rows,
     tableOnPushRendering:tableOnPush.observed,
     radioIdentity:radioIdentity.observed,

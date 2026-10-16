@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {readBidiIsolatedBefore} from './bidi-isolated-packed-source-requalification.mjs';
 /** Complete source decisions; actual current packed/browser execution is mandatory. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -67,7 +68,8 @@ function replaceEntries(text, entries) {
   return text;
 }
 export function inspectProgressCspJudgments({root = rootDefault, readMember} = {}) {
-  const read = path => readMember ? readMember(path) : readFileSync(resolve(root, path));
+  const rawRead = path => readMember ? readMember(path) : readFileSync(resolve(root, path));
+  const read = path => readBidiIsolatedBefore(path, rawRead);
   const pkg = JSON.parse(read('projects/ngx-material-legacy/package.json')), line = pkg.version.startsWith('21.') ? '21.x' : 'main';
   const input = read(inputPath); assert.equal(hash(input), pins[line], 'progress CSP source input changed'); const inputs = JSON.parse(input);
   const priorBytes = read(inputs.prior.path); assert.equal(hash(priorBytes), inputs.prior.sha256);
