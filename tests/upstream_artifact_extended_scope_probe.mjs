@@ -136,6 +136,8 @@ for (const definition of definitions) {
     run('omitted-reviewed-source', () => f.entry.individual_proof.artifact_behavior.source_members.pop(), false);
     run('wrong-branch-review', () => f.entry.individual_proof.affected_branches = [line === 'main' ? '21.x' : 'main'], false);
     if (definition.sha === TABLE_ONPUSH_SHA) {
+      run('omitted-construction-helper', () => {f.entry.individual_proof.artifact_behavior.source_members = f.entry.individual_proof.artifact_behavior.source_members.filter(row => !row.path.endsWith('/table-construction-context.ts'));}, false);
+      run('stale-construction-helper', () => {f.entry.individual_proof.artifact_behavior.source_members.find(row => row.path.endsWith('/table-construction-context.ts')).sha256 = '0'.repeat(64);}, false);
       run('wrong-installed-table-member', () => f.entry.individual_proof.installed_member.version = '16.2.14', false);
       run('wrong-public-delegation', () => f.entry.individual_proof.reachable_behavior.id = 'unrelated-assertion', false);
     }

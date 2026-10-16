@@ -48,7 +48,7 @@ ARTIFACT_REQUIRED_SUBJECTS = {
     '688c430fe8df09152ee59eb8a2ca62b5ba2fb81e':
         ('already-adapted', 'select-close-on-real-scroll-detach', 'packed-consumer/harness/select-close-on-real-scroll-detach', 9),
     'ca9c490ee30dbf7c9c147079197d0dbc0abcd611':
-        ('inherited', 'table-no-data-row-on-push', 'packed-consumer/harness/table-no-data-row-on-push-rendering', 13),
+        ('inherited', 'table-no-data-row-on-push', 'packed-consumer/harness/table-no-data-row-on-push-rendering', 14),
 }
 ARTIFACT_REQUIRED_SHA_IDS = frozenset(ARTIFACT_REQUIRED_SUBJECTS)
 LATER_METHOD_PROOFS = {

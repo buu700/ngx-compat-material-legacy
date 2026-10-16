@@ -43,6 +43,7 @@ export const SELECT_DETACH_MEMBERS = Object.freeze([
 ]);
 export const TABLE_ONPUSH_MEMBERS = Object.freeze([
   'projects/ngx-material-legacy/legacy-table/table.ts',
+  'projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts',
   'projects/ngx-material-legacy/legacy-table/row.ts',
   'projects/ngx-material-legacy/legacy-table/table-module.ts',
   'projects/ngx-material-legacy/legacy-table/table-data-source.ts',

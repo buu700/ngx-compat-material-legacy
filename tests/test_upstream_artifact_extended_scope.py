@@ -21,7 +21,7 @@ class ExtendedArtifactScopeTests(unittest.TestCase):
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         observed = json.loads(result.stdout.strip().splitlines()[-1])
-        self.assertEqual(observed['actual_cli_cases'], 32)
+        self.assertEqual(observed['actual_cli_cases'], 34)
         self.assertEqual(observed['new_scopes'], 2)
         for field in ['complete_run_validation_text_preserved', 'complete_path_hash_primitives_preserved',
                 'focus_observation_predicate_preserved', 'existing_focus_hunk_judgment_unchanged']:
