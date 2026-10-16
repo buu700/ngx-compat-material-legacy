@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SmallSpecContextTests(unittest.TestCase):
     def test_actual_source_readers_and_context_corruption_controls(self):
-        result = subprocess.run(['node', 'tests/spec_small_context_probe.mjs'], cwd=ROOT,
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'spec-fixture-context'], cwd=ROOT,
                                 capture_output=True, text=True, timeout=120)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])

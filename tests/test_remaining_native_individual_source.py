@@ -13,14 +13,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class RemainingNativeIndividualSourceTests(unittest.TestCase):
-    def run_probe(self, name, timeout=60):
-        result = subprocess.run(['node', name], cwd=ROOT, capture_output=True,
+    def run_probe(self, name, timeout=60, *arguments):
+        result = subprocess.run(['node', name, *arguments], cwd=ROOT, capture_output=True,
                                 text=True, timeout=timeout)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         return json.loads(result.stdout.strip().splitlines()[-1])
 
     def test_whole_original_and_current_source_controls(self):
-        report = self.run_probe('tests/remaining_native_individual_source_probe.mjs')
+        report = self.run_probe('scripts/run-historical-source-probe.mjs', 60, 'native-individual-source')
         self.assertEqual(report['source_judgments'], 3)
         self.assertEqual(report['whole_original_hunks'], 4)
         self.assertEqual(report['controls'], 391)
@@ -36,7 +36,7 @@ class RemainingNativeIndividualSourceTests(unittest.TestCase):
         self.assertFalse(report['actual_angular_native_or_packed_qualified'])
 
     def test_real_source_judgments_require_observed_runtime(self):
-        report = self.run_probe('tests/upstream/remaining-native-individual-admission.mjs', 180)
+        report = self.run_probe('scripts/run-historical-source-probe.mjs', 180, 'native-individual-admission')
         self.assertEqual(report['actual_root_cli_controls'], 19 if report['line'] == '21.x' else 18)
         self.assertTrue(report['real_source_judgments_preserved'])
         self.assertFalse(report['actual_native_packed_or_floor_qualified'])
