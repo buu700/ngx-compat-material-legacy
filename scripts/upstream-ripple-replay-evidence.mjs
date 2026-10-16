@@ -79,6 +79,7 @@ export function validateRippleReplay({root,entry,proof,request}) {
     const line = request?.line ?? proof?.affected_branches?.[0], registered = rippleReplayRequirements(entry?.sha,line);
     const scope = proof?.ripple_replay_behavior;
     demand(registered && proof?.proof_kind === RIPPLE_REPLAY_KIND && proof.diff_sha256 === patch,'unregistered ripple replay subject');
+    demand(line !== '21.x' || entry.final_disposition !== 'inherited','21 public peer lacks the replay catch; inherited-fix disposition is invalid');
     demand(object(scope) && scope.kind === registered.kind && isDeepStrictEqual(scope.runtimes,registered.runtimes),'wrong ripple replay scope');
     demand(isDeepStrictEqual(proof.affected_branches,[line]) && isDeepStrictEqual(proof.peer_reference,registered.peer_reference),'wrong ripple replay peer reference');
     demand(Array.isArray(scope.source_members) && sameIds(scope.source_members.map(row => row?.path),registered.members),'incomplete ripple replay source scope');
