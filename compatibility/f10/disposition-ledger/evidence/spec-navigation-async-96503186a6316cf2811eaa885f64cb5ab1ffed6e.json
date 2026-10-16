@@ -1,0 +1,728 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "96503186a6316cf2811eaa885f64cb5ab1ffed6e",
+  "subject": "refactor(material/tabs): switch tests away from fakeAsync (#33234)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "ebe327d2696e9075541e3406b63b05ee74a8a5d4",
+      "after_blob": "71705913bbfa2980f0ac4ee2b868be5f4b48639f"
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "db80c8b1ec087687fe07bc63757cd2e2e4943398",
+      "after_blob": "71483fcc0b8bf8d6be2ee3454ecac8ef05cf720b"
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "896c71baa16451782632a611747b44172f092fb0",
+      "after_blob": "62252ff08fa75cd30876d8b8eeca605505993d48"
+    }
+  ],
+  "original_files": 3,
+  "original_hunks": 58,
+  "raw_commit_sha256": "b6d331d3d380df736be23113a5599b2d28855233ea427ccb51c83fd47fc75840",
+  "original_sources": {
+    "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+    "sha256": "5626ccdbfe448e3698d24ad685bbef2995664c4feb41ed2ce45276f41610099f"
+  },
+  "patch_file": "compatibility/rc/spec-navigation-async-source-96503186a6316cf2811eaa885f64cb5ab1ffed6e.patch",
+  "diff_sha256": "8aae412be7d96651af02476bfacdd6f4f528e542b6dd553b824be1e1ae3aaa11",
+  "hunk_reviews": [
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -10,14 +10,7 @@ import {",
+      "sha256": "b0b7c80cf975fdc011e156def0f2c255d664d293a2107a312689e7b66f5145c1",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -31,11 +24,11 @@ import {",
+      "sha256": "ec61744fa2d97f63ef1c4e37c15f1766ff4aa9f999de216fe78642fa0f83cd94",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -72,7 +65,7 @@ describe('MatTabGroup', () => {",
+      "sha256": "c8e8a63a14f395205b57db2a560736d2492456242106d09d57f4f0ab3d169609",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -81,13 +74,12 @@ describe('MatTabGroup', () => {",
+      "sha256": "1f4bb5462a98d316c899b1e94fd5be1ebcef76ade57e261bc76c8600095782e1",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -101,9 +93,9 @@ describe('MatTabGroup', () => {",
+      "sha256": "359f10319ab0df1ff906f0d15012a810ef0f3f49f5683d06cdeaff2352161c46",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -115,11 +107,11 @@ describe('MatTabGroup', () => {",
+      "sha256": "5e537447bded1a521db860af8fd11a3b4cf44f7100d05bbd9fff553de26fd235",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -214,9 +206,9 @@ describe('MatTabGroup', () => {",
+      "sha256": "ede0ccfe50b5050ea00b064c306b6a1b7684b6354b8e3ae383f335ab555a34d8",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -227,24 +219,24 @@ describe('MatTabGroup', () => {",
+      "sha256": "8182675312f182f06c09166717678fb35c7cf7d4a96a521d61988522934803ea",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -320,7 +312,7 @@ describe('MatTabGroup', () => {",
+      "sha256": "73f9b4b5264cedbc70f59ae63e8c8b43ffea495c9dcff34a120907cd674b4dbd",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -332,14 +324,14 @@ describe('MatTabGroup', () => {",
+      "sha256": "3f258398b5341f3a345f8016a38d7b21d98d57f8d3b72f306a205396c82a2431",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -392,9 +384,9 @@ describe('MatTabGroup', () => {",
+      "sha256": "22d43f288e43d7eb78fd732c190ba9a4445c49196e6055d948111df8d0f4eacf",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -408,11 +400,11 @@ describe('MatTabGroup', () => {",
+      "sha256": "65083855bf020013c51e6d2200a79b1c1639617e03ff33551aa1b16c03d15361",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -426,7 +418,7 @@ describe('MatTabGroup', () => {",
+      "sha256": "c2de64e3950841076831dd8c8463740532220272f742150634ee6df5f42b5d1f",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -492,12 +484,12 @@ describe('MatTabGroup', () => {",
+      "sha256": "92592158aad463aca6bd1baace535aa9fd065587d967ea03ac46d0b2ef7f4c20",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -540,12 +532,12 @@ describe('MatTabGroup', () => {",
+      "sha256": "bfb4e0b9c714ac273c5193ae3f620acb2ec735e1e120de471a61d9b78de5b21c",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -594,14 +586,14 @@ describe('MatTabGroup', () => {",
+      "sha256": "96d14562af7ba4674401f26fca1037e1769122f4c91f5c005c105c1523bee7b0",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -610,16 +602,16 @@ describe('MatTabGroup', () => {",
+      "sha256": "6ec52c019c43929006dfc24c7e0d6a161a1a73a72272e0eb97c73066cdd3ce2a",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -661,7 +653,7 @@ describe('MatTabGroup', () => {",
+      "sha256": "e8c3e1769e60fa25c7c66a645b4357a2b558a34d4de0980fcde493030e2d022c",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -672,13 +664,13 @@ describe('MatTabGroup', () => {",
+      "sha256": "8e04f5b60095a913666fb70ebf8db720590689cc1086b281deeb5c03dbb4e50a",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -689,13 +681,13 @@ describe('MatTabGroup', () => {",
+      "sha256": "5b0d1128cecdf3fe41256ed55930207d8f9e21157d0c50eb30471a890607a7a8",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -708,19 +700,19 @@ describe('MatTabGroup', () => {",
+      "sha256": "fbf61b30700c90c2e4b325804bf543459da0bc77824e69a1276ba4f3c0a9c43e",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -728,52 +720,52 @@ describe('MatTabGroup', () => {",
+      "sha256": "f9c479dec95f952d69240d09501a08df70913e3e4263415d8019145c607fdbac",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -785,24 +777,24 @@ describe('MatTabGroup', () => {",
+      "sha256": "4f7bb752f7314847df2b6c3987891d86869a042385e7eb54e601435a6df25963",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -816,7 +808,7 @@ describe('MatTabGroup', () => {",
+      "sha256": "b45fd434c150d409fafa7e9f1f3b717b8f4397990c016ea784877e9e8a21eec8",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -827,13 +819,13 @@ describe('MatTabGroup', () => {",
+      "sha256": "79d97b662b9f6e6c021741bdd01c59008edc9966736d45fc89090c87d701e7c5",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -845,51 +837,53 @@ describe('MatTabGroup', () => {",
+      "sha256": "c8811ea32ebc9a5a20189fd73ca7655c8b56525239aada730e6399d0fab6f848",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -903,14 +897,14 @@ describe('MatTabGroup', () => {",
+      "sha256": "7c9014512db93e33dd58172542b759f7ed71c988062794154ce14a56c188ed2d",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -921,17 +915,17 @@ describe('MatTabGroup', () => {",
+      "sha256": "a79254e8d62dd8d3eac771174b699f717f92ce8aa9cf680ff75fcaf649d46399",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -939,10 +933,10 @@ describe('MatTabGroup', () => {",
+      "sha256": "79e33e71b24131c61ba9fe7d2e287776d591cf73cd716e1fc98387540dcd2ad3",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -954,13 +948,13 @@ describe('MatTabGroup', () => {",
+      "sha256": "7916503eed0b97e5a8ca12abd6e6f0635ab892dc26cce6b624e51b988403c218",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -971,8 +965,8 @@ describe('MatTabGroup', () => {",
+      "sha256": "b8a665a62df7798d3eee33249d0fae12e111ac21d892d5fe9a97bdd396b93056",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1068,31 +1062,35 @@ describe('MatTabGroup', () => {",
+      "sha256": "b0c8c5543ec6ef9f4094eda7c981b6adbfaf197b559b847122b09b227c8afbf9",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1134,7 +1132,7 @@ describe('MatTabGroup with ink bar fit to content', () => {",
+      "sha256": "ccb2b0bd7920b151172feb1d598a5f5717edf462f284eff8384d60408a50c6db",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1143,7 +1141,7 @@ describe('MatTabGroup with a default config', () => {",
+      "sha256": "68333da7b224038e603e55c7c2690813316b4cf6ad30e64246907c4d101c0be3",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -16,16 +16,7 @@ import {",
+      "sha256": "83851d5ffdcc2396ca1a184851fc61d69bedbb3ec1bdb0b29c7360ab7776c4cd",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -36,10 +27,14 @@ describe('MatTabHeader', () => {",
+      "sha256": "95fef698f1b678ed4491edcab7fce16d8cf1d02116907fc30ea0c9b19d2a08c8",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -326,7 +321,7 @@ describe('MatTabHeader', () => {",
+      "sha256": "4eeaac18f65cd63d709e7e1f4bc628711c7f9ba3c89a574cd8c83e070fe2a9b9",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -346,12 +341,12 @@ describe('MatTabHeader', () => {",
+      "sha256": "b18097192df410ff0f3861e202e7fa65563b98d0472640ec73b278ba5ea91f9e",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -402,103 +397,70 @@ describe('MatTabHeader', () => {",
+      "sha256": "6c07102a92ea42140207d5f88173f1f04f3ab8e2a0487d23888a069b04cae021",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -508,12 +470,13 @@ describe('MatTabHeader', () => {",
+      "sha256": "55a2ba85116786d66993ee3f7466b3640abaafd49ca409a508bb5d16c1f6f2e8",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -521,30 +484,31 @@ describe('MatTabHeader', () => {",
+      "sha256": "0b9e285e54a598c9afd2e66ca95c68f64bb55d884457fcff303493a91c56d324",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -552,14 +516,15 @@ describe('MatTabHeader', () => {",
+      "sha256": "bffec43412182d7a54b57d9441267cc0a62b18d9c8bcdcfc95131d1827f84834",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -567,7 +532,7 @@ describe('MatTabHeader', () => {",
+      "sha256": "377340e8966abf520c8a5fc7809e34087d7fd35fa70a6dede08f7e83caabd33c",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -577,28 +542,29 @@ describe('MatTabHeader', () => {",
+      "sha256": "9915140a656a3e70c72f243d0aa84996b7b9d339c05fd54e31f08d150d3af2cb",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -636,7 +602,7 @@ describe('MatTabHeader', () => {",
+      "sha256": "8a63be8d83df75b5579e53a04659d3f48ee312af741f94f4f16f63737037af2e",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -648,12 +614,12 @@ describe('MatTabHeader', () => {",
+      "sha256": "3c2ccfd7ab4f08b8574df1ec227ba23e15d2af5e1f5bade80fa659a79558f4d2",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -663,13 +629,12 @@ describe('MatTabHeader', () => {",
+      "sha256": "c72c29b5ec8307755fcfc5fd3b809e0ddfc8ad24df3692bf360fc317fc8d5a91",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-header.spec.ts",
+      "header": "@@ -678,11 +643,10 @@ describe('MatTabHeader', () => {",
+      "sha256": "65ceb085485460c569aff94b0d9f0ad842443dedaf61d268cbdd07acdf688526",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -16,7 +16,7 @@ import {",
+      "sha256": "3892bd958015802c4472a1c36c1fa7d67087aa1c89230722405f2920e703033a",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -29,7 +29,11 @@ describe('MatTabNavBar', () => {",
+      "sha256": "379f06147704cf5c764424f02d4d1f33200acfc1d30771c807630cc2772355fd",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -42,7 +46,7 @@ describe('MatTabNavBar', () => {",
+      "sha256": "3e3da32babb9b192baff33990b37e877be8badf5a49aba0caf1b79732b478753",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -127,19 +131,19 @@ describe('MatTabNavBar', () => {",
+      "sha256": "90f777c8c01fc2e2cbd28031ae791e43ce509626d887e5fa9336c6b6c7880de6",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -147,10 +151,10 @@ describe('MatTabNavBar', () => {",
+      "sha256": "5a42200130cc68a820eeb07b65be23697be3757dbbedbab6ea5eaade6c29778c",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -167,17 +171,17 @@ describe('MatTabNavBar', () => {",
+      "sha256": "34069483f58ed41f768c123a3a1c35e986ed62b4bc8a13c0cecd7e759b352215",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -200,14 +204,14 @@ describe('MatTabNavBar', () => {",
+      "sha256": "26daba7a7568a77f3762d8e2c9d1986e3bcb5e635a29ff3964c5dd4bc71cdd49",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -350,27 +354,27 @@ describe('MatTabNavBar', () => {",
+      "sha256": "db862c97bfa77a564ffb506ab8256d272b246ddc777d0dae1f6ce56449366551",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -503,11 +507,11 @@ describe('MatTabNavBar', () => {",
+      "sha256": "73efa9bc90ab825b05b694a4618208cb691c0f79c775f66b326aadb85c6c5a34",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -524,22 +528,24 @@ describe('MatTabNavBar with a default config', () => {",
+      "sha256": "d7b43d174890c177f0c2abbb2cce96b18ad9d39036dcd090b05cf2f2d8bed8f9",
+      "judgment": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "96503186a6316cf2811eaa885f64cb5ab1ffed6e",
+    "complete_original_files": 3,
+    "complete_original_hunks": 58,
+    "removed": [
+      {
+        "path": "src/material/tabs/tab-header.spec.ts",
+        "suites": [
+          "'MatTabHeader'",
+          "'pagination'",
+          "'scrolling when holding paginator'"
+        ],
+        "name": "'should clear the timeouts on click'",
+        "mode": "it",
+        "sha256": "f30f1fed81ae3acaca97770134e69f2f31aff796f91b37e94f93a806ad5e5337"
+      },
+      {
+        "path": "src/material/tabs/tab-header.spec.ts",
+        "suites": [
+          "'MatTabHeader'",
+          "'pagination'",
+          "'scrolling when holding paginator'"
+        ],
+        "name": "'should clear the timeouts on touchend'",
+        "mode": "it",
+        "sha256": "5ef5fedb6e8a0e3d8927bfacee19b9b6d249aef318064c2af516bfa92588c8f3"
+      },
+      {
+        "path": "src/material/tabs/tab-header.spec.ts",
+        "suites": [
+          "'MatTabHeader'",
+          "'pagination'",
+          "'scrolling when holding paginator'"
+        ],
+        "name": "'should clear the timeouts when reaching the start'",
+        "mode": "it",
+        "sha256": "aafa71e5fcd0955602437cf61677717e20865d40c2b9faf107dc6483e1521f47"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 138,
+    "hooks": 23,
+    "fixture_classes": 25,
+    "template_style_properties": 26
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+    "sha256": "2a6e33df7be00cc122b314a57db861c012683cd03a10c810fdb299c27b248415"
+  },
+  "decision": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+  "prior_entry": {
+    "sha": "96503186a6316cf2811eaa885f64cb5ab1ffed6e",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/tabs): switch tests away from fakeAsync (#33234)",
+    "files": [
+      "src/material/tabs/tab-group.spec.ts",
+      "src/material/tabs/tab-header.spec.ts",
+      "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+    "sha256": "f0eb677a66cdfed1e4981b15fa41ea47fe56a37e55f7aa10f5a850bc75738b91"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "8aae412be7d96651af02476bfacdd6f4f528e542b6dd553b824be1e1ae3aaa11",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-navigation-async-source-review.mjs",
+        "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+      },
+      {
+        "path": "tests/spec_navigation_async_source_probe.mjs",
+        "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+      },
+      {
+        "path": "tests/test_spec_navigation_async_source.py",
+        "sha256": "49d5071cdd479516603bd7ac529d9448622eb0e31493a493a5070218c834d75f"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+        "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+        "sha256": "5626ccdbfe448e3698d24ad685bbef2995664c4feb41ed2ce45276f41610099f"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+        "sha256": "4dbcf185a2a9365dca431da46fd4e0abc5830d854cb14c533b876fed27129ccf"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+        "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+        "sha256": "f0eb677a66cdfed1e4981b15fa41ea47fe56a37e55f7aa10f5a850bc75738b91"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+        "sha256": "2a6e33df7be00cc122b314a57db861c012683cd03a10c810fdb299c27b248415"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+        "sha256": "6e9b856df6f2c7415cb27f2f9ed8a47f1dc54b8dd8761b488d939eff3cb99084"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+        "sha256": "49e0ad2abae65423b62866b4692f727961d126f39cf127b7750625bbad33d842"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+        "sha256": "63862f4559c0cea83cec6deb3f3577b279c620b6300995eb49a931ae9b83b57d"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+        "sha256": "046663eff8a7c8b0b26fe6e8a4ee87c3953478180e00f3a05e6ae9d01ee11fe7"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+        "sha256": "78fb07523317bcd0a5db5eed633b03d0098597394f99fd24a1575db89f6b5f4c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+        "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+        "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+        "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+        "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+        "sha256": "1fe76bf969a400b9cd6f5be7e58e1bf997f496a8d5beaa755882b9a6340e58f8"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-navigation-async-source-review.mjs",
+      "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+    },
+    {
+      "path": "tests/spec_navigation_async_source_probe.mjs",
+      "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+    },
+    {
+      "path": "tests/test_spec_navigation_async_source.py",
+      "sha256": "49d5071cdd479516603bd7ac529d9448622eb0e31493a493a5070218c834d75f"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+      "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+      "sha256": "5626ccdbfe448e3698d24ad685bbef2995664c4feb41ed2ce45276f41610099f"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+      "sha256": "4dbcf185a2a9365dca431da46fd4e0abc5830d854cb14c533b876fed27129ccf"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+      "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+      "sha256": "f0eb677a66cdfed1e4981b15fa41ea47fe56a37e55f7aa10f5a850bc75738b91"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+      "sha256": "2a6e33df7be00cc122b314a57db861c012683cd03a10c810fdb299c27b248415"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+      "sha256": "6e9b856df6f2c7415cb27f2f9ed8a47f1dc54b8dd8761b488d939eff3cb99084"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+      "sha256": "49e0ad2abae65423b62866b4692f727961d126f39cf127b7750625bbad33d842"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+      "sha256": "63862f4559c0cea83cec6deb3f3577b279c620b6300995eb49a931ae9b83b57d"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+      "sha256": "046663eff8a7c8b0b26fe6e8a4ee87c3953478180e00f3a05e6ae9d01ee11fe7"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+      "sha256": "78fb07523317bcd0a5db5eed633b03d0098597394f99fd24a1575db89f6b5f4c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+      "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+      "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+      "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+      "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+      "sha256": "1fe76bf969a400b9cd6f5be7e58e1bf997f496a8d5beaa755882b9a6340e58f8"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
