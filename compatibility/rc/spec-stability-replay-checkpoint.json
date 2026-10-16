@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "Replay preparation qualified:20 immutable original source programs registered, prior18 frames/16 wrapper records/75 controls exact;81 guard controls and two actual original programs via unchanged-assertion/time-limit Python wrappers passed. Four stability SHA decisions and actual native/floor gates remain pending.",
+  "source_parent": "54dcecfb8e2594713e9bbdb313a65357b39d61ba",
+  "current_frame": {
+    "commit": "13e9b350728834a1825f2d2d139cfa5af91a503e",
+    "tree": "3ecfb8a7596f9ddd4c630cffd1f6707e70d4d206",
+    "tree_listing_sha256": "8ae56c744ff842f1d34d43e1bcf9c0d4010cd31212dcc4897a68871ef2be7c4a",
+    "members": 6361
+  },
+  "registry": {
+    "path": "compatibility/rc/historical-source-replay-inputs.json",
+    "sha256": "f2444f76dd8c6a75941f0967f796e1240a0ac6cc60027ed11ae1ca3852bf1ea4"
+  },
+  "helper": {
+    "path": "scripts/historical-source-replay.mjs",
+    "sha256": "a4d30ce86b042413fc60f59fedac9048ae74a396fdbc303db91009d377028aab"
+  },
+  "prior": {
+    "path": "compatibility/rc/spec-stability-replay-prior.json.gz",
+    "sha256": "34fe5ab1b726e3e0b32497ff7fdb94af108ae8e14f421962e24942a0d5c4b7b6"
+  },
+  "controls": {
+    "path": "compatibility/rc/spec-stability-replay-controls.json",
+    "sha256": "859ed33b325c808a68030730ec2f1d2a82940f0a20d107ca42730cfe6edd6380"
+  },
+  "python_integration": {
+    "path": "compatibility/rc/spec-stability-replay-python.log.gz",
+    "sha256": "4395535a9cdd0b57c610f5a331cbce167180324e544739b0c9f6dcf72008df3c"
+  },
+  "qualified_context": {
+    "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+    "sha256": "7be945fb436c1b4df1bcf782a9dd8a2fd1e285469eff461f32d59ca9550fce3e"
+  },
+  "registered_original_programs": 20,
+  "prior18_frames_programs_unchanged": true,
+  "prior16_wrapper_records_unchanged": true,
+  "prior75_controls_exact": true,
+  "new_frames": [
+    {
+      "id": "stability-chip-method",
+      "probe": "tests/spec_stability_chip_probe.mjs",
+      "probe_sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032",
+      "frame": {
+        "commit": "e0efe2790f729c7f58ada7bc9f2fcda17176755f",
+        "tree": "973a116a08d2bd934101f9de08977b919f3ab392",
+        "tree_listing_sha256": "df0572d831df4052e1f19bca05300940e5d6fc9f1ab263b5a87432371201941f",
+        "members": 6359
+      },
+      "timeout_ms": 60000,
+      "report_option": "--out"
+    },
+    {
+      "id": "stability-chip-context",
+      "probe": "tests/spec_stability_context_probe.mjs",
+      "probe_sha256": "2a31f08dfdf0631e2798dc645a3302445eb081ba55dc2ec495541c20ff694e73",
+      "frame": {
+        "commit": "e0efe2790f729c7f58ada7bc9f2fcda17176755f",
+        "tree": "973a116a08d2bd934101f9de08977b919f3ab392",
+        "tree_listing_sha256": "df0572d831df4052e1f19bca05300940e5d6fc9f1ab263b5a87432371201941f",
+        "members": 6359
+      },
+      "timeout_ms": 60000,
+      "report_option": "--out"
+    }
+  ],
+  "new_exact_wrapper_edits": [
+    {
+      "path": "tests/test_spec_stability_chip.py",
+      "reference_commit": "e0efe2790f729c7f58ada7bc9f2fcda17176755f",
+      "before_sha256": "6d9f74980ced9a95c9097d5cb733357bff168aff68aaa6bdbacff9bf6eed4ed6",
+      "after_sha256": "a9cf18feea6a94dc947d02186885b4d129bff34e2ca6075a1915a0ce48483a16",
+      "edits": [
+        {
+          "before": "['node', 'tests/spec_stability_chip_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'stability-chip-method']"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_spec_stability_context.py",
+      "reference_commit": "e0efe2790f729c7f58ada7bc9f2fcda17176755f",
+      "before_sha256": "871d78318dd49464183e571a1cbae4e05678c84a429c7fee653b8907e6c1d6bc",
+      "after_sha256": "094c64feb2dc82745bf58069d252b04ace3a6738dd1ca5b525b11a5c0892b1de",
+      "edits": [
+        {
+          "before": "['node', 'tests/spec_stability_context_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'stability-chip-context']"
+        }
+      ]
+    }
+  ],
+  "guard_controls_passed": 81,
+  "actual_original_programs_replayed": 2,
+  "python_integration_tests_passed": 2,
+  "current_guard_checked_before_and_after_actual_replays": true,
+  "current_source_qualification_from_replay": false,
+  "current_native_or_floor_qualification": false,
+  "product_members": 1141,
+  "original_owned_cases_preserved": 2222,
+  "current_cases": 2223,
+  "case_cells": 2228,
+  "ledger_decisions_and_authored_statuses_changed": 0,
+  "pushed": false,
+  "actions_started": false,
+  "ready_for_Actions": false,
+  "g11_claim": "not-passed",
+  "next_actions": [
+    "Complete the four individual stability source decisions from7 complete original files/42 hunks, including the chip adaptation, removed tree debounce registration, explicit OnPush removal and timer/stability changes. Preserve all20 original historical programs/frames/assertions and the prior75+new6 guard controls.",
+    "After qualified SHA decisions change ledger metadata, explicitly advance strict historical current coherence to the qualified graph before relying on historical tests or final implementation CI. Preserve all20 fixed frames/programs and six-HEAD-tool/two-progress-path protocol; no bypass.",
+    "Continue remaining41 genuine spec-only and41 mixed candidates, all1697 SHA/1736 frozen+308 delta/C02-C05/A01-A10/R01-R03/G01-G13 and actual packed/native/browser/SSR/migration/compiler/Node/RxJS/peer floors, final private command-source reconciliation, plausibly final implementation Actions and independent audit. No publication."
+  ]
+}
