@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class HistoricalBehaviorTests(unittest.TestCase):
     def test_actual_writer_named_cases_and_admission_corruption_controls(self):
-        result = subprocess.run(['node', 'tests/upstream/historical-behavior-admission.mjs'],
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'historical-native-admission'],
                                 cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-10000:])
         observed = json.loads(result.stdout.strip().splitlines()[-1])
