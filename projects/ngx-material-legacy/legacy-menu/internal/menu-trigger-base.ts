@@ -56,7 +56,6 @@ import {normalizePassiveListenerOptions} from '@angular/cdk/platform';
 import {asapScheduler, merge, Observable, of as observableOf, Subscription} from 'rxjs';
 import {delay, filter, takeUntil} from 'rxjs/operators';
 import {_MatMenuBase} from './menu-base';
-import {_MatMenuContentBase} from './menu-content-base';
 import type {MatMenuPanel} from './menu-panel';
 import {MAT_MENU_PANEL} from './menu-panel-token';
 import {throwMatMenuRecursiveError} from './menu-errors';
@@ -75,6 +74,9 @@ export const MAT_MENU_SCROLL_STRATEGY_FACTORY_PROVIDER = {
 
 /** Options for binding a passive event listener. */
 const passiveEventListenerOptions = normalizePassiveListenerOptions({passive: true});
+
+/** The overlay/lazy view currently displaying an owned menu has one trigger. */
+const MENU_PANEL_OWNERS = new WeakMap<MatMenuPanel, _MatMenuTriggerBase>();
 
 /**
  * Default top padding of the menu panel.
@@ -101,6 +103,12 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
   private _closingActionsSubscription = Subscription.EMPTY;
   private _hoverSubscription = Subscription.EMPTY;
   private _menuCloseSubscription = Subscription.EMPTY;
+  private _pendingRemoval = Subscription.EMPTY;
+  private _keydownSubscription = Subscription.EMPTY;
+  private _attachedMenu: MatMenuPanel | null = null;
+  private _menuGeneration = 0;
+  private _destroyed = false;
+  private _closedMenus = new WeakSet<MatMenuPanel>();
   private _scrollStrategy: () => ScrollStrategy;
   private _changeDetectorRef = inject(ChangeDetectorRef);
 
@@ -160,13 +168,26 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
         throwMatMenuRecursiveError();
       }
 
-      this._menuCloseSubscription = menu.close.subscribe((reason: MenuCloseReason) => {
-        this._destroyMenu(reason);
+      this._menuCloseSubscription = menu.close.subscribe({
+        next: (reason: MenuCloseReason) => {
+          this._destroyMenu(reason);
 
-        // If a click closed the menu, we should close the entire chain of nested menus.
-        if ((reason === 'click' || reason === 'tab') && this._parentMaterialMenu) {
-          this._parentMaterialMenu.closed.emit(reason);
-        }
+          // A click/tab closes the whole chain of nested menus.
+          if ((reason === 'click' || reason === 'tab') && this._parentMaterialMenu) {
+            this._parentMaterialMenu.closed.emit(reason);
+          }
+        },
+        complete: () => {
+          this._closedMenus.add(menu);
+          if (this._attachedMenu === menu) {
+            this._destroyMenu(undefined);
+            if (this._attachedMenu === menu && this._overlayRef) {
+              this._pendingRemoval.unsubscribe();
+              this._pendingRemoval = Subscription.EMPTY;
+              this._detachMenu(menu, this._overlayRef);
+            }
+          }
+        },
       });
     }
 
@@ -276,6 +297,18 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
   }
 
   ngOnDestroy() {
+    if (this._destroyed) {
+      return;
+    }
+    this._destroyed = true;
+    this._menuGeneration++;
+    this._menuOpen = false;
+    this._pendingRemoval.unsubscribe();
+    this._keydownSubscription.unsubscribe();
+    this._closingActionsSubscription.unsubscribe();
+    if (this._attachedMenu && this._overlayRef) {
+      this._detachMenu(this._attachedMenu, this._overlayRef);
+    }
     if (this._overlayRef) {
       this._overlayRef.dispose();
       this._overlayRef = null;
@@ -316,7 +349,34 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
   openMenu(): void {
     const menu = this.menu;
 
-    if (this._menuOpen || !menu) {
+    if (this._destroyed || this._menuOpen || !menu || this._closedMenus.has(menu)) {
+      return;
+    }
+
+    const generation = ++this._menuGeneration;
+    this._pendingRemoval.unsubscribe();
+    this._pendingRemoval = Subscription.EMPTY;
+    if (this._attachedMenu && this._overlayRef) {
+      this._detachMenu(this._attachedMenu, this._overlayRef);
+    }
+
+    const previousOwner = MENU_PANEL_OWNERS.get(menu);
+    if (previousOwner && previousOwner !== this) {
+      previousOwner._destroyMenu(undefined);
+      // A close/focus observer may have made a newer open request.
+      if (previousOwner.menuOpen) {
+        return;
+      }
+      previousOwner._pendingRemoval.unsubscribe();
+      previousOwner._pendingRemoval = Subscription.EMPTY;
+      if (previousOwner._attachedMenu === menu && previousOwner._overlayRef) {
+        previousOwner._detachMenu(menu, previousOwner._overlayRef);
+      }
+      if (MENU_PANEL_OWNERS.has(menu)) {
+        return;
+      }
+    }
+    if (this._destroyed || generation !== this._menuGeneration || this.menu !== menu) {
       return;
     }
 
@@ -327,24 +387,34 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
     this._setPosition(menu, positionStrategy);
     overlayConfig.hasBackdrop =
       menu.hasBackdrop == null ? !this.triggersSubmenu() : menu.hasBackdrop;
+    MENU_PANEL_OWNERS.set(menu, this);
+    this._attachedMenu = menu;
     overlayRef.attach(this._getPortal(menu));
 
     if (menu.lazyContent) {
       menu.lazyContent.attach(this.menuData);
     }
 
+    if (this._destroyed || generation !== this._menuGeneration || MENU_PANEL_OWNERS.get(menu) !== this) {
+      return;
+    }
+
     this._closingActionsSubscription = this._menuClosingActions().subscribe(() => this.closeMenu());
     this._initMenu(menu);
+
+    if (this._destroyed || generation !== this._menuGeneration || !this.menuOpen) {
+      return;
+    }
 
     if (typeof (menu as _MatMenuBase)._startAnimation === 'function') {
       const materialMenu = menu as _MatMenuBase;
       materialMenu._startAnimation();
-      materialMenu._directDescendantItems.changes.pipe(takeUntil(materialMenu.close)).subscribe(() => {
+      this._closingActionsSubscription.add(materialMenu._directDescendantItems.changes.pipe(takeUntil(materialMenu.close)).subscribe(() => {
         // Re-adjust the position without locking when the amount of items
         // changes so that the overlay is allowed to pick a new optimal position.
         positionStrategy.withLockedPosition(false).reapplyLastPosition();
         positionStrategy.withLockedPosition(true);
-      });
+      }));
     }
   }
 
@@ -374,34 +444,79 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
 
   /** Closes the menu and does the necessary cleanup. */
   private _destroyMenu(reason: MenuCloseReason) {
-    if (!this._overlayRef || !this.menuOpen) {
+    if (this._destroyed || !this._overlayRef || !this.menuOpen) {
       return;
     }
 
-    const menu = this.menu;
+    const menu = this._attachedMenu || this.menu;
+    const overlayRef = this._overlayRef;
+    const generation = ++this._menuGeneration;
+    const openedBy = this._openedBy;
+    this._openedBy = undefined;
     this._closingActionsSubscription.unsubscribe();
-    this._overlayRef.detach();
+    this._keydownSubscription.unsubscribe();
+    overlayRef.detachBackdrop();
+    // Retain painting without intercepting interaction meant for lower overlays.
+    overlayRef.overlayElement.style.pointerEvents = 'none';
+    this._setIsMenuOpen(false);
+    if (this._destroyed || generation !== this._menuGeneration) {
+      return;
+    }
 
     // Always restore focus if the user is navigating using the keyboard or the menu was opened
     // programmatically. We don't restore for non-root triggers, because it can prevent focus
     // from making it back to the root trigger when closing a long chain of menus by clicking
     // on the backdrop.
-    if (this.restoreFocus && (reason === 'keydown' || !this._openedBy || !this.triggersSubmenu())) {
+    if (this.restoreFocus && (reason === 'keydown' || !openedBy || !this.triggersSubmenu())) {
       // Fall back to program like focusFirstItem when open was not from mouse/touch
       // (e.g. click after a non-primary mousedown). Native focus() can otherwise
       // inherit a stale FocusMonitor mouse origin from that mousedown.
-      this.focus(this._openedBy || 'program');
+      this.focus(openedBy || 'program');
     }
 
-    this._openedBy = undefined;
-
-    // Detach immediately; do not bind semantic close to the exit animation.
-    this._setIsMenuOpen(false);
-    if (menu instanceof _MatMenuBase) {
+    if (this._destroyed || generation !== this._menuGeneration) {
+      return;
+    }
+    if (menu instanceof _MatMenuBase && MENU_PANEL_OWNERS.get(menu) === this) {
+      // CSS motion needs the overlay and lazy views to remain attached. Close
+      // state/focus are already settled; only physical removal waits for void.
+      const removal = new Subscription();
+      this._pendingRemoval = removal;
+      const remove = () => {
+        if (generation === this._menuGeneration && MENU_PANEL_OWNERS.get(menu) === this) {
+          this._pendingRemoval = Subscription.EMPTY;
+          removal.unsubscribe();
+          this._detachMenu(menu, overlayRef);
+        }
+      };
+      removal.add(menu._animationDone.subscribe({
+        next: event => {
+          if (event.toState === 'void') {
+            remove();
+          }
+        },
+        complete: remove,
+      }));
       menu._resetAnimation();
-      (menu.lazyContent as _MatMenuContentBase | undefined)?.detach();
+    } else if (menu) {
+      this._detachMenu(menu, overlayRef);
     } else {
-      menu?.lazyContent?.detach();
+      overlayRef.detach();
+    }
+  }
+
+  /** Release only this attachment; a reentrant open may already own the content. */
+  private _detachMenu(menu: MatMenuPanel, overlayRef: OverlayRef) {
+    const owned = MENU_PANEL_OWNERS.get(menu) === this;
+    if (this._attachedMenu === menu) {
+      this._attachedMenu = null;
+    }
+    if (owned) {
+      MENU_PANEL_OWNERS.delete(menu);
+    }
+    overlayRef.detach();
+    if (owned && !MENU_PANEL_OWNERS.has(menu)) {
+      menu.lazyContent?.detach();
     }
   }
 
@@ -438,6 +553,10 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
       this._menuOpen = isOpen;
       this._menuOpen ? this.menuOpened.emit() : this.menuClosed.emit();
 
+      if (this._destroyed || this._menuOpen !== isOpen) {
+        return;
+      }
+
       if (this.triggersSubmenu()) {
         this._menuItemInstance._setHighlighted(isOpen);
       }
@@ -459,8 +578,12 @@ export abstract class _MatMenuTriggerBase implements AfterContentInit, OnDestroy
       );
       this._overlayRef = this._overlay.create(config);
 
-      // Handle keyboard events through the overlay keydown stream so stacking context is respected.
-      this._overlayRef.keydownEvents().subscribe(event => {
+    }
+
+    // Only an open menu participates in the overlay keyboard dispatcher. Reuse
+    // one subscription on reopen, including while the previous view exits.
+    if (this._keydownSubscription.closed) {
+      this._keydownSubscription = this._overlayRef.keydownEvents().subscribe(event => {
         if (this.menu instanceof _MatMenuBase) {
           this.menu._handleKeydown(event);
         }

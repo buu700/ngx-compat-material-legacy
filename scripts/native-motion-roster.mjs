@@ -159,6 +159,17 @@ function enabledProblem(component, mode, obs) {
   } else if (obs.durationMs !== 0) {
     return 'disabled motion still running';
   }
+  if (component === 'menu') {
+    const exit = obs.exit;
+    if (!exit || exit.semanticClosed !== true || exit.retainedAtClose !== true || exit.nonInteractiveAtClose !== true || exit.removed !== true) return 'menu exit attachment lifetime';
+    if (mode === 'enabled') {
+      if (exit.trustedStarts !== 1 || exit.trustedEnds !== 1 || exit.startConnected !== true || exit.endConnected !== true
+        || exit.renderedAtStart !== true || exit.animationName !== 'mat-legacy-menu-exit'
+        || !Number.isFinite(exit.durationMs) || exit.durationMs < 100) return 'menu exit was not painted through trusted completion';
+    } else if (exit.trustedStarts !== 0 || exit.trustedEnds !== 0) {
+      return 'disabled menu exit still animating';
+    }
+  }
   if (component === 'tabs' && obs.duplicateEndEventsDispatched !== true) return 'tab duplicate completion control missing';
   if (NOTIFICATION_CONTRACT.has(component) && obs.notifications !== 1) return 'notification count';
   return null;
@@ -255,6 +266,12 @@ export function samplePass(caseId) {
       durationMs: mode === 'enabled' ? MIN_ENABLED_MS[component] : 0,
       finalState: 'visible',
       notifications: NOTIFICATION_CONTRACT.has(component) ? 1 : 0,
+      ...(component === 'menu' ? {exit: {
+        semanticClosed: true, retainedAtClose: true, nonInteractiveAtClose: true, removed: true,
+        trustedStarts: mode === 'enabled' ? 1 : 0, trustedEnds: mode === 'enabled' ? 1 : 0,
+        startConnected: mode === 'enabled', endConnected: mode === 'enabled', renderedAtStart: mode === 'enabled',
+        animationName: mode === 'enabled' ? 'mat-legacy-menu-exit' : '', durationMs: mode === 'enabled' ? 100 : 0,
+      }} : {}),
       ...(component === 'tabs' ? {duplicateEndEventsDispatched: true} : {}),
       detectChangesCalls: 0,
     };
