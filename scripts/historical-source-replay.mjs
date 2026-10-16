@@ -16,7 +16,7 @@ import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export const HISTORICAL_REPLAY_INPUTS='compatibility/rc/historical-source-replay-inputs.json';
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'59531eadf50b7301f6e0dc73728c250e075613f9ee35c3f7aa4ec6b6d7cfd2af','21.x':'48dabb4ef5ebf4509eda3fe6916c64407aa948fb6b4738ec68cabce941a6140b'};
+const pins={main:'729141fa050a9452a8d01c9f5816c09f9aa08df34183f8d406e78453edbddd7e','21.x':'96c2978a7b21053cf5b8b94a7f2b8725397f85ee6c565f3d7f4b852f732705df'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
  'native-individual-source','native-individual-admission','spec-fixture-context'];
 // These six versioned replay-tool members are checked against the caller HEAD,
