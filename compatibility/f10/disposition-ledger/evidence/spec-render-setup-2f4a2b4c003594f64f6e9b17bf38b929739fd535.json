@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "2f4a2b4c003594f64f6e9b17bf38b929739fd535",
+  "subject": "refactor(cdk/table): remove explicit change detection",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "f231512597947a3d908917255549d4465a9efa6e",
+      "after_blob": "359ac3e3a8eeaa97a114c468c6592fff402867a9"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 1,
+  "raw_commit_sha256": "f1c896f83ebc33a85f973d2308c9c877c168e1ccd668bc9a4151084fe69335e1",
+  "original_sources": [
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "before": {
+        "git_blob": "f231512597947a3d908917255549d4465a9efa6e",
+        "sha256": "bbe2761285a3eb2ad11e805f315523525a4d24381fe85285d697ca34835d5c93",
+        "bytes": 132310
+      },
+      "after": {
+        "git_blob": "359ac3e3a8eeaa97a114c468c6592fff402867a9",
+        "sha256": "dcc33c33ae580e16dfafaa10d6209838254c17b0e609b89f89a9f5c21ad0add7",
+        "bytes": 132259
+      }
+    }
+  ],
+  "diff": "diff --git a/src/cdk/table/table.spec.ts b/src/cdk/table/table.spec.ts\nindex f231512597947a3d908917255549d4465a9efa6e..359ac3e3a8eeaa97a114c468c6592fff402867a9 100644\n--- a/src/cdk/table/table.spec.ts\n+++ b/src/cdk/table/table.spec.ts\n@@ -3325,7 +3325,6 @@ class TableWithIndirectDescendantDefs {\n       </tr>\n     </table>\n   `,\n-  changeDetection: ChangeDetectionStrategy.OnPush,\n   imports: [CdkTableModule],\n })\n class NativeHtmlTableAppOnPush {\n",
+  "diff_sha256": "a940dde88669104d6549638830c320e8618966183570e1719a01ba5a8c45cff5",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -3325,7 +3325,6 @@ class TableWithIndirectDescendantDefs {",
+      "sha256": "4e12ffeca2f742b26f614e15336ef0bc99d836f91d7fe2675fd2b5be04fff1f4",
+      "judgment": "Removes only the OnPush field from the decorator on NativeHtmlTableAppOnPush, leaving its name and assertions intact. This changes test rendering mode. Keep the separate owned NativeHtmlTableApp/public-CDK fixtures and all their assertions; no product rendering fix is inferred."
+    }
+  ],
+  "semantics": [
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "kind": "remove-OnPush-from-native-CDK-test-fixture",
+      "fixture": "NativeHtmlTableAppOnPush",
+      "rendering_mode_change_is_not_production_fix": true,
+      "assertion_text_unchanged_but_test_environment_changed": true
+    }
+  ],
+  "decision": "The single original hunk removes ChangeDetectionStrategy.OnPush from the private CDK NativeHtmlTableAppOnPush component decorator. The class name and surrounding assertions remain, but the fixture now uses default change detection, so the assertion text does not establish equivalence of rendering coverage. The owned table suite has its own NativeHtmlTableApp and public CdkTable/CdkTableModule consumer fixtures; it has no NativeHtmlTableAppOnPush counterpart to rewrite. The public CDK remains reachable and is not treated as an absent dependency. Decline this private test-environment change and preserve every owned fixture/rendering assertion and production change-detection setting. Actual table rendering, native row-group structure, nested ownership, viewport behavior and both supported peer floors remain required.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "a940dde88669104d6549638830c320e8618966183570e1719a01ba5a8c45cff5",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "The single original hunk removes ChangeDetectionStrategy.OnPush from the private CDK NativeHtmlTableAppOnPush component decorator. The class name and surrounding assertions remain, but the fixture now uses default change detection, so the assertion text does not establish equivalence of rendering coverage. The owned table suite has its own NativeHtmlTableApp and public CdkTable/CdkTableModule consumer fixtures; it has no NativeHtmlTableAppOnPush counterpart to rewrite. The public CDK remains reachable and is not treated as an absent dependency. Decline this private test-environment change and preserve every owned fixture/rendering assertion and production change-detection setting. Actual table rendering, native row-group structure, nested ownership, viewport behavior and both supported peer floors remain required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-render-setup-source-review.mjs",
+        "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+      },
+      {
+        "path": "tests/spec_render_setup_source_probe.mjs",
+        "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+        "sha256": "c8f172f1a452d9a0a7db086cad1e304916e0b0c322637e94bd4ec78ee05e35a7"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+        "sha256": "b10ffb29f37997babdbd53ca0742b463ef1cc1fa819ab278b7c7e1afbfe51a95"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-controls.json",
+        "sha256": "3c55cadb87ec0cae54cf88eee526218c986d16815cdadd8981774dff7c72ee2f"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-review.json",
+        "sha256": "7e2d8c4913d8664f3814f0f40af9291e9b0165de655b61ac8ff2ff9fcae80469"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+        "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+        "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "2f4a2b4c003594f64f6e9b17bf38b929739fd535",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(cdk/table): remove explicit change detection",
+    "files": [
+      "src/cdk/table/table.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-render-setup-source-prior.json.gz",
+    "sha256": "028ddfbe86810e9cc1c1cecfa3b958aa9193eccf40d507625f3a97342fb978eb"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-render-setup-source-review.mjs",
+      "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+    },
+    {
+      "path": "tests/spec_render_setup_source_probe.mjs",
+      "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+      "sha256": "c8f172f1a452d9a0a7db086cad1e304916e0b0c322637e94bd4ec78ee05e35a7"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+      "sha256": "b10ffb29f37997babdbd53ca0742b463ef1cc1fa819ab278b7c7e1afbfe51a95"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-controls.json",
+      "sha256": "3c55cadb87ec0cae54cf88eee526218c986d16815cdadd8981774dff7c72ee2f"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-review.json",
+      "sha256": "7e2d8c4913d8664f3814f0f40af9291e9b0165de655b61ac8ff2ff9fcae80469"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+      "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+    }
+  ],
+  "production_HTML_CSS_SCSS_or_TS_changed_in_this_review": false,
+  "popover_current_behavior_executed": false,
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

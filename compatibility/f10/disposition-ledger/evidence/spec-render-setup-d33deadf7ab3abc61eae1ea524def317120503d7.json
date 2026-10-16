@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "d33deadf7ab3abc61eae1ea524def317120503d7",
+  "subject": "test(multiple): remove usage of deprecated API",
+  "status": "reviewed",
+  "final_disposition": "already-adapted",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "0893cbfe41a9fef0a8949e10b3a5c99306480804",
+      "after_blob": "1f9c7d226ee543303456ca079945c95cdd56cfa9"
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "5aeb7b9e8ba446cb8f1cc5884d855ee31cbab6f4",
+      "after_blob": "42e5bd65d00c555516e80bcd253ec6a7e1281888"
+    }
+  ],
+  "original_files": 2,
+  "original_hunks": 4,
+  "raw_commit_sha256": "f884e9bae233f593fc2e1c53634aed609ca8f9c7c5c713369a5f27c33b5c7a12",
+  "original_sources": [
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "before": {
+        "git_blob": "0893cbfe41a9fef0a8949e10b3a5c99306480804",
+        "sha256": "f247959ce0656f852307b8914d2904528b1c79db46a42dbebfcb990a7dfa4be9",
+        "bytes": 36864
+      },
+      "after": {
+        "git_blob": "1f9c7d226ee543303456ca079945c95cdd56cfa9",
+        "sha256": "81df7d863b58feceab5be80b2d38d628333e317833570ede7873f92967cc0428",
+        "bytes": 36858
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "before": {
+        "git_blob": "5aeb7b9e8ba446cb8f1cc5884d855ee31cbab6f4",
+        "sha256": "563c6f4ce944eee1c50b7e15564447317500c7b1f3b64619290a8963499c8e37",
+        "bytes": 86523
+      },
+      "after": {
+        "git_blob": "42e5bd65d00c555516e80bcd253ec6a7e1281888",
+        "sha256": "1054a351dbe35eb344cae13c3a662af9df74a53a1b186e2657049655480ea3bf",
+        "bytes": 86517
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/bottom-sheet/bottom-sheet.spec.ts b/src/material/bottom-sheet/bottom-sheet.spec.ts\nindex 0893cbfe41a9fef0a8949e10b3a5c99306480804..1f9c7d226ee543303456ca079945c95cdd56cfa9 100644\n--- a/src/material/bottom-sheet/bottom-sheet.spec.ts\n+++ b/src/material/bottom-sheet/bottom-sheet.spec.ts\n@@ -13,7 +13,7 @@ import {SpyLocation} from '@angular/common/testing';\n import {\n   Component,\n   ComponentRef,\n-  createNgModuleRef,\n+  createNgModule,\n   Directive,\n   Injectable,\n   Injector,\n@@ -1098,7 +1098,7 @@ class ModuleBoundBottomSheetParentComponent {\n   private _bottomSheet = inject(MatBottomSheet);\n \n   openBottomSheet(): void {\n-    const ngModuleRef = createNgModuleRef(\n+    const ngModuleRef = createNgModule(\n       ModuleBoundBottomSheetModule,\n       /* parentInjector */ this._injector,\n     );\ndiff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts\nindex 5aeb7b9e8ba446cb8f1cc5884d855ee31cbab6f4..42e5bd65d00c555516e80bcd253ec6a7e1281888 100644\n--- a/src/material/dialog/dialog.spec.ts\n+++ b/src/material/dialog/dialog.spec.ts\n@@ -16,7 +16,7 @@ import {SpyLocation} from '@angular/common/testing';\n import {\n   ChangeDetectionStrategy,\n   Component,\n-  createNgModuleRef,\n+  createNgModule,\n   Directive,\n   Injectable,\n   Injector,\n@@ -2445,7 +2445,7 @@ class ModuleBoundDialogParentComponent {\n   private _dialog = inject(MatDialog);\n \n   openDialog(): void {\n-    const ngModuleRef = createNgModuleRef(\n+    const ngModuleRef = createNgModule(\n       ModuleBoundDialogModule,\n       /* parentInjector */ this._injector,\n     );\n",
+  "diff_sha256": "48db89a0869ed15e9b52b27844b630c8919ac1c6d5873357b958ad27f6d5519f",
+  "hunk_reviews": [
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -13,7 +13,7 @@ import {SpyLocation} from '@angular/common/testing';",
+      "sha256": "369e68573ebd1cee679469100360377336c08fb18c4633195deb8f9344bb31c8",
+      "judgment": "Renames the private bottom-sheet fixture Core import createNgModuleRef to createNgModule; this is the deprecated alias replacement, not a wait/render API change."
+    },
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -1098,7 +1098,7 @@ class ModuleBoundBottomSheetParentComponent {",
+      "sha256": "a60626cf9ef0af334f2684bd40e42348e4252de1ac5b14c6f4bc576ca3c94f26",
+      "judgment": "Renames the bottom-sheet module-creation call while retaining module type, parent injector and resulting injector. The add-on owns no ordinary bottom-sheet component implementation."
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -16,7 +16,7 @@ import {SpyLocation} from '@angular/common/testing';",
+      "sha256": "0bc30a7d70dfd9c729db558e8b4a6b1758523f43111ec51bb50359ea93683703",
+      "judgment": "Renames the private dialog fixture Core import to createNgModule. The owned dialog spec already imports that public nondeprecated minimum API."
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2445,7 +2445,7 @@ class ModuleBoundDialogParentComponent {",
+      "sha256": "59631602afc88f42d2ab1754a22e06dd8e29db6b36dcd6fdd4e23701ce53e082",
+      "judgment": "Renames the dialog module-creation call without changing arguments or injector use. The owned parent fixture already uses the corresponding replacement; lifetime and actual injection execution remain pending."
+    }
+  ],
+  "semantics": [
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "kind": "deprecated-module-factory-alias-rename",
+      "import_and_call_identifier_changes": 2,
+      "arguments_injector_and_assertions_unchanged": true
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "kind": "deprecated-module-factory-alias-rename",
+      "import_and_call_identifier_changes": 2,
+      "arguments_injector_and_assertions_unchanged": true
+    }
+  ],
+  "decision": "The complete two-file four-hunk patch replaces only the createNgModuleRef import and call identifier with createNgModule in private bottom-sheet and dialog module-bound fixtures. It preserves the module type, parent injector, resulting module injector and test assertions. The owned legacy dialog already imports/calls createNgModule with its parent injector and passes ngModuleRef.injector into its dialog open operation; no owned Core import of createNgModuleRef exists. Authenticated exact Core21.2.23/22.1.7 declarations expose createNgModule publicly without a deprecation tag. Record that narrow source adaptation as already present; no API, fixture, public bottom-sheet fork or consumer change follows. This does not qualify module lifetime, injection behavior, actual Angular or the supported floors.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "48db89a0869ed15e9b52b27844b630c8919ac1c6d5873357b958ad27f6d5519f",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "The complete two-file four-hunk patch replaces only the createNgModuleRef import and call identifier with createNgModule in private bottom-sheet and dialog module-bound fixtures. It preserves the module type, parent injector, resulting module injector and test assertions. The owned legacy dialog already imports/calls createNgModule with its parent injector and passes ngModuleRef.injector into its dialog open operation; no owned Core import of createNgModuleRef exists. Authenticated exact Core21.2.23/22.1.7 declarations expose createNgModule publicly without a deprecation tag. Record that narrow source adaptation as already present; no API, fixture, public bottom-sheet fork or consumer change follows. This does not qualify module lifetime, injection behavior, actual Angular or the supported floors.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-render-setup-source-review.mjs",
+        "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+      },
+      {
+        "path": "tests/spec_render_setup_source_probe.mjs",
+        "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+        "sha256": "c8f172f1a452d9a0a7db086cad1e304916e0b0c322637e94bd4ec78ee05e35a7"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+        "sha256": "b10ffb29f37997babdbd53ca0742b463ef1cc1fa819ab278b7c7e1afbfe51a95"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-controls.json",
+        "sha256": "3c55cadb87ec0cae54cf88eee526218c986d16815cdadd8981774dff7c72ee2f"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-review.json",
+        "sha256": "7e2d8c4913d8664f3814f0f40af9291e9b0165de655b61ac8ff2ff9fcae80469"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+        "sha256": "dfc5961661c06ae15f186d25846f4a40f61880ac2c09e9975e0d9faabbbdea2b"
+      },
+      {
+        "path": "testing/legacy-runner/adapt-spec.mjs",
+        "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+      },
+      {
+        "path": "compatibility/rc/material-public-subjects.json",
+        "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+      },
+      {
+        "path": "compatibility/rc/autocomplete-landscape-cdk-sources/identities.json",
+        "sha256": "6d7675f22f6b93c4a8ed00f9a8de5c814944f5685e965bb7046fa4b957c1aa3d"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/22.1.7/types/core.d.ts",
+        "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+      },
+      {
+        "path": "compatibility/rc/autocomplete-landscape-cdk-sources/22.1.7/fesm2022/_overlay-module-chunk.mjs.gz",
+        "sha256": "664062571b7ab43c4bec8d80595fc055fe0e7587bd4133debd91a92ad39d28fa"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/21.2.23/types/core.d.ts",
+        "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+      },
+      {
+        "path": "compatibility/rc/autocomplete-landscape-cdk-sources/21.2.14/fesm2022/_overlay-module-chunk.mjs.gz",
+        "sha256": "e926a3c082f478550b9a68dd72addd8f101bf393d4323c3ed505f5cce39b6ba0"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "d33deadf7ab3abc61eae1ea524def317120503d7",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(multiple): remove usage of deprecated API",
+    "files": [
+      "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "src/material/dialog/dialog.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-render-setup-source-prior.json.gz",
+    "sha256": "028ddfbe86810e9cc1c1cecfa3b958aa9193eccf40d507625f3a97342fb978eb"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-render-setup-source-review.mjs",
+      "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+    },
+    {
+      "path": "tests/spec_render_setup_source_probe.mjs",
+      "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+      "sha256": "c8f172f1a452d9a0a7db086cad1e304916e0b0c322637e94bd4ec78ee05e35a7"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+      "sha256": "b10ffb29f37997babdbd53ca0742b463ef1cc1fa819ab278b7c7e1afbfe51a95"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-controls.json",
+      "sha256": "3c55cadb87ec0cae54cf88eee526218c986d16815cdadd8981774dff7c72ee2f"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-review.json",
+      "sha256": "7e2d8c4913d8664f3814f0f40af9291e9b0165de655b61ac8ff2ff9fcae80469"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+      "sha256": "dfc5961661c06ae15f186d25846f4a40f61880ac2c09e9975e0d9faabbbdea2b"
+    },
+    {
+      "path": "testing/legacy-runner/adapt-spec.mjs",
+      "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+    },
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-cdk-sources/identities.json",
+      "sha256": "6d7675f22f6b93c4a8ed00f9a8de5c814944f5685e965bb7046fa4b957c1aa3d"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/22.1.7/types/core.d.ts",
+      "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-cdk-sources/22.1.7/fesm2022/_overlay-module-chunk.mjs.gz",
+      "sha256": "664062571b7ab43c4bec8d80595fc055fe0e7587bd4133debd91a92ad39d28fa"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/21.2.23/types/core.d.ts",
+      "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-cdk-sources/21.2.14/fesm2022/_overlay-module-chunk.mjs.gz",
+      "sha256": "e926a3c082f478550b9a68dd72addd8f101bf393d4323c3ed505f5cce39b6ba0"
+    }
+  ],
+  "production_HTML_CSS_SCSS_or_TS_changed_in_this_review": false,
+  "popover_current_behavior_executed": false,
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

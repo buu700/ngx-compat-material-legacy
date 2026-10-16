@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "14479d47cbf77c52fe52b5e5fd8511a8d7f18c82",
+  "subject": "test(multiple): remove checks for popover from test (#32622)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "45014d01ed850a86da2327c5944d73392b1a77eb",
+      "after_blob": "655f01bcb9aacb85e3fe873c34f572cd4c880f80"
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "74ee062c7139835fd3889b04c5fb35a13c5c0efc",
+      "after_blob": "5445067f35f78d7efc984a211b6c00c6d0ae159a"
+    },
+    {
+      "path": "src/material/select/select.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "07db59eb8b03ef9da765579b21932149578ca6a6",
+      "after_blob": "07fe510d67eeec1932846d698d75395b2d4e8069"
+    }
+  ],
+  "original_files": 3,
+  "original_hunks": 10,
+  "raw_commit_sha256": "0ea9775faf5e470a8276d7d7dfb5fc297732b8f560af8d1d5f4fda8212f93680",
+  "original_sources": [
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "before": {
+        "git_blob": "45014d01ed850a86da2327c5944d73392b1a77eb",
+        "sha256": "194cb21be41fceb6f1e804d2ccbca8f76c9aa60838d35ec7eaad08ddd8617447",
+        "bytes": 97314
+      },
+      "after": {
+        "git_blob": "655f01bcb9aacb85e3fe873c34f572cd4c880f80",
+        "sha256": "98be05e212411aa2bba4ab74e682b2f44822af69918fb6a705595c292a92df52",
+        "bytes": 97026
+      }
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "before": {
+        "git_blob": "74ee062c7139835fd3889b04c5fb35a13c5c0efc",
+        "sha256": "f7bf571bbeb3500ff09bf6c772cc822e0356ae6bd34ae3e07943cf98efd61b80",
+        "bytes": 166116
+      },
+      "after": {
+        "git_blob": "5445067f35f78d7efc984a211b6c00c6d0ae159a",
+        "sha256": "880d9d70f3a3bb4bda7d36e9c12cc918ae69fad3078c37f7467e528d43d54214",
+        "bytes": 165712
+      }
+    },
+    {
+      "path": "src/material/select/select.spec.ts",
+      "before": {
+        "git_blob": "07db59eb8b03ef9da765579b21932149578ca6a6",
+        "sha256": "1e739c9daf681a9032244c68f47af792c20c7ab8139640ff0b39068b78ecc13f",
+        "bytes": 200631
+      },
+      "after": {
+        "git_blob": "07fe510d67eeec1932846d698d75395b2d4e8069",
+        "sha256": "47ef2258878f3072c82d9a22cc14ffa446c8c3ac939cfe655c563849b8e2f74d",
+        "bytes": 200270
+      }
+    }
+  ],
+  "diff": "diff --git a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts\nindex 45014d01ed850a86da2327c5944d73392b1a77eb..655f01bcb9aacb85e3fe873c34f572cd4c880f80 100644\n--- a/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts\n+++ b/src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts\n@@ -2992,10 +2992,6 @@ describe('FlexibleConnectedPositionStrategy', () => {\n     });\n \n     it('should be able to opt into placing the overlay inside an adjacent popover element', () => {\n-      if (!('showPopover' in document.body)) {\n-        return;\n-      }\n-\n       attachOverlay({positionStrategy, usePopover: true});\n \n       expect(containerElement.contains(overlayRef.hostElement)).toBe(false);\n@@ -3004,10 +3000,6 @@ describe('FlexibleConnectedPositionStrategy', () => {\n     });\n \n     it('should re-attach the popover next to the origin element', () => {\n-      if (!('showPopover' in document.body)) {\n-        return;\n-      }\n-\n       attachOverlay({positionStrategy, usePopover: true});\n       expect(originElement.nextElementSibling).toBe(overlayRef.hostElement);\n \n@@ -3020,10 +3012,6 @@ describe('FlexibleConnectedPositionStrategy', () => {\n     });\n \n     it('should insert the overlay as a child of a custom element', () => {\n-      if (!('showPopover' in document.body)) {\n-        return;\n-      }\n-\n       positionStrategy.withPopoverLocation({type: 'parent', element: customHostElement});\n       attachOverlay({positionStrategy, usePopover: true});\n \n@@ -3033,10 +3021,6 @@ describe('FlexibleConnectedPositionStrategy', () => {\n     });\n \n     it('should insert the overlay as a child of the origin', () => {\n-      if (!('showPopover' in document.body)) {\n-        return;\n-      }\n-\n       positionStrategy.withPopoverLocation({type: 'parent', element: originElement});\n       attachOverlay({positionStrategy, usePopover: true});\n \ndiff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts\nindex 74ee062c7139835fd3889b04c5fb35a13c5c0efc..5445067f35f78d7efc984a211b6c00c6d0ae159a 100644\n--- a/src/material/autocomplete/autocomplete.spec.ts\n+++ b/src/material/autocomplete/autocomplete.spec.ts\n@@ -1,6 +1,6 @@\n import {Direction} from '@angular/cdk/bidi';\n import {DOWN_ARROW, ENTER, ESCAPE, SPACE, TAB, UP_ARROW} from '@angular/cdk/keycodes';\n-import {OverlayContainer, OverlayModule, createCloseScrollStrategy} from '@angular/cdk/overlay';\n+import {OverlayModule, createCloseScrollStrategy} from '@angular/cdk/overlay';\n import {_supportsShadowDom} from '@angular/cdk/platform';\n import {ScrollDispatcher} from '@angular/cdk/scrolling';\n import {\n@@ -62,9 +62,6 @@ import {\n } from './index';\n \n describe('MatAutocomplete', () => {\n-  const supportsPopover = 'showPopover' in document.body;\n-  let overlayContainerElement: HTMLElement;\n-\n   // Creates a test component fixture.\n   function createComponent<T>(component: Type<T>, providers: Provider[] = []) {\n     TestBed.configureTestingModule({\n@@ -74,21 +71,17 @@ describe('MatAutocomplete', () => {\n       ],\n     });\n \n-    overlayContainerElement = TestBed.inject(OverlayContainer).getContainerElement();\n     return TestBed.createComponent<T>(component);\n   }\n \n   function getOverlayHost(fixture: ComponentFixture<unknown>): HTMLElement | null {\n-    return supportsPopover\n-      ? fixture.nativeElement.querySelector('.cdk-overlay-popover')\n-      : overlayContainerElement.querySelector('.cdk-overlay-connected-position-bounding-box');\n+    return fixture.nativeElement.querySelector('.cdk-overlay-popover');\n   }\n \n   function getBackdrop(fixture: ComponentFixture<unknown>): HTMLElement | null {\n-    const selector = '.cdk-overlay-backdrop';\n-    return supportsPopover\n-      ? getOverlayHost(fixture)?.querySelector(selector) || null\n-      : overlayContainerElement.querySelector(selector);\n+    return (\n+      fixture.nativeElement.querySelector('.cdk-overlay-popover .cdk-overlay-backdrop') || null\n+    );\n   }\n \n   describe('panel toggling', () => {\ndiff --git a/src/material/select/select.spec.ts b/src/material/select/select.spec.ts\nindex 07db59eb8b03ef9da765579b21932149578ca6a6..07fe510d67eeec1932846d698d75395b2d4e8069 100644\n--- a/src/material/select/select.spec.ts\n+++ b/src/material/select/select.spec.ts\n@@ -15,7 +15,7 @@ import {\n   TAB,\n   UP_ARROW,\n } from '@angular/cdk/keycodes';\n-import {OverlayContainer, OverlayModule, createCloseScrollStrategy} from '@angular/cdk/overlay';\n+import {OverlayModule, createCloseScrollStrategy} from '@angular/cdk/overlay';\n import {ScrollDispatcher} from '@angular/cdk/scrolling';\n import {\n   createKeyboardEvent,\n@@ -76,7 +76,6 @@ import {\n const DEFAULT_TYPEAHEAD_DEBOUNCE_INTERVAL = 200;\n \n describe('MatSelect', () => {\n-  const supportsPopover = 'showPopover' in document.body;\n   let dir: WritableSignal<Direction>;\n   let scrolledSubject = new Subject();\n \n@@ -97,18 +96,11 @@ describe('MatSelect', () => {\n   });\n \n   function getOverlayHost(fixture: ComponentFixture<unknown>): HTMLElement | null {\n-    return supportsPopover\n-      ? fixture.nativeElement.querySelector('.cdk-overlay-popover')\n-      : TestBed.inject(OverlayContainer)\n-          .getContainerElement()\n-          .querySelector('.cdk-overlay-connected-position-bounding-box');\n+    return fixture.nativeElement.querySelector('.cdk-overlay-popover');\n   }\n \n   function getBackdrop(fixture: ComponentFixture<unknown>): HTMLElement | null {\n-    const parent = supportsPopover\n-      ? fixture.nativeElement\n-      : TestBed.inject(OverlayContainer).getContainerElement();\n-    return parent.querySelector('.cdk-overlay-backdrop');\n+    return fixture.nativeElement.querySelector('.cdk-overlay-backdrop');\n   }\n \n   describe('core', () => {\n",
+  "diff_sha256": "46b7b93a7daead16632ebc2e3e5a0a9a41f67e54cd55610272419b00f630dae4",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "header": "@@ -2992,10 +2992,6 @@ describe('FlexibleConnectedPositionStrategy', () => {",
+      "sha256": "cfc0031d8a372bb2a845ee7d7191cf361fe06f2fa17d0abd0c4445bce94f3c48",
+      "judgment": "Removes the showPopover unsupported-browser early return from adjacent-popover placement. It changes private test eligibility, not product placement; preserve real legacy overlay structure requirements."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "header": "@@ -3004,10 +3000,6 @@ describe('FlexibleConnectedPositionStrategy', () => {",
+      "sha256": "89a720b880d66a1bd9d515124a9d5ccc72d17e711d0280b761cd2427145039c1",
+      "judgment": "Removes the corresponding guard from popover reattachment beside the origin. Exact floor overlay routing is reachable and actual placement remains pending."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "header": "@@ -3020,10 +3012,6 @@ describe('FlexibleConnectedPositionStrategy', () => {",
+      "sha256": "36e9d404518a35990b380cd2fa65229b34851256a3e282c4000721c5ef4a6dfe",
+      "judgment": "Removes the feature guard from custom-parent placement. Do not infer custom parent/legacy CSS compatibility from this source edit."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "header": "@@ -3033,10 +3021,6 @@ describe('FlexibleConnectedPositionStrategy', () => {",
+      "sha256": "f1dc272fb94770894c02a7eae108d953deab1cc1e9dc89256af726345b785f52",
+      "judgment": "Removes the feature guard from origin-child placement. No production strategy code is changed; supported-browser coverage remains required."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -1,6 +1,6 @@",
+      "sha256": "230cc89d8d9254e4b206f425b415ef552fc2ef62bf474336a830380312db34fd",
+      "judgment": "Drops OverlayContainer from modern autocomplete test imports. The owned test still needs its actual container queries and keeps the public import."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -62,9 +62,6 @@ import {",
+      "sha256": "4b537a3b5d4361260e01cd869833a6097b9f76daa3254af9bd2890db11955b20",
+      "judgment": "Removes the modern autocomplete supportsPopover flag and container variable. Keep owned legacy panel/container assertions; do not treat current popover support as unreachable."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -74,21 +71,17 @@ describe('MatAutocomplete', () => {",
+      "sha256": "d5ed25e9393c93a568d17556230b87cf6a9d62cec4b7d4e2f841aa76f0b12126",
+      "judgment": "Removes modern autocomplete container setup/fallback host and backdrop query branches in favor of inline popover descendants. This changes test observation/location assumptions; retain legacy structure expectations and require actual native qualification."
+    },
+    {
+      "path": "src/material/select/select.spec.ts",
+      "header": "@@ -15,7 +15,7 @@ import {",
+      "sha256": "4a57d00fb16d9edd2c96da021cda34857f229713f751ec55335110c290e9bc33",
+      "judgment": "Drops OverlayContainer from modern select test imports. Keep the owned public container import and legacy pane/backdrop queries."
+    },
+    {
+      "path": "src/material/select/select.spec.ts",
+      "header": "@@ -76,7 +76,6 @@ import {",
+      "sha256": "45bd86029ab65726c19de3cf81817409ed4388558fbe126084dc606a5a54047e",
+      "judgment": "Removes the modern select supportsPopover flag. Minimum public CDK still distinguishes supported and unsupported browser routing, which remains a native verification obligation."
+    },
+    {
+      "path": "src/material/select/select.spec.ts",
+      "header": "@@ -97,18 +96,11 @@ describe('MatSelect', () => {",
+      "sha256": "e0f4cdf4b25586e2b41947927020ac07d9c85c0e4b89d318333f190fbff8c3bf",
+      "judgment": "Changes modern select host/backdrop helpers to fixture descendant queries, deleting container fallback lookups. Preserve owned legacy selectors/styles. The complete patch changes no select or overlay implementation."
+    }
+  ],
+  "semantics": [
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "kind": "remove-four-browser-feature-early-returns",
+      "feature_guards_removed": 4,
+      "assertions_preserved": true
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "kind": "modern-inline-popover-only-query-helpers",
+      "legacy_overlay_container_fallback_removed": true,
+      "production_overlay_creation_changed": false
+    },
+    {
+      "path": "src/material/select/select.spec.ts",
+      "kind": "modern-inline-popover-only-query-helpers",
+      "legacy_overlay_container_fallback_removed": true,
+      "production_overlay_creation_changed": false
+    }
+  ],
+  "decision": "Review all ten hunks across all three original files. Four public-CDK private position tests lose browser-feature early returns; modern autocomplete/select helpers drop OverlayContainer fallback queries and assume inline popover descendants. The owned legacy specs retain real OverlayContainer, bounding-box/pane/backdrop and legacy panel queries, and their product paths reach the public overlay service/directive. Exact minimum CDK21.2.14/22.1.7 source enables popovers by default when supported and falls back without support, so the popover path is reachable and must not be excluded. Do not transplant modern inline-popover-only test selectors or erase legacy container/style expectations. This source-only decision declines the private helper rewrite; it neither disables popovers nor certifies existing DOM/style compatibility. Actual supported-browser, overlay structure, no-required-consumer-CSS and focus validation remains mandatory and may justify a narrow owned configuration repair.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "46b7b93a7daead16632ebc2e3e5a0a9a41f67e54cd55610272419b00f630dae4",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Review all ten hunks across all three original files. Four public-CDK private position tests lose browser-feature early returns; modern autocomplete/select helpers drop OverlayContainer fallback queries and assume inline popover descendants. The owned legacy specs retain real OverlayContainer, bounding-box/pane/backdrop and legacy panel queries, and their product paths reach the public overlay service/directive. Exact minimum CDK21.2.14/22.1.7 source enables popovers by default when supported and falls back without support, so the popover path is reachable and must not be excluded. Do not transplant modern inline-popover-only test selectors or erase legacy container/style expectations. This source-only decision declines the private helper rewrite; it neither disables popovers nor certifies existing DOM/style compatibility. Actual supported-browser, overlay structure, no-required-consumer-CSS and focus validation remains mandatory and may justify a narrow owned configuration repair.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-render-setup-source-review.mjs",
+        "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+      },
+      {
+        "path": "tests/spec_render_setup_source_probe.mjs",
+        "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+        "sha256": "c8f172f1a452d9a0a7db086cad1e304916e0b0c322637e94bd4ec78ee05e35a7"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+        "sha256": "b10ffb29f37997babdbd53ca0742b463ef1cc1fa819ab278b7c7e1afbfe51a95"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-controls.json",
+        "sha256": "3c55cadb87ec0cae54cf88eee526218c986d16815cdadd8981774dff7c72ee2f"
+      },
+      {
+        "path": "compatibility/rc/spec-render-setup-source-review.json",
+        "sha256": "7e2d8c4913d8664f3814f0f40af9291e9b0165de655b61ac8ff2ff9fcae80469"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+        "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.html",
+        "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      },
+      {
+        "path": "compatibility/rc/material-public-subjects.json",
+        "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+      },
+      {
+        "path": "compatibility/rc/autocomplete-landscape-cdk-sources/identities.json",
+        "sha256": "6d7675f22f6b93c4a8ed00f9a8de5c814944f5685e965bb7046fa4b957c1aa3d"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/22.1.7/types/core.d.ts",
+        "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+      },
+      {
+        "path": "compatibility/rc/autocomplete-landscape-cdk-sources/22.1.7/fesm2022/_overlay-module-chunk.mjs.gz",
+        "sha256": "664062571b7ab43c4bec8d80595fc055fe0e7587bd4133debd91a92ad39d28fa"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/21.2.23/types/core.d.ts",
+        "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+      },
+      {
+        "path": "compatibility/rc/autocomplete-landscape-cdk-sources/21.2.14/fesm2022/_overlay-module-chunk.mjs.gz",
+        "sha256": "e926a3c082f478550b9a68dd72addd8f101bf393d4323c3ed505f5cce39b6ba0"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "14479d47cbf77c52fe52b5e5fd8511a8d7f18c82",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(multiple): remove checks for popover from test (#32622)",
+    "files": [
+      "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "src/material/autocomplete/autocomplete.spec.ts",
+      "src/material/select/select.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-render-setup-source-prior.json.gz",
+    "sha256": "028ddfbe86810e9cc1c1cecfa3b958aa9193eccf40d507625f3a97342fb978eb"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-render-setup-source-review.mjs",
+      "sha256": "614c451308b71a21b7208097f8034eaea0769c4d02b2fc43f22675d9d83eb846"
+    },
+    {
+      "path": "tests/spec_render_setup_source_probe.mjs",
+      "sha256": "a945e0f1b49a08049155738258dd13110e57eb0fd57bfb7032b9f2f6d422df7b"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-subjects.json.gz",
+      "sha256": "c8f172f1a452d9a0a7db086cad1e304916e0b0c322637e94bd4ec78ee05e35a7"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-acquisition.json.gz",
+      "sha256": "b10ffb29f37997babdbd53ca0742b463ef1cc1fa819ab278b7c7e1afbfe51a95"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-controls.json",
+      "sha256": "3c55cadb87ec0cae54cf88eee526218c986d16815cdadd8981774dff7c72ee2f"
+    },
+    {
+      "path": "compatibility/rc/spec-render-setup-source-review.json",
+      "sha256": "7e2d8c4913d8664f3814f0f40af9291e9b0165de655b61ac8ff2ff9fcae80469"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.html",
+      "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    },
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-cdk-sources/identities.json",
+      "sha256": "6d7675f22f6b93c4a8ed00f9a8de5c814944f5685e965bb7046fa4b957c1aa3d"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/22.1.7/types/core.d.ts",
+      "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-cdk-sources/22.1.7/fesm2022/_overlay-module-chunk.mjs.gz",
+      "sha256": "664062571b7ab43c4bec8d80595fc055fe0e7587bd4133debd91a92ad39d28fa"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/21.2.23/types/core.d.ts",
+      "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-landscape-cdk-sources/21.2.14/fesm2022/_overlay-module-chunk.mjs.gz",
+      "sha256": "e926a3c082f478550b9a68dd72addd8f101bf393d4323c3ed505f5cce39b6ba0"
+    }
+  ],
+  "production_HTML_CSS_SCSS_or_TS_changed_in_this_review": false,
+  "popover_current_behavior_executed": false,
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
