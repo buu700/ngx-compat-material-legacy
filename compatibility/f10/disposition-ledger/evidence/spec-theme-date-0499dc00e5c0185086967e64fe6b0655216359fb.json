@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "0499dc00e5c0185086967e64fe6b0655216359fb",
+  "subject": "test: Ensure M3 theme is well behaved (#28555)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/core/theming/tests/m3-theme.spec.ts",
+      "status": "A",
+      "before_mode": "000000",
+      "after_mode": "100644",
+      "before_blob": "0000000000000000000000000000000000000000",
+      "after_blob": "fcf151bd4b1b458fc9de84f7dcf73d881c818e78"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 1,
+  "raw_commit_sha256": "3abe8e844d654b8712db115018179242e29142ee165e2af340e6792e34b3897f",
+  "original_sources": [
+    {
+      "path": "src/material/core/theming/tests/m3-theme.spec.ts",
+      "before": {
+        "git_blob": "0000000000000000000000000000000000000000",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "after": {
+        "git_blob": "fcf151bd4b1b458fc9de84f7dcf73d881c818e78",
+        "sha256": "f918eec3b5fbd7535f1b0fe84107ffae5c351142e7b51c857c8523fa73190f8a",
+        "bytes": 2112
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/core/theming/tests/m3-theme.spec.ts b/src/material/core/theming/tests/m3-theme.spec.ts\nnew file mode 100644\nindex 0000000000000000000000000000000000000000..fcf151bd4b1b458fc9de84f7dcf73d881c818e78\n--- /dev/null\n+++ b/src/material/core/theming/tests/m3-theme.spec.ts\n@@ -0,0 +1,67 @@\n+import {parse} from 'postcss';\n+import {compileString} from 'sass';\n+import {runfiles} from '@bazel/runfiles';\n+import * as path from 'path';\n+\n+import {createLocalAngularPackageImporter} from '../../../../../tools/sass/local-sass-importer';\n+import {pathToFileURL} from 'url';\n+\n+// Note: For Windows compatibility, we need to resolve the directory paths through runfiles\n+// which are guaranteed to reside in the source tree.\n+const testDir = path.join(runfiles.resolvePackageRelative('../_all-theme.scss'), '../tests');\n+const packagesDir = path.join(runfiles.resolveWorkspaceRelative('src/cdk/_index.scss'), '../..');\n+\n+const localPackageSassImporter = createLocalAngularPackageImporter(packagesDir);\n+\n+const mdcSassImporter = {\n+  findFileUrl: (url: string) => {\n+    if (url.toString().startsWith('@material')) {\n+      return pathToFileURL(\n+        path.join(runfiles.resolveWorkspaceRelative('./node_modules'), url),\n+      ) as URL;\n+    }\n+    return null;\n+  },\n+};\n+\n+/** Transpiles given Sass content into CSS. */\n+function transpile(content: string) {\n+  return compileString(\n+    `\n+        @use '../../../index' as mat;\n+        @use '../../../../material-experimental/index' as matx;\n+\n+        $internals: _mat-theming-internals-do-not-access;\n+\n+        $theme: matx.define-theme();\n+\n+        ${content}\n+      `,\n+    {\n+      loadPaths: [testDir],\n+      importers: [localPackageSassImporter, mdcSassImporter],\n+    },\n+  ).css.toString();\n+}\n+\n+describe('M3 theme', () => {\n+  it('should emit all styles under the given selector', () => {\n+    const root = parse(transpile(`html { @include mat.all-component-themes($theme); }`));\n+    const selectors: string[] = [];\n+    root.walkRules(rule => {\n+      selectors.push(rule.selector);\n+    });\n+    expect(selectors).toEqual(['html']);\n+  });\n+\n+  it('should only emit CSS variables', () => {\n+    const root = parse(transpile(`html { @include mat.all-component-themes($theme); }`));\n+    const nonVarProps: string[] = [];\n+    root.walkDecls(decl => {\n+      if (!decl.prop.startsWith('--')) {\n+        nonVarProps.push(decl.prop);\n+      }\n+    });\n+    expect(nonVarProps).toEqual([]);\n+  });\n+});\n",
+  "diff_sha256": "b9fbfdbd15119fbb3749c3ebd255255aea825ac7bcd18863412abd24802f7a69",
+  "hunk_reviews": [
+    {
+      "path": "src/material/core/theming/tests/m3-theme.spec.ts",
+      "header": "@@ -0,0 +1,67 @@",
+      "sha256": "64dadbca2550260be859becc13f3deb93799a84630595cb7057d7c452473a8a0",
+      "judgment": "Authenticate the added-file absent before-blob,67 plus-lines and complete after blob. Two tests compile an experimental M3 theme and assert html-only selectors and CSS-custom-properties-only declarations. Preserve owned M2 style output and finite facade; native M3 theme shape is not a replacement for mixed-theme coexistence or legacy CSS."
+    }
+  ],
+  "semantics": [
+    {
+      "path": "src/material/core/theming/tests/m3-theme.spec.ts",
+      "kind": "added-M3-only-theme-shape-tests",
+      "added_lines": 67,
+      "cases": 2,
+      "owned_M2_output_cannot_be_assumed_variable_only": true,
+      "actual_Sass_executed": false
+    }
+  ],
+  "decision": "The original adds a complete67-line M3 theme spec with two expectations: all-component M3 theme output is nested under html and contains only custom properties. It uses the then-experimental define-theme and private Bazel/local MDC import setup. These expectations describe upstream M3 output, not the owned Material16 M2 palette/theme/typography facade, which intentionally emits legacy selectors and ordinary CSS properties. Do not impose variable-only output on the retained facade, forward it to current Material, rename consumer calls, or empty its mixins to satisfy this test. Keep the owned M2 model and actual style output. Mixed current M3/legacy M2 coexistence, both inclusion orders, scoped/shared styles and contamination checks remain required separately. No native M3 theming of legacy controls or actual Sass/browser/packed qualification is inferred from this source decision.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "b9fbfdbd15119fbb3749c3ebd255255aea825ac7bcd18863412abd24802f7a69",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The original adds a complete67-line M3 theme spec with two expectations: all-component M3 theme output is nested under html and contains only custom properties. It uses the then-experimental define-theme and private Bazel/local MDC import setup. These expectations describe upstream M3 output, not the owned Material16 M2 palette/theme/typography facade, which intentionally emits legacy selectors and ordinary CSS properties. Do not impose variable-only output on the retained facade, forward it to current Material, rename consumer calls, or empty its mixins to satisfy this test. Keep the owned M2 model and actual style output. Mixed current M3/legacy M2 coexistence, both inclusion orders, scoped/shared styles and contamination checks remain required separately. No native M3 theming of legacy controls or actual Sass/browser/packed qualification is inferred from this source decision.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-theme-date-source-review.mjs",
+        "sha256": "24c509c86fc83d61d63610569bc423046fccbc545c7a214834edbef304b8c92f"
+      },
+      {
+        "path": "tests/spec_theme_date_source_probe.mjs",
+        "sha256": "2deb49ebcdcc13634942418e378cf1a412187a04813ae7119b3406dc83de6c60"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-subjects.json.gz",
+        "sha256": "26b49659f5dcc1b75a5f2879d963b33acccd18158915231ee45965a5f2008faa"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-acquisition.json.gz",
+        "sha256": "4d29b8e9a84f58acd41ca3d1c60caa73cca7253d7cdc63d4b68715106099540e"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-controls.json",
+        "sha256": "9fbc54294da383e836e7dab6ab7ae918f6ec2328415e4192020311f713a5abbe"
+      },
+      {
+        "path": "compatibility/rc/spec-theme-date-source-review.json",
+        "sha256": "19cc1d615193cd7b4af2b7d4f1447e33cfe81d3688e2c77f6c08dc36f98b4d75"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/_index.scss",
+        "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/theming/_theming.scss",
+        "sha256": "54d065537ee74a0def763b52f37cdabd792b4a29820b02d135d7daf4b05c06e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/legacy-button/_button-theme.scss",
+        "sha256": "dbeccc67f7538f9e9b7529dd3226a45b0a8b3ad7079970fd553dcb25c067c3d0"
+      },
+      {
+        "path": "scripts/check-m3-inclusion-order.mjs",
+        "sha256": "877f0127b63e8783527c2c203a6dc6701b3d7e6210750ca31605f354980843d8"
+      },
+      {
+        "path": "scripts/m3-rendered-coexistence.mjs",
+        "sha256": "1954c7cd1bc4e2b74059a5d774fa00bf571e27ef5e98e7629e558c352f9a051c"
+      }
+    ],
+    "actual_Angular_Sass_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "0499dc00e5c0185086967e64fe6b0655216359fb",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test: Ensure M3 theme is well behaved (#28555)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=c9a7349de55ab4d6c9722ec78caded32cc22124f2d879835b2bc07446fe4d99c, bytes=2426). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/core/theming/tests/m3-theme.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/core/theming/tests/m3-theme.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0499dc00e5c0185086967e64fe6b0655216359fb.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "c9a7349de55ab4d6c9722ec78caded32cc22124f2d879835b2bc07446fe4d99c"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-theme-date-source-prior.json.gz",
+    "sha256": "fad8bea54c9b0700e031880acdf46a3a7889bfb5c099f8aeea1924d30a522972"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-theme-date-source-review.mjs",
+      "sha256": "24c509c86fc83d61d63610569bc423046fccbc545c7a214834edbef304b8c92f"
+    },
+    {
+      "path": "tests/spec_theme_date_source_probe.mjs",
+      "sha256": "2deb49ebcdcc13634942418e378cf1a412187a04813ae7119b3406dc83de6c60"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-subjects.json.gz",
+      "sha256": "26b49659f5dcc1b75a5f2879d963b33acccd18158915231ee45965a5f2008faa"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-acquisition.json.gz",
+      "sha256": "4d29b8e9a84f58acd41ca3d1c60caa73cca7253d7cdc63d4b68715106099540e"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-controls.json",
+      "sha256": "9fbc54294da383e836e7dab6ab7ae918f6ec2328415e4192020311f713a5abbe"
+    },
+    {
+      "path": "compatibility/rc/spec-theme-date-source-review.json",
+      "sha256": "19cc1d615193cd7b4af2b7d4f1447e33cfe81d3688e2c77f6c08dc36f98b4d75"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/_index.scss",
+      "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/theming/_theming.scss",
+      "sha256": "54d065537ee74a0def763b52f37cdabd792b4a29820b02d135d7daf4b05c06e6"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/legacy-button/_button-theme.scss",
+      "sha256": "dbeccc67f7538f9e9b7529dd3226a45b0a8b3ad7079970fd553dcb25c067c3d0"
+    },
+    {
+      "path": "scripts/check-m3-inclusion-order.mjs",
+      "sha256": "877f0127b63e8783527c2c203a6dc6701b3d7e6210750ca31605f354980843d8"
+    },
+    {
+      "path": "scripts/m3-rendered-coexistence.mjs",
+      "sha256": "1954c7cd1bc4e2b74059a5d774fa00bf571e27ef5e98e7629e558c352f9a051c"
+    }
+  ],
+  "production_HTML_CSS_SCSS_or_TS_changed_in_this_review": false,
+  "actual_Angular_Sass_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

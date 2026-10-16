@@ -23711,17 +23711,93 @@
       "sha": "0499dc00e5c0185086967e64fe6b0655216359fb",
       "bucket": "test-only-batch-candidate",
       "subject": "test: Ensure M3 theme is well behaved (#28555)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=c9a7349de55ab4d6c9722ec78caded32cc22124f2d879835b2bc07446fe4d99c, bytes=2426). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/core/theming/tests/m3-theme.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The original adds a complete67-line M3 theme spec with two expectations: all-component M3 theme output is nested under html and contains only custom properties. It uses the then-experimental define-theme and private Bazel/local MDC import setup. These expectations describe upstream M3 output, not the owned Material16 M2 palette/theme/typography facade, which intentionally emits legacy selectors and ordinary CSS properties. Do not impose variable-only output on the retained facade, forward it to current Material, rename consumer calls, or empty its mixins to satisfy this test. Keep the owned M2 model and actual style output. Mixed current M3/legacy M2 coexistence, both inclusion orders, scoped/shared styles and contamination checks remain required separately. No native M3 theming of legacy controls or actual Sass/browser/packed qualification is inferred from this source decision.",
+      "read_note_disposition": "individual complete-original source conclusion; actual Sass/product/floor and G11 gates remain separate",
       "files": [
         "src/material/core/theming/tests/m3-theme.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/0499dc00e5c0185086967e64fe6b0655216359fb.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-theme-date-0499dc00e5c0185086967e64fe6b0655216359fb.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "c9a7349de55ab4d6c9722ec78caded32cc22124f2d879835b2bc07446fe4d99c"
+      "patch_sha256": "c9a7349de55ab4d6c9722ec78caded32cc22124f2d879835b2bc07446fe4d99c",
+      "diff_sha256": "b9fbfdbd15119fbb3749c3ebd255255aea825ac7bcd18863412abd24802f7a69",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "b9fbfdbd15119fbb3749c3ebd255255aea825ac7bcd18863412abd24802f7a69",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The original adds a complete67-line M3 theme spec with two expectations: all-component M3 theme output is nested under html and contains only custom properties. It uses the then-experimental define-theme and private Bazel/local MDC import setup. These expectations describe upstream M3 output, not the owned Material16 M2 palette/theme/typography facade, which intentionally emits legacy selectors and ordinary CSS properties. Do not impose variable-only output on the retained facade, forward it to current Material, rename consumer calls, or empty its mixins to satisfy this test. Keep the owned M2 model and actual style output. Mixed current M3/legacy M2 coexistence, both inclusion orders, scoped/shared styles and contamination checks remain required separately. No native M3 theming of legacy controls or actual Sass/browser/packed qualification is inferred from this source decision.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-theme-date-source-review.mjs",
+            "sha256": "24c509c86fc83d61d63610569bc423046fccbc545c7a214834edbef304b8c92f"
+          },
+          {
+            "path": "tests/spec_theme_date_source_probe.mjs",
+            "sha256": "2deb49ebcdcc13634942418e378cf1a412187a04813ae7119b3406dc83de6c60"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-subjects.json.gz",
+            "sha256": "26b49659f5dcc1b75a5f2879d963b33acccd18158915231ee45965a5f2008faa"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-acquisition.json.gz",
+            "sha256": "4d29b8e9a84f58acd41ca3d1c60caa73cca7253d7cdc63d4b68715106099540e"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-controls.json",
+            "sha256": "9fbc54294da383e836e7dab6ab7ae918f6ec2328415e4192020311f713a5abbe"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-review.json",
+            "sha256": "19cc1d615193cd7b4af2b7d4f1447e33cfe81d3688e2c77f6c08dc36f98b4d75"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/_index.scss",
+            "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/theming/_theming.scss",
+            "sha256": "54d065537ee74a0def763b52f37cdabd792b4a29820b02d135d7daf4b05c06e6"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/legacy-button/_button-theme.scss",
+            "sha256": "dbeccc67f7538f9e9b7529dd3226a45b0a8b3ad7079970fd553dcb25c067c3d0"
+          },
+          {
+            "path": "scripts/check-m3-inclusion-order.mjs",
+            "sha256": "877f0127b63e8783527c2c203a6dc6701b3d7e6210750ca31605f354980843d8"
+          },
+          {
+            "path": "scripts/m3-rendered-coexistence.mjs",
+            "sha256": "1954c7cd1bc4e2b74059a5d774fa00bf571e27ef5e98e7629e558c352f9a051c"
+          }
+        ],
+        "actual_Angular_Sass_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "Authenticate the added-file absent before-blob,67 plus-lines and complete after blob. Two tests compile an experimental M3 theme and assert html-only selectors and CSS-custom-properties-only declarations. Preserve owned M2 style output and finite facade; native M3 theme shape is not a replacement for mixed-theme coexistence or legacy CSS.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "d5aa679213590279b0d3c8270b5bf47ef787f443",
@@ -24501,20 +24577,108 @@
       "sha": "3806c7170e7f88e3546e145d7d27db9fd9e8a8dd",
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): add more time parsing tests",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=b073585b708b34e66bf588c752b08866dab0034ab301b4329826d7483717843f, bytes=7789). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts, src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts, src/material-moment-adapter/adapter/moment-date-adapter.spec.ts, src/material/core/datetime/native-date-adapter.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "not-applicable",
+      "reason": "All four original hunks strengthen the existing compareTime case in the date-fns, Luxon, Moment and native adapters. They replace one shared calendar date with Jan1 and Feb7 while preserving six time comparisons and their two negative, one equal and three positive results per adapter. No case, production parser, adapter algorithm or public API is added or changed. The complete owned product contains no ordinary date-adapter fork; public current datepicker/native-adapter use is reachable through the legacy form-field harness and Cyph. Do not copy peer private adapter specs or claim inherited correct time parsing/comparison merely because the tests changed. This excludes those private test changes from owned source adaptation only; actual public peer/datepicker interoperability and supported-floor gates remain separate.",
+      "read_note_disposition": "individual complete-original source conclusion; actual Sass/product/floor and G11 gates remain separate",
       "files": [
         "src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts",
         "src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts",
         "src/material-moment-adapter/adapter/moment-date-adapter.spec.ts",
         "src/material/core/datetime/native-date-adapter.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/3806c7170e7f88e3546e145d7d27db9fd9e8a8dd.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-theme-date-3806c7170e7f88e3546e145d7d27db9fd9e8a8dd.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "b073585b708b34e66bf588c752b08866dab0034ab301b4329826d7483717843f"
+      "patch_sha256": "b073585b708b34e66bf588c752b08866dab0034ab301b4329826d7483717843f",
+      "diff_sha256": "3f7a6557f904c16b290159f1d0d3ca9dc71019050be8a8108b25bb290ea4eaaa",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "3f7a6557f904c16b290159f1d0d3ca9dc71019050be8a8108b25bb290ea4eaaa",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "All four original hunks strengthen the existing compareTime case in the date-fns, Luxon, Moment and native adapters. They replace one shared calendar date with Jan1 and Feb7 while preserving six time comparisons and their two negative, one equal and three positive results per adapter. No case, production parser, adapter algorithm or public API is added or changed. The complete owned product contains no ordinary date-adapter fork; public current datepicker/native-adapter use is reachable through the legacy form-field harness and Cyph. Do not copy peer private adapter specs or claim inherited correct time parsing/comparison merely because the tests changed. This excludes those private test changes from owned source adaptation only; actual public peer/datepicker interoperability and supported-floor gates remain separate.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-theme-date-source-review.mjs",
+            "sha256": "24c509c86fc83d61d63610569bc423046fccbc545c7a214834edbef304b8c92f"
+          },
+          {
+            "path": "tests/spec_theme_date_source_probe.mjs",
+            "sha256": "2deb49ebcdcc13634942418e378cf1a412187a04813ae7119b3406dc83de6c60"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-subjects.json.gz",
+            "sha256": "26b49659f5dcc1b75a5f2879d963b33acccd18158915231ee45965a5f2008faa"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-acquisition.json.gz",
+            "sha256": "4d29b8e9a84f58acd41ca3d1c60caa73cca7253d7cdc63d4b68715106099540e"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-controls.json",
+            "sha256": "9fbc54294da383e836e7dab6ab7ae918f6ec2328415e4192020311f713a5abbe"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-review.json",
+            "sha256": "19cc1d615193cd7b4af2b7d4f1447e33cfe81d3688e2c77f6c08dc36f98b4d75"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.spec.ts",
+            "sha256": "3c4eb8fff2e07edd8243bff934f226a80a8004a29a69f93896322977d8fe218f"
+          },
+          {
+            "path": "testing/legacy-runner/shims/harness/form-field/shared.spec.ts",
+            "sha256": "40ef26bce00f4b8088b021994363ed503b2c9d395e0c98a304ff107bbe0544a1"
+          },
+          {
+            "path": "testing/legacy-runner/adapt-spec.mjs",
+            "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+          },
+          {
+            "path": "compatibility/rc/material-public-subjects.json",
+            "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880.gz",
+            "sha256": "55e60cf4148c6f57c24888fc47fcaf3d9d7ba1c11de88a80caca1e709cabc4fb"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/c411f1fcb4b76b838433f9c4d6dd2da1f489609f82e417ab14730c5c68dc6b60.gz",
+            "sha256": "033364c4c6b628183bf8d0f0a5013996a3e6dbf0a0d54b973eb909d3a0c9f18e"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/e69eba12b87eaae09de70629e0637fc9b07751a7fb4493dac9d7e3cf0ed21964.gz",
+            "sha256": "0283a9011ad20c094b16bc1f74bbfff38b3f5d9521a3567f1aa44023f212536a"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/af1db9de63ad6c2953f211b34af25568aab1efccad253725621b63a2210488f0.gz",
+            "sha256": "b715536b513f9362fa296d0809fce0ce2d928320c56e41ecc493dcf31d5eed0c"
+          }
+        ],
+        "actual_Angular_Sass_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "In src/material-date-fns-adapter/adapter/date-fns-adapter.spec.ts, the existing should-compare-times body now uses Jan1 and Feb7 calendar dates. All six original time tuples and their two less-than, one equal and three greater-than expectations are identical after only date-identifier normalization. All other complete-file bytes are exact. This strengthens test discrimination without changing a production adapter. In src/material-luxon-adapter/adapter/luxon-date-adapter.spec.ts, the existing should-compare-times body now uses Jan1 and Feb7 calendar dates. All six original time tuples and their two less-than, one equal and three greater-than expectations are identical after only date-identifier normalization. All other complete-file bytes are exact. This strengthens test discrimination without changing a production adapter. In src/material-moment-adapter/adapter/moment-date-adapter.spec.ts, the existing should-compare-times body now uses Jan1 and Feb7 calendar dates. All six original time tuples and their two less-than, one equal and three greater-than expectations are identical after only date-identifier normalization. All other complete-file bytes are exact. This strengthens test discrimination without changing a production adapter. In src/material/core/datetime/native-date-adapter.spec.ts, the existing should-compare-times body now uses Jan1 and Feb7 calendar dates. All six original time tuples and their two less-than, one equal and three greater-than expectations are identical after only date-identifier normalization. All other complete-file bytes are exact. This strengthens test discrimination without changing a production adapter.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "fa0f514fce6a166cf38eb4c31e90959c932f97b6",
@@ -27075,9 +27239,9 @@
       "sha": "8f7292fb972ce8576f0e680b50ead7840d989729",
       "bucket": "test-only-batch-candidate",
       "subject": "test: replace native date module with provider function (#32114)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=f65b48e2afaa9aa1c4a6d2e04702b3057d29ee8a7606b9614bd7354d16d795c2, bytes=38964). Changed paths are only unit/harness specs and testing BUILD.bazel (src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts, src/components-examples/material/timepicker/timepicker-harness/timepicker-harness-example.spec.ts, src/material/datepicker/calendar-header.spec.ts, src/material/datepicker/date-range-input.spec.ts, src/material/datepicker/date-range-selection-strategy.spec.ts, src/material/datepicker/datepicker.spec.ts\u2026). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all72 hunks across all14 original example/calendar/datepicker/harness files. They remove MatNativeDateModule/NativeDateModule imports from private fixture scopes, add provideNativeDateAdapter calls to providers, and change the private datepicker createComponent helper/calls and one describe label. Assertions, templates, locale values, custom direction/scroll provider objects and other operations are preserved by the bounded full-program normalization. Provider ordering is not declared equivalent for arbitrary custom overrides, especially the range helper adding the native factory after its provider spread. Exact minimum Material21.2.14/22.1.7 public declarations expose both MatNativeDateModule and provideNativeDateAdapter without deprecation/private markers; the module injector metadata itself uses the same default factory. The owned form-field harness already configures that stable module through its modules-array API. Keep that setup and the public datepicker/harness integration; do not extend its private helper API or migrate fixtures solely for this upstream preference. This static source/provider-identity observation does not qualify actual DI lifetime, date behavior, browser, Sass, packed artifacts or floors.",
+      "read_note_disposition": "individual complete-original source conclusion; actual Sass/product/floor and G11 gates remain separate",
       "files": [
         "src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts",
         "src/components-examples/material/timepicker/timepicker-harness/timepicker-harness-example.spec.ts",
@@ -27094,11 +27258,99 @@
         "src/material/datepicker/year-view.spec.ts",
         "src/material/form-field/testing/form-field-harness.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/8f7292fb972ce8576f0e680b50ead7840d989729.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-theme-date-8f7292fb972ce8576f0e680b50ead7840d989729.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "f65b48e2afaa9aa1c4a6d2e04702b3057d29ee8a7606b9614bd7354d16d795c2"
+      "patch_sha256": "f65b48e2afaa9aa1c4a6d2e04702b3057d29ee8a7606b9614bd7354d16d795c2",
+      "diff_sha256": "c6abba62e56e87219b70ef4307fed0a8762507be0f0f26a424fad9f849519376",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "c6abba62e56e87219b70ef4307fed0a8762507be0f0f26a424fad9f849519376",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all72 hunks across all14 original example/calendar/datepicker/harness files. They remove MatNativeDateModule/NativeDateModule imports from private fixture scopes, add provideNativeDateAdapter calls to providers, and change the private datepicker createComponent helper/calls and one describe label. Assertions, templates, locale values, custom direction/scroll provider objects and other operations are preserved by the bounded full-program normalization. Provider ordering is not declared equivalent for arbitrary custom overrides, especially the range helper adding the native factory after its provider spread. Exact minimum Material21.2.14/22.1.7 public declarations expose both MatNativeDateModule and provideNativeDateAdapter without deprecation/private markers; the module injector metadata itself uses the same default factory. The owned form-field harness already configures that stable module through its modules-array API. Keep that setup and the public datepicker/harness integration; do not extend its private helper API or migrate fixtures solely for this upstream preference. This static source/provider-identity observation does not qualify actual DI lifetime, date behavior, browser, Sass, packed artifacts or floors.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-theme-date-source-review.mjs",
+            "sha256": "24c509c86fc83d61d63610569bc423046fccbc545c7a214834edbef304b8c92f"
+          },
+          {
+            "path": "tests/spec_theme_date_source_probe.mjs",
+            "sha256": "2deb49ebcdcc13634942418e378cf1a412187a04813ae7119b3406dc83de6c60"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-subjects.json.gz",
+            "sha256": "26b49659f5dcc1b75a5f2879d963b33acccd18158915231ee45965a5f2008faa"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-acquisition.json.gz",
+            "sha256": "4d29b8e9a84f58acd41ca3d1c60caa73cca7253d7cdc63d4b68715106099540e"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-controls.json",
+            "sha256": "9fbc54294da383e836e7dab6ab7ae918f6ec2328415e4192020311f713a5abbe"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-review.json",
+            "sha256": "19cc1d615193cd7b4af2b7d4f1447e33cfe81d3688e2c77f6c08dc36f98b4d75"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.spec.ts",
+            "sha256": "3c4eb8fff2e07edd8243bff934f226a80a8004a29a69f93896322977d8fe218f"
+          },
+          {
+            "path": "testing/legacy-runner/shims/harness/form-field/shared.spec.ts",
+            "sha256": "40ef26bce00f4b8088b021994363ed503b2c9d395e0c98a304ff107bbe0544a1"
+          },
+          {
+            "path": "testing/legacy-runner/adapt-spec.mjs",
+            "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+          },
+          {
+            "path": "compatibility/rc/material-public-subjects.json",
+            "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880.gz",
+            "sha256": "55e60cf4148c6f57c24888fc47fcaf3d9d7ba1c11de88a80caca1e709cabc4fb"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/c411f1fcb4b76b838433f9c4d6dd2da1f489609f82e417ab14730c5c68dc6b60.gz",
+            "sha256": "033364c4c6b628183bf8d0f0a5013996a3e6dbf0a0d54b973eb909d3a0c9f18e"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/e69eba12b87eaae09de70629e0637fc9b07751a7fb4493dac9d7e3cf0ed21964.gz",
+            "sha256": "0283a9011ad20c094b16bc1f74bbfff38b3f5d9521a3567f1aa44023f212536a"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/af1db9de63ad6c2953f211b34af25568aab1efccad253725621b63a2210488f0.gz",
+            "sha256": "b715536b513f9362fa296d0809fce0ce2d928320c56e41ecc493dcf31d5eed0c"
+          }
+        ],
+        "actual_Angular_Sass_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts; @@ -3,7 +3,7 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/components-examples/material/datepicker/datepicker-harness/datepicker-harness-example.spec.ts; @@ -11,8 +11,10 @@ describe('DatepickerHarnessExample', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/components-examples/material/timepicker/timepicker-harness/timepicker-harness-example.spec.ts; @@ -3,7 +3,7 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/components-examples/material/timepicker/timepicker-harness/timepicker-harness-example.spec.ts; @@ -11,8 +11,10 @@ describe('TimepickerHarnessExample', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/calendar-header.spec.ts; @@ -2,7 +2,7 @@ import {provideFakeDirectionality} from '@angular/cdk/testing/private';. Moves the native date setup from a module-import argument to a provider call while preserving all explicit directionality/scroll-provider objects and operations. The private helper signature/caller changes are normalized together; no corresponding owned helper migration is required. Reviewed original file src/material/datepicker/calendar-header.spec.ts; @@ -12,8 +12,8 @@ import {yearsPerPage} from './multi-year-view';. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/calendar-header.spec.ts; @@ -378,7 +378,7 @@ describe('MatCalendarHeader', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/calendar-header.spec.ts; @@ -395,7 +395,7 @@ class StandardCalendar {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/date-range-input.spec.ts; @@ -19,7 +19,7 @@ import {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/date-range-input.spec.ts; @@ -36,11 +36,11 @@ describe('MatDateRangeInput', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/date-range-selection-strategy.spec.ts; @@ -1,5 +1,5 @@. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/date-range-selection-strategy.spec.ts; @@ -13,8 +13,8 @@ describe('DefaultMatCalendarRangeStrategy', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -42,7 +42,7 @@ import {. Simplifies the private datepicker createComponent helper from separate import/provider arrays to a provider-array argument and removes the old imports shorthand. The native module arguments at all callers are migrated in this same complete commit; the retained legacy helper is not changed. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -61,13 +61,8 @@ describe('MatDatepicker', () => {. Renames the private with-MatNativeDateModule describe label to with-native-adapter and migrates its setup to the provider function. The full normalized program preserves every it body, assertion and template. No retained case name/identity is renamed. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -77,14 +72,14 @@ describe('MatDatepicker', () => {. Moves the native date setup from a module-import argument to a provider call while preserving all explicit directionality/scroll-provider objects and operations. The private helper signature/caller changes are normalized together; no corresponding owned helper migration is required. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -499,20 +494,17 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -674,14 +666,14 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -693,7 +685,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -724,7 +716,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -749,7 +741,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -770,7 +762,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -823,7 +815,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -877,7 +869,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1059,7 +1051,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1175,7 +1167,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1300,7 +1292,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1452,7 +1444,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1467,7 +1459,9 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1476,7 +1470,9 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1490,7 +1486,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1580,7 +1576,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1746,7 +1742,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1843,7 +1839,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1966,7 +1962,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -1993,7 +1989,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2026,7 +2022,7 @@ describe('MatDatepicker', () => {. Moves the native date setup from a module-import argument to a provider call while preserving all explicit directionality/scroll-provider objects and operations. The private helper signature/caller changes are normalized together; no corresponding owned helper migration is required. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2075,11 +2071,10 @@ describe('MatDatepicker', () => {. Moves the native date setup from a module-import argument to a provider call while preserving all explicit directionality/scroll-provider objects and operations. The private helper signature/caller changes are normalized together; no corresponding owned helper migration is required. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2093,11 +2088,10 @@ describe('MatDatepicker', () => {. Moves the native date setup from a module-import argument to a provider call while preserving all explicit directionality/scroll-provider objects and operations. The private helper signature/caller changes are normalized together; no corresponding owned helper migration is required. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2123,11 +2117,10 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2154,13 +2147,17 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2168,7 +2165,9 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2177,13 +2176,17 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2197,7 +2200,7 @@ describe('MatDatepicker', () => {. The i18n caller replaces MatNativeDateModule plus NativeDateModule imports with the native factory while preserving its explicit de-DE MAT_DATE_LOCALE provider and all assertions. The exact floor factory/module metadata supports the narrow default-provider identity; arbitrary provider-order equivalence is not assumed. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2315,11 +2318,10 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2351,7 +2353,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2382,7 +2384,9 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2401,7 +2405,9 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2420,7 +2426,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2441,7 +2447,7 @@ describe('MatDatepicker', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/datepicker.spec.ts; @@ -2466,7 +2472,7 @@ describe('MatDatepicker', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/month-view.spec.ts; @@ -23,7 +23,7 @@ import {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/month-view.spec.ts; @@ -41,8 +41,8 @@ describe('MatMonthView', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/month-view.spec.ts; @@ -798,8 +798,8 @@ describe('MatMonthView', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/multi-year-view.spec.ts; @@ -17,7 +17,7 @@ import {. Moves the native date setup from a module-import argument to a provider call while preserving all explicit directionality/scroll-provider objects and operations. The private helper signature/caller changes are normalized together; no corresponding owned helper migration is required. Reviewed original file src/material/datepicker/multi-year-view.spec.ts; @@ -29,8 +29,7 @@ describe('MatMultiYearView', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/testing/calendar-harness.spec.ts; @@ -2,7 +2,7 @@ import {HarnessLoader, parallel} from '@angular/cdk/testing';. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/testing/calendar-harness.spec.ts; @@ -20,8 +20,8 @@ describe('MatCalendarHarness', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/testing/calendar-harness.spec.ts; @@ -329,7 +329,7 @@ describe('MatCalendarHarness', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/testing/date-range-input-harness.spec.ts; @@ -3,7 +3,7 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/testing/date-range-input-harness.spec.ts; @@ -25,8 +25,11 @@ describe('matDateRangeInputHarness', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/testing/date-range-input-harness.spec.ts; @@ -279,7 +282,6 @@ describe('matDateRangeInputHarness', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/testing/datepicker-input-harness.spec.ts; @@ -3,7 +3,7 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/testing/datepicker-input-harness.spec.ts; @@ -16,8 +16,10 @@ describe('MatDatepickerInputHarness', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/testing/datepicker-input-harness.spec.ts; @@ -214,13 +216,7 @@ describe('MatDatepickerInputHarness', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/testing/datepicker-toggle-harness.spec.ts; @@ -2,7 +2,7 @@ import {HarnessLoader, parallel} from '@angular/cdk/testing';. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/testing/datepicker-toggle-harness.spec.ts; @@ -13,8 +13,10 @@ describe('MatDatepickerToggleHarness', () => {. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/datepicker/testing/datepicker-toggle-harness.spec.ts; @@ -83,7 +85,7 @@ describe('MatDatepickerToggleHarness', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/datepicker/year-view.spec.ts; @@ -17,7 +17,7 @@ import {. Moves the native date setup from a module-import argument to a provider call while preserving all explicit directionality/scroll-provider objects and operations. The private helper signature/caller changes are normalized together; no corresponding owned helper migration is required. Reviewed original file src/material/datepicker/year-view.spec.ts; @@ -29,8 +29,7 @@ describe('MatYearView', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/form-field/testing/form-field-harness.spec.ts; @@ -8,7 +8,7 @@ import {MatError, MatFormField, MatHint, MatLabel, MatPrefix, MatSuffix} from '.. Migrates this private native-date TestBed/fixture/call-site setup from module imports to provideNativeDateAdapter, retaining all surrounding assertions, templates and custom provider objects. The range-helper factory can follow the providers spread, so no blanket claim about override precedence is made. Keep the owned legacy modules-array setup. Reviewed original file src/material/form-field/testing/form-field-harness.spec.ts; @@ -30,8 +30,11 @@ describe('MatFormFieldHarness', () => {. Changes native-date module import bindings or fixture import-array members into the public native-provider setup. Both exact minimum public module/function declarations are nondeprecated, and the retained legacy harness module is kept. Complete-file normalization verifies all unrelated bindings, templates and operations. Reviewed original file src/material/form-field/testing/form-field-harness.spec.ts; @@ -344,7 +347,6 @@ describe('MatFormFieldHarness', () => {.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "14479d47cbf77c52fe52b5e5fd8511a8d7f18c82",
@@ -27462,19 +27714,107 @@
       "sha": "3e092f10d49a274d79ca73222510eb45de098a6a",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/datepicker): switch tests to standalone",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=fd9efb9828b39493923cf43696b505672fc219666d9cf985402fe70f1b26756f, bytes=9184). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/datepicker/date-range-input.spec.ts, src/material/datepicker/testing/date-range-input-harness.spec.ts, src/material/form-field/testing/form-field-harness.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all17 hunks across the complete date-range-input, date-range harness and form-field harness files. They migrate private fixture declarations/import scopes to standalone components/directives, add explicit per-fixture imports, simplify the createComponent declarations parameter and its RTL provider call, and move public Material imports. Every fixture template, assertion and other operation is preserved after only those exact setup normalizations, and the ten explicit resulting fixture scopes are checked independently. The owned legacy harness is reachable: it uses MatLegacy modules, a shared FormFieldHarnessTest TestBed declaration, current public datepicker harnesses and a stable public native-date module. Preserve this non-standalone historical module setup, exact templates/selectors and case roster; do not transplant modern standalone component contracts. Decline the private fixture migration. Actual harness compilation, mixed legacy/current behavior and floors remain pending.",
+      "read_note_disposition": "individual complete-original source conclusion; actual Sass/product/floor and G11 gates remain separate",
       "files": [
         "src/material/datepicker/date-range-input.spec.ts",
         "src/material/datepicker/testing/date-range-input-harness.spec.ts",
         "src/material/form-field/testing/form-field-harness.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/3e092f10d49a274d79ca73222510eb45de098a6a.json",
-      "batch_id": "test-only-refactor-wave2-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-theme-date-3e092f10d49a274d79ca73222510eb45de098a6a.json",
       "recorded_at_utc": "2026-10-01T18:47:11Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "fd9efb9828b39493923cf43696b505672fc219666d9cf985402fe70f1b26756f"
+      "patch_sha256": "fd9efb9828b39493923cf43696b505672fc219666d9cf985402fe70f1b26756f",
+      "diff_sha256": "c7610760f5b5577f7f6c3050a2cc8174bc1d96e1d91c17d29608c0c8aaed48ce",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "c7610760f5b5577f7f6c3050a2cc8174bc1d96e1d91c17d29608c0c8aaed48ce",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all17 hunks across the complete date-range-input, date-range harness and form-field harness files. They migrate private fixture declarations/import scopes to standalone components/directives, add explicit per-fixture imports, simplify the createComponent declarations parameter and its RTL provider call, and move public Material imports. Every fixture template, assertion and other operation is preserved after only those exact setup normalizations, and the ten explicit resulting fixture scopes are checked independently. The owned legacy harness is reachable: it uses MatLegacy modules, a shared FormFieldHarnessTest TestBed declaration, current public datepicker harnesses and a stable public native-date module. Preserve this non-standalone historical module setup, exact templates/selectors and case roster; do not transplant modern standalone component contracts. Decline the private fixture migration. Actual harness compilation, mixed legacy/current behavior and floors remain pending.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-theme-date-source-review.mjs",
+            "sha256": "24c509c86fc83d61d63610569bc423046fccbc545c7a214834edbef304b8c92f"
+          },
+          {
+            "path": "tests/spec_theme_date_source_probe.mjs",
+            "sha256": "2deb49ebcdcc13634942418e378cf1a412187a04813ae7119b3406dc83de6c60"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-subjects.json.gz",
+            "sha256": "26b49659f5dcc1b75a5f2879d963b33acccd18158915231ee45965a5f2008faa"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-acquisition.json.gz",
+            "sha256": "4d29b8e9a84f58acd41ca3d1c60caa73cca7253d7cdc63d4b68715106099540e"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-controls.json",
+            "sha256": "9fbc54294da383e836e7dab6ab7ae918f6ec2328415e4192020311f713a5abbe"
+          },
+          {
+            "path": "compatibility/rc/spec-theme-date-source-review.json",
+            "sha256": "19cc1d615193cd7b4af2b7d4f1447e33cfe81d3688e2c77f6c08dc36f98b4d75"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.spec.ts",
+            "sha256": "3c4eb8fff2e07edd8243bff934f226a80a8004a29a69f93896322977d8fe218f"
+          },
+          {
+            "path": "testing/legacy-runner/shims/harness/form-field/shared.spec.ts",
+            "sha256": "40ef26bce00f4b8088b021994363ed503b2c9d395e0c98a304ff107bbe0544a1"
+          },
+          {
+            "path": "testing/legacy-runner/adapt-spec.mjs",
+            "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+          },
+          {
+            "path": "compatibility/rc/material-public-subjects.json",
+            "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/06e2cf0c67ba3d8555edb38626bd7264e7c0871e3f1fa4d517725935589aa880.gz",
+            "sha256": "55e60cf4148c6f57c24888fc47fcaf3d9d7ba1c11de88a80caca1e709cabc4fb"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/c411f1fcb4b76b838433f9c4d6dd2da1f489609f82e417ab14730c5c68dc6b60.gz",
+            "sha256": "033364c4c6b628183bf8d0f0a5013996a3e6dbf0a0d54b973eb909d3a0c9f18e"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/e69eba12b87eaae09de70629e0637fc9b07751a7fb4493dac9d7e3cf0ed21964.gz",
+            "sha256": "0283a9011ad20c094b16bc1f74bbfff38b3f5d9521a3567f1aa44023f212536a"
+          },
+          {
+            "path": "compatibility/rc/material-public-source-members/af1db9de63ad6c2953f211b34af25568aab1efccad253725621b63a2210488f0.gz",
+            "sha256": "b715536b513f9362fa296d0809fce0ce2d928320c56e41ecc493dcf31d5eed0c"
+          }
+        ],
+        "actual_Angular_Sass_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "Adds direct MatFormField/MatLabel imports beside the retained module import for private standalone date-range fixtures. No product import or consumer scope changes. Removes the private createComponent declarations parameter. The normalized remaining signature/body preserves providers and TestBed creation; the owned shared legacy helper retains its own modules/declarations API. Moves the fixture into TestBed imports and removes its declarations array. This is a modern standalone test-environment change, not a change to date-range behavior or retained legacy declarations. Removes the empty declarations argument from the RTL fixture call, preserving its Directionality provider object and assertions. Marks StandardRangePicker standalone and adds its exact seven directive/form imports. Its entire template and executable class body remain unchanged. Marks RangePickerNoStart standalone with its exact five date-range/form-field imports; preserves its intentionally malformed fixture and assertion. Marks RangePickerNoEnd standalone with the same exact five imports; preserves this separate malformed fixture and assertion. Marks RangePickerNgModel standalone with its exact six imports including FormsModule; preserves model bindings and assertions. Marks RangePickerNoLabel standalone with five exact imports; preserves the unlabeled fixture and existing behavior checks. Marks the private CustomValidator directive standalone without adding imports; preserves its validator provider and implementation. Marks RangePickerWithCustomValidator standalone with seven exact imports including CustomValidator/FormsModule. The validator and template bytes are unchanged. Marks RangePickerErrorStateMatcher standalone with five exact imports; preserves its matcher fixture and assertions. Expands public datepicker imports for the private standalone date-range harness. No owned public datepicker implementation is introduced. Replaces the private DateRangeInputHarnessTest module import with its exact six native/date-range/form imports. The template, cases and harness operations stay exact. Changes the modern form-field harness imports from aggregate modules to public standalone components/directives. The owned MatLegacy module configuration remains distinct and reachable. Simplifies modern root TestBed imports while keeping native-date, fixture and datepicker module provisioning. No legacy TestBed declaration is removed. Expands modern FormFieldHarnessTest imports to the exact eighteen native/form/control/date directive bindings. All template bytes and assertions remain intact; retain the owned legacy fixture.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "69e1369c99df0d28a8f305a64fe90d5b58dd8b6a",
