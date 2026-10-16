@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class HistoricalMenuImportRequalificationTests(unittest.TestCase):
     def test_live_roles_authenticated_execution_and_source_controls(self):
-        result = subprocess.run(['node', 'tests/historical_menu_import_requalification_probe.mjs'],
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'historical-menu-import'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=90)
         self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
         report = json.loads(result.stdout)
@@ -24,7 +24,7 @@ class HistoricalMenuImportRequalificationTests(unittest.TestCase):
         self.assertFalse(report['native_or_packed_qualified'])
 
     def test_actual_review_admission_rejects_missing_changed_wrong_line_and_caller_evidence(self):
-        result = subprocess.run(['node', 'tests/historical_menu_import_admission_probe.mjs'],
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'historical-menu-import-admission'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=90)
         self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
         report = json.loads(result.stdout)
