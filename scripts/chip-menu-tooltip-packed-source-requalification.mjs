@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {reverseBidiIsolatedPackedSource} from './bidi-isolated-packed-source-requalification.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
@@ -20,6 +21,7 @@ let cached;
 /** Compose before the unchanged earlier guards; never admit a runtime result. */
 export function reverseChipMenuTooltipPackedSource(member,raw,line,{readMember}={}){
  assert.ok(Object.hasOwn(pins,line),'unknown packed observation source line');
+ raw=reverseBidiIsolatedPackedSource(member,raw,line,{readMember});
  const read=readMember||((p)=>readFileSync(resolve(root,p)));
  const input=read(path);assert.equal(hash(input),pins[line],'packed observation source inputs changed');
  let capsule;

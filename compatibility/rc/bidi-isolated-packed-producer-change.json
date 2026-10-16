@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "path": "scripts/packed-consumer-aot-smoke.mjs",
+  "before_sha256": "1e3758f666ce0cefdac0cec1cd564df097b07c15ce76d149acd4d4f1e882f665",
+  "current_sha256": "52fdf805a927f18b080c5eed6d326329400013188024c80407c46b463ab67b53",
+  "edits": [
+    [
+      "import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-packed-contract.mjs';",
+      "import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-packed-contract.mjs';\nimport {bidiIsolatedPackedFixture} from './bidi-isolated-packed-fixture.mjs';\nimport {packedLegacyBidiScopeCase} from './bidi-isolated-packed-contract.mjs';"
+    ],
+    [
+      "    packedTooltipContainerCase(parsed.tooltipContainerObservation),",
+      "    packedTooltipContainerCase(parsed.tooltipContainerObservation),packedLegacyBidiScopeCase(parsed.isolatedLegacyBidi),"
+    ],
+    [
+      "    writeFileSync(join(consumer, 'src/chip-menu-tooltip-contract.mjs'), readFileSync(join(root, 'scripts/chip-menu-tooltip-packed-contract.mjs')));",
+      "    writeFileSync(join(consumer, 'src/chip-menu-tooltip-contract.mjs'), readFileSync(join(root, 'scripts/chip-menu-tooltip-packed-contract.mjs')));\n    writeFileSync(join(consumer, 'src/bidi-isolated-probe.ts'), bidiIsolatedPackedFixture());\n    writeFileSync(join(consumer, 'src/bidi-isolated-contract.mjs'), readFileSync(join(root, 'scripts/bidi-isolated-packed-contract.mjs')));"
+    ],
+    [
+      "import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-contract.mjs';",
+      "import {packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase} from './chip-menu-tooltip-contract.mjs';\nimport {PackedLegacyBidiScope,observePackedLegacyBidiScope} from './bidi-isolated-probe';\nimport {packedLegacyBidiScopeCase} from './bidi-isolated-contract.mjs';"
+    ],
+    [
+      "imports: [HarnessHost, SmokeDialogContent,",
+      "imports: [HarnessHost, PackedLegacyBidiScope, SmokeDialogContent,"
+    ],
+    [
+      "  const fixture = TestBed.createComponent(HarnessHost);",
+      "  const isolatedLegacyBidi = await observePackedLegacyBidiScope();\n  const fixture = TestBed.createComponent(HarnessHost);"
+    ],
+    [
+      "  const legacyBidiScope=bidiInitial&&bidiUpdated&&fixture.componentInstance.legacyDirectionChanges===1;",
+      "  const legacyBidiScope=bidiInitial&&bidiUpdated&&fixture.componentInstance.legacyDirectionChanges===1&&isolatedLegacyBidi.okay;"
+    ],
+    [
+      "    packedMenuLazyCase(menuLazyObservation),packedTooltipContainerCase(tooltipContainerObservation)]",
+      "    packedMenuLazyCase(menuLazyObservation),packedTooltipContainerCase(tooltipContainerObservation),\n    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed)]"
+    ],
+    [
+      "    chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,",
+      "    chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,isolatedLegacyBidi:isolatedLegacyBidi.observed,"
+    ]
+  ],
+  "old_case_ids_retained": 106,
+  "new_case_ids": 0,
+  "original_mixed_bidi_assertions_retained": true,
+  "canonical_native_or_packed_execution": false
+}

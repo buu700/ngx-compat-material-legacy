@@ -18,6 +18,7 @@ import {ARTIFACT_BEHAVIOR_KIND, SELECT_FOCUS_SHA, SELECT_DETACH_SHA, SELECT_DETA
   SELECT_DETACH_MEMBERS, TABLE_ONPUSH_SHA, TABLE_ONPUSH_PATCH, TABLE_ONPUSH_MEMBERS,
   requiresArtifactBehavior, artifactBehaviorRequirements} from '../scripts/upstream-artifact-behavior-evidence.mjs';
 import {createFixture} from './upstream/artifact-behavior-fixture.mjs';
+import {readBidiIsolatedBefore, bidiRequirementsBefore} from '../scripts/bidi-isolated-packed-source-requalification.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'), read = path => readFileSync(join(root, path));
 const json = path => JSON.parse(read(path)), hash = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -46,7 +47,9 @@ function focusPredicate(source) {
 assert.equal(focusPredicate(read('scripts/upstream-artifact-behavior-evidence.mjs').toString()),
   focusPredicate(preimage).replace('selected.legacy_harness_passed', 'selected?.legacy_harness_passed'));
 const focusEntry = json('compatibility/f10/disposition-ledger/ledger.json').entries.find(row => row.sha === SELECT_FOCUS_SHA);
-const focusReview = json(focusEntry.evidence_report), prior = focusReview.prior_source_judgment;
+const liveFocusReview = json(focusEntry.evidence_report), bidiContext = liveFocusReview.bidi_isolated_source_context;
+if (bidiContext) for (const ref of [bidiContext.previous_source_review, bidiContext.source_proof]) assert.equal(hash(read(ref.path)), ref.sha256);
+const focusReview = bidiContext ? json(bidiContext.previous_source_review.path) : liveFocusReview, prior = focusReview.prior_source_judgment;
 assert.equal(hash(read(prior.path)), prior.sha256); assert.equal(hash(read(preimagePath)), focusReview.admission_refactor_review.exact_before_helper.sha256);
 const precedingFocusMembers = structuredClone(json(prior.path).reviewed_source_members);
 if (focusReview.historical_branch_matrix_requalification) {
@@ -82,12 +85,12 @@ if (focusReview.chip_menu_tooltip_context_requalification) {
   assert.equal(precedingFocusMembers.find(row=>row.path===producer.path).sha256,producer.before_sha256);
   for(const row of precedingFocusMembers){
     if(row.path===producer.path)row.sha256=producer.current_sha256;
-    assert.equal(hash(read(row.path)),row.sha256);
+    assert.equal(hash(readBidiIsolatedBefore(row.path,read)),row.sha256);
   }
   const added=['scripts/chip-menu-tooltip-packed-contract.mjs','scripts/upstream-artifact-behavior-evidence.mjs'];
   assert.deepEqual(context.added_source_members.map(row=>row.path),added);
-  for(const row of context.added_source_members){assert.equal(hash(read(row.path)),row.sha256);precedingFocusMembers.push(row);}
-  const paths=artifactBehaviorRequirements(focusEntry.sha).members;
+  for(const row of context.added_source_members){assert.equal(hash(readBidiIsolatedBefore(row.path,read)),row.sha256);precedingFocusMembers.push(row);}
+  const paths=bidiRequirementsBefore(focusEntry.sha,artifactBehaviorRequirements(focusEntry.sha),line).members;
   assert.deepEqual([...paths].sort(),precedingFocusMembers.map(row=>row.path).sort());
   precedingFocusMembers.sort((a,b)=>paths.indexOf(a.path)-paths.indexOf(b.path));
 }

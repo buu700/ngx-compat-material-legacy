@@ -44,6 +44,7 @@ const escaped = generatedIdentityRequirements(GENERATED_IDENTITY_SHAS[0]); escap
 assert.ok(generatedIdentityRequirements(GENERATED_IDENTITY_SHAS[0]).members.length > 0);
 for (const [index, sha] of GENERATED_IDENTITY_SHAS.entries()) {
   const entry = structuredClone(judgments.entries.find(row => row.sha === sha)), review = JSON.parse(judgments.writes.get(entry.evidence_report));
+  entry.individual_proof.generated_identity_behavior.source_members=generatedIdentityRequirements(sha).members.map(path=>({path,sha256:hash(read(path))}));
   entry.individual_proof.artifact_behavior = {source_members: entry.individual_proof.generated_identity_behavior.source_members};
   const f = createFixture(root, {entry, review}); delete f.entry.individual_proof.artifact_behavior;
   const selected = () => f.observation.cases.find(row => row.case_id === GENERATED_IDENTITY_CASE_ID);

@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {readBidiIsolatedBefore,bidiChipSourceLedger} from '../../scripts/bidi-isolated-packed-source-requalification.mjs';
 /** Actual helper/CLI with deliberately synthetic runtime inputs, never product receipts. */
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
@@ -16,8 +17,8 @@ import {inspectChipMenuTooltipJudgments} from '../../scripts/chip-menu-tooltip-a
 import {artifactBehaviorRequirements,requiresArtifactBehavior,validateArtifactBehavior} from '../../scripts/upstream-artifact-behavior-evidence.mjs';
 import {chipMenuTooltipPackedSamples as samples} from '../chip_menu_tooltip_packed_samples.mjs';
 import {createFixture,hash} from './artifact-behavior-fixture.mjs';
-const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..'),read=p=>readFileSync(join(root,p)),json=p=>JSON.parse(read(p));
-const prefix='compatibility/rc/chip-menu-tooltip-admission-',inputs=json(prefix+'inputs.json'),result=inspectChipMenuTooltipJudgments({root});
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..'),actualRead=p=>readFileSync(join(root,p)),read=p=>p==='compatibility/f10/disposition-ledger/ledger.json'?bidiChipSourceLedger(actualRead):readBidiIsolatedBefore(p,actualRead),json=p=>JSON.parse(read(p));
+const prefix='compatibility/rc/chip-menu-tooltip-admission-',inputs=json(prefix+'inputs.json'),result=inspectChipMenuTooltipJudgments({root,readMember:read});
 const ledger=json('compatibility/f10/disposition-ledger/ledger.json');let recovered=read('compatibility/f10/disposition-ledger/ledger.json').toString();
 const block=x=>JSON.stringify(x,null,2).split('\n').map(line=>'    '+line).join('\n');
 for(const row of result.decisions){const entry=ledger.entries.find(e=>e.sha===row.sha);assert.equal(hash(read(entry.evidence_report)),row.review_sha256);
@@ -50,7 +51,9 @@ const names=['chip','menu','tooltip'],shaIds=inputs.sha_ids.slice(3),rows=[];let
 for(const [index,name]of names.entries()){
  const sha=shaIds[index],entry=ledger.entries.find(e=>e.sha===sha),review=json(entry.evidence_report),required=artifactBehaviorRequirements(sha);
  assert.equal(requiresArtifactBehavior(entry,{}),true);assert.deepEqual(required.case_ids,entry.individual_proof.artifact_behavior.case_ids);
- const f=createFixture(root,{entry,review});
+ const currentEntry=structuredClone(entry);
+ currentEntry.individual_proof.artifact_behavior.source_members=required.members.map(path=>({path,sha256:hash(actualRead(path))}));
+ const f=createFixture(root,{entry:currentEntry,review});
  try{
   const id=required.case_ids[0],selected=()=>f.observation.cases.find(row=>row.case_id===id);
   selected().observation=structuredClone(samples[name]);selected().legacy_harness_passed=true;

@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {readBidiIsolatedBefore,bidiRequirementsBefore} from './bidi-isolated-packed-source-requalification.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
@@ -60,7 +61,8 @@ function replaceEntries(text, entries) {
   assert.equal(edits.length, 8); for (const edit of edits.reverse()) text = text.slice(0, edit.start) + edit.text + text.slice(edit.end); return text;
 }
 export function inspectIdentitySourceJudgments({root = rootDefault, readMember} = {}) {
-  const read = path => readMember ? readMember(path) : readFileSync(resolve(root, path));
+  const rawRead = path => readMember ? readMember(path) : readFileSync(resolve(root, path));
+  const read = path => readBidiIsolatedBefore(path, rawRead);
   const pkg = JSON.parse(read('projects/ngx-material-legacy/package.json')), line = pkg.version.startsWith('21.') ? '21.x' : 'main';
   const input = read(inputPath); assert.equal(hash(input), pins[line], 'identity source input changed'); const inputs = JSON.parse(input);
   const stored = read(inputs.prior.path); assert.equal(hash(stored), inputs.prior.sha256); const raw = gunzipSync(stored); assert.equal(hash(raw), inputs.prior.raw_sha256);
@@ -94,7 +96,7 @@ export function inspectIdentitySourceJudgments({root = rootDefault, readMember} 
     peerReview.push({...peer, callers, application_prefix_and_optional_randomization_owned_by_current_CDK: true, owned_service_dependency: false});
   }
   const originals = inputs.originals.map(row => {assert.equal(gitObject('commit', row.commit_object), row.sha); assert.equal(hash(row.commit_object), row.commit_object_sha256);
-    const bytes = read(row.path); assert.equal(hash(bytes), row.sha256); assert.equal(row.sha256, generatedIdentityRequirements(row.sha).patch);
+    const bytes = read(row.path); assert.equal(hash(bytes), row.sha256); assert.equal(row.sha256, bidiRequirementsBefore(row.sha,generatedIdentityRequirements(row.sha),line,{readMember:rawRead}).patch);
     const hunks = []; let file; for (const text of bytes.toString().split('\n')) {if (text.startsWith('diff --git ')) file = text.split(' b/')[1]; if (text.startsWith('@@')) hunks.push({hunk: hunks.length + 1, file, header: text});}
     assert.equal(hunks.length, profiles[row.sha].hunks.length); return {...row, paths: [...new Set(hunks.map(row => row.file))], hunks};});
   const dependencies = ['scripts/upstream-generated-identity-evidence.mjs', 'scripts/generated-identity-packed-contract.mjs', 'tests/upstream/identity-source-context.mjs'].map(path => ({path, sha256: hash(read(path))}));
@@ -110,7 +112,7 @@ export function inspectIdentitySourceJudgments({root = rootDefault, readMember} 
     const refs = [previousRef, ...inputs.source_evidence, ...dependencies, {path: proofPath, sha256: hash(proofBytes)}];
     let review, path;
     if (profile) {
-      const definition = generatedIdentityRequirements(previous.sha), original = originals.find(row => row.sha === previous.sha);
+      const definition = bidiRequirementsBefore(previous.sha,generatedIdentityRequirements(previous.sha),line,{readMember:rawRead}), original = originals.find(row => row.sha === previous.sha);
       const sourceMembers = definition.members.map(path => ({path, sha256: hash(read(path))}));
       current.final_disposition = profile.disposition; current.reason = profile.decision; current.files = original.paths; current.affected_branches = [line];
       current.individual_proof = {proof_kind: GENERATED_IDENTITY_KIND, review_depth: 'individual-compatibility', diff_sha256: definition.patch, affected_branches: [line], decision: profile.decision,

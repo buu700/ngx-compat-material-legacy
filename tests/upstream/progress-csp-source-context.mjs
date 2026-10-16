@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {readBidiIsolatedBefore} from '../../scripts/bidi-isolated-packed-source-requalification.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
@@ -35,7 +36,7 @@ export function stripProgressCspIntegration(text, kind) {
  * packed guard. Recover its complete three-scope predecessor from that change's
  * authenticated capsule; its original expected hash remains an assertion. */
 export function precedingHistoricalContextMember(path, read) {
-  const bytes = read(path);
+  const bytes = readBidiIsolatedBefore(path,read);
   if (path !== 'scripts/upstream-artifact-behavior-evidence.mjs') return bytes;
   const hash = value => createHash('sha256').update(value).digest('hex');
   const input = read('compatibility/rc/chip-menu-tooltip-admission-inputs.json'), capsule = JSON.parse(input);

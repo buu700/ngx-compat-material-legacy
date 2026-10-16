@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';
 /** Synthetic admission controls only. Does not instantiate or qualify any control. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -45,8 +46,8 @@ assert.equal(file.parseDiagnostics.length,0);
 const node=file.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases');assert.ok(node);
 const source=node.getText(file),keys=loadExportKeys(),expected=allConsumerCaseIds(keys),manifest=JSON.parse(readFileSync(join(root,'projects/ngx-material-legacy/package.json')));
 const line=manifest.version.startsWith('21.')?'21.x':'main';assert.equal(expected.length,106);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase',text+';return collectAcceptanceCases;')
- (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase',text+';return collectAcceptanceCases;')
+ (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase);
 const collect=load(source),observations=rows=>collect({harness:{status:'ok',result:{valueAccessorRegistration:rows}}},keys,'/tmp/consumer','/tmp/source')
  .filter(row=>VALUE_ACCESSOR_CASE_IDS.includes(row.case_id));
 assert.deepEqual(observations(samples).map(row=>row.result),Array(6).fill('pass'));

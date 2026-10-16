@@ -24,6 +24,7 @@ export const SELECT_FOCUS_MEMBERS = Object.freeze([
   'scripts/packed-consumer-aot-smoke.mjs',
   'scripts/packed-consumer-evidence.mjs',
   'scripts/chip-menu-tooltip-packed-contract.mjs',
+  'scripts/bidi-isolated-packed-contract.mjs', 'scripts/bidi-isolated-packed-fixture.mjs',
   'scripts/upstream-artifact-behavior-evidence.mjs',
   'scripts/select-focus-click-packed-fixture.mjs',
   'scripts/select-focus-click-packed-contract.mjs',
@@ -37,6 +38,7 @@ export const TABLE_ONPUSH_PATCH = '3630c1798278c09cfd65afa8a4d5853034cfd2a0bd67e
 const producerMembers = [
   'scripts/packed-consumer-aot-smoke.mjs', 'scripts/packed-consumer-evidence.mjs',
   'scripts/chip-menu-tooltip-packed-contract.mjs', 'scripts/upstream-artifact-behavior-evidence.mjs',
+  'scripts/bidi-isolated-packed-contract.mjs', 'scripts/bidi-isolated-packed-fixture.mjs',
   'compatibility/rc/matrices/library-exports.json', 'compatibility/rc/matrices/full-verify.json',
 ];
 export const SELECT_DETACH_MEMBERS = Object.freeze([
