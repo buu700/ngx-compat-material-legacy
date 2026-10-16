@@ -98,6 +98,7 @@ try {
   negative('foreign-sha',()=>{f.entry.sha='0'.repeat(40);},/unregistered/);
   negative('renamed-kind',()=>{f.entry.individual_proof.proof_kind='ordinary-source';},/unregistered/);
   negative('wrong-patch',()=>{f.entry.individual_proof.diff_sha256='0'.repeat(64);},/unregistered/);
+  if(line==='21.x')negative('false-inherited-peer-fix',()=>{f.entry.final_disposition='inherited';},/inherited-fix disposition is invalid/);
   negative('wrong-peer',()=>{f.entry.individual_proof.peer_reference.helper_has_replay_catch=!definition.peer_reference.helper_has_replay_catch;},/peer reference/);
   negative('wrong-line',()=>{f.request.line=line==='main'?'21.x':'main';},/peer reference/);
   for(const field of ['kind','runtimes'])negative('scope-'+field,()=>{f.entry.individual_proof.ripple_replay_behavior[field]='wrong';},/scope/);

@@ -1,0 +1,310 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+  "status": "reviewed",
+  "final_disposition": "adapt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "original_files": 1,
+  "original_hunks": 1,
+  "diff": "diff --git a/src/cdk/platform/features/shadow-dom.ts b/src/cdk/platform/features/shadow-dom.ts\nindex 6c0720f6d69f8dab27d6b72e95b40ce4ee2d5ac6..f65450f556810cd21ba34be3f0536820a5d5fad1 100644\n--- a/src/cdk/platform/features/shadow-dom.ts\n+++ b/src/cdk/platform/features/shadow-dom.ts\n@@ -57,7 +57,14 @@ export function _getFocusedElementPierceShadowDom(): HTMLElement | null {\n \n /** Gets the target of an event while accounting for Shadow DOM. */\n export function _getEventTarget<T extends EventTarget>(event: Event): T | null {\n-  // If an event is bound outside the Shadow DOM, the `event.target` will\n-  // point to the shadow root so we have to use `composedPath` instead.\n-  return (event.composedPath ? event.composedPath()[0] : event.target) as T | null;\n+  // If an event is bound outside the Shadow DOM, the `event.target` will point to the shadow root\n+  // so we have to use `composedPath` instead. Note that `composedPath` can throw if it's called\n+  // during event replay (see #33386).\n+  // TODO(crisbeto): it seems like `preventDefault` throws during replay as well.\n+  if (event.composedPath) {\n+    try {\n+      return event.composedPath()[0] as T | null;\n+    } catch {}\n+  }\n+  return event.target as T | null;\n }\n",
+  "diff_sha256": "c5a3cab8777ece5990a5e00eaa506a871971176c33e8ade45277d7a2a169b037",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/platform/features/shadow-dom.ts",
+      "header": "@@ -57,7 +57,14 @@ export function _getFocusedElementPierceShadowDom(): HTMLElement | null {",
+      "hunk_sha256": "f1e665d2fd43ce43046d22aac4274c7b1fb920dc86a0fb03940031f66f40a216",
+      "judgment": "The only original hunk moves composedPath invocation into try/catch and falls back to event.target; its preventDefault comment does not implement a second fix. The owned helper applies this behavior while keeping its already owned empty/missing-path fallback. No current private symbol is imported or invoked. Exact public peer source traces identify direct document capture and the22-only private catch;21 lacks it. Exact Angular core/primitives/platform-browser sources prove the expected stashed-handler replay route and the absence of a default DOM redispatch into that peer listener. The public launch route is not event-target evidence. The current producer keeps owned replay, manual launch, directive-only native input and genuine no-manual-launch replay observations separate. Actual packed/browser observations must confirm this supported route; deliberately broken native composedPath on21 remains an explicit diagnostic failure rather than an inherited fix."
+    }
+  ],
+  "decision": "Adapt the complete throwing-composedPath fallback in the independently owned event-target helper and retain its existing empty/missing-path fallback. Every owned ripple manager event delegates through that helper and preserves historical registration order and cleanup. The public MatRipple alias is a separate peer route:22.1.7 contains the private catch,21.2.14 does not and must never be described as inherited-fixed. Complete exact-floor Angular replay sources patch composedPath to throw and invoke stashed Angular handlers directly without DOM redispatch; the public directive has no Angular host listener and registers document capture instead. Public launch receives coordinates/config, not the replay event. The diagnostic Angular replay handler never launches or forwards. This establishes the expected default route without patching or invoking private peer/framework symbols. Require genuine packed Angular replay/native observations, actual no-launch replay plus live native creation, owned fallback and cleanup on both runtime modes. Preserve the explicit21 controlled native fault as a diagnostic, not a fix or risk exception; native/source-floor qualification remains independently mandatory.",
+  "individual_proof": {
+    "proof_kind": "browser-required-individual-ripple-replay",
+    "diff_sha256": "c5a3cab8777ece5990a5e00eaa506a871971176c33e8ade45277d7a2a169b037",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Adapt the complete throwing-composedPath fallback in the independently owned event-target helper and retain its existing empty/missing-path fallback. Every owned ripple manager event delegates through that helper and preserves historical registration order and cleanup. The public MatRipple alias is a separate peer route:22.1.7 contains the private catch,21.2.14 does not and must never be described as inherited-fixed. Complete exact-floor Angular replay sources patch composedPath to throw and invoke stashed Angular handlers directly without DOM redispatch; the public directive has no Angular host listener and registers document capture instead. Public launch receives coordinates/config, not the replay event. The diagnostic Angular replay handler never launches or forwards. This establishes the expected default route without patching or invoking private peer/framework symbols. Require genuine packed Angular replay/native observations, actual no-launch replay plus live native creation, owned fallback and cleanup on both runtime modes. Preserve the explicit21 controlled native fault as a diagnostic, not a fix or risk exception; native/source-floor qualification remains independently mandatory.",
+    "peer_reference": {
+      "public_route": "@angular/material/core#MatRipple",
+      "core_version": "21.2.23",
+      "cdk_version": "21.2.14",
+      "material_version": "21.2.14",
+      "helper_has_replay_catch": false,
+      "helper": {
+        "path": "compatibility/rc/material-public-source-members/98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228.gz",
+        "sha256": "98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228"
+      },
+      "caller": {
+        "path": "compatibility/rc/material-public-source-members/37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3.gz",
+        "sha256": "37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3"
+      }
+    },
+    "ripple_replay_behavior": {
+      "kind": "owned-replay-fallback-and-distinct-public-native-route",
+      "source_members": [
+        {
+          "path": "scripts/upstream-ripple-replay-evidence.mjs",
+          "sha256": "5e726337f025668551cd6413a183a76227d6da5a9d21d12819dfbf4abc650a99"
+        },
+        {
+          "path": "scripts/upstream-browser-run-evidence.mjs",
+          "sha256": "a60c4e7bb1c61de9c5672861a04ee57df229ff695d44298b85e3a6a6a7c4a886"
+        },
+        {
+          "path": "scripts/upstream-packed-run-evidence.mjs",
+          "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+        },
+        {
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "sha256": "5021aee6224fe16f9ff8030c9503e90c6359a4fd96cd3fe3d1ffdece41a0f4be"
+        },
+        {
+          "path": "scripts/rc-verify.py",
+          "sha256": "665d42097cfd383e4f99e9e46ab7639813414051360f2569581aed2e669855e8"
+        },
+        {
+          "path": "scripts/browser-matrix-acceptance.mjs",
+          "sha256": "656ea79245084c2bf182e208fe33f6410877502a5f6ea92fc85a8f17e326ec18"
+        },
+        {
+          "path": "scripts/browser-matrix-roster.mjs",
+          "sha256": "f2e7a47be98d5cc5650930e663ff13de7f27554c7180d1cb3eb8661c394637ca"
+        },
+        {
+          "path": "scripts/browser-required-cells.mjs",
+          "sha256": "763fde441bc9ec8793c38896dc25f031daf42eb5159a891dd16902873be6874a"
+        },
+        {
+          "path": "scripts/ripple-hydration-replay.mjs",
+          "sha256": "59d499fa66c018456eca5b67e97dc3417854426d0733e01ba660a886bd77c605"
+        },
+        {
+          "path": "scripts/ripple-hydration-application.mjs",
+          "sha256": "432231a645e5bc0ce8e375e9da9745177f7f1b577ac1ee0758913cdd5989a59f"
+        },
+        {
+          "path": "scripts/ripple-hydration-component-fixture.mjs",
+          "sha256": "2518dfb938446f31a1ba614f4e5c89cae973fbb8d8f6742207665ad3a94a3169"
+        },
+        {
+          "path": "scripts/ripple-native-event-probe.mjs",
+          "sha256": "e4dcc033d6bd29c2a80fa16246330486ad0c5f9b487f21915ea1d54edb6616de"
+        },
+        {
+          "path": "scripts/ripple-public-replay-probe.mjs",
+          "sha256": "0540f4b149ffa1080e162110bd1fd4451e9cae4ab00ca286f0bcef31c0003544"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "f72e2b5715c760a709aa62678e0352c16eed8945ffe0ebb4a136ec4daa57cfe0"
+        },
+        {
+          "path": "compatibility/rc/matrices/library-exports.json",
+          "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+        },
+        {
+          "path": "testing/legacy-runner/historical-inventory.json",
+          "sha256": "2a485e6a37f0bfffacf13efebb57c86848cee04c359a324ec34d1d6d61dee929"
+        },
+        {
+          "path": "projects/ngx-material-legacy/package.json",
+          "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+          "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/ripple/index.ts",
+          "sha256": "bb1177a1a13bc75224e27d6f41cecb9f82b80db8bcf05c3577eecf9458641e0c"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+          "sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts",
+          "sha256": "2cb38621b0481e8745d306422dca5eba1ad4dce31f3e86931680feaf4f2fe0be"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts",
+          "sha256": "4821492afe8b8f13782032fee0e16886fe002d8c79f33bc1332fd4813d91edd2"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts",
+          "sha256": "39a8a95c574620b4aa4ef50a30b86eba359c793d69d504b53fb98d4962c4119e"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "compatibility/rc/material-public-source-members/98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228.gz",
+          "sha256": "be6e8f61eeea5f7c186c729b2f8d01a69d6cc88c994a8c0ad8c5333874afb6f5"
+        },
+        {
+          "path": "compatibility/rc/material-public-source-members/37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3.gz",
+          "sha256": "5ae7f8ec67a027f754a41eb76d1ca9c3d0c7c0abf5721428e35ab8eb590160a3"
+        }
+      ],
+      "runtimes": [
+        "zoneful",
+        "zoneless"
+      ]
+    }
+  },
+  "prior_entry": {
+    "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+    "bucket": "behavior-semantic",
+    "subject": "fix(cdk/platform): account for composedPath error during event replay (#33409)",
+    "files": [
+      "src/cdk/platform/features/shadow-dom.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Exact main22.1.7 private event-target source contains a try/catch fallback. Exact21.2.14 and original16.2.14 do not. Both current public MatRipple implementations delegate native document-capture events through their private RippleEventManager and the CDK helper. The existing hydration peer_ripple_launches counts manual public launch() calls from the component; that public API does not receive the replay event. Those counts do not prove shared peer event-target error handling, and21 must not be called inherited-fixed. Packed AOT/client native execution, genuine supported replay reachability, the21 public-peer applicability decision and final10db3 disposition are still pending. Controlled failure is diagnostic evidence, not a risk exception or compatibility pass. No product/consumer API, HTML, CSS or SCSS change; no source-baseline increase, G11 clearance, push or Actions dispatch.",
+    "read_note_disposition": "individual source-floor provenance; native and final applicability pending",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-ripple-event-floor-review.json",
+    "current_owned_repair": {
+      "path": "compatibility/rc/ripple-event-manager-source-proof.json",
+      "sha256": "72abb9dfade645fef395c3d9507bead935ac889f06c3c80e33aeb592a07876cd"
+    },
+    "prior_dispositions": [
+      {
+        "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+        "bucket": "behavior-semantic",
+        "subject": "fix(cdk/platform): account for composedPath error during event replay (#33409)",
+        "files": [
+          "src/cdk/platform/features/shadow-dom.ts"
+        ],
+        "final_disposition": "needs-individual-review",
+        "reason": "The original main inherited rationale cites an unrelated normalizePassiveListenerOptions import in slider.ts. That call does not delegate this event-target behavior. Current source has an owned public event-target helper and an owned ripple manager using composed paths; both need contextual review. The new owned repair does not prove shared public MatRipple at both floors or genuine native replay/hydration. Complete exact floor private-member provenance through genuine public callers and packed/native controlled event plus actual hydration/replay qualification. Keep SHA open; a pending item is not an audit pass. The new public NgZone import admission is a separate finite boundary.",
+        "read_note_disposition": "unreviewed-on-21.x",
+        "affected_branches": [
+          "21.x"
+        ],
+        "g11_claim": "not-passed",
+        "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+        "evidence_report": "compatibility/rc/ripple-event-replay-upstream-correction.json",
+        "current_owned_repair": {
+          "path": "compatibility/rc/ripple-event-manager-source-proof.json",
+          "sha256": "72abb9dfade645fef395c3d9507bead935ac889f06c3c80e33aeb592a07876cd"
+        }
+      }
+    ],
+    "diff_sha256": "c5a3cab8777ece5990a5e00eaa506a871971176c33e8ade45277d7a2a169b037",
+    "public_peer_source_floor_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-ripple-event-floor-review.json",
+      "sha256": "5a26784dfbcdf2558f82a9156bc9b4d1320f79de38e275f6087c9915a9a48487"
+    }
+  },
+  "prior_source_review": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-ripple-event-floor-review.json",
+    "sha256": "5a26784dfbcdf2558f82a9156bc9b4d1320f79de38e275f6087c9915a9a48487"
+  },
+  "independent_evidence": [
+    {
+      "path": "compatibility/rc/remaining-native-admission-individual-source-proof.json",
+      "sha256": "82d018c28f0ba77c442e324328e16ec916f748cc6a12c50826697a1585714895"
+    },
+    {
+      "path": "compatibility/rc/form-field-hover-followup-source-review.json",
+      "sha256": "f0bab6623905894a78bf3a32667125b16aac4417fe1f385d6e843b0d0bf47218"
+    },
+    {
+      "path": "compatibility/rc/form-field-hover-followup-source-diagnostic.json.gz",
+      "sha256": "605f9b6fa36d2da9848c1e5196a2170f46b52736500baac99dd595c80292f7fa"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-lifecycle-controls.json",
+      "sha256": "7a855591fe8cc4bcb66c0b7c2900820fa54ac862d2168bf832d0859747a0c96d"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-controls.json",
+      "sha256": "196de43e45c3180027e9d86fd1d9eacbec3a12d1d801f6d5d83233427d2b9f69"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-cyph-style.json",
+      "sha256": "ddbe385744bc4b59f8af2e3dec3b1212b92ce0de12c393b790ba6baf05ef39c5"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-ripple-route-source-controls.json",
+      "sha256": "980370f05a18d09e25bebce67f96955963e080d1dc77734fb74a8a0601125e7b"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-ripple-source-disposition-controls.json",
+      "sha256": "09e49140f3a253b0fc53fcd8e5fb9661de0c935e125c85f2683d1811ad917d9f"
+    },
+    {
+      "path": "compatibility/rc/ripple-event-manager-source-proof.json",
+      "sha256": "72abb9dfade645fef395c3d9507bead935ac889f06c3c80e33aeb592a07876cd"
+    },
+    {
+      "path": "compatibility/rc/ripple-native-channel-floor-source.json",
+      "sha256": "6b0bc9c8bf28eaf1eeaf5c50fcd00bc4fe582c25f7f95f05708f53c8247e8204"
+    }
+  ],
+  "required_native_contract": {
+    "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+    "patch": "c5a3cab8777ece5990a5e00eaa506a871971176c33e8ade45277d7a2a169b037",
+    "kind": "owned-replay-fallback-and-distinct-public-native-route",
+    "runtimes": [
+      "zoneful",
+      "zoneless"
+    ],
+    "members": [
+      "scripts/upstream-ripple-replay-evidence.mjs",
+      "scripts/upstream-browser-run-evidence.mjs",
+      "scripts/upstream-packed-run-evidence.mjs",
+      "scripts/check-upstream-audit-disposition.mjs",
+      "scripts/rc-verify.py",
+      "scripts/browser-matrix-acceptance.mjs",
+      "scripts/browser-matrix-roster.mjs",
+      "scripts/browser-required-cells.mjs",
+      "scripts/ripple-hydration-replay.mjs",
+      "scripts/ripple-hydration-application.mjs",
+      "scripts/ripple-hydration-component-fixture.mjs",
+      "scripts/ripple-native-event-probe.mjs",
+      "scripts/ripple-public-replay-probe.mjs",
+      "compatibility/rc/matrices/full-verify.json",
+      "compatibility/rc/matrices/library-exports.json",
+      "testing/legacy-runner/historical-inventory.json",
+      "projects/ngx-material-legacy/package.json",
+      "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "projects/ngx-material-legacy/legacy-core/ripple/index.ts",
+      "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+      "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts",
+      "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts",
+      "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts",
+      "compatibility/rc/material-public-subjects.json",
+      "compatibility/rc/material-public-source-members/98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228.gz",
+      "compatibility/rc/material-public-source-members/37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3.gz"
+    ],
+    "peer_reference": {
+      "public_route": "@angular/material/core#MatRipple",
+      "core_version": "21.2.23",
+      "cdk_version": "21.2.14",
+      "material_version": "21.2.14",
+      "helper_has_replay_catch": false,
+      "helper": {
+        "path": "compatibility/rc/material-public-source-members/98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228.gz",
+        "sha256": "98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228"
+      },
+      "caller": {
+        "path": "compatibility/rc/material-public-source-members/37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3.gz",
+        "sha256": "37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3"
+      }
+    }
+  },
+  "private_peer_fix_inherited": false,
+  "actual_native_or_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
