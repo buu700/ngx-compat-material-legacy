@@ -12,7 +12,7 @@ import {readEvidenceMember, validatePackedConsumerRun} from './upstream-packed-r
 export const HISTORICAL_BEHAVIOR_KIND = 'historical-required-individual-behavior';
 const checkId = 'historical-legacy-artifact';
 // Expansion requires reviewing this finite contract alongside its indexed names.
-const requiredCaseCount = 2225;
+const requiredCaseCount = 2228;
 const casePrefix = checkId + '/original-and-shared-cases/';
 const commonMembers = [
   'scripts/rc-test-legacy-family.mjs', 'scripts/historical-case-roster.mjs',
@@ -32,6 +32,16 @@ const nativeCase = (path, index, full_name) => ({
   candidate: 'projects/ngx-material-legacy/' + path,
   full_name,
 });
+// Existing regression additions are required by the complete historical run.
+// They supplement every original named scope; no prior requirement is replaced.
+const retainedRegressionCases = [
+  nativeCase('legacy-autocomplete/autocomplete.spec.ts', 172, 'MatAutocomplete > should not throw errors when closing without options'),
+  nativeCase('legacy-chips/chip-list.spec.ts', 87, 'MatChipList > should clear a destroyed active chip when the list becomes empty'),
+  nativeCase('legacy-table/table-data-source.spec.ts', 6, 'MatTableDataSource > sort > should be able to correctly sort an array of strings and numbers with left zero'),
+];
+export function historicalRegressionRequirements() {
+  return structuredClone(retainedRegressionCases);
+}
 // This finite registry is owned by individual whole-patch source reviews.
 // Names are checked in addition to indexed ids: an inserted test cannot silently
 // turn the same numeric id into an unrelated behavior assertion.
@@ -124,7 +134,8 @@ export function validateHistoricalBehavior({root, entry, proof, request}) {
     demand(object(groups) && Object.values(groups).every(Array.isArray), 'missing full historical matrix roster');
     const expected = Object.values(groups).flat();
     demand(expected.length === requiredCaseCount && new Set(expected).size === expected.length
-      && registered.cases.every(row => expected.includes(row.case_id)), 'incomplete full historical matrix roster');
+      && registered.cases.every(row => expected.includes(row.case_id))
+      && retainedRegressionCases.every(row => expected.includes(row.case_id)), 'incomplete full historical matrix roster');
     const report = JSON.parse(readEvidenceMember(runDir, 'reports/' + checkId + '.json'));
     demand(report.schema_version === 1 && report.template === false && report.check_id === checkId
       && report.line === binding.source_line && report.run_id === binding.run_id
@@ -154,7 +165,7 @@ export function validateHistoricalBehavior({root, entry, proof, request}) {
     demand(Array.isArray(observation.cases) && sameIds(observation.cases.map(row => row?.case_id), expected)
       && observation.cases.every(row => row.result === 'pass')
       && isDeepStrictEqual(observation.rejection_reasons, []), 'incomplete historical observed cases');
-    for (const required of registered.cases) {
+    for (const required of [...registered.cases, ...retainedRegressionCases]) {
       const selected = observation.cases.find(row => row.case_id === required.case_id);
       demand(Object.entries(required).every(([key, value]) => selected[key] === value)
         && selected.executed_full_name === required.full_name, 'wrong required historical test identity');
@@ -162,7 +173,8 @@ export function validateHistoricalBehavior({root, entry, proof, request}) {
     return {ok: true, detail: 'Required named tests passed in the complete same-run historical artifact invocation; final sealing remains separate.',
       invocation_id: execution.invocation_id, output, library: packed.library,
       packed_consumer: {invocation_id: packed.invocation_id, output: packed.output},
-      required_cases: registered.cases.map(row => row.case_id)};
+      required_cases: registered.cases.map(row => row.case_id),
+      retained_regression_cases: retainedRegressionCases.map(row => row.case_id)};
   } catch (error) {
     return {ok: false, detail: error.message};
   }

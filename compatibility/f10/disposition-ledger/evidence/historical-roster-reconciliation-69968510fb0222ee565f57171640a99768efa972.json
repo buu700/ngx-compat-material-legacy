@@ -1,0 +1,1272 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "69968510fb0222ee565f57171640a99768efa972",
+  "status": "reviewed",
+  "final_disposition": "already-adapted",
+  "source_parent": "56ba5ab801caca63c9c906318a420d60422affa7",
+  "reviewer": "Codex primary implementer",
+  "review_date": "2026-10-16",
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main"
+  ],
+  "judgment_stage": "source-complete-packed-required",
+  "diff_sha256": "3809a4c8be10fbe0e99531fda686e37f32dc153640055c86b612be0668849dbe",
+  "patch_file": "compatibility/rc/remaining-identity-69968510fb0222ee565f57171640a99768efa972.diff",
+  "complete_original_files": [
+    "src/material/snack-bar/snack-bar-container.ts"
+  ],
+  "complete_original_hunks": 2,
+  "full_patch_verified_against_cached_Git_object": true,
+  "hunk_reviews": [
+    {
+      "hunk": 1,
+      "file": "src/material/snack-bar/snack-bar-container.ts",
+      "header": "@@ -29,13 +29,11 @@ import {",
+      "judgment": "The original import adds the underscore generator and removes the modern uniqueId counter. The maintained public peer container owns its own service state, which does not coordinate the owned historical counter. The existing independently owned legacy prefix avoids both duplicate ID and cross-generation substring cleanup hazards; no private upstream import or new constructor injection is added."
+    },
+    {
+      "hunk": 2,
+      "file": "src/material/snack-bar/snack-bar-container.ts",
+      "header": "@@ -109,7 +107,7 @@ export class MatSnackBarContainer extends BasePortalOutlet implements OnDestroy",
+      "judgment": "The live-element field changes to injected generation of the modern prefix. The owned field retains its counter with mat-legacy-snack-bar-container-live. Existing modal exposure and teardown remain unchanged. The actual packed fixture must preserve an unrelated aria-owns target, add both live nodes, dismiss in each creation order and require exact retained tokens/nodes after each stage; a coherent rehashed observation with a lost or partially removed peer token must still fail."
+    }
+  ],
+  "source_conclusion": "The complete snack live-region ID patch is adapted through an owned historical namespace while preserving manual construction, templates/styles and announcement behavior. Both minimum public peers generate mat-snack-bar-container-live IDs through their private service; the owned container uses mat-legacy-snack-bar-container-live plus its historical counter. A trailing legacy suffix alone was insufficient because modal aria-owns cleanup uses substring replacement: the distinct prefix prevents a peer dismissal from partially removing the legacy ID. Required actual packed observations open both real generations under a modal in each creation order, prove unique exact live nodes and preserved existing ownership, dismiss each and require only its own token/node to disappear, then prove complete cleanup. The original service/API itself is not adopted. Synthetic validators and constructor diagnostics do not establish an actual announcement, DOM, floor, hydration or release pass.",
+  "decision": "The complete snack live-region ID patch is adapted through an owned historical namespace while preserving manual construction, templates/styles and announcement behavior. Both minimum public peers generate mat-snack-bar-container-live IDs through their private service; the owned container uses mat-legacy-snack-bar-container-live plus its historical counter. A trailing legacy suffix alone was insufficient because modal aria-owns cleanup uses substring replacement: the distinct prefix prevents a peer dismissal from partially removing the legacy ID. Required actual packed observations open both real generations under a modal in each creation order, prove unique exact live nodes and preserved existing ownership, dismiss each and require only its own token/node to disappear, then prove complete cleanup. The original service/API itself is not adopted. Synthetic validators and constructor diagnostics do not establish an actual announcement, DOM, floor, hydration or release pass.",
+  "individual_proof": {
+    "proof_kind": "packed-required-individual-generated-identity",
+    "review_depth": "individual-compatibility",
+    "diff_sha256": "3809a4c8be10fbe0e99531fda686e37f32dc153640055c86b612be0668849dbe",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete snack live-region ID patch is adapted through an owned historical namespace while preserving manual construction, templates/styles and announcement behavior. Both minimum public peers generate mat-snack-bar-container-live IDs through their private service; the owned container uses mat-legacy-snack-bar-container-live plus its historical counter. A trailing legacy suffix alone was insufficient because modal aria-owns cleanup uses substring replacement: the distinct prefix prevents a peer dismissal from partially removing the legacy ID. Required actual packed observations open both real generations under a modal in each creation order, prove unique exact live nodes and preserved existing ownership, dismiss each and require only its own token/node to disappear, then prove complete cleanup. The original service/API itself is not adopted. Synthetic validators and constructor diagnostics do not establish an actual announcement, DOM, floor, hydration or release pass.",
+    "generated_identity_behavior": {
+      "kind": "owned-snack-live-identity-and-modal-ownership",
+      "case_ids": [
+        "packed-consumer/harness/generated-identity-coexistence"
+      ],
+      "source_members": [
+        {
+          "path": "scripts/upstream-generated-identity-evidence.mjs",
+          "sha256": "442dd7910576051ce98d2bf4ad90fe1e1dbf648adc63dc05703bcb40fc8688fd"
+        },
+        {
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "sha256": "5021aee6224fe16f9ff8030c9503e90c6359a4fd96cd3fe3d1ffdece41a0f4be"
+        },
+        {
+          "path": "scripts/upstream-packed-run-evidence.mjs",
+          "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+        },
+        {
+          "path": "scripts/packed-consumer-evidence.mjs",
+          "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+        },
+        {
+          "path": "scripts/packed-consumer-aot-smoke.mjs",
+          "sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591"
+        },
+        {
+          "path": "scripts/generated-identity-packed-fixture.mjs",
+          "sha256": "e6562475d0347f551b1e7cb775114111fbdb8f9a99450564d0b4d2d6d78b72d5"
+        },
+        {
+          "path": "scripts/generated-identity-packed-contract.mjs",
+          "sha256": "82dc83d16dc6f1fc882df001407f8896bdb8e62a9fb4220ed0663f5f0d494301"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "ce5746a3721935ab59e5c10087341c661b2b477a8f17f8c49e589c5b3410584b"
+        },
+        {
+          "path": "scripts/bidi-isolated-packed-contract.mjs",
+          "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+        },
+        {
+          "path": "scripts/bidi-isolated-packed-fixture.mjs",
+          "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+        },
+        {
+          "path": "scripts/selection-comparator-packed-contract.mjs",
+          "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+        },
+        {
+          "path": "scripts/selection-comparator-packed-fixture.mjs",
+          "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+        },
+        {
+          "path": "compatibility/rc/matrices/library-exports.json",
+          "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+        },
+        {
+          "path": "projects/ngx-material-legacy/package.json",
+          "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+          "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+          "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "sha256": "d9ddfcf0a2f5a27a17670b9c4f382b2739c9a4f9ff5baffaef542cd866ecddab"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+          "sha256": "9b92fdf9e5e74ea73f6f7cd3305dfd79dc832c25f5de1f6d2aa1f63b17ccaee2"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "sha256": "a35c9828093141136e677671aefb92409813dc313e9e247d431841aafc36045d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "sha256": "dd193a5f4cdef0ee0be3c993474efa482229854d33b4853c6d5dd519d21a6fd0"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "sha256": "89e91390739e518a2a3e9dbdd8d75ff09dfcaa94bfe4bccc73d86f1e577c206c"
+        },
+        {
+          "path": "compatibility/rc/remaining-identity-public-subjects.json",
+          "sha256": "c3600dff7acf9eeb0a0bbd0fd893273e392592fc1bae06110fb792ffe673a8fc"
+        },
+        {
+          "path": "compatibility/rc/remaining-identity-source-proof.json",
+          "sha256": "43a96a1a8d4f2b15b3c146451cddf2ae42dea37ecfc571e523803580422b5d64"
+        },
+        {
+          "path": "compatibility/rc/snack-modal-identity-source-proof.json",
+          "sha256": "af946b53ecedbeea8d0d7ff94c5cceb89d86aaa4690462909956f98a965672ff"
+        },
+        {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json",
+          "sha256": "ab668ec4418b26af5c45e3cb62b1a83222332260b8c28cd0fa0eaa0aa7f22766"
+        }
+      ]
+    },
+    "historical_roster_source_context": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "7694977ba8e20050d29e2d1c605a9b168f5232345a42f589eb70f0977c5f172b"
+    }
+  },
+  "branch_review": {
+    "line": "main",
+    "minimum_framework": "22.1.7",
+    "minimum_CDK": "22.1.7",
+    "peer_reviews": [
+      {
+        "line": "main",
+        "path": "@angular/cdk/fesm2022/_id-generator-chunk.mjs",
+        "sha256": "f0892b3412633492aafe4fd3e149495352427aff5a870c8cd07d3b67fe90614b",
+        "bytes": 1151,
+        "semantics": "Actual main floor uses a module Map keyed by prefix, optional application-ID prefix and optional random infix; getId still ends in an incrementing decimal count.",
+        "callers": [
+          {
+            "key": "@angular/material/fesm2022/menu.mjs",
+            "path": "compatibility/rc/remaining-identity-runtime-sources/d8f563e5de5fc52a6b3161a3971363f6ff141701b893d9211063af646225710d.gz",
+            "sha256": "d8f563e5de5fc52a6b3161a3971363f6ff141701b893d9211063af646225710d",
+            "exact_default_call": "panelId = inject(_IdGenerator).getId('mat-menu-panel-');"
+          },
+          {
+            "key": "@angular/material/fesm2022/snack-bar.mjs",
+            "path": "compatibility/rc/remaining-identity-runtime-sources/a3aef232509cc44e971b41be1bc017ba543374b323d16bce90a5162fc568922b.gz",
+            "sha256": "a3aef232509cc44e971b41be1bc017ba543374b323d16bce90a5162fc568922b",
+            "exact_default_call": "_liveElementId = inject(_IdGenerator).getId('mat-snack-bar-container-live-');"
+          }
+        ],
+        "application_prefix_and_optional_randomization_owned_by_current_CDK": true,
+        "owned_service_dependency": false
+      },
+      {
+        "line": "21.x",
+        "path": "@angular/cdk/fesm2022/_id-generator-chunk.mjs",
+        "sha256": "b230dd0785cfb872757bdb9684aebea82deda164912a0b70abf113b48795c1d8",
+        "bytes": 1167,
+        "semantics": "Actual 21.x floor uses a module object keyed by prefix, optional application-ID prefix and optional random infix; getId still ends in an incrementing decimal count.",
+        "callers": [
+          {
+            "key": "@angular/material/fesm2022/menu.mjs",
+            "path": "compatibility/rc/remaining-identity-runtime-sources/fc53d00edd4edc70e57dd5fb0be0e4b6144f414ace0e2336bc8915bce4021105.gz",
+            "sha256": "fc53d00edd4edc70e57dd5fb0be0e4b6144f414ace0e2336bc8915bce4021105",
+            "exact_default_call": "panelId = inject(_IdGenerator).getId('mat-menu-panel-');"
+          },
+          {
+            "key": "@angular/material/fesm2022/snack-bar.mjs",
+            "path": "compatibility/rc/remaining-identity-runtime-sources/2c5d78a32e101a37d3f99592409e436f45fe99a964fd349038be8223a931ee60.gz",
+            "sha256": "2c5d78a32e101a37d3f99592409e436f45fe99a964fd349038be8223a931ee60",
+            "exact_default_call": "_liveElementId = inject(_IdGenerator).getId('mat-snack-bar-container-live-');"
+          }
+        ],
+        "application_prefix_and_optional_randomization_owned_by_current_CDK": true,
+        "owned_service_dependency": false
+      }
+    ]
+  },
+  "independent_evidence": [
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json",
+      "sha256": "ab668ec4418b26af5c45e3cb62b1a83222332260b8c28cd0fa0eaa0aa7f22766"
+    },
+    {
+      "path": "compatibility/rc/generated-identity-packed-source-proof.json",
+      "sha256": "2cf34c00d8f6f494f229f74639af6d83d5f0909b217a53e1b9b3c8da96c48bb8"
+    },
+    {
+      "path": "compatibility/rc/remaining-identity-source-proof.json",
+      "sha256": "43a96a1a8d4f2b15b3c146451cddf2ae42dea37ecfc571e523803580422b5d64"
+    },
+    {
+      "path": "compatibility/rc/remaining-identity-public-subjects.json",
+      "sha256": "c3600dff7acf9eeb0a0bbd0fd893273e392592fc1bae06110fb792ffe673a8fc"
+    },
+    {
+      "path": "compatibility/rc/snack-modal-identity-source-proof.json",
+      "sha256": "af946b53ecedbeea8d0d7ff94c5cceb89d86aaa4690462909956f98a965672ff"
+    },
+    {
+      "path": "compatibility/rc/remaining-identity-generator-worksheet.json",
+      "sha256": "7223eadf6162cb53f7c1f75d632a186d6156284dc20083f87d25159024fddac8"
+    },
+    {
+      "path": "scripts/upstream-generated-identity-evidence.mjs",
+      "sha256": "442dd7910576051ce98d2bf4ad90fe1e1dbf648adc63dc05703bcb40fc8688fd"
+    },
+    {
+      "path": "scripts/generated-identity-packed-contract.mjs",
+      "sha256": "82dc83d16dc6f1fc882df001407f8896bdb8e62a9fb4220ed0663f5f0d494301"
+    },
+    {
+      "path": "tests/upstream/identity-source-context.mjs",
+      "sha256": "8c59412ab4d5e44f5ae6d17761ab378404e06d5266b16784e052b5f1cc2643cf"
+    },
+    {
+      "path": "compatibility/rc/identity-source-admission-source-proof.json",
+      "sha256": "aedfb0aa458b6190636c994c43ba35b1c8a0fb4fd747b22f4c5aaad92572aabc"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-identity-snack-source-judgment.json",
+      "sha256": "add72aa1166ad164421b611d309bd5ef72ee7da18469d82059bde5dc435a7002"
+    },
+    {
+      "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+      "sha256": "402a2af8c924ee04b650da5c7470cbf7b7bd5c4a665e89fe89b1ea88f9618b23"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-contract.mjs",
+      "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-fixture.mjs",
+      "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-source-requalification.mjs",
+      "sha256": "8af454d84a753f57d57af6df261527dfbabc9c940f06410080d614d3fa28e266"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-evidence-requalification.mjs",
+      "sha256": "ebe0e1614336e5fcf4b088a83f4f2968b52400808d7b975f6605a701ebce1333"
+    },
+    {
+      "path": "tests/bidi_isolated_packed_sample.mjs",
+      "sha256": "460a9ae10da400dc743f5f05238b2ac97b0b8783a9e9fbfb9d31bc2ab9c2af94"
+    },
+    {
+      "path": "tests/bidi_isolated_packed_probe.mjs",
+      "sha256": "6b5a1ff2b2cffea149930970dac2e8b9ac5e0d48a4115b28ca71bf1af8e01f77"
+    },
+    {
+      "path": "tests/bidi_isolated_requalification_probe.mjs",
+      "sha256": "30de1f8c0e8a5642ab60febd34384db53803f130489b29e27135992c3f4dff24"
+    },
+    {
+      "path": "tests/test_bidi_isolated_requalification.py",
+      "sha256": "6bccc20589803ac755b21664920e6be9f83fd43c37e6ca5bea24c16db508c1af"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "sha256": "dbc41a06cd81b2924b57d012cf3cb206a19bef2cf4990f334f0ca860d4309b33"
+    },
+    {
+      "path": "compatibility/rc/bidi-peer-admission-source-proof.json",
+      "sha256": "f3069c67b4f97e0d4945cc537edddb30bf4b727cfae979136feb8739382dcdb9"
+    },
+    {
+      "path": "scripts/upstream-bidi-evidence.mjs",
+      "sha256": "146b245f86532b11330b863827f11fbb9792bc8e024a54251d8f600b2dc97fa8"
+    },
+    {
+      "path": "scripts/bidi-peer-source-context.mjs",
+      "sha256": "59557039efc69fb2568b973165a9b3f71115ead69a9d99e30247c48f54180fae"
+    },
+    {
+      "path": "scripts/bidi-peer-source-judgments.mjs",
+      "sha256": "9c4badc90d27d0f17e2b4b1cac6204b3e26e73f1baf5fe5a7d5d27e51a2c0a36"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-source-requalification.mjs",
+      "sha256": "8af454d84a753f57d57af6df261527dfbabc9c940f06410080d614d3fa28e266"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-peer-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "sha256": "64d2ded4831c792a79805c9a149a9eb6c2fdb482a959bc7aa8b3caa9d6d89de6"
+    },
+    {
+      "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+      "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+    },
+    {
+      "path": "scripts/selection-comparator-source-judgments.mjs",
+      "sha256": "75e7e1714918123085897d39692cd586f997ad14ef38a7e68d055fb61119d473"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-source-context.mjs",
+      "sha256": "d1fc5106e9591c48f0118eec4fb06503390369e68499b0315ddc049dd94cc512"
+    },
+    {
+      "path": "scripts/upstream-selection-evidence.mjs",
+      "sha256": "ad26403d8e4b2ebfa8b9d98aaa6e3ef844e8cebaeee56ce6f3432fec0d226fb2"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-contract.mjs",
+      "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-fixture.mjs",
+      "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-source-proof.json",
+      "sha256": "5526eabae45cf015ab58df754014c929e0daaca8a48cab8a4ab456e39a38b46f"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-context-proof.json",
+      "sha256": "72b63f593128d86380682ad88cb060f7c076df8daef372aa1ba632578b62b374"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-proof.json",
+      "sha256": "835ff94c0a8ffdd4c49f6e3816bb908c35f6464c8a5017c76b9e4fcaeca91888"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    }
+  ],
+  "prior_entry": {
+    "sha": "69968510fb0222ee565f57171640a99768efa972",
+    "bucket": "behavior-semantic",
+    "subject": "refactor(material/snack-bar): use ID generator",
+    "final_disposition": "needs-individual-review",
+    "reason": "The complete original snack-bar hunk removes uniqueId, adds the underscore ID-generator import and changes the live-element ID initialization to injected getId(mat-snack-bar-container-live-). This is the target referenced by the snack-bar live/description contract, not an irrelevant internal number. Owned historical and genuine current constructors use separate counters; both orders at both floors reproduce the same default live-element ID before repair. The suffix isolates that target while leaving all templates/styles and explicit content/config inputs unchanged. The old local-counter not-applicable reason is contradicted by actual construction and is reopened. Real packed aria-describedby resolution, announcement/lifecycle behavior and DOM uniqueness still need execution; constructor-only results are not an accessibility or runtime completion claim.",
+    "read_note_disposition": "individually-reopened-pending-packed-identity",
+    "files": [
+      "src/material/snack-bar/snack-bar-container.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json",
+    "recorded_at_utc": "2026-10-01T16:57:12Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "disposition_history": [
+      {
+        "recorded_at_utc": "2026-10-15T17:25:11.199Z",
+        "prior_entry": {
+          "sha": "69968510fb0222ee565f57171640a99768efa972",
+          "bucket": "behavior-semantic",
+          "subject": "refactor(material/snack-bar): use ID generator",
+          "final_disposition": "not-applicable",
+          "reason": "The patch assigns the snack-bar live-region id through the CDK _IdGenerator. Owned snack-bar still uses a local uniqueId counter (legacy-snack-bar/internal/snack-bar-container-base.ts). That counter was not replaced. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+          "read_note_disposition": "owned-retained",
+          "files": [
+            "src/material/snack-bar/snack-bar-container.ts"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "Owned dialog/menu/snack-bar still use local uniqueId/menuPanelUid counters; CDK _IdGenerator absent (0).",
+          "batch_id": "owned-retain-not-applied-2026-10-01-f",
+          "recorded_at_utc": "2026-10-01T16:57:12Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        },
+        "reason": "Individual whole-patch/caller review and real constructor collisions disprove closure by peer ancestry or local-counter retention. Packed DOM/ARIA evidence remains pending."
+      }
+    ]
+  },
+  "runtime_admission": {
+    "required": true,
+    "qualified_by_this_document": false,
+    "case_ids": [
+      "packed-consumer/harness/generated-identity-coexistence"
+    ],
+    "contract": "Captured actual successful full106 packed coordinator invocation, current clean source/library/run identity, one check-owned rehashed output and equal rich raw/selected observations. Re-evaluate both generation creation orders, own exact nodes/ARIA and explicit IDs, snack ownership/lifecycle and cleanup; source/constructor/synthetic diagnostics are insufficient."
+  },
+  "consumer_HTML_CSS_SCSS_changed": false,
+  "source_conclusion_only": true,
+  "semantic_pass": false,
+  "actual_packed_or_native_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "bidi_isolated_source_context": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-identity-snack-source-judgment.json",
+      "sha256": "add72aa1166ad164421b611d309bd5ef72ee7da18469d82059bde5dc435a7002"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+      "sha256": "402a2af8c924ee04b650da5c7470cbf7b7bd5c4a665e89fe89b1ea88f9618b23"
+    },
+    "original_hunk_decisions_retained": true,
+    "runtime_validation_bodies_unchanged": true,
+    "actual_runtime_qualified": false
+  },
+  "bidi_peer_context_requalification": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "sha256": "dbc41a06cd81b2924b57d012cf3cb206a19bef2cf4990f334f0ca860d4309b33"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/bidi-peer-admission-source-proof.json",
+      "sha256": "f3069c67b4f97e0d4945cc537edddb30bf4b727cfae979136feb8739382dcdb9"
+    },
+    "complete_preceding_root_and_assertions_recovered": true,
+    "original_runtime_validation_bodies_and_hunk_decisions_retained": true,
+    "actual_runtime_qualified": false
+  },
+  "selection_comparator_context_requalification": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-peer-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "sha256": "64d2ded4831c792a79805c9a149a9eb6c2fdb482a959bc7aa8b3caa9d6d89de6"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+      "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+    },
+    "complete_preceding_source_and_scope_recovered": true,
+    "original_runtime_predicate_and_hunk_decisions_retained": true,
+    "actual_runtime_qualified": false
+  },
+  "remaining_native_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "682be319d595b478826277b5f239d53f9fd9fe06",
+    "release_reference_parent": "a0d5b5dff1365971e172a1126c3613fdf923e901",
+    "inputs": {
+      "path": "compatibility/rc/remaining-native-admission-source-inputs.json",
+      "sha256": "cac82c2c3b1df2b94d1c7ee1a9b6e7e2a7af4204cce0720c75eb7d20b8c3190d"
+    },
+    "prior": {
+      "path": "compatibility/rc/remaining-native-admission-integration-prior.json.gz",
+      "sha256": "c308ad0dce673dc6be50eea0aa332ee9d86fde9fb353ab23fc2d31b31478b137",
+      "source_parent": "a0d5b5dff1365971e172a1126c3613fdf923e901"
+    },
+    "changed_product": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+        "before_sha256": "bf02faabd1d0fff61c0e756ee6422af4d417b4d045c475179807c195b4edf7b4",
+        "current_sha256": "7a84291a13db6e907e84b42a581f993d81e6da1f28966696861d0b325e6def14"
+      }
+    ],
+    "unchanged_product_members": 1140,
+    "original_decisions_hunks_and_analyses_retained": true,
+    "public_tab_boundary_roles": 13,
+    "implementation_evidence": [
+      {
+        "path": "compatibility/rc/remaining-native-admission-root-dispatch-controls.json",
+        "sha256": "bc8ce291677399ff4c296383a4f4267d26638bdf517e1ae5a655d24c219ca7ea"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-ripple-controls.json",
+        "sha256": "d80df1f440981a296dc8c2c841890d13e61d7688506f237b8f98b1e66bf4fdb9"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-lifecycle.json",
+        "sha256": "d8a6d6fd6a38cc128188b6c569d49b9c4e1e6bf60fae67f68b5981bdf5c52e43"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-controls.json",
+        "sha256": "be8bbecaea4ef23780a4952f585d42e99b043e1c2823d313957eed6dd44f1ffb"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-layout-native-css.json.gz",
+        "sha256": "bff5c3857027bac41978d1e6be34276364b6550fe48074cbe8198ef99e5b1651"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-cyph-style-sanity.json",
+        "sha256": "b38b616b01a0d43009b39e944caa46c3a8f6eb43054a583a2015e9482035d583"
+      }
+    ],
+    "scope": "The exact11-line private incoming-pane layout insertion changes no package membership, peer import/API, constructor, decorator, build input or resource. Original build/test/slider exclusions remain unchanged; no new upstream/runtime/security decision.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-selection-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "sha256": "0c3ab2b2b54ad0dcce9be44c1ace795c4e52c494854d213dabb27e05a8ea4577"
+    },
+    "prior_individual_proof": {
+      "proof_kind": "packed-required-individual-generated-identity",
+      "review_depth": "individual-compatibility",
+      "diff_sha256": "3809a4c8be10fbe0e99531fda686e37f32dc153640055c86b612be0668849dbe",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "The complete snack live-region ID patch is adapted through an owned historical namespace while preserving manual construction, templates/styles and announcement behavior. Both minimum public peers generate mat-snack-bar-container-live IDs through their private service; the owned container uses mat-legacy-snack-bar-container-live plus its historical counter. A trailing legacy suffix alone was insufficient because modal aria-owns cleanup uses substring replacement: the distinct prefix prevents a peer dismissal from partially removing the legacy ID. Required actual packed observations open both real generations under a modal in each creation order, prove unique exact live nodes and preserved existing ownership, dismiss each and require only its own token/node to disappear, then prove complete cleanup. The original service/API itself is not adopted. Synthetic validators and constructor diagnostics do not establish an actual announcement, DOM, floor, hydration or release pass.",
+      "generated_identity_behavior": {
+        "kind": "owned-snack-live-identity-and-modal-ownership",
+        "case_ids": [
+          "packed-consumer/harness/generated-identity-coexistence"
+        ],
+        "source_members": [
+          {
+            "path": "scripts/upstream-generated-identity-evidence.mjs",
+            "sha256": "442dd7910576051ce98d2bf4ad90fe1e1dbf648adc63dc05703bcb40fc8688fd"
+          },
+          {
+            "path": "scripts/check-upstream-audit-disposition.mjs",
+            "sha256": "ce4add8d1a5e896b3094c2ec4cbab95e71fd7ed01b2800d8ca3447a16e0770e2"
+          },
+          {
+            "path": "scripts/upstream-packed-run-evidence.mjs",
+            "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+          },
+          {
+            "path": "scripts/packed-consumer-evidence.mjs",
+            "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+          },
+          {
+            "path": "scripts/packed-consumer-aot-smoke.mjs",
+            "sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591"
+          },
+          {
+            "path": "scripts/generated-identity-packed-fixture.mjs",
+            "sha256": "e6562475d0347f551b1e7cb775114111fbdb8f9a99450564d0b4d2d6d78b72d5"
+          },
+          {
+            "path": "scripts/generated-identity-packed-contract.mjs",
+            "sha256": "82dc83d16dc6f1fc882df001407f8896bdb8e62a9fb4220ed0663f5f0d494301"
+          },
+          {
+            "path": "compatibility/rc/matrices/full-verify.json",
+            "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-contract.mjs",
+            "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-fixture.mjs",
+            "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-contract.mjs",
+            "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-fixture.mjs",
+            "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+          },
+          {
+            "path": "compatibility/rc/matrices/library-exports.json",
+            "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+            "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+            "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+            "sha256": "d9ddfcf0a2f5a27a17670b9c4f382b2739c9a4f9ff5baffaef542cd866ecddab"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+            "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+            "sha256": "9b92fdf9e5e74ea73f6f7cd3305dfd79dc832c25f5de1f6d2aa1f63b17ccaee2"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+            "sha256": "a35c9828093141136e677671aefb92409813dc313e9e247d431841aafc36045d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+            "sha256": "dd193a5f4cdef0ee0be3c993474efa482229854d33b4853c6d5dd519d21a6fd0"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+            "sha256": "89e91390739e518a2a3e9dbdd8d75ff09dfcaa94bfe4bccc73d86f1e577c206c"
+          },
+          {
+            "path": "compatibility/rc/remaining-identity-public-subjects.json",
+            "sha256": "c3600dff7acf9eeb0a0bbd0fd893273e392592fc1bae06110fb792ffe673a8fc"
+          },
+          {
+            "path": "compatibility/rc/remaining-identity-source-proof.json",
+            "sha256": "43a96a1a8d4f2b15b3c146451cddf2ae42dea37ecfc571e523803580422b5d64"
+          },
+          {
+            "path": "compatibility/rc/snack-modal-identity-source-proof.json",
+            "sha256": "af946b53ecedbeea8d0d7ff94c5cceb89d86aaa4690462909956f98a965672ff"
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json",
+            "sha256": "ab668ec4418b26af5c45e3cb62b1a83222332260b8c28cd0fa0eaa0aa7f22766"
+          }
+        ]
+      }
+    },
+    "original_hunk_and_branch_judgments_retained": true
+  },
+  "tab_lifecycle_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "f1615ad0cbdfbc122e696421b4afd47ddb55c68f",
+    "release_reference_parent": "960d98d87aeac3a24b312cf9112abc6d6383a7fd",
+    "inputs": {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-inputs.json",
+      "sha256": "92a1e6c683bf36815471b90674b949f8972f1fbdc7c1d736c60ec79de7d1ce0e"
+    },
+    "prior": {
+      "path": "compatibility/rc/remaining-native-admission-tab-lifecycle-repair-prior.json.gz",
+      "sha256": "13b9222a165a1bb9a875e523c9cd24ef0f19960d4890060bc5a05833cab0bbeb"
+    },
+    "changed_product": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+        "before_sha256": "7a84291a13db6e907e84b42a581f993d81e6da1f28966696861d0b325e6def14",
+        "current_sha256": "9133c2404db7ef40b39819969e310a71caf660c9d9c05ecfd16a8a4fe6ea0154"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+        "before_sha256": "fb4e59b10d5d2f72cf8aa00688a67ad21a415928e588957d9e5ae0b00782aa53",
+        "current_sha256": "c4d86c99bfeed0a10d6451e034ade808bfb52b4240471e1aef5ccd47e3f124f1"
+      }
+    ],
+    "unchanged_product_members": 1139,
+    "original_decisions_hunks_and_analyses_retained": true,
+    "public_tab_boundary_roles": 13,
+    "implementation_evidence": [
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-lifecycle-controls.json",
+        "sha256": "7a855591fe8cc4bcb66c0b7c2900820fa54ac862d2168bf832d0859747a0c96d"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-producer-controls.json",
+        "sha256": "e2d96d2d159ba09bc3599cc8600d4e337e3b0640445f1ba9400b7f71b5f3884e"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-admission-controls.json",
+        "sha256": "7d73b061d54176ee0545c6a2957b948f7c041f3bde33e65e0aa9187a5aaaf8ef"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-dispatch-controls.json",
+        "sha256": "bc8ce291677399ff4c296383a4f4267d26638bdf517e1ae5a655d24c219ca7ea"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-source-controls.json",
+        "sha256": "0c9625aba2c20522df499d7263214efdfc85d9f8129c301cd23a1c2f84e6e98c"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-cyph-style.json",
+        "sha256": "8512aa2ccd9dda09e550386a3da93866887ecf5c472179e91f6d65d89d22a286"
+      }
+    ],
+    "scope": "The independently reviewed departure/origin lifecycle repair changes four owned method bodies, adds four owned members and changes exactly one private visibility expression. All existing imports/reference roles, constructor, metadata, outputs, element/class structure, CSS/SCSS, package membership and build inputs remain exact. Tagged lifecycle and focused controls support the bounded repair; original build/test/slider exclusions remain unchanged. No new SHA/use closure or runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "sha256": "1e0ae8c4b2327817317ce168b804a5b99dffc1457e1f513fe0dd19e34ca09a1e"
+    },
+    "prior_individual_proof": {
+      "proof_kind": "packed-required-individual-generated-identity",
+      "review_depth": "individual-compatibility",
+      "diff_sha256": "3809a4c8be10fbe0e99531fda686e37f32dc153640055c86b612be0668849dbe",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "The complete snack live-region ID patch is adapted through an owned historical namespace while preserving manual construction, templates/styles and announcement behavior. Both minimum public peers generate mat-snack-bar-container-live IDs through their private service; the owned container uses mat-legacy-snack-bar-container-live plus its historical counter. A trailing legacy suffix alone was insufficient because modal aria-owns cleanup uses substring replacement: the distinct prefix prevents a peer dismissal from partially removing the legacy ID. Required actual packed observations open both real generations under a modal in each creation order, prove unique exact live nodes and preserved existing ownership, dismiss each and require only its own token/node to disappear, then prove complete cleanup. The original service/API itself is not adopted. Synthetic validators and constructor diagnostics do not establish an actual announcement, DOM, floor, hydration or release pass.",
+      "generated_identity_behavior": {
+        "kind": "owned-snack-live-identity-and-modal-ownership",
+        "case_ids": [
+          "packed-consumer/harness/generated-identity-coexistence"
+        ],
+        "source_members": [
+          {
+            "path": "scripts/upstream-generated-identity-evidence.mjs",
+            "sha256": "442dd7910576051ce98d2bf4ad90fe1e1dbf648adc63dc05703bcb40fc8688fd"
+          },
+          {
+            "path": "scripts/check-upstream-audit-disposition.mjs",
+            "sha256": "5021aee6224fe16f9ff8030c9503e90c6359a4fd96cd3fe3d1ffdece41a0f4be"
+          },
+          {
+            "path": "scripts/upstream-packed-run-evidence.mjs",
+            "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+          },
+          {
+            "path": "scripts/packed-consumer-evidence.mjs",
+            "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+          },
+          {
+            "path": "scripts/packed-consumer-aot-smoke.mjs",
+            "sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591"
+          },
+          {
+            "path": "scripts/generated-identity-packed-fixture.mjs",
+            "sha256": "e6562475d0347f551b1e7cb775114111fbdb8f9a99450564d0b4d2d6d78b72d5"
+          },
+          {
+            "path": "scripts/generated-identity-packed-contract.mjs",
+            "sha256": "82dc83d16dc6f1fc882df001407f8896bdb8e62a9fb4220ed0663f5f0d494301"
+          },
+          {
+            "path": "compatibility/rc/matrices/full-verify.json",
+            "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-contract.mjs",
+            "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-fixture.mjs",
+            "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-contract.mjs",
+            "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-fixture.mjs",
+            "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+          },
+          {
+            "path": "compatibility/rc/matrices/library-exports.json",
+            "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+            "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+            "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+            "sha256": "d9ddfcf0a2f5a27a17670b9c4f382b2739c9a4f9ff5baffaef542cd866ecddab"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+            "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+            "sha256": "9b92fdf9e5e74ea73f6f7cd3305dfd79dc832c25f5de1f6d2aa1f63b17ccaee2"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+            "sha256": "a35c9828093141136e677671aefb92409813dc313e9e247d431841aafc36045d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+            "sha256": "dd193a5f4cdef0ee0be3c993474efa482229854d33b4853c6d5dd519d21a6fd0"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+            "sha256": "89e91390739e518a2a3e9dbdd8d75ff09dfcaa94bfe4bccc73d86f1e577c206c"
+          },
+          {
+            "path": "compatibility/rc/remaining-identity-public-subjects.json",
+            "sha256": "c3600dff7acf9eeb0a0bbd0fd893273e392592fc1bae06110fb792ffe673a8fc"
+          },
+          {
+            "path": "compatibility/rc/remaining-identity-source-proof.json",
+            "sha256": "43a96a1a8d4f2b15b3c146451cddf2ae42dea37ecfc571e523803580422b5d64"
+          },
+          {
+            "path": "compatibility/rc/snack-modal-identity-source-proof.json",
+            "sha256": "af946b53ecedbeea8d0d7ff94c5cceb89d86aaa4690462909956f98a965672ff"
+          },
+          {
+            "path": "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json",
+            "sha256": "ab668ec4418b26af5c45e3cb62b1a83222332260b8c28cd0fa0eaa0aa7f22766"
+          }
+        ]
+      }
+    },
+    "original_hunk_and_branch_judgments_retained": true
+  },
+  "spec_fixture_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "ee94710c4e98c5c30c89d0e1710370674d3ac0ba",
+    "qualified_reference_parent": "251b24059fe51c340f484002a25399f7d53290fb",
+    "inputs": {
+      "path": "compatibility/rc/spec-small-context-inputs.json",
+      "sha256": "517745e4e287814633468cb8ab5b75bfb79083d2e98047941863c3f77d34bad0"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "84e5ca0c5060c756ac186c409097556315882a88b280a12e34def1080e5a1dcf",
+        "current_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "0d1d0fd2757060ea9f4b6fbe77f08aa732ca562cc91330b65c0085dbb6d00ed6",
+        "current_sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a"
+      }
+    ],
+    "fixture_controls": {
+      "path": "compatibility/rc/spec-small-source-controls.json",
+      "sha256": "b81aa3d32cbce32f51164dcc63776ada5c1e7e63537ae150c8693783b6d666ba"
+    },
+    "unchanged_other_product_members": 1140,
+    "changed_private_fixture_data_names": 3,
+    "historical_paths": 57,
+    "case_identities_order_names": 2220,
+    "discovery_controls": 5,
+    "all_original_hunks_decisions_and_runtime_requirements_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only three private test-data keys and their explicit current source snapshot differ. Complete tagged templates, states/label values, all cases/assertions, all other product sources and all production peer uses stay exact. The48 source/semantic/adapter controls support this finite source repair. Current packed/native/floor qualification remains mandatory.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_entry": {
+      "sha": "69968510fb0222ee565f57171640a99768efa972",
+      "bucket": "behavior-semantic",
+      "subject": "refactor(material/snack-bar): use ID generator",
+      "final_disposition": "already-adapted",
+      "reason": "The complete snack live-region ID patch is adapted through an owned historical namespace while preserving manual construction, templates/styles and announcement behavior. Both minimum public peers generate mat-snack-bar-container-live IDs through their private service; the owned container uses mat-legacy-snack-bar-container-live plus its historical counter. A trailing legacy suffix alone was insufficient because modal aria-owns cleanup uses substring replacement: the distinct prefix prevents a peer dismissal from partially removing the legacy ID. Required actual packed observations open both real generations under a modal in each creation order, prove unique exact live nodes and preserved existing ownership, dismiss each and require only its own token/node to disappear, then prove complete cleanup. The original service/API itself is not adopted. Synthetic validators and constructor diagnostics do not establish an actual announcement, DOM, floor, hydration or release pass.",
+      "read_note_disposition": "individually-reopened-pending-packed-identity",
+      "files": [
+        "src/material/snack-bar/snack-bar-container.ts"
+      ],
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "recorded_at_utc": "2026-10-01T16:57:12Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "disposition_history": [
+        {
+          "recorded_at_utc": "2026-10-15T17:25:11.199Z",
+          "prior_entry": {
+            "sha": "69968510fb0222ee565f57171640a99768efa972",
+            "bucket": "behavior-semantic",
+            "subject": "refactor(material/snack-bar): use ID generator",
+            "final_disposition": "not-applicable",
+            "reason": "The patch assigns the snack-bar live-region id through the CDK _IdGenerator. Owned snack-bar still uses a local uniqueId counter (legacy-snack-bar/internal/snack-bar-container-base.ts). That counter was not replaced. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
+            "read_note_disposition": "owned-retained",
+            "files": [
+              "src/material/snack-bar/snack-bar-container.ts"
+            ],
+            "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+            "source_check": "Owned dialog/menu/snack-bar still use local uniqueId/menuPanelUid counters; CDK _IdGenerator absent (0).",
+            "batch_id": "owned-retain-not-applied-2026-10-01-f",
+            "recorded_at_utc": "2026-10-01T16:57:12Z",
+            "g11_claim": "not-passed",
+            "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+          },
+          "reason": "Individual whole-patch/caller review and real constructor collisions disprove closure by peer ancestry or local-counter retention. Packed DOM/ARIA evidence remains pending."
+        }
+      ],
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "packed-required-individual-generated-identity",
+        "review_depth": "individual-compatibility",
+        "diff_sha256": "3809a4c8be10fbe0e99531fda686e37f32dc153640055c86b612be0668849dbe",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete snack live-region ID patch is adapted through an owned historical namespace while preserving manual construction, templates/styles and announcement behavior. Both minimum public peers generate mat-snack-bar-container-live IDs through their private service; the owned container uses mat-legacy-snack-bar-container-live plus its historical counter. A trailing legacy suffix alone was insufficient because modal aria-owns cleanup uses substring replacement: the distinct prefix prevents a peer dismissal from partially removing the legacy ID. Required actual packed observations open both real generations under a modal in each creation order, prove unique exact live nodes and preserved existing ownership, dismiss each and require only its own token/node to disappear, then prove complete cleanup. The original service/API itself is not adopted. Synthetic validators and constructor diagnostics do not establish an actual announcement, DOM, floor, hydration or release pass.",
+        "generated_identity_behavior": {
+          "kind": "owned-snack-live-identity-and-modal-ownership",
+          "case_ids": [
+            "packed-consumer/harness/generated-identity-coexistence"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/upstream-generated-identity-evidence.mjs",
+              "sha256": "442dd7910576051ce98d2bf4ad90fe1e1dbf648adc63dc05703bcb40fc8688fd"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "5021aee6224fe16f9ff8030c9503e90c6359a4fd96cd3fe3d1ffdece41a0f4be"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/packed-consumer-evidence.mjs",
+              "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+            },
+            {
+              "path": "scripts/packed-consumer-aot-smoke.mjs",
+              "sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591"
+            },
+            {
+              "path": "scripts/generated-identity-packed-fixture.mjs",
+              "sha256": "e6562475d0347f551b1e7cb775114111fbdb8f9a99450564d0b4d2d6d78b72d5"
+            },
+            {
+              "path": "scripts/generated-identity-packed-contract.mjs",
+              "sha256": "82dc83d16dc6f1fc882df001407f8896bdb8e62a9fb4220ed0663f5f0d494301"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+            },
+            {
+              "path": "scripts/bidi-isolated-packed-contract.mjs",
+              "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+            },
+            {
+              "path": "scripts/bidi-isolated-packed-fixture.mjs",
+              "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+            },
+            {
+              "path": "scripts/selection-comparator-packed-contract.mjs",
+              "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+            },
+            {
+              "path": "scripts/selection-comparator-packed-fixture.mjs",
+              "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "compatibility/rc/matrices/library-exports.json",
+              "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+            },
+            {
+              "path": "projects/ngx-material-legacy/package.json",
+              "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+              "sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-menu/menu.ts",
+              "sha256": "e53577eef744606d3368bf4fa61cc49f669ea945b64f26e411c113ba572f2877"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-menu/menu.html",
+              "sha256": "c0de05010295b38649dec59fa3c54b9aa6dc4c88f20d18ea78053e0f7e102a47"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+              "sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+              "sha256": "d9ddfcf0a2f5a27a17670b9c4f382b2739c9a4f9ff5baffaef542cd866ecddab"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+              "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+              "sha256": "9b92fdf9e5e74ea73f6f7cd3305dfd79dc832c25f5de1f6d2aa1f63b17ccaee2"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+              "sha256": "a35c9828093141136e677671aefb92409813dc313e9e247d431841aafc36045d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+              "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+              "sha256": "dd193a5f4cdef0ee0be3c993474efa482229854d33b4853c6d5dd519d21a6fd0"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+              "sha256": "89e91390739e518a2a3e9dbdd8d75ff09dfcaa94bfe4bccc73d86f1e577c206c"
+            },
+            {
+              "path": "compatibility/rc/remaining-identity-public-subjects.json",
+              "sha256": "c3600dff7acf9eeb0a0bbd0fd893273e392592fc1bae06110fb792ffe673a8fc"
+            },
+            {
+              "path": "compatibility/rc/remaining-identity-source-proof.json",
+              "sha256": "43a96a1a8d4f2b15b3c146451cddf2ae42dea37ecfc571e523803580422b5d64"
+            },
+            {
+              "path": "compatibility/rc/snack-modal-identity-source-proof.json",
+              "sha256": "af946b53ecedbeea8d0d7ff94c5cceb89d86aaa4690462909956f98a965672ff"
+            },
+            {
+              "path": "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json",
+              "sha256": "ab668ec4418b26af5c45e3cb62b1a83222332260b8c28cd0fa0eaa0aa7f22766"
+            }
+          ]
+        }
+      },
+      "source_check": {
+        "kind": "individual-source-reviewed-runtime-required",
+        "diff_sha256": "3809a4c8be10fbe0e99531fda686e37f32dc153640055c86b612be0668849dbe",
+        "patch_path": "compatibility/rc/remaining-identity-69968510fb0222ee565f57171640a99768efa972.diff",
+        "evidence_report_sha256": "0c3ab2b2b54ad0dcce9be44c1ace795c4e52c494854d213dabb27e05a8ea4577"
+      },
+      "generated_identity_source_context": {
+        "inputs": {
+          "path": "compatibility/rc/identity-source-admission-inputs.json",
+          "sha256": "be73f929ded213e0cbbbbf8170152635aa927c6e2ad9ab33d0256fa643a0759e"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/identity-source-admission-source-proof.json",
+          "sha256": "aedfb0aa458b6190636c994c43ba35b1c8a0fb4fd747b22f4c5aaad92572aabc"
+        },
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json",
+          "sha256": "ab668ec4418b26af5c45e3cb62b1a83222332260b8c28cd0fa0eaa0aa7f22766"
+        }
+      },
+      "bidi_isolated_source_context": {
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-identity-snack-source-judgment.json",
+          "sha256": "add72aa1166ad164421b611d309bd5ef72ee7da18469d82059bde5dc435a7002"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+          "sha256": "402a2af8c924ee04b650da5c7470cbf7b7bd5c4a665e89fe89b1ea88f9618b23"
+        }
+      },
+      "bidi_peer_source_context": {
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-69968510fb0222ee565f57171640a99768efa972.json",
+          "sha256": "dbc41a06cd81b2924b57d012cf3cb206a19bef2cf4990f334f0ca860d4309b33"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/bidi-peer-admission-source-proof.json",
+          "sha256": "f3069c67b4f97e0d4945cc537edddb30bf4b727cfae979136feb8739382dcdb9"
+        }
+      },
+      "selection_comparator_source_context": {
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-peer-context-69968510fb0222ee565f57171640a99768efa972.json",
+          "sha256": "64d2ded4831c792a79805c9a149a9eb6c2fdb482a959bc7aa8b3caa9d6d89de6"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+          "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+        }
+      }
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "sha256": "6dde9c80dca3ac37d22cbf23de9e34b4b885c633827c66090bec31b0c1b6e97d"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "control_case_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "05500bf4d60693c715030349d818440465c57b6d",
+    "qualified_reference_parent": "804b5c68b177c8eff2ed0fdac92caa73d5e9aaf1",
+    "inputs": {
+      "path": "compatibility/rc/spec-control-context-inputs.json",
+      "sha256": "c68029f9ff43fb4c47f58cfa21c9924400f1fbdd142c54c37457399272685fbb"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+        "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54",
+        "current_sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a",
+        "current_sha256": "766c955ca56694fcf3c82ab00296194103bb0fac812cd22571bf89a960f1d9c7"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+    },
+    "unchanged_other_product_members": 1139,
+    "original_cases_preserved": 2220,
+    "additional_cases": 2,
+    "current_case_cells": 2227,
+    "all_original_hunks_decisions_and_runtime_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only two appended candidate cases and their exact two-row inventory update differ. Preserve every prior case/body/template, all production resources and all original source judgments. This is source-context qualification, never actual Angular/native/packed/floor or complete G11 admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    "prior_entry": {
+      "sha": "69968510fb0222ee565f57171640a99768efa972",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "804b5c68b177c8eff2ed0fdac92caa73d5e9aaf1",
+      "entry_sha256": "14629532257f705023feb89603b7770afa1c2219f8016c8fcf577a899b39def5"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-spec-fixture-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "sha256": "125405acb50b445c8eb350a6e63b26cb3907365cc12a934d5bc72cafaaa5e2bd"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "chip_empty_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "e89625fa8145b1d746f24728a83ba25bbfe81871",
+    "qualified_reference_parent": "00fd476b50ad0eb6777e709d13b990e22a785717",
+    "inputs": {
+      "path": "compatibility/rc/spec-stability-context-inputs.json",
+      "sha256": "7259c44866d5e9f1d7c69a8685ad4682c6a0cfbb26eb9330a10879ac6a2b6638"
+    },
+    "prequalified_wrapper_receipt_transitions": [
+      {
+        "path": "tests/test_spec_standalone_environment_source.py",
+        "reference_commit": "a95969e7b493b70141ffa25e5c98f8b9499ace7a",
+        "before_sha256": "3e74aaee57ff849163758989b2f59f588fc975d95504ca3f6cb3ce0ce32923d9",
+        "after_sha256": "7717141028f282aeb800a7e045b7f6a1009fd4ed60974d1cab3c26e553ef23c8",
+        "edits": [
+          {
+            "before": "['node', 'tests/spec_standalone_environment_source_probe.mjs']",
+            "after": "['node', 'scripts/run-historical-source-probe.mjs', 'standalone-environment-source']"
+          }
+        ],
+        "affected_shas": [
+          "31077c2eae76b0bc0bc348ee2bd2801864aa409a",
+          "83006db94a2912fa3cd3b7e1f1dcca9be064d183"
+        ],
+        "qualification": {
+          "path": "compatibility/rc/historical-stability-source-replay-checkpoint.json",
+          "sha256": "7af49a12a6dcda906fc1a8fbf21817a60bf3cee09550ef38074b6e61c282dde1"
+        }
+      }
+    ],
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "before_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "current_sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "before_sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+        "current_sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "766c955ca56694fcf3c82ab00296194103bb0fac812cd22571bf89a960f1d9c7",
+        "current_sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-source-proof.json",
+      "sha256": "f6ea8843244aee5e2eb3a20632ad8d30c27627e151ab912d61ad7272564d3506"
+    },
+    "original_cases_preserved": 2222,
+    "additional_cases": 1,
+    "current_case_cells": 2228,
+    "all_original_branch_hunk_verdicts_and_native_requirement_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only the authenticated chip empty-query reset, one appended Angular lifecycle case and exact inventory refresh differ. Current API call details are qualified against both fixed public minima; every prior verdict and actual native/packed/compiler/floor requirement remains. No source-only runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    },
+    "prior_entry": {
+      "sha": "69968510fb0222ee565f57171640a99768efa972",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "00fd476b50ad0eb6777e709d13b990e22a785717",
+      "entry_sha256": "8a42199763573946b63c13d0acb702808f9876100be89c7e3df1ba2e6967f41f"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-control-case-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "sha256": "6cad8509d4814b20bc6ecba5bf8cc44766b04fbe0ca265bfb040afa6f257536d"
+    },
+    "original_judgments_preserved": true
+  },
+  "historical_roster_reconciliation": {
+    "qualification": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "7694977ba8e20050d29e2d1c605a9b168f5232345a42f589eb70f0977c5f172b"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-stability-chip-context-69968510fb0222ee565f57171640a99768efa972.json",
+      "sha256": "09c1312f083f905f795a7d4918c41a579abd82397e839542c2a51cd4f2ef8d0d"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "44365daf1ce5985fb2b178bf6882b6ae24b6ddc1",
+      "entry_sha256": "8362a5a546387fcc35574e56413c53dcc4cc51db8b4dcc8a1974c3aebc2564e1"
+    },
+    "source_judgment_and_actual_runtime_obligations_preserved": true
+  }
+}
