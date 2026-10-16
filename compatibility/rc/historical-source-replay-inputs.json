@@ -1,12 +1,12 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "line": "21.x",
   "scope": "Finite original historical source probes only. Current-source coherence is mandatory; historical execution never admits current source, runtime, compiler, peer floors or G11.",
   "current_frame": {
-    "commit": "922471b5dd4e61825a19f26881e9c576949d0258",
-    "tree": "d73fa2651ea02ba3ad3dd775f703d13af5a4baad",
-    "tree_listing_sha256": "f400d885741d02c414791c5a0ae6db884d0b550d73cbab753a1e4bbe7a72546c",
-    "members": 6130
+    "commit": "23c9f11394aa5b7acb7c0cb31436c9240c3cb587",
+    "tree": "e195d23a306a95af9c24207dbf66291dfff74772",
+    "tree_listing_sha256": "ee4f5933b1463fd1e60fd912772fbddeb52f1066da42d06b3c5f5c5c271d69cc",
+    "members": 6210
   },
   "mutable_progress_paths": [
     "compatibility/rc/remaining-native-admission-worksheet.json",
@@ -124,6 +124,58 @@
       },
       "timeout_ms": 120000,
       "report_option": "--out"
+    },
+    {
+      "id": "small-spec-source",
+      "probe": "tests/spec_small_source_probe.mjs",
+      "probe_sha256": "385b82de643416a5c54c82016a79367cd4b84c2f3ec548d0bdb19b2056f36f62",
+      "frame": {
+        "commit": "58a2faabf1216f6b271f1c688c8861504f55489e",
+        "tree": "8796958c8391f8a0371c236c9ddbc4104a9fdc72",
+        "tree_listing_sha256": "5e9933df1ea849ef876bf17c9ab24d7b9074d00b0813c561574fc02abf082c64",
+        "members": 6153
+      },
+      "timeout_ms": 60000,
+      "report_option": "--out"
+    },
+    {
+      "id": "followup-spec-source",
+      "probe": "tests/spec_followup_source_probe.mjs",
+      "probe_sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0",
+      "frame": {
+        "commit": "58a2faabf1216f6b271f1c688c8861504f55489e",
+        "tree": "8796958c8391f8a0371c236c9ddbc4104a9fdc72",
+        "tree_listing_sha256": "5e9933df1ea849ef876bf17c9ab24d7b9074d00b0813c561574fc02abf082c64",
+        "members": 6153
+      },
+      "timeout_ms": 60000,
+      "report_option": "--out"
+    },
+    {
+      "id": "peer-spec-source",
+      "probe": "tests/spec_peer_test_source_probe.mjs",
+      "probe_sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce",
+      "frame": {
+        "commit": "58a2faabf1216f6b271f1c688c8861504f55489e",
+        "tree": "8796958c8391f8a0371c236c9ddbc4104a9fdc72",
+        "tree_listing_sha256": "5e9933df1ea849ef876bf17c9ab24d7b9074d00b0813c561574fc02abf082c64",
+        "members": 6153
+      },
+      "timeout_ms": 60000,
+      "report_option": "--out"
+    },
+    {
+      "id": "control-case-context",
+      "probe": "tests/spec_control_context_probe.mjs",
+      "probe_sha256": "780e22137696a757b00430f8846ec584e0fdea242fc47614d9e8b936738f6eaa",
+      "frame": {
+        "commit": "47ae77359c953242802ee628e03c49a98d166445",
+        "tree": "f6e77865e3c7eb73653c5a756ad44713e9723aba",
+        "tree_listing_sha256": "9b61edba6557195ce33b9c8f070e6f70143d82d955087e658a834155dda32e91",
+        "members": 6206
+      },
+      "timeout_ms": 180000,
+      "report_option": "--out"
     }
   ],
   "wrapper_edits": [
@@ -221,6 +273,54 @@
           "after": "['node', 'scripts/run-historical-source-probe.mjs', 'spec-fixture-context']"
         }
       ]
+    },
+    {
+      "path": "tests/test_spec_small_source_review.py",
+      "reference_commit": "58a2faabf1216f6b271f1c688c8861504f55489e",
+      "before_sha256": "c9c3c8a57e06d4ca9ca30b1e75c8606c710430c37fe1e127338f213696f6259b",
+      "after_sha256": "da6c2ff8149849a28069ac267dadb1f2ea654889970867e16137938885cea000",
+      "edits": [
+        {
+          "before": "['node', 'tests/spec_small_source_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'small-spec-source']"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_spec_followup_source.py",
+      "reference_commit": "58a2faabf1216f6b271f1c688c8861504f55489e",
+      "before_sha256": "ffb377d5fd6a1ad00d147eb981121d69075df4bc90c7b9a92aea48b1aa773fac",
+      "after_sha256": "59996bc46d56058db0236ffc17dca070b6a98d3adb83099bf3f6892291e561a2",
+      "edits": [
+        {
+          "before": "['node', 'tests/spec_followup_source_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'followup-spec-source']"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_spec_peer_test_source.py",
+      "reference_commit": "58a2faabf1216f6b271f1c688c8861504f55489e",
+      "before_sha256": "dbbf96c5d37516799b52a0e2cb5c504e428318a82fcbe772ddee3d586c7695f4",
+      "after_sha256": "23ac0d77dc04fa38f6e96d50148317419015b67b072d01505d3057e6717bd170",
+      "edits": [
+        {
+          "before": "['node', 'tests/spec_peer_test_source_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'peer-spec-source']"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_spec_control_context.py",
+      "reference_commit": "47ae77359c953242802ee628e03c49a98d166445",
+      "before_sha256": "b51f0a0b17022af2270be06bd4f80b4723ec474650dac724d1ba21cc60c2b6eb",
+      "after_sha256": "d504fde27510ea7f0860d33cd6c5dd2bf01eb27941e1f889c550b4f37f8a0a9f",
+      "edits": [
+        {
+          "before": "['node', 'tests/spec_control_context_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'control-case-context']"
+        }
+      ]
     }
   ],
   "source_phase_reports": {
@@ -235,7 +335,11 @@
     "individual_spec_decisions": "compatibility/rc/spec-small-individual-source-proof.json",
     "individual_spec_status": "compatibility/rc/spec-small-individual-source-checkpoint.json",
     "followup_spec_review": "compatibility/rc/spec-followup-source-review.json",
-    "followup_spec_status": "compatibility/rc/spec-followup-source-checkpoint.json"
+    "followup_spec_status": "compatibility/rc/spec-followup-source-checkpoint.json",
+    "peer_spec_review": "compatibility/rc/spec-peer-test-source-review.json",
+    "peer_spec_status": "compatibility/rc/spec-peer-test-source-checkpoint.json",
+    "control_case_context": "compatibility/rc/spec-control-context-proof.json",
+    "control_case_status": "compatibility/rc/spec-control-context-checkpoint.json"
   },
   "no_install_build_publish_or_remote_operations": true,
   "original_js_programs_and_assertions_unchanged": true,

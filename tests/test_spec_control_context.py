@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SpecControlContextTests(unittest.TestCase):
     def test_original_scope_readers_source_bindings_and_rejection_controls(self):
-        result = subprocess.run(['node', 'tests/spec_control_context_probe.mjs'], cwd=ROOT,
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'control-case-context'], cwd=ROOT,
                                 capture_output=True, text=True, timeout=180)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])
