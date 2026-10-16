@@ -1,0 +1,592 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "01cc137b512f34af97f1adb40fc95043329beef2",
+  "subject": "refactor(material/icon): switch tests away from fakeAsync (#33301)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "dafea1b0db1fef090c32ac9f752375a3436c2d78",
+      "after_blob": "28812b00a57f031cf182f53f878b5a5b5bddac62"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 28,
+  "raw_commit_sha256": "c6e761c75c1925606452e29eb433edc2530047e6f70b8ec62bcb91e98df5e413",
+  "original_sources": [
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "before": {
+        "git_blob": "dafea1b0db1fef090c32ac9f752375a3436c2d78",
+        "sha256": "e49e6af1e4ba4a90eed76082f28b52268a55cc2f5c5957fc2991731d0c611f7f",
+        "bytes": 58831
+      },
+      "after": {
+        "git_blob": "28812b00a57f031cf182f53f878b5a5b5bddac62",
+        "sha256": "f19f9e05ca7e48a360f28936eea074ca815f0b706f8f2a5d57417ac3cae0cb55",
+        "bytes": 58423
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/icon/icon.spec.ts b/src/material/icon/icon.spec.ts\nindex dafea1b0db1fef090c32ac9f752375a3436c2d78..28812b00a57f031cf182f53f878b5a5b5bddac62 100644\n--- a/src/material/icon/icon.spec.ts\n+++ b/src/material/icon/icon.spec.ts\n@@ -11,7 +11,7 @@ import {\n   ViewChild,\n   ChangeDetectionStrategy,\n } from '@angular/core';\n-import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';\n+import {TestBed} from '@angular/core/testing';\n import {DomSanitizer, SafeHtml, SafeResourceUrl} from '@angular/platform-browser';\n import {FAKE_SVGS} from './fake-svgs';\n import {MatIcon} from './icon';\n@@ -64,7 +64,7 @@ describe('MatIcon', () => {\n   let sanitizer: DomSanitizer;\n   let errorHandler: ErrorHandler;\n \n-  beforeEach(waitForAsync(() => {\n+  beforeEach(() => {\n     // The $ prefix tells Karma not to try to process the\n     // request so that we don't get warnings in our logs.\n     fakePath = '/$fake-path';\n@@ -83,7 +83,7 @@ describe('MatIcon', () => {\n     http = TestBed.inject(HttpTestingController);\n     sanitizer = TestBed.inject(DomSanitizer);\n     errorHandler = TestBed.inject(ErrorHandler);\n-  }));\n+  });\n \n   it('should apply the correct role', () => {\n     const fixture = TestBed.createComponent(IconWithColor);\n@@ -315,7 +315,7 @@ describe('MatIcon', () => {\n   });\n \n   describe('Icons from URLs', () => {\n-    it('should register icon URLs by name', fakeAsync(() => {\n+    it('should register icon URLs by name', () => {\n       iconRegistry.addSvgIcon('fluffy', trustUrl('cat.svg'));\n       iconRegistry.addSvgIcon('fido', trustUrl('dog.svg'));\n       iconRegistry.addSvgIcon('felix', trustUrl('auth-cat.svg'), {withCredentials: true});\n@@ -363,11 +363,9 @@ describe('MatIcon', () => {\n       iconRegistry.getSvgIconFromUrl(trustUrl('cat.svg')).subscribe((element: SVGElement) => {\n         verifyPathChildElement(element, 'meow');\n       });\n+    });\n \n-      tick();\n-    }));\n-\n-    it('should be able to set the viewBox when registering a single SVG icon', fakeAsync(() => {\n+    it('should be able to set the viewBox when registering a single SVG icon', () => {\n       iconRegistry.addSvgIcon('fluffy', trustUrl('cat.svg'), {viewBox: '0 0 27 27'});\n       iconRegistry.addSvgIcon('fido', trustUrl('dog.svg'), {viewBox: '0 0 43 43'});\n \n@@ -390,7 +388,7 @@ describe('MatIcon', () => {\n       http.expectOne('cat.svg').flush(FAKE_SVGS.cat);\n       svgElement = verifyAndGetSingleSvgChild(iconElement);\n       expect(svgElement.getAttribute('viewBox')).toBe('0 0 27 27');\n-    }));\n+    });\n \n     it('should throw an error when using an untrusted icon url', () => {\n       iconRegistry.addSvgIcon('fluffy', 'farm-set-1.svg');\n@@ -745,7 +743,7 @@ describe('MatIcon', () => {\n       expect(icon.querySelector('svg')).toBeFalsy();\n     });\n \n-    it('should keep non-SVG user content inside the icon element', fakeAsync(() => {\n+    it('should keep non-SVG user content inside the icon element', () => {\n       iconRegistry.addSvgIcon('fido', trustUrl('dog.svg'));\n \n       const fixture = TestBed.createComponent(SvgIconWithUserContent);\n@@ -761,11 +759,9 @@ describe('MatIcon', () => {\n \n       expect(userDiv).toBeTruthy();\n       expect(iconElement.textContent.trim()).toContain('Hello');\n+    });\n \n-      tick();\n-    }));\n-\n-    it('should cancel in-progress fetches if the icon changes', fakeAsync(() => {\n+    it('should cancel in-progress fetches if the icon changes', () => {\n       // Register an icon that will resolve immediately.\n       iconRegistry.addSvgIconLiteral('fluffy', trustHtml(FAKE_SVGS.cat));\n \n@@ -790,9 +786,9 @@ describe('MatIcon', () => {\n \n       // Expect the last icon to have been assigned.\n       verifyPathChildElement(verifyAndGetSingleSvgChild(iconElement), 'meow');\n-    }));\n+    });\n \n-    it('should cancel in-progress fetches if the component is destroyed', fakeAsync(() => {\n+    it('should cancel in-progress fetches if the component is destroyed', () => {\n       iconRegistry.addSvgIcon('fido', trustUrl('dog.svg'));\n \n       const fixture = TestBed.createComponent(IconFromSvgName);\n@@ -802,11 +798,11 @@ describe('MatIcon', () => {\n       fixture.destroy();\n \n       expect(http.expectOne('dog.svg').cancelled).toBe(true);\n-    }));\n+    });\n   });\n \n   describe('Icons from HTML string', () => {\n-    it('should register icon HTML strings by name', fakeAsync(() => {\n+    it('should register icon HTML strings by name', () => {\n       iconRegistry.addSvgIconLiteral('fluffy', trustHtml(FAKE_SVGS.cat));\n       iconRegistry.addSvgIconLiteral('fido', trustHtml(FAKE_SVGS.dog));\n \n@@ -831,11 +827,9 @@ describe('MatIcon', () => {\n       iconRegistry.getNamedSvgIcon('fluffy').subscribe((element: SVGElement) => {\n         verifyPathChildElement(element, 'meow');\n       });\n+    });\n \n-      tick();\n-    }));\n-\n-    it('should be able to configure the icon viewBox', fakeAsync(() => {\n+    it('should be able to configure the icon viewBox', () => {\n       iconRegistry.addSvgIconLiteral('fluffy', trustHtml(FAKE_SVGS.cat), {viewBox: '0 0 43 43'});\n       iconRegistry.addSvgIconLiteral('fido', trustHtml(FAKE_SVGS.dog), {viewBox: '0 0 27 27'});\n \n@@ -855,7 +849,7 @@ describe('MatIcon', () => {\n       fixture.detectChanges();\n       svgElement = verifyAndGetSingleSvgChild(iconElement);\n       expect(svgElement.getAttribute('viewBox')).toBe('0 0 43 43');\n-    }));\n+    });\n \n     it('should throw an error when using untrusted HTML', () => {\n       // Stub out console.warn so we don't pollute our logs with Angular's warnings.\n@@ -993,7 +987,7 @@ describe('MatIcon', () => {\n       expect(svgElement.getAttribute('viewBox')).toBe('0 0 43 43');\n     });\n \n-    it('should prepend the current path to attributes with `url()` references', fakeAsync(() => {\n+    it('should prepend the current path to attributes with `url()` references', () => {\n       iconRegistry.addSvgIconLiteral(\n         'fido',\n         trustHtml(`\n@@ -1016,11 +1010,9 @@ describe('MatIcon', () => {\n       // We use a regex to match here, rather than the exact value, because different browsers\n       // return different quotes through `getAttribute`, while some even omit the quotes altogether.\n       expect(circle.getAttribute('filter')).toMatch(/^url\\(['\"]?\\/\\$fake-path#blur['\"]?\\)$/);\n+    });\n \n-      tick();\n-    }));\n-\n-    it('should use latest path when prefixing the `url()` references', fakeAsync(() => {\n+    it('should use latest path when prefixing the `url()` references', () => {\n       iconRegistry.addSvgIconLiteral(\n         'fido',\n         trustHtml(`\n@@ -1041,7 +1033,6 @@ describe('MatIcon', () => {\n       let circle = fixture.nativeElement.querySelector('mat-icon svg circle');\n \n       expect(circle.getAttribute('filter')).toMatch(/^url\\(['\"]?\\/\\$fake-path#blur['\"]?\\)$/);\n-      tick();\n       fixture.destroy();\n \n       fakePath = '/$another-fake-path';\n@@ -1054,10 +1045,9 @@ describe('MatIcon', () => {\n       expect(circle.getAttribute('filter')).toMatch(\n         /^url\\(['\"]?\\/\\$another-fake-path#blur['\"]?\\)$/,\n       );\n-      tick();\n-    }));\n+    });\n \n-    it('should update the `url()` references when the path changes', fakeAsync(() => {\n+    it('should update the `url()` references when the path changes', () => {\n       iconRegistry.addSvgIconLiteral(\n         'fido',\n         trustHtml(`\n@@ -1080,14 +1070,13 @@ describe('MatIcon', () => {\n       // We use a regex to match here, rather than the exact value, because different browsers\n       // return different quotes through `getAttribute`, while some even omit the quotes altogether.\n       expect(circle.getAttribute('filter')).toMatch(/^url\\(['\"]?\\/\\$fake-path#blur['\"]?\\)$/);\n-      tick();\n \n       fakePath = '/$different-path';\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n \n       expect(circle.getAttribute('filter')).toMatch(/^url\\(['\"]?\\/\\$different-path#blur['\"]?\\)$/);\n-    }));\n+    });\n   });\n \n   describe('custom fonts', () => {\n@@ -1204,7 +1193,7 @@ describe('MatIcon', () => {\n   });\n \n   describe('Icons resolved through a resolver function', () => {\n-    it('should resolve icons through a resolver function', fakeAsync(() => {\n+    it('should resolve icons through a resolver function', () => {\n       iconRegistry.addSvgIconResolver(name => {\n         if (name === 'fluffy') {\n           return trustUrl('cat.svg');\n@@ -1259,11 +1248,9 @@ describe('MatIcon', () => {\n       iconRegistry.getSvgIconFromUrl(trustUrl('cat.svg')).subscribe((element: SVGElement) => {\n         verifyPathChildElement(element, 'meow');\n       });\n+    });\n \n-      tick();\n-    }));\n-\n-    it('should fall back to second resolver if the first one returned null', fakeAsync(() => {\n+    it('should fall back to second resolver if the first one returned null', () => {\n       iconRegistry\n         .addSvgIconResolver(() => null)\n         .addSvgIconResolver(name => (name === 'fido' ? trustUrl('dog.svg') : null));\n@@ -1276,10 +1263,9 @@ describe('MatIcon', () => {\n       fixture.detectChanges();\n       http.expectOne('dog.svg').flush(FAKE_SVGS.dog);\n       verifyPathChildElement(verifyAndGetSingleSvgChild(iconElement), 'woof');\n-      tick();\n-    }));\n+    });\n \n-    it('should be able to set the viewBox when resolving an icon with a function', fakeAsync(() => {\n+    it('should be able to set the viewBox when resolving an icon with a function', () => {\n       iconRegistry.addSvgIconResolver(name => {\n         if (name === 'fluffy') {\n           return {url: trustUrl('cat.svg'), options: {viewBox: '0 0 27 27'}};\n@@ -1308,7 +1294,7 @@ describe('MatIcon', () => {\n       http.expectOne('cat.svg').flush(FAKE_SVGS.cat);\n       svgElement = verifyAndGetSingleSvgChild(iconElement);\n       expect(svgElement.getAttribute('viewBox')).toBe('0 0 27 27');\n-    }));\n+    });\n \n     it('should throw an error when the resolver returns an untrusted URL', () => {\n       iconRegistry.addSvgIconResolver(() => 'not-trusted.svg');\n@@ -1322,7 +1308,7 @@ describe('MatIcon', () => {\n     });\n   });\n \n-  it('should handle assigning an icon through the setter', fakeAsync(() => {\n+  it('should handle assigning an icon through the setter', () => {\n     iconRegistry.addSvgIconLiteral('fido', trustHtml(FAKE_SVGS.dog));\n \n     const fixture = TestBed.createComponent(BlankIcon);\n@@ -1336,8 +1322,7 @@ describe('MatIcon', () => {\n     fixture.detectChanges();\n     svgElement = verifyAndGetSingleSvgChild(iconElement);\n     verifyPathChildElement(svgElement, 'woof');\n-    tick();\n-  }));\n+  });\n \n   /** Marks an SVG icon url as explicitly trusted. */\n   function trustUrl(iconUrl: string): SafeResourceUrl {\n@@ -1351,7 +1336,7 @@ describe('MatIcon', () => {\n });\n \n describe('MatIcon with default options', () => {\n-  it('should be able to configure color globally', fakeAsync(() => {\n+  it('should be able to configure color globally', () => {\n     const fixture = createComponent(IconWithLigature, [\n       {provide: MAT_ICON_DEFAULT_OPTIONS, useValue: {color: 'accent'}},\n     ]);\n@@ -1359,9 +1344,9 @@ describe('MatIcon with default options', () => {\n     fixture.detectChanges();\n     expect(iconElement.classList).not.toContain('mat-icon-no-color');\n     expect(iconElement.classList).toContain('mat-accent');\n-  }));\n+  });\n \n-  it('should use passed color rather then color provided', fakeAsync(() => {\n+  it('should use passed color rather then color provided', () => {\n     const fixture = createComponent(IconWithColor, [\n       {provide: MAT_ICON_DEFAULT_OPTIONS, useValue: {color: 'warn'}},\n     ]);\n@@ -1369,9 +1354,9 @@ describe('MatIcon with default options', () => {\n     fixture.detectChanges();\n     expect(iconElement.classList).not.toContain('mat-warn');\n     expect(iconElement.classList).toContain('mat-primary');\n-  }));\n+  });\n \n-  it('should use default color if no color passed', fakeAsync(() => {\n+  it('should use default color if no color passed', () => {\n     const fixture = createComponent(IconWithColor, [\n       {provide: MAT_ICON_DEFAULT_OPTIONS, useValue: {color: 'accent'}},\n     ]);\n@@ -1382,18 +1367,18 @@ describe('MatIcon with default options', () => {\n     expect(iconElement.classList).not.toContain('mat-icon-no-color');\n     expect(iconElement.classList).not.toContain('mat-primary');\n     expect(iconElement.classList).toContain('mat-accent');\n-  }));\n+  });\n \n-  it('should be able to configure font set globally', fakeAsync(() => {\n+  it('should be able to configure font set globally', () => {\n     const fixture = createComponent(IconWithLigature, [\n       {provide: MAT_ICON_DEFAULT_OPTIONS, useValue: {fontSet: 'custom-font-set'}},\n     ]);\n     const iconElement = fixture.debugElement.nativeElement.querySelector('mat-icon');\n     fixture.detectChanges();\n     expect(iconElement.classList).toContain('custom-font-set');\n-  }));\n+  });\n \n-  it('should use passed fontSet rather then default one', fakeAsync(() => {\n+  it('should use passed fontSet rather then default one', () => {\n     const fixture = createComponent(IconWithCustomFontCss, [\n       {provide: MAT_ICON_DEFAULT_OPTIONS, useValue: {fontSet: 'default-font-set'}},\n     ]);\n@@ -1403,16 +1388,16 @@ describe('MatIcon with default options', () => {\n     fixture.detectChanges();\n     expect(iconElement.classList).not.toContain('default-font-set');\n     expect(iconElement.classList).toContain('custom-font-set');\n-  }));\n+  });\n \n-  it('should use passed empty fontSet rather then default one', fakeAsync(() => {\n+  it('should use passed empty fontSet rather then default one', () => {\n     const fixture = createComponent(IconWithCustomFontCss, [\n       {provide: MAT_ICON_DEFAULT_OPTIONS, useValue: {fontSet: 'default-font-set'}},\n     ]);\n     const iconElement = fixture.debugElement.nativeElement.querySelector('mat-icon');\n     fixture.detectChanges();\n     expect(iconElement.classList).not.toContain('default-font-set');\n-  }));\n+  });\n });\n \n @Component({\n",
+  "diff_sha256": "c65df77e1e6f10d7449ec0d3babf4291cc1924d9558893d63d132bf29c5e2161",
+  "hunk_reviews": [
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -11,7 +11,7 @@ import {",
+      "sha256": "ab6970a8731df2e943e50ae25c611ff5765cca82c00c562c111440e40ee3a156",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -64,7 +64,7 @@ describe('MatIcon', () => {",
+      "sha256": "e91715aa5534980f2347e1f70e58082d689b4b9c47fdb1f340b50b3e4bbc3cde",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -83,7 +83,7 @@ describe('MatIcon', () => {",
+      "sha256": "49ddf5efaa49f5b3be49328fc7965f5eb7ea4584f99a6d52b6791b86d9ecef10",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -315,7 +315,7 @@ describe('MatIcon', () => {",
+      "sha256": "3e6d8324bc1b7adb3272f5a4c11835bc0c01e8621f50ae0458b5ec7500563ec2",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -363,11 +363,9 @@ describe('MatIcon', () => {",
+      "sha256": "5df5804f138b841d8eed5292423ca8394bf216208d01c5d19fbbcb5b3402f630",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -390,7 +388,7 @@ describe('MatIcon', () => {",
+      "sha256": "afbd8aa307d04e8bc68dcfdc38221957c82dbc38ef23e95e09021a0c2be71e10",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -745,7 +743,7 @@ describe('MatIcon', () => {",
+      "sha256": "44b5259e1a5915ec546fdd8dedc3c59a666448d14514e7e83e05b6b6b60024ea",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -761,11 +759,9 @@ describe('MatIcon', () => {",
+      "sha256": "8cc121ce68ecf8e70365a508d12a25be2d1646ee981c49896cfb3000c3750370",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -790,9 +786,9 @@ describe('MatIcon', () => {",
+      "sha256": "8a7a37367a9dc1f1b376864a5338c1ff544bbe99457584f95e5a44c64a65f3bf",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -802,11 +798,11 @@ describe('MatIcon', () => {",
+      "sha256": "21d9e3acc2fdf8396f811ca5d4d6ce4de872c28571f435e0e4383824fcc89729",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -831,11 +827,9 @@ describe('MatIcon', () => {",
+      "sha256": "b58243c9deafd8201af35ca4989935991e6e9ef284cce9d17c8157e87a3a899b",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -855,7 +849,7 @@ describe('MatIcon', () => {",
+      "sha256": "e46fc624bec6846a574560ba6aa8b63fcea5a11a19f26b061e0c12ef26c8f236",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -993,7 +987,7 @@ describe('MatIcon', () => {",
+      "sha256": "ac25129161dc89c74c5611b96c2b06c22adbdd8e64e393d571c9ea451ca60e49",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1016,11 +1010,9 @@ describe('MatIcon', () => {",
+      "sha256": "51e84051f1b213d9cb805bfa0ada9bf584d6060f4e3db314cb31d932a6ea3477",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1041,7 +1033,6 @@ describe('MatIcon', () => {",
+      "sha256": "a239b29dea5755ece25fd83003abef6083391a532ab8ef21ba7fbbbca4d5e131",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1054,10 +1045,9 @@ describe('MatIcon', () => {",
+      "sha256": "68494362cc8896786580afb0a3e9b0d3b5718dc4aa5ff0871a4211c8e3ca2b61",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1080,14 +1070,13 @@ describe('MatIcon', () => {",
+      "sha256": "431d8de9b5aa3ba7537bc531d32eb4a2fda34776e8a6fe87a634445f2519d158",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1204,7 +1193,7 @@ describe('MatIcon', () => {",
+      "sha256": "efdefc471b5be8d56eacf2836ee7165f7122c77bf463686c66a44e4dc322d801",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1259,11 +1248,9 @@ describe('MatIcon', () => {",
+      "sha256": "d54d7a8dd797ebeff35f94ca0e67f72c675c3b852cdba12958b6a54cc36ea209",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1276,10 +1263,9 @@ describe('MatIcon', () => {",
+      "sha256": "2982fd0291adb53a11fd67ce57775db3fe37001c6904f11d0be107125c1adfe5",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1308,7 +1294,7 @@ describe('MatIcon', () => {",
+      "sha256": "4a688c3491f498169801791dc53e66c8962564b2be57a1b9fe6d179c9c8360e9",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1322,7 +1308,7 @@ describe('MatIcon', () => {",
+      "sha256": "aedb56b7b58865b0ccdc3e6f119095a5aaff8ff917f2d5db0193a92759c6288e",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1336,8 +1322,7 @@ describe('MatIcon', () => {",
+      "sha256": "5569b88d9fb71591964e255939e3491bdcc451d8d4758ddebdb2f828b2f85a1d",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1351,7 +1336,7 @@ describe('MatIcon', () => {",
+      "sha256": "0acd38c2313353e9df31d0f58e6fa2116ef9735d6cebd453dbf15df1d05bf10c",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1359,9 +1344,9 @@ describe('MatIcon with default options', () => {",
+      "sha256": "c7a292bac7a894fac6e1eeda02610eeeabb2c389511e42fee35f3acf22a65424",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1369,9 +1354,9 @@ describe('MatIcon with default options', () => {",
+      "sha256": "6d89631e9c32e885f1b7c8a0f51d1b9d038021d53a5880bef3d442e4e5432354",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1382,18 +1367,18 @@ describe('MatIcon with default options', () => {",
+      "sha256": "06b5409554217275f59d2d6d209fa7140f24c7a710c8e2e4b0ce9f39972604d2",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/icon/icon.spec.ts",
+      "header": "@@ -1403,16 +1388,16 @@ describe('MatIcon with default options', () => {",
+      "sha256": "5e1349f664c3ba3fa12069e25f8cb65c0e873b2f9f2d3b1ceed8290460d90188",
+      "judgment": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    }
+  ],
+  "async_source_semantics": {
+    "sha": "01cc137b512f34af97f1adb40fc95043329beef2",
+    "complete_original_files": 1,
+    "complete_original_hunks": 28,
+    "static_occurrences_paired": 60,
+    "unchanged_complete_callback_semantics": 40,
+    "fixtureClasses": [
+      {
+        "name": "IconWithLigature",
+        "raw_sha256": "e00edcba02f4a66a467516ecd125a132a16a6f1a62888603bfd219a13aea1a61"
+      },
+      {
+        "name": "IconWithLigatureByAttribute",
+        "raw_sha256": "d714477cf3f015159aeb10234dd491e29f3f253e081533852b3b86408936fa60"
+      },
+      {
+        "name": "IconWithColor",
+        "raw_sha256": "e607eb3815125c1620fcc0a1f4690a2670482b84b83206957bf1ad22e1004082"
+      },
+      {
+        "name": "IconWithCustomFontCss",
+        "raw_sha256": "ed8bbe6b2eb568ba5e0dc3ac061266632a5d28cc72f99ae32b98fce5f64db569"
+      },
+      {
+        "name": "IconFromSvgName",
+        "raw_sha256": "fcf9a37474bf693ffcfe9ad8c1deaf8efdd50a7bcd1b43c0d540b47fa7d89f49"
+      },
+      {
+        "name": "IconWithAriaHiddenFalse",
+        "raw_sha256": "48ef2e6aee747f206b9588a6c4190b324cae7f242458dddd2ae6f99d7170adf2"
+      },
+      {
+        "name": "IconWithBindingAndNgIf",
+        "raw_sha256": "0db7dd4d79c72a952d96a178febb3e123078c49a1bf075c42a4ce36bc3395f6b"
+      },
+      {
+        "name": "InlineIcon",
+        "raw_sha256": "b4d56ceed85fe54d65d836a3b3abfce6aaf012b2868e6802ee22fc9bda1bbc62"
+      },
+      {
+        "name": "SvgIconWithUserContent",
+        "raw_sha256": "3da059e1c4556f34426270819385a904e6e3fc73bde72a2f62fce37ed1c660f7"
+      },
+      {
+        "name": "IconWithLigatureAndSvgBinding",
+        "raw_sha256": "63811d89476cb5274b43ca966ff5c62904a001b4efd1248a7400525dad49ac46"
+      },
+      {
+        "name": "BlankIcon",
+        "raw_sha256": "d7dd713992d3555c63a476a065c44a21c8a4ea2d0cd73ffc2c080710918d250b"
+      }
+    ],
+    "removed_testing_imports": [
+      "fakeAsync",
+      "tick",
+      "waitForAsync"
+    ],
+    "native_wait_helper_added": false,
+    "all_other_noncase_helpers_and_metadata_equal": true,
+    "retained_expansion_waitForAsync_binding_and_setup": false,
+    "trustChecks": [
+      {
+        "path": "src/material/icon/icon.spec.ts",
+        "suites": [
+          "'MatIcon'",
+          "'Icons from URLs'"
+        ],
+        "name": "'should throw an error when using an untrusted icon url'",
+        "raw_sha256": "1c77e5373e72fc7af4a0eddb6937c9ab4651518af3b90ee31759e0511dc58792",
+        "complete_original_case_unchanged": true,
+        "actual_security_validation_executed": false
+      },
+      {
+        "path": "src/material/icon/icon.spec.ts",
+        "suites": [
+          "'MatIcon'",
+          "'Icons from HTML string'"
+        ],
+        "name": "'should throw an error when using untrusted HTML'",
+        "raw_sha256": "4df2c321a2b26599e44381523a703d93081c0646a659ce12e642ec2fc5b5f696",
+        "complete_original_case_unchanged": true,
+        "actual_security_validation_executed": false
+      },
+      {
+        "path": "src/material/icon/icon.spec.ts",
+        "suites": [
+          "'MatIcon'",
+          "'Icons resolved through a resolver function'"
+        ],
+        "name": "'should throw an error when the resolver returns an untrusted URL'",
+        "raw_sha256": "551efb10b38c3b5b080bc5d51b76c5726c821725bb5a4924d302d9fd595f8565",
+        "complete_original_case_unchanged": true,
+        "actual_security_validation_executed": false
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "security_clearance": "not-passed",
+    "complete_case_pairs_boundary_positions_and_setup_hooks": {
+      "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+      "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+    }
+  },
+  "decision": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "c65df77e1e6f10d7449ec0d3babf4291cc1924d9558893d63d132bf29c5e2161",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-surface-async-source-review.mjs",
+        "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+      },
+      {
+        "path": "tests/spec_surface_async_source_probe.mjs",
+        "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+        "sha256": "2ed9950eeba1d35a3c356a7356dd247797e0b2c4dcc2c5057970cd174d2ad185"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+        "sha256": "664fcf7edf5f10c1d847538b2669fee5ca77a930160fa42afd5002236a210dee"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+        "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-controls.json",
+        "sha256": "ca11d9db6fbb69fc880517eb6c8ca3a920ad1a2e769e919f201c4d7f771a4077"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+        "sha256": "5fe84575f5ced6c35f590f9a493f3c005fb9c3bd968749a9b299bd6742f3fb2e"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+        "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+        "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+      },
+      {
+        "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+        "sha256": "dfde6c6c08858f72f40e7260441eb7840d511a322a2fc196983028632c5ff54f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+        "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+        "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+        "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+        "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+        "sha256": "5ad5a3b1a9dcdeefd5804ff7a9fa4f22d39f732a14e126630430914c42a549ae"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+        "sha256": "6eb8124c3d5b81dc8df3ef265f1c46de2a3e513bb2096392b4399e1b2057e8d6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+        "sha256": "42d8fc6ecb90375e3e12d4b1d2148575e037487cd09377800b0bd90d4dd68b9b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+        "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+        "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "security_clearance": "not-passed"
+  },
+  "prior_entry": {
+    "sha": "01cc137b512f34af97f1adb40fc95043329beef2",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/icon): switch tests away from fakeAsync (#33301)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=d5feeef45b8f5e3820187aa3b9a0b528032f2bf29de5b3a9ad256d10d7b5193f, bytes=13837). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/icon/icon.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/icon/icon.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/01cc137b512f34af97f1adb40fc95043329beef2.json",
+    "batch_id": "test-only-refactor-wave2-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:47:11Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "d5feeef45b8f5e3820187aa3b9a0b528032f2bf29de5b3a9ad256d10d7b5193f"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-surface-async-source-prior.json.gz",
+    "sha256": "52414ff5a703bf58dc8ffba868e78ad163348470291b2cb9e2e9b89ca7e1bd06"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-surface-async-source-review.mjs",
+      "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+    },
+    {
+      "path": "tests/spec_surface_async_source_probe.mjs",
+      "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+      "sha256": "2ed9950eeba1d35a3c356a7356dd247797e0b2c4dcc2c5057970cd174d2ad185"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+      "sha256": "664fcf7edf5f10c1d847538b2669fee5ca77a930160fa42afd5002236a210dee"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+      "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-controls.json",
+      "sha256": "ca11d9db6fbb69fc880517eb6c8ca3a920ad1a2e769e919f201c4d7f771a4077"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+      "sha256": "5fe84575f5ced6c35f590f9a493f3c005fb9c3bd968749a9b299bd6742f3fb2e"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+      "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+      "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+    },
+    {
+      "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+      "sha256": "dfde6c6c08858f72f40e7260441eb7840d511a322a2fc196983028632c5ff54f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+      "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+      "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+      "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+      "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+      "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+      "sha256": "5ad5a3b1a9dcdeefd5804ff7a9fa4f22d39f732a14e126630430914c42a549ae"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+      "sha256": "6eb8124c3d5b81dc8df3ef265f1c46de2a3e513bb2096392b4399e1b2057e8d6"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+      "sha256": "42d8fc6ecb90375e3e12d4b1d2148575e037487cd09377800b0bd90d4dd68b9b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+      "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+      "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+    }
+  ],
+  "all_other1693_rows_unchanged": true,
+  "product_or_consumer_files_changed": 0,
+  "actual_new_Angular_chip_case_executed": false,
+  "actual_Angular_native_artifact_or_floor_qualified": false,
+  "security_clearance": "not-passed",
+  "g11_claim": "not-passed"
+}

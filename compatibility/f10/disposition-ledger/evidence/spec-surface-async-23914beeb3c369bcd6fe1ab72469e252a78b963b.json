@@ -1,0 +1,555 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "23914beeb3c369bcd6fe1ab72469e252a78b963b",
+  "subject": "refactor(material/button-toggle): switch tests away from fakeAsync (#33302)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "0071e1217c19240adafd4296eabf8f93768db88c",
+      "after_blob": "bbb18bc3419c76ed831d1c93f637d0a551e494d2"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 24,
+  "raw_commit_sha256": "11ccae6392e91fa809b2c1ad608a759ea31f262bd2aa779614e4544eee5f53fa",
+  "original_sources": [
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "before": {
+        "git_blob": "0071e1217c19240adafd4296eabf8f93768db88c",
+        "sha256": "93fe0c8924d52669456a9d4ea758323198cf23180839e9c77f0f8c4eb01e6db7",
+        "bytes": 51333
+      },
+      "after": {
+        "git_blob": "bbb18bc3419c76ed831d1c93f637d0a551e494d2",
+        "sha256": "3b8fb961d74663ba5f5cf5962bf1eb310188050db56f0ca5051bb182f22023df",
+        "bytes": 50803
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/button-toggle/button-toggle.spec.ts b/src/material/button-toggle/button-toggle.spec.ts\nindex 0071e1217c19240adafd4296eabf8f93768db88c..bbb18bc3419c76ed831d1c93f637d0a551e494d2 100644\n--- a/src/material/button-toggle/button-toggle.spec.ts\n+++ b/src/material/button-toggle/button-toggle.spec.ts\n@@ -8,14 +8,7 @@ import {\n   ViewChildren,\n   ChangeDetectionStrategy,\n } from '@angular/core';\n-import {\n-  ComponentFixture,\n-  TestBed,\n-  fakeAsync,\n-  flush,\n-  tick,\n-  waitForAsync,\n-} from '@angular/core/testing';\n+import {ComponentFixture, TestBed} from '@angular/core/testing';\n import {FormControl, FormsModule, NgModel, ReactiveFormsModule} from '@angular/forms';\n import {By} from '@angular/platform-browser';\n import {\n@@ -33,7 +26,7 @@ describe('MatButtonToggle with forms', () => {\n     let groupInstance: MatButtonToggleGroup;\n     let testComponent: ButtonToggleGroupWithFormControl;\n \n-    beforeEach(fakeAsync(() => {\n+    beforeEach(() => {\n       fixture = TestBed.createComponent(ButtonToggleGroupWithFormControl);\n       fixture.detectChanges();\n \n@@ -41,7 +34,7 @@ describe('MatButtonToggle with forms', () => {\n \n       groupDebugElement = fixture.debugElement.query(By.directive(MatButtonToggleGroup))!;\n       groupInstance = groupDebugElement.injector.get<MatButtonToggleGroup>(MatButtonToggleGroup);\n-    }));\n+    });\n \n     it('should toggle the disabled state', () => {\n       testComponent.control.disable();\n@@ -99,17 +92,16 @@ describe('MatButtonToggle with forms', () => {\n       );\n     });\n \n-    it('should update the model before firing change event', fakeAsync(() => {\n+    it('should update the model before firing change event', () => {\n       expect(testComponent.modelValue).toBeUndefined();\n       expect(testComponent.lastEvent).toBeUndefined();\n \n       innerButtons[0].click();\n       fixture.detectChanges();\n \n-      tick();\n       expect(testComponent.modelValue).toBe('red');\n       expect(testComponent.lastEvent.value).toBe('red');\n-    }));\n+    });\n \n     it('should set individual radio names based on the group name', () => {\n       expect(groupInstance.name).toBeTruthy();\n@@ -166,14 +158,13 @@ describe('MatButtonToggle with forms', () => {\n       expect(selected.value).toBe(groupInstance.value);\n     });\n \n-    it('should have the correct FormControl state initially and after interaction', fakeAsync(() => {\n+    it('should have the correct FormControl state initially and after interaction', () => {\n       expect(groupNgModel.valid).toBe(true);\n       expect(groupNgModel.pristine).toBe(true);\n       expect(groupNgModel.touched).toBe(false);\n \n       buttonToggleInstances[1].checked = true;\n       fixture.detectChanges();\n-      tick();\n \n       expect(groupNgModel.valid).toBe(true);\n       expect(groupNgModel.pristine).toBe(true);\n@@ -181,21 +172,18 @@ describe('MatButtonToggle with forms', () => {\n \n       innerButtons[2].click();\n       fixture.detectChanges();\n-      tick();\n \n       expect(groupNgModel.valid).toBe(true);\n       expect(groupNgModel.pristine).toBe(false);\n       expect(groupNgModel.touched).toBe(true);\n-    }));\n+    });\n \n-    it('should update the ngModel value when selecting a button toggle', fakeAsync(() => {\n+    it('should update the ngModel value when selecting a button toggle', () => {\n       innerButtons[1].click();\n       fixture.detectChanges();\n \n-      tick();\n-\n       expect(testComponent.modelValue).toBe('green');\n-    }));\n+    });\n \n     it('should show a ripple on label click', () => {\n       const groupElement = groupDebugElement.nativeElement;\n@@ -226,7 +214,7 @@ describe('MatButtonToggle with forms', () => {\n     it(\n       'should maintain the selected value when swapping out the list of toggles with one ' +\n         'that still contains the value',\n-      fakeAsync(() => {\n+      () => {\n         expect(buttonToggleInstances[0].checked).toBe(false);\n         expect(fixture.componentInstance.modelValue).toBeFalsy();\n         expect(groupInstance.value).toBeFalsy();\n@@ -239,7 +227,6 @@ describe('MatButtonToggle with forms', () => {\n \n         fixture.componentInstance.options = [...fixture.componentInstance.options];\n         fixture.detectChanges();\n-        tick();\n         fixture.detectChanges();\n \n         buttonToggleDebugElements = fixture.debugElement.queryAll(By.directive(MatButtonToggle));\n@@ -247,11 +234,11 @@ describe('MatButtonToggle with forms', () => {\n \n         expect(buttonToggleInstances[0].checked).toBe(true);\n         expect(groupInstance.value).toBe('red');\n-      }),\n+      },\n     );\n   });\n \n-  it('should be able to pick up toggles that are not direct descendants', fakeAsync(() => {\n+  it('should be able to pick up toggles that are not direct descendants', () => {\n     const fixture = TestBed.createComponent(ButtonToggleGroupWithIndirectDescendantToggles);\n     fixture.detectChanges();\n \n@@ -262,12 +249,11 @@ describe('MatButtonToggle with forms', () => {\n \n     button.click();\n     fixture.detectChanges();\n-    tick();\n \n     expect(groupInstance.value).toBe('red');\n     expect(fixture.componentInstance.control.value).toBe('red');\n     expect(groupInstance._buttonToggles.length).toBe(3);\n-  }));\n+  });\n \n   it('should preserve the selection if the pre-selected option is removed and re-added', () => {\n     const fixture = TestBed.createComponent(ButtonToggleGroupWithFormControlAndDynamicButtons);\n@@ -312,17 +298,16 @@ describe('MatButtonToggle with forms', () => {\n     expect(instance.toggles.map(t => t.checked)).toEqual([true, false, false]);\n   });\n \n-  it('should set the initial tabindex when using ngModel with a static list of options where none match the value', fakeAsync(() => {\n+  it('should set the initial tabindex when using ngModel with a static list of options where none match the value', () => {\n     const fixture = TestBed.createComponent(ButtonToggleGroupWithNgModelAndStaticOptions);\n     fixture.detectChanges();\n-    tick();\n     const indexes = Array.from(\n       fixture.nativeElement.querySelectorAll('button'),\n       (button: HTMLElement) => button.getAttribute('tabindex'),\n     );\n \n     expect(indexes).toEqual(['0', '-1', '-1']);\n-  }));\n+  });\n });\n \n describe('MatButtonToggle without forms', () => {\n@@ -494,7 +479,7 @@ describe('MatButtonToggle without forms', () => {\n       expect(groupNativeElement.classList).toContain('mat-button-toggle-vertical');\n     });\n \n-    it('should emit a change event from button toggles', fakeAsync(() => {\n+    it('should emit a change event from button toggles', () => {\n       expect(buttonToggleInstances[0].checked).toBe(false);\n \n       const changeSpy = jasmine.createSpy('button-toggle change listener');\n@@ -502,18 +487,16 @@ describe('MatButtonToggle without forms', () => {\n \n       innerButtons[0].click();\n       fixture.detectChanges();\n-      tick();\n       expect(changeSpy).toHaveBeenCalledTimes(1);\n \n       innerButtons[0].click();\n       fixture.detectChanges();\n-      tick();\n \n       // Always emit change event when button toggle is clicked\n       expect(changeSpy).toHaveBeenCalledTimes(2);\n-    }));\n+    });\n \n-    it('should emit a change event from the button toggle group', fakeAsync(() => {\n+    it('should emit a change event from the button toggle group', () => {\n       expect(groupInstance.value).toBeFalsy();\n \n       const changeSpy = jasmine.createSpy('button-toggle-group change listener');\n@@ -521,14 +504,12 @@ describe('MatButtonToggle without forms', () => {\n \n       innerButtons[0].click();\n       fixture.detectChanges();\n-      tick();\n       expect(changeSpy).toHaveBeenCalled();\n \n       innerButtons[1].click();\n       fixture.detectChanges();\n-      tick();\n       expect(changeSpy).toHaveBeenCalledTimes(2);\n-    }));\n+    });\n \n     it('should update the group and button toggles when updating the group value', () => {\n       expect(groupInstance.value).toBeFalsy();\n@@ -562,7 +543,7 @@ describe('MatButtonToggle without forms', () => {\n       expect(buttonToggleInstances.every(toggle => !toggle.checked)).toBe(true);\n     });\n \n-    it('should update the model if a selected toggle is removed', fakeAsync(() => {\n+    it('should update the model if a selected toggle is removed', () => {\n       expect(groupInstance.value).toBeFalsy();\n       innerButtons[0].click();\n       fixture.detectChanges();\n@@ -573,11 +554,10 @@ describe('MatButtonToggle without forms', () => {\n       testComponent.renderFirstToggle = false;\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n-      tick();\n \n       expect(groupInstance.value).toBeFalsy();\n       expect(groupInstance.selected).toBeFalsy();\n-    }));\n+    });\n \n     it('should show checkmark indicator by default', () => {\n       innerButtons[0].click();\n@@ -596,12 +576,12 @@ describe('MatButtonToggle without forms', () => {\n       let UP_ARROW_EVENT: KeyboardEvent;\n       let DOWN_ARROW_EVENT: KeyboardEvent;\n \n-      beforeEach(waitForAsync(async () => {\n+      beforeEach(() => {\n         LEFT_ARROW_EVENT = createKeyboardEvent('keydown', LEFT_ARROW);\n         RIGHT_ARROW_EVENT = createKeyboardEvent('keydown', RIGHT_ARROW);\n         UP_ARROW_EVENT = createKeyboardEvent('keydown', UP_ARROW);\n         DOWN_ARROW_EVENT = createKeyboardEvent('keydown', DOWN_ARROW);\n-      }));\n+      });\n \n       it('should not change selection on arrow key press with a modifier key', () => {\n         expect(groupInstance.value).toBeFalsy();\n@@ -709,7 +689,7 @@ describe('MatButtonToggle without forms', () => {\n     let buttonToggleInstances: MatButtonToggle[];\n     let testComponent: ButtonTogglesInsideButtonToggleGroupMultiple;\n \n-    beforeEach(fakeAsync(() => {\n+    beforeEach(() => {\n       fixture = TestBed.createComponent(ButtonTogglesInsideButtonToggleGroupMultiple);\n       fixture.detectChanges();\n \n@@ -725,7 +705,7 @@ describe('MatButtonToggle without forms', () => {\n         .queryAll(By.css('button'))\n         .map(debugEl => debugEl.nativeElement);\n       buttonToggleInstances = buttonToggleDebugElements.map(debugEl => debugEl.componentInstance);\n-    }));\n+    });\n \n     it('should disable click interactions when the group is disabled', () => {\n       testComponent.isGroupDisabled = true;\n@@ -786,23 +766,21 @@ describe('MatButtonToggle without forms', () => {\n       expect(groupNativeElement.classList).toContain('mat-button-toggle-vertical');\n     });\n \n-    it('should deselect a button toggle when selected twice', fakeAsync(() => {\n+    it('should deselect a button toggle when selected twice', () => {\n       buttonToggleLabelElements[0].click();\n       fixture.detectChanges();\n-      tick();\n \n       expect(buttonToggleInstances[0].checked).toBe(true);\n       expect(groupInstance.value).toEqual(['eggs']);\n \n       buttonToggleLabelElements[0].click();\n       fixture.detectChanges();\n-      tick();\n \n       expect(groupInstance.value).toEqual([]);\n       expect(buttonToggleInstances[0].checked).toBe(false);\n-    }));\n+    });\n \n-    it('should emit a change event for state changes', fakeAsync(() => {\n+    it('should emit a change event for state changes', () => {\n       expect(buttonToggleInstances[0].checked).toBe(false);\n \n       const changeSpy = jasmine.createSpy('button-toggle change listener');\n@@ -810,20 +788,18 @@ describe('MatButtonToggle without forms', () => {\n \n       buttonToggleLabelElements[0].click();\n       fixture.detectChanges();\n-      tick();\n       expect(changeSpy).toHaveBeenCalled();\n       expect(groupInstance.value).toEqual(['eggs']);\n \n       buttonToggleLabelElements[0].click();\n       fixture.detectChanges();\n-      tick();\n       expect(groupInstance.value).toEqual([]);\n \n       // The default browser behavior is to emit an event, when the value was set\n       // to false. That's because the current input type is set to `checkbox` when\n       // using the multiple mode.\n       expect(changeSpy).toHaveBeenCalledTimes(2);\n-    }));\n+    });\n \n     it('should throw when attempting to assign a non-array value', () => {\n       expect(() => {\n@@ -852,7 +828,7 @@ describe('MatButtonToggle without forms', () => {\n     let buttonToggleInstance: MatButtonToggle;\n     let buttonToggleButtonElement: HTMLButtonElement;\n \n-    beforeEach(fakeAsync(() => {\n+    beforeEach(() => {\n       fixture = TestBed.createComponent(StandaloneButtonToggle);\n       fixture.detectChanges();\n \n@@ -865,23 +841,21 @@ describe('MatButtonToggle without forms', () => {\n       buttonToggleButtonElement = buttonToggleNativeElement.querySelector(\n         'button',\n       )! as HTMLButtonElement;\n-    }));\n+    });\n \n-    it('should toggle when clicked', fakeAsync(() => {\n+    it('should toggle when clicked', () => {\n       buttonToggleLabelElement.click();\n       fixture.detectChanges();\n-      flush();\n \n       expect(buttonToggleInstance.checked).toBe(true);\n \n       buttonToggleLabelElement.click();\n       fixture.detectChanges();\n-      flush();\n \n       expect(buttonToggleInstance.checked).toBe(false);\n-    }));\n+    });\n \n-    it('should emit a change event for state changes', fakeAsync(() => {\n+    it('should emit a change event for state changes', () => {\n       expect(buttonToggleInstance.checked).toBe(false);\n \n       const changeSpy = jasmine.createSpy('button-toggle change listener');\n@@ -889,17 +863,15 @@ describe('MatButtonToggle without forms', () => {\n \n       buttonToggleLabelElement.click();\n       fixture.detectChanges();\n-      tick();\n       expect(changeSpy).toHaveBeenCalled();\n \n       buttonToggleLabelElement.click();\n       fixture.detectChanges();\n-      tick();\n \n       // The default browser behavior is to emit an event, when the value was set\n       // to false. That's because the current input type is set to `checkbox`.\n       expect(changeSpy).toHaveBeenCalledTimes(2);\n-    }));\n+    });\n \n     it('should focus on underlying input element when focus() is called', () => {\n       const nativeButton = buttonToggleDebugElement.query(By.css('button'))!.nativeElement;\n",
+  "diff_sha256": "947106b40437fc973f85a76c9ac43e43c55805662ddcb3b09e05a4d31e73b463",
+  "hunk_reviews": [
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -8,14 +8,7 @@ import {",
+      "sha256": "41fafb13eec64f974491b6086fdc6d7596b5f9aff4b84fc6e406ec85863c181a",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -33,7 +26,7 @@ describe('MatButtonToggle with forms', () => {",
+      "sha256": "75adefe392fcadce69ea9a8851e00a149a929930e980dc134f5752414364770b",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -41,7 +34,7 @@ describe('MatButtonToggle with forms', () => {",
+      "sha256": "925249f7e6fb4fed0309c2710bef2b48ba5132b99fb777d30f8f8f15d2eb0de1",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -99,17 +92,16 @@ describe('MatButtonToggle with forms', () => {",
+      "sha256": "a925793a5c72796f369d33d377b3fec4c48e02633fe323341d7072202b288d8a",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -166,14 +158,13 @@ describe('MatButtonToggle with forms', () => {",
+      "sha256": "1d84cd2bd191a25d840dcba56282f95a274e8c93e7183cfee9b256beaab17929",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -181,21 +172,18 @@ describe('MatButtonToggle with forms', () => {",
+      "sha256": "86f39cd73779475ddbf550cf9f0b746abfd82ee470d01cd06b83a4c822cd9df0",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -226,7 +214,7 @@ describe('MatButtonToggle with forms', () => {",
+      "sha256": "60eba65b88251eaaa7b0596f4a0ea7c5591e9c8a61698a7145b11a9b20979023",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -239,7 +227,6 @@ describe('MatButtonToggle with forms', () => {",
+      "sha256": "b1916471554f48faefb200600a0d6d8bd6ed55fb7a63de2498583ef682b8b497",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -247,11 +234,11 @@ describe('MatButtonToggle with forms', () => {",
+      "sha256": "9008df4b8381bb302a8aa4515294237d5017c126e6bcdda9cf107fda37eee3f6",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -262,12 +249,11 @@ describe('MatButtonToggle with forms', () => {",
+      "sha256": "b39e70ad4493062dd09e4943dbce56690aad61b877253222c91d9be5b8411217",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -312,17 +298,16 @@ describe('MatButtonToggle with forms', () => {",
+      "sha256": "5f4560f14abc1fbf56e4bf3809116fdf72bd33b25a50dec483a308e05d86fa0f",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -494,7 +479,7 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "65ee2be51bd876468b3f82cf85d2cc84d2fa9684c9ba0e03655bbe60de0643ce",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -502,18 +487,16 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "5ca9f0770a714352865ae1a792d5959d7fc0951ba75adb307a3b138d5139d0b1",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -521,14 +504,12 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "6ba650220aad47dd4fb7b1037bc86b169f8b2398730ff2c2a5ad7d2d1f80c984",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -562,7 +543,7 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "b3baf39f9f0fd03ae530be03287fe9b19cb2e4306b67ffce10dd81b95ad84257",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -573,11 +554,10 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "748ffad7b54151b26a6fa01af2569df1c714239bf304c9f5efb735e4f3ea1343",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -596,12 +576,12 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "0cfcb4f6f0cd1c80b13fdf08d5d7b1cc6c340f5859cdba5e715edfe9d4cf044a",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -709,7 +689,7 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "ad63f55bae388967da9367312ae4cddd4191d67c516bcc23dcdcf75ae67d652c",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -725,7 +705,7 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "9b5638d0feb8c381b80023c3733777cacfda2e81102ed704f8054a0e595a5b27",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -786,23 +766,21 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "f67b06cef280cc8e203380cd5374b11d70f0d9b57d314be3c700e69f623de415",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -810,20 +788,18 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "973f1bafa1afbd9d38f40922f587dc3ef489cb0f401cbb1d4322be8d1e93a1aa",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -852,7 +828,7 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "edfa1de88fb9bcdd5960aa02e97cf6ea8407b1106962c4b0f5cfebceb1695bff",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -865,23 +841,21 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "f3a3964fdd30b4fb5bc0404ed460c4bcfe762d463671a824a3a054639080c5fa",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/button-toggle/button-toggle.spec.ts",
+      "header": "@@ -889,17 +863,15 @@ describe('MatButtonToggle without forms', () => {",
+      "sha256": "fa770e15914aecbc21c269ab256feccd6d032f8539220b32b0ebfa667aaba92f",
+      "judgment": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    }
+  ],
+  "async_source_semantics": {
+    "sha": "23914beeb3c369bcd6fe1ab72469e252a78b963b",
+    "complete_original_files": 1,
+    "complete_original_hunks": 24,
+    "static_occurrences_paired": 73,
+    "unchanged_complete_callback_semantics": 60,
+    "fixtureClasses": [
+      {
+        "name": "ButtonTogglesInsideButtonToggleGroup",
+        "raw_sha256": "11ffd11c0bf59d3adf175bf8de4af353738b4fa7d3d0744455a3da1684adbbf0"
+      },
+      {
+        "name": "ButtonToggleGroupWithNgModel",
+        "raw_sha256": "cb219f7713f3f35d204d42638a3cd6c514b987ee1a1161b04ba54a70ce0eda26"
+      },
+      {
+        "name": "ButtonTogglesInsideButtonToggleGroupMultiple",
+        "raw_sha256": "0c0835c329067725451e4fa9102f7b3e6cdaba954ba8664249ec645e529d380d"
+      },
+      {
+        "name": "FalsyButtonTogglesInsideButtonToggleGroupMultiple",
+        "raw_sha256": "cf159be5c294085174de0cf4082a4c6da320cd9495e09a7d5c9444ddf17d9876"
+      },
+      {
+        "name": "StandaloneButtonToggle",
+        "raw_sha256": "be2037b47c099ee0babce89f9bf7f3338c5bb555fd6d6c59402a3ffcb732b1b1"
+      },
+      {
+        "name": "ButtonToggleGroupWithInitialValue",
+        "raw_sha256": "67fdcac42ade2dc4413cfb031492eb337947ff0bd104bd4f3331718bf6fd5c46"
+      },
+      {
+        "name": "ButtonToggleGroupWithFormControl",
+        "raw_sha256": "ab5a0dfc536ef10a1b6122b6ac0610218884576d9670e89b84d56b5c050d1ca5"
+      },
+      {
+        "name": "ButtonToggleGroupWithIndirectDescendantToggles",
+        "raw_sha256": "c0ae25dc9b276a0a58c550917fe97547609ebd00ee87978c8f0c67dda9e001df"
+      },
+      {
+        "name": "ButtonToggleWithAriaLabel",
+        "raw_sha256": "c74cb4695d953984a9c3965152856df2486f41cc5c2aa29ab0230c3d409e2f7c"
+      },
+      {
+        "name": "ButtonToggleWithAriaLabelledby",
+        "raw_sha256": "1a42aba3570495c5fff46d07855d1a2824873b1bc193b747ceb0f20e08c1bd87"
+      },
+      {
+        "name": "RepeatedButtonTogglesWithPreselectedValue",
+        "raw_sha256": "313e11115f33504f4801be90590be3116cccb2d9440872f0196f1e09e8642a36"
+      },
+      {
+        "name": "ButtonToggleWithTabindex",
+        "raw_sha256": "79de6276cf74d04e29388c545b18c85f278867b8d6e6d1e249723f0554665f1e"
+      },
+      {
+        "name": "ButtonToggleWithStaticName",
+        "raw_sha256": "7f23d0a3b3779b04d8321416686952475412812e47fd730fd2ed379e47b46da7"
+      },
+      {
+        "name": "ButtonToggleWithStaticChecked",
+        "raw_sha256": "74bd4112998e6fa678d87ee03c9801f57fb84a419bb9c49c9d40c1fe8bf3d4c2"
+      },
+      {
+        "name": "ButtonToggleWithStaticAriaAttributes",
+        "raw_sha256": "a4822d3238fe152e477eccb2ea88c62a17b4fe3835c4abf4b449780def3684de"
+      },
+      {
+        "name": "ButtonToggleGroupWithFormControlAndDynamicButtons",
+        "raw_sha256": "8b12c0fcabdd20acad096a814a44e95d12df8b5f0002f39c590c4e0b9e81ba43"
+      },
+      {
+        "name": "ButtonToggleGroupWithNgModelAndStaticOptions",
+        "raw_sha256": "39243eb38448ffdd60d2d49101557822834290945a2d3b7f8c624c970258e25e"
+      }
+    ],
+    "removed_testing_imports": [
+      "fakeAsync",
+      "flush",
+      "tick",
+      "waitForAsync"
+    ],
+    "native_wait_helper_added": false,
+    "all_other_noncase_helpers_and_metadata_equal": true,
+    "retained_expansion_waitForAsync_binding_and_setup": false,
+    "trustChecks": [],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "security_clearance": "not-passed",
+    "complete_case_pairs_boundary_positions_and_setup_hooks": {
+      "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+      "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+    }
+  },
+  "decision": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "947106b40437fc973f85a76c9ac43e43c55805662ddcb3b09e05a4d31e73b463",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-surface-async-source-review.mjs",
+        "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+      },
+      {
+        "path": "tests/spec_surface_async_source_probe.mjs",
+        "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+        "sha256": "2ed9950eeba1d35a3c356a7356dd247797e0b2c4dcc2c5057970cd174d2ad185"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+        "sha256": "664fcf7edf5f10c1d847538b2669fee5ca77a930160fa42afd5002236a210dee"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+        "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-controls.json",
+        "sha256": "ca11d9db6fbb69fc880517eb6c8ca3a920ad1a2e769e919f201c4d7f771a4077"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+        "sha256": "5fe84575f5ced6c35f590f9a493f3c005fb9c3bd968749a9b299bd6742f3fb2e"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+        "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+        "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+      },
+      {
+        "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+        "sha256": "dfde6c6c08858f72f40e7260441eb7840d511a322a2fc196983028632c5ff54f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+        "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+        "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+        "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+        "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+        "sha256": "5ad5a3b1a9dcdeefd5804ff7a9fa4f22d39f732a14e126630430914c42a549ae"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+        "sha256": "6eb8124c3d5b81dc8df3ef265f1c46de2a3e513bb2096392b4399e1b2057e8d6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+        "sha256": "42d8fc6ecb90375e3e12d4b1d2148575e037487cd09377800b0bd90d4dd68b9b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+        "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+        "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "security_clearance": "not-passed"
+  },
+  "prior_entry": {
+    "sha": "23914beeb3c369bcd6fe1ab72469e252a78b963b",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/button-toggle): switch tests away from fakeAsync (#33302)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=5418643a6f1bef711dea00cab3b003f485bcc73a44cd4a982aa7e11c8b3d841f, bytes=13931). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/button-toggle/button-toggle.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/button-toggle/button-toggle.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/23914beeb3c369bcd6fe1ab72469e252a78b963b.json",
+    "batch_id": "test-only-refactor-wave2-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:47:11Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "5418643a6f1bef711dea00cab3b003f485bcc73a44cd4a982aa7e11c8b3d841f"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-surface-async-source-prior.json.gz",
+    "sha256": "52414ff5a703bf58dc8ffba868e78ad163348470291b2cb9e2e9b89ca7e1bd06"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-surface-async-source-review.mjs",
+      "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+    },
+    {
+      "path": "tests/spec_surface_async_source_probe.mjs",
+      "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+      "sha256": "2ed9950eeba1d35a3c356a7356dd247797e0b2c4dcc2c5057970cd174d2ad185"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+      "sha256": "664fcf7edf5f10c1d847538b2669fee5ca77a930160fa42afd5002236a210dee"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+      "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-controls.json",
+      "sha256": "ca11d9db6fbb69fc880517eb6c8ca3a920ad1a2e769e919f201c4d7f771a4077"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+      "sha256": "5fe84575f5ced6c35f590f9a493f3c005fb9c3bd968749a9b299bd6742f3fb2e"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+      "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+      "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+    },
+    {
+      "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+      "sha256": "dfde6c6c08858f72f40e7260441eb7840d511a322a2fc196983028632c5ff54f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+      "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+      "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+      "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+      "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+      "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+      "sha256": "5ad5a3b1a9dcdeefd5804ff7a9fa4f22d39f732a14e126630430914c42a549ae"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+      "sha256": "6eb8124c3d5b81dc8df3ef265f1c46de2a3e513bb2096392b4399e1b2057e8d6"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+      "sha256": "42d8fc6ecb90375e3e12d4b1d2148575e037487cd09377800b0bd90d4dd68b9b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+      "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+      "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+    }
+  ],
+  "all_other1693_rows_unchanged": true,
+  "product_or_consumer_files_changed": 0,
+  "actual_new_Angular_chip_case_executed": false,
+  "actual_Angular_native_artifact_or_floor_qualified": false,
+  "security_clearance": "not-passed",
+  "g11_claim": "not-passed"
+}

@@ -28281,33 +28281,283 @@
       "sha": "c6505d8ea45631d58c5dc1f427996dfb93d6de92",
       "bucket": "test-only-batch-candidate",
       "subject": "test(material/expansion): switch tests away from fakeAsync (#33617)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=64ad10b70c905a63da886be944dc46384485ca783a01ffdb7ed6e13830f5f59f, bytes=5761). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/expansion/expansion.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "read_note_disposition": "individual complete-original source conclusion; actual peer/product/security/floor and G11 gates remain separate",
       "files": [
         "src/material/expansion/expansion.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/c6505d8ea45631d58c5dc1f427996dfb93d6de92.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-surface-async-c6505d8ea45631d58c5dc1f427996dfb93d6de92.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "64ad10b70c905a63da886be944dc46384485ca783a01ffdb7ed6e13830f5f59f"
+      "patch_sha256": "64ad10b70c905a63da886be944dc46384485ca783a01ffdb7ed6e13830f5f59f",
+      "diff_sha256": "022579a9fc00671557a0f88f117c57951826d176ad7d3f4c5714fa8c3c016aa8",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "022579a9fc00671557a0f88f117c57951826d176ad7d3f4c5714fa8c3c016aa8",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-surface-async-source-review.mjs",
+            "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+          },
+          {
+            "path": "tests/spec_surface_async_source_probe.mjs",
+            "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+            "sha256": "2ed9950eeba1d35a3c356a7356dd247797e0b2c4dcc2c5057970cd174d2ad185"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+            "sha256": "664fcf7edf5f10c1d847538b2669fee5ca77a930160fa42afd5002236a210dee"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+            "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-controls.json",
+            "sha256": "ca11d9db6fbb69fc880517eb6c8ca3a920ad1a2e769e919f201c4d7f771a4077"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+            "sha256": "5fe84575f5ced6c35f590f9a493f3c005fb9c3bd968749a9b299bd6742f3fb2e"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+            "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+            "sha256": "dfde6c6c08858f72f40e7260441eb7840d511a322a2fc196983028632c5ff54f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+            "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+            "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+            "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+            "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+            "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+            "sha256": "5ad5a3b1a9dcdeefd5804ff7a9fa4f22d39f732a14e126630430914c42a549ae"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+            "sha256": "6eb8124c3d5b81dc8df3ef265f1c46de2a3e513bb2096392b4399e1b2057e8d6"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+            "sha256": "42d8fc6ecb90375e3e12d4b1d2148575e037487cd09377800b0bd90d4dd68b9b"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+            "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+            "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false,
+        "security_clearance": "not-passed"
+      },
+      "source_check": "Authenticated all11 original hunks and the complete before/after program; paired29 static cases and all setup hooks. All predicates/nonboundary operations and fixture class/template/style bodies preserved; every changed boundary separately recorded without runtime/security admission.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "ef620d83d55275276d313be8ffc47fb5e282068e",
       "bucket": "test-only-batch-candidate",
       "subject": "test(material/sort): switch tests away from fakeAsync (#33716)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=ba1ca234c8929f232d953ebd5106803fa51c0a8ef3a3911edc82f25dfeb8cf81, bytes=4017). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/sort/sort.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+      "read_note_disposition": "individual complete-original source conclusion; actual peer/product/security/floor and G11 gates remain separate",
       "files": [
         "src/material/sort/sort.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/ef620d83d55275276d313be8ffc47fb5e282068e.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-surface-async-ef620d83d55275276d313be8ffc47fb5e282068e.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "ba1ca234c8929f232d953ebd5106803fa51c0a8ef3a3911edc82f25dfeb8cf81"
+      "patch_sha256": "ba1ca234c8929f232d953ebd5106803fa51c0a8ef3a3911edc82f25dfeb8cf81",
+      "diff_sha256": "621fce19700917f374a91f0b9813722bc1e084d3dc7c79554bb597632b05f2f1",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "621fce19700917f374a91f0b9813722bc1e084d3dc7c79554bb597632b05f2f1",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all eight hunks of the complete sort spec migration. Pair all26 static cases;23 callback semantics are unchanged and three fakeAsync callbacks become native async, replacing three tick calls with fixture.whenStable for initialization and disabled-column arrow observations. All26 predicate expressions and all other operations remain equal. Two default-option setup callbacks lose waitForAsync, retaining their provider objects; all five setup hooks and11 fixture classes/templates are accounted for without declaring initialization/injector/render equivalence. Decline the private fixture migration. Public MatSort remains directly used by the owned legacy table data source, which merges sortChange with initialized, and its retained table-data-source specs import MatSortModule. Cyph renders actual matSort/mat-sort-header directives on legacy table markup. Preserve these public contracts, the historical M2 sort Sass and all existing comparator/initialization/data-source tests; no MatSort fork, modern API mirror, assertion weakening or CSS/SCSS change. Actual packed/public-peer initialization, sort rendering/data updates and both supported floors remain unexecuted.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-surface-async-source-review.mjs",
+            "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+          },
+          {
+            "path": "tests/spec_surface_async_source_probe.mjs",
+            "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+            "sha256": "2ed9950eeba1d35a3c356a7356dd247797e0b2c4dcc2c5057970cd174d2ad185"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+            "sha256": "664fcf7edf5f10c1d847538b2669fee5ca77a930160fa42afd5002236a210dee"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+            "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-controls.json",
+            "sha256": "ca11d9db6fbb69fc880517eb6c8ca3a920ad1a2e769e919f201c4d7f771a4077"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+            "sha256": "5fe84575f5ced6c35f590f9a493f3c005fb9c3bd968749a9b299bd6742f3fb2e"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+            "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+            "sha256": "dfde6c6c08858f72f40e7260441eb7840d511a322a2fc196983028632c5ff54f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+            "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+            "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+            "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+            "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+            "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+            "sha256": "5ad5a3b1a9dcdeefd5804ff7a9fa4f22d39f732a14e126630430914c42a549ae"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+            "sha256": "6eb8124c3d5b81dc8df3ef265f1c46de2a3e513bb2096392b4399e1b2057e8d6"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+            "sha256": "42d8fc6ecb90375e3e12d4b1d2148575e037487cd09377800b0bd90d4dd68b9b"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+            "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+            "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false,
+        "security_clearance": "not-passed"
+      },
+      "source_check": "Authenticated all8 original hunks and the complete before/after program; paired26 static cases and all setup hooks. All predicates/nonboundary operations and fixture class/template/style bodies preserved; every changed boundary separately recorded without runtime/security admission.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "5006b416b4f20e1138793b33aaedc879a4f4b931",
@@ -29575,33 +29825,283 @@
       "sha": "01cc137b512f34af97f1adb40fc95043329beef2",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/icon): switch tests away from fakeAsync (#33301)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=d5feeef45b8f5e3820187aa3b9a0b528032f2bf29de5b3a9ad256d10d7b5193f, bytes=13837). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/icon/icon.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+      "read_note_disposition": "individual complete-original source conclusion; actual peer/product/security/floor and G11 gates remain separate",
       "files": [
         "src/material/icon/icon.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/01cc137b512f34af97f1adb40fc95043329beef2.json",
-      "batch_id": "test-only-refactor-wave2-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-surface-async-01cc137b512f34af97f1adb40fc95043329beef2.json",
       "recorded_at_utc": "2026-10-01T18:47:11Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "d5feeef45b8f5e3820187aa3b9a0b528032f2bf29de5b3a9ad256d10d7b5193f"
+      "patch_sha256": "d5feeef45b8f5e3820187aa3b9a0b528032f2bf29de5b3a9ad256d10d7b5193f",
+      "diff_sha256": "c65df77e1e6f10d7449ec0d3babf4291cc1924d9558893d63d132bf29c5e2161",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "c65df77e1e6f10d7449ec0d3babf4291cc1924d9558893d63d132bf29c5e2161",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all28 hunks of the complete icon spec migration. All60 static cases pair in exact suite/path/mode/occurrence order;40 callback semantics remain identical and20 fakeAsync wrappers become ordinary callbacks, removing ten tick calls. The main setup loses waitForAsync while its provider/injection operations remain the same. All60 predicate expressions and all other callback operations, including HTTP response flushes, request credential options, subscribers, SVG verification helpers, URL-prefix updates and fetch cancellation on replacement/destruction, are preserved in the complete source comparison. The three untrusted URL/HTML/resolver rejection cases retain their entire original raw bodies individually; unchanged source is explicitly not executed sanitization or security clearance. All11 fixture classes and the one setup hook are accounted for, with full noncase helper and template/style preservation. Decline this private test scheduling preference. Public MatIcon/MatIconRegistry remains reachable through legacy chip harness imports and actual Cyph module/template/SVG registration use. The add-on owns historical M2 icon Sass, not a MatIcon TypeScript fork; absence of an owned implementation is not an exclusion or inherited pass. Keep all1141 product members and2223 owned cases, consumer structure, peer minima and no-required-CSS/SCSS changes. Actual mixed peer, icon rendering/cancellation/security and supported-floor validation remain separate and unexecuted.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-surface-async-source-review.mjs",
+            "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+          },
+          {
+            "path": "tests/spec_surface_async_source_probe.mjs",
+            "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+            "sha256": "2ed9950eeba1d35a3c356a7356dd247797e0b2c4dcc2c5057970cd174d2ad185"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+            "sha256": "664fcf7edf5f10c1d847538b2669fee5ca77a930160fa42afd5002236a210dee"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+            "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-controls.json",
+            "sha256": "ca11d9db6fbb69fc880517eb6c8ca3a920ad1a2e769e919f201c4d7f771a4077"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+            "sha256": "5fe84575f5ced6c35f590f9a493f3c005fb9c3bd968749a9b299bd6742f3fb2e"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+            "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+            "sha256": "dfde6c6c08858f72f40e7260441eb7840d511a322a2fc196983028632c5ff54f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+            "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+            "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+            "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+            "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+            "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+            "sha256": "5ad5a3b1a9dcdeefd5804ff7a9fa4f22d39f732a14e126630430914c42a549ae"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+            "sha256": "6eb8124c3d5b81dc8df3ef265f1c46de2a3e513bb2096392b4399e1b2057e8d6"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+            "sha256": "42d8fc6ecb90375e3e12d4b1d2148575e037487cd09377800b0bd90d4dd68b9b"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+            "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+            "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false,
+        "security_clearance": "not-passed"
+      },
+      "source_check": "Authenticated all28 original hunks and the complete before/after program; paired60 static cases and all setup hooks. All predicates/nonboundary operations and fixture class/template/style bodies preserved; every changed boundary separately recorded without runtime/security admission.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "23914beeb3c369bcd6fe1ab72469e252a78b963b",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/button-toggle): switch tests away from fakeAsync (#33302)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=5418643a6f1bef711dea00cab3b003f485bcc73a44cd4a982aa7e11c8b3d841f, bytes=13931). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/button-toggle/button-toggle.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+      "read_note_disposition": "individual complete-original source conclusion; actual peer/product/security/floor and G11 gates remain separate",
       "files": [
         "src/material/button-toggle/button-toggle.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/23914beeb3c369bcd6fe1ab72469e252a78b963b.json",
-      "batch_id": "test-only-refactor-wave2-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-surface-async-23914beeb3c369bcd6fe1ab72469e252a78b963b.json",
       "recorded_at_utc": "2026-10-01T18:47:11Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "5418643a6f1bef711dea00cab3b003f485bcc73a44cd4a982aa7e11c8b3d841f"
+      "patch_sha256": "5418643a6f1bef711dea00cab3b003f485bcc73a44cd4a982aa7e11c8b3d841f",
+      "diff_sha256": "947106b40437fc973f85a76c9ac43e43c55805662ddcb3b09e05a4d31e73b463",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "947106b40437fc973f85a76c9ac43e43c55805662ddcb3b09e05a4d31e73b463",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Review all24 hunks of the complete button-toggle spec migration. All73 static cases pair in full order,60 callbacks retain complete semantics and13 fakeAsync wrappers become ordinary callbacks.18 tick calls and two flush calls disappear; all73 predicates and other operations remain identical. Four setup wrappers change: three fakeAsync wrappers become synchronous and a waitForAsync(async-arrow) keyboard-event initializer becomes a synchronous callback. All seven hooks and17 fixture classes/templates are accounted for without claiming equivalent creation, ngModel propagation, event ordering, roving tabindex or lifetime. Changed observations cover model-before-change ordering, selected-value preservation after list replacement, indirect descendants, initial tabindex, removal of a selected toggle, exclusive/multiple/standalone change events and repeated clicks. Decline the private test preference and preserve owned historical legacy/standard button-toggle Sass and actual public-peer interoperability. Cyph imports MatButtonToggleModule and renders standalone and multiple toggle groups. There is no owned legacy button-toggle TypeScript family; do not create an ordinary component fork or infer inheritance from its absence. No product/API/HTML/CSS/SCSS change is required. Actual forms, event/focus, packed/consumer and both-floor gates remain open.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-surface-async-source-review.mjs",
+            "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+          },
+          {
+            "path": "tests/spec_surface_async_source_probe.mjs",
+            "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+            "sha256": "2ed9950eeba1d35a3c356a7356dd247797e0b2c4dcc2c5057970cd174d2ad185"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+            "sha256": "664fcf7edf5f10c1d847538b2669fee5ca77a930160fa42afd5002236a210dee"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+            "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-controls.json",
+            "sha256": "ca11d9db6fbb69fc880517eb6c8ca3a920ad1a2e769e919f201c4d7f771a4077"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+            "sha256": "5fe84575f5ced6c35f590f9a493f3c005fb9c3bd968749a9b299bd6742f3fb2e"
+          },
+          {
+            "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+            "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+            "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+          },
+          {
+            "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+            "sha256": "dfde6c6c08858f72f40e7260441eb7840d511a322a2fc196983028632c5ff54f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/package.json",
+            "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+            "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+            "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+            "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+            "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+            "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+            "sha256": "5ad5a3b1a9dcdeefd5804ff7a9fa4f22d39f732a14e126630430914c42a549ae"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+            "sha256": "6eb8124c3d5b81dc8df3ef265f1c46de2a3e513bb2096392b4399e1b2057e8d6"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+            "sha256": "42d8fc6ecb90375e3e12d4b1d2148575e037487cd09377800b0bd90d4dd68b9b"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+            "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+            "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+          }
+        ],
+        "actual_Angular_native_artifact_or_floor_qualified": false,
+        "security_clearance": "not-passed"
+      },
+      "source_check": "Authenticated all24 original hunks and the complete before/after program; paired73 static cases and all setup hooks. All predicates/nonboundary operations and fixture class/template/style bodies preserved; every changed boundary separately recorded without runtime/security admission.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "72fb9d2d47d52a570a1d81c287244a52e53a5b93",
