@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "9cd1d30839a737c2fc929f32e20242f180bc3828",
+  "subject": "test: fix failing test",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "afc1f93512b671462ea4eb27cdf7280bea2bfd6c",
+      "after_blob": "9691374ed25c4e6273b5f0df3c694ea9cf1ad9f8"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 1,
+  "raw_commit_sha256": "8faa4bffee27ac1e79dbbbedff37380e96e0e05e81ef56ec7440086165d00437",
+  "original_sources": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts",
+      "before": {
+        "git_blob": "afc1f93512b671462ea4eb27cdf7280bea2bfd6c",
+        "sha256": "ec2505f97515101559fe6fb0fdd6e3c4e9acf77c0845d8d73634be90cddc9702",
+        "bytes": 6890
+      },
+      "after": {
+        "git_blob": "9691374ed25c4e6273b5f0df3c694ea9cf1ad9f8",
+        "sha256": "1c2b35468d540c63df856c276aab25bc0d04fb9cedf9cf5ab33081486335314a",
+        "bytes": 6911
+      }
+    }
+  ],
+  "diff": "diff --git a/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts b/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts\nindex afc1f93512b671462ea4eb27cdf7280bea2bfd6c..9691374ed25c4e6273b5f0df3c694ea9cf1ad9f8 100644\n--- a/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts\n+++ b/src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts\n@@ -142,12 +142,13 @@ describe('OverlayKeyboardDispatcher', () => {\n     spyOn(body, 'removeEventListener');\n \n     keyboardDispatcher.add(overlayRef);\n-    expect(body.addEventListener).toHaveBeenCalledWith('keydown', jasmine.any(Function), false);\n+    expect(body.addEventListener).toHaveBeenCalledWith('keydown', jasmine.any(Function), undefined);\n \n     overlayRef.dispose();\n     expect(document.body.removeEventListener).toHaveBeenCalledWith(\n       'keydown',\n       jasmine.any(Function),\n+      undefined,\n     );\n   });\n \n",
+  "diff_sha256": "6aafdf1fcb3ea8dc9dddb2411e1ee6530b22d6286593c99b2e7087b76f4026ce",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts",
+      "header": "@@ -142,12 +142,13 @@ describe('OverlayKeyboardDispatcher', () => {",
+      "sha256": "dac9728776741cad534039e1ba48be92897e6dc552cf9876142c527b081578dc",
+      "judgment": "Both exact spy argument edits are confined to the same listener registration/disposal test. The listener event name and function matchers remain; the expectations distinguish omitted, false and explicit undefined arguments. The complete remaining test file is exact. This patch provides no runtime dispatch, event-capture or teardown execution evidence for either supported peer."
+    }
+  ],
+  "semantics": {
+    "kind": "keyboard-listener-spy-argument-expectation-change",
+    "add_capture_argument": "false to undefined",
+    "remove_options_argument": "omitted to explicit undefined",
+    "changed_expectations": 2,
+    "production_listener_code_changed": false,
+    "before_cases": 10,
+    "after_cases": 10,
+    "before_assertions": 21,
+    "after_assertions": 21
+  },
+  "decision": "The complete original keyboard-dispatcher patch changes two private test spy expectations: addEventListener capture false becomes undefined, and removeEventListener gains explicit undefined options. It changes no dispatcher implementation or public API. Owned autocomplete/menu/dialog code reaches keyboard events through public CDK overlay APIs, so the dependency is reachable; it is not an absent-package exclusion. The owned package defines no OverlayKeyboardDispatcher fork or matching listener-spy spec. Keep its current public overlay subscriptions and real teardown/keyboard obligations. Do not copy an upstream private spy-arity expectation into product code or claim inherited listener behavior from this test-only patch.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "6aafdf1fcb3ea8dc9dddb2411e1ee6530b22d6286593c99b2e7087b76f4026ce",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "The complete original keyboard-dispatcher patch changes two private test spy expectations: addEventListener capture false becomes undefined, and removeEventListener gains explicit undefined options. It changes no dispatcher implementation or public API. Owned autocomplete/menu/dialog code reaches keyboard events through public CDK overlay APIs, so the dependency is reachable; it is not an absent-package exclusion. The owned package defines no OverlayKeyboardDispatcher fork or matching listener-spy spec. Keep its current public overlay subscriptions and real teardown/keyboard obligations. Do not copy an upstream private spy-arity expectation into product code or claim inherited listener behavior from this test-only patch.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-peer-test-source-review.mjs",
+        "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+      },
+      {
+        "path": "tests/spec_peer_test_source_probe.mjs",
+        "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+        "sha256": "fe7ac15c448d514aeadecc39e80171a64af0cf5a57751301eb20219ee474b906"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+        "sha256": "e47dc26507496c0028642778124eeffb29a9c769cdff3349c4937e0c88cb7226"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-controls.json",
+        "sha256": "f85e73b81a20ce30f8f5ed9776dad647e8330c3918738c70d0b047f1e0e66039"
+      },
+      {
+        "path": "compatibility/rc/spec-peer-test-source-review.json",
+        "sha256": "7bf9b6b46889bfa75c9d307f3d85e2640abb7177d0e27533c7ff8af210be26f9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+        "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+        "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+        "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+        "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "9cd1d30839a737c2fc929f32e20242f180bc3828",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test: fix failing test",
+    "files": [
+      "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-peer-test-source-review.mjs",
+      "sha256": "3e71112f2dc68f77880715fe5ceac2bd1bb134093a347e8632086155d95450d1"
+    },
+    {
+      "path": "tests/spec_peer_test_source_probe.mjs",
+      "sha256": "362179f5138e299c5c38a819ace034ac2155c94e0d581d1c20812e2c0b3441ce"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-subjects.json.gz",
+      "sha256": "fe7ac15c448d514aeadecc39e80171a64af0cf5a57751301eb20219ee474b906"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-acquisition.json.gz",
+      "sha256": "e47dc26507496c0028642778124eeffb29a9c769cdff3349c4937e0c88cb7226"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-controls.json",
+      "sha256": "f85e73b81a20ce30f8f5ed9776dad647e8330c3918738c70d0b047f1e0e66039"
+    },
+    {
+      "path": "compatibility/rc/spec-peer-test-source-review.json",
+      "sha256": "7bf9b6b46889bfa75c9d307f3d85e2640abb7177d0e27533c7ff8af210be26f9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+      "sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+      "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+      "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+      "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+    }
+  ],
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
