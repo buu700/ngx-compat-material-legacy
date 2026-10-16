@@ -16,7 +16,7 @@ import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export const HISTORICAL_REPLAY_INPUTS='compatibility/rc/historical-source-replay-inputs.json';
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'5592a0d88ea6385f82ca96e92a137c1f5d1883d4d0e9e5165ccf151046c88c88','21.x':'918bc1e9b5082d020cb155fc385bb3c08fc3642e353afa81031bcc0363308e16'};
+const pins={main:'5b78af5c75e2470e810e9b7e90e13d38e836d675913a04dc541cf04fca7fa992','21.x':'10b3b3787a332bc625aa190b342971ceb86ac70f47e009c4f395558af63d1f4d'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
  'native-individual-source','native-individual-admission','spec-fixture-context',
  'small-spec-source','followup-spec-source','peer-spec-source','control-case-context',
@@ -46,6 +46,7 @@ export function historicalReplayInputs({root=rootDefault,readMember}={}){
  assert.deepEqual(data.mutable_progress_paths,['compatibility/rc/remaining-native-admission-worksheet.json','compatibility/rc/session-handoff.json']);
  assert.deepEqual(data.current_head_tooling_paths,toolingPaths);
  for(const entry of data.entries)assert.equal(entry.report_option,['tab-lifecycle-source','native-individual-source','native-individual-admission','spec-fixture-context','small-spec-source','followup-spec-source','peer-spec-source','control-case-context','control-test-source','render-setup-source','theme-date-source','test-environment-zone-source','standalone-environment-source','stability-chip-method','stability-chip-context'].includes(entry.id)?'--out':undefined,'historical report invocation changed');
+ for(const entry of data.entries)assert.equal(entry.report_source,entry.id==='wide-fixture-adapter-context'?'stdout-json':undefined,'historical report channel changed');
  assert.equal(data.wrapper_edits.length,19);assert.equal(new Set(data.wrapper_edits.map(row=>row.path)).size,19);
  assert.match(data.wrapper_reference_commit,/^[0-9a-f]{40}$/);for(const wrapper of data.wrapper_edits)if(wrapper.reference_commit!==undefined)assert.match(wrapper.reference_commit,/^[0-9a-f]{40}$/);
  assert.equal(data.original_js_programs_and_assertions_unchanged,true);assert.equal(data.new_sha_or_authored_use_closures,0);
@@ -145,7 +146,16 @@ export async function runHistoricalSourceProbe({root=rootDefault,id,reportPath}=
   const timer=setTimeout(()=>{timedOut=true;child.kill('SIGTERM');},entry.timeout_ms);
   let finished;try{finished=await completion(child);}finally{clearTimeout(timer);}
   const postStatus=git(checkout,['status','--porcelain','--untracked-files=all']).toString();
-  const original=existsSync(diagnostic)?JSON.parse(readFileSync(diagnostic)):null;
+  // One fixed original program reports JSON on stdout. Preserve that program's
+  // complete assertions/interface; the prior twenty retain their file reports.
+  let original;
+  if(entry.report_source==='stdout-json'){
+   assert.equal(entry.id,'wide-fixture-adapter-context');assert.equal(existsSync(diagnostic),false,'unexpected adapter report file');
+   original=JSON.parse(stdout);assert.equal(original.schema_version,1);
+   assert.equal(original.qualified_entries,13);assert.equal(original.unrelated_rows_preserved,1684);
+   assert.equal(original.scope_rejection_controls,7);assert.equal(original.native_rejection_controls,15);
+   assert.equal(original.all1697_verdicts_unchanged,true);assert.equal(original.actual_Angular_native_artifact_or_floor_qualified,false);
+  }else original=existsSync(diagnostic)?JSON.parse(readFileSync(diagnostic)):null;
   if(original){assert.equal(original.line,data.line,'historical report line changed');assert.notEqual(original.g11_claim,'passed');for(const flag of ['actual_native_packed_or_floor_qualified','native_or_packed_qualified','packed_or_native_qualified'])assert.notEqual(original[flag],true,'historical probe claimed runtime qualification');}
   // Recheck the caller graph after the original program runs. It was never replaced.
   const after=verifyHistoricalCurrentSubjects({root,data,members:currentMembers});assert.deepEqual(after,guard);
