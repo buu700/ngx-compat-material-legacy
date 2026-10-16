@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+  "status": "reviewed",
+  "final_disposition": "already-present",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent complete audit remains separate",
+  "recorded_at_utc": "2026-10-16T02:41:33.464421+00:00",
+  "patch_file": "compatibility/rc/resource-style-upstream-patches/5dd614aa100e28f0815fdd83e5b68f4239ef01f9.patch",
+  "diff_sha256": "ee5e90a8d85ee282ae185775732e8e6a56e907bb60cda7c9fe36923d406006bf",
+  "full_original_patch_verified_against_cached_Git_object": true,
+  "original_files": 2,
+  "original_hunks": 2,
+  "hunk_reviews": [
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -327,6 +327,19 @@ describe('MDC-based MatTabNavBar', () => {",
+      "hunk_sha256": "35169c888012491e8671e744ed7f8f4481169e58fa078e2d0b08dd54671c4823",
+      "judgment": "Regression assertion or enabled-motion TestBed setup reviewed in full. The current finite native requirements use the real owned legacy component and legacy classes while retaining the upstream behavior assertion. Actual artifact execution remains mandatory."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.ts",
+      "header": "@@ -384,10 +384,12 @@ export class MatTabLink",
+      "hunk_sha256": "0998ffb999a95c1132a51407d971124e90ce7ae1fc285336620f322029f25aaa",
+      "judgment": "The complete two-file patch adds Enter to tab-panel link activation. Untouched16.2.14 already has that route. The current owned whole handler preserves enabled Enter click without preventing its default, disabled Enter prevention without activation, and native links without a tab panel. Its public legacy host dispatches keydown to this handler. The preexisting extra Space prevention is explicitly retained as a separate adaptation and is not accepted or concealed by this Enter judgment. No product or consumer HTML/CSS/SCSS change is required. The exact enabled, disabled and no-panel native cases remain mandatory."
+    }
+  ],
+  "decision": "The complete two-file patch adds Enter to tab-panel link activation. Untouched16.2.14 already has that route. The current owned whole handler preserves enabled Enter click without preventing its default, disabled Enter prevention without activation, and native links without a tab panel. Its public legacy host dispatches keydown to this handler. The preexisting extra Space prevention is explicitly retained as a separate adaptation and is not accepted or concealed by this Enter judgment. No product or consumer HTML/CSS/SCSS change is required. The exact enabled, disabled and no-panel native cases remain mandatory.",
+  "required_behavior": "Enter activates an enabled link associated with a panel without cancelling native navigation; disabled links prevent activation, and links without a panel retain native Enter handling.",
+  "required_native_cases": [
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#21",
+      "historical_path": "src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "full_name": "MatTabNavBar > should activate a tab-panel link on enter without preventing navigation"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#22",
+      "historical_path": "src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "full_name": "MatTabNavBar > should prevent enter on disabled tab-panel links without activating them"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#33",
+      "historical_path": "src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "full_name": "MatTabNavBar > without panel > should leave native enter navigation alone without a tab panel"
+    }
+  ],
+  "individual_proof": {
+    "proof_kind": "historical-required-individual-behavior",
+    "review_depth": "individual-compatibility",
+    "diff_sha256": "ee5e90a8d85ee282ae185775732e8e6a56e907bb60cda7c9fe36923d406006bf",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete two-file patch adds Enter to tab-panel link activation. Untouched16.2.14 already has that route. The current owned whole handler preserves enabled Enter click without preventing its default, disabled Enter prevention without activation, and native links without a tab panel. Its public legacy host dispatches keydown to this handler. The preexisting extra Space prevention is explicitly retained as a separate adaptation and is not accepted or concealed by this Enter judgment. No product or consumer HTML/CSS/SCSS change is required. The exact enabled, disabled and no-panel native cases remain mandatory.",
+    "historical_behavior": {
+      "kind": "tab-link-enter-activation",
+      "case_ids": [
+        "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#21",
+        "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#22",
+        "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#33"
+      ],
+      "source_members": [
+        {
+          "path": "scripts/rc-test-legacy-family.mjs",
+          "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+        },
+        {
+          "path": "scripts/historical-case-roster.mjs",
+          "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+        },
+        {
+          "path": "scripts/resolve-run-library.mjs",
+          "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+        },
+        {
+          "path": "scripts/rc-verify.py",
+          "sha256": "21c2e1ffae02d9c10e261512a588b86febaa134fc60ed41e54ce4aee2989098c"
+        },
+        {
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "sha256": "99124b018a39412a64fe083bf59c46b1a08cdf920aeb381a9a3a7bb63c1a90ba"
+        },
+        {
+          "path": "scripts/upstream-historical-behavior-evidence.mjs",
+          "sha256": "862a712b0d0bdbe0869889cb87f80ce71d2ac18a26cf936db09c0a6c72c97b6b"
+        },
+        {
+          "path": "testing/legacy-runner/build.mjs",
+          "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+        },
+        {
+          "path": "testing/legacy-runner/adapt-spec.mjs",
+          "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+        },
+        {
+          "path": "testing/legacy-runner/entry.ts",
+          "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+        },
+        {
+          "path": "testing/legacy-runner/init-test-env.ts",
+          "sha256": "0eed39e86075f38a2f0e3c65bc0db1ec58da7b3d3e565ca87e1750071522913b"
+        },
+        {
+          "path": "testing/legacy-runner/karma.conf.cjs",
+          "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+        },
+        {
+          "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+        },
+        {
+          "path": "testing/legacy-runner/historical-inventory.json",
+          "sha256": "0d1d0fd2757060ea9f4b6fbe77f08aa732ca562cc91330b65c0085dbb6d00ed6"
+        },
+        {
+          "path": "testing/legacy-runner/historical-specs.json",
+          "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+        },
+        {
+          "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "sha256": "dd193a5f4cdef0ee0be3c993474efa482229854d33b4853c6d5dd519d21a6fd0"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "sha256": "89e91390739e518a2a3e9dbdd8d75ff09dfcaa94bfe4bccc73d86f1e577c206c"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+          "sha256": "d4dd6b6b180ce5f7783c63b18f4db609fca76b9e48677b510b034f277ac53eff"
+        }
+      ]
+    }
+  },
+  "independent_evidence": [
+    {
+      "path": "compatibility/rc/reopened-native-behavior-inputs.json",
+      "sha256": "3d5250e048e374fb62c6b44c5f49fb2110d1187d8930c5c08781ccca18a727b6"
+    },
+    {
+      "path": "compatibility/rc/reopened-native-behavior-diagnostics.json.gz",
+      "sha256": "a65486352901a9bcfd6e85bd1b01743d2a4405270a12cfa0255380b3d5d1e5ed",
+      "compression": "gzip",
+      "uncompressed_sha256": "e1c87768ffee5fb40a847c783f1e6ab05cd1961cb88d146dfad34006e11300e8"
+    },
+    {
+      "path": "compatibility/rc/historical-behavior-admission-final-controls.json",
+      "sha256": "a798c66b3f9e1c1d318d77bc58d4de2fe0e5b03eeedd47862e8defa84bb42e63"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-stale-source-proof-5dd614aa100e28f0815fdd83e5b68f4239ef01f9.json",
+      "sha256": "872cf927198c90a7c4e080c10f646a74acf4917e882bcfa6bb1391e1b4fd7c85"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-reopened-tab_link-source-review.json",
+      "sha256": "ec221fbbe19665fc0efc70996172840637871bc7d23c8eb82d50cdbbc2f568c2"
+    },
+    {
+      "path": "compatibility/rc/progress-csp-coordinator-checkpoint.json",
+      "sha256": "0f0fb2f22b61936101808d0d8d5c647bf76ea4f1bf7eaaaf6b396e731afd8b50"
+    },
+    {
+      "path": "compatibility/rc/progress-csp-coordinator-source-proof.json",
+      "sha256": "bcfcc468ccd6ae1dbb242fb94c141a6c78cbe0e1177fc79912c75cf05e896a89"
+    },
+    {
+      "path": "compatibility/rc/progress-csp-style-guard-proof.json",
+      "sha256": "549e34d06050fbc7784c6893bcf8b9da8747328e8b0971df6bfc123293e06099"
+    },
+    {
+      "path": "compatibility/rc/progress-public-color-slot-source-proof.json",
+      "sha256": "fe50b448751525b5009636e3310d80cf0e5c89ca08010479a69a9ce0efe7f1d5"
+    },
+    {
+      "path": "scripts/upstream-progress-csp-evidence.mjs",
+      "sha256": "e48cb0dcebcf7440d1026b7eced2fe52ba3939b5af1ff7698e376da05fffb67d"
+    },
+    {
+      "path": "scripts/progress-csp-style-contract.mjs",
+      "sha256": "e4dbf8db4853f18a328c4146983a2619e5ae71e2178bd726909148b98c7cb321"
+    },
+    {
+      "path": "scripts/browser-matrix-roster.mjs",
+      "sha256": "370350b69325c8b9a54c6c5cffa2c62c7e4b616096598d78a5c87345116b0c8c"
+    },
+    {
+      "path": "tests/upstream/progress-csp-source-context.mjs",
+      "sha256": "29d7911fa86081780de4fdccaf1f8b6f6001f333671271a41a6d892491194c52"
+    },
+    {
+      "path": "compatibility/rc/progress-csp-admission-source-proof.json",
+      "sha256": "b81ab6e01303f3dd99e814384d15760c2d11a490fc7446dd70cedd9552c1996f"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-tab-link-enter-native-source-judgment.json",
+      "sha256": "4b02ca3cd2cc94617579ea2271ce952be0be613de9bf8f275103c88aa903eb83"
+    }
+  ],
+  "source_conclusion_only": true,
+  "actual_native_or_packed_or_floor_qualified": false,
+  "semantic_pass": false,
+  "runtime_admission": "Required by the registered historical-required-individual-behavior guard. Complete current packed-consumer and2225-case historical artifact results must share the current clean coordinator run; missing runtime never admits this source conclusion. Consumer/runtime/compiler/RxJS floors and independent audit remain separate gates.",
+  "separate_keyboard_adaptation": [
+    "enabled-panel/space",
+    "enabled-panel/space-alt"
+  ],
+  "cyph_sanity_check": {
+    "source_commit": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "full_build_executed": false,
+    "inspected_members": [
+      {
+        "path": "shared/js/cyph/components/search-bar/search-bar.component.html",
+        "sha256": "f733c8a7b4864e9054adae72f467f0511055eac4b55d40b667c610a347201e4c"
+      },
+      {
+        "path": "shared/js/cyph/components/account-menu/account-menu.component.html",
+        "sha256": "a97ccd98fe1679bd8d237485d8e86d2315979de875661ad63682ccdaa79ed595"
+      },
+      {
+        "path": "shared/js/cyph/components/account-menu/account-menu.component.scss",
+        "sha256": "dd3ba40e9fb8bcada3d57381894dfe520dc29e9b4d6ea3ec31d4768b892c4762"
+      },
+      {
+        "path": "shared/js/cyph/components/dynamic-form/dynamic-form.component.html",
+        "sha256": "78d27ff78c2d622ed2cb0cf09fefca1f3ee9e1192b4e234a7067bc6ed7569df3"
+      },
+      {
+        "path": "shared/js/cyph/components/email-compose/email-compose.component.scss",
+        "sha256": "0f4f63c2ec19ea8c317930411a3ba39d63e95efb34fde4b8d1397f943e02cea2"
+      }
+    ],
+    "finding": "Search-bar autocomplete uses the default selection mode and its existing FormControl/optionSelected route. Account menu/dynamic form use legacy select, and consumer styles select .mat-select-value-text, .mat-select-arrow and .mat-select-panel. This packet changes no product, template or resource bytes and requires no consumer HTML/CSS/SCSS changes. No full consumer build or browser claim."
+  },
+  "prior_entry": {
+    "sha": "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/tabs): nav bar not navigating on enter presses (#27862)",
+    "final_disposition": "needs-individual-review",
+    "reason": "Fresh individual source and targeted behavior review recorded at compatibility/f10/disposition-ledger/evidence/closeout-reopened-tab_link-source-review.json. Keep pending until current native/floor and independent admission; preserve stale original proof and its finding.",
+    "read_note_disposition": "prior-source-proof-stale-reopened",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-stale-source-proof-5dd614aa100e28f0815fdd83e5b68f4239ef01f9.json",
+    "source_check": "legacy-tabs/internal/tab-nav-bar-base.ts ENTER|SPACE handler",
+    "files": [
+      "src/material/tabs/tab-nav-bar/tab-nav-bar.ts",
+      "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts"
+    ],
+    "batch_id": "security-already-present-2026-10-01-b",
+    "recorded_at_utc": "2026-10-09T16:45:16.150774+00:00",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "source_review_followup": "compatibility/f10/disposition-ledger/evidence/closeout-reopened-tab_link-source-review.json"
+  },
+  "g11_claim": "not-passed",
+  "progress_csp_context_requalification": {
+    "source_parent": "e89d9e0cd8877036e368e431cc4ac3cc712963fa",
+    "prior_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-tab-link-enter-native-source-judgment.json",
+      "sha256": "4b02ca3cd2cc94617579ea2271ce952be0be613de9bf8f275103c88aa903eb83"
+    },
+    "complete_old_checker_coordinator_and_historical_assertions_recovered": true,
+    "source_context_conclusion": "The root checker additions dispatch and enforce a pure finite registry for the two different progress SHAs even if their metadata is relabeled, parse its captured browser outcome and preserve every original historical/packed guard in place. The only coordinator addition captures the earlier browser-matrix invocation/exit without altering packed or historical capture. Complete preceding files are recovered byte for byte after removing those exact additions. All old historical assertions and pins remain after finite context reversal. The retained source comparison additionally recovers the exact earlier three-scope guard from its already authenticated six-scope change capsule, preserving the original expected hash. The three original patch/hunk decisions, named historical requirements and every prior receipt remain unchanged. No runtime or floor credit follows.",
+    "added_dependencies": [
+      {
+        "path": "scripts/upstream-progress-csp-evidence.mjs",
+        "sha256": "e48cb0dcebcf7440d1026b7eced2fe52ba3939b5af1ff7698e376da05fffb67d"
+      },
+      {
+        "path": "scripts/progress-csp-style-contract.mjs",
+        "sha256": "e4dbf8db4853f18a328c4146983a2619e5ae71e2178bd726909148b98c7cb321"
+      },
+      {
+        "path": "scripts/browser-matrix-roster.mjs",
+        "sha256": "370350b69325c8b9a54c6c5cffa2c62c7e4b616096598d78a5c87345116b0c8c"
+      },
+      {
+        "path": "tests/upstream/progress-csp-source-context.mjs",
+        "sha256": "29d7911fa86081780de4fdccaf1f8b6f6001f333671271a41a6d892491194c52"
+      }
+    ],
+    "actual_runtime_qualified": false
+  }
+}
