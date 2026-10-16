@@ -25,17 +25,96 @@ export function isRunnerControl(fullName) {
   return CONTROL_PREFIXES.some(prefix => fullName === prefix || fullName.startsWith(`${prefix} > `) || fullName.startsWith(`${prefix} `));
 }
 
-function staticString(node) {
-  if (!node) return null;
+const UNKNOWN = Symbol('unresolved registration value');
+
+function staticValue(node, values = new Map()) {
+  if (!node) return UNKNOWN;
   if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) return node.text;
-  if (ts.isParenthesizedExpression(node)) return staticString(node.expression);
-  if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.PlusToken) {
-    const left = staticString(node.left);
-    const right = staticString(node.right);
-    if (left == null || right == null) return null;
-    return left + right;
+  if (ts.isNumericLiteral(node)) return Number(node.text);
+  if (node.kind === ts.SyntaxKind.TrueKeyword) return true;
+  if (node.kind === ts.SyntaxKind.FalseKeyword) return false;
+  if (node.kind === ts.SyntaxKind.NullKeyword) return null;
+  // Only immutable scalar bindings are reused. Literal array expressions are
+  // finite, but an array identifier may have been mutated or escaped.
+  if (ts.isIdentifier(node)) {
+    const value = values.has(node.text) ? values.get(node.text) : UNKNOWN;
+    return Array.isArray(value) ? UNKNOWN : value;
   }
-  return null;
+  if (ts.isParenthesizedExpression(node) || ts.isAsExpression(node) || ts.isTypeAssertionExpression(node)) return staticValue(node.expression, values);
+  if (ts.isArrayLiteralExpression(node)) {
+    if (node.elements.some(ts.isSpreadElement)) return UNKNOWN;
+    // Literal array length/order remain known when a test-body-only value
+    // (such as a host factory) is opaque. Using that value in a title still fails.
+    const items = node.elements.map(item => staticValue(item, values));
+    if (items.some((value, index) => value === UNKNOWN &&
+        !ts.isArrowFunction(node.elements[index]) && !ts.isFunctionExpression(node.elements[index]) &&
+        !ts.isIdentifier(node.elements[index]))) return UNKNOWN;
+    return items;
+  }
+  if (ts.isTemplateExpression(node)) {
+    let text = node.head.text;
+    for (const span of node.templateSpans) {
+      const value = staticValue(span.expression, values);
+      if (value === UNKNOWN || Array.isArray(value)) return UNKNOWN;
+      text += String(value) + span.literal.text;
+    }
+    return text;
+  }
+  if (ts.isPrefixUnaryExpression(node) && node.operator === ts.SyntaxKind.ExclamationToken) {
+    const value = staticValue(node.operand, values);
+    return value === UNKNOWN ? UNKNOWN : !value;
+  }
+  if (ts.isBinaryExpression(node)) {
+    const left = staticValue(node.left, values);
+    if (left !== UNKNOWN && node.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken && !left) return left;
+    if (left !== UNKNOWN && node.operatorToken.kind === ts.SyntaxKind.BarBarToken && left) return left;
+    const right = staticValue(node.right, values);
+    if (left === UNKNOWN || right === UNKNOWN || Array.isArray(left) || Array.isArray(right)) return UNKNOWN;
+    if (node.operatorToken.kind === ts.SyntaxKind.PlusToken) return left + right;
+    if (node.operatorToken.kind === ts.SyntaxKind.EqualsEqualsEqualsToken) return left === right;
+    if (node.operatorToken.kind === ts.SyntaxKind.ExclamationEqualsEqualsToken) return left !== right;
+    if (node.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) return left && right;
+    if (node.operatorToken.kind === ts.SyntaxKind.BarBarToken) return left || right;
+  }
+  if (ts.isConditionalExpression(node)) {
+    const condition = staticValue(node.condition, values);
+    return condition === UNKNOWN ? UNKNOWN : staticValue(condition ? node.whenTrue : node.whenFalse, values);
+  }
+  return UNKNOWN;
+}
+
+function bindPattern(pattern, value, values) {
+  if (ts.isIdentifier(pattern)) {values.set(pattern.text, value); return true;}
+  if (!ts.isArrayBindingPattern(pattern) || !Array.isArray(value)) return false;
+  return pattern.elements.every((element, index) => {
+    if (ts.isOmittedExpression(element)) return true;
+    if (element.dotDotDotToken) return false;
+    let item = index < value.length ? value[index] : undefined;
+    if (item === undefined && element.initializer) item = staticValue(element.initializer, values);
+    return bindPattern(element.name, item, values);
+  });
+}
+
+function staticString(node, scope) {
+  const value = staticValue(node, scope.values);
+  return typeof value === 'string' ? value : null;
+}
+
+function containsRegistration(node, scope, cache, seen = new Set()) {
+  let found = false;
+  const visit = item => {
+    if (ts.isCallExpression(item) && ['describe', 'fdescribe', 'xdescribe', 'it', 'fit', 'xit', 'test'].includes(jasmineKind(item.expression))) found = true;
+    if (!found && ts.isCallExpression(item) && scope) {
+      const target = resolveCall(item.expression, scope, cache);
+      if (target && !seen.has(target.fn)) {
+        seen.add(target.fn);
+        found = containsRegistration(target.fn.body, target.scope, cache, seen);
+      }
+    }
+    if (!found) ts.forEachChild(item, visit);
+  };
+  visit(node);
+  return found;
 }
 
 function jasmineKind(expr) {
@@ -112,8 +191,12 @@ function walkBlock(node, suite, scope, cases, cache, stack, sharedPath) {
       functions.set(statement.name.text, statement);
     }
   }
-  const localScope = {...scope, functions};
+  const localScope = {...scope, functions, values: new Map(scope.values)};
   for (const statement of node.statements) {
+    if (ts.isVariableStatement(statement)) for (const declaration of statement.declarationList.declarations) {
+      if (ts.isIdentifier(declaration.name)) localScope.values.set(declaration.name.text,
+        statement.declarationList.flags & ts.NodeFlags.Const ? staticValue(declaration.initializer, localScope.values) : UNKNOWN);
+    }
     walkNode(statement, suite, localScope, cases, cache, stack, sharedPath);
   }
 }
@@ -123,10 +206,40 @@ function walkNode(node, suite, scope, cases, cache, stack, sharedPath) {
     walkBlock(node, suite, scope, cases, cache, stack, sharedPath);
     return;
   }
+  if (ts.isForOfStatement(node)) {
+    const items = staticValue(node.expression, scope.values);
+    const declarations = ts.isVariableDeclarationList(node.initializer) ? node.initializer.declarations : [];
+    if (!Array.isArray(items) || node.awaitModifier || declarations.length !== 1 || !(node.initializer.flags & ts.NodeFlags.Const)) {
+      if (containsRegistration(node.statement, scope, cache)) throw new Error(`non-static registration loop in ${path.relative(root, scope.abs)}`);
+      return;
+    }
+    if (items.length > 256) throw new Error('registration loop exceeds the finite discovery bound');
+    for (const item of items) {
+      const values = new Map(scope.values);
+      if (!bindPattern(declarations[0].name, item, values)) throw new Error(`non-static registration binding in ${path.relative(root, scope.abs)}`);
+      walkNode(node.statement, suite, {...scope, values}, cases, cache, stack, sharedPath);
+    }
+    return;
+  }
+  if (ts.isIfStatement(node)) {
+    const condition = staticValue(node.expression, scope.values);
+    if (condition === UNKNOWN) {
+      if (containsRegistration(node.thenStatement, scope, cache) || node.elseStatement && containsRegistration(node.elseStatement, scope, cache)) {
+        throw new Error(`non-static registration condition in ${path.relative(root, scope.abs)}`);
+      }
+      return;
+    }
+    const branch = condition ? node.thenStatement : node.elseStatement;
+    if (branch) walkNode(branch, suite, scope, cases, cache, stack, sharedPath);
+    return;
+  }
+  if ((ts.isForStatement(node) || ts.isWhileStatement(node) || ts.isDoStatement(node)) && containsRegistration(node.statement, scope, cache)) {
+    throw new Error(`unsupported registration loop in ${path.relative(root, scope.abs)}`);
+  }
   if (ts.isCallExpression(node)) {
     const kind = jasmineKind(node.expression);
     if (kind === 'describe' || kind === 'fdescribe' || kind === 'xdescribe') {
-      const title = staticString(node.arguments[0]);
+      const title = staticString(node.arguments[0], scope);
       const callback = node.arguments[1];
       if (title == null || !callback) {
         throw new Error(`non-static describe in ${path.relative(root, scope.abs)}`);
@@ -135,8 +248,9 @@ function walkNode(node, suite, scope, cases, cache, stack, sharedPath) {
       return;
     }
     if (kind === 'it' || kind === 'fit' || kind === 'xit' || kind === 'test') {
-      const title = staticString(node.arguments[0]);
+      const title = staticString(node.arguments[0], scope);
       if (title == null) throw new Error(`non-static it in ${path.relative(root, scope.abs)}`);
+      if (cases.length >= 50000) throw new Error('registration case discovery exceeds its finite bound');
       cases.push({
         suite: [...suite],
         description: title,
@@ -151,6 +265,9 @@ function walkNode(node, suite, scope, cases, cache, stack, sharedPath) {
         walkFunctionBody(target.fn, suite, target.scope, cases, cache, [...stack, key], target.shared || sharedPath);
       }
       return;
+    }
+    if (node.arguments.some(argument => (ts.isArrowFunction(argument) || ts.isFunctionExpression(argument)) && containsRegistration(argument.body, scope, cache))) {
+      throw new Error(`unsupported registration callback in ${path.relative(root, scope.abs)}`);
     }
   }
   if (

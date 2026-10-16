@@ -171,8 +171,10 @@ function coordinatorRequest() {
 }
 
 function writeAcceptance(request, derived, results, library) {
-  if (request.line !== '21.x') {
-    console.error('historical-legacy-artifact: finite roster is derived for 21.x only');
+  const version = JSON.parse(fs.readFileSync(path.join(root, 'projects/ngx-material-legacy/package.json'), 'utf8')).version;
+  const sourceLine = version.startsWith('22.') ? 'main' : version.startsWith('21.') ? '21.x' : null;
+  if (!sourceLine || request.line !== sourceLine) {
+    console.error('historical-legacy-artifact: acceptance requires the actual checkout source line');
     return false;
   }
   const executed = Array.isArray(results.specs) ? results.specs : [];
