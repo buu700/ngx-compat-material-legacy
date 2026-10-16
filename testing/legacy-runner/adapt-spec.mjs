@@ -1,9 +1,16 @@
 /**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
  * Build-time adapter for historical Material 16 legacy specs.
  *
  * Rewrites legacy package imports onto the packed @ngx-compat entry points,
  * points private CDK test helpers and unpublished harness shared specs at the
- * local shims, and marks spec hosts standalone:false with Default change
+ * local shims, and marks spec hosts standalone:false with Eager change
  * detection. Angular 22 treats a missing strategy as OnPush and a missing
  * standalone flag as standalone, which skips later detectChanges() and rejects
  * TestBed declarations.
@@ -205,7 +212,7 @@ function decoratorInjection(node, sourceFile) {
   let text = '';
   if (!has('standalone')) text += 'standalone: false,';
   if (kind === 'Component' && !has('changeDetection')) {
-    text += 'changeDetection: ChangeDetectionStrategy.Default,';
+    text += 'changeDetection: ChangeDetectionStrategy.Eager,';
   }
   if (!text) return null;
   const start = arg.getStart(sourceFile) + 1;
@@ -217,6 +224,15 @@ export function adaptSpec(source, filename, options = {}) {
   const sourceFile = ts.createSourceFile(filename, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
   const replacements = [];
   let needsChangeDetection = false;
+  const coreBindings = exported => new Set(sourceFile.statements.flatMap(statement => {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) ||
+        statement.moduleSpecifier.text !== '@angular/core' ||
+        !statement.importClause?.namedBindings || !ts.isNamedImports(statement.importClause.namedBindings)) return [];
+    return statement.importClause.namedBindings.elements.filter(item =>
+      (item.propertyName || item.name).text === exported).map(item => item.name.text);
+  }));
+  const strategyBindings = coreBindings('ChangeDetectionStrategy');
+  const componentBindings = coreBindings('Component');
 
   for (const statement of sourceFile.statements) {
     if (
@@ -234,6 +250,16 @@ export function adaptSpec(source, filename, options = {}) {
   }
 
   function visit(node) {
+    if (ts.isPropertyAccessExpression(node) && ts.isIdentifier(node.expression) &&
+        strategyBindings.has(node.expression.text) && node.name.text === 'Default') {
+      const property = node.parent, metadata = property?.parent, call = metadata?.parent;
+      if (ts.isPropertyAssignment(property) && property.name.getText(sourceFile) === 'changeDetection' &&
+          ts.isObjectLiteralExpression(metadata) && ts.isCallExpression(call) &&
+          ts.isIdentifier(call.expression) && componentBindings.has(call.expression.text) &&
+          call.arguments[0] === metadata && ts.isDecorator(call.parent)) {
+        replacements.push({start: node.name.getStart(sourceFile), end: node.name.end, text: 'Eager'});
+      }
+    }
     const injection = decoratorInjection(node, sourceFile);
     if (injection) {
       replacements.push(injection);

@@ -1,0 +1,473 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "df7104f86f19bf34846e9081be232489ca4f120d",
+  "subject": "test(material/autocomplete): typos and unresolved variables in tests (#29532)",
+  "status": "reviewed",
+  "final_disposition": "adapt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "ef8b4f4b56c7938540c4fcd4e3fd758badbc34e1",
+      "after_blob": "0f5369e45c07b73c190c98a33c6b1e1a7cf01641"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 8,
+  "raw_commit_sha256": "c61a2ce574d30c909ace9acbdce2d082dc278dfda1aec7dda82e743ea9a9adbb",
+  "original_sources": [
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "before": {
+        "git_blob": "ef8b4f4b56c7938540c4fcd4e3fd758badbc34e1",
+        "sha256": "7c9154efdbe64f15b62d6f8158106db45f1b75297fef3ecc3934e15bfd34e2a8",
+        "bytes": 161407
+      },
+      "after": {
+        "git_blob": "0f5369e45c07b73c190c98a33c6b1e1a7cf01641",
+        "sha256": "1e9f479f8a4f0054235d68d886257f13a4e6ce2a031a4ea0444081b04c6a067b",
+        "bytes": 161409
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts\nindex ef8b4f4b56c7938540c4fcd4e3fd758badbc34e1..0f5369e45c07b73c190c98a33c6b1e1a7cf01641 100644\n--- a/src/material/autocomplete/autocomplete.spec.ts\n+++ b/src/material/autocomplete/autocomplete.spec.ts\n@@ -173,7 +173,7 @@ describe('MDC-based MatAutocomplete', () => {\n         .toEqual('');\n     }));\n \n-    it('should close the panel when the user clicks away via auxilliary button', waitForAsync(async () => {\n+    it('should close the panel when the user clicks away via auxiliary button', waitForAsync(async () => {\n       dispatchFakeEvent(input, 'focusin');\n       fixture.detectChanges();\n       await new Promise(r => setTimeout(r));\n@@ -1607,7 +1607,7 @@ describe('MDC-based MatAutocomplete', () => {\n         fixture.detectChanges();\n \n         expect(event.defaultPrevented)\n-          .withContext(`Expected autocompete not to block ${name} key`)\n+          .withContext(`Expected autocomplete not to block ${name} key`)\n           .toBe(false);\n       });\n     });\n@@ -3438,7 +3438,7 @@ describe('MDC-based MatAutocomplete', () => {\n     widthFixture.detectChanges();\n \n     const overlayPane = overlayContainerElement.querySelector('.cdk-overlay-pane') as HTMLElement;\n-    // Firefox, edge return a decimal value for width, so we need to parse and round it to verify\n+    // Firefox, Edge return a decimal value for width, so we need to parse and round it to verify\n     expect(Math.ceil(parseFloat(overlayPane.style.width as string))).toBe(300);\n \n     widthFixture.componentInstance.trigger.closePanel();\n@@ -3451,7 +3451,7 @@ describe('MDC-based MatAutocomplete', () => {\n     widthFixture.componentInstance.trigger.openPanel();\n     widthFixture.detectChanges();\n \n-    // Firefox, edge return a decimal value for width, so we need to parse and round it to verify\n+    // Firefox, Edge return a decimal value for width, so we need to parse and round it to verify\n     expect(Math.ceil(parseFloat(overlayPane.style.width as string))).toBe(500);\n   });\n \n@@ -3848,7 +3848,7 @@ describe('MDC-based MatAutocomplete', () => {\n       dispatchFakeEvent(document.querySelector('mat-option')!, 'click');\n       fixture.detectChanges();\n \n-      const selectedOption = document.querySelector('mat-option[aria-selected=\"true\"');\n+      const selectedOption = document.querySelector('mat-option[aria-selected=\"true\"]');\n       expect(selectedOption).withContext('Expected an option to be selected.').not.toBeNull();\n       expect(selectedOption?.querySelector('.mat-pseudo-checkbox.mat-pseudo-checkbox-minimal'))\n         .withContext(\n@@ -3874,7 +3874,7 @@ describe('MDC-based MatAutocomplete', () => {\n       dispatchFakeEvent(document.querySelector('mat-option')!, 'click');\n       fixture.detectChanges();\n \n-      const selectedOption = document.querySelector('mat-option[aria-selected=\"true\"');\n+      const selectedOption = document.querySelector('mat-option[aria-selected=\"true\"]');\n       expect(selectedOption).withContext('Expected an option to be selected.').not.toBeNull();\n       expect(document.querySelectorAll('.mat-pseudo-checkbox').length).toBe(0);\n     });\n@@ -4210,7 +4210,7 @@ class AutocompleteWithoutPanel {\n \n     <mat-autocomplete #auto=\"matAutocomplete\">\n       @for (group of stateGroups; track group) {\n-        <mat-optgroup [label]=\"group.label\">\n+        <mat-optgroup [label]=\"group.title\">\n           @for (state of group.states; track state) {\n             <mat-option [value]=\"state\">\n               <span>{{ state }}</span>\n@@ -4249,7 +4249,7 @@ class AutocompleteWithGroups {\n     <mat-autocomplete #auto=\"matAutocomplete\">\n       @if (true) {\n         @for (group of stateGroups; track group) {\n-          <mat-optgroup [label]=\"group.label\">\n+          <mat-optgroup [label]=\"group.title\">\n             @for (state of group.states; track state) {\n               <mat-option [value]=\"state\">\n                 <span>{{ state }}</span>\n",
+  "diff_sha256": "cbdf33a74c4fb07f9e19ac4ddda7385a29bb2229c4e90cb92b38ca0ee69f5e9f",
+  "hunk_reviews": [
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -173,7 +173,7 @@ describe('MDC-based MatAutocomplete', () => {",
+      "sha256": "9bd98aa3f549181de1d58d8745e9996835e2170bedfe3b053880ade052f9c105",
+      "judgment": "The auxilliary-to-auxiliary case-name correction is cosmetic. Keep the historical case name and its existing identity/order; renaming it would change the retained roster without repairing behavior."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -1607,7 +1607,7 @@ describe('MDC-based MatAutocomplete', () => {",
+      "sha256": "9fff143196b044c4a1c37a254f49fc8eda535d75afae643608e4fb9ba29f3817",
+      "judgment": "The autocompete-to-autocomplete diagnostic spelling change affects assertion context only. Preserve the historical assertion and context; no product change follows."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -3438,7 +3438,7 @@ describe('MDC-based MatAutocomplete', () => {",
+      "sha256": "5d14c7843a1dafab62dfbfd92b49d25b5bc510cb8f8e68166a81e93b15cf40c4",
+      "judgment": "The first Firefox, edge-to-Edge comment correction has no executable change. Preserve the historical comment and width assertion."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -3451,7 +3451,7 @@ describe('MDC-based MatAutocomplete', () => {",
+      "sha256": "20ee737439cf9b40d83045d2ab72f72cbd97052c886120bfd7526a6794e381a2",
+      "judgment": "The second Firefox, edge-to-Edge comment correction likewise has no executable change. Preserve the separate historical width assertion and comment."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -3848,7 +3848,7 @@ describe('MDC-based MatAutocomplete', () => {",
+      "sha256": "0861c41b4a40f6cd54e153e8e2546a1df346c3ee09272654a1ca5db7aafb396f",
+      "judgment": "The first selector fix adds a missing closing bracket to a modern mat-option aria-selected query used by a minimal selection-indicator assertion. The exact malformed query and modern indicator case are absent from the complete owned legacy autocomplete spec. Do not transplant the modern option/indicator contract."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -3874,7 +3874,7 @@ describe('MDC-based MatAutocomplete', () => {",
+      "sha256": "c97f4282730d405c8144d623f4cd02ff793aca7983d173143f0dc5344e24c4c0",
+      "judgment": "The second selector fix closes the corresponding query in the modern hidden-selection-indicator case. That private modern test is also absent; no existing legacy selector or assertion is deleted or broadened."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -4210,7 +4210,7 @@ class AutocompleteWithoutPanel {",
+      "sha256": "c23038c5c8412b86171a56949842d7e3e1c33af506d66eab8a99a6e7109679ad",
+      "judgment": "The first group template switches group.label to group.title. The untouched historical direct-group fixture uses *ngFor and group.label against three title data keys. Preserve the exact historical template; rename only those three private data keys to label, keeping One/Two/Three and all state arrays."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -4249,7 +4249,7 @@ class AutocompleteWithGroups {",
+      "sha256": "1aff52008f1001c693b94dd2ba8afce30daf669e9c81120a9df6c12fc878a190",
+      "judgment": "The second template changes the inherited indirect-group fixture in modern control-flow syntax. Its legacy counterpart inherits the same three objects and reads group.label. The same data repair supplies both bindings without changing either template, introducing modern control flow, or changing cases/assertions."
+    }
+  ],
+  "semantics": {
+    "kind": "mixed-test-diagnostics-selectors-and-fixture-binding",
+    "original_hunks": 8,
+    "selector_closing_brackets_repaired": 2,
+    "group_template_bindings_changed": 2,
+    "diagnostic_spelling_and_comments_changed": true,
+    "owned_data_mismatch_requires_individual_repair": true
+  },
+  "decision": "Review all eight original autocomplete hunks individually. Keep historical case names, diagnostic text, comments and templates unchanged. The two malformed selectors belong to modern single-selection-indicator cases absent from the retained legacy suite. The two group binding hunks expose a real retained fixture defect: both legacy templates read group.label but the three shared stateGroups objects defined title, including in the untouched tagged reference. Adapt only the three private test-data keys from title to label. All template bytes, label values, state arrays, cases, assertions, imports, production resources and consumer structure/styles remain unchanged. Source and roster controls plus the83-scope/20-binding context requalification passed on this branch; actual artifact Angular execution remains required.",
+  "prior_entry": {
+    "sha": "df7104f86f19bf34846e9081be232489ca4f120d",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/autocomplete): typos and unresolved variables in tests (#29532)",
+    "files": [
+      "src/material/autocomplete/autocomplete.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "individual_proof": {
+    "proof_kind": "individual-private-fixture-data-repair",
+    "diff_sha256": "cbdf33a74c4fb07f9e19ac4ddda7385a29bb2229c4e90cb92b38ca0ee69f5e9f",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Review all eight original autocomplete hunks individually. Keep historical case names, diagnostic text, comments and templates unchanged. The two malformed selectors belong to modern single-selection-indicator cases absent from the retained legacy suite. The two group binding hunks expose a real retained fixture defect: both legacy templates read group.label but the three shared stateGroups objects defined title, including in the untouched tagged reference. Adapt only the three private test-data keys from title to label. All template bytes, label values, state arrays, cases, assertions, imports, production resources and consumer structure/styles remain unchanged. Source and roster controls plus the83-scope/20-binding context requalification passed on this branch; actual artifact Angular execution remains required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-small-source-review.mjs",
+        "sha256": "a3f8c6ea65db0588648675819751fc76df41001b0ac160099b87de6ae00e3b16"
+      },
+      {
+        "path": "tests/spec_small_source_probe.mjs",
+        "sha256": "385b82de643416a5c54c82016a79367cd4b84c2f3ec548d0bdb19b2056f36f62"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-subjects.json.gz",
+        "sha256": "055c40ba3907191e258676b4ebff84ea5d233fb5c00bb877eac0f525dcf5ccfd"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-acquisition.json.gz",
+        "sha256": "f71a905296710e45c15a2e6bfb3766a741061aebb39b8d55e7aa7d48fa6a8200"
+      },
+      {
+        "path": "compatibility/rc/spec-small-fixture-prior.json.gz",
+        "sha256": "da83db9d7a07c2cc3f1dcf89a5fd312f433966b3486ceebf5b05d9d45bf1c9fc"
+      },
+      {
+        "path": "compatibility/rc/spec-small-source-controls.json",
+        "sha256": "745522c6f8e1a4d0f358bc93e1006353698d82a708c175fa1bddcc137813d835"
+      },
+      {
+        "path": "compatibility/rc/spec-small-context-proof.json",
+        "sha256": "011533399904f0dff41c7ed4c2c883400c61f8f5824efe50c0a0ea2e8d4d1a80"
+      },
+      {
+        "path": "compatibility/rc/spec-small-context-checkpoint.json",
+        "sha256": "93d4faaf5cc32986a4f32b1a02428be09b9ca17d836bb40c68dfe53b44485300"
+      },
+      {
+        "path": "compatibility/rc/historical-source-replay-fixture-context-checkpoint.json",
+        "sha256": "52104999873044603a1ac41c3553a4e8809e5fbd406d3c6bdda06b1564a2788c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+        "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+        "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+        "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+        "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "14d0d2ebb8c3f78a04b1c93becd6ce4b79400381af97d0ccfe7df93cfc228030"
+      },
+      {
+        "path": "projects/ngx-material-legacy/ng-package.json",
+        "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33"
+      },
+      {
+        "path": "testing/legacy-runner/adapt-spec.mjs",
+        "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-small-individual-source-proof.json",
+      "sha256": "3d5b6b0db2bba5b7cd91c1f278b6103e74f17aad5a70407fe0e4c974611b8c05"
+    },
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "current_source_context": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "9604d03f776294bb8a22c3015c4d40d2e0f98bd65b4a8b45ceb7738458706438"
+    },
+    "adapter_source_context": {
+      "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+      "sha256": "803c57ebb85011bc9d479bb9c5fc28ae456a842a647cbbd9ff205ea7963aab44"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "compatibility/rc/spec-small-individual-source-proof.json",
+      "sha256": "3d5b6b0db2bba5b7cd91c1f278b6103e74f17aad5a70407fe0e4c974611b8c05"
+    },
+    {
+      "path": "scripts/spec-small-source-review.mjs",
+      "sha256": "a3f8c6ea65db0588648675819751fc76df41001b0ac160099b87de6ae00e3b16"
+    },
+    {
+      "path": "tests/spec_small_source_probe.mjs",
+      "sha256": "385b82de643416a5c54c82016a79367cd4b84c2f3ec548d0bdb19b2056f36f62"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-subjects.json.gz",
+      "sha256": "055c40ba3907191e258676b4ebff84ea5d233fb5c00bb877eac0f525dcf5ccfd"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-acquisition.json.gz",
+      "sha256": "f71a905296710e45c15a2e6bfb3766a741061aebb39b8d55e7aa7d48fa6a8200"
+    },
+    {
+      "path": "compatibility/rc/spec-small-fixture-prior.json.gz",
+      "sha256": "da83db9d7a07c2cc3f1dcf89a5fd312f433966b3486ceebf5b05d9d45bf1c9fc"
+    },
+    {
+      "path": "compatibility/rc/spec-small-source-controls.json",
+      "sha256": "745522c6f8e1a4d0f358bc93e1006353698d82a708c175fa1bddcc137813d835"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-proof.json",
+      "sha256": "011533399904f0dff41c7ed4c2c883400c61f8f5824efe50c0a0ea2e8d4d1a80"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-checkpoint.json",
+      "sha256": "93d4faaf5cc32986a4f32b1a02428be09b9ca17d836bb40c68dfe53b44485300"
+    },
+    {
+      "path": "compatibility/rc/historical-source-replay-fixture-context-checkpoint.json",
+      "sha256": "52104999873044603a1ac41c3553a4e8809e5fbd406d3c6bdda06b1564a2788c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+      "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+      "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "14d0d2ebb8c3f78a04b1c93becd6ce4b79400381af97d0ccfe7df93cfc228030"
+    },
+    {
+      "path": "projects/ngx-material-legacy/ng-package.json",
+      "sha256": "692f6b0fc780306368c4f05078f01210e4f2dab1b5536c1984d7a721d669ea33"
+    },
+    {
+      "path": "testing/legacy-runner/adapt-spec.mjs",
+      "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "21cc8dfa42197436dae5abda6c37b181cb8f232a66848be412267d6610cbbddf"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "9604d03f776294bb8a22c3015c4d40d2e0f98bd65b4a8b45ceb7738458706438"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "control_case_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "e1f0d83fe9477279cc7400d41c0304972d62bdbc",
+    "qualified_reference_parent": "58a2faabf1216f6b271f1c688c8861504f55489e",
+    "inputs": {
+      "path": "compatibility/rc/spec-control-context-inputs.json",
+      "sha256": "802868cd4c19cbad3bd7e037c4b95702c3a1b9e778b296e98deb5e1129cf7239"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+        "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54",
+        "current_sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "c6869cf4cb9bf3dccb409899130d3dc231512f783b8f7e177dfaad6a9a3687df",
+        "current_sha256": "cb1935def422492f26410e71c150dd174ef190403242ad7fd73cf7d08f8052d1"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "7e8cf166761529583a0c5dadd958e69f36d01ff9eb5a5f4d7484cb7697ef5459"
+    },
+    "unchanged_other_product_members": 1139,
+    "original_cases_preserved": 2220,
+    "additional_cases": 2,
+    "current_case_cells": 2227,
+    "all_original_hunks_decisions_and_runtime_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only two appended candidate cases and their exact two-row inventory update differ. Preserve every prior case/body/template, all production resources and all original source judgments. This is source-context qualification, never actual Angular/native/packed/floor or complete G11 admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "21cc8dfa42197436dae5abda6c37b181cb8f232a66848be412267d6610cbbddf"
+    },
+    "prior_entry": {
+      "sha": "df7104f86f19bf34846e9081be232489ca4f120d",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "58a2faabf1216f6b271f1c688c8861504f55489e",
+      "entry_sha256": "4e8d8fdfc7eb39b4b9188ba9d592f13588214dd3627c1b86205a839f74f296a1"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-small-df7104f86f19bf34846e9081be232489ca4f120d.json",
+      "sha256": "70c0ff6091a36f76a74b66227ddfc95b38453fcbe1f3c0ce35ad18ca1b1dd9b0"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "chip_empty_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "799f80f440ea2ab044cb4754399f18177a9ec99b",
+    "qualified_reference_parent": "c92ef282d7d022c4e8c8711dd0fa4c9e996ad662",
+    "inputs": {
+      "path": "compatibility/rc/spec-stability-context-inputs.json",
+      "sha256": "15628f1c418a3f3fd507860234209055db4b268aec2d7cf2ec353d29849620ff"
+    },
+    "prequalified_wrapper_receipt_transitions": [
+      {
+        "path": "tests/test_spec_standalone_environment_source.py",
+        "reference_commit": "ee251cff600805900f6e5816951e3abee714adaa",
+        "before_sha256": "3e74aaee57ff849163758989b2f59f588fc975d95504ca3f6cb3ce0ce32923d9",
+        "after_sha256": "7717141028f282aeb800a7e045b7f6a1009fd4ed60974d1cab3c26e553ef23c8",
+        "edits": [
+          {
+            "before": "['node', 'tests/spec_standalone_environment_source_probe.mjs']",
+            "after": "['node', 'scripts/run-historical-source-probe.mjs', 'standalone-environment-source']"
+          }
+        ],
+        "affected_shas": [
+          "31077c2eae76b0bc0bc348ee2bd2801864aa409a",
+          "83006db94a2912fa3cd3b7e1f1dcca9be064d183"
+        ],
+        "qualification": {
+          "path": "compatibility/rc/historical-stability-source-replay-checkpoint.json",
+          "sha256": "ee6a31039d5e83770ac7a18dae9c8c9145f652365e4d40fdc7ae6596f988e7b2"
+        }
+      }
+    ],
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "before_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "current_sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "before_sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+        "current_sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "cb1935def422492f26410e71c150dd174ef190403242ad7fd73cf7d08f8052d1",
+        "current_sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-source-proof.json",
+      "sha256": "85fd33bb0dfffcdb0070070b1ead4ce30588f5d78659929014e268897725e10d"
+    },
+    "original_cases_preserved": 2222,
+    "additional_cases": 1,
+    "current_case_cells": 2228,
+    "all_original_branch_hunk_verdicts_and_native_requirement_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only the authenticated chip empty-query reset, one appended Angular lifecycle case and exact inventory refresh differ. Current API call details are qualified against both fixed public minima; every prior verdict and actual native/packed/compiler/floor requirement remains. No source-only runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "9604d03f776294bb8a22c3015c4d40d2e0f98bd65b4a8b45ceb7738458706438"
+    },
+    "prior_entry": {
+      "sha": "df7104f86f19bf34846e9081be232489ca4f120d",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "c92ef282d7d022c4e8c8711dd0fa4c9e996ad662",
+      "entry_sha256": "377d38cd5acfbc56ec55ec0d9ed56c455e3d24eefef79ceededa88be5e42596a"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-control-case-context-df7104f86f19bf34846e9081be232489ca4f120d.json",
+      "sha256": "e1af3808de2626400c14d066a578d0880f84a827295649897eae19983c757010"
+    },
+    "original_judgments_preserved": true
+  },
+  "adapter_eager_source_requalification": {
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+      "sha256": "803c57ebb85011bc9d479bb9c5fc28ae456a842a647cbbd9ff205ea7963aab44"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-stability-chip-context-df7104f86f19bf34846e9081be232489ca4f120d.json",
+      "sha256": "2d99d5f260d127b3f601378005d49ff704b2c61293f4c732b38fabb92e9fccc2"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "213ff0a90bde8ea760c71fe266f724f223229044",
+      "entry_sha256": "9b222df000efcf4f19a45df6c871984f75c230b408e790404ad074d4901e98a4"
+    },
+    "source_judgment_and_runtime_requirements_preserved": true
+  }
+}
