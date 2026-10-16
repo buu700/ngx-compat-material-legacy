@@ -8,12 +8,33 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {gunzipSync} from 'node:zlib';
 import {dirname,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {inspectTableViewportRequalification,TABLE_VIEWPORT_INPUTS} from '../scripts/table-virtual-context-requalification.mjs';
 import {reviewClassDecoratorUses} from '../scripts/class-decorator-use-review.mjs';
-const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=path=>readFileSync(resolve(root,path));
-const result=await inspectTableViewportRequalification({root}),inputs=JSON.parse(read(TABLE_VIEWPORT_INPUTS));
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),currentRead=path=>readFileSync(resolve(root,path));
+const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+const line=JSON.parse(currentRead('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';
+const replayPath='compatibility/rc/metadata-current-profile-replay-inputs.json',replayBytes=currentRead(replayPath);
+assert.equal(digest(replayBytes),{main:'dc0565b7df14dcae1ba58ce978432ef58e4cc1ba652b9d608e2716285e3a8f49','21.x':'9e7c39d1288a03b5f7ba9055ff03e3559889d021b922587b1ddbf8b28c328ce0'}[line]);
+const replay=JSON.parse(replayBytes);assert.equal(replay.line,line);
+assert.equal(digest(currentRead(replay.metadata_inputs.path)),replay.metadata_inputs.sha256);
+const packed=currentRead(replay.prior_contexts.path);assert.equal(digest(packed),replay.prior_contexts.sha256);
+const raw=gunzipSync(packed);assert.equal(digest(raw),replay.prior_contexts.raw_sha256);
+const before=JSON.parse(raw);assert.equal(before.line,line);
+assert.equal(digest(currentRead(replay.current_source_proof.path)),replay.current_source_proof.sha256);
+const currentProof=JSON.parse(currentRead(replay.current_source_proof.path));
+for(const member of currentProof.preservation)assert.equal(digest(currentRead(member.path)),member.current_sha256);
+const previous=new Map(before.context_files.map(member=>{assert.equal(digest(member.text),member.sha256);return [member.path,Buffer.from(member.text)];}));
+assert.equal(previous.size,5);
+assert.deepEqual([...previous.keys()].sort(),['scripts/class-decorator-use-review.mjs','scripts/framework-enum-use-review.mjs','tests/class_decorator_use_probe.mjs','tests/framework_enum_use_probe.mjs','tests/test_class_decorator_uses.py'].sort());
+assert.equal(digest(before.test_preimage.text),before.test_preimage.sha256);
+const controlBody=text=>text.slice(text.indexOf('\nassert.equal(result.roles.length,9);'),text.indexOf('\nconst hash='));
+assert.ok(controlBody(before.test_preimage.text).length>1000);
+assert.equal(controlBody(currentRead(before.test_preimage.path).toString()),controlBody(before.test_preimage.text),'historical table assertions or mutation controls changed');
+const read=path=>previous.get(path)??currentRead(path);
+const result=await inspectTableViewportRequalification({root,readMember:read}),inputs=JSON.parse(read(TABLE_VIEWPORT_INPUTS));
 assert.equal(result.roles.length,9);assert.equal(result.helper_uses_open.length,7);
 assert.equal(result.historical_after.rows.length,57);assert.equal(result.g11_claim,'not-passed');
 assert.equal(result.fresh_domain_role_counts.selected_current_class_decorators,2);
@@ -47,6 +68,7 @@ await assert.rejects(reviewClassDecoratorUses({root,skipDiagnostics:true}),/132 
 controls.push({id:'full-metadata-population-guard-retained',rejected:true});
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const report={schema_version:1,line:result.line,requalified_roles:result.roles.length,new_helper_uses_left_open:result.helper_uses_open.length,
+ historical_metadata_context_replay:{path:replayPath,sha256:digest(replayBytes),context_members:5,current_source_proof:replay.current_source_proof},
  explicit_current_class_selection:2,table_enum_roles:2,table_guard_roles:1,negative_controls:controls,
  producer_sha256:hash(read('tests/table_virtual_context_requalification_probe.mjs')),
  limits:result.scope,g11_claim:'not-passed'};

@@ -7,6 +7,7 @@
  */
 /** Public enum values used in owned Component metadata, not framework behavior qualification. */
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -111,7 +112,8 @@ function runtimeValues(binding) {
   return {values, source, source_sha256: sha(source), pure_IIFE_executed: true};
 }
 
-export function reviewFrameworkEnumUses({root = rootDefault, readSource, subjectData} = {}) {
+export function reviewFrameworkEnumUses({root = rootDefault, readSource, subjectData, population = 'captured'} = {}) {
+  assert.ok(['captured','current'].includes(population),'unknown enum population');
   const read = path => readSource ? readSource(path) : readFileSync(join(root, path), 'utf8');
   const seed = readFileSync(join(root, seedPath)); assert.equal(sha(seed), seedSha);
   const subjects = subjectData || JSON.parse(read('compatibility/rc/framework-enum-public-subjects.json'));
@@ -138,7 +140,16 @@ export function reviewFrameworkEnumUses({root = rootDefault, readSource, subject
     return {...subject, declarations, runtimes};
   });
   const original = models.find(model => model.line === 'original');
-  const uses = JSON.parse(seed).symbol_uses.filter(row => row.module === '@angular/core' && names.includes(row.symbol));
+  const frozenUses = JSON.parse(seed).symbol_uses.filter(row => row.module === '@angular/core' && names.includes(row.symbol));
+  assert.equal(frozenUses.length,78);
+  const retired=population==='current'?frozenUses.filter(row=>row.file==='legacy-tabs/internal/tab-nav-bar-base.ts').map(row=>({...row})):[];
+  if(population==='current'){
+    assert.deepEqual(retired.map(row=>row.symbol).sort(),[...names].sort());
+    const path='projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts',text=read(path),file=parse(path,text);
+    const visit=node=>{if(ts.isIdentifier(node)){assert.ok(!names.includes(node.text),'retired enum import or panel returned');if(node.text==='MatTabNavPanel')assert.ok(ts.isInterfaceDeclaration(node.parent)&&node.parent.name===node||ts.isTypeReferenceNode(node.parent)&&node.parent.typeName===node,'retired enum import or panel returned');}ts.forEachChild(node,visit);};visit(file);
+    for(const row of retired){row.candidate_source_sha256=sha(text);row.scope='Explicit retained frozen obligation; current structural panel runtime and enum imports are absent.';}
+  }
+  const uses=frozenUses.filter(row=>!retired.some(old=>old.file===row.file&&old.symbol===row.symbol));
   const paths = [...new Set(uses.map(row => row.file))], options = {noResolve: true, target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, experimentalDecorators: true};
   const host = ts.createCompilerHost(options), hostRead = host.readFile.bind(host), sourceRoot = join(root, 'projects/ngx-material-legacy');
   host.readFile = path => path.startsWith(sourceRoot + '/') ? read('projects/ngx-material-legacy/' + path.slice(sourceRoot.length + 1)) : hostRead(path);
@@ -158,6 +169,7 @@ export function reviewFrameworkEnumUses({root = rootDefault, readSource, subject
     const references = [];
     function visit(node) {
       if (ts.isIdentifier(node) && node !== binding.name && node !== binding.propertyName && checker.getSymbolAtLocation(node) === symbol) {
+        if(population==='current')assert.ok(!binding.isTypeOnly&&!binding.parent.parent.isTypeOnly,'runtime enum imported type only');
         const access = node.parent; assert.ok(ts.isPropertyAccessExpression(access) && access.expression === node, 'unsupported enum reference');
         const member = access.name.text, property = access.parent, expectedProperty = use.symbol === names[0] ? 'changeDetection' : 'encapsulation';
         assert.ok(ts.isPropertyAssignment(property) && property.initializer === access && property.name.getText(file) === expectedProperty, 'enum reference outside metadata slot');
@@ -187,5 +199,12 @@ export function reviewFrameworkEnumUses({root = rootDefault, readSource, subject
     }
     cases.push({...use, candidate_source_sha256: sha(file.text), local_name: binding.name.text, references, unused_import_erasure: unusedImportErasure});
   }
-  return {schema_version: 1, line, node: process.version, compiler: ts.version, seed_sha256: seedSha, models, cases, files: paths.length, limits: 'Exact public enum export/declaration and pure runtime IIFE identity, all authored direct Component metadata references. Eager replaces deprecated Default only at the identical numeric1 boundary. No full Angular runtime, change-detection behavior, encapsulation rendering, compiler/AOT, native/packed/floor or upstream SHA clearance.', g11_claim: 'not-passed'};
+  if(population==='current'){
+    const actual=execFileSync('rg',['--files','projects/ngx-material-legacy','-g','*.ts','-g','!*.spec.ts'],{cwd:root,encoding:'utf8'}).trim().split('\n').flatMap(path=>{
+      const file=parse(path,read(path));return file.statements.filter(node=>ts.isImportDeclaration(node)&&node.moduleSpecifier.text==='@angular/core'&&node.importClause?.namedBindings&&ts.isNamedImports(node.importClause.namedBindings))
+        .flatMap(node=>node.importClause.namedBindings.elements.filter(item=>names.includes((item.propertyName||item.name).text)).map(item=>path.slice('projects/ngx-material-legacy/'.length)+'#'+(item.propertyName||item.name).text));
+    });
+    assert.deepEqual(actual.sort(),uses.map(row=>row.file+'#'+row.symbol).sort(),'current enum population changed');
+  }
+  return {schema_version: 1, line, population, frozen_uses:frozenUses.length, retired_frozen_uses:retired, whole_current_population_reviewed:population==='current', node: process.version, compiler: ts.version, seed_sha256: seedSha, models, cases, files: paths.length, limits: 'Exact public enum export/declaration and pure runtime IIFE identity, all authored direct Component metadata references. Eager replaces deprecated Default only at the identical numeric1 boundary. No full Angular runtime, change-detection behavior, encapsulation rendering, compiler/AOT, native/packed/floor or upstream SHA clearance.', g11_claim: 'not-passed'};
 }
