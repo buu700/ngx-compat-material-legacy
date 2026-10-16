@@ -355,8 +355,23 @@ export class MotionRoot {
     }, 1500);
     // The historical centered output is asynchronous. Flush the initial selection before observing.
     await this.wait(20);
+    const target = document.querySelectorAll<HTMLElement>('mat-tab-body .mat-tab-body-content')[1];
+    if (!target?.isConnected) throw new Error('Incoming tab content shell missing');
+    const started = performance.now();
     let notifications = 0;
-    const sub = this.tabs.animationDone.subscribe(() => { notifications += 1; });
+    let firstCompletionAt: number | null = null;
+    const transitions: {type: string; trusted: boolean; property: string; same_target: boolean;
+      connected: boolean; at_ms: number; elapsed_ms: number}[] = [];
+    const onTransition = (event: TransitionEvent) => transitions.push({type: event.type, trusted: event.isTrusted,
+      property: event.propertyName, same_target: event.target === target, connected: target.isConnected,
+      at_ms: performance.now() - started, elapsed_ms: event.elapsedTime * 1000});
+    const transitionNames = ['transitionstart', 'transitionend', 'transitioncancel'] as const;
+    for (const name of transitionNames) target.addEventListener(name, onTransition);
+    const cleanup = {subscription_closed: false, listeners_removed: false};
+    const sub = this.tabs.animationDone.subscribe(() => {
+      notifications += 1;
+      if (firstCompletionAt === null) firstCompletionAt = performance.now() - started;
+    });
     try {
       this.clickTab('Two');
       const limit = zero || this.mode() !== 'enabled' ? 500 : 1500;
@@ -380,11 +395,21 @@ export class MotionRoot {
         finalState: el && (el.textContent || '').includes('Two') && getComputedStyle(el).visibility !== 'hidden' ? 'visible' : 'hidden',
         notifications,
         duplicateEndEventsDispatched: !!el,
+        native_transition: {
+          same_target_after: el === target && target.isConnected,
+          completion_at_ms: firstCompletionAt,
+          trusted_events: transitions.filter(event => event.trusted).map(event => ({...event})),
+          duplicate_end_controls: transitions.filter(event => !event.trusted).map(event => ({...event})),
+          cleanup,
+        },
         detectChangesCalls: 0,
       };
       return {key: `tabs/${mode}`, observation, notify: {key: `tabs/animationDone/${mode}`, observation}};
     } finally {
       sub.unsubscribe();
+      cleanup.subscription_closed = sub.closed === true;
+      for (const name of transitionNames) target.removeEventListener(name, onTransition);
+      cleanup.listeners_removed = true;
       this.tabs.selectedIndex = 0;
       this.tabDuration = '500ms';
     }

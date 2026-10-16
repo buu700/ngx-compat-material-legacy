@@ -215,6 +215,17 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       return;
     }
     if (isCentering) {
+      const content = this._contentElement?.nativeElement;
+      if (content?.style.visibility === 'hidden') {
+        // The historical hidden-style selector uses display:none. Reveal the
+        // attached content at its old offscreen transform before Angular applies
+        // the centered class; otherwise the browser cannot start a transition.
+        content.style.removeProperty('visibility');
+        content.getBoundingClientRect();
+      }
+      if (this._pendingTransition !== transition || this._destroyed) {
+        return;
+      }
       this._onCentering.emit(this._elementRef.nativeElement.clientHeight);
     }
     if (this._pendingTransition === transition && !this._destroyed) {

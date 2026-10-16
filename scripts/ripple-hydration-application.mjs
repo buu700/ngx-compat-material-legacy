@@ -7,6 +7,7 @@
  */
 import {rippleHydrationComponentFixture} from './ripple-hydration-component-fixture.mjs';
 import {publicRippleNativeEventsOkay} from './ripple-native-event-probe.mjs';
+import {publicRippleReplayOkay} from './ripple-public-replay-probe.mjs';
 
 /** Exact supported-floor application inputs. Installation/build belong to the packed runner. */
 export function rippleHydrationApplication(line, runtime) {
@@ -102,6 +103,7 @@ export function rippleHydrationReplayOkay(row, line) {
   const replay = row?.replayed, live = row?.live;
   const deliveries = replay?.deliveries;
   return publicRippleNativeEventsOkay(row?.native_peer_events, line)
+    && publicRippleReplayOkay(row?.public_peer_replay)
     && row?.server_hydration_metadata === true && row?.before_bootstrap === true
     && Array.isArray(row?.captured_native) && row.captured_native.length === 3
     && row.captured_native.map(event => event.type).join(',') === 'mousedown,mouseup,click'
