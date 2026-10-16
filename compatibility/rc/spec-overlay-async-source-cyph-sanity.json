@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "path": "/home/parallels/cyph",
+  "head": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+  "clean": true,
+  "read_only": true,
+  "reviewed_members": [
+    {
+      "path": "shared/js/cyph/modules/cyph-shared.module.ts",
+      "sha256": "42fea0471f52148b9f6938d670a4fd9fd65363e2f34ae000efd58b9ec3a82c29"
+    },
+    {
+      "path": "shared/js/cyph/modules/cyph-web.module.ts",
+      "sha256": "4b50f3b89c32ac00cff95891891e5e2284682afade511861fb0852bbc04d1a36"
+    },
+    {
+      "path": "shared/js/cyph/services/material-dialog.service.ts",
+      "sha256": "45607f3bd9d68f21e98b38cbda7d091d4a176c49bb14374f05c9d744642fb214"
+    },
+    {
+      "path": "shared/js/cyph/components/chat-message/chat-message.component.ts",
+      "sha256": "058e017dbf929f2624aff824c8ace19e96a773706620f4dddd5764e372ef7c10"
+    },
+    {
+      "path": "shared/js/cyph/components/search-bar/search-bar.component.html",
+      "sha256": "f733c8a7b4864e9054adae72f467f0511055eac4b55d40b667c610a347201e4c"
+    },
+    {
+      "path": "shared/js/cyph/components/account-contacts/account-contacts.component.html",
+      "sha256": "907c84cca8361acef721edb542ad391d0e2c1382cce77b1079422c44fa9f6157"
+    },
+    {
+      "path": "shared/js/cyph/components/email-compose/email-compose.component.ts",
+      "sha256": "54885c76d15a7a1755d651f9a8188e5095a337f2270a75a0d2d21f66a5678574"
+    },
+    {
+      "path": "shared/js/cyph/components/email-compose/email-compose.component.html",
+      "sha256": "fb41ff21cec259e9456c32e0c630e2bcf7ed58dce9401232566117461cf45272"
+    },
+    {
+      "path": "shared/js/cyph/components/email-compose/email-compose.component.scss",
+      "sha256": "0f4f63c2ec19ea8c317930411a3ba39d63e95efb34fde4b8d1397f943e02cea2"
+    },
+    {
+      "path": "shared/js/cyph/components/email-view/email-view.component.scss",
+      "sha256": "6f880ab02a9dc63b466e3b8d3ec9c2cc7668314ada4c90b5b1e0495852523752"
+    },
+    {
+      "path": "shared/css/mixins.scss",
+      "sha256": "cc248f0e8b86175c9f6edab6e0193300ad5e13f2d37f5575b556d246584baf2b"
+    },
+    {
+      "path": "shared/js/cyph/components/dialog-media/dialog-media.component.scss",
+      "sha256": "9ddd217326cbc2c50310737f6e4f582b936b9a1fac0c2c877d94b4cb73a22947"
+    }
+  ],
+  "reachable_contracts": {
+    "menu": "Cyph web module imports the legacy menu module; chat-message uses the legacy trigger, and account-contacts templates contain mat-menu/mat-menu-item.",
+    "select": "Cyph shared module imports the legacy select module; email compose/view use its typed component and mat-select templates; their SCSS addresses .mat-select-panel.",
+    "dialog": "Cyph imports the legacy dialog module/service/ref; service uses close/afterClosed, and dialog media SCSS retains .mat-dialog-content/.mat-dialog-actions.",
+    "autocomplete": "Cyph shared module imports the legacy autocomplete module and search-bar template declares mat-autocomplete."
+  },
+  "conclusion": "All four consumers remain reachable. Decline private selector/signal/template/scheduler preferences; preserve Material16 component structure, CSS/SCSS and existing owned lifecycle/observer tests. No consumer edits or new TypeScript API change is required by these source judgments; actual consumer build/browser/lifecycle/floor qualification remains separate.",
+  "required_consumer_CSS_SCSS_changes": 0,
+  "consumer_files_changed": false,
+  "consumer_build_or_browser_executed": false,
+  "actual_native_artifact_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
