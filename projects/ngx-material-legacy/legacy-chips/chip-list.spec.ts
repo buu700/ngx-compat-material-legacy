@@ -1582,6 +1582,33 @@ describe('MatChipList', () => {
     testComponent = fixture.debugElement.componentInstance;
     chips = chipListInstance.chips;
   }
+
+  it('should clear a destroyed active chip when the list becomes empty', () => {
+    setupStandardList();
+    const keyManager = chipListInstance._keyManager;
+    const removedChip = chips.last;
+
+    removedChip.focus();
+    fixture.detectChanges();
+    expect(keyManager.activeItem).toBe(removedChip);
+
+    testComponent.chips = [];
+    fixture.detectChanges();
+    expect(chips.length).toBe(0);
+    expect(keyManager.activeItemIndex).toBe(-1);
+    expect(keyManager.activeItem).toBeNull();
+
+    testComponent.chips = [10, 11];
+    fixture.detectChanges();
+    expect(keyManager.activeItemIndex).toBe(-1);
+    expect(keyManager.activeItem).toBeNull();
+
+    chips.first.focus();
+    fixture.detectChanges();
+    expect(keyManager.activeItemIndex).toBe(0);
+    expect(keyManager.activeItem).toBe(chips.first);
+    expect(keyManager.activeItem).not.toBe(removedChip);
+  });
 });
 
 @Component({
