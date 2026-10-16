@@ -3840,15 +3840,15 @@ class AutocompleteWithGroups {
   selectedState: string;
   stateGroups = [
     {
-      title: 'One',
+      label: 'One',
       states: ['Alabama', 'California', 'Florida', 'Oregon'],
     },
     {
-      title: 'Two',
+      label: 'Two',
       states: ['Kansas', 'Massachusetts', 'New York', 'Pennsylvania'],
     },
     {
-      title: 'Three',
+      label: 'Three',
       states: ['Tennessee', 'Virginia', 'Wyoming', 'Alaska'],
     },
   ];
