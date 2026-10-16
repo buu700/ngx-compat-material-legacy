@@ -1,9 +1,16 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatDialog, MatDialogModule, MatDialogConfig} from '@angular/material/dialog';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_NOOP_ANIMATIONS} from '../../../../../projects/ngx-material-legacy/internal/testing/owned-animation-modules';
 import {MatDialogHarness} from './dialog-harness';
 
 /** Shared tests to run on both the original and MDC-based dialog's. */
@@ -23,9 +30,9 @@ export function runHarnessTests(
     const providers =
       dialogService !== MatDialog ? [{provide: MatDialog, useExisting: dialogService}] : undefined;
     await TestBed.configureTestingModule({
-      imports: [dialogModule, NoopAnimationsModule],
+      imports: [dialogModule],
       declarations: [DialogHarnessTest],
-      providers,
+      providers: [LEGACY_NOOP_ANIMATIONS, ...(providers ?? [])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DialogHarnessTest);

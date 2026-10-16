@@ -1,10 +1,17 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {HarnessLoader, parallel} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_NOOP_ANIMATIONS} from '../../../../../projects/ngx-material-legacy/internal/testing/owned-animation-modules';
 import {MatNativeSelectHarness} from './native-select-harness';
 
 /** Shared tests to run on both the original and MDC-based native selects. */
@@ -17,7 +24,8 @@ export function runNativeSelectHarnessTests(
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NoopAnimationsModule, inputModule, FormsModule],
+      imports: [inputModule, FormsModule],
+      providers: [LEGACY_NOOP_ANIMATIONS],
       declarations: [SelectHarnessTest],
     }).compileComponents();
 

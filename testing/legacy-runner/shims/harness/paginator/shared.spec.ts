@@ -1,7 +1,14 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component} from '@angular/core';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_NOOP_ANIMATIONS} from '../../../../../projects/ngx-material-legacy/internal/testing/owned-animation-modules';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatPaginatorHarness} from './paginator-harness';
@@ -17,7 +24,8 @@ export function runHarnessTests(
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [paginatorModule, NoopAnimationsModule],
+      imports: [paginatorModule],
+      providers: [LEGACY_NOOP_ANIMATIONS],
       declarations: [PaginatorHarnessTest],
     }).compileComponents();
 

@@ -1,9 +1,16 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatMenuModule} from '@angular/material/menu';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {LEGACY_NOOP_ANIMATIONS} from '../../../../../projects/ngx-material-legacy/internal/testing/owned-animation-modules';
 import {MatMenuHarness} from './menu-harness';
 
 /** Shared tests to run on both the original and MDC-based menues. */
@@ -17,7 +24,8 @@ export function runHarnessTests(
 
     beforeEach(async () => {
       await TestBed.configureTestingModule({
-        imports: [menuModule, NoopAnimationsModule],
+        imports: [menuModule],
+        providers: [LEGACY_NOOP_ANIMATIONS],
         declarations: [MenuHarnessTest],
       }).compileComponents();
 
@@ -98,7 +106,8 @@ export function runHarnessTests(
 
     beforeEach(async () => {
       await TestBed.configureTestingModule({
-        imports: [menuModule, NoopAnimationsModule],
+        imports: [menuModule],
+        providers: [LEGACY_NOOP_ANIMATIONS],
         declarations: [NestedMenuHarnessTest],
       }).compileComponents();
 
