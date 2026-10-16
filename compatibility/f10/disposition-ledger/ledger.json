@@ -30414,18 +30414,129 @@
       "sha": "cb820b1d8a8d942965790b75b48c21e345c86219",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/sidenav): switch tests away from fakeAsync (#33121)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=1811659edf806aaf8e7421d1fdb8c07dddea5332299d5533244a019147cb15bf, bytes=44696). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/sidenav/drawer.spec.ts, src/material/sidenav/sidenav.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/material/sidenav/drawer.spec.ts",
         "src/material/sidenav/sidenav.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/cb820b1d8a8d942965790b75b48c21e345c86219.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-navigation-async-cb820b1d8a8d942965790b75b48c21e345c86219.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T21:56:50.391572+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "1811659edf806aaf8e7421d1fdb8c07dddea5332299d5533244a019147cb15bf"
+      "patch_sha256": "1811659edf806aaf8e7421d1fdb8c07dddea5332299d5533244a019147cb15bf",
+      "source_check": {
+        "kind": "individual-complete-original-navigation-fixture-source-review",
+        "diff_sha256": "5c2461674edd08ed371b3ee70a262ceeea294fcaae1b4ba842d1df70b55138b9",
+        "evidence_report_sha256": "0c6bf9763c4b4808801ecb9951217af2973af2fe1c38eedc773c097ad4d713da"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "5c2461674edd08ed371b3ee70a262ceeea294fcaae1b4ba842d1df70b55138b9",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-navigation-async-source-review.mjs",
+            "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+          },
+          {
+            "path": "tests/spec_navigation_async_source_probe.mjs",
+            "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+          },
+          {
+            "path": "tests/test_spec_navigation_async_source.py",
+            "sha256": "49d5071cdd479516603bd7ac529d9448622eb0e31493a493a5070218c834d75f"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+            "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+            "sha256": "9962cf4a8f2c4daa3b600f2d4323782133f664f850afa1e225d5847a2a06b0ff"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+            "sha256": "3be4b312c1ba731dd1e696d30a48511271acde6a680cc003a8850af1cc9dac1a"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+            "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+            "sha256": "868b398b5c936d9bb40aa0b18ca33906c73e4874af0b3f7a8f16b228e8b56833"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+            "sha256": "e34fca8f2290bf0a1eb54434a7a3556f62c2910c3ebdc399bdb9541b4b9e074e"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+            "sha256": "377fec91d1625c53025bbd05a5dae5826ca2e94417e67d87ec307074aecaa3a7"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+            "sha256": "ba407fd2f1ded164d5f79322b229ff21ce2da1f610860f221751cee58e5c9be5"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+            "sha256": "97a6bad999248a20b633437a9874cb300f93815db9880cc6367394bebacc8085"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+            "sha256": "e5abcf5f338482ecdd8d40c72b4c20bdb06397bf0d3a78a23449fb0bc6571d70"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+            "sha256": "24f6341c4d34990447b421b72d0d4e8a3f997d945c340833ebac7cb9e424151c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+            "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+            "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+            "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+            "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+            "sha256": "0feb1e09e960858f0b9cf52ab128a706abf144c19703e88824a0362eece45f7c"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2",
@@ -30450,18 +30561,129 @@
       "sha": "45582795cc29c3bcb1265b7f6c541b165be3ef9d",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/list): switch tests away from fakeAsync (#33189)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=85d1c09e8e8728c277f1b3c7d87b91ec803109ac5a96b07af58429aecb5c24f6, bytes=27414). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/list/list.spec.ts, src/material/list/selection-list.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/material/list/list.spec.ts",
         "src/material/list/selection-list.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/45582795cc29c3bcb1265b7f6c541b165be3ef9d.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-navigation-async-45582795cc29c3bcb1265b7f6c541b165be3ef9d.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T21:56:50.392315+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "85d1c09e8e8728c277f1b3c7d87b91ec803109ac5a96b07af58429aecb5c24f6"
+      "patch_sha256": "85d1c09e8e8728c277f1b3c7d87b91ec803109ac5a96b07af58429aecb5c24f6",
+      "source_check": {
+        "kind": "individual-complete-original-navigation-fixture-source-review",
+        "diff_sha256": "82c1e1c481d7a592d41a835c41f9afbe02782803b626f71451d37e7a2e5a8ccc",
+        "evidence_report_sha256": "17d3723e2455e4ab7cc54ef1ab5e126a8c921b8e4f040442c96fdcba7dd4f9c0"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "82c1e1c481d7a592d41a835c41f9afbe02782803b626f71451d37e7a2e5a8ccc",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-navigation-async-source-review.mjs",
+            "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+          },
+          {
+            "path": "tests/spec_navigation_async_source_probe.mjs",
+            "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+          },
+          {
+            "path": "tests/test_spec_navigation_async_source.py",
+            "sha256": "49d5071cdd479516603bd7ac529d9448622eb0e31493a493a5070218c834d75f"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+            "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+            "sha256": "9962cf4a8f2c4daa3b600f2d4323782133f664f850afa1e225d5847a2a06b0ff"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+            "sha256": "3be4b312c1ba731dd1e696d30a48511271acde6a680cc003a8850af1cc9dac1a"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+            "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+            "sha256": "868b398b5c936d9bb40aa0b18ca33906c73e4874af0b3f7a8f16b228e8b56833"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+            "sha256": "e34fca8f2290bf0a1eb54434a7a3556f62c2910c3ebdc399bdb9541b4b9e074e"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+            "sha256": "377fec91d1625c53025bbd05a5dae5826ca2e94417e67d87ec307074aecaa3a7"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+            "sha256": "ba407fd2f1ded164d5f79322b229ff21ce2da1f610860f221751cee58e5c9be5"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+            "sha256": "97a6bad999248a20b633437a9874cb300f93815db9880cc6367394bebacc8085"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+            "sha256": "e5abcf5f338482ecdd8d40c72b4c20bdb06397bf0d3a78a23449fb0bc6571d70"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+            "sha256": "24f6341c4d34990447b421b72d0d4e8a3f997d945c340833ebac7cb9e424151c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+            "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+            "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+            "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+            "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+            "sha256": "0feb1e09e960858f0b9cf52ab128a706abf144c19703e88824a0362eece45f7c"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "a3479f74eedcba962c642cb297f4d37028d8c023",
@@ -30695,36 +30917,258 @@
       "sha": "f35961a095dc2fbee6bfeb09878a82d391932cf7",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/snack-bar): switch tests away from fakeAsync (#33261)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=fa732c13a9e7eb0ede36897752f1bbd350e78e612eaf0a4462b6445bfd35d4c1, bytes=33733). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/snack-bar/snack-bar.spec.ts, src/material/snack-bar/snack-bar.zone.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/material/snack-bar/snack-bar.spec.ts",
         "src/material/snack-bar/snack-bar.zone.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/f35961a095dc2fbee6bfeb09878a82d391932cf7.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-navigation-async-f35961a095dc2fbee6bfeb09878a82d391932cf7.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T21:56:50.393076+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "fa732c13a9e7eb0ede36897752f1bbd350e78e612eaf0a4462b6445bfd35d4c1"
+      "patch_sha256": "fa732c13a9e7eb0ede36897752f1bbd350e78e612eaf0a4462b6445bfd35d4c1",
+      "source_check": {
+        "kind": "individual-complete-original-navigation-fixture-source-review",
+        "diff_sha256": "6f5fc46a12d1595791af141a2f4644c2365776703b83447ef74179eeded2f3d8",
+        "evidence_report_sha256": "c3a946c5b6311c97ac00784ebbd07abdab7a2d59186e7532309dabfe75578718"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "6f5fc46a12d1595791af141a2f4644c2365776703b83447ef74179eeded2f3d8",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-navigation-async-source-review.mjs",
+            "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+          },
+          {
+            "path": "tests/spec_navigation_async_source_probe.mjs",
+            "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+          },
+          {
+            "path": "tests/test_spec_navigation_async_source.py",
+            "sha256": "49d5071cdd479516603bd7ac529d9448622eb0e31493a493a5070218c834d75f"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+            "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+            "sha256": "9962cf4a8f2c4daa3b600f2d4323782133f664f850afa1e225d5847a2a06b0ff"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+            "sha256": "3be4b312c1ba731dd1e696d30a48511271acde6a680cc003a8850af1cc9dac1a"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+            "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+            "sha256": "868b398b5c936d9bb40aa0b18ca33906c73e4874af0b3f7a8f16b228e8b56833"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+            "sha256": "e34fca8f2290bf0a1eb54434a7a3556f62c2910c3ebdc399bdb9541b4b9e074e"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+            "sha256": "377fec91d1625c53025bbd05a5dae5826ca2e94417e67d87ec307074aecaa3a7"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+            "sha256": "ba407fd2f1ded164d5f79322b229ff21ce2da1f610860f221751cee58e5c9be5"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+            "sha256": "97a6bad999248a20b633437a9874cb300f93815db9880cc6367394bebacc8085"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+            "sha256": "e5abcf5f338482ecdd8d40c72b4c20bdb06397bf0d3a78a23449fb0bc6571d70"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+            "sha256": "24f6341c4d34990447b421b72d0d4e8a3f997d945c340833ebac7cb9e424151c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+            "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+            "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+            "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+            "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+            "sha256": "0feb1e09e960858f0b9cf52ab128a706abf144c19703e88824a0362eece45f7c"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "96503186a6316cf2811eaa885f64cb5ab1ffed6e",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(material/tabs): switch tests away from fakeAsync (#33234)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=93a20346202a62db573216359788d7e373c1acfb37e232e32f1df54edc79b132, bytes=44315). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/tabs/tab-group.spec.ts, src/material/tabs/tab-header.spec.ts, src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/material/tabs/tab-group.spec.ts",
         "src/material/tabs/tab-header.spec.ts",
         "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/96503186a6316cf2811eaa885f64cb5ab1ffed6e.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-navigation-async-96503186a6316cf2811eaa885f64cb5ab1ffed6e.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T21:56:50.394011+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "93a20346202a62db573216359788d7e373c1acfb37e232e32f1df54edc79b132"
+      "patch_sha256": "93a20346202a62db573216359788d7e373c1acfb37e232e32f1df54edc79b132",
+      "source_check": {
+        "kind": "individual-complete-original-navigation-fixture-source-review",
+        "diff_sha256": "8aae412be7d96651af02476bfacdd6f4f528e542b6dd553b824be1e1ae3aaa11",
+        "evidence_report_sha256": "dca915a9b79e9947dacc98eadacb7afb809ec0dc1fe785b017cdd9694f0a49f6"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "8aae412be7d96651af02476bfacdd6f4f528e542b6dd553b824be1e1ae3aaa11",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private tabs scheduler migration after reviewing all58 hunks in allthree complete files. Account for141 before/138 after cases:138 pair in exact retained order,90 complete callbacks retain semantics and48 change. Individually pin three removed paginator-cleanup cases for click,touchend and reaching the start after60000ms. Allthree remain in the unchanged owned legacy tab-header suite; do not remove them or infer an absence of behavior from assertion-free fakeAsync timer-queue observations. Four synchronous nonthrow checks become awaited asynchronous not-toBeRejected observers, changing error timing/scope. Review23 hooks,25 raw-identical fixture classes and26 template/style properties plus complete imports/global/helper boundaries, including the changed repeated-paginator native timing; no clock/error/geometry/animation-lifecycle equivalence is proved. Cyph imports legacy tabs, renders tab groups and styles .mat-tab-label-content/.mat-tab-label-active and active tab bodies. Keep owned Material16 tab/header/label structure and tests, with no modern API mirror, animation-engine fork, consumer CSS/SCSS edit or TS API change. Actual pagination cleanup, focus/scroll/events/animation, packed/native/browser and peer-floor gates remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-navigation-async-source-review.mjs",
+            "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+          },
+          {
+            "path": "tests/spec_navigation_async_source_probe.mjs",
+            "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+          },
+          {
+            "path": "tests/test_spec_navigation_async_source.py",
+            "sha256": "49d5071cdd479516603bd7ac529d9448622eb0e31493a493a5070218c834d75f"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+            "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+            "sha256": "9962cf4a8f2c4daa3b600f2d4323782133f664f850afa1e225d5847a2a06b0ff"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+            "sha256": "3be4b312c1ba731dd1e696d30a48511271acde6a680cc003a8850af1cc9dac1a"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+            "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+            "sha256": "868b398b5c936d9bb40aa0b18ca33906c73e4874af0b3f7a8f16b228e8b56833"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+            "sha256": "e34fca8f2290bf0a1eb54434a7a3556f62c2910c3ebdc399bdb9541b4b9e074e"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+            "sha256": "377fec91d1625c53025bbd05a5dae5826ca2e94417e67d87ec307074aecaa3a7"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+            "sha256": "ba407fd2f1ded164d5f79322b229ff21ce2da1f610860f221751cee58e5c9be5"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+            "sha256": "97a6bad999248a20b633437a9874cb300f93815db9880cc6367394bebacc8085"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+            "sha256": "e5abcf5f338482ecdd8d40c72b4c20bdb06397bf0d3a78a23449fb0bc6571d70"
+          },
+          {
+            "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+            "sha256": "24f6341c4d34990447b421b72d0d4e8a3f997d945c340833ebac7cb9e424151c"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+            "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+            "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+            "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+            "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+          },
+          {
+            "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+            "sha256": "0feb1e09e960858f0b9cf52ab128a706abf144c19703e88824a0362eece45f7c"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "01cc137b512f34af97f1adb40fc95043329beef2",
