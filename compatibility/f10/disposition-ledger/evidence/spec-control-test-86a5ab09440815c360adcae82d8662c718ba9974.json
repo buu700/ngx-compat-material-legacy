@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "86a5ab09440815c360adcae82d8662c718ba9974",
+  "subject": "test: fix broken autocomplete test (#30782)",
+  "status": "reviewed",
+  "final_disposition": "adapt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "112899f571244a4f9e293a417efb8ec7769cb54d",
+      "after_blob": "9bea4d09486c693bf40d3b013afe32a65db2eda2"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 3,
+  "raw_commit_sha256": "c797a84624ae875371a8e34c7a64fdba94591078ab6889d763e3d92e26dd659d",
+  "original_sources": [
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "before": {
+        "git_blob": "112899f571244a4f9e293a417efb8ec7769cb54d",
+        "sha256": "0c80f3cf9a7bba59dbead8178d2322022b101d00e47fcbf27af9486f99e2d530",
+        "bytes": 164269
+      },
+      "after": {
+        "git_blob": "9bea4d09486c693bf40d3b013afe32a65db2eda2",
+        "sha256": "8cc27533e9e0dbd69c28c8f4001281e474423a0bc6f77ee08e576c737c0b32a2",
+        "bytes": 164295
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts\nindex 112899f571244a4f9e293a417efb8ec7769cb54d..9bea4d09486c693bf40d3b013afe32a65db2eda2 100644\n--- a/src/material/autocomplete/autocomplete.spec.ts\n+++ b/src/material/autocomplete/autocomplete.spec.ts\n@@ -35,13 +35,13 @@ import {\n   waitForAsync,\n } from '@angular/core/testing';\n import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';\n-import {MatOption, MatOptionSelectionChange} from '../core';\n-import {MatFormField, MatFormFieldModule} from '../form-field';\n-import {MatInputModule} from '../input';\n import {By} from '@angular/platform-browser';\n import {NoopAnimationsModule} from '@angular/platform-browser/animations';\n import {EMPTY, Observable, Subject, Subscription} from 'rxjs';\n import {map, startWith} from 'rxjs/operators';\n+import {MatOption, MatOptionSelectionChange} from '../core';\n+import {MatFormField, MatFormFieldModule} from '../form-field';\n+import {MatInputModule} from '../input';\n import {\n   MAT_AUTOCOMPLETE_DEFAULT_OPTIONS,\n   MAT_AUTOCOMPLETE_SCROLL_STRATEGY,\n@@ -3254,6 +3254,7 @@ describe('MatAutocomplete', () => {\n \n   it('should not throw errors when closing without options', fakeAsync(() => {\n     const fixture = createComponent(AutocompleteWithoutOptions);\n+    fixture.detectChanges();\n     const trigger = fixture.componentInstance.trigger;\n \n     trigger.openPanel();\n@@ -4521,6 +4522,5 @@ class AutocompleteInsideAModal {\n   standalone: false,\n })\n class AutocompleteWithoutOptions {\n-  @ViewChild(MatAutocompleteTrigger, { static: true }) trigger: MatAutocompleteTrigger;\n+  @ViewChild(MatAutocompleteTrigger, {static: true}) trigger: MatAutocompleteTrigger;\n }\n-\n",
+  "diff_sha256": "49d7adac421d874da3223357af4de40ec7137a38857734c28cfeb47cf2bc80a8",
+  "hunk_reviews": [
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -35,13 +35,13 @@ import {",
+      "sha256": "37f848f1a3cef52cf48c57a62d8daecc3cc906720345fcba00ca05f501daa4be",
+      "judgment": "Reorders three Material imports after RxJS imports. It changes no dependency identity or executable assertion; preserve the retained legacy imports."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -3254,6 +3254,7 @@ describe('MatAutocomplete', () => {",
+      "sha256": "0d86d179e87c365dd26b4699b16403d60b8492d2f54e76df6a15a626551b3a93",
+      "judgment": "Initializes AutocompleteWithoutOptions with fixture.detectChanges before reading its trigger. Adopt the analogous missing regression through existing SimpleAutocomplete with empty arrays, initial detection and zero-option assertion; no fixture template is changed."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -4521,6 +4522,5 @@ class AutocompleteInsideAModal {",
+      "sha256": "f1469dfa46a4cb897342fcd48581c57659479c1e246cb290d67a30efd250fbb5",
+      "judgment": "Formats the static ViewChild option and removes an EOF blank line in a modern private fixture. The retained fixture is not copied; preserve its existing declaration and template."
+    }
+  ],
+  "semantics": {
+    "kind": "initialize-empty-autocomplete-fixture-before-trigger-read",
+    "meaningful_detect_changes_insertions": 1,
+    "other_hunks": "import order and ViewChild whitespace",
+    "owned_analogous_case_added": true,
+    "fixture_template_changed": false,
+    "before_cases": 185,
+    "after_cases": 185
+  },
+  "decision": "The complete original has three hunks: import reordering, one initial detectChanges before reading the empty-options fixture trigger, and ViewChild/EOF whitespace. The meaningful initialization protects a real open/close-with-no-options regression, which was absent from the retained legacy file. Add the analogous owned case using the existing SimpleAutocomplete template, empty both backing/filtered state arrays, run initial detection, assert zero options, open, close without throwing, then destroy. The exact appended case and all previous bodies/templates are authenticated by the repair/context evidence. Keep existing imports, fixtures and selectors; cosmetic modern hunks require no change. Adapt the coverage and correct initialization order only. This source review does not claim that the new Angular case has executed.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "49d7adac421d874da3223357af4de40ec7137a38857734c28cfeb47cf2bc80a8",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete original has three hunks: import reordering, one initial detectChanges before reading the empty-options fixture trigger, and ViewChild/EOF whitespace. The meaningful initialization protects a real open/close-with-no-options regression, which was absent from the retained legacy file. Add the analogous owned case using the existing SimpleAutocomplete template, empty both backing/filtered state arrays, run initial detection, assert zero options, open, close without throwing, then destroy. The exact appended case and all previous bodies/templates are authenticated by the repair/context evidence. Keep existing imports, fixtures and selectors; cosmetic modern hunks require no change. Adapt the coverage and correct initialization order only. This source review does not claim that the new Angular case has executed.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-control-test-source-review.mjs",
+        "sha256": "6817b81d6446f99ddc66127a3f4a3169c16452c292d21d2684f52e55339b8d9d"
+      },
+      {
+        "path": "tests/spec_control_test_source_probe.mjs",
+        "sha256": "da9152519b7509679433a41902319ed7678ba05d5d09eb2a58737191128a037e"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-subjects.json.gz",
+        "sha256": "3333b248abb4429d8ff74c7293365141e4f93ee077a9835c001e8821c1e115da"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-acquisition.json.gz",
+        "sha256": "fb0626d0ed27ef4c7c87787aa99a4f7bff863c99b2cb956cdcf8d494791f263a"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-controls.json",
+        "sha256": "23c071f0024ff520ed7c922128e7612f056059b8966aff6750e94a74971f5ade"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-review.json",
+        "sha256": "ec3a9e55bc14d33c8c52fe8b13d85abf4e4c140c0a95e134997e2f4c9fa8986d"
+      },
+      {
+        "path": "scripts/spec-control-test-repair.mjs",
+        "sha256": "836346b15c9337c4a325f4a28fb8d292b4ec18db125472bc67a6e9cb476069a0"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+        "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-repair-checkpoint.json",
+        "sha256": "9a77739909104db1f1ac990836b403bf3d5972a91b8d6b77d7eefdc8ee9f7be2"
+      },
+      {
+        "path": "compatibility/rc/spec-control-context-proof.json",
+        "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+      },
+      {
+        "path": "compatibility/rc/spec-control-context-checkpoint.json",
+        "sha256": "170b779af283e415aa66b69d2659e27b4d1574bb8fd0823346436d601415450f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "86a5ab09440815c360adcae82d8662c718ba9974",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test: fix broken autocomplete test (#30782)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=0b34973dcdcf8478fff942a8d38455e3f84a7ae6a06174fc80f5aeb3797d2cdb, bytes=1682). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/autocomplete/autocomplete.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/autocomplete/autocomplete.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/86a5ab09440815c360adcae82d8662c718ba9974.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "0b34973dcdcf8478fff942a8d38455e3f84a7ae6a06174fc80f5aeb3797d2cdb"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-control-test-source-prior.json.gz",
+    "sha256": "52eb58bde06b75e55d5f3869c0adc403e1846acb414f1160f1c015000d3feeb1"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-control-test-source-review.mjs",
+      "sha256": "6817b81d6446f99ddc66127a3f4a3169c16452c292d21d2684f52e55339b8d9d"
+    },
+    {
+      "path": "tests/spec_control_test_source_probe.mjs",
+      "sha256": "da9152519b7509679433a41902319ed7678ba05d5d09eb2a58737191128a037e"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-subjects.json.gz",
+      "sha256": "3333b248abb4429d8ff74c7293365141e4f93ee077a9835c001e8821c1e115da"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-acquisition.json.gz",
+      "sha256": "fb0626d0ed27ef4c7c87787aa99a4f7bff863c99b2cb956cdcf8d494791f263a"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-controls.json",
+      "sha256": "23c071f0024ff520ed7c922128e7612f056059b8966aff6750e94a74971f5ade"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-review.json",
+      "sha256": "ec3a9e55bc14d33c8c52fe8b13d85abf4e4c140c0a95e134997e2f4c9fa8986d"
+    },
+    {
+      "path": "scripts/spec-control-test-repair.mjs",
+      "sha256": "836346b15c9337c4a325f4a28fb8d292b4ec18db125472bc67a6e9cb476069a0"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-repair-checkpoint.json",
+      "sha256": "9a77739909104db1f1ac990836b403bf3d5972a91b8d6b77d7eefdc8ee9f7be2"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-checkpoint.json",
+      "sha256": "170b779af283e415aa66b69d2659e27b4d1574bb8fd0823346436d601415450f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    }
+  ],
+  "owned_test_coverage_adapted": true,
+  "production_HTML_CSS_SCSS_or_TS_changed_in_this_review": false,
+  "actual_new_Angular_cases_executed": false,
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

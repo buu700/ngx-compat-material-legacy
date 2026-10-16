@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "830e39ee983fcee507d3f42362b36d734cac8132",
+  "subject": "test(material/menu): enable exhaustive checks for all tests",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "b2f150e3d139a58181b198c80c942540b657fe4b",
+      "after_blob": "2dd79464239a44df537b5031ed615d69e7ac99ab"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 6,
+  "raw_commit_sha256": "d260583e3a26dac5df7a52cd217b621286fa254ca87634f4077ad7affcada90c",
+  "original_sources": [
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "before": {
+        "git_blob": "b2f150e3d139a58181b198c80c942540b657fe4b",
+        "sha256": "8e336d49ad659c010bb642283cbd8744ee9b92eb28083b31204d17b176041162",
+        "bytes": 108260
+      },
+      "after": {
+        "git_blob": "2dd79464239a44df537b5031ed615d69e7ac99ab",
+        "sha256": "e67c7540de593e9b32c42f5bfb75ef92bd245ea8b2b53d76a46f2bbfb0c11ed7",
+        "bytes": 108321
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts\nindex b2f150e3d139a58181b198c80c942540b657fe4b..2dd79464239a44df537b5031ed615d69e7ac99ab 100644\n--- a/src/material/menu/menu.spec.ts\n+++ b/src/material/menu/menu.spec.ts\n@@ -22,7 +22,6 @@ import {\n   Input,\n   OnDestroy,\n   Output,\n-  provideCheckNoChangesConfig,\n   QueryList,\n   signal,\n   TemplateRef,\n@@ -1744,7 +1743,6 @@ describe('MatMenu', () => {\n       direction = 'ltr';\n       TestBed.resetTestingModule().configureTestingModule({\n         providers: [\n-          provideCheckNoChangesConfig({exhaustive: false}),\n           {\n             provide: Directionality,\n             useValue: {\n@@ -1907,7 +1905,7 @@ describe('MatMenu', () => {\n         .withContext('Expected two open menus')\n         .toBe(2);\n \n-      items[1].componentInstance.disabled = true;\n+      fixture.componentInstance.secondItemDisabled = true;\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n \n@@ -1932,7 +1930,7 @@ describe('MatMenu', () => {\n \n       const item = fixture.debugElement.query(By.directive(MatMenuItem))!;\n \n-      item.componentInstance.disabled = true;\n+      fixture.componentInstance.firstItemDisabled = true;\n       fixture.changeDetectorRef.markForCheck();\n       fixture.detectChanges();\n \n@@ -2728,8 +2726,9 @@ class CustomMenu {\n       <button mat-menu-item\n         id=\"level-one-trigger\"\n         [matMenuTriggerFor]=\"levelOne\"\n+        [disabled]=\"firstItemDisabled\"\n         #levelOneTrigger=\"matMenuTrigger\">One</button>\n-      <button mat-menu-item>Two</button>\n+      <button mat-menu-item [disabled]=\"secondItemDisabled\">Two</button>\n       @if (showLazy) {\n         <button mat-menu-item\n           id=\"lazy-trigger\"\n@@ -2779,6 +2778,9 @@ class NestedMenu {\n   @ViewChild('lazy') lazyMenu: MatMenu;\n   @ViewChild('lazyTrigger') lazyTrigger: MatMenuTrigger;\n   showLazy = false;\n+\n+  firstItemDisabled = false;\n+  secondItemDisabled = false;\n }\n \n @Component({\n",
+  "diff_sha256": "1e15281ea26282268e768b6f70d79ec113a0224f745445e6ae089719c6534430",
+  "hunk_reviews": [
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "header": "@@ -22,7 +22,6 @@ import {",
+      "sha256": "81678f08b1324a43c92cf6033b556e3b10c80d5ce81e47ace03209cb6dc336af",
+      "judgment": "Removes the provideCheckNoChangesConfig import used by the private test override. The owned spec imports no such API, and no product import is needed."
+    },
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "header": "@@ -1744,7 +1743,6 @@ describe('MatMenu', () => {",
+      "sha256": "79b2672e4f4d1c759f4cb7df5a9261834420dd1bed81ef2607a75bf8916fcc61",
+      "judgment": "Removes exhaustive:false from the private nested-menu TestBed providers. The owned menu/bootstrap has no corresponding provider to remove. Exact minimum Core source defaults false; no actual runtime/floor success is inferred."
+    },
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "header": "@@ -1907,7 +1905,7 @@ describe('MatMenu', () => {",
+      "sha256": "95bda5131bf5fe2ff130ea2f830d0dd9868dc7b01afd4ce3c7012154409f2ed3",
+      "judgment": "Changes disabled sibling mutation from the menu item to the new secondItemDisabled fixture input binding. Preserve the owned disabled sibling API mutation, hover handler and one-panel assertion."
+    },
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "header": "@@ -1932,7 +1930,7 @@ describe('MatMenu', () => {",
+      "sha256": "4646c9eccd0e33f8031a419bb9bf31a0131cdab035d8503eaa5d320d61333af5",
+      "judgment": "Changes disabled trigger mutation to the firstItemDisabled fixture field. Preserve the owned disabled trigger API mutation, hover handler and one-panel assertion."
+    },
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "header": "@@ -2728,8 +2726,9 @@ class CustomMenu {",
+      "sha256": "d18433344a4686abf89e119687eadf11609dbd6e04d0ee3ead05c5930adf0ddc",
+      "judgment": "Adds first/second disabled bindings to the two root NestedMenu buttons. Complete-file context identifies NestedMenu despite the Git hunk heading mentioning preceding CustomMenu. Keep the owned fixture template unchanged."
+    },
+    {
+      "path": "src/material/menu/menu.spec.ts",
+      "header": "@@ -2779,6 +2778,9 @@ class NestedMenu {",
+      "sha256": "72dd693a69392e624a2997c3877e3fff78195a6bf5170e2eb08d054625a2bb90",
+      "judgment": "Adds the two false-valued fields to NestedMenu for those bindings. They are private exhaustive-test plumbing, not a change to disabled coercion or the public item API; no owned fields are required."
+    }
+  ],
+  "semantics": {
+    "kind": "private-nested-menu-exhaustive-check-enablement",
+    "removed_local_exhaustive_false_override": 1,
+    "disabled_assignments_moved_to_bound_fixture_fields": 2,
+    "fixture_disabled_bindings_added": 2,
+    "public_disabled_API_changed": false,
+    "before_cases": 121,
+    "after_cases": 121
+  },
+  "decision": "The six original menu hunks remove a private exhaustive:false test provider and its import, move two disabled mutations from item instances to parent fixture fields, and add the two corresponding bindings and fields to NestedMenu. The same disabled-sibling/disabled-trigger hover regressions are present in the owned suite, so this is not an unreachable-menu exclusion. The retained spec/bootstrap has no exhaustive override, and authenticated exact Core21.2.23/22.1.7 runtime sources set the exhaustive-check default to false. That is a bounded static applicability argument, not an actual test-floor result. Keep both direct disabled API/hover assertions and the legacy fixture template; enabling upstream private exhaustive testing is not required for the retained runner. Do not adopt this private fixture rewrite or remove any assertion. Actual artifact disabled-hover, rendering and supported-floor checks remain required.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "1e15281ea26282268e768b6f70d79ec113a0224f745445e6ae089719c6534430",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The six original menu hunks remove a private exhaustive:false test provider and its import, move two disabled mutations from item instances to parent fixture fields, and add the two corresponding bindings and fields to NestedMenu. The same disabled-sibling/disabled-trigger hover regressions are present in the owned suite, so this is not an unreachable-menu exclusion. The retained spec/bootstrap has no exhaustive override, and authenticated exact Core21.2.23/22.1.7 runtime sources set the exhaustive-check default to false. That is a bounded static applicability argument, not an actual test-floor result. Keep both direct disabled API/hover assertions and the legacy fixture template; enabling upstream private exhaustive testing is not required for the retained runner. Do not adopt this private fixture rewrite or remove any assertion. Actual artifact disabled-hover, rendering and supported-floor checks remain required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-control-test-source-review.mjs",
+        "sha256": "6817b81d6446f99ddc66127a3f4a3169c16452c292d21d2684f52e55339b8d9d"
+      },
+      {
+        "path": "tests/spec_control_test_source_probe.mjs",
+        "sha256": "da9152519b7509679433a41902319ed7678ba05d5d09eb2a58737191128a037e"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-subjects.json.gz",
+        "sha256": "3333b248abb4429d8ff74c7293365141e4f93ee077a9835c001e8821c1e115da"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-acquisition.json.gz",
+        "sha256": "fb0626d0ed27ef4c7c87787aa99a4f7bff863c99b2cb956cdcf8d494791f263a"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-controls.json",
+        "sha256": "23c071f0024ff520ed7c922128e7612f056059b8966aff6750e94a74971f5ade"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-review.json",
+        "sha256": "ec3a9e55bc14d33c8c52fe8b13d85abf4e4c140c0a95e134997e2f4c9fa8986d"
+      },
+      {
+        "path": "scripts/spec-control-test-repair.mjs",
+        "sha256": "836346b15c9337c4a325f4a28fb8d292b4ec18db125472bc67a6e9cb476069a0"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+        "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-repair-checkpoint.json",
+        "sha256": "9a77739909104db1f1ac990836b403bf3d5972a91b8d6b77d7eefdc8ee9f7be2"
+      },
+      {
+        "path": "compatibility/rc/spec-control-context-proof.json",
+        "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+      },
+      {
+        "path": "compatibility/rc/spec-control-context-checkpoint.json",
+        "sha256": "170b779af283e415aa66b69d2659e27b4d1574bb8fd0823346436d601415450f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+        "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+        "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368"
+      },
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "0eed39e86075f38a2f0e3c65bc0db1ec58da7b3d3e565ca87e1750071522913b"
+      },
+      {
+        "path": "compatibility/rc/material-public-subjects.json",
+        "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/22.1.7/fesm2022/_debug_node-chunk.mjs",
+        "sha256": "29bbc73e55bbfc1d541628946de10d7c81697fcbf7ad9cccd3ba795da5b2ce19"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/22.1.7/types/core.d.ts",
+        "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/21.2.23/fesm2022/_debug_node-chunk.mjs",
+        "sha256": "989c2736c705135d8ec0bf60f6ed8be93f769cac8b6c77626bc3685ad4df09f7"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/21.2.23/types/core.d.ts",
+        "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "830e39ee983fcee507d3f42362b36d734cac8132",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/menu): enable exhaustive checks for all tests",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=119518dff124de4b11559771137d94bd3870c81cc452aff1dbde629510fa090c, bytes=1930). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/menu/menu.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/menu/menu.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/830e39ee983fcee507d3f42362b36d734cac8132.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "119518dff124de4b11559771137d94bd3870c81cc452aff1dbde629510fa090c"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-control-test-source-prior.json.gz",
+    "sha256": "52eb58bde06b75e55d5f3869c0adc403e1846acb414f1160f1c015000d3feeb1"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-control-test-source-review.mjs",
+      "sha256": "6817b81d6446f99ddc66127a3f4a3169c16452c292d21d2684f52e55339b8d9d"
+    },
+    {
+      "path": "tests/spec_control_test_source_probe.mjs",
+      "sha256": "da9152519b7509679433a41902319ed7678ba05d5d09eb2a58737191128a037e"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-subjects.json.gz",
+      "sha256": "3333b248abb4429d8ff74c7293365141e4f93ee077a9835c001e8821c1e115da"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-acquisition.json.gz",
+      "sha256": "fb0626d0ed27ef4c7c87787aa99a4f7bff863c99b2cb956cdcf8d494791f263a"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-controls.json",
+      "sha256": "23c071f0024ff520ed7c922128e7612f056059b8966aff6750e94a74971f5ade"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-review.json",
+      "sha256": "ec3a9e55bc14d33c8c52fe8b13d85abf4e4c140c0a95e134997e2f4c9fa8986d"
+    },
+    {
+      "path": "scripts/spec-control-test-repair.mjs",
+      "sha256": "836346b15c9337c4a325f4a28fb8d292b4ec18db125472bc67a6e9cb476069a0"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-repair-checkpoint.json",
+      "sha256": "9a77739909104db1f1ac990836b403bf3d5972a91b8d6b77d7eefdc8ee9f7be2"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-checkpoint.json",
+      "sha256": "170b779af283e415aa66b69d2659e27b4d1574bb8fd0823346436d601415450f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+      "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+      "sha256": "82aaefb570df0953de0051aca4b3a987106b8ff3ea27e56d2e4c55fe75b461b4"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+      "sha256": "f2d261227d8fa8e04a8773d57373ca6c78ffe20081bff8a0c809991969fba368"
+    },
+    {
+      "path": "testing/legacy-runner/init-test-env.ts",
+      "sha256": "0eed39e86075f38a2f0e3c65bc0db1ec58da7b3d3e565ca87e1750071522913b"
+    },
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/22.1.7/fesm2022/_debug_node-chunk.mjs",
+      "sha256": "29bbc73e55bbfc1d541628946de10d7c81697fcbf7ad9cccd3ba795da5b2ce19"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/22.1.7/types/core.d.ts",
+      "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/21.2.23/fesm2022/_debug_node-chunk.mjs",
+      "sha256": "989c2736c705135d8ec0bf60f6ed8be93f769cac8b6c77626bc3685ad4df09f7"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/21.2.23/types/core.d.ts",
+      "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+    }
+  ],
+  "owned_test_coverage_adapted": false,
+  "production_HTML_CSS_SCSS_or_TS_changed_in_this_review": false,
+  "actual_new_Angular_cases_executed": false,
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

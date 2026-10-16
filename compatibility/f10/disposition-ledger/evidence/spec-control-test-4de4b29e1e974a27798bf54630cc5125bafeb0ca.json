@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "4de4b29e1e974a27798bf54630cc5125bafeb0ca",
+  "subject": "test(material/chips): remove dependency on NoopAnimationsModule (#31791)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "8058cb125377a3c51ad8b9cdfd97485ca18ff11b",
+      "after_blob": "8c2c9a060211ebdf80b8a2edec29def543d7a128"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 8,
+  "raw_commit_sha256": "1a6e7226ade9745def683fe0ef1e225a9798966373205e50f5675ac524404d97",
+  "original_sources": [
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "before": {
+        "git_blob": "8058cb125377a3c51ad8b9cdfd97485ca18ff11b",
+        "sha256": "4734fd1ac504deffeb9882af143a70f27b4785b4131354f243134d70b22aecce",
+        "bytes": 45954
+      },
+      "after": {
+        "git_blob": "8c2c9a060211ebdf80b8a2edec29def543d7a128",
+        "sha256": "c23eae7dca4c523b89eccb9e1b24d02fa8b746a3c592458b3345ded0eb160e66",
+        "bytes": 45064
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/chips/chip-grid.spec.ts b/src/material/chips/chip-grid.spec.ts\nindex 8058cb125377a3c51ad8b9cdfd97485ca18ff11b..8c2c9a060211ebdf80b8a2edec29def543d7a128 100644\n--- a/src/material/chips/chip-grid.spec.ts\n+++ b/src/material/chips/chip-grid.spec.ts\n@@ -37,7 +37,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';\n import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';\n import {FormControl, FormsModule, NgForm, ReactiveFormsModule, Validators} from '@angular/forms';\n import {By} from '@angular/platform-browser';\n-import {NoopAnimationsModule} from '@angular/platform-browser/animations';\n import {MATERIAL_ANIMATIONS} from '../core';\n import {MatError, MatFormField, MatHint, MatLabel} from '../form-field';\n import {\n@@ -178,13 +177,14 @@ describe('MatChipGrid', () => {\n \n       describe('on chip destroy', () => {\n         it('should focus the next item', () => {\n-          // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.\n-          // It can indicate a deeper issue with the chips.\n-          const fixture = createComponent(StandardChipGrid, undefined, [NoopAnimationsModule]);\n-          const midItem = chips.get(2)!;\n+          const fixture = createComponent(StandardChipGrid);\n+          const midItemAction = primaryActions[2];\n+          patchElementFocus(midItemAction);\n \n           // Focus the middle item\n-          midItem.focus();\n+          midItemAction.focus();\n+          fixture.changeDetectorRef.markForCheck();\n+          fixture.detectChanges();\n \n           // Destroy the middle item\n           testComponent.chips.splice(2, 1);\n@@ -196,11 +196,14 @@ describe('MatChipGrid', () => {\n         });\n \n         it('should focus the previous item', () => {\n-          // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.\n-          // It can indicate a deeper issue with the chips.\n-          const fixture = createComponent(StandardChipGrid, undefined, [NoopAnimationsModule]);\n+          const fixture = createComponent(StandardChipGrid);\n+          const lastAction = primaryActions[primaryActions.length - 1];\n+\n           // Focus the last item\n-          chips.last.focus();\n+          patchElementFocus(lastAction);\n+          lastAction.focus();\n+          fixture.changeDetectorRef.markForCheck();\n+          fixture.detectChanges();\n \n           // Destroy the last item\n           testComponent.chips.pop();\n@@ -212,9 +215,7 @@ describe('MatChipGrid', () => {\n         });\n \n         it('should not focus if chip grid is not focused', fakeAsync(() => {\n-          // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.\n-          // It can indicate a deeper issue with the chips.\n-          const fixture = createComponent(StandardChipGrid, undefined, [NoopAnimationsModule]);\n+          const fixture = createComponent(StandardChipGrid);\n           const midItem = chips.get(2)!;\n \n           // Focus and blur the middle item\n@@ -233,9 +234,7 @@ describe('MatChipGrid', () => {\n         }));\n \n         it('should focus the grid if the last focused item is removed', () => {\n-          // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.\n-          // It can indicate a deeper issue with the chips.\n-          const fixture = createComponent(StandardChipGrid, undefined, [NoopAnimationsModule]);\n+          const fixture = createComponent(StandardChipGrid);\n           testComponent.chips = [0];\n           fixture.changeDetectorRef.markForCheck();\n \n@@ -252,7 +251,7 @@ describe('MatChipGrid', () => {\n       });\n \n       it('should have a focus indicator', () => {\n-        createComponent(StandardChipGrid, undefined, [NoopAnimationsModule]);\n+        createComponent(StandardChipGrid);\n         const focusIndicators = chipGridNativeElement.querySelectorAll(\n           '.mat-mdc-chip-primary-focus-indicator',\n         );\n@@ -510,9 +509,7 @@ describe('MatChipGrid', () => {\n   describe('FormFieldChipGrid', () => {\n     describe('keyboard behavior', () => {\n       it('should maintain focus if the active chip is deleted', () => {\n-        // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.\n-        // It can indicate a deeper issue with the chips.\n-        const fixture = createComponent(FormFieldChipGrid, undefined, [NoopAnimationsModule]);\n+        const fixture = createComponent(FormFieldChipGrid);\n         const secondChip = fixture.nativeElement.querySelectorAll('.mat-mdc-chip')[1];\n         const secondChipAction = secondChip.querySelector('.mdc-evolution-chip__action--primary');\n \n@@ -658,9 +655,7 @@ describe('MatChipGrid', () => {\n \n   describe('with chip remove', () => {\n     it('should properly focus next item if chip is removed through click', fakeAsync(() => {\n-      // TODO(crisbeto): this test fails without the NoopAnimationsModule for some reason.\n-      // It can indicate a deeper issue with the chips.\n-      const fixture = createComponent(ChipGridWithRemove, undefined, [NoopAnimationsModule]);\n+      const fixture = createComponent(ChipGridWithRemove);\n       flush();\n       const trailingActions = chipGridNativeElement.querySelectorAll<HTMLElement>(\n         '.mdc-evolution-chip__action--secondary',\n",
+  "diff_sha256": "7fc2ad4a061ad631cec981ad330487b27ef4926ce9f7f454a769477420134cdc",
+  "hunk_reviews": [
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -37,7 +37,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';",
+      "sha256": "6dc033025b7c60189a56e70032cefd017fcb514caa55b6ddc6443b66c8efd040",
+      "judgment": "Removes the private chip-grid NoopAnimationsModule import. The owned chip-list spec already has no such import and uses a public core token provider."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -178,13 +177,14 @@ describe('MatChipGrid', () => {",
+      "sha256": "7cd842f2ba7f15ab13be739916bea4408ac2a3062604af2efbe666e509d9578c",
+      "judgment": "Drops the next-item test module argument/TODO and moves focus from the chip to a patched primary action followed by mark/render. Keep the legacy chip-host focus and next active-index assertion."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -196,11 +196,14 @@ describe('MatChipGrid', () => {",
+      "sha256": "c2e90262cc108327cf0f7168b8fb3ff23bb898cb3da7c7a401e7ae1afed82fb6",
+      "judgment": "Drops the previous-item test module argument/TODO and moves focus to the patched last primary action followed by mark/render. Keep the legacy host focus and previous active-index assertion."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -212,9 +215,7 @@ describe('MatChipGrid', () => {",
+      "sha256": "19ffd08c265846853a34cd589d886909ebc779eed5b10cacf426ea3d0d6a8bec",
+      "judgment": "Drops the unfocused-grid removal test module argument/TODO. Keep the analogous owned host blur/zone-exit/no-active-item test; do not substitute a grid/action fixture."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -233,9 +234,7 @@ describe('MatChipGrid', () => {",
+      "sha256": "93e98a9513aef68cdb386b849251faea5074a9462efb48636a37f41f49db1273",
+      "judgment": "Drops the final-item grid-focus test module argument/TODO. Keep the owned legacy list-focus fallback assertion."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -252,7 +251,7 @@ describe('MatChipGrid', () => {",
+      "sha256": "a3cd5d5dc77610de34d73f101613ff2f97bc6581ca6f92df11770a3db4a8b358",
+      "judgment": "Drops the module argument from the modern primary focus-indicator query. Legacy host structure/classes are preserved; no modern focus-indicator selector is introduced."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -510,9 +509,7 @@ describe('MatChipGrid', () => {",
+      "sha256": "0b3d09536476eacd23cd4416026edaac57a1a11e4464c782e454302e7d27a350",
+      "judgment": "Drops the module argument/TODO from a FormFieldChipGrid active-chip deletion test. The owned legacy chip/form and host-focus coverage remains required; this is not evidence of execution."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -658,9 +655,7 @@ describe('MatChipGrid', () => {",
+      "sha256": "9f0213aee0c8011d981c8ea9f06ecea5229aeabb4dd75acdbebafbc8d4d098dd",
+      "judgment": "Drops the module argument/TODO from removal via a secondary chip-grid action. Preserve the retained legacy removal/focus cases. Neither the existing token marker nor this source decision establishes real animated-host or native-focus behavior."
+    }
+  ],
+  "semantics": {
+    "kind": "modern-chip-grid-noop-module-removal-and-action-focus-setup",
+    "module_import_removed": 1,
+    "explicit_noop_module_call_arguments_removed": 7,
+    "focus_setup_moves_host_to_primary_action": 2,
+    "extra_mark_and_render_pairs": 2,
+    "removed_todo_comments": 6,
+    "production_chip_focus_changed": false,
+    "before_cases": 66,
+    "after_cases": 66
+  },
+  "decision": "The eight original chip-grid hunks remove one NoopAnimationsModule import and seven explicit module arguments. Six associated TODO comments are removed; the first two focus-removal tests additionally focus patched modern primary-action elements and mark/render before deleting the chip. The owned legacy chip list has analogous next/previous/blur/list fallback removal checks, but focus goes through the chip host and FocusKeyManager. Its owned spec already uses an ANIMATION_MODULE_TYPE provider instead of that engine NgModule. Exact Core21.2.23/22.1.7 public declarations mark this token public without deprecation; no token migration follows from the module removal. Do not transplant modern primary-action selectors, fake focus setup or a chip-grid contract into legacy controls. Preserve all legacy cases and host-focus assertions. The token marker is not an animation engine or actual animated-host/native-focus proof; those obligations remain pending.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "7fc2ad4a061ad631cec981ad330487b27ef4926ce9f7f454a769477420134cdc",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The eight original chip-grid hunks remove one NoopAnimationsModule import and seven explicit module arguments. Six associated TODO comments are removed; the first two focus-removal tests additionally focus patched modern primary-action elements and mark/render before deleting the chip. The owned legacy chip list has analogous next/previous/blur/list fallback removal checks, but focus goes through the chip host and FocusKeyManager. Its owned spec already uses an ANIMATION_MODULE_TYPE provider instead of that engine NgModule. Exact Core21.2.23/22.1.7 public declarations mark this token public without deprecation; no token migration follows from the module removal. Do not transplant modern primary-action selectors, fake focus setup or a chip-grid contract into legacy controls. Preserve all legacy cases and host-focus assertions. The token marker is not an animation engine or actual animated-host/native-focus proof; those obligations remain pending.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-control-test-source-review.mjs",
+        "sha256": "6817b81d6446f99ddc66127a3f4a3169c16452c292d21d2684f52e55339b8d9d"
+      },
+      {
+        "path": "tests/spec_control_test_source_probe.mjs",
+        "sha256": "da9152519b7509679433a41902319ed7678ba05d5d09eb2a58737191128a037e"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-subjects.json.gz",
+        "sha256": "3333b248abb4429d8ff74c7293365141e4f93ee077a9835c001e8821c1e115da"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-acquisition.json.gz",
+        "sha256": "fb0626d0ed27ef4c7c87787aa99a4f7bff863c99b2cb956cdcf8d494791f263a"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-controls.json",
+        "sha256": "23c071f0024ff520ed7c922128e7612f056059b8966aff6750e94a74971f5ade"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-source-review.json",
+        "sha256": "ec3a9e55bc14d33c8c52fe8b13d85abf4e4c140c0a95e134997e2f4c9fa8986d"
+      },
+      {
+        "path": "scripts/spec-control-test-repair.mjs",
+        "sha256": "836346b15c9337c4a325f4a28fb8d292b4ec18db125472bc67a6e9cb476069a0"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+        "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+      },
+      {
+        "path": "compatibility/rc/spec-control-test-repair-checkpoint.json",
+        "sha256": "9a77739909104db1f1ac990836b403bf3d5972a91b8d6b77d7eefdc8ee9f7be2"
+      },
+      {
+        "path": "compatibility/rc/spec-control-context-proof.json",
+        "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+      },
+      {
+        "path": "compatibility/rc/spec-control-context-checkpoint.json",
+        "sha256": "170b779af283e415aa66b69d2659e27b4d1574bb8fd0823346436d601415450f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+        "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+        "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+      },
+      {
+        "path": "compatibility/rc/material-public-subjects.json",
+        "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/22.1.7/fesm2022/_debug_node-chunk.mjs",
+        "sha256": "29bbc73e55bbfc1d541628946de10d7c81697fcbf7ad9cccd3ba795da5b2ce19"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/22.1.7/types/core.d.ts",
+        "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/21.2.23/fesm2022/_debug_node-chunk.mjs",
+        "sha256": "989c2736c705135d8ec0bf60f6ed8be93f769cac8b6c77626bc3685ad4df09f7"
+      },
+      {
+        "path": "compatibility/rc/framework-enum-sources/21.2.23/types/core.d.ts",
+        "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "4de4b29e1e974a27798bf54630cc5125bafeb0ca",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/chips): remove dependency on NoopAnimationsModule (#31791)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=1adccba8a709744a4c9011c575cdfd12302e19ed02ce0fc94b324a2a349099f3, bytes=5263). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/chips/chip-grid.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/chips/chip-grid.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/4de4b29e1e974a27798bf54630cc5125bafeb0ca.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "1adccba8a709744a4c9011c575cdfd12302e19ed02ce0fc94b324a2a349099f3"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-control-test-source-prior.json.gz",
+    "sha256": "52eb58bde06b75e55d5f3869c0adc403e1846acb414f1160f1c015000d3feeb1"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-control-test-source-review.mjs",
+      "sha256": "6817b81d6446f99ddc66127a3f4a3169c16452c292d21d2684f52e55339b8d9d"
+    },
+    {
+      "path": "tests/spec_control_test_source_probe.mjs",
+      "sha256": "da9152519b7509679433a41902319ed7678ba05d5d09eb2a58737191128a037e"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-subjects.json.gz",
+      "sha256": "3333b248abb4429d8ff74c7293365141e4f93ee077a9835c001e8821c1e115da"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-acquisition.json.gz",
+      "sha256": "fb0626d0ed27ef4c7c87787aa99a4f7bff863c99b2cb956cdcf8d494791f263a"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-controls.json",
+      "sha256": "23c071f0024ff520ed7c922128e7612f056059b8966aff6750e94a74971f5ade"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-source-review.json",
+      "sha256": "ec3a9e55bc14d33c8c52fe8b13d85abf4e4c140c0a95e134997e2f4c9fa8986d"
+    },
+    {
+      "path": "scripts/spec-control-test-repair.mjs",
+      "sha256": "836346b15c9337c4a325f4a28fb8d292b4ec18db125472bc67a6e9cb476069a0"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+    },
+    {
+      "path": "compatibility/rc/spec-control-test-repair-checkpoint.json",
+      "sha256": "9a77739909104db1f1ac990836b403bf3d5972a91b8d6b77d7eefdc8ee9f7be2"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-checkpoint.json",
+      "sha256": "170b779af283e415aa66b69d2659e27b4d1574bb8fd0823346436d601415450f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+      "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2"
+    },
+    {
+      "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+      "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+    },
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/22.1.7/fesm2022/_debug_node-chunk.mjs",
+      "sha256": "29bbc73e55bbfc1d541628946de10d7c81697fcbf7ad9cccd3ba795da5b2ce19"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/22.1.7/types/core.d.ts",
+      "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/21.2.23/fesm2022/_debug_node-chunk.mjs",
+      "sha256": "989c2736c705135d8ec0bf60f6ed8be93f769cac8b6c77626bc3685ad4df09f7"
+    },
+    {
+      "path": "compatibility/rc/framework-enum-sources/21.2.23/types/core.d.ts",
+      "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+    }
+  ],
+  "owned_test_coverage_adapted": false,
+  "production_HTML_CSS_SCSS_or_TS_changed_in_this_review": false,
+  "actual_new_Angular_cases_executed": false,
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
