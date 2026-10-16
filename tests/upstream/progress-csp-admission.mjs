@@ -17,11 +17,12 @@ import {execFileSync, spawnSync} from 'node:child_process';
 import {createFixture, hash} from './artifact-behavior-fixture.mjs';
 import {PROGRESS_CSP_SHAS, PROGRESS_CSP_KIND, progressCspRequirements, requiresProgressCsp, validateProgressCsp} from '../../scripts/upstream-progress-csp-evidence.mjs';
 import {inspectProgressCspJudgments} from '../../scripts/progress-csp-source-judgments.mjs';
+import {readIdentityPredecessor} from './identity-source-context.mjs';
 import {qualifyRelease} from '../../scripts/browser-matrix-acceptance.mjs';
 import * as rosterModule from '../../scripts/browser-matrix-roster.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..'), read = path => readFileSync(join(root, path));
 const ts = createRequire(import.meta.url)('typescript');
-const judgments = inspectProgressCspJudgments({root}), line = judgments.proof.line;
+const judgments = inspectProgressCspJudgments({root, readMember: path => readIdentityPredecessor(path, read)}), line = judgments.proof.line;
 const definitionSource = ts.createSourceFile('browser.mjs', read('scripts/browser-matrix-acceptance.mjs').toString(), ts.ScriptTarget.Latest, true);
 const writer = definitionSource.statements.find(node => ts.isFunctionDeclaration(node) && node.name?.text === 'runAcceptance').getText(definitionSource).replace(/^export /, '');
 let progress;
@@ -56,6 +57,7 @@ const escaped = progressCspRequirements(PROGRESS_CSP_SHAS[0]); escaped.members.l
 assert.ok(progressCspRequirements(PROGRESS_CSP_SHAS[0]).members.length > 0); assert.equal(progressCspRequirements(PROGRESS_CSP_SHAS[0]).runtimes.length, 2);
 for (const [index, sha] of PROGRESS_CSP_SHAS.entries()) {
   const entry = structuredClone(judgments.entries.find(row => row.sha === sha)), review = JSON.parse(judgments.writes.get(entry.evidence_report));
+  entry.individual_proof.progress_csp_behavior.source_members.find(row => row.path === 'scripts/check-upstream-audit-disposition.mjs').sha256 = hash(read('scripts/check-upstream-audit-disposition.mjs'));
   // Existing fixture accepts an explicit member list before its fake use census.
   entry.individual_proof.artifact_behavior = {source_members: entry.individual_proof.progress_csp_behavior.source_members};
   const f = createFixture(root, {entry, review}); delete f.entry.individual_proof.artifact_behavior;
@@ -202,8 +204,8 @@ for (const [path, mutate] of [
   ['scripts/upstream-artifact-behavior-evidence.mjs', bytes => Buffer.concat([bytes, Buffer.from('\n')])],
   ['compatibility/rc/chip-menu-tooltip-admission-guard-change.json', bytes => Buffer.concat([bytes, Buffer.from('\n')])],
 ]) {
-  const original = read(path), changed = mutate(original); assert.notDeepEqual(changed, original);
-  assert.throws(() => inspectProgressCspJudgments({root, readMember: target => target === path ? changed : read(target)}), undefined, path); sourceCases++;
+  const original = readIdentityPredecessor(path, read), changed = mutate(original); assert.notDeepEqual(changed, original);
+  assert.throws(() => inspectProgressCspJudgments({root, readMember: target => target === path ? changed : readIdentityPredecessor(target, read)}), undefined, path); sourceCases++;
 }
 const output = {schema_version: 1, line, subjects: 2, full_packed_roster: 106, full_browser_roster: 912,
   helper_controls: helperCases, semantic_progress_controls: semanticCases, actual_CLI_controls: cliCases, source_corruptions_rejected: sourceCases,

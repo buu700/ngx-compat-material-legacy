@@ -35,6 +35,7 @@ import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individ
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
 import {requiresHistoricalBehavior,validateHistoricalBehavior} from './upstream-historical-behavior-evidence.mjs';
 import {requiresProgressCsp,validateProgressCsp} from './upstream-progress-csp-evidence.mjs';
+import {requiresGeneratedIdentity,validateGeneratedIdentity} from './upstream-generated-identity-evidence.mjs';
 import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
 import {SLIDER_THUMB_DESTROY_SHA, SLIDER_THUMB_DESTROY_ROLE, sliderThumbDestroyEvidenceOk} from './upstream-slider-thumb-destroy-scope.mjs';
 import {BAZEL_BUILD_SHAS, BAZEL_BUILD_ROLE, bazelBuildEvidenceOk} from './upstream-bazel-build-scope.mjs';
@@ -256,6 +257,11 @@ function individualProofOk(entry) {
   if (line && !proof.affected_branches.includes(line)) return false;
   if (typeof proof.decision !== 'string' || proof.decision.trim().length < 40) return false;
   if (proof.proof_kind === 'batch' || proof.proof_kind === 'ancestry' || proof.proof_kind === 'import') return false;
+  if (requiresGeneratedIdentity(entry, proof)) {
+    const result = validateGeneratedIdentity({root, entry, proof, request});
+    artifactBehaviorResults.set(entry.sha, result);
+    if (!result.ok) return false;
+  }
   if (requiresProgressCsp(entry, proof)) {
     const result = validateProgressCsp({root, entry, proof, request});
     artifactBehaviorResults.set(entry.sha, result);
@@ -317,7 +323,7 @@ for (const entry of ledgerBySha.values()) {
     missingEvidence.push(entry.sha);
     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});
   }
-  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof);
+  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof);
   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);
   if (needsIndividual && !individualProofOk(entry)) {
     if (sensitive) insufficientSensitive.push(entry.sha);

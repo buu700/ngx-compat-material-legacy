@@ -17,6 +17,7 @@ import {HISTORICAL_BEHAVIOR_KIND, HISTORICAL_BEHAVIOR_SHAS, historicalBehaviorRe
   requiresHistoricalBehavior, validateHistoricalBehavior} from '../../scripts/upstream-historical-behavior-evidence.mjs';
 import {createFixture, hash} from './artifact-behavior-fixture.mjs';
 import {stripProgressCspIntegration, precedingHistoricalContextMember} from './progress-csp-source-context.mjs';
+import {stripIdentityIntegration} from './identity-source-context.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const read = p => fs.readFileSync(path.join(root, p));
@@ -34,7 +35,7 @@ const historicalGuard = '  if (requiresHistoricalBehavior(entry, proof)) {\n    
 const historicalEnvironment = "  let historicalExecution;\n  if (process.env.RC_UPSTREAM_HISTORICAL !== undefined) {\n    try { historicalExecution = JSON.parse(process.env.RC_UPSTREAM_HISTORICAL); }\n    catch { return {error: 'RC_UPSTREAM_HISTORICAL is not JSON'}; }\n  }\n";
 const historicalCapture = "        env['RC_UPSTREAM_HISTORICAL'] = json.dumps({\n            'run_id': ACTIVE_RUN.manifest['run_id'],\n            'invocation_id': ACTIVE_RUN.invocations.get('historical-legacy-artifact'),\n            'exit_code': ACTIVE_RUN.exit_codes.get('historical-legacy-artifact'),\n        }, sort_keys=True)\n";
 const removeOnce = (text, part) => { assert.equal(text.split(part).length, 2); return text.replace(part, ''); };
-let checker = stripProgressCspIntegration(read('scripts/check-upstream-audit-disposition.mjs').toString(), 'checker');
+let checker = stripProgressCspIntegration(stripIdentityIntegration(read('scripts/check-upstream-audit-disposition.mjs').toString()), 'checker');
 for (const added of [historicalImport, historicalGuard, historicalEnvironment]) checker = removeOnce(checker, added);
 assert.equal(checker.split('packedConsumerExecution, historicalExecution};').length, 2);
 assert.equal(checker.replace('packedConsumerExecution, historicalExecution};', 'packedConsumerExecution};'), before('scripts/check-upstream-audit-disposition.mjs'));
