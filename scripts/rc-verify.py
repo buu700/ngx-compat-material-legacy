@@ -516,6 +516,11 @@ def run_node(script: str, args: list[str], *, record: bool = True) -> int:
             'invocation_id': ACTIVE_RUN.invocations.get('browser-matrix'),
             'exit_code': ACTIVE_RUN.exit_codes.get('browser-matrix'),
         }, sort_keys=True)
+        env['RC_UPSTREAM_NATIVE_MOTION'] = json.dumps({
+            'run_id': ACTIVE_RUN.manifest['run_id'],
+            'invocation_id': ACTIVE_RUN.invocations.get('native-motion'),
+            'exit_code': ACTIVE_RUN.exit_codes.get('native-motion'),
+        }, sort_keys=True)
     code = 1
     try:
         if script in FIXED_DETAILS:

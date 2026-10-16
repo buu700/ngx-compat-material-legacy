@@ -122,6 +122,35 @@ class CoordinatorTests(unittest.TestCase):
         self.assertEqual(other.read_bytes(), b'{"outside":true}')
         self.assertEqual(self.fixed.read_bytes(), self.old)
 
+    def test_upstream_native_capture_uses_coordinator_outcome_and_overrides_inherited_env(self):
+        for outcome in (None, 0, 7):
+            with self.subTest(native_exit=outcome):
+                self.run.invocations.pop('native-motion', None)
+                self.run.exit_codes.pop('native-motion', None)
+                if outcome is not None:
+                    self.run.invocations['native-motion'] = 'observed-native'
+                    self.run.exit_codes['native-motion'] = outcome
+                expected = {'run_id': self.run.manifest['run_id'],
+                            'invocation_id': None if outcome is None else 'observed-native',
+                            'exit_code': outcome}
+
+                def child(*args, **kwargs):
+                    env = kwargs['env']
+                    self.assertEqual(json.loads(env['RC_UPSTREAM_NATIVE_MOTION']), expected)
+                    for name, check in [('RC_UPSTREAM_PACKED_CONSUMER', 'packed-consumer'),
+                                        ('RC_UPSTREAM_HISTORICAL', 'historical-legacy-artifact'),
+                                        ('RC_UPSTREAM_BROWSER_MATRIX', 'browser-matrix')]:
+                        self.assertEqual(json.loads(env[name]), {'run_id': self.run.manifest['run_id'],
+                                         'invocation_id': self.run.invocations.get(check),
+                                         'exit_code': self.run.exit_codes.get(check)})
+                    return subprocess.CompletedProcess([], 0)
+
+                with patch.dict(os.environ, {'RC_UPSTREAM_NATIVE_MOTION': '{"run_id":"foreign","invocation_id":"forged","exit_code":0}'}), \
+                        patch.object(verify.subprocess, 'run', side_effect=child), \
+                        contextlib.redirect_stdout(io.StringIO()):
+                    code = verify.run_node('scripts/check-upstream-audit-disposition.mjs', [], record=False)
+                self.assertEqual(code, 0)
+
     def test_missing_detail_after_zero_exit_becomes_failure(self):
         with patch.object(verify.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)):
             with contextlib.redirect_stderr(io.StringIO()):

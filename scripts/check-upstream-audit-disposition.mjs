@@ -38,6 +38,9 @@ import {requiresProgressCsp,validateProgressCsp} from './upstream-progress-csp-e
 import {requiresGeneratedIdentity,validateGeneratedIdentity} from './upstream-generated-identity-evidence.mjs';
 import {requiresBidiBehavior,validateBidiBehavior} from './upstream-bidi-evidence.mjs';
 import {requiresSelectionBehavior,validateSelectionBehavior} from './upstream-selection-evidence.mjs';
+import {requiresFormFieldHover,validateFormFieldHover} from './upstream-form-field-hover-evidence.mjs';
+import {requiresTabCompletion,validateTabCompletion} from './upstream-tab-completion-evidence.mjs';
+import {requiresRippleReplay,validateRippleReplay} from './upstream-ripple-replay-evidence.mjs';
 import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
 import {SLIDER_THUMB_DESTROY_SHA, SLIDER_THUMB_DESTROY_ROLE, sliderThumbDestroyEvidenceOk} from './upstream-slider-thumb-destroy-scope.mjs';
 import {BAZEL_BUILD_SHAS, BAZEL_BUILD_ROLE, bazelBuildEvidenceOk} from './upstream-bazel-build-scope.mjs';
@@ -274,6 +277,21 @@ function individualProofOk(entry) {
     artifactBehaviorResults.set(entry.sha, result);
     if (!result.ok) return false;
   }
+  if (requiresFormFieldHover(entry, proof)) {
+    const result = validateFormFieldHover({root, entry, proof, request});
+    artifactBehaviorResults.set(entry.sha, result);
+    if (!result.ok) return false;
+  }
+  if (requiresTabCompletion(entry, proof)) {
+    const result = validateTabCompletion({root, entry, proof, request});
+    artifactBehaviorResults.set(entry.sha, result);
+    if (!result.ok) return false;
+  }
+  if (requiresRippleReplay(entry, proof)) {
+    const result = validateRippleReplay({root, entry, proof, request});
+    artifactBehaviorResults.set(entry.sha, result);
+    if (!result.ok) return false;
+  }
   if (requiresProgressCsp(entry, proof)) {
     const result = validateProgressCsp({root, entry, proof, request});
     artifactBehaviorResults.set(entry.sha, result);
@@ -335,7 +353,8 @@ for (const entry of ledgerBySha.values()) {
     missingEvidence.push(entry.sha);
     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});
   }
-  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof);
+  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)
+    || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof);
   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);
   if (needsIndividual && !individualProofOk(entry)) {
     if (sensitive) insufficientSensitive.push(entry.sha);
@@ -507,7 +526,12 @@ function coordinatorRequest() {
     try { browserExecution = JSON.parse(process.env.RC_UPSTREAM_BROWSER_MATRIX); }
     catch { return {error: 'RC_UPSTREAM_BROWSER_MATRIX is not JSON'}; }
   }
-  return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line, packedConsumerExecution, historicalExecution, browserExecution};
+  let nativeMotionExecution;
+  if (process.env.RC_UPSTREAM_NATIVE_MOTION !== undefined) {
+    try { nativeMotionExecution = JSON.parse(process.env.RC_UPSTREAM_NATIVE_MOTION); }
+    catch { return {error: 'RC_UPSTREAM_NATIVE_MOTION is not JSON'}; }
+  }
+  return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line, packedConsumerExecution, historicalExecution, browserExecution, nativeMotionExecution};
 }
 
 const dependencyGroups = request ? JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'))
