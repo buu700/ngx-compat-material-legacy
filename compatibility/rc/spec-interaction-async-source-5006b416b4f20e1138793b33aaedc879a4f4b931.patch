@@ -1,0 +1,401 @@
+diff --git a/src/aria/combobox/combobox.zone.spec.ts b/src/aria/combobox/combobox.zone.spec.ts
+index ab603ee12fbeca6305de06cdce8b8bd17e250c83..7b7fd94b35251b0a2ec31a87bee78f999a9ccd40 100644
+--- a/src/aria/combobox/combobox.zone.spec.ts
++++ b/src/aria/combobox/combobox.zone.spec.ts
+@@ -7,7 +7,7 @@
+  */
+ 
+ import {Component, computed, signal, provideZoneChangeDetection} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {Combobox} from './combobox';
+ import {ComboboxPopup} from './combobox-popup';
+@@ -49,11 +49,11 @@ describe('Combobox Zone.js integration', () => {
+     return options.find(option => option.textContent?.trim() === text) || null;
+   }
+ 
+-  it('should relay ArrowDown to the listbox and update active descendant', fakeAsync(() => {
++  it('should relay ArrowDown to the listbox and update active descendant', async () => {
+     // Open the popup (sets active descendant to Alabama via default state)
+     keydown('ArrowDown');
+-    tick();
+     fixture.detectChanges();
++    await fixture.whenStable();
+ 
+     // Check if expanded is true
+     expect(inputElement.getAttribute('aria-expanded')).toBe('true');
+@@ -63,12 +63,12 @@ describe('Combobox Zone.js integration', () => {
+ 
+     // Press ArrowDown again to move to Alaska
+     keydown('ArrowDown');
+-    tick();
+     fixture.detectChanges();
++    await fixture.whenStable();
+ 
+     const alaska = getOption('Alaska')!;
+     expect(inputElement.getAttribute('aria-activedescendant')).toBe(alaska.id);
+-  }));
++  });
+ });
+ 
+ @Component({
+diff --git a/src/cdk/bidi/directionality.spec.ts b/src/cdk/bidi/directionality.spec.ts
+index 71167ea4b9c8c4655a81f4113d7666c0e01f238c..0c8d05a868e87780b54def8a3d92445f4f48b743 100644
+--- a/src/cdk/bidi/directionality.spec.ts
++++ b/src/cdk/bidi/directionality.spec.ts
+@@ -1,4 +1,4 @@
+-import {waitForAsync, fakeAsync, TestBed, flush} from '@angular/core/testing';
++import {waitForAsync, TestBed} from '@angular/core/testing';
+ import {Component, ViewChild, signal, inject, ChangeDetectionStrategy} from '@angular/core';
+ import {By} from '@angular/platform-browser';
+ import {BidiModule, Directionality, Dir, Direction, DIR_DOCUMENT} from './index';
+@@ -78,7 +78,7 @@ describe('Directionality', () => {
+       expect(injectedDirectionality.value).toBe('rtl');
+     });
+ 
+-    it('should emit a change event when the value changes', fakeAsync(() => {
++    it('should emit a change event when the value changes', () => {
+       const fixture = TestBed.createComponent(ElementWithDir);
+       const injectedDirectionality = fixture.debugElement.query(
+         By.directive(InjectsDirectionality),
+@@ -102,9 +102,9 @@ describe('Directionality', () => {
+       expect(direction).toBe('ltr');
+       expect(injectedDirectionality.value).toBe('ltr');
+       expect(fixture.componentInstance.changeCount).toBe(1);
+-    }));
++    });
+ 
+-    it('should complete the change stream on destroy', fakeAsync(() => {
++    it('should complete the change stream on destroy', () => {
+       const fixture = TestBed.createComponent(ElementWithDir);
+       const dir = fixture.debugElement.query(By.directive(InjectsDirectionality))!.componentInstance
+         .dir;
+@@ -114,8 +114,7 @@ describe('Directionality', () => {
+       fixture.destroy();
+       expect(spy).toHaveBeenCalled();
+       subscription.unsubscribe();
+-      flush();
+-    }));
++    });
+ 
+     it('should default to ltr if an invalid value is passed in', () => {
+       const fixture = TestBed.createComponent(ElementWithDir);
+diff --git a/src/cdk/coercion/private/observable.spec.ts b/src/cdk/coercion/private/observable.spec.ts
+index 214a35a711bb5f98cd64b665bbbddcbbb599062b..31293b55b72ce55e733ebda42555b204cf8c90a7 100644
+--- a/src/cdk/coercion/private/observable.spec.ts
++++ b/src/cdk/coercion/private/observable.spec.ts
+@@ -1,6 +1,5 @@
+ import {Observable, ReplaySubject} from 'rxjs';
+ import {coerceObservable} from './observable';
+-import {fakeAsync} from '@angular/core/testing';
+ 
+ describe('coerceObservable', () => {
+   it('should return the Observable, if an Observable is passed in', () => {
+@@ -13,12 +12,12 @@ describe('coerceObservable', () => {
+     expect(coerceObservable(observable)).toBe(observable);
+   });
+ 
+-  it('should wrap non-Observables in Observables', fakeAsync(() => {
++  it('should wrap non-Observables in Observables', () => {
+     const observable = coerceObservable(3);
+     let emittedValue = 0;
+     observable.subscribe(value => {
+       emittedValue = value;
+     });
+     expect(emittedValue).toBe(3);
+-  }));
++  });
+ });
+diff --git a/src/cdk/listbox/listbox.spec.ts b/src/cdk/listbox/listbox.spec.ts
+index e45f6796200c4ab3cf38009e6957deb6fc4bb72b..92c7bd88d922cf7aec75a88619e2e6f46781e2a3 100644
+--- a/src/cdk/listbox/listbox.spec.ts
++++ b/src/cdk/listbox/listbox.spec.ts
+@@ -1,6 +1,6 @@
+ import {A, B, DOWN_ARROW, END, HOME, LEFT_ARROW, RIGHT_ARROW, SPACE, UP_ARROW} from '../keycodes';
+ import {Component, Type, signal, ChangeDetectionStrategy} from '@angular/core';
+-import {TestBed, fakeAsync, tick} from '@angular/core/testing';
++import {TestBed} from '@angular/core/testing';
+ import {FormControl, ReactiveFormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+ import {dispatchFakeEvent, dispatchKeyboardEvent, dispatchMouseEvent} from '../testing/private';
+@@ -23,6 +23,10 @@ function setupComponent<T, O = string>(component: Type<T>) {
+   };
+ }
+ 
++function wait(milliseconds: number): Promise<void> {
++  return new Promise(resolve => setTimeout(resolve, milliseconds));
++}
++
+ describe('CdkOption and CdkListbox', () => {
+   describe('id', () => {
+     it('should generate unique ids', () => {
+@@ -449,20 +453,18 @@ describe('CdkOption and CdkListbox', () => {
+       expect(fixture.componentInstance.changedOption).toBe(null);
+     });
+ 
+-    it('should not handle type ahead on a disabled listbox', async (...args: unknown[]) => {
++    it('should not handle type ahead on a disabled listbox', async () => {
+       const {fixture, testComponent, listboxEl, options} = setupComponent(ListboxWithOptions);
+-      await fakeAsync(() => {
+-        testComponent.isListboxDisabled.set(true);
+-        fixture.detectChanges();
++      testComponent.isListboxDisabled.set(true);
++      fixture.detectChanges();
+ 
+-        dispatchKeyboardEvent(listboxEl, 'keydown', B);
+-        fixture.detectChanges();
+-        tick(200);
++      dispatchKeyboardEvent(listboxEl, 'keydown', B);
++      fixture.detectChanges();
++      await wait(200);
+ 
+-        for (let option of options) {
+-          expect(option.isActive()).toBeFalse();
+-        }
+-      })(args);
++      for (let option of options) {
++        expect(option.isActive()).toBeFalse();
++      }
+     });
+ 
+     it('should skip disabled options when navigating with arrow keys', () => {
+@@ -561,32 +563,28 @@ describe('CdkOption and CdkListbox', () => {
+       expect(optionEls[0].classList).toContain('cdk-option-active');
+     });
+ 
+-    it('should change active item using type ahead', async (...args: unknown[]) => {
++    it('should change active item using type ahead', async () => {
+       const {fixture, listbox, listboxEl, options} = setupComponent(ListboxWithOptions);
+-      await fakeAsync(() => {
+-        listbox.focus();
+-        fixture.detectChanges();
++      listbox.focus();
++      fixture.detectChanges();
+ 
+-        dispatchKeyboardEvent(listboxEl, 'keydown', B);
+-        fixture.detectChanges();
+-        tick(200);
++      dispatchKeyboardEvent(listboxEl, 'keydown', B);
++      fixture.detectChanges();
++      await wait(200);
+ 
+-        expect(options[2].isActive()).toBeTrue();
+-      })(args);
++      expect(options[2].isActive()).toBeTrue();
+     });
+ 
+-    it('should allow custom type ahead label', async (...args: unknown[]) => {
++    it('should allow custom type ahead label', async () => {
+       const {fixture, listbox, listboxEl, options} = setupComponent(ListboxWithCustomTypeahead);
+-      await fakeAsync(() => {
+-        listbox.focus();
+-        fixture.detectChanges();
++      listbox.focus();
++      fixture.detectChanges();
+ 
+-        dispatchKeyboardEvent(listboxEl, 'keydown', B);
+-        fixture.detectChanges();
+-        tick(200);
++      dispatchKeyboardEvent(listboxEl, 'keydown', B);
++      fixture.detectChanges();
++      await wait(200);
+ 
+-        expect(options[2].isActive()).toBeTrue();
+-      })(args);
++      expect(options[2].isActive()).toBeTrue();
+     });
+ 
+     it('should focus and toggle the next item when pressing SHIFT + DOWN_ARROW', () => {
+diff --git a/src/cdk/text-field/autosize.spec.ts b/src/cdk/text-field/autosize.spec.ts
+index fe9a141d9c8aa295e32912e0810dfb057f9a91e9..301018f5180c72c3fff875a2ee903b6214d006c3 100644
+--- a/src/cdk/text-field/autosize.spec.ts
++++ b/src/cdk/text-field/autosize.spec.ts
+@@ -1,5 +1,5 @@
+ import {Component, ViewChild, ChangeDetectionStrategy} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {FormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+ import {dispatchFakeEvent} from '../testing/private';
+@@ -264,7 +264,7 @@ describe('CdkTextareaAutosize', () => {
+       .toBe(textarea.scrollHeight);
+   });
+ 
+-  it('should resize when an associated form control value changes', fakeAsync(() => {
++  it('should resize when an associated form control value changes', async () => {
+     const fixtureWithForms = TestBed.createComponent(AutosizeTextareaWithNgModel);
+     textarea = fixtureWithForms.nativeElement.querySelector('textarea');
+     fixtureWithForms.detectChanges();
+@@ -280,15 +280,15 @@ describe('CdkTextareaAutosize', () => {
+                 This it is and nothing more.” `;
+     fixtureWithForms.changeDetectorRef.markForCheck();
+     fixtureWithForms.detectChanges();
+-    flush();
++    await wait(50);
+     fixtureWithForms.detectChanges();
+ 
+     expect(textarea.clientHeight)
+       .withContext('Expected increased height when ngModel is updated.')
+       .toBeGreaterThan(previousHeight);
+-  }));
++  });
+ 
+-  it('should resize when the textarea value is changed programmatically', fakeAsync(() => {
++  it('should resize when the textarea value is changed programmatically', () => {
+     const previousHeight = textarea.clientHeight;
+ 
+     textarea.value = `
+@@ -298,24 +298,22 @@ describe('CdkTextareaAutosize', () => {
+ 
+     fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+-    flush();
+-    fixture.detectChanges();
+ 
+     expect(textarea.clientHeight)
+       .withContext('Expected the textarea height to have increased.')
+       .toBeGreaterThan(previousHeight);
+-  }));
++  });
+ 
+-  it('should trigger a resize when the window is resized', fakeAsync(() => {
++  it('should trigger a resize when the window is resized', async () => {
+     spyOn(autosize, 'resizeToFitContent');
+ 
+     dispatchFakeEvent(window, 'resize');
+-    tick(16);
++    await wait(100);
+ 
+     expect(autosize.resizeToFitContent).toHaveBeenCalled();
+-  }));
++  });
+ 
+-  it('should not trigger a resize when it is disabled', fakeAsync(() => {
++  it('should not trigger a resize when it is disabled', () => {
+     const fixtureWithoutAutosize = TestBed.createComponent(AutosizeTextareaWithoutAutosize);
+     textarea = fixtureWithoutAutosize.nativeElement.querySelector('textarea');
+     autosize = fixtureWithoutAutosize.debugElement
+@@ -363,7 +361,7 @@ describe('CdkTextareaAutosize', () => {
+     expect(textarea.clientHeight)
+       .withContext('Expected textarea to have a scrollbar.')
+       .toBeLessThan(textarea.scrollHeight);
+-  }));
++  });
+ 
+   it('should handle an undefined placeholder', () => {
+     fixture.componentInstance.placeholder = undefined!;
+@@ -374,6 +372,10 @@ describe('CdkTextareaAutosize', () => {
+   });
+ });
+ 
++function wait(milliseconds: number) {
++  return new Promise(resolve => setTimeout(resolve, milliseconds));
++}
++
+ // Styles to reset padding and border to make measurement comparisons easier.
+ const textareaStyleReset = `
+     textarea {
+diff --git a/src/cdk/tree/tree.spec.ts b/src/cdk/tree/tree.spec.ts
+index 014e897cd72ee85d47b140bad7c957c0da4e1216..67cea88f8c1cf752444c635c3148555086e57773 100644
+--- a/src/cdk/tree/tree.spec.ts
++++ b/src/cdk/tree/tree.spec.ts
+@@ -19,7 +19,7 @@ import {
+   signal,
+   ChangeDetectionStrategy,
+ } from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {AsyncPipe} from '@angular/common';
+ 
+ import {BehaviorSubject, Observable, combineLatest, of} from 'rxjs';
+@@ -1407,13 +1407,13 @@ describe('CdkTree', () => {
+         component = fixture.componentInstance;
+       });
+       describe(`when pressing 'b' with default configuration`, () => {
+-        beforeEach(fakeAsync(() => {
++        beforeEach(async () => {
+           component.tree.nativeElement.dispatchEvent(
+             createKeyboardEvent('keydown', undefined, 'b'),
+           );
+           fixture.detectChanges();
+-          tick(1000);
+-        }));
++          await wait(1000);
++        });
+ 
+         it('focuses banana', () => {
+           expect(document.activeElement)
+@@ -1435,35 +1435,35 @@ describe('CdkTree', () => {
+       });
+ 
+       describe(`when pressing 'b' with typeahead label binding`, () => {
+-        beforeEach(fakeAsync(() => {
++        beforeEach(async () => {
+           component.tree.nativeElement.dispatchEvent(
+             createKeyboardEvent('keydown', undefined, 'b'),
+           );
+           fixture.detectChanges();
+-          tick(1000);
+-        }));
++          await wait(1000);
++        });
+ 
+-        it('focuses banana', fakeAsync(() => {
++        it('focuses banana', async () => {
+           component.tree.nativeElement.dispatchEvent(
+             createKeyboardEvent('keydown', undefined, 'b'),
+           );
+           fixture.detectChanges();
+-          tick(1000);
++          await wait(1000);
+ 
+           expect(document.activeElement)
+             .withContext('expecting banana to be focused')
+             .toBe(component.treeNodes.get(1)?.nativeElement!);
+-        }));
++        });
+       });
+ 
+       describe(`when pressing 'c'`, () => {
+-        beforeEach(fakeAsync(() => {
++        beforeEach(async () => {
+           component.tree.nativeElement.dispatchEvent(
+             createKeyboardEvent('keydown', undefined, 'c'),
+           );
+           fixture.detectChanges();
+-          tick(1000);
+-        }));
++          await wait(1000);
++        });
+         it('does not move focus', () => {
+           expect(document.activeElement)
+             .withContext('expecting document body to be focused')
+@@ -1472,13 +1472,13 @@ describe('CdkTree', () => {
+       });
+ 
+       describe(`when pressing 't'`, () => {
+-        beforeEach(fakeAsync(() => {
++        beforeEach(async () => {
+           component.tree.nativeElement.dispatchEvent(
+             createKeyboardEvent('keydown', undefined, 't'),
+           );
+           fixture.detectChanges();
+-          tick(1000);
+-        }));
++          await wait(1000);
++        });
+         it('focuses focuses cherry', () => {
+           expect(document.activeElement)
+             .withContext('expecting cherry to be focused')
+@@ -1632,6 +1632,10 @@ function getExpandedNodes<T>(nodes: T[] | undefined, tree: CdkTree<T>): T[] {
+   return nodes?.filter(node => tree.isExpanded(node)) ?? [];
+ }
+ 
++function wait(milliseconds: number) {
++  return new Promise(resolve => setTimeout(resolve, milliseconds));
++}
++
+ function expectFlatTreeToMatch(
+   treeElement: Element,
+   expectedPaddingIndent = 28,

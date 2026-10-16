@@ -1,0 +1,484 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "5006b416b4f20e1138793b33aaedc879a4f4b931",
+  "subject": "test(multiple): address remaining fakeAsync usages in CDK (#33721)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/aria/combobox/combobox.zone.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "ab603ee12fbeca6305de06cdce8b8bd17e250c83",
+      "after_blob": "7b7fd94b35251b0a2ec31a87bee78f999a9ccd40"
+    },
+    {
+      "path": "src/cdk/bidi/directionality.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "71167ea4b9c8c4655a81f4113d7666c0e01f238c",
+      "after_blob": "0c8d05a868e87780b54def8a3d92445f4f48b743"
+    },
+    {
+      "path": "src/cdk/coercion/private/observable.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "214a35a711bb5f98cd64b665bbbddcbbb599062b",
+      "after_blob": "31293b55b72ce55e733ebda42555b204cf8c90a7"
+    },
+    {
+      "path": "src/cdk/listbox/listbox.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "e45f6796200c4ab3cf38009e6957deb6fc4bb72b",
+      "after_blob": "92c7bd88d922cf7aec75a88619e2e6f46781e2a3"
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "fe9a141d9c8aa295e32912e0810dfb057f9a91e9",
+      "after_blob": "301018f5180c72c3fff875a2ee903b6214d006c3"
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "014e897cd72ee85d47b140bad7c957c0da4e1216",
+      "after_blob": "67cea88f8c1cf752444c635c3148555086e57773"
+    }
+  ],
+  "original_files": 6,
+  "original_hunks": 24,
+  "raw_commit_sha256": "9b2c493c0245bdacfcabd1fa63e3c50bfae7c4967d28e58f2a8adf3667387ab6",
+  "original_sources": {
+    "path": "compatibility/rc/spec-interaction-async-source-subjects.json.gz",
+    "sha256": "094e000cbf3b263a540451e9c1e8ea8b83c52751381f15cee6bae472f32817cf"
+  },
+  "patch_file": "compatibility/rc/spec-interaction-async-source-5006b416b4f20e1138793b33aaedc879a4f4b931.patch",
+  "diff_sha256": "3aa6ba0045a88382b0bf5be08b4456bc3af4add4595403dd055163c3a304d72a",
+  "hunk_reviews": [
+    {
+      "path": "src/aria/combobox/combobox.zone.spec.ts",
+      "header": "@@ -7,7 +7,7 @@",
+      "sha256": "fd2563098057b41e5e0466331bab802985f10ea5c827d131f4213e7182b0a696",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/aria/combobox/combobox.zone.spec.ts",
+      "header": "@@ -49,11 +49,11 @@ describe('Combobox Zone.js integration', () => {",
+      "sha256": "881fdd76ba851594f096b42e7a1fac4303804179d9b92ddeb05b7437aef674a4",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/aria/combobox/combobox.zone.spec.ts",
+      "header": "@@ -63,12 +63,12 @@ describe('Combobox Zone.js integration', () => {",
+      "sha256": "6f6a47847866d7e9ca60705695ee1c0da519cf7b5cc9e0468c056745ccbb9448",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/bidi/directionality.spec.ts",
+      "header": "@@ -1,4 +1,4 @@",
+      "sha256": "fc35aa208b12aa0ea0db21828f79f6a35bcd574d83682755e423f8f60000f832",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/bidi/directionality.spec.ts",
+      "header": "@@ -78,7 +78,7 @@ describe('Directionality', () => {",
+      "sha256": "ce72027b758a1a4dc7deb2006d6922d36f297382cfc5be7587455e067b241df2",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/bidi/directionality.spec.ts",
+      "header": "@@ -102,9 +102,9 @@ describe('Directionality', () => {",
+      "sha256": "f71e9faaf58fbeb5c234749aeaa23cdfffee166346d80bd82ff1854fd6905fd7",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/bidi/directionality.spec.ts",
+      "header": "@@ -114,8 +114,7 @@ describe('Directionality', () => {",
+      "sha256": "6ab514d15f12e46ca37f87d14df1cb53333577f86b686e9b22e60f164ab78734",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/coercion/private/observable.spec.ts",
+      "header": "@@ -1,6 +1,5 @@",
+      "sha256": "170da449bf7a13b9c86335eed96707ecaa0edfc9e59bc2967799c3f11b0ec264",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/coercion/private/observable.spec.ts",
+      "header": "@@ -13,12 +12,12 @@ describe('coerceObservable', () => {",
+      "sha256": "29bed9b44597c0cf3bb1a1bfb0b658df12c7af44d06cd072ce3813e9daefa0f1",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/listbox/listbox.spec.ts",
+      "header": "@@ -1,6 +1,6 @@",
+      "sha256": "2f3f7b39c4e380a81d4a2db8c958789f0b27c6ab89a94eba54a0c1c3660b6ecd",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/listbox/listbox.spec.ts",
+      "header": "@@ -23,6 +23,10 @@ function setupComponent<T, O = string>(component: Type<T>) {",
+      "sha256": "55ded95fb34b81190635e27ecf6c31ab725ed16bf3dc5efb67d4c58f26608a40",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/listbox/listbox.spec.ts",
+      "header": "@@ -449,20 +453,18 @@ describe('CdkOption and CdkListbox', () => {",
+      "sha256": "993d57a07d910416590fd4c7947eeeced4fe288dbeb1d3dc59d43c410112a1c7",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/listbox/listbox.spec.ts",
+      "header": "@@ -561,32 +563,28 @@ describe('CdkOption and CdkListbox', () => {",
+      "sha256": "a5b463c7b7be59b652025f8fec7a30408ca3845a69d46a201996e72fa2230069",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "header": "@@ -1,5 +1,5 @@",
+      "sha256": "85b617752fb9d67a731b5d33cb3a9aec56c768f1a1138f61326c67ab26ecfe84",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "header": "@@ -264,7 +264,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "65ee851102a293854506a3777945e9dcd4db5048ed5f9a696745a49554e1841b",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "header": "@@ -280,15 +280,15 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "0a9733cce2fd694e041cd868f76f823fbf2e215b8294c1de5b96a29c7288510d",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "header": "@@ -298,24 +298,22 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "075176c58daa1fc37c6dd99de9900bb396a028eeaf26c69213704aa0d7f42719",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "header": "@@ -363,7 +361,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "427d1b9e8982f71794e9f25e1bb1ce63c924cec9f1a82001621722de805ab7bc",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "header": "@@ -374,6 +372,10 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "e4fd006fd79e9d2c6c1d936903347d2c5df24ac6a768df096c2f27a197754419",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "header": "@@ -19,7 +19,7 @@ import {",
+      "sha256": "378b08522c577b334d3f637bcb4ba897462278a6ef06ac393dbea9bfacfdae23",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "header": "@@ -1407,13 +1407,13 @@ describe('CdkTree', () => {",
+      "sha256": "bdad075d20445362844d50c5fd42154940a74565b6229cbef657a630641b4aab",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "header": "@@ -1435,35 +1435,35 @@ describe('CdkTree', () => {",
+      "sha256": "89a2b4ad6cebc1b43369405e000b869932f2224a18f74ebde7d92d7890f90387",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "header": "@@ -1472,13 +1472,13 @@ describe('CdkTree', () => {",
+      "sha256": "443cce381dae9c441c4df7e770be69953374d17f77f31ad428f25ffa7890e846",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "header": "@@ -1632,6 +1632,10 @@ function getExpandedNodes<T>(nodes: T[] | undefined, tree: CdkTree<T>): T[] {",
+      "sha256": "cfd6ca6deb7783f6f8345848ae5dca3989dacecbc110a9a34a3a1207ec681d0b",
+      "judgment": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "5006b416b4f20e1138793b33aaedc879a4f4b931",
+    "complete_original_files": 6,
+    "complete_original_hunks": 24,
+    "removed": [],
+    "added_hooks": [],
+    "isolated_chip_iterations": [],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 150,
+    "hooks": 24,
+    "fixture_classes": 38,
+    "template_style_properties": 38
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-interaction-async-source-review.json.gz",
+    "sha256": "437bf1f9d0610be365d2637f3a80a41382e8ffa7ad9418988d572e799b58b93b"
+  },
+  "decision": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+  "prior_entry": {
+    "sha": "5006b416b4f20e1138793b33aaedc879a4f4b931",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(multiple): address remaining fakeAsync usages in CDK (#33721)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=f9961de24a0c8897849c10af0cd241d88d808ef62faa2a57b55fb5104c908cb1, bytes=15460). Changed paths are only unit/harness specs and testing BUILD.bazel (src/aria/combobox/combobox.zone.spec.ts, src/cdk/bidi/directionality.spec.ts, src/cdk/coercion/private/observable.spec.ts, src/cdk/listbox/listbox.spec.ts, src/cdk/text-field/autosize.spec.ts, src/cdk/tree/tree.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/aria/combobox/combobox.zone.spec.ts",
+      "src/cdk/bidi/directionality.spec.ts",
+      "src/cdk/coercion/private/observable.spec.ts",
+      "src/cdk/listbox/listbox.spec.ts",
+      "src/cdk/text-field/autosize.spec.ts",
+      "src/cdk/tree/tree.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/5006b416b4f20e1138793b33aaedc879a4f4b931.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "f9961de24a0c8897849c10af0cd241d88d808ef62faa2a57b55fb5104c908cb1"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-interaction-async-source-prior.json.gz",
+    "sha256": "62090cfc3afae847db983f38797153995ec22288cc0f8c9a1e93fd06358990f4"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "3aa6ba0045a88382b0bf5be08b4456bc3af4add4595403dd055163c3a304d72a",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Decline this remaining CDK/ARIA fixture cleanup after individual review of all 24 hunks in six complete originals. All 150 static cases and 24 hooks pair; 138 complete callbacks retain semantics and 12 change. Three listbox type-ahead cases remove rest-argument/inner fakeAsync invocation machinery while their setup, actions and predicate expressions remain under explicit complete-source review. Other callback/global operations and predicates match after finite timing changes. All 38 fixture classes and 38 template/style properties remain raw-byte identical; three native wait helpers are added and the obsolete private-observable testing import disappears. The complete patch includes ARIA combobox, public directionality, private observable coercion, listbox, textarea autosize and tree; the research source does not authorize adding an ARIA peer or using APIs absent at the advertised minimum. Owned input exports public TextFieldModule, and existing public bidi/accessibility/table/overlay integrations remain relevant. Preserve owned removed helpers rather than importing current private symbols; infer no runtime exclusion or inherited pass from absent owned modern widgets. No new implementation, selectors, consumer CSS/SCSS or TS API change is required by these private tests. Actual public-peer/consumer/native/browser/SSR and floor checks remain required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-interaction-async-source-review.mjs",
+        "sha256": "c7387cbea5154b700adadc3e89c91674249641238a487bbcd6fba051acb51df9"
+      },
+      {
+        "path": "tests/spec_interaction_async_source_probe.mjs",
+        "sha256": "e445d5ed73b0af2123296d35ba89704b81f2d3eb7932ba9ecacbd40edbd210c1"
+      },
+      {
+        "path": "tests/test_spec_interaction_async_source.py",
+        "sha256": "af7e1d779c0c8e0e189a7bf9ed1cacf6113b75ac342427d22678b36bbb3aedd1"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-qualification-inspector.py",
+        "sha256": "dfd4b6c81cd59c1ecc6b89cda4219e322e3838a7e9d2123e8317ecc93d26ac8a"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-subjects.json.gz",
+        "sha256": "094e000cbf3b263a540451e9c1e8ea8b83c52751381f15cee6bae472f32817cf"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-acquisition.json.gz",
+        "sha256": "6c3abbf37e8154cb4f2731b8fcbcf8bad91c594c4ca7260898b388660b22b8a2"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-observation-pins.json",
+        "sha256": "84cbc29345e9f8e313084c47ddd0fd7400c00765b915b82d5af8778cd3b9951d"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-prior.json.gz",
+        "sha256": "62090cfc3afae847db983f38797153995ec22288cc0f8c9a1e93fd06358990f4"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-review.json.gz",
+        "sha256": "437bf1f9d0610be365d2637f3a80a41382e8ffa7ad9418988d572e799b58b93b"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-controls.json",
+        "sha256": "e4b45c2641ae03e173eb92f41418d55e1bc49287fbfc2aaba2ed1f4e35dafe92"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-python.log.gz",
+        "sha256": "0b21f2f8dd90e25669eb1eb63bb71b4a6e2968506a2c0923c0fb11593fb1b674"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-cyph-sanity.json",
+        "sha256": "e92e6134aad4ebf0667e3f63c8204a1ccb421552d3f53817c1700a57c68bdf4c"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-checkpoint.json",
+        "sha256": "310e8e005ff9c09135a50072f130ccbdd932ad419603291444c862e6b99e5a42"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-replay-checkpoint.json",
+        "sha256": "7a54913e8390bfe620da2468f6c700ce0d27425f2af83500abdb36e360744372"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+        "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+        "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-interaction-async-source-review.mjs",
+      "sha256": "c7387cbea5154b700adadc3e89c91674249641238a487bbcd6fba051acb51df9"
+    },
+    {
+      "path": "tests/spec_interaction_async_source_probe.mjs",
+      "sha256": "e445d5ed73b0af2123296d35ba89704b81f2d3eb7932ba9ecacbd40edbd210c1"
+    },
+    {
+      "path": "tests/test_spec_interaction_async_source.py",
+      "sha256": "af7e1d779c0c8e0e189a7bf9ed1cacf6113b75ac342427d22678b36bbb3aedd1"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-qualification-inspector.py",
+      "sha256": "dfd4b6c81cd59c1ecc6b89cda4219e322e3838a7e9d2123e8317ecc93d26ac8a"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-subjects.json.gz",
+      "sha256": "094e000cbf3b263a540451e9c1e8ea8b83c52751381f15cee6bae472f32817cf"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-acquisition.json.gz",
+      "sha256": "6c3abbf37e8154cb4f2731b8fcbcf8bad91c594c4ca7260898b388660b22b8a2"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-observation-pins.json",
+      "sha256": "84cbc29345e9f8e313084c47ddd0fd7400c00765b915b82d5af8778cd3b9951d"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-prior.json.gz",
+      "sha256": "62090cfc3afae847db983f38797153995ec22288cc0f8c9a1e93fd06358990f4"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-review.json.gz",
+      "sha256": "437bf1f9d0610be365d2637f3a80a41382e8ffa7ad9418988d572e799b58b93b"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-controls.json",
+      "sha256": "e4b45c2641ae03e173eb92f41418d55e1bc49287fbfc2aaba2ed1f4e35dafe92"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-python.log.gz",
+      "sha256": "0b21f2f8dd90e25669eb1eb63bb71b4a6e2968506a2c0923c0fb11593fb1b674"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-cyph-sanity.json",
+      "sha256": "e92e6134aad4ebf0667e3f63c8204a1ccb421552d3f53817c1700a57c68bdf4c"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-checkpoint.json",
+      "sha256": "310e8e005ff9c09135a50072f130ccbdd932ad419603291444c862e6b99e5a42"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-replay-checkpoint.json",
+      "sha256": "7a54913e8390bfe620da2468f6c700ce0d27425f2af83500abdb36e360744372"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
