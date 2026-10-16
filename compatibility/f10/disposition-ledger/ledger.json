@@ -23727,17 +23727,101 @@
       "sha": "d5aa679213590279b0d3c8270b5bf47ef787f443",
       "bucket": "test-only-batch-candidate",
       "subject": "test(material/autocomplete): fix safari failure on CI (#28735)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=58d4de4b9e85e8aabf3921fb852df1ac1be80597aba82eef528257ddf536acae, bytes=601). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/autocomplete/autocomplete.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The complete original autocomplete patch adds one real timer turn and render pass to the modern async flushPosition helper used by the reposition-on-options-change regression. All183 case names and444 assertion statements are preserved in that upstream file, but scheduling changes; this is not type-only. The complete retained legacy spec has the corresponding below/above positioning assertions in a fakeAsync test using tick, simulateZoneExit and the original legacy form-field/panel selectors. It has no async flushPosition helper. Keep that historical test and all assertions. Do not copy a modern Safari retry into a different scheduler without an observed failure. Actual Safari and artifact execution of the retained regression remain required; no cross-browser or inherited-fix claim follows from this source decision.",
+      "read_note_disposition": "individual complete-original source conclusion only; actual runtime and release gates separate",
       "files": [
         "src/material/autocomplete/autocomplete.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/d5aa679213590279b0d3c8270b5bf47ef787f443.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-followup-d5aa679213590279b0d3c8270b5bf47ef787f443.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "58d4de4b9e85e8aabf3921fb852df1ac1be80597aba82eef528257ddf536acae"
+      "patch_sha256": "58d4de4b9e85e8aabf3921fb852df1ac1be80597aba82eef528257ddf536acae",
+      "affected_branches": [
+        "main"
+      ],
+      "diff_sha256": "d4ec28d4464444301d54259f4d26a1ffbb5b3d46cb7184ef6e466536eaa53b56",
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "d4ec28d4464444301d54259f4d26a1ffbb5b3d46cb7184ef6e466536eaa53b56",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete original autocomplete patch adds one real timer turn and render pass to the modern async flushPosition helper used by the reposition-on-options-change regression. All183 case names and444 assertion statements are preserved in that upstream file, but scheduling changes; this is not type-only. The complete retained legacy spec has the corresponding below/above positioning assertions in a fakeAsync test using tick, simulateZoneExit and the original legacy form-field/panel selectors. It has no async flushPosition helper. Keep that historical test and all assertions. Do not copy a modern Safari retry into a different scheduler without an observed failure. Actual Safari and artifact execution of the retained regression remain required; no cross-browser or inherited-fix claim follows from this source decision.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-spec-followup-originals.py",
+            "sha256": "7f42c8b7a42389f5379df617f7992cf065189c6348809239d82e916bf4320abf"
+          },
+          {
+            "path": "scripts/spec-followup-source-review.mjs",
+            "sha256": "026f9ff25b9495d95bef110ef0964f23b6df92d72fdcdfad29da099bc9f17ee6"
+          },
+          {
+            "path": "tests/spec_followup_source_probe.mjs",
+            "sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-subjects.json.gz",
+            "sha256": "8b3c61b0a41b00743aa7783f83d071f462b6bba248d14f5f72a18e0b0cdbf1f5"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-acquisition.json.gz",
+            "sha256": "2e3b3d4d1868e0bcceb2420458087014cd7ccec7f2a8bb326390433ca082de08"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-controls.json",
+            "sha256": "3c3135fdaa30ec7f8bdd53406303f92c488f532260a735df936339c400f4b0b5"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-review.json",
+            "sha256": "6e532951510efbaf8e38bfaf35a1850a4dd944cd1b356fcf16cc12ada71dee68"
+          },
+          {
+            "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+            "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+          },
+          {
+            "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+            "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+            "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+          },
+          {
+            "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+            "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+            "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+            "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+            "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+          },
+          {
+            "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+            "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "The only hunk adds await setTimeout followed by fixture.detectChanges after the existing Safari round. The complete async helper is used before initial measurement, after filtering to one option and after clearing the input. The legacy fakeAsync test has two geometry assertions and a different rendering/zone protocol. Preserve both comparisons and require actual browser results before changing timing.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "c26dd866e2952a7ac117397418d3f7697badf816",
@@ -23801,17 +23885,101 @@
       "sha": "58a30cfa4627a9e4875304aa2116654c08382a0b",
       "bucket": "test-only-batch-candidate",
       "subject": "test(material/bottom-sheet): fix broken tests (#29213)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=00b818711d361d7b4208659627c0b0bf921e12026753c5cea61696c857d492f6, bytes=3222). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/bottom-sheet/bottom-sheet.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "not-applicable",
+      "reason": "The complete nine-hunk bottom-sheet patch changes only focus-test synchronization: twelve flushMicrotasks calls become timer flush calls, with seven added render passes. All55 case names and88 assertion statements remain exact. These are executable timing changes in open/default focus, heading/selector focus and close/restoration cases, not type-only cleanup. The complete owned source population defines no MatBottomSheet or MatLegacyBottomSheet runtime class; ordinary bottom-sheet behavior belongs to the stable public current peer, while the add-on owns historical bottom-sheet Sass. Do not copy upstream private tests into owned dialog or fork the ordinary component. This excludes the private test patch only and does not qualify public peer focus restoration, delegated behavior or bottom-sheet Sass coexistence.",
+      "read_note_disposition": "individual complete-original source conclusion only; actual runtime and release gates separate",
       "files": [
         "src/material/bottom-sheet/bottom-sheet.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/58a30cfa4627a9e4875304aa2116654c08382a0b.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-followup-58a30cfa4627a9e4875304aa2116654c08382a0b.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "00b818711d361d7b4208659627c0b0bf921e12026753c5cea61696c857d492f6"
+      "patch_sha256": "00b818711d361d7b4208659627c0b0bf921e12026753c5cea61696c857d492f6",
+      "affected_branches": [
+        "main"
+      ],
+      "diff_sha256": "1a89ce5a1530eb5da589ca0244c5a3a0c42827b0255ed89c902abd210ecfd5a4",
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "1a89ce5a1530eb5da589ca0244c5a3a0c42827b0255ed89c902abd210ecfd5a4",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete nine-hunk bottom-sheet patch changes only focus-test synchronization: twelve flushMicrotasks calls become timer flush calls, with seven added render passes. All55 case names and88 assertion statements remain exact. These are executable timing changes in open/default focus, heading/selector focus and close/restoration cases, not type-only cleanup. The complete owned source population defines no MatBottomSheet or MatLegacyBottomSheet runtime class; ordinary bottom-sheet behavior belongs to the stable public current peer, while the add-on owns historical bottom-sheet Sass. Do not copy upstream private tests into owned dialog or fork the ordinary component. This excludes the private test patch only and does not qualify public peer focus restoration, delegated behavior or bottom-sheet Sass coexistence.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-spec-followup-originals.py",
+            "sha256": "7f42c8b7a42389f5379df617f7992cf065189c6348809239d82e916bf4320abf"
+          },
+          {
+            "path": "scripts/spec-followup-source-review.mjs",
+            "sha256": "026f9ff25b9495d95bef110ef0964f23b6df92d72fdcdfad29da099bc9f17ee6"
+          },
+          {
+            "path": "tests/spec_followup_source_probe.mjs",
+            "sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-subjects.json.gz",
+            "sha256": "8b3c61b0a41b00743aa7783f83d071f462b6bba248d14f5f72a18e0b0cdbf1f5"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-acquisition.json.gz",
+            "sha256": "2e3b3d4d1868e0bcceb2420458087014cd7ccec7f2a8bb326390433ca082de08"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-controls.json",
+            "sha256": "3c3135fdaa30ec7f8bdd53406303f92c488f532260a735df936339c400f4b0b5"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-review.json",
+            "sha256": "6e532951510efbaf8e38bfaf35a1850a4dd944cd1b356fcf16cc12ada71dee68"
+          },
+          {
+            "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+            "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+          },
+          {
+            "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+            "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+            "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+          },
+          {
+            "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+            "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+            "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+            "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+            "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+          },
+          {
+            "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+            "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "The default container-focus test drains timers and renders again before checking the active element. The expectation is unchanged. This is a private current-component test synchronization change, not an owned dialog implementation repair. The autoFocus dialog-container branch drains timers and renders before comparing the same container node. No API or expected focus target changes. The first-heading branch adds the same timer/render synchronization and retains its h1 tabindex selector and active-element assertion. Do not infer a production accessibility fix. The CSS-selector autoFocus branch keeps the p target and all assertions, adding timer/render synchronization only. The historical Sass facade does not execute this private test. The restoration-on-close case replaces two pre-dismiss microtask flushes with timer flushes and adds one rendering round. It still verifies that open moves focus away from the trigger. The same case drains timers after dismiss, still renders/ticks500 and still requires the trigger to regain focus. No production lifecycle code is touched. The restoreFocus:false case receives the analogous pre-dismiss timer/render sequence and retains the initial focus movement assertion. Its post-dismiss microtask flush becomes a timer flush while the assertion that the trigger stays unfocused remains intact. The configuration contract is unchanged by this patch. The moving-focus-outside-while-closing case gains pre-dismiss timer/render synchronization. Its later alternate-button focus and final preservation checks remain exact. Public peer focus behavior remains a separate real runtime obligation.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "4718718e3f66e0de2341c9f46bae59be1470b971",
@@ -24582,33 +24750,201 @@
       "sha": "da8b1f9aacd826060372d46e528658cc789122c6",
       "bucket": "test-only-batch-candidate",
       "subject": "test(material/slider): Ensure tick marks are rendered correctly (#30317)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=0d52a83ff14bfddcbded7893200618dfc3d538ecefce5774914b40b58224c1c9, bytes=3413). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/slider/slider.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The complete modern slider patch adds three live tick cases and one SliderWithTickMarks fixture, with no production changes. The tests inspect private _tickMarks counts, active/inactive MDC tick elements and the modern300px track with3px padding; three commented TODOs are not tests. The owned legacy slider exposes tickInterval and renders a historical gradient through .mat-slider-ticks, not one DOM element per tick or an input matSliderThumb. Its auto/set/reset interval cases and three complete tick style/calculation methods remain identical to the authenticated tagged methods. Keep the historical API, DOM and CSS/SCSS; the modern101-element geometry is not its oracle. Actual legacy rendering and supported peer/browser execution remain required.",
+      "read_note_disposition": "individual complete-original source conclusion only; actual runtime and release gates separate",
       "files": [
         "src/material/slider/slider.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/da8b1f9aacd826060372d46e528658cc789122c6.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-followup-da8b1f9aacd826060372d46e528658cc789122c6.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "0d52a83ff14bfddcbded7893200618dfc3d538ecefce5774914b40b58224c1c9"
+      "patch_sha256": "0d52a83ff14bfddcbded7893200618dfc3d538ecefce5774914b40b58224c1c9",
+      "affected_branches": [
+        "main"
+      ],
+      "diff_sha256": "81496893823fd0473c51ae4f1da377bb96ef2f26229313aee6c31bcd184370cd",
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "81496893823fd0473c51ae4f1da377bb96ef2f26229313aee6c31bcd184370cd",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete modern slider patch adds three live tick cases and one SliderWithTickMarks fixture, with no production changes. The tests inspect private _tickMarks counts, active/inactive MDC tick elements and the modern300px track with3px padding; three commented TODOs are not tests. The owned legacy slider exposes tickInterval and renders a historical gradient through .mat-slider-ticks, not one DOM element per tick or an input matSliderThumb. Its auto/set/reset interval cases and three complete tick style/calculation methods remain identical to the authenticated tagged methods. Keep the historical API, DOM and CSS/SCSS; the modern101-element geometry is not its oracle. Actual legacy rendering and supported peer/browser execution remain required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-spec-followup-originals.py",
+            "sha256": "7f42c8b7a42389f5379df617f7992cf065189c6348809239d82e916bf4320abf"
+          },
+          {
+            "path": "scripts/spec-followup-source-review.mjs",
+            "sha256": "026f9ff25b9495d95bef110ef0964f23b6df92d72fdcdfad29da099bc9f17ee6"
+          },
+          {
+            "path": "tests/spec_followup_source_probe.mjs",
+            "sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-subjects.json.gz",
+            "sha256": "8b3c61b0a41b00743aa7783f83d071f462b6bba248d14f5f72a18e0b0cdbf1f5"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-acquisition.json.gz",
+            "sha256": "2e3b3d4d1868e0bcceb2420458087014cd7ccec7f2a8bb326390433ca082de08"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-controls.json",
+            "sha256": "3c3135fdaa30ec7f8bdd53406303f92c488f532260a735df936339c400f4b0b5"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-review.json",
+            "sha256": "6e532951510efbaf8e38bfaf35a1850a4dd944cd1b356fcf16cc12ada71dee68"
+          },
+          {
+            "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+            "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+          },
+          {
+            "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+            "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+            "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+          },
+          {
+            "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+            "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+            "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+            "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+            "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+          },
+          {
+            "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+            "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "The first hunk adds three tests: a private-array existence check, count updates101/11/6/2 and modern tick-element spacing with0.1 tolerance. The300px-minus6px arithmetic and initial x18 belong to the modern MDC fixture. No evidence authorizes changing legacy padding, creating modern tick nodes or substituting these expectations for the historical interval/transform assertions. The three TODO comments are explicitly unexecuted. The second hunk adds SliderWithTickMarks with showTickMarks:true and an input matSliderThumb under SLIDER_STYLES. The retained historical slider has no thumb-input directive and continues to use tickInterval with gradient transforms. Do not add a modern component/API mirror or alter the existing legacy fixture template.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "9e1ee2f5be93aedc4ac4525f011a422a4ec7d325",
       "bucket": "test-only-batch-candidate",
       "subject": "test(material/chips): remove unnecessary animations test",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=f1aad4bb665642cdff60738a97ecbe028e8bc99a3868ccabdd319c02c408d95b, bytes=2576). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/chips/chip-grid.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "The complete four-hunk modern chip-grid patch removes one animation-host focus regression, its fixture, an animation import and a fixture union member. It deletes an actual focus assertion and is not type-only. The corresponding retained legacy chip-list regression and StandardChipListWithAnimations class remain present and unchanged. The tagged fixture really declared dummyAnimation; the current engine-free fixture declares no trigger, and LEGACY_ENABLED_ANIMATIONS publishes a token without loading the animation engine. Keeping that source case therefore does not prove a real animation-engine host interaction or native focus behavior. Reject the modern test deletion, retain the legacy key-manager/focus/removal coverage, and keep actual animation-context/native/artifact qualification as an explicit full-plan obligation. No animation engine fork or consumer style change is introduced.",
+      "read_note_disposition": "individual complete-original source conclusion only; actual runtime and release gates separate",
       "files": [
         "src/material/chips/chip-grid.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/9e1ee2f5be93aedc4ac4525f011a422a4ec7d325.json",
-      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-followup-9e1ee2f5be93aedc4ac4525f011a422a4ec7d325.json",
       "recorded_at_utc": "2026-10-01T18:25:29Z",
       "g11_claim": "not-passed",
-      "patch_sha256": "f1aad4bb665642cdff60738a97ecbe028e8bc99a3868ccabdd319c02c408d95b"
+      "patch_sha256": "f1aad4bb665642cdff60738a97ecbe028e8bc99a3868ccabdd319c02c408d95b",
+      "affected_branches": [
+        "main"
+      ],
+      "diff_sha256": "cce067bb9aefc618027d26a95ec16c7275ee35f621a06eac53cb630ea1f05573",
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "cce067bb9aefc618027d26a95ec16c7275ee35f621a06eac53cb630ea1f05573",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete four-hunk modern chip-grid patch removes one animation-host focus regression, its fixture, an animation import and a fixture union member. It deletes an actual focus assertion and is not type-only. The corresponding retained legacy chip-list regression and StandardChipListWithAnimations class remain present and unchanged. The tagged fixture really declared dummyAnimation; the current engine-free fixture declares no trigger, and LEGACY_ENABLED_ANIMATIONS publishes a token without loading the animation engine. Keeping that source case therefore does not prove a real animation-engine host interaction or native focus behavior. Reject the modern test deletion, retain the legacy key-manager/focus/removal coverage, and keep actual animation-context/native/artifact qualification as an explicit full-plan obligation. No animation engine fork or consumer style change is introduced.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/acquire-spec-followup-originals.py",
+            "sha256": "7f42c8b7a42389f5379df617f7992cf065189c6348809239d82e916bf4320abf"
+          },
+          {
+            "path": "scripts/spec-followup-source-review.mjs",
+            "sha256": "026f9ff25b9495d95bef110ef0964f23b6df92d72fdcdfad29da099bc9f17ee6"
+          },
+          {
+            "path": "tests/spec_followup_source_probe.mjs",
+            "sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-subjects.json.gz",
+            "sha256": "8b3c61b0a41b00743aa7783f83d071f462b6bba248d14f5f72a18e0b0cdbf1f5"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-acquisition.json.gz",
+            "sha256": "2e3b3d4d1868e0bcceb2420458087014cd7ccec7f2a8bb326390433ca082de08"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-controls.json",
+            "sha256": "3c3135fdaa30ec7f8bdd53406303f92c488f532260a735df936339c400f4b0b5"
+          },
+          {
+            "path": "compatibility/rc/spec-followup-source-review.json",
+            "sha256": "6e532951510efbaf8e38bfaf35a1850a4dd944cd1b356fcf16cc12ada71dee68"
+          },
+          {
+            "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+            "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+          },
+          {
+            "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+            "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+            "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+          },
+          {
+            "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+            "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+            "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+            "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+            "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+          },
+          {
+            "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+            "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+          }
+        ],
+        "actual_Angular_browser_native_packed_or_floor_qualified": false
+      },
+      "source_check": "The angular/animations animate/style/transition/trigger import is removed together with its modern fixture. This supplies no authority to delete retained legacy focus coverage or add a deprecated runtime animation dependency. The local focus-suite fixture union narrows to StandardChipGrid after deleting its animated alternative. This type edit is reviewed in the context of the removed runtime test, not classified as an independent harmless cleanup. The removed case destroys/resets the test fixture, instantiates the animated grid, focuses the final chip, dispatches BACKSPACE, ticks500 and checks the prior primary action receives focus. The complete owned legacy analogue retains the deletion and key-manager assertions. The engine-free current fixture is explicitly not real animated-host evidence. The deleted fixture has a dummy leave animation, modern @for chip rows, input and an array-splice removal method. The untouched legacy tag contains an analogous real trigger, while the current legacy fixture uses *ngFor and synchronous engine-free removal. Preserve the current fixture and record that distinction; no genuine engine or CSS-animation-host qualification is claimed by this source exclusion.",
+      "source_conclusion_only": true,
+      "product_adaptation": false
     },
     {
       "sha": "bc0c443e569975e4ddd16a2659104a0e790587e4",

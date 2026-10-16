@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "58a30cfa4627a9e4875304aa2116654c08382a0b",
+  "subject": "test(material/bottom-sheet): fix broken tests (#29213)",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "7fdabe91fe22ec89bf4dc1bf22b40ffa3ea8295c",
+      "after_blob": "5fe16b33781b7032aa98ed1465237071102a0f08"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 9,
+  "original_sources": [
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "before": {
+        "git_blob": "7fdabe91fe22ec89bf4dc1bf22b40ffa3ea8295c",
+        "sha256": "a51cb15d99cacf6e04ab0175ebba52da2896e52aa9bca6c9e356f607c6d34901",
+        "bytes": 35184
+      },
+      "after": {
+        "git_blob": "5fe16b33781b7032aa98ed1465237071102a0f08",
+        "sha256": "1a94174c0c978f815155c59ee49bb72a556f32dc44259db6b30da0abfb1c420a",
+        "bytes": 35378
+      }
+    }
+  ],
+  "raw_commit_sha256": "53677a9f4aac473151b8762cadd04e9021c72d14cc8c5775184232344ed13e98",
+  "diff": "diff --git a/src/material/bottom-sheet/bottom-sheet.spec.ts b/src/material/bottom-sheet/bottom-sheet.spec.ts\nindex 7fdabe91fe22ec89bf4dc1bf22b40ffa3ea8295c..5fe16b33781b7032aa98ed1465237071102a0f08 100644\n--- a/src/material/bottom-sheet/bottom-sheet.spec.ts\n+++ b/src/material/bottom-sheet/bottom-sheet.spec.ts\n@@ -609,7 +609,8 @@ describe('MatBottomSheet', () => {\n       });\n \n       viewContainerFixture.detectChanges();\n-      flushMicrotasks();\n+      flush();\n+      viewContainerFixture.detectChanges();\n \n       expect(document.activeElement!.tagName)\n         .withContext('Expected bottom sheet container to be focused.')\n@@ -658,7 +659,8 @@ describe('MatBottomSheet', () => {\n         });\n \n         viewContainerFixture.detectChanges();\n-        flushMicrotasks();\n+        flush();\n+        viewContainerFixture.detectChanges();\n \n         let container = overlayContainerElement.querySelector(\n           '.mat-bottom-sheet-container',\n@@ -679,7 +681,8 @@ describe('MatBottomSheet', () => {\n         });\n \n         viewContainerFixture.detectChanges();\n-        flushMicrotasks();\n+        flush();\n+        viewContainerFixture.detectChanges();\n \n         let firstHeader = overlayContainerElement.querySelector(\n           'h1[tabindex=\"-1\"]',\n@@ -701,7 +704,8 @@ describe('MatBottomSheet', () => {\n         });\n \n         viewContainerFixture.detectChanges();\n-        flushMicrotasks();\n+        flush();\n+        viewContainerFixture.detectChanges();\n \n         let firstParagraph = overlayContainerElement.querySelector(\n           'p[tabindex=\"-1\"]',\n@@ -721,9 +725,10 @@ describe('MatBottomSheet', () => {\n \n       const bottomSheetRef = bottomSheet.open(PizzaMsg, {viewContainerRef: testViewContainerRef});\n \n-      flushMicrotasks();\n+      flush();\n+      viewContainerFixture.detectChanges();\n+      flush();\n       viewContainerFixture.detectChanges();\n-      flushMicrotasks();\n \n       expect(document.activeElement!.id).not.toBe(\n         'bottom-sheet-trigger',\n@@ -736,7 +741,7 @@ describe('MatBottomSheet', () => {\n         'Expcted the focus not to have changed before the animation finishes.',\n       );\n \n-      flushMicrotasks();\n+      flush();\n       viewContainerFixture.detectChanges();\n       tick(500);\n \n@@ -758,9 +763,10 @@ describe('MatBottomSheet', () => {\n         restoreFocus: false,\n       });\n \n-      flushMicrotasks();\n+      flush();\n+      viewContainerFixture.detectChanges();\n+      flush();\n       viewContainerFixture.detectChanges();\n-      flushMicrotasks();\n \n       expect(document.activeElement!.id).not.toBe(\n         'bottom-sheet-trigger',\n@@ -773,7 +779,7 @@ describe('MatBottomSheet', () => {\n         'Expcted the focus not to have changed before the animation finishes.',\n       );\n \n-      flushMicrotasks();\n+      flush();\n       viewContainerFixture.detectChanges();\n       tick(500);\n \n@@ -798,9 +804,10 @@ describe('MatBottomSheet', () => {\n \n       const bottomSheetRef = bottomSheet.open(PizzaMsg, {viewContainerRef: testViewContainerRef});\n \n-      flushMicrotasks();\n+      flush();\n+      viewContainerFixture.detectChanges();\n+      flush();\n       viewContainerFixture.detectChanges();\n-      flushMicrotasks();\n \n       expect(document.activeElement!.id).not.toBe(\n         'bottom-sheet-trigger',\n",
+  "diff_sha256": "1a89ce5a1530eb5da589ca0244c5a3a0c42827b0255ed89c902abd210ecfd5a4",
+  "hunk_reviews": [
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -609,7 +609,8 @@ describe('MatBottomSheet', () => {",
+      "sha256": "daa09ec6a6f994b6928c373b1442d9237d1153c96fd32230d5353f7620cc346e",
+      "judgment": "The default container-focus test drains timers and renders again before checking the active element. The expectation is unchanged. This is a private current-component test synchronization change, not an owned dialog implementation repair."
+    },
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -658,7 +659,8 @@ describe('MatBottomSheet', () => {",
+      "sha256": "fd5812c405c2718f53baa7c378efe4505c80463a08b02d8c311411e829fbfd70",
+      "judgment": "The autoFocus dialog-container branch drains timers and renders before comparing the same container node. No API or expected focus target changes."
+    },
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -679,7 +681,8 @@ describe('MatBottomSheet', () => {",
+      "sha256": "5b74a31b887e7d77e04a4d64ac947bb6cedcad21a4bfce02ba8bc748be20a641",
+      "judgment": "The first-heading branch adds the same timer/render synchronization and retains its h1 tabindex selector and active-element assertion. Do not infer a production accessibility fix."
+    },
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -701,7 +704,8 @@ describe('MatBottomSheet', () => {",
+      "sha256": "1797d41f2098bbd9ebb077633a3a357713f1b2d942fe38b3b7bfb840d173f1ea",
+      "judgment": "The CSS-selector autoFocus branch keeps the p target and all assertions, adding timer/render synchronization only. The historical Sass facade does not execute this private test."
+    },
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -721,9 +725,10 @@ describe('MatBottomSheet', () => {",
+      "sha256": "d78b3789826a67842ba2f8fb9d200f55b43d44873a06b4e3b6ab0cddb145a830",
+      "judgment": "The restoration-on-close case replaces two pre-dismiss microtask flushes with timer flushes and adds one rendering round. It still verifies that open moves focus away from the trigger."
+    },
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -736,7 +741,7 @@ describe('MatBottomSheet', () => {",
+      "sha256": "3b0a9bd21e36dedddf2bfceeedcde7a7c4f7533286efa21730cd49e7833fe301",
+      "judgment": "The same case drains timers after dismiss, still renders/ticks500 and still requires the trigger to regain focus. No production lifecycle code is touched."
+    },
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -758,9 +763,10 @@ describe('MatBottomSheet', () => {",
+      "sha256": "9991d216c522934b735ab22daef43c71cefc81f562bd5aec8c9351253eddfacc",
+      "judgment": "The restoreFocus:false case receives the analogous pre-dismiss timer/render sequence and retains the initial focus movement assertion."
+    },
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -773,7 +779,7 @@ describe('MatBottomSheet', () => {",
+      "sha256": "773d97e315a504badc0dae60620a2d84f7c9cca40c1e53ae9a0605ad8e5aff7a",
+      "judgment": "Its post-dismiss microtask flush becomes a timer flush while the assertion that the trigger stays unfocused remains intact. The configuration contract is unchanged by this patch."
+    },
+    {
+      "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+      "header": "@@ -798,9 +804,10 @@ describe('MatBottomSheet', () => {",
+      "sha256": "d32b4890adaa74f621c422a8f61beda8a06e4249fd974607f1266b909e51ff7e",
+      "judgment": "The moving-focus-outside-while-closing case gains pre-dismiss timer/render synchronization. Its later alternate-button focus and final preservation checks remain exact. Public peer focus behavior remains a separate real runtime obligation."
+    }
+  ],
+  "semantics": {
+    "kind": "focus-test-timer-and-render-synchronization",
+    "removed_microtask_flushes": 12,
+    "added_timer_flushes": 12,
+    "added_render_passes": 7,
+    "focus_assertions_preserved": true,
+    "runtime_scheduling_change": true,
+    "before_cases": 55,
+    "after_cases": 55,
+    "before_assertions": 88,
+    "after_assertions": 88
+  },
+  "decision": "The complete nine-hunk bottom-sheet patch changes only focus-test synchronization: twelve flushMicrotasks calls become timer flush calls, with seven added render passes. All55 case names and88 assertion statements remain exact. These are executable timing changes in open/default focus, heading/selector focus and close/restoration cases, not type-only cleanup. The complete owned source population defines no MatBottomSheet or MatLegacyBottomSheet runtime class; ordinary bottom-sheet behavior belongs to the stable public current peer, while the add-on owns historical bottom-sheet Sass. Do not copy upstream private tests into owned dialog or fork the ordinary component. This excludes the private test patch only and does not qualify public peer focus restoration, delegated behavior or bottom-sheet Sass coexistence.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "1a89ce5a1530eb5da589ca0244c5a3a0c42827b0255ed89c902abd210ecfd5a4",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete nine-hunk bottom-sheet patch changes only focus-test synchronization: twelve flushMicrotasks calls become timer flush calls, with seven added render passes. All55 case names and88 assertion statements remain exact. These are executable timing changes in open/default focus, heading/selector focus and close/restoration cases, not type-only cleanup. The complete owned source population defines no MatBottomSheet or MatLegacyBottomSheet runtime class; ordinary bottom-sheet behavior belongs to the stable public current peer, while the add-on owns historical bottom-sheet Sass. Do not copy upstream private tests into owned dialog or fork the ordinary component. This excludes the private test patch only and does not qualify public peer focus restoration, delegated behavior or bottom-sheet Sass coexistence.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-spec-followup-originals.py",
+        "sha256": "7f42c8b7a42389f5379df617f7992cf065189c6348809239d82e916bf4320abf"
+      },
+      {
+        "path": "scripts/spec-followup-source-review.mjs",
+        "sha256": "026f9ff25b9495d95bef110ef0964f23b6df92d72fdcdfad29da099bc9f17ee6"
+      },
+      {
+        "path": "tests/spec_followup_source_probe.mjs",
+        "sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-subjects.json.gz",
+        "sha256": "8b3c61b0a41b00743aa7783f83d071f462b6bba248d14f5f72a18e0b0cdbf1f5"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-acquisition.json.gz",
+        "sha256": "2e3b3d4d1868e0bcceb2420458087014cd7ccec7f2a8bb326390433ca082de08"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-controls.json",
+        "sha256": "3c3135fdaa30ec7f8bdd53406303f92c488f532260a735df936339c400f4b0b5"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-review.json",
+        "sha256": "6e532951510efbaf8e38bfaf35a1850a4dd944cd1b356fcf16cc12ada71dee68"
+      },
+      {
+        "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+        "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+      },
+      {
+        "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+        "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+        "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+        "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+        "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+        "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "58a30cfa4627a9e4875304aa2116654c08382a0b",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/bottom-sheet): fix broken tests (#29213)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=00b818711d361d7b4208659627c0b0bf921e12026753c5cea61696c857d492f6, bytes=3222). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/bottom-sheet/bottom-sheet.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/bottom-sheet/bottom-sheet.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/58a30cfa4627a9e4875304aa2116654c08382a0b.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "00b818711d361d7b4208659627c0b0bf921e12026753c5cea61696c857d492f6"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-spec-followup-originals.py",
+      "sha256": "7f42c8b7a42389f5379df617f7992cf065189c6348809239d82e916bf4320abf"
+    },
+    {
+      "path": "scripts/spec-followup-source-review.mjs",
+      "sha256": "026f9ff25b9495d95bef110ef0964f23b6df92d72fdcdfad29da099bc9f17ee6"
+    },
+    {
+      "path": "tests/spec_followup_source_probe.mjs",
+      "sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-subjects.json.gz",
+      "sha256": "8b3c61b0a41b00743aa7783f83d071f462b6bba248d14f5f72a18e0b0cdbf1f5"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-acquisition.json.gz",
+      "sha256": "2e3b3d4d1868e0bcceb2420458087014cd7ccec7f2a8bb326390433ca082de08"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-controls.json",
+      "sha256": "3c3135fdaa30ec7f8bdd53406303f92c488f532260a735df936339c400f4b0b5"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-review.json",
+      "sha256": "6e532951510efbaf8e38bfaf35a1850a4dd944cd1b356fcf16cc12ada71dee68"
+    },
+    {
+      "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+      "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+    },
+    {
+      "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+      "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+    },
+    {
+      "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+      "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+      "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+      "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+      "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+    }
+  ],
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

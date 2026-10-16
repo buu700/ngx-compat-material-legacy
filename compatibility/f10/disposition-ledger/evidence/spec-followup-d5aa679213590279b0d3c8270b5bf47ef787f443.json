@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "d5aa679213590279b0d3c8270b5bf47ef787f443",
+  "subject": "test(material/autocomplete): fix safari failure on CI (#28735)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "14c9533d15285756879b7c0d8073dbb3609d68fc",
+      "after_blob": "3905e4c90b971e03371844fca996914ead43c894"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 1,
+  "original_sources": [
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "before": {
+        "git_blob": "14c9533d15285756879b7c0d8073dbb3609d68fc",
+        "sha256": "a6845fd3313de792710c249d044b96e28fcefd6a70ef4b25937d143dddac1aab",
+        "bytes": 159684
+      },
+      "after": {
+        "git_blob": "3905e4c90b971e03371844fca996914ead43c894",
+        "sha256": "3faad09eddc0b123c3918aa9c2b2357c3c6e5a21476640959331f1d61069d1dc",
+        "bytes": 159764
+      }
+    }
+  ],
+  "raw_commit_sha256": "4ac8c47414ed1dc4b4d81133d4b2ecb4d45baab699a815b23d620f1287ca5015",
+  "diff": "diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts\nindex 14c9533d15285756879b7c0d8073dbb3609d68fc..3905e4c90b971e03371844fca996914ead43c894 100644\n--- a/src/material/autocomplete/autocomplete.spec.ts\n+++ b/src/material/autocomplete/autocomplete.spec.ts\n@@ -2544,6 +2544,8 @@ describe('MDC-based MatAutocomplete', () => {\n         // Safari seems to require an extra round that other browsers don't.\n         await new Promise(r => setTimeout(r));\n         fixture.detectChanges();\n+        await new Promise(r => setTimeout(r));\n+        fixture.detectChanges();\n       };\n \n       await flushPosition();\n",
+  "diff_sha256": "d4ec28d4464444301d54259f4d26a1ffbb5b3d46cb7184ef6e466536eaa53b56",
+  "hunk_reviews": [
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -2544,6 +2544,8 @@ describe('MDC-based MatAutocomplete', () => {",
+      "sha256": "7057325f9e7d133910047a06c6e641c5bb394d80096a1729cd8ca66f3defaaed",
+      "judgment": "The only hunk adds await setTimeout followed by fixture.detectChanges after the existing Safari round. The complete async helper is used before initial measurement, after filtering to one option and after clearing the input. The legacy fakeAsync test has two geometry assertions and a different rendering/zone protocol. Preserve both comparisons and require actual browser results before changing timing."
+    }
+  ],
+  "semantics": {
+    "kind": "async-test-render-synchronization",
+    "added_timer_render_pairs": 1,
+    "assertions_and_case_names_preserved": true,
+    "runtime_scheduling_change": true,
+    "before_cases": 183,
+    "after_cases": 183,
+    "before_assertions": 444,
+    "after_assertions": 444
+  },
+  "decision": "The complete original autocomplete patch adds one real timer turn and render pass to the modern async flushPosition helper used by the reposition-on-options-change regression. All183 case names and444 assertion statements are preserved in that upstream file, but scheduling changes; this is not type-only. The complete retained legacy spec has the corresponding below/above positioning assertions in a fakeAsync test using tick, simulateZoneExit and the original legacy form-field/panel selectors. It has no async flushPosition helper. Keep that historical test and all assertions. Do not copy a modern Safari retry into a different scheduler without an observed failure. Actual Safari and artifact execution of the retained regression remain required; no cross-browser or inherited-fix claim follows from this source decision.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "d4ec28d4464444301d54259f4d26a1ffbb5b3d46cb7184ef6e466536eaa53b56",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete original autocomplete patch adds one real timer turn and render pass to the modern async flushPosition helper used by the reposition-on-options-change regression. All183 case names and444 assertion statements are preserved in that upstream file, but scheduling changes; this is not type-only. The complete retained legacy spec has the corresponding below/above positioning assertions in a fakeAsync test using tick, simulateZoneExit and the original legacy form-field/panel selectors. It has no async flushPosition helper. Keep that historical test and all assertions. Do not copy a modern Safari retry into a different scheduler without an observed failure. Actual Safari and artifact execution of the retained regression remain required; no cross-browser or inherited-fix claim follows from this source decision.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-spec-followup-originals.py",
+        "sha256": "7f42c8b7a42389f5379df617f7992cf065189c6348809239d82e916bf4320abf"
+      },
+      {
+        "path": "scripts/spec-followup-source-review.mjs",
+        "sha256": "026f9ff25b9495d95bef110ef0964f23b6df92d72fdcdfad29da099bc9f17ee6"
+      },
+      {
+        "path": "tests/spec_followup_source_probe.mjs",
+        "sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-subjects.json.gz",
+        "sha256": "8b3c61b0a41b00743aa7783f83d071f462b6bba248d14f5f72a18e0b0cdbf1f5"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-acquisition.json.gz",
+        "sha256": "2e3b3d4d1868e0bcceb2420458087014cd7ccec7f2a8bb326390433ca082de08"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-controls.json",
+        "sha256": "3c3135fdaa30ec7f8bdd53406303f92c488f532260a735df936339c400f4b0b5"
+      },
+      {
+        "path": "compatibility/rc/spec-followup-source-review.json",
+        "sha256": "6e532951510efbaf8e38bfaf35a1850a4dd944cd1b356fcf16cc12ada71dee68"
+      },
+      {
+        "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+        "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+      },
+      {
+        "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+        "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+        "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+        "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+        "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+        "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+      }
+    ],
+    "actual_Angular_browser_native_packed_or_floor_qualified": false
+  },
+  "prior_entry": {
+    "sha": "d5aa679213590279b0d3c8270b5bf47ef787f443",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/autocomplete): fix safari failure on CI (#28735)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=58d4de4b9e85e8aabf3921fb852df1ac1be80597aba82eef528257ddf536acae, bytes=601). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/autocomplete/autocomplete.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/autocomplete/autocomplete.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/d5aa679213590279b0d3c8270b5bf47ef787f443.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "58d4de4b9e85e8aabf3921fb852df1ac1be80597aba82eef528257ddf536acae"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-spec-followup-originals.py",
+      "sha256": "7f42c8b7a42389f5379df617f7992cf065189c6348809239d82e916bf4320abf"
+    },
+    {
+      "path": "scripts/spec-followup-source-review.mjs",
+      "sha256": "026f9ff25b9495d95bef110ef0964f23b6df92d72fdcdfad29da099bc9f17ee6"
+    },
+    {
+      "path": "tests/spec_followup_source_probe.mjs",
+      "sha256": "ac3ea5d7a696da6d3b167ddf5a32c228a10aa8e5f325b3e2746724969e1783c0"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-subjects.json.gz",
+      "sha256": "8b3c61b0a41b00743aa7783f83d071f462b6bba248d14f5f72a18e0b0cdbf1f5"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-acquisition.json.gz",
+      "sha256": "2e3b3d4d1868e0bcceb2420458087014cd7ccec7f2a8bb326390433ca082de08"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-controls.json",
+      "sha256": "3c3135fdaa30ec7f8bdd53406303f92c488f532260a735df936339c400f4b0b5"
+    },
+    {
+      "path": "compatibility/rc/spec-followup-source-review.json",
+      "sha256": "6e532951510efbaf8e38bfaf35a1850a4dd944cd1b356fcf16cc12ada71dee68"
+    },
+    {
+      "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+      "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+    },
+    {
+      "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+      "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+    },
+    {
+      "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+      "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+      "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+      "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+      "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+    },
+    {
+      "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+      "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+    }
+  ],
+  "actual_Angular_browser_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
