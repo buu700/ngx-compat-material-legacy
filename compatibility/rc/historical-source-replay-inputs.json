@@ -1,12 +1,12 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "line": "21.x",
   "scope": "Finite original historical source probes only. Current-source coherence is mandatory; historical execution never admits current source, runtime, compiler, peer floors or G11.",
   "current_frame": {
-    "commit": "d10a227abe5c76c8d1238da49c71d2585e783a2d",
-    "tree": "746eec0b2688324c4fa61a7a97448d878432bb1c",
-    "tree_listing_sha256": "e195d99e2023b39fde9cb26d8bca3297c11fc1f71086e3f7e662d8027f6bea9f",
-    "members": 6299
+    "commit": "e0efe2790f729c7f58ada7bc9f2fcda17176755f",
+    "tree": "973a116a08d2bd934101f9de08977b919f3ab392",
+    "tree_listing_sha256": "df0572d831df4052e1f19bca05300940e5d6fc9f1ab263b5a87432371201941f",
+    "members": 6359
   },
   "mutable_progress_paths": [
     "compatibility/rc/remaining-native-admission-worksheet.json",
@@ -241,6 +241,32 @@
       },
       "timeout_ms": 60000,
       "report_option": "--out"
+    },
+    {
+      "id": "stability-chip-method",
+      "probe": "tests/spec_stability_chip_probe.mjs",
+      "probe_sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032",
+      "frame": {
+        "commit": "e0efe2790f729c7f58ada7bc9f2fcda17176755f",
+        "tree": "973a116a08d2bd934101f9de08977b919f3ab392",
+        "tree_listing_sha256": "df0572d831df4052e1f19bca05300940e5d6fc9f1ab263b5a87432371201941f",
+        "members": 6359
+      },
+      "timeout_ms": 60000,
+      "report_option": "--out"
+    },
+    {
+      "id": "stability-chip-context",
+      "probe": "tests/spec_stability_context_probe.mjs",
+      "probe_sha256": "2a31f08dfdf0631e2798dc645a3302445eb081ba55dc2ec495541c20ff694e73",
+      "frame": {
+        "commit": "e0efe2790f729c7f58ada7bc9f2fcda17176755f",
+        "tree": "973a116a08d2bd934101f9de08977b919f3ab392",
+        "tree_listing_sha256": "df0572d831df4052e1f19bca05300940e5d6fc9f1ab263b5a87432371201941f",
+        "members": 6359
+      },
+      "timeout_ms": 60000,
+      "report_option": "--out"
     }
   ],
   "wrapper_edits": [
@@ -446,6 +472,30 @@
           "after": "['node', 'scripts/run-historical-source-probe.mjs', 'standalone-environment-source']"
         }
       ]
+    },
+    {
+      "path": "tests/test_spec_stability_chip.py",
+      "reference_commit": "e0efe2790f729c7f58ada7bc9f2fcda17176755f",
+      "before_sha256": "6d9f74980ced9a95c9097d5cb733357bff168aff68aaa6bdbacff9bf6eed4ed6",
+      "after_sha256": "a9cf18feea6a94dc947d02186885b4d129bff34e2ca6075a1915a0ce48483a16",
+      "edits": [
+        {
+          "before": "['node', 'tests/spec_stability_chip_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'stability-chip-method']"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_spec_stability_context.py",
+      "reference_commit": "e0efe2790f729c7f58ada7bc9f2fcda17176755f",
+      "before_sha256": "871d78318dd49464183e571a1cbae4e05678c84a429c7fee653b8907e6c1d6bc",
+      "after_sha256": "094c64feb2dc82745bf58069d252b04ace3a6738dd1ca5b525b11a5c0892b1de",
+      "edits": [
+        {
+          "before": "['node', 'tests/spec_stability_context_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'stability-chip-context']"
+        }
+      ]
     }
   ],
   "source_phase_reports": {
@@ -469,7 +519,9 @@
     "render_setup_source": "compatibility/rc/spec-render-setup-source-checkpoint.json",
     "theme_date_source": "compatibility/rc/spec-theme-date-source-checkpoint.json",
     "test_environment_zone_source": "compatibility/rc/spec-test-environment-source-zone-checkpoint.json",
-    "standalone_environment_source": "compatibility/rc/spec-test-environment-source-standalone-checkpoint.json"
+    "standalone_environment_source": "compatibility/rc/spec-test-environment-source-standalone-checkpoint.json",
+    "chip_method_source": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
+    "chip_context_source": "compatibility/rc/spec-stability-context-checkpoint.json"
   },
   "no_install_build_publish_or_remote_operations": true,
   "original_js_programs_and_assertions_unchanged": true,
