@@ -16,7 +16,7 @@ import {fileURLToPath} from 'node:url';
 import {execFileSync, spawnSync} from 'node:child_process';
 import {ARTIFACT_BEHAVIOR_KIND, SELECT_FOCUS_SHA, SELECT_DETACH_SHA, SELECT_DETACH_PATCH,
   SELECT_DETACH_MEMBERS, TABLE_ONPUSH_SHA, TABLE_ONPUSH_PATCH, TABLE_ONPUSH_MEMBERS,
-  requiresArtifactBehavior} from '../scripts/upstream-artifact-behavior-evidence.mjs';
+  requiresArtifactBehavior, artifactBehaviorRequirements} from '../scripts/upstream-artifact-behavior-evidence.mjs';
 import {createFixture} from './upstream/artifact-behavior-fixture.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'), read = path => readFileSync(join(root, path));
@@ -67,6 +67,29 @@ if (focusReview.historical_branch_matrix_requalification) {
   assert.deepEqual(recovered, oldMatrix, 'matrix requalification changed an unrelated gate');
   const priorMember = precedingFocusMembers.find(row => row.path === member.path);
   assert.equal(priorMember.sha256, member.sha256); priorMember.sha256 = hash(read(member.path));
+}
+if (focusReview.chip_menu_tooltip_context_requalification) {
+  const context=focusReview.chip_menu_tooltip_context_requalification;
+  assert.equal(context.inputs.path,'compatibility/rc/chip-menu-tooltip-admission-inputs.json');
+  const bytes=read(context.inputs.path);assert.equal(hash(bytes),context.inputs.sha256);const inputs=JSON.parse(bytes);
+  const stored=read(inputs.prior.path);assert.equal(hash(stored),inputs.prior.sha256);
+  const raw=gunzipSync(stored);assert.equal(hash(raw),inputs.prior.raw_sha256);const retained=JSON.parse(raw);
+  const previous=retained.members.find(row=>row.path===context.preceding_source_review.path);
+  assert.equal(hash(previous.text),context.preceding_source_review.sha256);
+  assert.deepEqual(JSON.parse(previous.text).reviewed_source_members,precedingFocusMembers);
+  const packedInput=json('compatibility/rc/chip-menu-tooltip-packed-source-inputs.json');
+  const producer=packedInput.members.find(row=>row.path==='scripts/packed-consumer-aot-smoke.mjs');
+  assert.equal(precedingFocusMembers.find(row=>row.path===producer.path).sha256,producer.before_sha256);
+  for(const row of precedingFocusMembers){
+    if(row.path===producer.path)row.sha256=producer.current_sha256;
+    assert.equal(hash(read(row.path)),row.sha256);
+  }
+  const added=['scripts/chip-menu-tooltip-packed-contract.mjs','scripts/upstream-artifact-behavior-evidence.mjs'];
+  assert.deepEqual(context.added_source_members.map(row=>row.path),added);
+  for(const row of context.added_source_members){assert.equal(hash(read(row.path)),row.sha256);precedingFocusMembers.push(row);}
+  const paths=artifactBehaviorRequirements(focusEntry.sha).members;
+  assert.deepEqual([...paths].sort(),precedingFocusMembers.map(row=>row.path).sort());
+  precedingFocusMembers.sort((a,b)=>paths.indexOf(a.path)-paths.indexOf(b.path));
 }
 assert.deepEqual(focusReview.reviewed_source_members, precedingFocusMembers);
 assert.deepEqual(focusReview.hunk_reviews, json(prior.path).hunk_reviews); assert.equal(focusReview.semantic_pass, false);
