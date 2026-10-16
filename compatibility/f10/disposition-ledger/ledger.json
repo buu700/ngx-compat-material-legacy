@@ -30542,20 +30542,139 @@
       "sha": "fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(cdk/scrolling): switch tests away from fakeAsync (#33150)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=d479a108388660bf8ab548e82c924d035b3f84809964382ef5cdb81fece08fdd, bytes=56169). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/scrolling/scroll-dispatcher.spec.ts, src/cdk/scrolling/viewport-ruler.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/cdk/scrolling/scroll-dispatcher.spec.ts",
         "src/cdk/scrolling/viewport-ruler.spec.ts",
         "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
         "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T22:14:31.217539+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "d479a108388660bf8ab548e82c924d035b3f84809964382ef5cdb81fece08fdd"
+      "patch_sha256": "d479a108388660bf8ab548e82c924d035b3f84809964382ef5cdb81fece08fdd",
+      "source_check": {
+        "kind": "individual-complete-original-cdk-async-fixture-source-review",
+        "diff_sha256": "5dde1ced48907cd34bb29dd212623cbfa3c3b1079f01939c327b4b55d3cbcebd",
+        "evidence_report_sha256": "8dd602ce20bd2d560cdd23c721e4c4838fbef5c385119b865c79b25cf9d3f17e"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "5dde1ced48907cd34bb29dd212623cbfa3c3b1079f01939c327b4b55d3cbcebd",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-cdk-async-source-review.mjs",
+            "sha256": "982719c6e0b660c03dbf682dbcd213821401846ef0353a5bc1bd801462ebd13c"
+          },
+          {
+            "path": "tests/spec_cdk_async_source_probe.mjs",
+            "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9"
+          },
+          {
+            "path": "tests/test_spec_cdk_async_source.py",
+            "sha256": "234254cb56f2b58909bc9723be4ccb70e0b50055d03aa24db2db2e105bb54d59"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-qualification-inspector.py",
+            "sha256": "ca63e1d8fbeb973a805e3822dd623e6a13b3c423d2ed33d8af2dbf8cda1c0328"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+            "sha256": "ef515f777d07954c79743aac97363eee5066dd73cd9258dd7a141c345738d72d"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-acquisition.json.gz",
+            "sha256": "66273c1785f6149e4ef73743ea58262751ca59b94070c9c3d8cc5ba8765e008b"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-observation-pins.json",
+            "sha256": "90d5226c7425d697d525b923dc66d5f9aa1e8b79341f97c5b2e2534d8fe390de"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+            "sha256": "d266bfdc06bb5c290007521513d5b2e551a278a5457f9d2131dccac488c7f001"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+            "sha256": "bac1c2bbf8986c45cbedd75b015880139e24c73092cd2140be2030813d6412d0"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-controls.json",
+            "sha256": "77b519f445caa2e870d1271ff05aa4808d0bd77f047a9cd732fd3941528cc949"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-python.log.gz",
+            "sha256": "d9cc9df950599c8a19643dd26224dbf82b4cdab715cd544ed8b6d24bc2be842c"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-cyph-sanity.json",
+            "sha256": "4a2143dea859b118422041e79e57c858069ad9000fa5ab9b0aa85a873b9883be"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-probe.mjs",
+            "sha256": "f7ebe44564f0d6da673e5e3023ae97b2944a36e646cd253d4fb32f52f4907ee3"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+            "sha256": "f9c0a6c9717d731ab263d4c8d39ad2d1292b7b479f666fad00dd7a4abdfcfc44"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-checkpoint.json",
+            "sha256": "878f0d5a276091ffe256dfa0220486fc1007192483ccf82df8bd12dec7715c52"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-replay-checkpoint.json",
+            "sha256": "ff42a8648cb6433f742117d1e3e2eb3329542c642a81bba9013166732f0db95d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+            "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+            "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+            "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "45582795cc29c3bcb1265b7f6c541b165be3ef9d",
@@ -30689,9 +30808,9 @@
       "sha": "a3479f74eedcba962c642cb297f4d37028d8c023",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(cdk/overlay): switch tests away from fakeAsync (#33192)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=426125ea0f90231ddc8aaae544b551585d7c70b9ab1c5b1488a948c6ae0be840, bytes=18888). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/overlay/overlay-directives.spec.ts, src/cdk/overlay/overlay.spec.ts, src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts, src/cdk/overlay/scroll/close-scroll-strategy.spec.ts, src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/cdk/overlay/overlay-directives.spec.ts",
         "src/cdk/overlay/overlay.spec.ts",
@@ -30699,11 +30818,130 @@
         "src/cdk/overlay/scroll/close-scroll-strategy.spec.ts",
         "src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/a3479f74eedcba962c642cb297f4d37028d8c023.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-a3479f74eedcba962c642cb297f4d37028d8c023.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T22:14:31.218251+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "426125ea0f90231ddc8aaae544b551585d7c70b9ab1c5b1488a948c6ae0be840"
+      "patch_sha256": "426125ea0f90231ddc8aaae544b551585d7c70b9ab1c5b1488a948c6ae0be840",
+      "source_check": {
+        "kind": "individual-complete-original-cdk-async-fixture-source-review",
+        "diff_sha256": "2bd363d7cd5d367291ca9bb662aec9ce0843498a9a2ea69f9e853832cea54133",
+        "evidence_report_sha256": "0cb02861cf522eae4d393fba6b68174c01a339c3c8540eecbeace52536614673"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "2bd363d7cd5d367291ca9bb662aec9ce0843498a9a2ea69f9e853832cea54133",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-cdk-async-source-review.mjs",
+            "sha256": "982719c6e0b660c03dbf682dbcd213821401846ef0353a5bc1bd801462ebd13c"
+          },
+          {
+            "path": "tests/spec_cdk_async_source_probe.mjs",
+            "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9"
+          },
+          {
+            "path": "tests/test_spec_cdk_async_source.py",
+            "sha256": "234254cb56f2b58909bc9723be4ccb70e0b50055d03aa24db2db2e105bb54d59"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-qualification-inspector.py",
+            "sha256": "ca63e1d8fbeb973a805e3822dd623e6a13b3c423d2ed33d8af2dbf8cda1c0328"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+            "sha256": "ef515f777d07954c79743aac97363eee5066dd73cd9258dd7a141c345738d72d"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-acquisition.json.gz",
+            "sha256": "66273c1785f6149e4ef73743ea58262751ca59b94070c9c3d8cc5ba8765e008b"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-observation-pins.json",
+            "sha256": "90d5226c7425d697d525b923dc66d5f9aa1e8b79341f97c5b2e2534d8fe390de"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+            "sha256": "d266bfdc06bb5c290007521513d5b2e551a278a5457f9d2131dccac488c7f001"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+            "sha256": "bac1c2bbf8986c45cbedd75b015880139e24c73092cd2140be2030813d6412d0"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-controls.json",
+            "sha256": "77b519f445caa2e870d1271ff05aa4808d0bd77f047a9cd732fd3941528cc949"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-python.log.gz",
+            "sha256": "d9cc9df950599c8a19643dd26224dbf82b4cdab715cd544ed8b6d24bc2be842c"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-cyph-sanity.json",
+            "sha256": "4a2143dea859b118422041e79e57c858069ad9000fa5ab9b0aa85a873b9883be"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-probe.mjs",
+            "sha256": "f7ebe44564f0d6da673e5e3023ae97b2944a36e646cd253d4fb32f52f4907ee3"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+            "sha256": "f9c0a6c9717d731ab263d4c8d39ad2d1292b7b479f666fad00dd7a4abdfcfc44"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-checkpoint.json",
+            "sha256": "878f0d5a276091ffe256dfa0220486fc1007192483ccf82df8bd12dec7715c52"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-replay-checkpoint.json",
+            "sha256": "ff42a8648cb6433f742117d1e3e2eb3329542c642a81bba9013166732f0db95d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+            "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+            "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+            "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "2f4a2b4c003594f64f6e9b17bf38b929739fd535",
@@ -31456,33 +31694,271 @@
       "sha": "72fb9d2d47d52a570a1d81c287244a52e53a5b93",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(cdk/layout): switch tests away from fakeAsync (#33446)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=664e4db55a9a3296ecc9372df1f580d68f7a90293bf28457fb50adb7cf71bbbb, bytes=7432). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/layout/breakpoints-observer.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private CDK breakpoint-observer scheduling migration after individual review of all six hunks in the complete original. All 11 static case registrations and both hooks pair in full order; every complete callback changes but all projected predicate/nonboundary sequences retain identity. An exact after-only debounceTime=20 constant and native timer observations replace simulated ticks; both fake-media fixture classes remain raw-byte identical. This proves no observable emission/debounce/error/unsubscription equivalence. Public BreakpointObserver is actually consumed by legacy autocomplete,tooltip and snack-bar; Cyph uses these legacy controls. Preserve the owned integrations, historical M 2 HTML/CSS/SCSS and all tests, without a CDK fork, obsolete-surface dependency or narrower peer minimum. Actual layout/overlay/consumer/native/browser/supported-floor validation remains open.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/cdk/layout/breakpoints-observer.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/72fb9d2d47d52a570a1d81c287244a52e53a5b93.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-72fb9d2d47d52a570a1d81c287244a52e53a5b93.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T22:14:31.216114+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "664e4db55a9a3296ecc9372df1f580d68f7a90293bf28457fb50adb7cf71bbbb"
+      "patch_sha256": "664e4db55a9a3296ecc9372df1f580d68f7a90293bf28457fb50adb7cf71bbbb",
+      "source_check": {
+        "kind": "individual-complete-original-cdk-async-fixture-source-review",
+        "diff_sha256": "a28be9ab796b1f4457fb99df3df9cf93b951f40c16150c99e42339919c524f3d",
+        "evidence_report_sha256": "b179d01fde4d530c794eeeeee77399e953caee6bcbb266a11b499e13153b43b1"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "a28be9ab796b1f4457fb99df3df9cf93b951f40c16150c99e42339919c524f3d",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private CDK breakpoint-observer scheduling migration after individual review of all six hunks in the complete original. All 11 static case registrations and both hooks pair in full order; every complete callback changes but all projected predicate/nonboundary sequences retain identity. An exact after-only debounceTime=20 constant and native timer observations replace simulated ticks; both fake-media fixture classes remain raw-byte identical. This proves no observable emission/debounce/error/unsubscription equivalence. Public BreakpointObserver is actually consumed by legacy autocomplete,tooltip and snack-bar; Cyph uses these legacy controls. Preserve the owned integrations, historical M 2 HTML/CSS/SCSS and all tests, without a CDK fork, obsolete-surface dependency or narrower peer minimum. Actual layout/overlay/consumer/native/browser/supported-floor validation remains open.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-cdk-async-source-review.mjs",
+            "sha256": "982719c6e0b660c03dbf682dbcd213821401846ef0353a5bc1bd801462ebd13c"
+          },
+          {
+            "path": "tests/spec_cdk_async_source_probe.mjs",
+            "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9"
+          },
+          {
+            "path": "tests/test_spec_cdk_async_source.py",
+            "sha256": "234254cb56f2b58909bc9723be4ccb70e0b50055d03aa24db2db2e105bb54d59"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-qualification-inspector.py",
+            "sha256": "ca63e1d8fbeb973a805e3822dd623e6a13b3c423d2ed33d8af2dbf8cda1c0328"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+            "sha256": "ef515f777d07954c79743aac97363eee5066dd73cd9258dd7a141c345738d72d"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-acquisition.json.gz",
+            "sha256": "66273c1785f6149e4ef73743ea58262751ca59b94070c9c3d8cc5ba8765e008b"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-observation-pins.json",
+            "sha256": "90d5226c7425d697d525b923dc66d5f9aa1e8b79341f97c5b2e2534d8fe390de"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+            "sha256": "d266bfdc06bb5c290007521513d5b2e551a278a5457f9d2131dccac488c7f001"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+            "sha256": "bac1c2bbf8986c45cbedd75b015880139e24c73092cd2140be2030813d6412d0"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-controls.json",
+            "sha256": "77b519f445caa2e870d1271ff05aa4808d0bd77f047a9cd732fd3941528cc949"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-python.log.gz",
+            "sha256": "d9cc9df950599c8a19643dd26224dbf82b4cdab715cd544ed8b6d24bc2be842c"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-cyph-sanity.json",
+            "sha256": "4a2143dea859b118422041e79e57c858069ad9000fa5ab9b0aa85a873b9883be"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-probe.mjs",
+            "sha256": "f7ebe44564f0d6da673e5e3023ae97b2944a36e646cd253d4fb32f52f4907ee3"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+            "sha256": "f9c0a6c9717d731ab263d4c8d39ad2d1292b7b479f666fad00dd7a4abdfcfc44"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-checkpoint.json",
+            "sha256": "878f0d5a276091ffe256dfa0220486fc1007192483ccf82df8bd12dec7715c52"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-replay-checkpoint.json",
+            "sha256": "ff42a8648cb6433f742117d1e3e2eb3329542c642a81bba9013166732f0db95d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+            "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+            "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+            "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "85a81a614992ec9a42f40d525cda8a265291fcbe",
       "bucket": "test-only-batch-candidate",
       "subject": "refactor(cdk/table): switch tests away from fakeAsync (#33456)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=2e4894d31585966892767b49e827cbff835f3917ad1d2af5c4b7e58c002673d5, bytes=16418). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/table/table.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/cdk/table/table.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/85a81a614992ec9a42f40d525cda8a265291fcbe.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-85a81a614992ec9a42f40d525cda8a265291fcbe.json",
       "batch_id": "test-only-refactor-wave2-2026-10-01",
-      "recorded_at_utc": "2026-10-01T18:47:11Z",
+      "recorded_at_utc": "2026-10-16T22:14:31.216777+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "2e4894d31585966892767b49e827cbff835f3917ad1d2af5c4b7e58c002673d5"
+      "patch_sha256": "2e4894d31585966892767b49e827cbff835f3917ad1d2af5c4b7e58c002673d5",
+      "source_check": {
+        "kind": "individual-complete-original-cdk-async-fixture-source-review",
+        "diff_sha256": "3a5333c81f17b4203c2c62650290cbf6b2f86b3b66bdcb66f83a39df851bc216",
+        "evidence_report_sha256": "87bc937a6631e82dc107c58037fe99c4276e3d2336855f8ebfde49294bd3d71c"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-spec-source-applicability",
+        "diff_sha256": "3a5333c81f17b4203c2c62650290cbf6b2f86b3b66bdcb66f83a39df851bc216",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/spec-cdk-async-source-review.mjs",
+            "sha256": "982719c6e0b660c03dbf682dbcd213821401846ef0353a5bc1bd801462ebd13c"
+          },
+          {
+            "path": "tests/spec_cdk_async_source_probe.mjs",
+            "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9"
+          },
+          {
+            "path": "tests/test_spec_cdk_async_source.py",
+            "sha256": "234254cb56f2b58909bc9723be4ccb70e0b50055d03aa24db2db2e105bb54d59"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-qualification-inspector.py",
+            "sha256": "ca63e1d8fbeb973a805e3822dd623e6a13b3c423d2ed33d8af2dbf8cda1c0328"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/authenticated-single-spec-review.mjs",
+            "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+          },
+          {
+            "path": "scripts/acquire-upstream-spec-originals.py",
+            "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+            "sha256": "ef515f777d07954c79743aac97363eee5066dd73cd9258dd7a141c345738d72d"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-acquisition.json.gz",
+            "sha256": "66273c1785f6149e4ef73743ea58262751ca59b94070c9c3d8cc5ba8765e008b"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-observation-pins.json",
+            "sha256": "90d5226c7425d697d525b923dc66d5f9aa1e8b79341f97c5b2e2534d8fe390de"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+            "sha256": "d266bfdc06bb5c290007521513d5b2e551a278a5457f9d2131dccac488c7f001"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+            "sha256": "bac1c2bbf8986c45cbedd75b015880139e24c73092cd2140be2030813d6412d0"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-controls.json",
+            "sha256": "77b519f445caa2e870d1271ff05aa4808d0bd77f047a9cd732fd3941528cc949"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-python.log.gz",
+            "sha256": "d9cc9df950599c8a19643dd26224dbf82b4cdab715cd544ed8b6d24bc2be842c"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-cyph-sanity.json",
+            "sha256": "4a2143dea859b118422041e79e57c858069ad9000fa5ab9b0aa85a873b9883be"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-probe.mjs",
+            "sha256": "f7ebe44564f0d6da673e5e3023ae97b2944a36e646cd253d4fb32f52f4907ee3"
+          },
+          {
+            "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+            "sha256": "f9c0a6c9717d731ab263d4c8d39ad2d1292b7b479f666fad00dd7a4abdfcfc44"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-checkpoint.json",
+            "sha256": "878f0d5a276091ffe256dfa0220486fc1007192483ccf82df8bd12dec7715c52"
+          },
+          {
+            "path": "compatibility/rc/spec-navigation-async-source-replay-checkpoint.json",
+            "sha256": "ff42a8648cb6433f742117d1e3e2eb3329542c642a81bba9013166732f0db95d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+            "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+            "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+            "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+            "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "47ac55fcdc5178f094ad5e8bb2d378f1525d02a8",
