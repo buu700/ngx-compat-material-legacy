@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SpecFollowupSourceTests(unittest.TestCase):
     def test_provenance_semantics_and_retained_regressions(self):
-        result = subprocess.run(['node', 'tests/spec_followup_source_probe.mjs'], cwd=ROOT,
+        result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'followup-spec-source'], cwd=ROOT,
                                 capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])
