@@ -1,0 +1,733 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "f81b620f62179350d008b069d0d7228695a00ce0",
+  "subject": "build: switch karma tests to `rules_browsers` (#30820)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "WORKSPACE",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "371d8a2690f57df095ea45494b32acd988f396ec",
+      "after_blob": "86e1d2a5926248666e157cf43b55894b1b09ca18"
+    },
+    {
+      "path": "scripts/create-legacy-tests-bundle.mjs",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "061037c2044839b4911ad8847cd296741304f593",
+      "after_blob": "6d0a8ebd4bf2e1dfd7e94b08422f7110c014a3fd"
+    },
+    {
+      "path": "src/BUILD.bazel",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "7fc1547649d3fd8027cf127f2bc534e9e09e88b3",
+      "after_blob": "ce3549ed1771873479331abc87675a36aaf910c5"
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "51821330ed0683b6f8724a4fbfe8a4a2f2643e83",
+      "after_blob": "e40f5aae1c12f5bcc9bfe4fecc5e244d42072ac5"
+    },
+    {
+      "path": "src/cdk/testing/tests/webdriver-test.bzl",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "22ef96c78b9e75021ba33b77c67b1005e48abf63",
+      "after_blob": "895facd7e72691cf1fc419261b0606825c6b5a46"
+    },
+    {
+      "path": "src/cdk/testing/tests/webdriver.e2e.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "9db630d6f06829e13d701c238908de0ed29bcbe0",
+      "after_blob": "b1629e67156fdffd969e2a438041e1091ef68d86"
+    },
+    {
+      "path": "test/BUILD.bazel",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "47c5b667c77c5bb16959b021274e59f39032e254",
+      "after_blob": "d7f3caf8dff070ebb4e23fd3da8859b0b215f502"
+    },
+    {
+      "path": "test/angular-test-init-spec.ts",
+      "status": "D",
+      "before_mode": "100644",
+      "after_mode": "000000",
+      "before_blob": "ae9b810a769c847fd07cd0f60ad7cc223060a484",
+      "after_blob": "0000000000000000000000000000000000000000"
+    },
+    {
+      "path": "test/angular-test.init.ts",
+      "status": "A",
+      "before_mode": "000000",
+      "after_mode": "100644",
+      "before_blob": "0000000000000000000000000000000000000000",
+      "after_blob": "6961b9c7effc6f872f15833d0fe9d1a953482e3e"
+    },
+    {
+      "path": "test/karma.conf.js",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "7b769afd5f496bc68063384fa68adea769ac8015",
+      "after_blob": "7f6ce9a77ae4507191fa3c658dd3c661f46a7f78"
+    },
+    {
+      "path": "tools/defaults.bzl",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "9d3563e39f053f97f6f5a22e36b88ab6e39571b6",
+      "after_blob": "050d4efc6f8ab51a9fa945a773adb7d245ac2ab5"
+    },
+    {
+      "path": "tools/defaults2.bzl",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "793349e37aa0d80f78c349c222c5ff44a956c16b",
+      "after_blob": "2039548b0a78dedd6014b5b6b7ece37e4d6f79f5"
+    }
+  ],
+  "original_files": 12,
+  "original_hunks": 25,
+  "raw_commit_sha256": "521f407760a3ab4b300555399594391d3eb0dcf8abc6b6ca9edd652b5b56e3e0",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-build-harness-source-subjects.json.gz",
+    "sha256": "35cb769fa6769f1b982d2155969b009d6e67cae6fdd5b6f7e18cbd460b9a452c"
+  },
+  "patch_file": "compatibility/rc/mixed-build-harness-source-f81b620f62179350d008b069d0d7228695a00ce0.original.patch",
+  "diff_sha256": "ff905dd3c4f153f9f7f50b9d5ff734d7ba4c65256c0381cfe8657a6735c852e9",
+  "hunk_reviews": [
+    {
+      "path": "WORKSPACE",
+      "status": "M",
+      "header": "@@ -65,9 +65,9 @@ build_bazel_rules_nodejs_dependencies()",
+      "sha256": "3460690799334317dc552ef511c877fbf43fa9751ce3e581b18d3b7e5cfa2c4d",
+      "judgment": "Pins rules_js2.1.1 with exact archive digest, updates devinfra commit and adds rules_browsers Git/setup calls. These are inert upstream build dependencies; no repository fetching, setup, installer or action adoption."
+    },
+    {
+      "path": "WORKSPACE",
+      "status": "M",
+      "header": "@@ -249,7 +249,7 @@ load(\"@bazel_tools//tools/build_defs/repo:git.bzl\", \"git_repository\")",
+      "sha256": "162977929162f1bbe1550d29d5c3cc2951580c2fb2990174e6e717f8b5ac93a4",
+      "judgment": "Pins rules_js2.1.1 with exact archive digest, updates devinfra commit and adds rules_browsers Git/setup calls. These are inert upstream build dependencies; no repository fetching, setup, installer or action adoption."
+    },
+    {
+      "path": "WORKSPACE",
+      "status": "M",
+      "header": "@@ -299,3 +299,17 @@ esbuild_register_toolchains(",
+      "sha256": "b6d5ba89a2559f848d9df4fac65a26af673843f196ad16f8a9975cb03d306521",
+      "judgment": "Pins rules_js2.1.1 with exact archive digest, updates devinfra commit and adds rules_browsers Git/setup calls. These are inert upstream build dependencies; no repository fetching, setup, installer or action adoption."
+    },
+    {
+      "path": "scripts/create-legacy-tests-bundle.mjs",
+      "status": "M",
+      "header": "@@ -7,7 +7,7 @@ import fs from 'fs';",
+      "sha256": "b160e95228ae6cf06af423db6810f1a8331fcf9db9dfa24abbb26eb8da56a913",
+      "judgment": "Switches Sass namespace import, sets treeShaking:false, changes compileAsync to synchronous compile followed by deferred parallel writes, logs compilation progress and imports angular-test.init.ts. Preserve whole before/after functions, discovery and side-effect preservation mechanism; no execution or equivalence to the separate owned runner."
+    },
+    {
+      "path": "scripts/create-legacy-tests-bundle.mjs",
+      "status": "M",
+      "header": "@@ -65,6 +65,7 @@ async function main() {",
+      "sha256": "af67966afcec12c8d16b29577f6c1260e43289f961e85d77ea4cd9dcf52bc7e2",
+      "judgment": "Switches Sass namespace import, sets treeShaking:false, changes compileAsync to synchronous compile followed by deferred parallel writes, logs compilation progress and imports angular-test.init.ts. Preserve whole before/after functions, discovery and side-effect preservation mechanism; no execution or equivalence to the separate owned runner."
+    },
+    {
+      "path": "scripts/create-legacy-tests-bundle.mjs",
+      "status": "M",
+      "header": "@@ -85,22 +86,26 @@ async function main() {",
+      "sha256": "374ba683fb92a7c023c0fe12679646a70c9edc7c54b3e7f2f5daccb4d2610e6a",
+      "judgment": "Switches Sass namespace import, sets treeShaking:false, changes compileAsync to synchronous compile followed by deferred parallel writes, logs compilation progress and imports angular-test.init.ts. Preserve whole before/after functions, discovery and side-effect preservation mechanism; no execution or equivalence to the separate owned runner."
+    },
+    {
+      "path": "scripts/create-legacy-tests-bundle.mjs",
+      "status": "M",
+      "header": "@@ -131,7 +136,7 @@ async function compileProjectWithNgtsc() {",
+      "sha256": "a545e5ea6ff54ea8bcc41422b9a2aae16bda841ca4bc9b9be0ed35182c69cad5",
+      "judgment": "Switches Sass namespace import, sets treeShaking:false, changes compileAsync to synchronous compile followed by deferred parallel writes, logs compilation progress and imports angular-test.init.ts. Preserve whole before/after functions, discovery and side-effect preservation mechanism; no execution or equivalence to the separate owned runner."
+    },
+    {
+      "path": "scripts/create-legacy-tests-bundle.mjs",
+      "status": "M",
+      "header": "@@ -155,14 +160,12 @@ async function createEntryPointSpecFile() {",
+      "sha256": "17cd0e16c620c9a3e396de06b9883dfbf2ac71c74c13b01f94c92dbf6b1c1380",
+      "judgment": "Switches Sass namespace import, sets treeShaking:false, changes compileAsync to synchronous compile followed by deferred parallel writes, logs compilation progress and imports angular-test.init.ts. Preserve whole before/after functions, discovery and side-effect preservation mechanism; no execution or equivalence to the separate owned runner."
+    },
+    {
+      "path": "src/BUILD.bazel",
+      "status": "M",
+      "header": "@@ -49,11 +49,11 @@ dgeni_api_docs(",
+      "sha256": "250f4cfc167daaf73a198f5898c0858ceba2dd652673c7291c4755d2e7b9057b",
+      "judgment": "Changes five Angular API-doc dependency labels from npm aliases to root node_modules labels. Capture whole metadata; do not inherit upstream docs/build graph."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "status": "M",
+      "header": "@@ -272,34 +272,40 @@ describe('Key managers', () => {",
+      "sha256": "98e7012cb162da6128e9aa84e0b2a0baecbf7267a110878abca8d1c056958dbf",
+      "judgment": "Three directional suites replace function(this:KeyEventTestContext) with arrow callbacks, explicit per-suite context objects, assignments and runDirectionalKeyTests.call(context). Preserve full suite/helper/hook context; all case callbacks remain equal but framework this-binding preparation changes."
+    },
+    {
+      "path": "src/cdk/testing/tests/webdriver-test.bzl",
+      "status": "M",
+      "header": "@@ -12,13 +12,13 @@ def webdriver_test(name, deps, tags = [], **kwargs):",
+      "sha256": "845f3f675ee43b045a3e6acc45e53bcfa3a5a090b89f6ea494d96d60cf180552",
+      "judgment": "Moves Chromium labels/toolchain to rules_browsers and changes CHROMIUM_BIN environment/make variable to CHROME_HEADLESS_BIN/CHROME-HEADLESS-SHELL. Whole toolchain metadata is inert; no WebDriver or browser matrix pass."
+    },
+    {
+      "path": "src/cdk/testing/tests/webdriver.e2e.spec.ts",
+      "status": "M",
+      "header": "@@ -21,7 +21,7 @@ const projectRoot = path.resolve(__dirname, '../../../');",
+      "sha256": "a1b635a40e92392467a9edeae0a13238b403dad8fc4b7258f20eeb465a929a87",
+      "judgment": "Changes exact environment lookup for Chromium executable to CHROME_HEADLESS_BIN, keeping complete setup/helpers/callbacks captured. No process, environment secret read or WebDriver execution occurs in this source review."
+    },
+    {
+      "path": "test/BUILD.bazel",
+      "status": "M",
+      "header": "@@ -16,10 +16,12 @@ ts_project(",
+      "sha256": "82b1741cfeb28124d2b00e6925260d1c1516dcc322fed21242b705ed1c891a7f",
+      "judgment": "Changes initializer source path and adds reflect-metadata/zone.js dependencies. The retained comment about spec suffix is not treated as proof of actual discovery. New bootstrap bundling behavior must be judged with both complete initializers/macros."
+    },
+    {
+      "path": "test/angular-test-init-spec.ts",
+      "status": "D",
+      "header": "@@ -1,36 +0,0 @@",
+      "sha256": "cce3bb53ec9412394553f607c85a44db21738911b949cb485ef2af345c10d814",
+      "judgment": "Complete36-line deleted initializer includes experimental zoneless provider, throwing ErrorHandler, TestBed init and browser globals. Authenticated absent after-image. The separate owned runner uses stable public zoneful setup; do not import this removed initializer or restore a stability shortcut."
+    },
+    {
+      "path": "test/angular-test.init.ts",
+      "status": "A",
+      "header": "@@ -0,0 +1,40 @@",
+      "sha256": "f9005dd3563d9015b845b598baabb3949044005bdf37a29b37f860ffeefcb70b",
+      "judgment": "Complete40-line added initializer differs from the deleted body only by zone.js, zone.js/testing and reflect-metadata side-effect imports. Authenticated absent before-image. Loading order/provider/fixture/error semantics are not established equivalent to the owned runner."
+    },
+    {
+      "path": "test/karma.conf.js",
+      "status": "M",
+      "header": "@@ -29,21 +29,6 @@ module.exports = config => {",
+      "sha256": "9a37bbcc9ddf304f8a9476446dbd4e31c12b6f698ad79b029df5202d89e762b2",
+      "judgment": "Removes seven external metadata/Zone/testing script-file entries because loading moves into the initializer. Whole remaining config captured; missing/duplicated/ordered bootstrap execution remains an actual framework obligation."
+    },
+    {
+      "path": "tools/defaults.bzl",
+      "status": "M",
+      "header": "@@ -8,13 +8,13 @@ load(\"@npm//@angular/build-tooling/bazel/integration:index.bzl\", _integration_te",
+      "sha256": "dcadb7d5b29f074c2339232f92880651b448ec48a33efecffc65544976efd5f8",
+      "judgment": "Moves initializer from conditional dependency to bootstrap, removes exclude_init_script argument, builds CSS .init.js bootstrap outputs and removes external Zone/metadata bootstrap list. Preserve complete macro and preload order as source; no inherited test tooling."
+    },
+    {
+      "path": "tools/defaults.bzl",
+      "status": "M",
+      "header": "@@ -190,21 +190,7 @@ def node_integration_test(setup_chromium = False, node_repository = \"nodejs\", **",
+      "sha256": "aed1d16c325663fa7b95fa8932beff2233e5d27db3acb5a18a6d81df67f73ecd",
+      "judgment": "Moves initializer from conditional dependency to bootstrap, removes exclude_init_script argument, builds CSS .init.js bootstrap outputs and removes external Zone/metadata bootstrap list. Preserve complete macro and preload order as source; no inherited test tooling."
+    },
+    {
+      "path": "tools/defaults.bzl",
+      "status": "M",
+      "header": "@@ -213,6 +199,8 @@ def ng_web_test_suite(deps = [], static_css = [], exclude_init_script = False, *",
+      "sha256": "de7030fc39aa644086ae68aced8ce86887f1f33e372a194bc9d34794034f8704",
+      "judgment": "Moves initializer from conditional dependency to bootstrap, removes exclude_init_script argument, builds CSS .init.js bootstrap outputs and removes external Zone/metadata bootstrap list. Preserve complete macro and preload order as source; no inherited test tooling."
+    },
+    {
+      "path": "tools/defaults.bzl",
+      "status": "M",
+      "header": "@@ -226,7 +214,7 @@ def ng_web_test_suite(deps = [], static_css = [], exclude_init_script = False, *",
+      "sha256": "397b0afa910b4f8301988a7ab75d29a3853c30416f91b8d417ae77902e544cb7",
+      "judgment": "Moves initializer from conditional dependency to bootstrap, removes exclude_init_script argument, builds CSS .init.js bootstrap outputs and removes external Zone/metadata bootstrap list. Preserve complete macro and preload order as source; no inherited test tooling."
+    },
+    {
+      "path": "tools/defaults.bzl",
+      "status": "M",
+      "header": "@@ -244,8 +232,8 @@ def ng_web_test_suite(deps = [], static_css = [], exclude_init_script = False, *",
+      "sha256": "4b93ae6feb61605d0ee8c55e8ff4f39f95f909cb7953cb0496b1e0bf323032cb",
+      "judgment": "Moves initializer from conditional dependency to bootstrap, removes exclude_init_script argument, builds CSS .init.js bootstrap outputs and removes external Zone/metadata bootstrap list. Preserve complete macro and preload order as source; no inherited test tooling."
+    },
+    {
+      "path": "tools/defaults2.bzl",
+      "status": "M",
+      "header": "@@ -3,8 +3,8 @@ load(\"//tools/bazel:ts_project_interop.bzl\", _ts_project = \"ts_project\")",
+      "sha256": "e0e3ba49c8903e43acae8e3219d15ad0d74024ad759a96e9a2298886e9a159eb",
+      "judgment": "Replaces AMD/spec-bundle+karma wrapper with spec_bundle bootstrap and rules_browsers wtr_test; removes external/browsers parameters and default browser/native-tag setup. Do not narrow the owned required browser/runtime matrix or claim a build result."
+    },
+    {
+      "path": "tools/defaults2.bzl",
+      "status": "M",
+      "header": "@@ -56,7 +56,7 @@ def ng_project(",
+      "sha256": "d77525ab6250637c2b2c1fb8d1c59827d97ebb6a3372c3a0f14a913111d90c6f",
+      "judgment": "Replaces AMD/spec-bundle+karma wrapper with spec_bundle bootstrap and rules_browsers wtr_test; removes external/browsers parameters and default browser/native-tag setup. Do not narrow the owned required browser/runtime matrix or claim a build result."
+    },
+    {
+      "path": "tools/defaults2.bzl",
+      "status": "M",
+      "header": "@@ -77,11 +77,11 @@ def jasmine_test(name, data = [], args = [], external = [], **kwargs):",
+      "sha256": "b9d5fecaaab5a06eb7de905d5f8324ae040fe93ae52e228c097bd6967aac8789",
+      "judgment": "Replaces AMD/spec-bundle+karma wrapper with spec_bundle bootstrap and rules_browsers wtr_test; removes external/browsers parameters and default browser/native-tag setup. Do not narrow the owned required browser/runtime matrix or claim a build result."
+    },
+    {
+      "path": "tools/defaults2.bzl",
+      "status": "M",
+      "header": "@@ -91,20 +91,9 @@ def karma_web_test_suite(name, tags = [], deps = [], browsers = None, **kwargs):",
+      "sha256": "a3b510678c7b3c16a4f181dc6e34676e5aaf15b6dc896b2a1e08e3603d871d91",
+      "judgment": "Replaces AMD/spec-bundle+karma wrapper with spec_bundle bootstrap and rules_browsers wtr_test; removes external/browsers parameters and default browser/native-tag setup. Do not narrow the owned required browser/runtime matrix or claim a build result."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "WORKSPACE",
+      "review": "Pins rules_js2.1.1 with exact archive digest, updates devinfra commit and adds rules_browsers Git/setup calls. These are inert upstream build dependencies; no repository fetching, setup, installer or action adoption."
+    },
+    {
+      "path": "scripts/create-legacy-tests-bundle.mjs",
+      "review": "Switches Sass namespace import, sets treeShaking:false, changes compileAsync to synchronous compile followed by deferred parallel writes, logs compilation progress and imports angular-test.init.ts. Preserve whole before/after functions, discovery and side-effect preservation mechanism; no execution or equivalence to the separate owned runner."
+    },
+    {
+      "path": "src/BUILD.bazel",
+      "review": "Changes five Angular API-doc dependency labels from npm aliases to root node_modules labels. Capture whole metadata; do not inherit upstream docs/build graph."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "review": "Three directional suites replace function(this:KeyEventTestContext) with arrow callbacks, explicit per-suite context objects, assignments and runDirectionalKeyTests.call(context). Preserve full suite/helper/hook context; all case callbacks remain equal but framework this-binding preparation changes."
+    },
+    {
+      "path": "src/cdk/testing/tests/webdriver-test.bzl",
+      "review": "Moves Chromium labels/toolchain to rules_browsers and changes CHROMIUM_BIN environment/make variable to CHROME_HEADLESS_BIN/CHROME-HEADLESS-SHELL. Whole toolchain metadata is inert; no WebDriver or browser matrix pass."
+    },
+    {
+      "path": "src/cdk/testing/tests/webdriver.e2e.spec.ts",
+      "review": "Changes exact environment lookup for Chromium executable to CHROME_HEADLESS_BIN, keeping complete setup/helpers/callbacks captured. No process, environment secret read or WebDriver execution occurs in this source review."
+    },
+    {
+      "path": "test/BUILD.bazel",
+      "review": "Changes initializer source path and adds reflect-metadata/zone.js dependencies. The retained comment about spec suffix is not treated as proof of actual discovery. New bootstrap bundling behavior must be judged with both complete initializers/macros."
+    },
+    {
+      "path": "test/angular-test-init-spec.ts",
+      "review": "Complete36-line deleted initializer includes experimental zoneless provider, throwing ErrorHandler, TestBed init and browser globals. Authenticated absent after-image. The separate owned runner uses stable public zoneful setup; do not import this removed initializer or restore a stability shortcut."
+    },
+    {
+      "path": "test/angular-test.init.ts",
+      "review": "Complete40-line added initializer differs from the deleted body only by zone.js, zone.js/testing and reflect-metadata side-effect imports. Authenticated absent before-image. Loading order/provider/fixture/error semantics are not established equivalent to the owned runner."
+    },
+    {
+      "path": "test/karma.conf.js",
+      "review": "Removes seven external metadata/Zone/testing script-file entries because loading moves into the initializer. Whole remaining config captured; missing/duplicated/ordered bootstrap execution remains an actual framework obligation."
+    },
+    {
+      "path": "tools/defaults.bzl",
+      "review": "Moves initializer from conditional dependency to bootstrap, removes exclude_init_script argument, builds CSS .init.js bootstrap outputs and removes external Zone/metadata bootstrap list. Preserve complete macro and preload order as source; no inherited test tooling."
+    },
+    {
+      "path": "tools/defaults2.bzl",
+      "review": "Replaces AMD/spec-bundle+karma wrapper with spec_bundle bootstrap and rules_browsers wtr_test; removes external/browsers parameters and default browser/native-tag setup. Do not narrow the owned required browser/runtime matrix or claim a build result."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-build-harness-source-review.json.gz",
+    "sha256": "ff329ea251fd6be9e1f2cacb8a3b89d10f3aa911b07ef2656358cc293b24e2cf"
+  },
+  "source_semantics": {
+    "sha": "f81b620f62179350d008b069d0d7228695a00ce0",
+    "explicitly_removed_exact_duplicate_registrations": [],
+    "initializer": {
+      "deleted_path": "test/angular-test-init-spec.ts",
+      "added_path": "test/angular-test.init.ts",
+      "added_side_effect_imports": "import 'zone.js';\nimport 'zone.js/testing';\nimport 'reflect-metadata';\n\n",
+      "complete_other_bytes_equal": true,
+      "owned_zoneful_error_stability_or_loading_order_equivalence_proved": false
+    },
+    "cases_before": 82,
+    "cases_after": 82,
+    "unchanged_complete_callbacks": 82,
+    "exact_identity_relabels": 0,
+    "fixture_compiler_bootstrap_error_lifecycle_or_runtime_equivalence_proved": false,
+    "actual_original_tool_Sass_Angular_native_artifact_browser_SSR_or_floor_qualified": false,
+    "review": "Do not wholesale adopt this rules_browsers/Bazel/web-test-runner harness migration. The old36-line initializer and new40-line initializer are equal after removing exactly three newly added side-effect imports (zone.js, zone.js/testing, reflect-metadata), but loading responsibility/order changes along with Karma bootstrap removal and Bazel bootstrap/spec bundling. Both originals retain experimental zoneless setup and a throwing ErrorHandler, which is distinct from the owned explicit public zoneful runner. The upstream legacy bundler adds treeShaking:false, changes async Sass compilation to synchronous compile plus deferred writes and uses the new initializer path. Three key-manager suites replace suite-this context with explicitly owned context objects; the82 complete case callbacks remain equal but hook/registration context differs. Preserve the owned runner public stability/error behavior and actual discovery/lifetime/floor obligations; never restore the removed false-stability shortcut or infer a native suite pass from these source frames."
+  },
+  "source_projection_summary": [],
+  "decision": "Do not wholesale adopt this rules_browsers/Bazel/web-test-runner harness migration. The old36-line initializer and new40-line initializer are equal after removing exactly three newly added side-effect imports (zone.js, zone.js/testing, reflect-metadata), but loading responsibility/order changes along with Karma bootstrap removal and Bazel bootstrap/spec bundling. Both originals retain experimental zoneless setup and a throwing ErrorHandler, which is distinct from the owned explicit public zoneful runner. The upstream legacy bundler adds treeShaking:false, changes async Sass compilation to synchronous compile plus deferred writes and uses the new initializer path. Three key-manager suites replace suite-this context with explicitly owned context objects; the82 complete case callbacks remain equal but hook/registration context differs. Preserve the owned runner public stability/error behavior and actual discovery/lifetime/floor obligations; never restore the removed false-stability shortcut or infer a native suite pass from these source frames. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "owned_context": {
+    "owned_context": [
+      {
+        "path": "toolchain-lock.json",
+        "sha256": "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b"
+      },
+      {
+        "path": ".node-version",
+        "sha256": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f"
+      },
+      {
+        "path": ".npm-version",
+        "sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2"
+      },
+      {
+        "path": "package.json",
+        "sha256": "e55e954caf2e9313f8f6e94d7427ac27fc1c1e780f91dff1a3ee988cdd7ee6d6"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "sha256": "65e1fdd4ce6fc5540c55d2f55053725018d81c812b78be3fcb32e035e9790497"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "tsconfig.json",
+        "sha256": "bce3ae1393dfd7d51a9b2b9e411e9cad0d48238ca1e54161216fbfb0f5030aa4"
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "1033fedc94585b927c0a8d6f4c10516cea1c9b3de6c4083d952829043020b863"
+      },
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+      },
+      {
+        "path": "testing/legacy-runner/karma.conf.cjs",
+        "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+      },
+      {
+        "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+        "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+      },
+      {
+        "path": "scripts/create-legacy-tests-bundle.mjs",
+        "sha256": "a4b65b5577ee4efdee032e1edb657a2e59136e8d6855a066540594ebb45cf0c7"
+      },
+      {
+        "path": ".github/workflows/ci.yml",
+        "sha256": "bd2cbd58e5937ace4c63b556ece9ba561a4f229ad4e1bad9a5cbb2030022e779"
+      },
+      {
+        "path": "projects/ngx-material-legacy/schematics/migrate-legacy/index.js",
+        "sha256": "f31164def0fb2aab265322093ef17886a59fd684d3b14a8c27ca097de7291b4e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/schematics/migrate-legacy/ts-rewrite.js",
+        "sha256": "95abe0c0ea8c96812cc51a9580f9d78c1c069b9c15cfb276698263e72ea6ba3e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/schematics/migrate-legacy/sass-rewrite.js",
+        "sha256": "fd4bc5ede05a4198addca06240fcd67a2e55255fc9a0224150540cf2d1515970"
+      }
+    ],
+    "source_members": 1028,
+    "source_members_sha256": "5d1d290d9405e02363840fb94fb743739ef52a3b9afd9d0f111d418967c77b05",
+    "explicit_owned_zoneful_preparation": true,
+    "public_fixture_stability_untouched": true,
+    "historical_callbacks_unchanged": true,
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "actual_Angular_native_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "f81b620f62179350d008b069d0d7228695a00ce0",
+    "bucket": "test-only-batch-candidate",
+    "subject": "build: switch karma tests to `rules_browsers` (#30820)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=0890dce2d731b255801364ece02d1e7b9c87b6e9c2f8bf565ee4391cf56a6e41, bytes=20628). Changed paths: WORKSPACE, scripts/create-legacy-tests-bundle.mjs, src/BUILD.bazel, src/cdk/a11y/key-manager/list-key-manager.spec.ts, src/cdk/testing/tests/webdriver-test.bzl, src/cdk/testing/tests/webdriver.e2e.spec.ts, test/BUILD.bazel, test/angular-test-init-spec.ts, test/angular-test.init.ts, test/karma.conf.js, tools/defaults.bzl, tools/defaults2.bzl. repository build/toolchain/test-infrastructure change; not a retained legacy product adaptation. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+    "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
+    "files": [
+      "WORKSPACE",
+      "scripts/create-legacy-tests-bundle.mjs",
+      "src/BUILD.bazel",
+      "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "src/cdk/testing/tests/webdriver-test.bzl",
+      "src/cdk/testing/tests/webdriver.e2e.spec.ts",
+      "test/BUILD.bazel",
+      "test/angular-test-init-spec.ts",
+      "test/angular-test.init.ts",
+      "test/karma.conf.js",
+      "tools/defaults.bzl",
+      "tools/defaults2.bzl"
+    ],
+    "patch_sha256": "0890dce2d731b255801364ece02d1e7b9c87b6e9c2f8bf565ee4391cf56a6e41",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/f81b620f62179350d008b069d0d7228695a00ce0.json",
+    "read_note_disposition": "irrelevant",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "recorded_at_utc": "2026-10-01T20:50:49Z",
+    "individual_proof": {
+      "diff_sha256": "84de97b80e19cf3644f2fc972390717ce565ca81b5a3699c9776415a1ef47245",
+      "review_depth": "individual-semantic",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Read upstream patch f81b620f62179350d008b069d0d7228695a00ce0 (build: switch karma tests to `rules_browsers` (#30820)). It touches 11 paths: WORKSPACE, scripts/create-legacy-tests-bundle.mjs, src/BUILD.bazel, src/cdk/a11y/key-manager/list-key-manager.spec.ts, src/cdk/testing/tests/webdriver-test.bzl, src/cdk/testing/tests/webdriver.e2e.spec.ts and 5 more. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
+      "proof_kind": "diff-read"
+    }
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-build-harness-source-prior.json.gz",
+    "sha256": "5ed83316694ef61fa7f42262b6a625205994e07acf3d17e45df63f477b33ee16"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-build-harness-source-applicability",
+    "diff_sha256": "ff905dd3c4f153f9f7f50b9d5ff734d7ba4c65256c0381cfe8657a6735c852e9",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Do not wholesale adopt this rules_browsers/Bazel/web-test-runner harness migration. The old36-line initializer and new40-line initializer are equal after removing exactly three newly added side-effect imports (zone.js, zone.js/testing, reflect-metadata), but loading responsibility/order changes along with Karma bootstrap removal and Bazel bootstrap/spec bundling. Both originals retain experimental zoneless setup and a throwing ErrorHandler, which is distinct from the owned explicit public zoneful runner. The upstream legacy bundler adds treeShaking:false, changes async Sass compilation to synchronous compile plus deferred writes and uses the new initializer path. Three key-manager suites replace suite-this context with explicitly owned context objects; the82 complete case callbacks remain equal but hook/registration context differs. Preserve the owned runner public stability/error behavior and actual discovery/lifetime/floor obligations; never restore the removed false-stability shortcut or infer a native suite pass from these source frames. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-build-harness-source-review.mjs",
+        "sha256": "962018fd64d277a4d83ff2c8c84f38d366849e5a0c3d8b8cfefc36b9c993890a"
+      },
+      {
+        "path": "tests/mixed_build_harness_source_probe.mjs",
+        "sha256": "baa7f180a1249ab45626789d722bc9c614df7a058c61318558710bd6b7fcebf7"
+      },
+      {
+        "path": "tests/test_mixed_build_harness_source.py",
+        "sha256": "2e8a5eb709de93d8855059a1cf715f88dec0a5699c6b82d1de917548c2a08207"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-qualification-record.py",
+        "sha256": "c64aaabca5f2fd4a731bd024d774472379e878e0ff94856893fb3540780b2be2"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/mixed-zone-moves-source-review.mjs",
+        "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+      },
+      {
+        "path": "scripts/mixed-compiler-build-source-review.mjs",
+        "sha256": "29a28e82ebc5d13d091f8415d91c4c178336d2e5ff156fe6acab26a088a040b4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-build-harness-originals.py",
+        "sha256": "cff4b5317d1a3f0cde577fe5a7786f265738ddacec2faaf35adb8fd83288420f"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-authenticator.mjs",
+        "sha256": "f391b38ab1767e1b40033d64fb5e5cc58757be0b47aad7e2d3408b047ce3be74"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-subjects.json.gz",
+        "sha256": "35cb769fa6769f1b982d2155969b009d6e67cae6fdd5b6f7e18cbd460b9a452c"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-acquisition.json.gz",
+        "sha256": "0fd5cbe8d53999c79f3ca0a7fa948f94e0ce5d40f435e1ea6667a3b5023bb46d"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-authentication.json.gz",
+        "sha256": "b9ae67015a545f5870c811c18fefee2f894eea109f76c504184498ad7cdece18"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.json",
+        "sha256": "697f70877693c445aa6d1d158f6b84edf3e4415b42bcd5ba8c75ed735ee0d5bd"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.py",
+        "sha256": "9bda39b9237fc5e7124c4d9007d022179f8c992cc70015874dd44a93155396f2"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-acquisition-inspector.mjs",
+        "sha256": "fd06e6635066ce89d73e5f8ce3ee151a4400d8be3775c0c940b03b741772bc24"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-control-results.json",
+        "sha256": "32340c7560b1225b19c9b300656691c229a155fd0fbdbf502327fc2ce64052c0"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-controls.mjs",
+        "sha256": "53c645f8745793e1106426d6d20d8b818bb198c3edd294f14bef15dc57f3e1b7"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-acquisition-checkpoint.json",
+        "sha256": "90bcd420ff21732938503ae186ec0641e1652766274cc5c2c4296611d89d5fe9"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-intake.json",
+        "sha256": "bdb15d853efd90f996c987f29c65cfda633387331714ee816314f5c952bb3507"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-observation-pins.json.gz",
+        "sha256": "5875983308eeba6f75c33fa5dae4a03d186bc7ee73beb64f8f1528bef933b314"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-prior.json.gz",
+        "sha256": "5ed83316694ef61fa7f42262b6a625205994e07acf3d17e45df63f477b33ee16"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-review.json.gz",
+        "sha256": "ff329ea251fd6be9e1f2cacb8a3b89d10f3aa911b07ef2656358cc293b24e2cf"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-controls.json",
+        "sha256": "420d3a2ee48fb42c3e3c35c6ef0104745623a9e647a409691beb4b0540af449e"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-python.log.gz",
+        "sha256": "0051f37d59ce5116cb104ca2c8c9da942603a015ea32d1cbac2f43925e0e5415"
+      },
+      {
+        "path": "compatibility/rc/mixed-build-harness-source-cyph-sanity.json",
+        "sha256": "80f0c8426d6c7450e9ff062232e6f6e55021f4d447c25c21dc6046d5f572c686"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-build-harness-source-review.mjs",
+      "sha256": "962018fd64d277a4d83ff2c8c84f38d366849e5a0c3d8b8cfefc36b9c993890a"
+    },
+    {
+      "path": "tests/mixed_build_harness_source_probe.mjs",
+      "sha256": "baa7f180a1249ab45626789d722bc9c614df7a058c61318558710bd6b7fcebf7"
+    },
+    {
+      "path": "tests/test_mixed_build_harness_source.py",
+      "sha256": "2e8a5eb709de93d8855059a1cf715f88dec0a5699c6b82d1de917548c2a08207"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-qualification-record.py",
+      "sha256": "c64aaabca5f2fd4a731bd024d774472379e878e0ff94856893fb3540780b2be2"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/mixed-zone-moves-source-review.mjs",
+      "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+    },
+    {
+      "path": "scripts/mixed-compiler-build-source-review.mjs",
+      "sha256": "29a28e82ebc5d13d091f8415d91c4c178336d2e5ff156fe6acab26a088a040b4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-build-harness-originals.py",
+      "sha256": "cff4b5317d1a3f0cde577fe5a7786f265738ddacec2faaf35adb8fd83288420f"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-authenticator.mjs",
+      "sha256": "f391b38ab1767e1b40033d64fb5e5cc58757be0b47aad7e2d3408b047ce3be74"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-subjects.json.gz",
+      "sha256": "35cb769fa6769f1b982d2155969b009d6e67cae6fdd5b6f7e18cbd460b9a452c"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-acquisition.json.gz",
+      "sha256": "0fd5cbe8d53999c79f3ca0a7fa948f94e0ce5d40f435e1ea6667a3b5023bb46d"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-authentication.json.gz",
+      "sha256": "b9ae67015a545f5870c811c18fefee2f894eea109f76c504184498ad7cdece18"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.json",
+      "sha256": "697f70877693c445aa6d1d158f6b84edf3e4415b42bcd5ba8c75ed735ee0d5bd"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.py",
+      "sha256": "9bda39b9237fc5e7124c4d9007d022179f8c992cc70015874dd44a93155396f2"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-acquisition-inspector.mjs",
+      "sha256": "fd06e6635066ce89d73e5f8ce3ee151a4400d8be3775c0c940b03b741772bc24"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-control-results.json",
+      "sha256": "32340c7560b1225b19c9b300656691c229a155fd0fbdbf502327fc2ce64052c0"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-controls.mjs",
+      "sha256": "53c645f8745793e1106426d6d20d8b818bb198c3edd294f14bef15dc57f3e1b7"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-acquisition-checkpoint.json",
+      "sha256": "90bcd420ff21732938503ae186ec0641e1652766274cc5c2c4296611d89d5fe9"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-intake.json",
+      "sha256": "bdb15d853efd90f996c987f29c65cfda633387331714ee816314f5c952bb3507"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-observation-pins.json.gz",
+      "sha256": "5875983308eeba6f75c33fa5dae4a03d186bc7ee73beb64f8f1528bef933b314"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-prior.json.gz",
+      "sha256": "5ed83316694ef61fa7f42262b6a625205994e07acf3d17e45df63f477b33ee16"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-review.json.gz",
+      "sha256": "ff329ea251fd6be9e1f2cacb8a3b89d10f3aa911b07ef2656358cc293b24e2cf"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-controls.json",
+      "sha256": "420d3a2ee48fb42c3e3c35c6ef0104745623a9e647a409691beb4b0540af449e"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-python.log.gz",
+      "sha256": "0051f37d59ce5116cb104ca2c8c9da942603a015ea32d1cbac2f43925e0e5415"
+    },
+    {
+      "path": "compatibility/rc/mixed-build-harness-source-cyph-sanity.json",
+      "sha256": "80f0c8426d6c7450e9ff062232e6f6e55021f4d447c25c21dc6046d5f572c686"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

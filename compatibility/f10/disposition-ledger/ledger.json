@@ -39590,8 +39590,8 @@
       "sha": "f3602573ad8c79ccbcf76ac2355a9a95ab377566",
       "bucket": "test-only-batch-candidate",
       "subject": "build: replace custom lint rule with compiler option (#27833)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=c227cb2474ebbf8b0bc97d2ebdaae5a176187f9b98a26c7b9726fe136f4a0b65, bytes=29932). Changed paths: integration/mdc-migration/verify-golden.ts, integration/size-test/check-size.ts, scripts/build-docs-content.mts, scripts/build-packages-dist.mts, scripts/caretaking/resync-caretaker-app-prs.ts, scripts/circleci/notify-slack-job-failure.mts, scripts/docs-deploy/deploy-ci-push.mts, scripts/docs-deploy/deploy-to-site.mts, scripts/docs-deploy/utils.mts, scripts/tsconfig.json, src/bazel-tsconfig-build.json, src/cdk/schematics/tsconfig.json, src/cdk/schematics/utils/build-component.ts, src/cdk/schematics/utils/html-manipulation.ts, ... (+16 more). repository build/toolchain/test-infrastructure change; not a retained legacy product adaptation. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not adopt this obsolete lint/compiler-policy migration or inherit its upstream build/deploy scripts. The deleted80-line TypedRule/Walker specifically examined ngOnChanges SimpleChanges-like accesses, with name/type-checker resolution and a hasOwnProperty exemption; compiler noPropertyAccessFromIndexSignature has a different scope. Complete scripts/schematic/test sources use literal-key accesses, with22 full-source projections equal after only static dot/literal-property normalization and the explicitly retained getProjectStyleFile function exclusion. That function caches buildOptions styles once, so do not claim arbitrary getter/retrieval-count equivalence. All86 cases remain;78 callbacks are byte-semantically equal, and eight changed callbacks use exact literal error/style keys. Preserve owned finite module-source migration, historical callback inventory and current private compiler policy. No command, deploy, notification, credential access, old lint helper execution or native/compiler/floor pass is part of this source decision. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "integration/mdc-migration/verify-golden.ts",
@@ -39626,18 +39626,153 @@
         "tslint.json"
       ],
       "patch_sha256": "c227cb2474ebbf8b0bc97d2ebdaae5a176187f9b98a26c7b9726fe136f4a0b65",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/f3602573ad8c79ccbcf76ac2355a9a95ab377566.json",
-      "read_note_disposition": "irrelevant",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-build-harness-f3602573ad8c79ccbcf76ac2355a9a95ab377566.json",
+      "read_note_disposition": "individual-source-judgment-only",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-17T04:47:44.941906+00:00",
+      "source_check": {
+        "kind": "individual-complete-original-build-harness-source-review",
+        "diff_sha256": "d6de8f8233d01ac1d5aae8ae2e6b6822175778e67927bd6d0cc0ad9eccc6fd76",
+        "evidence_report_sha256": "88cbff770e26850e7ab4b947e6d85961e8877c9af7d8ffe3accef2bd93cce938"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-build-harness-source-applicability",
+        "diff_sha256": "d6de8f8233d01ac1d5aae8ae2e6b6822175778e67927bd6d0cc0ad9eccc6fd76",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not adopt this obsolete lint/compiler-policy migration or inherit its upstream build/deploy scripts. The deleted80-line TypedRule/Walker specifically examined ngOnChanges SimpleChanges-like accesses, with name/type-checker resolution and a hasOwnProperty exemption; compiler noPropertyAccessFromIndexSignature has a different scope. Complete scripts/schematic/test sources use literal-key accesses, with22 full-source projections equal after only static dot/literal-property normalization and the explicitly retained getProjectStyleFile function exclusion. That function caches buildOptions styles once, so do not claim arbitrary getter/retrieval-count equivalence. All86 cases remain;78 callbacks are byte-semantically equal, and eight changed callbacks use exact literal error/style keys. Preserve owned finite module-source migration, historical callback inventory and current private compiler policy. No command, deploy, notification, credential access, old lint helper execution or native/compiler/floor pass is part of this source decision. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-build-harness-source-review.mjs",
+            "sha256": "962018fd64d277a4d83ff2c8c84f38d366849e5a0c3d8b8cfefc36b9c993890a"
+          },
+          {
+            "path": "tests/mixed_build_harness_source_probe.mjs",
+            "sha256": "baa7f180a1249ab45626789d722bc9c614df7a058c61318558710bd6b7fcebf7"
+          },
+          {
+            "path": "tests/test_mixed_build_harness_source.py",
+            "sha256": "2e8a5eb709de93d8855059a1cf715f88dec0a5699c6b82d1de917548c2a08207"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-qualification-record.py",
+            "sha256": "c64aaabca5f2fd4a731bd024d774472379e878e0ff94856893fb3540780b2be2"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/mixed-zone-moves-source-review.mjs",
+            "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+          },
+          {
+            "path": "scripts/mixed-compiler-build-source-review.mjs",
+            "sha256": "29a28e82ebc5d13d091f8415d91c4c178336d2e5ff156fe6acab26a088a040b4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-build-harness-originals.py",
+            "sha256": "cff4b5317d1a3f0cde577fe5a7786f265738ddacec2faaf35adb8fd83288420f"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-authenticator.mjs",
+            "sha256": "f391b38ab1767e1b40033d64fb5e5cc58757be0b47aad7e2d3408b047ce3be74"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-subjects.json.gz",
+            "sha256": "35cb769fa6769f1b982d2155969b009d6e67cae6fdd5b6f7e18cbd460b9a452c"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition.json.gz",
+            "sha256": "0fd5cbe8d53999c79f3ca0a7fa948f94e0ce5d40f435e1ea6667a3b5023bb46d"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-authentication.json.gz",
+            "sha256": "b9ae67015a545f5870c811c18fefee2f894eea109f76c504184498ad7cdece18"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.json",
+            "sha256": "697f70877693c445aa6d1d158f6b84edf3e4415b42bcd5ba8c75ed735ee0d5bd"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.py",
+            "sha256": "9bda39b9237fc5e7124c4d9007d022179f8c992cc70015874dd44a93155396f2"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-inspector.mjs",
+            "sha256": "fd06e6635066ce89d73e5f8ce3ee151a4400d8be3775c0c940b03b741772bc24"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-control-results.json",
+            "sha256": "32340c7560b1225b19c9b300656691c229a155fd0fbdbf502327fc2ce64052c0"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-controls.mjs",
+            "sha256": "53c645f8745793e1106426d6d20d8b818bb198c3edd294f14bef15dc57f3e1b7"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-checkpoint.json",
+            "sha256": "90bcd420ff21732938503ae186ec0641e1652766274cc5c2c4296611d89d5fe9"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-intake.json",
+            "sha256": "bdb15d853efd90f996c987f29c65cfda633387331714ee816314f5c952bb3507"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-observation-pins.json.gz",
+            "sha256": "5875983308eeba6f75c33fa5dae4a03d186bc7ee73beb64f8f1528bef933b314"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-prior.json.gz",
+            "sha256": "5ed83316694ef61fa7f42262b6a625205994e07acf3d17e45df63f477b33ee16"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-review.json.gz",
+            "sha256": "ff329ea251fd6be9e1f2cacb8a3b89d10f3aa911b07ef2656358cc293b24e2cf"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-controls.json",
+            "sha256": "420d3a2ee48fb42c3e3c35c6ef0104745623a9e647a409691beb4b0540af449e"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-python.log.gz",
+            "sha256": "0051f37d59ce5116cb104ca2c8c9da942603a015ea32d1cbac2f43925e0e5415"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-cyph-sanity.json",
+            "sha256": "80f0c8426d6c7450e9ff062232e6f6e55021f4d447c25c21dc6046d5f572c686"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "47b3be5f6fe9bc23e62b2036210ec31f79ab22d4",
       "bucket": "test-only-batch-candidate",
       "subject": "build: update to TypeScript 5.3 (#28227)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=4a3f1acc4609a2b26e5b765ca6e294ba671bf9d4befef9cd84ff42a8a6602fbe, bytes=5745816). Changed paths: integration/yarn-pnp-compat/.yarn/releases/yarn-3.6.3.cjs, integration/yarn-pnp-compat/.yarn/releases/yarn-4.0.2.cjs, integration/yarn-pnp-compat/.yarnrc.yml, integration/yarn-pnp-compat/package.json, integration/yarn-pnp-compat/yarn.lock, package.json, src/dev-app/BUILD.bazel, src/dev-app/index.html, src/e2e-app/index.html, src/material/form-field/testing/form-field-harness.spec.ts, src/material/radio/radio.spec.ts, test/karma.conf.js, tools/defaults.bzl, tslint.json, ... (+1 more). repository build/toolchain/test-infrastructure change; not a retained legacy product adaptation. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not adopt the historical TypeScript5.3/Angular17.1 prerelease/Yarn4 tool migration. Complete deleted/added executable Yarn bundles, metadata and both lock formats are authenticated inert artifacts; their internals are not behavior/security reviewed or executed, and they are outside the owned legacy runtime. Current exact Node/pnpm/npm/compiler/peer pins and published consumer engines stay independent. Dev/e2e/Karma/Bazel Zone paths move from dist to bundles, but that is not an owned loading-order/runtime proof. The modern form-field harness adds MatOption to fixture imports; the radio transcluding wrapper moves before its user and is explicitly imported. All85 case callbacks remain equal, while complete fixture/decorator/helper and tooling frames remain distinct. Retain owned historical module fixtures and no required consumer HTML/CSS/SCSS changes; no historical install, tool advisory clearance or modern API mirror. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "integration/yarn-pnp-compat/.yarn/releases/yarn-3.6.3.cjs",
@@ -39657,11 +39792,146 @@
         "yarn.lock"
       ],
       "patch_sha256": "4a3f1acc4609a2b26e5b765ca6e294ba671bf9d4befef9cd84ff42a8a6602fbe",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/47b3be5f6fe9bc23e62b2036210ec31f79ab22d4.json",
-      "read_note_disposition": "irrelevant",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-build-harness-47b3be5f6fe9bc23e62b2036210ec31f79ab22d4.json",
+      "read_note_disposition": "individual-source-judgment-only",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-17T04:47:44.951060+00:00",
+      "source_check": {
+        "kind": "individual-complete-original-build-harness-source-review",
+        "diff_sha256": "6a2487f35a173f192dd43593016065264050974eb9957d51b67c05aa7216696a",
+        "evidence_report_sha256": "d29bca5db61ad1805271ef6e2598c1fd600a22113f42019caa8c53f4ec9689f8"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-build-harness-source-applicability",
+        "diff_sha256": "6a2487f35a173f192dd43593016065264050974eb9957d51b67c05aa7216696a",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not adopt the historical TypeScript5.3/Angular17.1 prerelease/Yarn4 tool migration. Complete deleted/added executable Yarn bundles, metadata and both lock formats are authenticated inert artifacts; their internals are not behavior/security reviewed or executed, and they are outside the owned legacy runtime. Current exact Node/pnpm/npm/compiler/peer pins and published consumer engines stay independent. Dev/e2e/Karma/Bazel Zone paths move from dist to bundles, but that is not an owned loading-order/runtime proof. The modern form-field harness adds MatOption to fixture imports; the radio transcluding wrapper moves before its user and is explicitly imported. All85 case callbacks remain equal, while complete fixture/decorator/helper and tooling frames remain distinct. Retain owned historical module fixtures and no required consumer HTML/CSS/SCSS changes; no historical install, tool advisory clearance or modern API mirror. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-build-harness-source-review.mjs",
+            "sha256": "962018fd64d277a4d83ff2c8c84f38d366849e5a0c3d8b8cfefc36b9c993890a"
+          },
+          {
+            "path": "tests/mixed_build_harness_source_probe.mjs",
+            "sha256": "baa7f180a1249ab45626789d722bc9c614df7a058c61318558710bd6b7fcebf7"
+          },
+          {
+            "path": "tests/test_mixed_build_harness_source.py",
+            "sha256": "2e8a5eb709de93d8855059a1cf715f88dec0a5699c6b82d1de917548c2a08207"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-qualification-record.py",
+            "sha256": "c64aaabca5f2fd4a731bd024d774472379e878e0ff94856893fb3540780b2be2"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/mixed-zone-moves-source-review.mjs",
+            "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+          },
+          {
+            "path": "scripts/mixed-compiler-build-source-review.mjs",
+            "sha256": "29a28e82ebc5d13d091f8415d91c4c178336d2e5ff156fe6acab26a088a040b4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-build-harness-originals.py",
+            "sha256": "cff4b5317d1a3f0cde577fe5a7786f265738ddacec2faaf35adb8fd83288420f"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-authenticator.mjs",
+            "sha256": "f391b38ab1767e1b40033d64fb5e5cc58757be0b47aad7e2d3408b047ce3be74"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-subjects.json.gz",
+            "sha256": "35cb769fa6769f1b982d2155969b009d6e67cae6fdd5b6f7e18cbd460b9a452c"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition.json.gz",
+            "sha256": "0fd5cbe8d53999c79f3ca0a7fa948f94e0ce5d40f435e1ea6667a3b5023bb46d"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-authentication.json.gz",
+            "sha256": "b9ae67015a545f5870c811c18fefee2f894eea109f76c504184498ad7cdece18"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.json",
+            "sha256": "697f70877693c445aa6d1d158f6b84edf3e4415b42bcd5ba8c75ed735ee0d5bd"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.py",
+            "sha256": "9bda39b9237fc5e7124c4d9007d022179f8c992cc70015874dd44a93155396f2"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-inspector.mjs",
+            "sha256": "fd06e6635066ce89d73e5f8ce3ee151a4400d8be3775c0c940b03b741772bc24"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-control-results.json",
+            "sha256": "32340c7560b1225b19c9b300656691c229a155fd0fbdbf502327fc2ce64052c0"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-controls.mjs",
+            "sha256": "53c645f8745793e1106426d6d20d8b818bb198c3edd294f14bef15dc57f3e1b7"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-checkpoint.json",
+            "sha256": "90bcd420ff21732938503ae186ec0641e1652766274cc5c2c4296611d89d5fe9"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-intake.json",
+            "sha256": "bdb15d853efd90f996c987f29c65cfda633387331714ee816314f5c952bb3507"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-observation-pins.json.gz",
+            "sha256": "5875983308eeba6f75c33fa5dae4a03d186bc7ee73beb64f8f1528bef933b314"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-prior.json.gz",
+            "sha256": "5ed83316694ef61fa7f42262b6a625205994e07acf3d17e45df63f477b33ee16"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-review.json.gz",
+            "sha256": "ff329ea251fd6be9e1f2cacb8a3b89d10f3aa911b07ef2656358cc293b24e2cf"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-controls.json",
+            "sha256": "420d3a2ee48fb42c3e3c35c6ef0104745623a9e647a409691beb4b0540af449e"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-python.log.gz",
+            "sha256": "0051f37d59ce5116cb104ca2c8c9da942603a015ea32d1cbac2f43925e0e5415"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-cyph-sanity.json",
+            "sha256": "80f0c8426d6c7450e9ff062232e6f6e55021f4d447c25c21dc6046d5f572c686"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "a0eb8b06917b6fc83e13578a8a7358e008844c6f",
@@ -41178,8 +41448,8 @@
       "sha": "f81b620f62179350d008b069d0d7228695a00ce0",
       "bucket": "test-only-batch-candidate",
       "subject": "build: switch karma tests to `rules_browsers` (#30820)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=0890dce2d731b255801364ece02d1e7b9c87b6e9c2f8bf565ee4391cf56a6e41, bytes=20628). Changed paths: WORKSPACE, scripts/create-legacy-tests-bundle.mjs, src/BUILD.bazel, src/cdk/a11y/key-manager/list-key-manager.spec.ts, src/cdk/testing/tests/webdriver-test.bzl, src/cdk/testing/tests/webdriver.e2e.spec.ts, test/BUILD.bazel, test/angular-test-init-spec.ts, test/angular-test.init.ts, test/karma.conf.js, tools/defaults.bzl, tools/defaults2.bzl. repository build/toolchain/test-infrastructure change; not a retained legacy product adaptation. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not wholesale adopt this rules_browsers/Bazel/web-test-runner harness migration. The old36-line initializer and new40-line initializer are equal after removing exactly three newly added side-effect imports (zone.js, zone.js/testing, reflect-metadata), but loading responsibility/order changes along with Karma bootstrap removal and Bazel bootstrap/spec bundling. Both originals retain experimental zoneless setup and a throwing ErrorHandler, which is distinct from the owned explicit public zoneful runner. The upstream legacy bundler adds treeShaking:false, changes async Sass compilation to synchronous compile plus deferred writes and uses the new initializer path. Three key-manager suites replace suite-this context with explicitly owned context objects; the82 complete case callbacks remain equal but hook/registration context differs. Preserve the owned runner public stability/error behavior and actual discovery/lifetime/floor obligations; never restore the removed false-stability shortcut or infer a native suite pass from these source frames. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "WORKSPACE",
@@ -41196,20 +41466,146 @@
         "tools/defaults2.bzl"
       ],
       "patch_sha256": "0890dce2d731b255801364ece02d1e7b9c87b6e9c2f8bf565ee4391cf56a6e41",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/f81b620f62179350d008b069d0d7228695a00ce0.json",
-      "read_note_disposition": "irrelevant",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-build-harness-f81b620f62179350d008b069d0d7228695a00ce0.json",
+      "read_note_disposition": "individual-source-judgment-only",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z",
+      "recorded_at_utc": "2026-10-17T04:47:44.958965+00:00",
       "individual_proof": {
-        "diff_sha256": "84de97b80e19cf3644f2fc972390717ce565ca81b5a3699c9776415a1ef47245",
-        "review_depth": "individual-semantic",
+        "proof_kind": "individual-complete-build-harness-source-applicability",
+        "diff_sha256": "ff905dd3c4f153f9f7f50b9d5ff734d7ba4c65256c0381cfe8657a6735c852e9",
+        "review_depth": "individual-compatibility",
         "affected_branches": [
           "main"
         ],
-        "decision": "Read upstream patch f81b620f62179350d008b069d0d7228695a00ce0 (build: switch karma tests to `rules_browsers` (#30820)). It touches 11 paths: WORKSPACE, scripts/create-legacy-tests-bundle.mjs, src/BUILD.bazel, src/cdk/a11y/key-manager/list-key-manager.spec.ts, src/cdk/testing/tests/webdriver-test.bzl, src/cdk/testing/tests/webdriver.e2e.spec.ts and 5 more. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+        "decision": "Do not wholesale adopt this rules_browsers/Bazel/web-test-runner harness migration. The old36-line initializer and new40-line initializer are equal after removing exactly three newly added side-effect imports (zone.js, zone.js/testing, reflect-metadata), but loading responsibility/order changes along with Karma bootstrap removal and Bazel bootstrap/spec bundling. Both originals retain experimental zoneless setup and a throwing ErrorHandler, which is distinct from the owned explicit public zoneful runner. The upstream legacy bundler adds treeShaking:false, changes async Sass compilation to synchronous compile plus deferred writes and uses the new initializer path. Three key-manager suites replace suite-this context with explicitly owned context objects; the82 complete case callbacks remain equal but hook/registration context differs. Preserve the owned runner public stability/error behavior and actual discovery/lifetime/floor obligations; never restore the removed false-stability shortcut or infer a native suite pass from these source frames. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-build-harness-source-review.mjs",
+            "sha256": "962018fd64d277a4d83ff2c8c84f38d366849e5a0c3d8b8cfefc36b9c993890a"
+          },
+          {
+            "path": "tests/mixed_build_harness_source_probe.mjs",
+            "sha256": "baa7f180a1249ab45626789d722bc9c614df7a058c61318558710bd6b7fcebf7"
+          },
+          {
+            "path": "tests/test_mixed_build_harness_source.py",
+            "sha256": "2e8a5eb709de93d8855059a1cf715f88dec0a5699c6b82d1de917548c2a08207"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-qualification-record.py",
+            "sha256": "c64aaabca5f2fd4a731bd024d774472379e878e0ff94856893fb3540780b2be2"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/mixed-zone-moves-source-review.mjs",
+            "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+          },
+          {
+            "path": "scripts/mixed-compiler-build-source-review.mjs",
+            "sha256": "29a28e82ebc5d13d091f8415d91c4c178336d2e5ff156fe6acab26a088a040b4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-build-harness-originals.py",
+            "sha256": "cff4b5317d1a3f0cde577fe5a7786f265738ddacec2faaf35adb8fd83288420f"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-authenticator.mjs",
+            "sha256": "f391b38ab1767e1b40033d64fb5e5cc58757be0b47aad7e2d3408b047ce3be74"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-subjects.json.gz",
+            "sha256": "35cb769fa6769f1b982d2155969b009d6e67cae6fdd5b6f7e18cbd460b9a452c"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition.json.gz",
+            "sha256": "0fd5cbe8d53999c79f3ca0a7fa948f94e0ce5d40f435e1ea6667a3b5023bb46d"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-authentication.json.gz",
+            "sha256": "b9ae67015a545f5870c811c18fefee2f894eea109f76c504184498ad7cdece18"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.json",
+            "sha256": "697f70877693c445aa6d1d158f6b84edf3e4415b42bcd5ba8c75ed735ee0d5bd"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.py",
+            "sha256": "9bda39b9237fc5e7124c4d9007d022179f8c992cc70015874dd44a93155396f2"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-inspector.mjs",
+            "sha256": "fd06e6635066ce89d73e5f8ce3ee151a4400d8be3775c0c940b03b741772bc24"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-control-results.json",
+            "sha256": "32340c7560b1225b19c9b300656691c229a155fd0fbdbf502327fc2ce64052c0"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-controls.mjs",
+            "sha256": "53c645f8745793e1106426d6d20d8b818bb198c3edd294f14bef15dc57f3e1b7"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-checkpoint.json",
+            "sha256": "90bcd420ff21732938503ae186ec0641e1652766274cc5c2c4296611d89d5fe9"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-intake.json",
+            "sha256": "bdb15d853efd90f996c987f29c65cfda633387331714ee816314f5c952bb3507"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-observation-pins.json.gz",
+            "sha256": "5875983308eeba6f75c33fa5dae4a03d186bc7ee73beb64f8f1528bef933b314"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-prior.json.gz",
+            "sha256": "5ed83316694ef61fa7f42262b6a625205994e07acf3d17e45df63f477b33ee16"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-review.json.gz",
+            "sha256": "ff329ea251fd6be9e1f2cacb8a3b89d10f3aa911b07ef2656358cc293b24e2cf"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-controls.json",
+            "sha256": "420d3a2ee48fb42c3e3c35c6ef0104745623a9e647a409691beb4b0540af449e"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-python.log.gz",
+            "sha256": "0051f37d59ce5116cb104ca2c8c9da942603a015ea32d1cbac2f43925e0e5415"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-cyph-sanity.json",
+            "sha256": "80f0c8426d6c7450e9ff062232e6f6e55021f4d447c25c21dc6046d5f572c686"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_check": {
+        "kind": "individual-complete-original-build-harness-source-review",
+        "diff_sha256": "ff905dd3c4f153f9f7f50b9d5ff734d7ba4c65256c0381cfe8657a6735c852e9",
+        "evidence_report_sha256": "9267dc6aa826b8474ffcf467808e48f196699f5ef6722044850d4cd1dd5a58fc"
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "839dfba8fc3a7bd9f7865a5eeed6aff1155c5d80",
@@ -41760,8 +42156,8 @@
       "sha": "3da71ce7f921f16392bf454eddbd1c421bfbdd32",
       "bucket": "test-only-batch-candidate",
       "subject": "build: update repository locations for bazel rules (#32866)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=1d12042d623b3a89f425c57622261e04b83e7e1e57e27077b61f654b705e58c5, bytes=266117). Changed paths: MODULE.bazel, MODULE.bazel.lock, src/aria/listbox/listbox.spec.ts, src/aria/private/behaviors/grid/grid-focus.spec.ts, src/aria/private/behaviors/grid/grid-navigation.spec.ts, src/aria/private/behaviors/list-navigation/list-navigation.spec.ts, src/aria/private/behaviors/list-selection/list-selection.spec.ts, src/aria/private/behaviors/list/list.spec.ts, src/aria/private/behaviors/tree/tree.spec.ts, src/aria/private/combobox/combobox.spec.ts, src/aria/private/deferred-content/deferred-content.spec.ts, src/aria/private/grid/grid.spec.ts, src/aria/private/listbox/listbox.spec.ts, src/aria/private/menu/menu.spec.ts, ... (+39 more). repository build/toolchain/test-infrastructure change; not a retained legacy product adaptation. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not inherit Bazel repository overrides or apply this newer test-name sweep to the historical roster. MODULE.bazel moves three rule repositories/pins and the lock records changed digests and a TypeScript5.8.2 repository. All51 complete spec files match after only replacing registration-title arguments and removing exactly two byte-identical duplicate registrations; both duplicates retain one identical original registration in the same file/suite. The2765-to2763 source count and684 identity relabels are explicit; all2763 paired callback bodies remain unchanged. Preserve entire callback/helper/hook operations, dynamic title expressions and original source modes. Source-name uniqueness cleanup is not proof of expanded runtime discovery, case invocation counts or fixture/lifetime equivalence. Keep owned Material16 callbacks/goldens/styles and actual artifact/peer/browser execution requirements unchanged. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "MODULE.bazel",
@@ -41819,20 +42215,146 @@
         "src/material/tree/tree.spec.ts"
       ],
       "patch_sha256": "1d12042d623b3a89f425c57622261e04b83e7e1e57e27077b61f654b705e58c5",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/3da71ce7f921f16392bf454eddbd1c421bfbdd32.json",
-      "read_note_disposition": "irrelevant",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-build-harness-3da71ce7f921f16392bf454eddbd1c421bfbdd32.json",
+      "read_note_disposition": "individual-source-judgment-only",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z",
+      "recorded_at_utc": "2026-10-17T04:47:44.968695+00:00",
       "individual_proof": {
-        "diff_sha256": "6d675820fa320310d5565e2392cd25ee355f9479b096216303cb7efe8ec28bf8",
-        "review_depth": "individual-semantic",
+        "proof_kind": "individual-complete-build-harness-source-applicability",
+        "diff_sha256": "fcaaae57e0dd1fb6a94104de68f554102ad2ba6ef064ba884cd326fcf88f0bdf",
+        "review_depth": "individual-compatibility",
         "affected_branches": [
           "main"
         ],
-        "decision": "Read upstream patch 3da71ce7f921f16392bf454eddbd1c421bfbdd32 (build: update repository locations for bazel rules (#32866)). It touches 53 paths: MODULE.bazel, MODULE.bazel.lock, src/aria/listbox/listbox.spec.ts, src/aria/private/behaviors/grid/grid-focus.spec.ts, src/aria/private/behaviors/grid/grid-navigation.spec.ts, src/aria/private/behaviors/list-navigation/list-navigation.spec.ts and 47 more. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+        "decision": "Do not inherit Bazel repository overrides or apply this newer test-name sweep to the historical roster. MODULE.bazel moves three rule repositories/pins and the lock records changed digests and a TypeScript5.8.2 repository. All51 complete spec files match after only replacing registration-title arguments and removing exactly two byte-identical duplicate registrations; both duplicates retain one identical original registration in the same file/suite. The2765-to2763 source count and684 identity relabels are explicit; all2763 paired callback bodies remain unchanged. Preserve entire callback/helper/hook operations, dynamic title expressions and original source modes. Source-name uniqueness cleanup is not proof of expanded runtime discovery, case invocation counts or fixture/lifetime equivalence. Keep owned Material16 callbacks/goldens/styles and actual artifact/peer/browser execution requirements unchanged. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-build-harness-source-review.mjs",
+            "sha256": "962018fd64d277a4d83ff2c8c84f38d366849e5a0c3d8b8cfefc36b9c993890a"
+          },
+          {
+            "path": "tests/mixed_build_harness_source_probe.mjs",
+            "sha256": "baa7f180a1249ab45626789d722bc9c614df7a058c61318558710bd6b7fcebf7"
+          },
+          {
+            "path": "tests/test_mixed_build_harness_source.py",
+            "sha256": "2e8a5eb709de93d8855059a1cf715f88dec0a5699c6b82d1de917548c2a08207"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-qualification-record.py",
+            "sha256": "c64aaabca5f2fd4a731bd024d774472379e878e0ff94856893fb3540780b2be2"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/mixed-zone-moves-source-review.mjs",
+            "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+          },
+          {
+            "path": "scripts/mixed-compiler-build-source-review.mjs",
+            "sha256": "29a28e82ebc5d13d091f8415d91c4c178336d2e5ff156fe6acab26a088a040b4"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-build-harness-originals.py",
+            "sha256": "cff4b5317d1a3f0cde577fe5a7786f265738ddacec2faaf35adb8fd83288420f"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-authenticator.mjs",
+            "sha256": "f391b38ab1767e1b40033d64fb5e5cc58757be0b47aad7e2d3408b047ce3be74"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-subjects.json.gz",
+            "sha256": "35cb769fa6769f1b982d2155969b009d6e67cae6fdd5b6f7e18cbd460b9a452c"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition.json.gz",
+            "sha256": "0fd5cbe8d53999c79f3ca0a7fa948f94e0ce5d40f435e1ea6667a3b5023bb46d"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-authentication.json.gz",
+            "sha256": "b9ae67015a545f5870c811c18fefee2f894eea109f76c504184498ad7cdece18"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.json",
+            "sha256": "697f70877693c445aa6d1d158f6b84edf3e4415b42bcd5ba8c75ed735ee0d5bd"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-controls.py",
+            "sha256": "9bda39b9237fc5e7124c4d9007d022179f8c992cc70015874dd44a93155396f2"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-inspector.mjs",
+            "sha256": "fd06e6635066ce89d73e5f8ce3ee151a4400d8be3775c0c940b03b741772bc24"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-control-results.json",
+            "sha256": "32340c7560b1225b19c9b300656691c229a155fd0fbdbf502327fc2ce64052c0"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-lifecycle-mode-controls.mjs",
+            "sha256": "53c645f8745793e1106426d6d20d8b818bb198c3edd294f14bef15dc57f3e1b7"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-acquisition-checkpoint.json",
+            "sha256": "90bcd420ff21732938503ae186ec0641e1652766274cc5c2c4296611d89d5fe9"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-intake.json",
+            "sha256": "bdb15d853efd90f996c987f29c65cfda633387331714ee816314f5c952bb3507"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-observation-pins.json.gz",
+            "sha256": "5875983308eeba6f75c33fa5dae4a03d186bc7ee73beb64f8f1528bef933b314"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-prior.json.gz",
+            "sha256": "5ed83316694ef61fa7f42262b6a625205994e07acf3d17e45df63f477b33ee16"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-review.json.gz",
+            "sha256": "ff329ea251fd6be9e1f2cacb8a3b89d10f3aa911b07ef2656358cc293b24e2cf"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-controls.json",
+            "sha256": "420d3a2ee48fb42c3e3c35c6ef0104745623a9e647a409691beb4b0540af449e"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-python.log.gz",
+            "sha256": "0051f37d59ce5116cb104ca2c8c9da942603a015ea32d1cbac2f43925e0e5415"
+          },
+          {
+            "path": "compatibility/rc/mixed-build-harness-source-cyph-sanity.json",
+            "sha256": "80f0c8426d6c7450e9ff062232e6f6e55021f4d447c25c21dc6046d5f572c686"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_check": {
+        "kind": "individual-complete-original-build-harness-source-review",
+        "diff_sha256": "fcaaae57e0dd1fb6a94104de68f554102ad2ba6ef064ba884cd326fcf88f0bdf",
+        "evidence_report_sha256": "d914fcb5ed0a460bf7cab8b2db8eec9a459ab035f8b670b44841cc06a6ed1414"
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "780639853242381b4fa307f913a49241e9514ba6",
