@@ -37111,9 +37111,9 @@
       "sha": "487c4537847c68638811063adff7c59d8a5d6f7a",
       "bucket": "test-only-batch-candidate",
       "subject": "docs(material/dialog): use standalone imports in docs (#28110)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=986a52abf05ac80f3e8d53bb75b06476b1262bd868e9984db5a858ded2812287, bytes=18398). Changed paths are only components-examples, harness example specs, and universal/dev-app demo sources (src/components-examples/material/dialog/dialog-animations/dialog-animations-example.ts, src/components-examples/material/dialog/dialog-data/dialog-data-example.ts, src/components-examples/material/dialog/dialog-elements/dialog-elements-example.ts, src/components-examples/material/dialog/dialog-from-menu/dialog-from-menu-example.ts, src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts, src/components-examples/material/dialog/dialog-harness/dialog-harness-example.ts, src/components-examples/material/dialog/dialog-overview/dialog-overview-example.ts, src/dev-app/autocomplete/autocomplete-demo.ts, src/dev-app/dialog/dialog-demo.ts, src/dev-app/focus-trap/focus-trap-demo.ts, src/dev-app/slider/slider-demo.ts, src/material/dialog/testing/dialog-harness.spec.ts, src/universal-app/kitchen-sink/kitchen-sink.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship upstream Material docs examples; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Individually review all13 complete files and38 hunks of the dialog standalone example migration. Seven examples and four internal app/demo files replace module imports with the exact public title/content/actions/close directives used by each component, or remove an unused dialog module import; the kitchen-sink example also removes that module. The example spec removes MatDialogModule setup and the modern dialog harness fixture becomes standalone with individual directives instead of a declaration. The full finite metadata projection retains every operation outside the individually recorded import/approved metadata roles, including other imports, providers, templates, constructors, open/config/data behavior, callbacks and cleanup. All13 source test identities and complete callback semantics remain. This is executable fixture/compiler/provider configuration, not editorial text or a proof that providers and standalone scopes are interchangeable. The owned legacy title/content/actions/close directives remain standalone:false, their module declares/exports them and provides the legacy dialog/scroll strategy. The shared historical harness still declares its fixture, imports the supplied module, preserves the service alias provider and uses owned LEGACY_NOOP_ANIMATIONS. Preserve that Material16 module/markup/token contract; do not adopt this modern standalone recipe or a compiler/provider shortcut. Whole owned product/callback guards and actual Cyph module/style context stay unchanged; no consumer TS/API, HTML, CSS or SCSS edit is needed. Real compiler/DI/render/floor validation remains separate. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/components-examples/material/dialog/dialog-animations/dialog-animations-example.ts",
         "src/components-examples/material/dialog/dialog-data/dialog-data-example.ts",
@@ -37129,28 +37129,126 @@
         "src/material/dialog/testing/dialog-harness.spec.ts",
         "src/universal-app/kitchen-sink/kitchen-sink.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/487c4537847c68638811063adff7c59d8a5d6f7a.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-example-docs-487c4537847c68638811063adff7c59d8a5d6f7a.json",
       "batch_id": "needs-triage-companion-docs-examples-spec-2026-10-01",
-      "recorded_at_utc": "2026-10-01T19:19:46Z",
+      "recorded_at_utc": "2026-10-17T01:48:55.366373+00:00",
       "g11_claim": "not-passed",
       "patch_sha256": "986a52abf05ac80f3e8d53bb75b06476b1262bd868e9984db5a858ded2812287",
       "individual_proof": {
-        "diff_sha256": "7437fe048fe34d4bf2b5de6747a08d90e10530caba6b5241bf61bfba121e3391",
-        "review_depth": "individual-semantic",
+        "proof_kind": "individual-complete-example-docs-source-applicability",
+        "diff_sha256": "44348bb9d44018192572babb6fb27b0f8808b2a13e437dab33aa680bd8d4fede",
+        "review_depth": "individual-compatibility",
         "affected_branches": [
           "main"
         ],
-        "decision": "Read upstream patch 487c4537847c68638811063adff7c59d8a5d6f7a (docs(material/dialog): use standalone imports in docs (#28110)). It touches 13 paths: src/components-examples/material/dialog/dialog-animations/dialog-animations-example.ts, src/components-examples/material/dialog/dialog-data/dialog-data-example.ts, src/components-examples/material/dialog/dialog-elements/dialog-elements-example.ts, src/components-examples/material/dialog/dialog-from-menu/dialog-from-menu-example.ts, src/components-examples/material/dialog/dialog-harness/dialog-harness-example.spec.ts, src/components-examples/material/dialog/dialog-harness/dialog-harness-example.ts and 7 more. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
-        "proof_kind": "diff-read"
-      }
+        "decision": "Individually review all13 complete files and38 hunks of the dialog standalone example migration. Seven examples and four internal app/demo files replace module imports with the exact public title/content/actions/close directives used by each component, or remove an unused dialog module import; the kitchen-sink example also removes that module. The example spec removes MatDialogModule setup and the modern dialog harness fixture becomes standalone with individual directives instead of a declaration. The full finite metadata projection retains every operation outside the individually recorded import/approved metadata roles, including other imports, providers, templates, constructors, open/config/data behavior, callbacks and cleanup. All13 source test identities and complete callback semantics remain. This is executable fixture/compiler/provider configuration, not editorial text or a proof that providers and standalone scopes are interchangeable. The owned legacy title/content/actions/close directives remain standalone:false, their module declares/exports them and provides the legacy dialog/scroll strategy. The shared historical harness still declares its fixture, imports the supplied module, preserves the service alias provider and uses owned LEGACY_NOOP_ANIMATIONS. Preserve that Material16 module/markup/token contract; do not adopt this modern standalone recipe or a compiler/provider shortcut. Whole owned product/callback guards and actual Cyph module/style context stay unchanged; no consumer TS/API, HTML, CSS or SCSS edit is needed. Real compiler/DI/render/floor validation remains separate. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-example-docs-source-review.mjs",
+            "sha256": "8d8da1f08fad71c165ac4156e62e566c936388a9ba52fe269d725305baed957d"
+          },
+          {
+            "path": "tests/mixed_example_docs_source_probe.mjs",
+            "sha256": "ac229d70fef50377d05b28a47ec2185b8912d8c6d92dd5c411670c213e35e36e"
+          },
+          {
+            "path": "tests/test_mixed_example_docs_source.py",
+            "sha256": "931a54bc43432c516c3b384701e18ce102aceead15d8746005cb976a647b2d60"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-qualification-record.py",
+            "sha256": "68736bef264328442e10add24e435af3c11e915e252e684af54489a4e2828037"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-example-docs-originals.py",
+            "sha256": "35018d91cc473b74c670f3dc87d440ce63c6ed081564393378446043fd63235e"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-authenticator.mjs",
+            "sha256": "f7a8e2347b31c077348ec74e09d9fdf55c02909992952652ad50fb1a359fe93f"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-subjects.json.gz",
+            "sha256": "5cd6ced1fd88410988d5181a7e4743ef74db35f3a8fba5db4a0feeb27a1103b5"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-acquisition.json.gz",
+            "sha256": "f7aec2272cd2c402bb2108aae8bb9c5bbbb83f819db0bd560af009a93e38ab11"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-authentication.json.gz",
+            "sha256": "908154f69b9e663d280d3caf89ecad64e5e52378fca626e2ca143ec63cc6d7f1"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-acquisition-checkpoint.json",
+            "sha256": "51fb88a0b143cc2217d5f6b62a06b4633894af30acfd7ab26ee44c229604a796"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-intake.json",
+            "sha256": "8557f80d93d00eadb865559c55a9c18b6f9761df11b410eb1c2d68d9e705a2d3"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-observation-pins.json.gz",
+            "sha256": "f1fb4c3ec84bec29d68195f3a626e4b1200f507eb1e1924a4c2ea7cb675c4253"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-prior.json.gz",
+            "sha256": "d13dc71704cb747a3b2b986b74d6296699d099ae877261b7eea9013cbbf44eff"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-review.json.gz",
+            "sha256": "80d231356a0ee27ac13ac2fcc742ea23314ac053b5e668e305639400ae0d0ca7"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-controls.json",
+            "sha256": "70dbf0dcb06a59306aa9dad0f406231f0648230ff0c86fe0f49914a365137a40"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-python.log.gz",
+            "sha256": "f68d468263417fdf81fe3a1eb072fdc1c2beac13daa9c6fff15e80d261f1dacd"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-cyph-sanity.json",
+            "sha256": "971de377d1d941596e640faac51f34ca467ac5d5603688f7449b7fb9ef0e26ec"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_check": {
+        "kind": "individual-complete-original-example-docs-source-review",
+        "diff_sha256": "44348bb9d44018192572babb6fb27b0f8808b2a13e437dab33aa680bd8d4fede",
+        "evidence_report_sha256": "83aac0c85b73925b27fed1dd46cd783f3d57e72ae5635d51fa33116e3ffebf1c"
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "6875bb6cb8e6bc13c3e480e85b3c93f8e7f28f98",
       "bucket": "test-only-batch-candidate",
       "subject": "docs(material/snack-bar): adjust docs for standalone (#28111)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=e426e400971205ae4135f49338a340a3beb4bade6197a3c000df88c4ceff5dd4, bytes=11750). Changed paths are only components-examples and harness example/unit specs (src/components-examples/material-experimental/popover-edit/popover-edit-mat-table/popover-edit-mat-table-example.ts, src/components-examples/material/snack-bar/snack-bar-annotated-component/snack-bar-annotated-component-example.ts, src/components-examples/material/snack-bar/snack-bar-component/snack-bar-component-example.ts, src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.spec.ts, src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.ts, src/components-examples/material/snack-bar/snack-bar-overview/snack-bar-overview-example.ts, src/components-examples/material/snack-bar/snack-bar-position/snack-bar-position-example.ts, src/material/snack-bar/testing/snack-bar-harness.spec.ts, src/universal-app/kitchen-sink/kitchen-sink.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship upstream Material docs examples; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Individually review all nine complete files and20 hunks of the snack-bar standalone migration. Application examples and kitchen sink remove MatSnackBarModule; the annotated custom content imports exact label/actions/action directives. The example spec removes the module and the modern harness content becomes standalone with those directives, removing its declarations entry. The complete finite metadata projection retains all other array items, providers, templates, component/service methods, callbacks, expectations and cleanup; all17 source test identities and complete callback semantics remain. Do not infer DI/compiler/provider equivalence from that projection. Owned MatLegacySnackBarModule continues to declare its legacy container/simple content, import historical button/common/overlay/portal modules and provide the legacy service/default options. Its historical shared harness declares the fixture, imports the supplied module and uses the already qualified owned no-op provider. Preserve distinct legacy ownership and Material16 structure rather than transplanting modern standalone content directives or removing legacy module setup. The1028 source-member and1141 product-member guards and Cyph consumer context require no TS/API, HTML, CSS or SCSS change. Actual Angular/DI/render/floor execution is not proved by this source decision. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/components-examples/material-experimental/popover-edit/popover-edit-mat-table/popover-edit-mat-table-example.ts",
         "src/components-examples/material/snack-bar/snack-bar-annotated-component/snack-bar-annotated-component-example.ts",
@@ -37162,19 +37260,126 @@
         "src/material/snack-bar/testing/snack-bar-harness.spec.ts",
         "src/universal-app/kitchen-sink/kitchen-sink.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/6875bb6cb8e6bc13c3e480e85b3c93f8e7f28f98.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-example-docs-6875bb6cb8e6bc13c3e480e85b3c93f8e7f28f98.json",
       "batch_id": "needs-triage-companion-docs-examples-spec-2026-10-01",
-      "recorded_at_utc": "2026-10-01T19:19:46Z",
+      "recorded_at_utc": "2026-10-17T01:48:55.367075+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "e426e400971205ae4135f49338a340a3beb4bade6197a3c000df88c4ceff5dd4"
+      "patch_sha256": "e426e400971205ae4135f49338a340a3beb4bade6197a3c000df88c4ceff5dd4",
+      "source_check": {
+        "kind": "individual-complete-original-example-docs-source-review",
+        "diff_sha256": "12105c0d2c1dca5f430cc3b030c0630f92ac73f1fb8ee2685c57da2633a7e569",
+        "evidence_report_sha256": "8252d7e181310a033ba22be5fe5ff49da1323d8dd03792fe2022460d0f13c357"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-example-docs-source-applicability",
+        "diff_sha256": "12105c0d2c1dca5f430cc3b030c0630f92ac73f1fb8ee2685c57da2633a7e569",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Individually review all nine complete files and20 hunks of the snack-bar standalone migration. Application examples and kitchen sink remove MatSnackBarModule; the annotated custom content imports exact label/actions/action directives. The example spec removes the module and the modern harness content becomes standalone with those directives, removing its declarations entry. The complete finite metadata projection retains all other array items, providers, templates, component/service methods, callbacks, expectations and cleanup; all17 source test identities and complete callback semantics remain. Do not infer DI/compiler/provider equivalence from that projection. Owned MatLegacySnackBarModule continues to declare its legacy container/simple content, import historical button/common/overlay/portal modules and provide the legacy service/default options. Its historical shared harness declares the fixture, imports the supplied module and uses the already qualified owned no-op provider. Preserve distinct legacy ownership and Material16 structure rather than transplanting modern standalone content directives or removing legacy module setup. The1028 source-member and1141 product-member guards and Cyph consumer context require no TS/API, HTML, CSS or SCSS change. Actual Angular/DI/render/floor execution is not proved by this source decision. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-example-docs-source-review.mjs",
+            "sha256": "8d8da1f08fad71c165ac4156e62e566c936388a9ba52fe269d725305baed957d"
+          },
+          {
+            "path": "tests/mixed_example_docs_source_probe.mjs",
+            "sha256": "ac229d70fef50377d05b28a47ec2185b8912d8c6d92dd5c411670c213e35e36e"
+          },
+          {
+            "path": "tests/test_mixed_example_docs_source.py",
+            "sha256": "931a54bc43432c516c3b384701e18ce102aceead15d8746005cb976a647b2d60"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-qualification-record.py",
+            "sha256": "68736bef264328442e10add24e435af3c11e915e252e684af54489a4e2828037"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-example-docs-originals.py",
+            "sha256": "35018d91cc473b74c670f3dc87d440ce63c6ed081564393378446043fd63235e"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-authenticator.mjs",
+            "sha256": "f7a8e2347b31c077348ec74e09d9fdf55c02909992952652ad50fb1a359fe93f"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-subjects.json.gz",
+            "sha256": "5cd6ced1fd88410988d5181a7e4743ef74db35f3a8fba5db4a0feeb27a1103b5"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-acquisition.json.gz",
+            "sha256": "f7aec2272cd2c402bb2108aae8bb9c5bbbb83f819db0bd560af009a93e38ab11"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-authentication.json.gz",
+            "sha256": "908154f69b9e663d280d3caf89ecad64e5e52378fca626e2ca143ec63cc6d7f1"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-acquisition-checkpoint.json",
+            "sha256": "51fb88a0b143cc2217d5f6b62a06b4633894af30acfd7ab26ee44c229604a796"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-intake.json",
+            "sha256": "8557f80d93d00eadb865559c55a9c18b6f9761df11b410eb1c2d68d9e705a2d3"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-observation-pins.json.gz",
+            "sha256": "f1fb4c3ec84bec29d68195f3a626e4b1200f507eb1e1924a4c2ea7cb675c4253"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-prior.json.gz",
+            "sha256": "d13dc71704cb747a3b2b986b74d6296699d099ae877261b7eea9013cbbf44eff"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-review.json.gz",
+            "sha256": "80d231356a0ee27ac13ac2fcc742ea23314ac053b5e668e305639400ae0d0ca7"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-controls.json",
+            "sha256": "70dbf0dcb06a59306aa9dad0f406231f0648230ff0c86fe0f49914a365137a40"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-python.log.gz",
+            "sha256": "f68d468263417fdf81fe3a1eb072fdc1c2beac13daa9c6fff15e80d261f1dacd"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-cyph-sanity.json",
+            "sha256": "971de377d1d941596e640faac51f34ca467ac5d5603688f7449b7fb9ef0e26ec"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "14d5de1f2f4d262df9c7afd1e1a1677f7886ec85",
       "bucket": "test-only-batch-candidate",
       "subject": "docs(material/dialog): use h2 for dialog title (#28519)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=b9ef690442c51fff329e4bdc41ba932b9363f53f67e4e5d5cff5a51c9d8a24f4, bytes=6059). Changed paths are only unit specs, components-examples HTML, and a dev-app demo (src/cdk/dialog/dialog.spec.ts, src/components-examples/material/dialog/dialog-animations/dialog-animations-example-dialog.html, src/components-examples/material/dialog/dialog-data/dialog-data-example-dialog.html, src/components-examples/material/dialog/dialog-elements/dialog-elements-example-dialog.html, src/components-examples/material/dialog/dialog-overview/dialog-overview-example-dialog.html, src/dev-app/slider/slider-demo.ts, src/material/dialog/dialog.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material unit-spec / docs-example layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Individually review all seven complete files and eleven hunks of the dialog heading change. Four external example templates, one inline demo and CDK/Material test templates change h1 to h2; focus-query expectations change h1[tabindex=-1] to h2[tabindex=-1]. A finite heading-tag and exact focus-query literal projection proves every other complete TS/HTML operation remains unchanged. All182 source cases retain identity;179 complete callbacks are unchanged and three change heading/query/template literals. Heading levels and default typography can differ, so neither accessibility, rendering, focus delivery nor style equivalence is claimed. The owned historical legacy dialog still uses its h1 first-heading regression and Material16 templates/classes/styles. User authorization requires no consumer structure/CSS/SCSS changes; this modern example/fixture preference does not justify rewriting owned or Cyph headings, source goldens or focus expectations. Preserve the actual historical contract and validate its real native focus/lifecycle path through the separate artifact/floor gates. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/cdk/dialog/dialog.spec.ts",
         "src/components-examples/material/dialog/dialog-animations/dialog-animations-example-dialog.html",
@@ -37184,19 +37389,126 @@
         "src/dev-app/slider/slider-demo.ts",
         "src/material/dialog/dialog.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/14d5de1f2f4d262df9c7afd1e1a1677f7886ec85.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-example-docs-14d5de1f2f4d262df9c7afd1e1a1677f7886ec85.json",
       "batch_id": "needs-triage-companion-docs-examples-spec-2026-10-01",
-      "recorded_at_utc": "2026-10-01T19:19:46Z",
+      "recorded_at_utc": "2026-10-17T01:48:55.367673+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "b9ef690442c51fff329e4bdc41ba932b9363f53f67e4e5d5cff5a51c9d8a24f4"
+      "patch_sha256": "b9ef690442c51fff329e4bdc41ba932b9363f53f67e4e5d5cff5a51c9d8a24f4",
+      "source_check": {
+        "kind": "individual-complete-original-example-docs-source-review",
+        "diff_sha256": "60974b0f938ed950253f8818d3c0ced3a9c6416ef104f537eba48678fcdf3145",
+        "evidence_report_sha256": "8dceb8a499e618d66d269619c7c03c3a90b87ef424183b0c97e9d33743db8b25"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-example-docs-source-applicability",
+        "diff_sha256": "60974b0f938ed950253f8818d3c0ced3a9c6416ef104f537eba48678fcdf3145",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Individually review all seven complete files and eleven hunks of the dialog heading change. Four external example templates, one inline demo and CDK/Material test templates change h1 to h2; focus-query expectations change h1[tabindex=-1] to h2[tabindex=-1]. A finite heading-tag and exact focus-query literal projection proves every other complete TS/HTML operation remains unchanged. All182 source cases retain identity;179 complete callbacks are unchanged and three change heading/query/template literals. Heading levels and default typography can differ, so neither accessibility, rendering, focus delivery nor style equivalence is claimed. The owned historical legacy dialog still uses its h1 first-heading regression and Material16 templates/classes/styles. User authorization requires no consumer structure/CSS/SCSS changes; this modern example/fixture preference does not justify rewriting owned or Cyph headings, source goldens or focus expectations. Preserve the actual historical contract and validate its real native focus/lifecycle path through the separate artifact/floor gates. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-example-docs-source-review.mjs",
+            "sha256": "8d8da1f08fad71c165ac4156e62e566c936388a9ba52fe269d725305baed957d"
+          },
+          {
+            "path": "tests/mixed_example_docs_source_probe.mjs",
+            "sha256": "ac229d70fef50377d05b28a47ec2185b8912d8c6d92dd5c411670c213e35e36e"
+          },
+          {
+            "path": "tests/test_mixed_example_docs_source.py",
+            "sha256": "931a54bc43432c516c3b384701e18ce102aceead15d8746005cb976a647b2d60"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-qualification-record.py",
+            "sha256": "68736bef264328442e10add24e435af3c11e915e252e684af54489a4e2828037"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-example-docs-originals.py",
+            "sha256": "35018d91cc473b74c670f3dc87d440ce63c6ed081564393378446043fd63235e"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-authenticator.mjs",
+            "sha256": "f7a8e2347b31c077348ec74e09d9fdf55c02909992952652ad50fb1a359fe93f"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-subjects.json.gz",
+            "sha256": "5cd6ced1fd88410988d5181a7e4743ef74db35f3a8fba5db4a0feeb27a1103b5"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-acquisition.json.gz",
+            "sha256": "f7aec2272cd2c402bb2108aae8bb9c5bbbb83f819db0bd560af009a93e38ab11"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-authentication.json.gz",
+            "sha256": "908154f69b9e663d280d3caf89ecad64e5e52378fca626e2ca143ec63cc6d7f1"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-acquisition-checkpoint.json",
+            "sha256": "51fb88a0b143cc2217d5f6b62a06b4633894af30acfd7ab26ee44c229604a796"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-intake.json",
+            "sha256": "8557f80d93d00eadb865559c55a9c18b6f9761df11b410eb1c2d68d9e705a2d3"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-observation-pins.json.gz",
+            "sha256": "f1fb4c3ec84bec29d68195f3a626e4b1200f507eb1e1924a4c2ea7cb675c4253"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-prior.json.gz",
+            "sha256": "d13dc71704cb747a3b2b986b74d6296699d099ae877261b7eea9013cbbf44eff"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-review.json.gz",
+            "sha256": "80d231356a0ee27ac13ac2fcc742ea23314ac053b5e668e305639400ae0d0ca7"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-controls.json",
+            "sha256": "70dbf0dcb06a59306aa9dad0f406231f0648230ff0c86fe0f49914a365137a40"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-python.log.gz",
+            "sha256": "f68d468263417fdf81fe3a1eb072fdc1c2beac13daa9c6fff15e80d261f1dacd"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-cyph-sanity.json",
+            "sha256": "971de377d1d941596e640faac51f34ca467ac5d5603688f7449b7fb9ef0e26ec"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "7798bb7c64233db5e5d27a192c060ae52fc413d9",
       "bucket": "test-only-batch-candidate",
       "subject": "docs(material/chips): clean up forms examples (#33185)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=c8ea07f9b2972e003579145df75e6300923281c9c738c9751388ad276c8408e5, bytes=8848). Changed paths are only components-examples form demos and a unit spec (src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.html, src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.ts, src/components-examples/material/chips/chips-template-form/chips-template-form-example.html, src/components-examples/material/chips/chips-template-form/chips-template-form-example.ts, src/material/tooltip/tooltip.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship upstream Material docs examples; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Individually review all five complete files and eight hunks of the chip-form/example commit, including its unrelated tooltip timing hunk. Reactive example keywords now come from one non-null FormControl initialized with all four values instead of a separate signal plus a one-value control; add/remove call setValue and removal deliberately uses lastIndexOf, changing duplicate-removal semantics. Template-driven content renames its keyword signal/handlers, makes announcer private and reorganizes add/remove while preserving its signal update path. Both templates change bindings/handlers, and clear no longer uses a redundant non-null assertion on chipInput. These are real example/form/API/announcement changes, not a mechanical rename and not a reason to replace legacy MatChipList markup with modern grid/row components. The tooltip case changes async waits250/600 plus whenStable to fakeAsync ticks250/500 plus flush. The exact complete tooltip file is unchanged outside that one captured case; all74 source identities remain and73 complete callbacks are unchanged. Do not assert scheduler/error/lifetime equivalence for the changed callback. The owned legacy event already requires chipInput, and its retained tooltip case already uses fakeAsync ticks250/500, historical assertions and explicit owned animation completion. Preserve that case, existing legacy forms/CVA, styles and the Cyph mat-chip-list/formControl structure. No owned product, test callback, consumer TS/API, HTML, CSS or SCSS change is required; actual reactive form/native tooltip/floor execution remains open. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.html",
         "src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.ts",
@@ -37204,11 +37516,118 @@
         "src/components-examples/material/chips/chips-template-form/chips-template-form-example.ts",
         "src/material/tooltip/tooltip.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/7798bb7c64233db5e5d27a192c060ae52fc413d9.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-example-docs-7798bb7c64233db5e5d27a192c060ae52fc413d9.json",
       "batch_id": "needs-triage-companion-docs-examples-spec-2026-10-01",
-      "recorded_at_utc": "2026-10-01T19:19:46Z",
+      "recorded_at_utc": "2026-10-17T01:48:55.368221+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "c8ea07f9b2972e003579145df75e6300923281c9c738c9751388ad276c8408e5"
+      "patch_sha256": "c8ea07f9b2972e003579145df75e6300923281c9c738c9751388ad276c8408e5",
+      "source_check": {
+        "kind": "individual-complete-original-example-docs-source-review",
+        "diff_sha256": "af0e84096c868f1cbd56794be33c6fdee688f2f22597fd2453c464e4ae4f0889",
+        "evidence_report_sha256": "d776f722813e60d68bc51806366099380f90d74a8d48f6646ce8c500322aaf56"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-example-docs-source-applicability",
+        "diff_sha256": "af0e84096c868f1cbd56794be33c6fdee688f2f22597fd2453c464e4ae4f0889",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Individually review all five complete files and eight hunks of the chip-form/example commit, including its unrelated tooltip timing hunk. Reactive example keywords now come from one non-null FormControl initialized with all four values instead of a separate signal plus a one-value control; add/remove call setValue and removal deliberately uses lastIndexOf, changing duplicate-removal semantics. Template-driven content renames its keyword signal/handlers, makes announcer private and reorganizes add/remove while preserving its signal update path. Both templates change bindings/handlers, and clear no longer uses a redundant non-null assertion on chipInput. These are real example/form/API/announcement changes, not a mechanical rename and not a reason to replace legacy MatChipList markup with modern grid/row components. The tooltip case changes async waits250/600 plus whenStable to fakeAsync ticks250/500 plus flush. The exact complete tooltip file is unchanged outside that one captured case; all74 source identities remain and73 complete callbacks are unchanged. Do not assert scheduler/error/lifetime equivalence for the changed callback. The owned legacy event already requires chipInput, and its retained tooltip case already uses fakeAsync ticks250/500, historical assertions and explicit owned animation completion. Preserve that case, existing legacy forms/CVA, styles and the Cyph mat-chip-list/formControl structure. No owned product, test callback, consumer TS/API, HTML, CSS or SCSS change is required; actual reactive form/native tooltip/floor execution remains open. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-example-docs-source-review.mjs",
+            "sha256": "8d8da1f08fad71c165ac4156e62e566c936388a9ba52fe269d725305baed957d"
+          },
+          {
+            "path": "tests/mixed_example_docs_source_probe.mjs",
+            "sha256": "ac229d70fef50377d05b28a47ec2185b8912d8c6d92dd5c411670c213e35e36e"
+          },
+          {
+            "path": "tests/test_mixed_example_docs_source.py",
+            "sha256": "931a54bc43432c516c3b384701e18ce102aceead15d8746005cb976a647b2d60"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-qualification-record.py",
+            "sha256": "68736bef264328442e10add24e435af3c11e915e252e684af54489a4e2828037"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-example-docs-originals.py",
+            "sha256": "35018d91cc473b74c670f3dc87d440ce63c6ed081564393378446043fd63235e"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-authenticator.mjs",
+            "sha256": "f7a8e2347b31c077348ec74e09d9fdf55c02909992952652ad50fb1a359fe93f"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-subjects.json.gz",
+            "sha256": "5cd6ced1fd88410988d5181a7e4743ef74db35f3a8fba5db4a0feeb27a1103b5"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-acquisition.json.gz",
+            "sha256": "f7aec2272cd2c402bb2108aae8bb9c5bbbb83f819db0bd560af009a93e38ab11"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-authentication.json.gz",
+            "sha256": "908154f69b9e663d280d3caf89ecad64e5e52378fca626e2ca143ec63cc6d7f1"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-acquisition-checkpoint.json",
+            "sha256": "51fb88a0b143cc2217d5f6b62a06b4633894af30acfd7ab26ee44c229604a796"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-intake.json",
+            "sha256": "8557f80d93d00eadb865559c55a9c18b6f9761df11b410eb1c2d68d9e705a2d3"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-observation-pins.json.gz",
+            "sha256": "f1fb4c3ec84bec29d68195f3a626e4b1200f507eb1e1924a4c2ea7cb675c4253"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-prior.json.gz",
+            "sha256": "d13dc71704cb747a3b2b986b74d6296699d099ae877261b7eea9013cbbf44eff"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-review.json.gz",
+            "sha256": "80d231356a0ee27ac13ac2fcc742ea23314ac053b5e668e305639400ae0d0ca7"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-controls.json",
+            "sha256": "70dbf0dcb06a59306aa9dad0f406231f0648230ff0c86fe0f49914a365137a40"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-python.log.gz",
+            "sha256": "f68d468263417fdf81fe3a1eb072fdc1c2beac13daa9c6fff15e80d261f1dacd"
+          },
+          {
+            "path": "compatibility/rc/mixed-example-docs-source-cyph-sanity.json",
+            "sha256": "971de377d1d941596e640faac51f34ca467ac5d5603688f7449b7fb9ef0e26ec"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "544257ad0f58e70688abe0d80eccaa73d25ba5d8",
