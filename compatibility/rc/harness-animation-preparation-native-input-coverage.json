@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Source inspection of existing complete tracked-run input binding; no runtime admission",
+  "validator": {
+    "path": "scripts/upstream-packed-run-evidence.mjs",
+    "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+  },
+  "consumer": "scripts/upstream-historical-behavior-evidence.mjs",
+  "observed_requirements": [
+    "validateHistoricalBehavior requires successful validatePackedConsumerRun before admitting a historical result.",
+    "validatePackedConsumerRun requires binding.source_commit equal current HEAD, binding.source_tree equal current HEAD^{tree}, and clean tracked/untracked checkout except generated reports.",
+    "The run source and execution_inputs commit/tree/line/clean fields must match the same binding."
+  ],
+  "affected_inputs_are_tracked": [
+    {
+      "path": "testing/legacy-runner/shims/harness/autocomplete/shared.spec.ts",
+      "git_blob": "77c7107a9f88c63a7330c045762d6704cc24bb43"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/dialog/shared.spec.ts",
+      "git_blob": "1b3760b51ef425d7b5d575ecc0f8ba6bd14b2896"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/form-field/shared.spec.ts",
+      "git_blob": "6dce19016ba03e8ed8059b970a488cdcdd280417"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/input/shared-input.spec.ts",
+      "git_blob": "59e97c69024cc9d9a4edcc8802f7d522304b128d"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/input/shared-native-select.spec.ts",
+      "git_blob": "dee9ff102c580c0458a28962e18107984c0003e9"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/menu/shared.spec.ts",
+      "git_blob": "556f8764ac4f9254365f35999890af63809ab7f8"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/paginator/shared.spec.ts",
+      "git_blob": "f72f64190321c92d5aa34766f1ff046a14f63dc2"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/select/shared.spec.ts",
+      "git_blob": "dd4e692af1449650be1d3735374d3515ebc0bbc2"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/snack-bar/shared.spec.ts",
+      "git_blob": "256e9677a1e2673983c5b09cfdfa284762155faa"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/tabs/tab-group-shared.spec.ts",
+      "git_blob": "820a6ab208b19688ad95066b03c0da8b7d6132cc"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/tabs/tab-nav-bar-shared.spec.ts",
+      "git_blob": "b09025f7d16264256023da75413f8c436205972b"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/tooltip/shared.spec.ts",
+      "git_blob": "abb50b73d4b5c03583b392c90ca6a22a82cf57cd"
+    }
+  ],
+  "conclusion": "The existing complete Git tree/clean-check binding covers all12 changed tracked harness fixtures. No finite native definition or required case is relaxed or expanded for this repair. All20 native results remain missing coordinator run.",
+  "native_definitions_changed": false,
+  "actual_native_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
