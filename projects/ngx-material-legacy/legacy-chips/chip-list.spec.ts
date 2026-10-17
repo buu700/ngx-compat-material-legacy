@@ -1609,6 +1609,84 @@ describe('MatChipList', () => {
     expect(keyManager.activeItem).toBe(chips.first);
     expect(keyManager.activeItem).not.toBe(removedChip);
   });
+  describe('classic focus and state contract', () => {
+    it('should focus the first enabled chip when a later chip was active', () => {
+      setupStandardList();
+      const keyManager = chipListInstance._keyManager;
+      chips.last.focus();
+      fixture.detectChanges();
+      expect(keyManager.activeItem).toBe(chips.last);
+
+      chipListInstance.focus();
+      fixture.detectChanges();
+      expect(keyManager.activeItem).toBe(chips.first);
+      expect(document.activeElement).toBe(chips.first._elementRef.nativeElement);
+    });
+
+    it('should skip the disabled first and active chips when focusing', () => {
+      setupStandardList();
+      const keyManager = chipListInstance._keyManager;
+      const chipArray = chips.toArray();
+      chipArray[0].disabled = chipArray[1].disabled = true;
+      keyManager.updateActiveItem(1);
+      fixture.detectChanges();
+
+      chipListInstance.focus();
+      fixture.detectChanges();
+      expect(keyManager.activeItem).toBe(chipArray[2]);
+      expect(document.activeElement).toBe(chipArray[2]._elementRef.nativeElement);
+    });
+
+    it('should refocus the first chip after focus leaves while index zero remains active', fakeAsync(() => {
+      setupStandardList();
+      const keyManager = chipListInstance._keyManager;
+      const outside = document.createElement('button');
+      document.body.appendChild(outside);
+      try {
+        chipListInstance.focus();
+        outside.focus();
+        zone.simulateZoneExit();
+        tick();
+        fixture.detectChanges();
+        expect(document.activeElement).toBe(outside);
+        expect(keyManager.activeItemIndex).toBe(0);
+
+        chipListInstance.focus();
+        fixture.detectChanges();
+        expect(document.activeElement).toBe(chips.first._elementRef.nativeElement);
+        expect(keyManager.activeItem).toBe(chips.first);
+      } finally {
+        outside.remove();
+      }
+    }));
+
+    it('should notify disabled state after propagating it to chips and render the form field state', () => {
+      setupInputList();
+      const states: {disabled: boolean; children: boolean[]}[] = [];
+      const subscription = chipListInstance.stateChanges.subscribe(() => {
+        states.push({disabled: chipListInstance.disabled, children: chips.map(chip => chip.disabled)});
+      });
+      const formField: HTMLElement = fixture.nativeElement.querySelector('.mat-form-field');
+      const renderedChips: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('mat-chip'));
+      try {
+        chipListInstance.disabled = true;
+        expect(states).toEqual([{disabled: true, children: [true, true, true]}]);
+        fixture.detectChanges();
+        expect(formField.classList).toContain('mat-form-field-disabled');
+        expect(renderedChips.map(chip => chip.getAttribute('aria-disabled'))).toEqual(['true', 'true', 'true']);
+
+        states.length = 0;
+        chipListInstance.disabled = false;
+        expect(states).toEqual([{disabled: false, children: [false, false, false]}]);
+        fixture.detectChanges();
+        expect(formField.classList).not.toContain('mat-form-field-disabled');
+        expect(renderedChips.map(chip => chip.getAttribute('aria-disabled'))).toEqual(['false', 'false', 'false']);
+      } finally {
+        subscription.unsubscribe();
+      }
+    });
+  });
+
 });
 
 @Component({
