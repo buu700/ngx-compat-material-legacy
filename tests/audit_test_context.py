@@ -154,21 +154,27 @@ def prior_source_entry(root,entry,predicate):
 
 
 def read_original_patch(root,sha,review):
-    """Read complete authenticated retained bytes without reviving a temp path."""
+    """Authenticate named original provenance and every stored representation."""
+    original=None
+    ref=review.get('original_sources')
+    if isinstance(ref,dict):
+        import gzip
+        stored=member_path(root,ref['path']).read_bytes()
+        assert hashlib.sha256(stored).hexdigest()==ref['sha256']
+        capsule=json.loads(gzip.decompress(stored))
+        subjects=[row for row in capsule['subjects'] if row['sha']==sha]
+        assert len(subjects)==1
+        original=subjects[0]['diff'].encode()
+        assert hashlib.sha256(original).hexdigest()==subjects[0]['diff_sha256']==review['diff_sha256']
     if isinstance(review.get('diff'),str):raw=review['diff'].encode()
     else:
         member=member_path(root,review['patch_file'])
         if member.is_file():raw=member.read_bytes()
         else:
-            import gzip
-            ref=review['original_sources'];stored=member_path(root,ref['path']).read_bytes()
-            assert hashlib.sha256(stored).hexdigest()==ref['sha256']
-            capsule=json.loads(gzip.decompress(stored))
-            subjects=[row for row in capsule['subjects'] if row['sha']==sha]
-            assert len(subjects)==1
-            raw=subjects[0]['diff'].encode()
-            assert hashlib.sha256(raw).hexdigest()==subjects[0]['diff_sha256']
+            assert original is not None
+            raw=original
     assert hashlib.sha256(raw).hexdigest()==review['diff_sha256']
+    if original is not None:assert raw==original
     return raw
 
 
