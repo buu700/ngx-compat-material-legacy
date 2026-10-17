@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+  "line": "21.x",
+  "final_disposition": "do-not-adopt",
+  "decision": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open. Current qualification additionally requires the complete current clean same-library packed106 run and both rich constructor/provider observations; the retained old Actions receipts are historical.",
+  "review_depth": "individual-compatibility",
+  "diff_sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/b423c0e0b754b1f1d118d17e022981c357c3aa68.patch",
+  "patch_paths": [
+    "src/material/core/datetime/native-date-adapter.ts",
+    "tools/public_api_guard/material/core.md"
+  ],
+  "individual_proof": {
+    "diff_sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open. Current qualification additionally requires the complete current clean same-library packed106 run and both rich constructor/provider observations; the retained old Actions receipts are historical.",
+    "proof_kind": "packed-required-individual-native-date",
+    "native_date_behavior": {
+      "kind": "owned-original-native-date-constructor-and-isolated-providers",
+      "case_ids": [
+        "packed-consumer/harness/native-date-constructor",
+        "packed-consumer/harness/native-date-provider"
+      ],
+      "source_members": [
+        {
+          "path": "scripts/upstream-native-date-evidence.mjs",
+          "sha256": "5ca276bb33b14048781b161937aa76dc04f7a2e0a3e4e7da75d00f4c09eb17cf"
+        },
+        {
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "sha256": "7f093cf3899def097dca506191ef220bbd3a54042bbd14a713100882b1e72ba1"
+        },
+        {
+          "path": "scripts/upstream-packed-run-evidence.mjs",
+          "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+        },
+        {
+          "path": "scripts/packed-consumer-evidence.mjs",
+          "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+        },
+        {
+          "path": "scripts/packed-consumer-aot-smoke.mjs",
+          "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
+        },
+        {
+          "path": "scripts/native-date-packed-fixture.mjs",
+          "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
+        },
+        {
+          "path": "scripts/native-date-packed-contract.mjs",
+          "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "e7a4875c48d489e268beaef1ed02adebb0522b85bd3127d8e08dffe9be6d1244"
+        },
+        {
+          "path": "compatibility/rc/matrices/library-exports.json",
+          "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+        },
+        {
+          "path": "projects/ngx-material-legacy/package.json",
+          "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts",
+          "sha256": "b69f5c2bbc12deb6ff4c420252733f51742616e016b2a6193de066cf4eecade5"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+          "sha256": "ea7b50c1618c5631f6dddb395461a144fb2d9448d2e1cb05222664ade19b23c1"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+          "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+        },
+        {
+          "path": "reference/material-16.2.14/datetime/native-date-adapter.ts",
+          "sha256": "9764348262387bc4d76f3c1724620074288167e8d2b13ebd5e109bab23f8e797"
+        },
+        {
+          "path": "reference/material-16.2.14/datetime/source-provenance.json",
+          "sha256": "e9273638fd232a9845eeda741cff2c243cb4a64b273145a983aaa689776f6643"
+        },
+        {
+          "path": "reference/material-16.2.14/factory-metadata.json",
+          "sha256": "1b124aab1f570e111647f8142cdea8066ae9db673efc405a6999c178709602b6"
+        },
+        {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-source-review.json",
+          "sha256": "cf2fec7b589a1c6f8a8df9ad5b2c4523a9a85e9d1fda3a2db86cc2739d1cd989"
+        },
+        {
+          "path": "compatibility/f10/disposition-ledger/evidence/patches/b423c0e0b754b1f1d118d17e022981c357c3aa68.patch",
+          "sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d"
+        }
+      ]
+    }
+  },
+  "original_tag": "16.2.14",
+  "original_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+  "original_source_review": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-source-review.json",
+    "sha256": "cf2fec7b589a1c6f8a8df9ad5b2c4523a9a85e9d1fda3a2db86cc2739d1cd989"
+  },
+  "historical_source_review": {
+    "schema_version": 1,
+    "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+    "line": "21.x",
+    "final_disposition": "do-not-adopt",
+    "decision": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open.",
+    "review_depth": "individual-compatibility",
+    "diff_sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d",
+    "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/b423c0e0b754b1f1d118d17e022981c357c3aa68.patch",
+    "patch_paths": [
+      "src/material/core/datetime/native-date-adapter.ts",
+      "tools/public_api_guard/material/core.md"
+    ],
+    "owned_source": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts",
+        "sha256": "b69f5c2bbc12deb6ff4c420252733f51742616e016b2a6193de066cf4eecade5",
+        "bytes": 8524
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+        "sha256": "ea7b50c1618c5631f6dddb395461a144fb2d9448d2e1cb05222664ade19b23c1",
+        "bytes": 871
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+        "sha256": "c54bd7d94179da6fc7e6340e37445351357e4618fde30070f026d5bd13547801",
+        "bytes": 3399
+      },
+      {
+        "path": "reference/material-16.2.14/datetime/native-date-adapter.ts",
+        "sha256": "9764348262387bc4d76f3c1724620074288167e8d2b13ebd5e109bab23f8e797",
+        "bytes": 8475
+      },
+      {
+        "path": "reference/material-16.2.14/factory-metadata.json",
+        "sha256": "1b124aab1f570e111647f8142cdea8066ae9db673efc405a6999c178709602b6",
+        "bytes": 220609
+      },
+      {
+        "path": "scripts/packed-consumer-aot-smoke.mjs",
+        "sha256": "cc03b5411ababa6b2cdb9aa2df00d9c127e7cf1f78b05a5c36e99f0a35d2c13a",
+        "bytes": 49476
+      }
+    ],
+    "original_tag": "16.2.14",
+    "original_commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+    "execution": {
+      "source_commit": "9b016947bbf8a8cf05ad16ab32782330788df282",
+      "run": 37515479277,
+      "job": 112447179667,
+      "library_sha256": "08bc08f1ff28cf697f0c59cc154400920c2eee6cd8ae977c70062722ca3a2ac5"
+    },
+    "executed_cases": [
+      "packed-consumer/harness/native-date-constructor",
+      "packed-consumer/harness/native-date-provider"
+    ],
+    "packed_roster_passed": 65,
+    "evidence_transport": "Reviewed authenticated Actions job logs; artifact archive was not downloaded or independently rehashed.",
+    "scope": "Two original factory tokens and historical constructor/provider semantics; this is not complete API/DI or runtime-floor certification.",
+    "independent_review": "Required at C05/A02/A07, not yet performed",
+    "g11_claim": "not-passed",
+    "recorded_at_utc": "2026-10-06T19:51:14.065922+00:00"
+  },
+  "historical_source_proof": {
+    "diff_sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open.",
+    "proof_kind": "source-and-executed-packed-constructor-provider",
+    "execution": {
+      "source_commit": "9b016947bbf8a8cf05ad16ab32782330788df282",
+      "run": 37515479277,
+      "job": 112447179667,
+      "library_sha256": "08bc08f1ff28cf697f0c59cc154400920c2eee6cd8ae977c70062722ca3a2ac5"
+    }
+  },
+  "native_date_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/native-date-context-inputs.json",
+      "sha256": "ad9b34e36a2083a9cd08e8a730c7b766b928370e8eff8bd5a28ea6ddf9d483f2"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "ce9d00877a1b4cffe645776b8e733a5e87e79039",
+      "entry_sha256": "dec3a974ad729c3950055b57f555d7c62333e8f85ff64ed0919225785ca1dfb7"
+    },
+    "original_verdict_preserved": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "native_admission": {
+    "kind": "packed-required-individual-native-date",
+    "required": true,
+    "case_ids": [
+      "packed-consumer/harness/native-date-constructor",
+      "packed-consumer/harness/native-date-provider"
+    ],
+    "complete_packed_roster": 106,
+    "qualified_by_this_document": false,
+    "actual_native_or_packed_executed": false
+  },
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "recorded_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/chip-source-batch-inputs.json",
+      "sha256": "a4e65889f9166f1d29cf8977be68c9385a3deb75935f3ff35e82c8f70f8a1c0e"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "29869118e58f3065cb7bf04e15d49da6c0c2f99d",
+      "entry_sha256": "dc4f85e51e1e6999fb96b986ea6d1e79e62dcf260f8938487fab88cad9a2c921"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-audit-source-b423c0e0b754b1f1d118d17e022981c357c3aa68.json",
+      "sha256": "d4e412f9fb3382b6df8f3955e4e283581d9ae974a7d109059a63665d8f1acd0c"
+    },
+    "source_scope_only": true,
+    "actual_native_packed_or_floor_qualified": false,
+    "note": "Rebind the existing native requirement to current checker source after nine independently reviewed modern chip source decisions. All prior disposition, historical contracts, artifact cases, floor and real coordinator obligations remain unchanged; no runtime credit."
+  }
+}
