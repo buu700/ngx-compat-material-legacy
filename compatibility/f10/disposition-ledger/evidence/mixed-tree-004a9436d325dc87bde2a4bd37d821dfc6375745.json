@@ -1,0 +1,398 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "004a9436d325dc87bde2a4bd37d821dfc6375745",
+  "subject": "Revert \"fix(material/tree): aria-expanded attribute should not appear in the leaf node (#29096)\" (#29272)",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "093b4be86af563f8b2fca91e857b68bbd6071e0d",
+      "after_blob": "db8d9eedbb1518829145ffcefc1e44de034a10fe"
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "16b2a21bc06fd0290c74884fa326ad263d174e03",
+      "after_blob": "9746981bdf4f6065cb41115886dadc5abe63dadd"
+    },
+    {
+      "path": "src/material/tree/tree.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "fc6e290736234d059b627041ddd1c8baefd140e4",
+      "after_blob": "7091498106ccec01ac25efb88173f9188222f1ec"
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "92d38fefc7647dbd3163745d867374602bd58a64",
+      "after_blob": "693d41f1c2f3c27e98aaa8554121beeebad87d39"
+    }
+  ],
+  "original_files": 4,
+  "original_hunks": 10,
+  "raw_commit_sha256": "910af5677105e9383ae2c273487c52eb47065f1ed7a666f8435a22f0d0f80636",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-tree-source-subjects.json.gz",
+    "sha256": "ce46de875ed322a07213564aa3bb3365b6b6b6030e81e73c00851d19211ae4b1"
+  },
+  "patch_file": "compatibility/rc/mixed-tree-source-004a9436d325dc87bde2a4bd37d821dfc6375745.original.patch",
+  "diff_sha256": "79f5da43a17c0c7916ee523f312d14ff726a024f314f1a94fd1e4f7b6ad25d7f",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "header": "@@ -145,14 +145,20 @@ describe('CdkTree', () => {",
+      "sha256": "2456521531d304ff8bb3499b84194fbf0c6aaf028d174d13500fac171301fcf9",
+      "judgment": "Complete CDK/Material spec: retain every case identity and all hooks/helpers/templates. Review the exact leaf/nonleaf null/false/true expectation arrays and recursive markForCheck boundary in this commit direction. No timing, rendered accessibility or callback equivalence is claimed for the five changed cases."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "header": "@@ -799,8 +805,11 @@ describe('CdkTree', () => {",
+      "sha256": "910e5d48dce738c8e26986cca7a06ad4fe4a44f62d2be4ab6d1c66d34bd4698d",
+      "judgment": "Complete CDK/Material spec: retain every case identity and all hooks/helpers/templates. Review the exact leaf/nonleaf null/false/true expectation arrays and recursive markForCheck boundary in this commit direction. No timing, rendered accessibility or callback equivalence is claimed for the five changed cases."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "header": "@@ -813,7 +822,7 @@ describe('CdkTree', () => {",
+      "sha256": "7c4513876ca0c6bc55c21a005400eed747e0e6d718f45888b1dc8180e0c8125f",
+      "judgment": "Complete CDK/Material spec: retain every case identity and all hooks/helpers/templates. Review the exact leaf/nonleaf null/false/true expectation arrays and recursive markForCheck boundary in this commit direction. No timing, rendered accessibility or callback equivalence is claimed for the five changed cases."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "header": "@@ -877,7 +886,6 @@ describe('CdkTree', () => {",
+      "sha256": "37c2d140133bf448f3b2236306627f159a7579cf66d213bde64ddd3397679ea8",
+      "judgment": "Complete CDK/Material spec: retain every case identity and all hooks/helpers/templates. Review the exact leaf/nonleaf null/false/true expectation arrays and recursive markForCheck boundary in this commit direction. No timing, rendered accessibility or callback equivalence is claimed for the five changed cases."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "header": "@@ -324,7 +324,7 @@ export class CdkTree<T, K = T> implements AfterContentChecked, CollectionViewer,",
+      "sha256": "27a57268ca3ec3aa5724bb6d4eed299c7bf3a8713f33fa683c1745e89ece8e1a",
+      "judgment": "Complete runtime: individually review the leaf getter and host binding in this fix/revert/reapply direction. Removing only those nodes leaves identical complete-file runtime semantics. No owned tree dependency or fork."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "header": "@@ -375,26 +375,6 @@ export class CdkTreeNode<T, K = T> implements FocusableOption, OnDestroy, OnInit",
+      "sha256": "f8a62a8796acdc4cdd30c743dd9515ea16c543322035026a6a583c70d9fdde05",
+      "judgment": "Complete runtime: individually review the leaf getter and host binding in this fix/revert/reapply direction. Removing only those nodes leaves identical complete-file runtime semantics. No owned tree dependency or fork."
+    },
+    {
+      "path": "src/material/tree/tree.spec.ts",
+      "header": "@@ -78,14 +78,20 @@ describe('MatTree', () => {",
+      "sha256": "772c77202fca68190f11ffe40d5cfd1d19e80fc3ac0394e2e984269b2b2915d4",
+      "judgment": "Complete CDK/Material spec: retain every case identity and all hooks/helpers/templates. Review the exact leaf/nonleaf null/false/true expectation arrays and recursive markForCheck boundary in this commit direction. No timing, rendered accessibility or callback equivalence is claimed for the five changed cases."
+    },
+    {
+      "path": "src/material/tree/tree.spec.ts",
+      "header": "@@ -464,8 +470,11 @@ describe('MatTree', () => {",
+      "sha256": "beb8aa12b68c50166733d6313bd524009075f4abbfcfb9abe8fbcdc213c4a4d9",
+      "judgment": "Complete CDK/Material spec: retain every case identity and all hooks/helpers/templates. Review the exact leaf/nonleaf null/false/true expectation arrays and recursive markForCheck boundary in this commit direction. No timing, rendered accessibility or callback equivalence is claimed for the five changed cases."
+    },
+    {
+      "path": "src/material/tree/tree.spec.ts",
+      "header": "@@ -477,7 +486,7 @@ describe('MatTree', () => {",
+      "sha256": "fbe2adb28fa40a0decda9e9f85c7f5b0d042784815944e401ed1e3f066ad869e",
+      "judgment": "Complete CDK/Material spec: retain every case identity and all hooks/helpers/templates. Review the exact leaf/nonleaf null/false/true expectation arrays and recursive markForCheck boundary in this commit direction. No timing, rendered accessibility or callback equivalence is claimed for the five changed cases."
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "header": "@@ -127,8 +127,6 @@ export class CdkTreeNode<T, K = T> implements FocusableOption, OnDestroy, OnInit",
+      "sha256": "cc57641879582ca137d62facd45bc2a4d44af41fda7ce9164a51391693cc9af5",
+      "judgment": "Complete untouched upstream API-reference before/after bodies record the exact added/removed public leaf getter or protected type/initializer declaration. This is source contract evidence only; no owned golden is updated."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "review": "Complete CDK/Material spec: retain every case identity and all hooks/helpers/templates. Review the exact leaf/nonleaf null/false/true expectation arrays and recursive markForCheck boundary in this commit direction. No timing, rendered accessibility or callback equivalence is claimed for the five changed cases."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "review": "Complete runtime: individually review the leaf getter and host binding in this fix/revert/reapply direction. Removing only those nodes leaves identical complete-file runtime semantics. No owned tree dependency or fork."
+    },
+    {
+      "path": "src/material/tree/tree.spec.ts",
+      "review": "Complete CDK/Material spec: retain every case identity and all hooks/helpers/templates. Review the exact leaf/nonleaf null/false/true expectation arrays and recursive markForCheck boundary in this commit direction. No timing, rendered accessibility or callback equivalence is claimed for the five changed cases."
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "review": "Complete untouched upstream API-reference before/after bodies record the exact added/removed public leaf getter or protected type/initializer declaration. This is source contract evidence only; no owned golden is updated."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-tree-source-review.json.gz",
+    "sha256": "d0ba97804e63c9d1b03afb8114367f4e36ff7e3f18df64a9bb290e68cbfcf402"
+  },
+  "source_semantics": {
+    "sha": "004a9436d325dc87bde2a4bd37d821dfc6375745",
+    "cases_before": 59,
+    "cases_after": 59,
+    "unchanged_complete_callbacks": 54,
+    "source_conclusion_only": true,
+    "actual_lifecycle_Angular_accessibility_browser_or_floor_qualified": false,
+    "review": "Individually review all four complete files and ten hunks of the revert. Its before/after bodies invert the original fix exactly for the complete CDK runtime, both complete specs and original public API reference. It removes isLeafNode, restores aria-expanded on all nodes and restores the earlier assertions/notification boundary; all59 case identities remain and54 complete callbacks are unchanged. This historical rollback is a real accessibility/contract reversal, not a test-only or docs-only change. It does not cancel the later enumerated reapplication. The whole owned source population has no tree dependency, markup or ordinary fork, so no owned code or consumer style change is applicable. Preserve the revert evidence as its own source judgment without selecting obsolete peer behavior or claiming runtime/floor execution."
+  },
+  "decision": "Individually review all four complete files and ten hunks of the revert. Its before/after bodies invert the original fix exactly for the complete CDK runtime, both complete specs and original public API reference. It removes isLeafNode, restores aria-expanded on all nodes and restores the earlier assertions/notification boundary; all59 case identities remain and54 complete callbacks are unchanged. This historical rollback is a real accessibility/contract reversal, not a test-only or docs-only change. It does not cancel the later enumerated reapplication. The whole owned source population has no tree dependency, markup or ordinary fork, so no owned code or consumer style change is applicable. Preserve the revert evidence as its own source judgment without selecting obsolete peer behavior or claiming runtime/floor execution. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "exact_revert_reapply_relations": [
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "before_sha256": "5cd69846cacffd1e8596a1c917882ae0e3771e2d8fe46dde258582d3617ca1e3",
+      "after_sha256": "2b41289c2ed64ac046824cdc95960a7b3972579b9ecf3b392ce2b26c7af6cc39",
+      "exact_revert_and_byte_identical_reapply": true
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "before_sha256": "eacebcae45da178d842efbf7cc2d5fc27d17a40dfcc157632f1d0ceeacfa9f40",
+      "after_sha256": "21c01c68942aca7cc71a39050047d7e396ce4fb2738fed60accd662a1b3f7e51",
+      "exact_revert_and_byte_identical_reapply": true
+    },
+    {
+      "path": "src/material/tree/tree.spec.ts",
+      "before_sha256": "985edfdeaa43d8f25956b368def0b56103bcda9adba216968d284d7cff2a473f",
+      "after_sha256": "16aa5373bf37e942b409bd2de38ad062bb67747e6ea41f2eea1a51788e99521a",
+      "exact_revert_and_byte_identical_reapply": true
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "before_sha256": "e3155b5b8a16d1257d577dc1f270018c627bf257b3934cbe6997580ec8662b97",
+      "after_sha256": "ec2cf26e5b7f4939ae336387952f60307798d32c4c8ceebef63e885a3b4fc0d3",
+      "exact_revert_and_byte_identical_reapply": true
+    }
+  ],
+  "owned_scope": {
+    "source_members": 1028,
+    "members_sha256": "5d1d290d9405e02363840fb94fb743739ef52a3b9afd9d0f111d418967c77b05",
+    "owned_tree_import_export_dynamic_import_or_require_routes": 0,
+    "ordinary_tree_forks": 0,
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "scope_source_only": true,
+    "actual_peer_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "004a9436d325dc87bde2a4bd37d821dfc6375745",
+    "bucket": "test-only-batch-candidate",
+    "subject": "Revert \"fix(material/tree): aria-expanded attribute should not appear in the leaf node (#29096)\" (#29272)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=2e33898d7f20039b3224b2a5787b8830fe372ae14b21ce208c88c8ad295a9905, bytes=6555). Changed paths: src/cdk/tree/tree.spec.ts, src/cdk/tree/tree.ts, src/material/tree/tree.spec.ts, tools/public_api_guard/cdk/tree.md. Tree is not a retained legacy product family in this package. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+    "batch_id": "needs-triage-testonly-button-tokens-structural-nonshipped-2026-10-01",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "individual_proof": {
+      "diff_sha256": "d4321d4c3382fb01575bf467089627816b3e82c965883acba2a9556aa8183c30",
+      "review_depth": "individual-semantic",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Read upstream patch 004a9436d325dc87bde2a4bd37d821dfc6375745 (Revert \"fix(material/tree): aria-expanded attribute should not appear in the leaf node (#29096)\" (#29272)). It touches 4 paths: src/cdk/tree/tree.spec.ts, src/cdk/tree/tree.ts, src/material/tree/tree.spec.ts, tools/public_api_guard/cdk/tree.md. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
+      "proof_kind": "diff-read"
+    },
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/004a9436d325dc87bde2a4bd37d821dfc6375745.json"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-tree-source-prior.json.gz",
+    "sha256": "11795433f51443715cf3fa82995197bf897ea6576dc6dcc6a3a6d7f88caa3dd1"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-tree-source-applicability",
+    "diff_sha256": "79f5da43a17c0c7916ee523f312d14ff726a024f314f1a94fd1e4f7b6ad25d7f",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Individually review all four complete files and ten hunks of the revert. Its before/after bodies invert the original fix exactly for the complete CDK runtime, both complete specs and original public API reference. It removes isLeafNode, restores aria-expanded on all nodes and restores the earlier assertions/notification boundary; all59 case identities remain and54 complete callbacks are unchanged. This historical rollback is a real accessibility/contract reversal, not a test-only or docs-only change. It does not cancel the later enumerated reapplication. The whole owned source population has no tree dependency, markup or ordinary fork, so no owned code or consumer style change is applicable. Preserve the revert evidence as its own source judgment without selecting obsolete peer behavior or claiming runtime/floor execution. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-tree-source-review.mjs",
+        "sha256": "18715e004a4f9f41ceb112a15db85306098882a69792155f4137c84411af68b6"
+      },
+      {
+        "path": "tests/mixed_tree_source_probe.mjs",
+        "sha256": "faa12a6720a1691bb0ebbbdbe9719d6b7e281e282ad232457412cfcda7957384"
+      },
+      {
+        "path": "tests/test_mixed_tree_source.py",
+        "sha256": "a38cfa9f8eda303e2291abdead2e465a1c6a5eb9c2436ca1fb13896c0602dcdc"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-qualification-record.py",
+        "sha256": "8531d96d81b210b8acbbc0cde95604bf668a253d482d2641c4a719c143f00c93"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-tree-originals.py",
+        "sha256": "f250bfee18b2dff0d21acbf3587be94b7b0e2522fdc0cb71fb2aa50ee1ca23fc"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-authenticator.mjs",
+        "sha256": "5475c715ec2869f0646e85b95cb64b27d5520e49cf9b0630d284202d7716f871"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-subjects.json.gz",
+        "sha256": "ce46de875ed322a07213564aa3bb3365b6b6b6030e81e73c00851d19211ae4b1"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-acquisition.json.gz",
+        "sha256": "c35d8be2a688568397fb2ac1bf646da5dc02c8cd87d6dc2769f4540427f2f47c"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-authentication.json.gz",
+        "sha256": "5107f6b5f9fbc966884a0cc940a87ccf0c9df160da5b6ff49560723dd9b7079a"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-acquisition-checkpoint.json",
+        "sha256": "020d8b7077a95c428c13e71469442331b37892c4f8dd3b7139c803548ae87b65"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-intake.json",
+        "sha256": "d84d492d246902127f89fb20369e3bbe23106f142bf3ddaf2dbca0c0f04564b5"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-observation-pins.json.gz",
+        "sha256": "55c34d2a4c6ed3554f341de1445b9b6776cf04fc20a01c9931d45d7a269f8bec"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-prior.json.gz",
+        "sha256": "11795433f51443715cf3fa82995197bf897ea6576dc6dcc6a3a6d7f88caa3dd1"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-review.json.gz",
+        "sha256": "d0ba97804e63c9d1b03afb8114367f4e36ff7e3f18df64a9bb290e68cbfcf402"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-controls.json",
+        "sha256": "4bae43076406052ac620cf5a23ba3520a09fc15d915d2b9f1858d677fd5bc037"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-python.log.gz",
+        "sha256": "91113567f2a599f4560060d752aef2635d1d307857986fe88e240a75557c0eab"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-cyph-sanity.json",
+        "sha256": "6b21fdacb40a04bd682ceb417fe8379967a7f534fcbe3ba34049d097d525f122"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-tree-source-review.mjs",
+      "sha256": "18715e004a4f9f41ceb112a15db85306098882a69792155f4137c84411af68b6"
+    },
+    {
+      "path": "tests/mixed_tree_source_probe.mjs",
+      "sha256": "faa12a6720a1691bb0ebbbdbe9719d6b7e281e282ad232457412cfcda7957384"
+    },
+    {
+      "path": "tests/test_mixed_tree_source.py",
+      "sha256": "a38cfa9f8eda303e2291abdead2e465a1c6a5eb9c2436ca1fb13896c0602dcdc"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-qualification-record.py",
+      "sha256": "8531d96d81b210b8acbbc0cde95604bf668a253d482d2641c4a719c143f00c93"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-tree-originals.py",
+      "sha256": "f250bfee18b2dff0d21acbf3587be94b7b0e2522fdc0cb71fb2aa50ee1ca23fc"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-authenticator.mjs",
+      "sha256": "5475c715ec2869f0646e85b95cb64b27d5520e49cf9b0630d284202d7716f871"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-subjects.json.gz",
+      "sha256": "ce46de875ed322a07213564aa3bb3365b6b6b6030e81e73c00851d19211ae4b1"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-acquisition.json.gz",
+      "sha256": "c35d8be2a688568397fb2ac1bf646da5dc02c8cd87d6dc2769f4540427f2f47c"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-authentication.json.gz",
+      "sha256": "5107f6b5f9fbc966884a0cc940a87ccf0c9df160da5b6ff49560723dd9b7079a"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-acquisition-checkpoint.json",
+      "sha256": "020d8b7077a95c428c13e71469442331b37892c4f8dd3b7139c803548ae87b65"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-intake.json",
+      "sha256": "d84d492d246902127f89fb20369e3bbe23106f142bf3ddaf2dbca0c0f04564b5"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-observation-pins.json.gz",
+      "sha256": "55c34d2a4c6ed3554f341de1445b9b6776cf04fc20a01c9931d45d7a269f8bec"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-prior.json.gz",
+      "sha256": "11795433f51443715cf3fa82995197bf897ea6576dc6dcc6a3a6d7f88caa3dd1"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-review.json.gz",
+      "sha256": "d0ba97804e63c9d1b03afb8114367f4e36ff7e3f18df64a9bb290e68cbfcf402"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-controls.json",
+      "sha256": "4bae43076406052ac620cf5a23ba3520a09fc15d915d2b9f1858d677fd5bc037"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-python.log.gz",
+      "sha256": "91113567f2a599f4560060d752aef2635d1d307857986fe88e240a75557c0eab"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-cyph-sanity.json",
+      "sha256": "6b21fdacb40a04bd682ceb417fe8379967a7f534fcbe3ba34049d097d525f122"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
