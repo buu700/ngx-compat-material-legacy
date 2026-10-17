@@ -3556,13 +3556,44 @@ describe('MatAutocomplete', () => {
 
   it('should not throw errors when closing without options', fakeAsync(() => {
     const fixture = createComponent(SimpleAutocomplete);
-    fixture.componentInstance.filteredStates = fixture.componentInstance.states = [];
     fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const selected = component.states[1];
+    component.panel.requireSelection = true;
+    component.stateCtrl.setValue(selected);
+    tick();
+    component.filteredStates = component.states = [];
+    fixture.detectChanges();
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(input.value).toBe('California');
+    expect(component.stateCtrl.value).toBe(selected);
     expect(fixture.componentInstance.options.length).toBe(0);
     const trigger = fixture.componentInstance.trigger;
 
     trigger.openPanel();
+    expect(trigger.panelOpen).toBe(false);
     expect(() => trigger.closePanel()).not.toThrow();
+
+    const changes = jasmine.createSpy('empty panel model changes');
+    const selections = jasmine.createSpy('empty panel option selections');
+    const valueSubscription = component.stateCtrl.valueChanges.subscribe(changes);
+    const selectionSubscription = trigger.optionSelections.subscribe(selections);
+    const close = spyOn(trigger, 'closePanel').and.callThrough();
+    trigger.openPanel();
+    fixture.detectChanges();
+    zone.simulateZoneExit();
+    expect(trigger.panelOpen).toBe(false);
+    dispatchFakeEvent(document, 'click');
+    fixture.detectChanges();
+    tick();
+
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(input.value).toBe('California');
+    expect(component.stateCtrl.value).toBe(selected);
+    expect(changes).not.toHaveBeenCalled();
+    expect(selections).not.toHaveBeenCalled();
+    valueSubscription.unsubscribe();
+    selectionSubscription.unsubscribe();
     fixture.destroy();
   }));
 });
