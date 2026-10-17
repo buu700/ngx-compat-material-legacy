@@ -30,6 +30,7 @@ import {BUILD_SCOPE_ROLE,BUILD_SCOPE_PATCHES,buildScopeEvidenceOk} from './upstr
 import {TEST_CONSOLIDATION_ROLE,TEST_CONSOLIDATION_PATCHES,testConsolidationBatchOk,testConsolidationEntryOk} from './upstream-test-consolidation-evidence.mjs';
 import {COMMENT_SCOPE_ROLE,COMMENT_SHAS,commentScopeEvidenceOk} from './upstream-comment-review.mjs';
 import {SLIDER_TOKEN_SHA,SLIDER_TOKEN_ROLE,sliderTokenEvidenceOk} from './upstream-slider-token-evidence.mjs';
+import {SLIDER_RANGE_SHAS,SLIDER_RANGE_ROLE,sliderRangeEvidenceOk} from './upstream-slider-range-followups.mjs';
 import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
@@ -190,6 +191,10 @@ function evidenceClass(entry) {
     if(entry.sha===SLIDER_TOKEN_SHA||body.role===SLIDER_TOKEN_ROLE){
       const readMember=rel=>{const member=regularRepoMember(rel);return member?readFileSync(member):null;};
       if(!sliderTokenEvidenceOk(body,entry,readMember,line||body.line))return 'invalid-slider-token-scope';
+    }
+    if(SLIDER_RANGE_SHAS.includes(entry.sha)||body.role===SLIDER_RANGE_ROLE){
+      const readMember=rel=>{const member=regularRepoMember(rel);return member?readFileSync(member):null;};
+      if(!sliderRangeEvidenceOk(body,entry,readMember,()=>candidateProductSourcePaths(root),line||body.line))return 'invalid-slider-range-followup-scope';
     }
     if (COMMENT_SHAS.includes(entry.sha) || body.role === COMMENT_SCOPE_ROLE) {
       const readMember = rel => {const member = regularRepoMember(rel); return member ? readFileSync(member) : null;};
