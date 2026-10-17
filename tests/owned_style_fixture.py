@@ -16,6 +16,12 @@ def style_receipt(root,active,case,invocation):
         from sass_mixin_fixture import mixin_receipt
         body['reference_kind']='untouched-material-16.2.14-compiled-css'
         body['custom_typography_theme']=mixin_receipt(root,active,'mixin-argument/all-legacy-component-themes/custom-full-theme',invocation)
+    if body['context'] in ('theme-light','theme-dark'):
+        from sass_mixin_fixture import mixin_receipt
+        variant='custom-full-theme' if body['context']=='theme-light' else 'custom-dark-theme'
+        body['reference_kind']='untouched-material-16.2.14-compiled-css'
+        body['custom_theme']=theme=mixin_receipt(root,active,'mixin-argument/all-legacy-component-themes/'+variant,invocation)
+        body['theme_frames']={mode:dict(context=body['context'],body_scope=True,nested_scope=False,overlay_in_body=True,overlay_outside_nested=True,mutation_present=mode=='negative',theme_stylesheet_sha256=theme['expected' if mode=='reference' else 'actual']['css_sha256']) for mode in ('reference','candidate','negative')}
     body['settlement']={mode:dict(fonts_status='loaded',active_animations=0,stable_frames=2,observed_animations=1) for mode in ('reference','candidate','negative')}
     body['identities']={id:dict(reference_sha256=hashlib.sha256((root/'reference/material-16.2.14/sass-css'/f'{id}.css').read_bytes()).hexdigest(),candidate_sha256='e'*64,fixture_sha256=hashlib.sha256((root/'fixtures/sass'/f'{id}.scss').read_bytes()).hexdigest()) for id in ['owned-legacy-select','owned-legacy-snack-bar','owned-legacy-button','05-custom-map-nested']}
     return body

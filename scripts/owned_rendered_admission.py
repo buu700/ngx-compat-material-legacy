@@ -19,7 +19,7 @@ def owned_schema():
 def owned_rendered_ok(root,active,body,invocation):
     try:
         schema=owned_schema()[body['case_id']]
-        reference_kind='untouched-material-16.2.14-compiled-css' if schema['context']=='typography' else 'untouched-material-16.2.14-css'
+        reference_kind=schema['reference_kind']
         if any(body.get(k)!=v for k,v in dict(kind='assertion',result='pass',check_id='sass-seal',group='owned-rendered',run_id=active.manifest['run_id'],invocation_id=invocation,binding=active.binding,line=active.binding['source_line'],source_kind='packed',reference_kind=reference_kind,strict_templates=True,skip_lib_check=False,found=True,mutation_detected=True,selector=schema['selector'],context=schema['context']).items()):return False
         library=[a for a in active.manifest['artifacts'] if a['id']=='library']
         if len(library)!=1 or body['tarball_sha256']!=library[0]['sha256'] or not isinstance(body['browser'],str) or not body['browser']:return False
@@ -40,6 +40,15 @@ def owned_rendered_ok(root,active,body,invocation):
         if schema['context']=='typography':
             theme=body['custom_typography_theme']
             if theme['case_id']!='mixin-argument/all-legacy-component-themes/custom-full-theme' or theme['line']!=active.binding['source_line'] or not mixin_argument_measurements_ok(root,theme):return False
+        if schema['context'] in ('theme-light','theme-dark'):
+            theme=body['custom_theme']
+            variant='custom-full-theme' if schema['context']=='theme-light' else 'custom-dark-theme'
+            if theme['case_id']!='mixin-argument/all-legacy-component-themes/'+variant or theme['line']!=active.binding['source_line'] or not mixin_argument_measurements_ok(root,theme):return False
+            frames=body['theme_frames']
+            if set(frames)!={'reference','candidate','negative'}:return False
+            for mode,frame in frames.items():
+                expected=dict(context=schema['context'],body_scope=True,nested_scope=False,overlay_in_body=True,overlay_outside_nested=True,mutation_present=mode=='negative',theme_stylesheet_sha256=theme['expected' if mode=='reference' else 'actual']['css_sha256'])
+                if frame!=expected or any(type(frame[k]) is not bool for k in ('body_scope','nested_scope','overlay_in_body','overlay_outside_nested','mutation_present')):return False
         props=body['properties']
         if [p['property'] for p in props]!=[p['property'] for p in schema['properties']]:return False
         if any(not isinstance(p['reference'],str) or not p['reference'] or p['candidate']!=p['reference'] for p in props):return False
