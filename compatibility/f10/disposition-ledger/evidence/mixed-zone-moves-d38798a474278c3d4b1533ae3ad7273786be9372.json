@@ -1,0 +1,1062 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "d38798a474278c3d4b1533ae3ad7273786be9372",
+  "subject": "test: Remove MockNgZone (#28775)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/testing/private/mock-ng-zone.ts",
+      "status": "D",
+      "before_mode": "100644",
+      "after_mode": "000000",
+      "before_blob": "5fa5ff1d072a260f0faa4aa1eb670d9cdfd2bc61",
+      "after_blob": "0000000000000000000000000000000000000000"
+    },
+    {
+      "path": "src/cdk/testing/private/public-api.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "8474b1560a5ef70bdefa3bca0442345a5c35e40f",
+      "after_blob": "65555053d1ec2d80c583d3a0f1916b9908e50cb5"
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "fcfeeff6122ce8ed5c5f23dc195fa49ac5b850b6",
+      "after_blob": "4f4a34f8f43f6b434e6edd2d54c5d6ccf4e810db"
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "3adc9c01a5abac6c6bf5098f8f3fc5a1bdbe12d8",
+      "after_blob": "a0a41f7614d57ca3441b56a8710a72e26992814c"
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "91f25693a713c63acd0310035db753b1b377d77e",
+      "after_blob": "a31110447e38d2bb7b69eb390568bfdc177d4a54"
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "2e1b0ad891964cc02023ac815a4ddc968e14f71d",
+      "after_blob": "ef6f88fa3633e4ce1b5b48b2f6893cbfb1d0b55f"
+    }
+  ],
+  "original_files": 6,
+  "original_hunks": 87,
+  "raw_commit_sha256": "795dcb28d3cd3b7e8e0034fee6cdb44fc2c9c5c182a6cbe10619ced56a7e4da9",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+    "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+  },
+  "patch_file": "compatibility/rc/mixed-zone-moves-source-d38798a474278c3d4b1533ae3ad7273786be9372.original.patch",
+  "diff_sha256": "34c7ba605a653d0a17bd8f27bb45be1035586a3bc4d64ec3ede558e39da6700c",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/testing/private/mock-ng-zone.ts",
+      "status": "D",
+      "header": "@@ -1,37 +0,0 @@",
+      "sha256": "91556897faf31326731e078c293af416c368cf7cb84febdaf1aeafa69aef2ac2",
+      "judgment": "Complete deleted 37-line injectable NgZone subclass: synchronous run/runOutsideAngular, owned EventEmitter onStable and simulateZoneExit. Compare its whole class AST to the retained historical shim; equal. Keep local ownership and public Core APIs because historical fixtures still require these notifications."
+    },
+    {
+      "path": "src/cdk/testing/private/public-api.ts",
+      "status": "M",
+      "header": "@@ -6,9 +6,8 @@",
+      "sha256": "44952736aaa93a83722af11efdb3f4450a04447055dcfd25514eac343a060f34",
+      "judgment": "Removes only the private MockNgZone export in the captured complete API file. The owned testing shim remains local; this is not authorization to import a removed or current upstream private helper."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "header": "@@ -15,21 +15,19 @@ import {",
+      "sha256": "33cf61af2ca821db675e81b06252da5a5ceadebcc72891cfdb9abf60612d9fc3",
+      "judgment": "Modern grid fixture removes MockNgZone/NgZone imports, zone variable/provider and two simulateZoneExit calls. Case identities survive, but notification preparation changes. Keep legacy chip-list fixtures and strict lifecycle expectations."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "header": "@@ -42,7 +40,6 @@ describe('MDC-based MatChipGrid', () => {",
+      "sha256": "7d6e59aaaaa3fd12075c8016f07a49f0455470b05df09ecbb55dfc03f307ab85",
+      "judgment": "Modern grid fixture removes MockNgZone/NgZone imports, zone variable/provider and two simulateZoneExit calls. Case identities survive, but notification preparation changes. Keep legacy chip-list fixtures and strict lifecycle expectations."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "header": "@@ -194,7 +191,6 @@ describe('MDC-based MatChipGrid', () => {",
+      "sha256": "30c846fe2fd8af9343488d328516d2f9db317abcf63934439c1e24be6a4317ed",
+      "judgment": "Modern grid fixture removes MockNgZone/NgZone imports, zone variable/provider and two simulateZoneExit calls. Case identities survive, but notification preparation changes. Keep legacy chip-list fixtures and strict lifecycle expectations."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "header": "@@ -720,7 +716,6 @@ describe('MDC-based MatChipGrid', () => {",
+      "sha256": "132277ffaf4f0b6356cef4f77569af0b0b264eb7119424e9b5cf9f7d15a6698a",
+      "judgment": "Modern grid fixture removes MockNgZone/NgZone imports, zone variable/provider and two simulateZoneExit calls. Case identities survive, but notification preparation changes. Keep legacy chip-list fixtures and strict lifecycle expectations."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "header": "@@ -1007,10 +1002,7 @@ describe('MDC-based MatChipGrid', () => {",
+      "sha256": "e1ff9a64003c12010130198fd6574edc3dc217c9b75a7e2810b6b296639fa29d",
+      "judgment": "Modern grid fixture removes MockNgZone/NgZone imports, zone variable/provider and two simulateZoneExit calls. Case identities survive, but notification preparation changes. Keep legacy chip-list fixtures and strict lifecycle expectations."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "status": "M",
+      "header": "@@ -3,20 +3,18 @@ import {END, HOME, LEFT_ARROW, RIGHT_ARROW, SPACE, TAB} from '@angular/cdk/keyco",
+      "sha256": "59cba479d75a0e1978c76d356c3333fec0485cd85930a82f0c69bbad30c1ae9c",
+      "judgment": "Modern listbox fixture removes MockNgZone/NgZone imports, variable/provider and one simulateZoneExit call. Retained callbacks alone do not prove equivalent notification or fixture stability. No modern chip runtime is changed by this commit."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "status": "M",
+      "header": "@@ -28,7 +26,6 @@ describe('MDC-based MatChipListbox', () => {",
+      "sha256": "0069ada32626e87ffdfdddc0aedca807e091636e7f9fc6d2a67e4c6930abf1ce",
+      "judgment": "Modern listbox fixture removes MockNgZone/NgZone imports, variable/provider and one simulateZoneExit call. Retained callbacks alone do not prove equivalent notification or fixture stability. No modern chip runtime is changed by this commit."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "status": "M",
+      "header": "@@ -223,7 +220,6 @@ describe('MDC-based MatChipListbox', () => {",
+      "sha256": "1e321dfc7cd554bc85bad7500ff0083fc40709ed0a05fecd4f5caf45bf5ba038",
+      "judgment": "Modern listbox fixture removes MockNgZone/NgZone imports, variable/provider and one simulateZoneExit call. Retained callbacks alone do not prove equivalent notification or fixture stability. No modern chip runtime is changed by this commit."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "status": "M",
+      "header": "@@ -850,10 +846,7 @@ describe('MDC-based MatChipListbox', () => {",
+      "sha256": "d974b123fb189e46fdf855a76b6f5fa92742ddb094eccdcef4e290dca6386157",
+      "judgment": "Modern listbox fixture removes MockNgZone/NgZone imports, variable/provider and one simulateZoneExit call. Retained callbacks alone do not prove equivalent notification or fixture stability. No modern chip runtime is changed by this commit."
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "header": "@@ -165,15 +165,6 @@",
+      "sha256": "c860a2e93ee05400402f52feff651d8f4f966b286237fa2fdafe489a923ffb18",
+      "judgment": "Removes named zone-use exemptions for drag/overlay/style scheduler/table/autocomplete/chips/form-field/menu/sidenav paths. Historical upstream lint policy is not inherited by this add-on."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -713,6 +713,17 @@",
+      "sha256": "688f39205583f39813ef3aeb215501c9ad2562f7ce7955e614379180cf2b1365",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1142,14 +1153,14 @@",
+      "sha256": "076599fd1f0d95e468ba01aafbe3fa2440267de0a80b1700c11acb6f2a4cb514",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1158,7 +1169,7 @@",
+      "sha256": "465038f4423f378794a0f8066bce3c46805046fb0bbfcf327cc172f8415417de",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1216,14 +1227,14 @@",
+      "sha256": "c551a073d8f97cb06286936ab7c27b8db0aba1af68b1bb6b524eca6ed6b0953a",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1308,7 +1319,7 @@",
+      "sha256": "7d764be90534df091c77f83279d8a9d82ad82381792dc84e6de8ee084df8b622",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1325,7 +1336,7 @@",
+      "sha256": "2cd988e1493415db4a6977cc6d60ff417516e476869d917f2828f4327121e128",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1344,7 +1355,7 @@",
+      "sha256": "cabbe4f9c1dd9bf8d6a3506939f646dff85efd8d654fe9991af2bf3eb76ebe89",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1353,21 +1364,21 @@",
+      "sha256": "62d8751d75c43243ba2c2a799c1c259eb715c4ef2bf8ecb88db23d360f58a7d3",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1375,7 +1386,7 @@",
+      "sha256": "9735ff989491e1a9fecadf50493de256e4c5da8b828a7384d1859b7780084dbf",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1384,7 +1395,7 @@",
+      "sha256": "0997c0ec8965c3c7b6c83f4c52d5531cc2c3122e9188a1319db2e281af0d3ad3",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1398,7 +1409,7 @@",
+      "sha256": "ce9aee6ef7f5b3d9f56a94821a570ab5a807952a1c64f872175676c31f685f02",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1406,14 +1417,14 @@",
+      "sha256": "5b5484cfd5c19ff50b636c864e261ddb77ea4cac81becb281f348184f78994e5",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1421,14 +1432,14 @@",
+      "sha256": "451489c7bcd535c2d1be33515e19167c2601d96e0447c8998b1d2403c2b89cb2",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1436,7 +1447,7 @@",
+      "sha256": "ac2682f351608f3b6a1885d91986534fbc8c114beb24f2b96cb7d55643f2d102",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1444,7 +1455,7 @@",
+      "sha256": "04daefa21cea9ea208ec05544ab3d803956ae06c682050140deaab729aa2618f",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1452,7 +1463,7 @@",
+      "sha256": "07930b7a175d68dbbeac5a84e2df2cccd772cf6fa3d31f188901f5e5f19b1d1b",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1460,7 +1471,7 @@",
+      "sha256": "f278b8dde516611a4ff61dcb77c351e090a074de0966ab03196df4d7e9ecb38b",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1469,7 +1480,7 @@",
+      "sha256": "eb0bd18ff3b588fad27c74b277334fbf12690989f137e5873d50b81863bd82b4",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1477,14 +1488,14 @@",
+      "sha256": "b67da013035c2c68d609ad795fd906003ea1de9a1dd8b089e8b23f38307e3365",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1492,14 +1503,14 @@",
+      "sha256": "854ac8be7a09c0ed31eec7d3ab6102793995096e9b7b8098a2bf830e636882f7",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1507,7 +1518,7 @@",
+      "sha256": "8a6085ed0e1432be0751215598a612923c99a24e2edcbb3cc09714de46dd9fdd",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1516,7 +1527,7 @@",
+      "sha256": "e250c4c77572257a81de76e7e3b826ddc410930106cee0becd0e4724a6ccf0f2",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1526,7 +1537,7 @@",
+      "sha256": "5f7f1112073eb596b301602a2d9f5087e546018d08fa9f84278af6305769af7d",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1542,14 +1553,14 @@",
+      "sha256": "b515550b6984321d2020ea21aa32c20c05ca466c04e2d6f7c51e59835a3e2f14",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1557,7 +1568,7 @@",
+      "sha256": "7d8752477c2f16816efe0c4f940e527c16b5a17410cedc3c0c4c66f8e4695021",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1565,7 +1576,7 @@",
+      "sha256": "208553f8bb99fe63ee51acd48f46691e91912631e8d6a6f320919f229a18e4ea",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1575,7 +1586,7 @@",
+      "sha256": "3f4f1ed34ec18f83a5b3944b5b8aefa33b4a68f7b3b46a9b86c4b7425c2b962c",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1583,7 +1594,7 @@",
+      "sha256": "8032df564c18ed25b5c06aabe367792bb371a7a4423ea2d96b95044995da08bd",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1591,7 +1602,7 @@",
+      "sha256": "be831b75d80139eac1d5dcdd5e4df7575354e1b94e8918d73bd91b87e62095de",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1600,14 +1611,14 @@",
+      "sha256": "f46c2bd314eb0d6a25db17c6683e624e415ac6f70c8d59ff2cfe1aa27c90b7d7",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1615,7 +1626,7 @@",
+      "sha256": "ee46ef7bcd9cb0622714d4a97c12b9e2e2ce47d067fe65a750e8904cce81b5cc",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1625,14 +1636,14 @@",
+      "sha256": "10700522830e204605df07e448eed7c882c5d24ee70c60f39380be17acb0381b",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1640,7 +1651,7 @@",
+      "sha256": "895f6cac7b08640066b93a4bbc297c72b205a5bbe481d69cf2ec3a22c365f63f",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1671,14 +1682,14 @@",
+      "sha256": "ffa8dfc82ea098bc08017e0f96f0e262ac29af42b68826cb57e85c5c8e0ad0d9",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1686,35 +1697,35 @@",
+      "sha256": "108c27f7ff5994ae648d16b657f5c1041b89248fedae113313d49d595b712e80",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1722,7 +1733,7 @@",
+      "sha256": "fac9966a0185ee592c4059339e8d555a782abd942b1defab9f95218d98dee27f",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -1730,7 +1741,7 @@",
+      "sha256": "b60570adce9cf8e00e00962e20f2a183388f6e3cacf8670fe1a379cb29766995",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2090,7 +2101,7 @@",
+      "sha256": "4c1aec4c5ad8bfc369c22da9136172d22b655da92ea9aefff5927049b1b0d57c",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2216,6 +2227,16 @@",
+      "sha256": "c41f67ef220c9a550fd1a4549b1d2d5cf0660cb5a619a888a44bfba63ddc4af6",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2226,6 +2247,16 @@",
+      "sha256": "9f50d18bae56cdf6f58677b384388538eecc74ef52acbf52a13f9d0f89a7df04",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2236,6 +2267,16 @@",
+      "sha256": "92b9ae2506a57f284e19a222d1d8da7182c25e4da74609ee72ba1c72e3cd3d9a",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2246,6 +2287,16 @@",
+      "sha256": "9e8e820548924928217b4c20444dd81753fc112f12e1d8e85a6c45a24e14fa6c",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2256,6 +2307,16 @@",
+      "sha256": "1862e4dbadce7b157f9daef173dde3a57ece274991c6347bc46ee3084eb80a23",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2266,6 +2327,16 @@",
+      "sha256": "26b8ec7b99735740b452ee631572d08e70d05b40c72046d45f658f917a166f75",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2276,6 +2347,16 @@",
+      "sha256": "d847c060d7a5408cb47417703a023a472c64800825cd3f828988553d911cde3e",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2286,6 +2367,16 @@",
+      "sha256": "5b82cb75a606e4edbd5512bdf146c4a6476d4dd4cb2b2f24816019a4dfcd4195",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2296,6 +2387,16 @@",
+      "sha256": "40f6e931d52e66140ed25f56df03b32a89d2c7ba53b7d0bcb6ac30daa78afd77",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2306,6 +2407,16 @@",
+      "sha256": "c6cd770d80de141c68875bcba1796258d8e232cdd824f29161cc3bf8fd16e289",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2316,6 +2427,16 @@",
+      "sha256": "5a5ecd69ac67200d5f363cd039ab84f87fc3953e6e80c3e73e65d78fe24055b5",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2326,6 +2447,16 @@",
+      "sha256": "e36564fc62e7968799d4762773c0e8afd5a3138cf16cdb3c6b06488f39c16e59",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2336,6 +2467,16 @@",
+      "sha256": "9935f7a111a3028e955e76ff9bd2afcfda67faa10682145d387436a63b9a7b02",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2346,6 +2487,16 @@",
+      "sha256": "e6b5a3cb350e61dfb6220e95c29b86253101c6a5ef1948800de202486620d607",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2356,6 +2507,16 @@",
+      "sha256": "5b29b514bd0c5d5ac8acc3f5449e13d4db8c1f2fa97b0cc541f6a39e832d7110",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2366,6 +2527,16 @@",
+      "sha256": "1255390b75e7c5d5b9ac81127dda32fdb71a6a0773cf2b18f6a96f2feda0f624",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2376,6 +2547,16 @@",
+      "sha256": "b4e4eb780584ea30e800ae261ccbcb129d84952566ac14dd9cdc17eb706afefd",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2386,6 +2567,16 @@",
+      "sha256": "8351948473b38190ea91cdb674ea186688653b80c79f0640e967dddefa6accee",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2396,6 +2587,16 @@",
+      "sha256": "8129fbd4a9fd0dc57d62916df7d4ec765377ddb12f113fc1c950d493adb857f2",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2406,6 +2607,16 @@",
+      "sha256": "5496c02c071fa26abb5a4eb1a77488bc8371f24f06fa29e8952de1b97f507cc0",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2416,6 +2627,16 @@",
+      "sha256": "239e7bacbbc94c89329caffc4a8a306806783684160f1a8eb3b132ef7427c1a5",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2426,6 +2647,16 @@",
+      "sha256": "9bcadc84372cb1a2bf24fbda4a6770c16a15a44e528b0661f2797aa67ff721e5",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2436,6 +2667,16 @@",
+      "sha256": "25b9c8a0ab82d6a8e79735624f41e98ee43cec5fcb040ed5adeb6f6b36928135",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2646,18 +2887,18 @@",
+      "sha256": "eb65890d6b5ec5af1948041daaa3fc2f3869fc237f1760a34b189d6d5c3fe56b",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -2672,7 +2913,7 @@",
+      "sha256": "319309c3711f23885f75cbf8204b222a4e43da85f3f6be178ef295a9b635592f",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -4752,7 +4993,7 @@",
+      "sha256": "c3f203c6f72017eb6af05e4aa427d72557dae2a15accc4faf06721e6346db0b5",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -4818,7 +5059,7 @@",
+      "sha256": "6bcadc00707ece165fcb1e518545a79cd091ee9fecc9d719c80f49f745eceb15",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -4853,7 +5094,7 @@",
+      "sha256": "a35bd3b898a4db13f21057dd5e69626c48dbf0f5e7273b4c7a3cb01e0b122da7",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -5443,7 +5684,7 @@ babel-plugin-istanbul@6.1.1:",
+      "sha256": "e761af67551ba711463220c475ef69f229bf6ceb418a1970ac11fda26b75d5d6",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -5460,6 +5701,21 @@ babel-plugin-polyfill-corejs3@^0.10.1, babel-plugin-polyfill-corejs3@^0.10.4:",
+      "sha256": "7dc3153c0860d20c2fd5289b878c1270b95ea48f92f319aae0e59f205b4c94d9",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -6941,7 +7197,7 @@ core-js-compat@^3.31.0:",
+      "sha256": "7ef96895b18f0cda938926017b6bffc8c1f5ff3d0cf1c7f6346e5b8bad50d87d",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -8001,7 +8257,7 @@ engine.io@~6.1.0:",
+      "sha256": "3d724be022510b320f823c3eb375fa48bf0db2f52a2b2c014e238abb6dce3a1d",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -8220,6 +8476,35 @@ esbuild@^0.17.5:",
+      "sha256": "68c9bf07540ae929f7984275d9b48388cfc29147c598eb2431e49d9a7190631d",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -9651,7 +9936,7 @@ graceful-fs@^4.1.10, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0,",
+      "sha256": "8c4d0d0044c67756ca0fa36a91736ee806b714f79c272deb81ff0ef86b2adeb2",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -13655,7 +13940,7 @@ postcss@^8.4.23:",
+      "sha256": "a562d0120727c489f00a1f1d08e0d567076576b58ad3e36272e9977c9cac82ca",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -14600,7 +14885,7 @@ rollup@^2.66.1:",
+      "sha256": "aca56e7322f0c3dad9ad474def352756343c23e3f7be2ac90af8bf58d0f1d437",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    },
+    {
+      "path": "yarn.lock",
+      "status": "M",
+      "header": "@@ -17040,7 +17325,7 @@ watchpack@2.4.0:",
+      "sha256": "e73a47e3a4da9d3aa045a87d85ea1f3ced25de7460f66b9cdf73adc5cfd8bfe0",
+      "judgment": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "src/cdk/testing/private/mock-ng-zone.ts",
+      "review": "Complete deleted 37-line injectable NgZone subclass: synchronous run/runOutsideAngular, owned EventEmitter onStable and simulateZoneExit. Compare its whole class AST to the retained historical shim; equal. Keep local ownership and public Core APIs because historical fixtures still require these notifications."
+    },
+    {
+      "path": "src/cdk/testing/private/public-api.ts",
+      "review": "Removes only the private MockNgZone export in the captured complete API file. The owned testing shim remains local; this is not authorization to import a removed or current upstream private helper."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "review": "Modern grid fixture removes MockNgZone/NgZone imports, zone variable/provider and two simulateZoneExit calls. Case identities survive, but notification preparation changes. Keep legacy chip-list fixtures and strict lifecycle expectations."
+    },
+    {
+      "path": "src/material/chips/chip-listbox.spec.ts",
+      "review": "Modern listbox fixture removes MockNgZone/NgZone imports, variable/provider and one simulateZoneExit call. Retained callbacks alone do not prove equivalent notification or fixture stability. No modern chip runtime is changed by this commit."
+    },
+    {
+      "path": "tslint.json",
+      "review": "Removes named zone-use exemptions for drag/overlay/style scheduler/table/autocomplete/chips/form-field/menu/sidenav paths. Historical upstream lint policy is not inherited by this add-on."
+    },
+    {
+      "path": "yarn.lock",
+      "review": "Complete raw before/after bytes and every Yarn v1 entry header, block hash, version, resolved and integrity field are retained. Includes Babel selector/helper updates and esbuild 0.19/0.20 families. Do not install this obsolete upstream lock, change owned pins or treat this source judgment as an advisory/security clearance."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+    "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+  },
+  "source_semantics": {
+    "sha": "d38798a474278c3d4b1533ae3ad7273786be9372",
+    "runtime": [],
+    "lifecycle": [
+      {
+        "path": "src/cdk/testing/private/mock-ng-zone.ts",
+        "status": "D",
+        "before_present": true,
+        "after_present": false,
+        "before_sha256": "bf04242c0e44a37b6770f9b718b21ce9320cf5dbbc9e60dc4e30469d1cc5eb56",
+        "after_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "src/cdk/testing/private/public-api.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "00c29d2848778a0ea21ae5c9821032739b8578e8a362e00af83a266099bb708a",
+        "after_sha256": "f105a69d07eb7e72ba16778930f28a3b604d29f7b05ea2c2c8f6e11fd5ea6965"
+      },
+      {
+        "path": "src/material/chips/chip-grid.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "6dab5c5373cc19593805f9f1ed56032c38e045ee149d029fd020bc6baa8fef8d",
+        "after_sha256": "81cd8f6e2c60894fbc700f5e25ce9fc6ef6eeddb5845f56d6bbdcae3fcb72dc4"
+      },
+      {
+        "path": "src/material/chips/chip-listbox.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "ccf59765b9824665657c6e57f5849d765abef9129e53f2598ec88ddab4440ed0",
+        "after_sha256": "8e843177aa5e2b5bd88cfaef3735833c6fcf605acd17370cd291274ed590e10b"
+      },
+      {
+        "path": "tslint.json",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "ef10900aa11cd2fe18d8e900fbbe31e6af872a626370915f1c244911f293a568",
+        "after_sha256": "d86db9d7d10ec15faf25a869d9d1a1f12766b28bc37993e8af3bdc2a4ec86ed5"
+      },
+      {
+        "path": "yarn.lock",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "a854ff68e53d5dc8dbce9de518f8451941ee88562e051b30f33e9970c84a5fcd",
+        "after_sha256": "9cafefaa62760a3a986444f8fccddd8f846786ddf176bd199f5512525271d885"
+      }
+    ],
+    "cases_before": 105,
+    "cases_after": 105,
+    "unchanged_complete_callbacks": 102,
+    "exact_reviewed_relocations": 0,
+    "fixture_provider_notification_error_or_lifecycle_equivalence_proved": false,
+    "actual_Angular_native_artifact_browser_SSR_or_floor_qualified": false,
+    "review": "Do not adopt this modern test/tooling migration into the historical legacy runner. The complete deleted MockNgZone class is semantically identical to the locally retained historical shim; autocomplete, chip-list, input and menu fixtures still use explicit simulated zone exits. Modern chip-grid/listbox tests remove two and one zone-exit calls respectively, as well as the MockNgZone provider. That changes notification preparation, even though 102 of 105 complete callbacks remain unchanged. The private export removal authorizes no current private dependency. Historical upstream lint exemptions and Yarn dependency updates are not our pinned workspace toolchain or a dependency-advisory clearance. Retain public Core-based owned mocks, explicit zoneful setup and strict public stability; actual notification, lifecycle, error and peer-floor execution remains required."
+  },
+  "decision": "Do not adopt this modern test/tooling migration into the historical legacy runner. The complete deleted MockNgZone class is semantically identical to the locally retained historical shim; autocomplete, chip-list, input and menu fixtures still use explicit simulated zone exits. Modern chip-grid/listbox tests remove two and one zone-exit calls respectively, as well as the MockNgZone provider. That changes notification preparation, even though 102 of 105 complete callbacks remain unchanged. The private export removal authorizes no current private dependency. Historical upstream lint exemptions and Yarn dependency updates are not our pinned workspace toolchain or a dependency-advisory clearance. Retain public Core-based owned mocks, explicit zoneful setup and strict public stability; actual notification, lifecycle, error and peer-floor execution remains required. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "owned_context": {
+    "source_members": 1028,
+    "members_sha256": "4eea094fdf39828468fc9dfd4d4ae09009e78c4c6d26ce619d9d8a4b3b4dcbd3",
+    "owned_context": [
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+      },
+      {
+        "path": "testing/legacy-runner/shims/mock-ng-zone.ts",
+        "sha256": "bf04242c0e44a37b6770f9b718b21ce9320cf5dbbc9e60dc4e30469d1cc5eb56"
+      },
+      {
+        "path": "testing/legacy-runner/shims/cdk-testing-private.ts",
+        "sha256": "a2ab9af08d1e5e1756a92e6dfd193b1fdcf48cb995ad34de3e05383ac6fc116c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+        "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "413601de7ed5123e022613374e79680c492653fe2e2491a4f5b03db40b0d1b2a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+        "sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945"
+      }
+    ],
+    "retained_deleted_helper_class": {
+      "kind": "ClassDeclaration",
+      "raw": "@Injectable()\nexport class MockNgZone extends NgZone {\n  override readonly onStable = new EventEmitter(false);\n\n  constructor() {\n    super({enableLongStackTrace: false});\n  }\n\n  override run(fn: Function): any {\n    return fn();\n  }\n\n  override runOutsideAngular(fn: Function): any {\n    return fn();\n  }\n\n  simulateZoneExit(): void {\n    this.onStable.emit(null);\n  }\n}",
+      "sha256": "a6a4860f289cd7c067232c3aac65ec6223b5960388f1550233cfdc187f1bb278",
+      "semantic_sha256": "d59f8189b969fb1f0cf660fd6017708c4eb075b4172baa0ae6c48bca4d161adb"
+    },
+    "historical_deleted_class_semantics_equal": true,
+    "current_owned_test_event_mock": {
+      "kind": "ClassDeclaration",
+      "raw": "export class MockNgZone extends NgZone {\n  constructor() {\n    super({enableLongStackTrace: false});\n  }\n\n  override run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T {\n    return fn.apply(applyThis, applyArgs ?? []);\n  }\n\n  override runOutsideAngular<T>(fn: (...args: any[]) => T): T {\n    return fn();\n  }\n\n  simulateZoneExit(): void {\n    (this.onStable as EventEmitter<any>).emit(null);\n  }\n}",
+      "sha256": "19ac1fe5319abb471c73ae63cfa9b6bdad716684dece889e68bd9e04779b9351",
+      "semantic_sha256": "d2a680b25769dab0a8579fccb19dd11c2250b7244268d9df531927d273c3838e"
+    },
+    "explicit_legacy_zoneful_preparation": true,
+    "public_fixture_stability_untouched": true,
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "actual_fixture_Angular_native_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "d38798a474278c3d4b1533ae3ad7273786be9372",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test: Remove MockNgZone (#28775)",
+    "files": [
+      "src/material/chips/chip-grid.spec.ts",
+      "src/material/chips/chip-listbox.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+    "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-zone-moves-source-applicability",
+    "diff_sha256": "34c7ba605a653d0a17bd8f27bb45be1035586a3bc4d64ec3ede558e39da6700c",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Do not adopt this modern test/tooling migration into the historical legacy runner. The complete deleted MockNgZone class is semantically identical to the locally retained historical shim; autocomplete, chip-list, input and menu fixtures still use explicit simulated zone exits. Modern chip-grid/listbox tests remove two and one zone-exit calls respectively, as well as the MockNgZone provider. That changes notification preparation, even though 102 of 105 complete callbacks remain unchanged. The private export removal authorizes no current private dependency. Historical upstream lint exemptions and Yarn dependency updates are not our pinned workspace toolchain or a dependency-advisory clearance. Retain public Core-based owned mocks, explicit zoneful setup and strict public stability; actual notification, lifecycle, error and peer-floor execution remains required. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-zone-moves-source-review.mjs",
+        "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+      },
+      {
+        "path": "tests/mixed_zone_moves_source_probe.mjs",
+        "sha256": "a66dbd79a054f104331f6f90623b5765fcf9f2bd5169ca3c9baee10f79e8ce43"
+      },
+      {
+        "path": "tests/test_mixed_zone_moves_source.py",
+        "sha256": "1ed77b39490f22119af4388b92307c2cdc055c27ba549dfd887b62cfce345e96"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-qualification-record.py",
+        "sha256": "887a2e0e4c2134dba3f40b91176f101508b08d6c22ca39c65f62c0ae57c95a3c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-zone-moves-originals.py",
+        "sha256": "7311cfad4c39b221a8732e01e2f610f4618d4f581bb08d699c44172ff7c061e0"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-authenticator.mjs",
+        "sha256": "ce87034b912c50de87ff80bc68311cf828d2cbbedbd63caf4428d50cbe081133"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+        "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-acquisition.json.gz",
+        "sha256": "28706738deb8f0fe4ff5cdef88e9fcbd2edd5f3d6ddce1acac8d6473b970a2e6"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-authentication.json.gz",
+        "sha256": "0e8eb4b5dcc112b69024aee0ac27b773b22fe47a3866f2f05ce038f6f1633482"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-control-results.json",
+        "sha256": "de72e2b55dfa66c024df9b4c70095477ff378c61ce1cfdd6f16d7a63e8cf7273"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-controls.mjs",
+        "sha256": "ff02fb991b245999d15cb6621d6e58bb2bd401fbeabdb05e5fcb4aa0de5e274a"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-acquisition-checkpoint.json",
+        "sha256": "0f56870a585f667d203423172085e4df9875835f097a995c29f3b0aa4bf96984"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-intake.json",
+        "sha256": "63b375cdb296d8bcb733a8c5504c92ae56fe68becaf7954292ab6ba422e0e6fc"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-observation-pins.json.gz",
+        "sha256": "233903018312f589237200e66edb578a68de745b5c671e345ece1dcda6e5a0b7"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+        "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+        "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-controls.json",
+        "sha256": "de3ca290a067ec4a1be217f8c2206a23439c8752c60f2ba1ef878eb8e52ce2ac"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-python.log.gz",
+        "sha256": "aeb250f884e1a593b218d1839d39ceb7e6fed9ac7972862237dfac0faf03cdae"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-cyph-sanity.json",
+        "sha256": "603c0efe729c92c643cc449d783030e2bb3caaae35262a0f5dbb153b7f20dae4"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-zone-moves-source-review.mjs",
+      "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+    },
+    {
+      "path": "tests/mixed_zone_moves_source_probe.mjs",
+      "sha256": "a66dbd79a054f104331f6f90623b5765fcf9f2bd5169ca3c9baee10f79e8ce43"
+    },
+    {
+      "path": "tests/test_mixed_zone_moves_source.py",
+      "sha256": "1ed77b39490f22119af4388b92307c2cdc055c27ba549dfd887b62cfce345e96"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-qualification-record.py",
+      "sha256": "887a2e0e4c2134dba3f40b91176f101508b08d6c22ca39c65f62c0ae57c95a3c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-zone-moves-originals.py",
+      "sha256": "7311cfad4c39b221a8732e01e2f610f4618d4f581bb08d699c44172ff7c061e0"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-authenticator.mjs",
+      "sha256": "ce87034b912c50de87ff80bc68311cf828d2cbbedbd63caf4428d50cbe081133"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+      "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-acquisition.json.gz",
+      "sha256": "28706738deb8f0fe4ff5cdef88e9fcbd2edd5f3d6ddce1acac8d6473b970a2e6"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-authentication.json.gz",
+      "sha256": "0e8eb4b5dcc112b69024aee0ac27b773b22fe47a3866f2f05ce038f6f1633482"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-control-results.json",
+      "sha256": "de72e2b55dfa66c024df9b4c70095477ff378c61ce1cfdd6f16d7a63e8cf7273"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-controls.mjs",
+      "sha256": "ff02fb991b245999d15cb6621d6e58bb2bd401fbeabdb05e5fcb4aa0de5e274a"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-acquisition-checkpoint.json",
+      "sha256": "0f56870a585f667d203423172085e4df9875835f097a995c29f3b0aa4bf96984"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-intake.json",
+      "sha256": "63b375cdb296d8bcb733a8c5504c92ae56fe68becaf7954292ab6ba422e0e6fc"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-observation-pins.json.gz",
+      "sha256": "233903018312f589237200e66edb578a68de745b5c671e345ece1dcda6e5a0b7"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+      "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+      "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-controls.json",
+      "sha256": "de3ca290a067ec4a1be217f8c2206a23439c8752c60f2ba1ef878eb8e52ce2ac"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-python.log.gz",
+      "sha256": "aeb250f884e1a593b218d1839d39ceb7e6fed9ac7972862237dfac0faf03cdae"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-cyph-sanity.json",
+      "sha256": "603c0efe729c92c643cc449d783030e2bb3caaae35262a0f5dbb153b7f20dae4"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

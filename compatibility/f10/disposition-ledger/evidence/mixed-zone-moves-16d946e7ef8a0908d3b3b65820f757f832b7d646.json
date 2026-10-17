@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "16d946e7ef8a0908d3b3b65820f757f832b7d646",
+  "subject": "test: Fix invalid test that breaks in zoneless (#28815)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "c239266135cc9b43e0cdb9d24c2674cb87c3445d",
+      "after_blob": "7a103af0b6b600be07b3d4174459d7703a5284c6"
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a31110447e38d2bb7b69eb390568bfdc177d4a54",
+      "after_blob": "9f46ae5744a1b375c4664cd28580a230ce70ec07"
+    }
+  ],
+  "original_files": 2,
+  "original_hunks": 3,
+  "raw_commit_sha256": "fe87b4aeb0b094808dc1dce4e1b043952f15dc9325b190c50ed70706331c811c",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+    "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+  },
+  "patch_file": "compatibility/rc/mixed-zone-moves-source-16d946e7ef8a0908d3b3b65820f757f832b7d646.original.patch",
+  "diff_sha256": "fceeadfdc098e8227f64030f891ba34eb109e3e80eb55e307d535d09366cba77",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts",
+      "status": "M",
+      "header": "@@ -1,10 +1,10 @@",
+      "sha256": "aeafcabfc736df94473f138bc6ffa6683c5bf642698fdb0f61e8d24f56964cd7",
+      "judgment": "Import ordering aside, removes the subscribed keydown dispatch and positive appRef.tick==1 tail from one performance case; zero-tick no-subscriber assertions remain. This discarded expectation is substantive, not a proof of callback/notification or keyboard-delivery equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts",
+      "status": "M",
+      "header": "@@ -192,11 +192,6 @@ describe('OverlayKeyboardDispatcher', () => {",
+      "sha256": "1e96dc0454ff6367b793b31c9498a4e8f163b8c6d3f86f4486777e246570ce0d",
+      "judgment": "Import ordering aside, removes the subscribed keydown dispatch and positive appRef.tick==1 tail from one performance case; zero-tick no-subscriber assertions remain. This discarded expectation is substantive, not a proof of callback/notification or keyboard-delivery equivalence."
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "header": "@@ -164,8 +164,7 @@",
+      "sha256": "b1b943ddf87d881afae13a54597fc4ea0f6e3d46320253afc433452698878d7c",
+      "judgment": "Drops the paginated-tab-header zone exemption; no legacy product runtime change or authority to replace local test preparation."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts",
+      "review": "Import ordering aside, removes the subscribed keydown dispatch and positive appRef.tick==1 tail from one performance case; zero-tick no-subscriber assertions remain. This discarded expectation is substantive, not a proof of callback/notification or keyboard-delivery equivalence."
+    },
+    {
+      "path": "tslint.json",
+      "review": "Drops the paginated-tab-header zone exemption; no legacy product runtime change or authority to replace local test preparation."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+    "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+  },
+  "source_semantics": {
+    "sha": "16d946e7ef8a0908d3b3b65820f757f832b7d646",
+    "runtime": [],
+    "lifecycle": [
+      {
+        "path": "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "a4cb5e5657c9c96bc1d3bc4cca80d5b8e7088123abfa65bda69ddadd6278acd0",
+        "after_sha256": "1715dce82a703c5480be0137d7dc8cbdf57147eb455383b32570521164810288"
+      },
+      {
+        "path": "tslint.json",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "d86db9d7d10ec15faf25a869d9d1a1f12766b28bc37993e8af3bdc2a4ec86ed5",
+        "after_sha256": "ed3da13c4beb2b6474fac610ce45f206ba8739cf979f6e8b2708f6b419d0fcc0"
+      }
+    ],
+    "cases_before": 10,
+    "cases_after": 10,
+    "unchanged_complete_callbacks": 9,
+    "exact_reviewed_relocations": 0,
+    "fixture_provider_notification_error_or_lifecycle_equivalence_proved": false,
+    "actual_Angular_native_artifact_browser_SSR_or_floor_qualified": false,
+    "review": "Do not adopt the discarded positive performance expectation as evidence of legacy overlay behavior. The upstream overlay-keyboard spec keeps zero-tick checks without a subscriber but deletes subscription, dispatch and the expected one ApplicationRef.tick call after a subscriber. Nine of ten complete callbacks are unchanged; that does not establish equivalent keyboard delivery or application notification semantics. The import reorder and lint exemption removal require no owned change. Preserve existing legacy overlay tests and public peer delegation. Actual subscribed keyboard delivery, teardown, zoneful/zoneless behavior and advertised peer floors remain execution obligations."
+  },
+  "decision": "Do not adopt the discarded positive performance expectation as evidence of legacy overlay behavior. The upstream overlay-keyboard spec keeps zero-tick checks without a subscriber but deletes subscription, dispatch and the expected one ApplicationRef.tick call after a subscriber. Nine of ten complete callbacks are unchanged; that does not establish equivalent keyboard delivery or application notification semantics. The import reorder and lint exemption removal require no owned change. Preserve existing legacy overlay tests and public peer delegation. Actual subscribed keyboard delivery, teardown, zoneful/zoneless behavior and advertised peer floors remain execution obligations. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "owned_context": {
+    "source_members": 1028,
+    "members_sha256": "4eea094fdf39828468fc9dfd4d4ae09009e78c4c6d26ce619d9d8a4b3b4dcbd3",
+    "owned_context": [
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+      },
+      {
+        "path": "testing/legacy-runner/shims/mock-ng-zone.ts",
+        "sha256": "bf04242c0e44a37b6770f9b718b21ce9320cf5dbbc9e60dc4e30469d1cc5eb56"
+      },
+      {
+        "path": "testing/legacy-runner/shims/cdk-testing-private.ts",
+        "sha256": "a2ab9af08d1e5e1756a92e6dfd193b1fdcf48cb995ad34de3e05383ac6fc116c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+        "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "413601de7ed5123e022613374e79680c492653fe2e2491a4f5b03db40b0d1b2a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+        "sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945"
+      }
+    ],
+    "retained_deleted_helper_class": {
+      "kind": "ClassDeclaration",
+      "raw": "@Injectable()\nexport class MockNgZone extends NgZone {\n  override readonly onStable = new EventEmitter(false);\n\n  constructor() {\n    super({enableLongStackTrace: false});\n  }\n\n  override run(fn: Function): any {\n    return fn();\n  }\n\n  override runOutsideAngular(fn: Function): any {\n    return fn();\n  }\n\n  simulateZoneExit(): void {\n    this.onStable.emit(null);\n  }\n}",
+      "sha256": "a6a4860f289cd7c067232c3aac65ec6223b5960388f1550233cfdc187f1bb278",
+      "semantic_sha256": "d59f8189b969fb1f0cf660fd6017708c4eb075b4172baa0ae6c48bca4d161adb"
+    },
+    "historical_deleted_class_semantics_equal": true,
+    "current_owned_test_event_mock": {
+      "kind": "ClassDeclaration",
+      "raw": "export class MockNgZone extends NgZone {\n  constructor() {\n    super({enableLongStackTrace: false});\n  }\n\n  override run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T {\n    return fn.apply(applyThis, applyArgs ?? []);\n  }\n\n  override runOutsideAngular<T>(fn: (...args: any[]) => T): T {\n    return fn();\n  }\n\n  simulateZoneExit(): void {\n    (this.onStable as EventEmitter<any>).emit(null);\n  }\n}",
+      "sha256": "19ac1fe5319abb471c73ae63cfa9b6bdad716684dece889e68bd9e04779b9351",
+      "semantic_sha256": "d2a680b25769dab0a8579fccb19dd11c2250b7244268d9df531927d273c3838e"
+    },
+    "explicit_legacy_zoneful_preparation": true,
+    "public_fixture_stability_untouched": true,
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "actual_fixture_Angular_native_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "16d946e7ef8a0908d3b3b65820f757f832b7d646",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test: Fix invalid test that breaks in zoneless (#28815)",
+    "files": [
+      "src/cdk/overlay/dispatchers/overlay-keyboard-dispatcher.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+    "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-zone-moves-source-applicability",
+    "diff_sha256": "fceeadfdc098e8227f64030f891ba34eb109e3e80eb55e307d535d09366cba77",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Do not adopt the discarded positive performance expectation as evidence of legacy overlay behavior. The upstream overlay-keyboard spec keeps zero-tick checks without a subscriber but deletes subscription, dispatch and the expected one ApplicationRef.tick call after a subscriber. Nine of ten complete callbacks are unchanged; that does not establish equivalent keyboard delivery or application notification semantics. The import reorder and lint exemption removal require no owned change. Preserve existing legacy overlay tests and public peer delegation. Actual subscribed keyboard delivery, teardown, zoneful/zoneless behavior and advertised peer floors remain execution obligations. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-zone-moves-source-review.mjs",
+        "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+      },
+      {
+        "path": "tests/mixed_zone_moves_source_probe.mjs",
+        "sha256": "a66dbd79a054f104331f6f90623b5765fcf9f2bd5169ca3c9baee10f79e8ce43"
+      },
+      {
+        "path": "tests/test_mixed_zone_moves_source.py",
+        "sha256": "1ed77b39490f22119af4388b92307c2cdc055c27ba549dfd887b62cfce345e96"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-qualification-record.py",
+        "sha256": "887a2e0e4c2134dba3f40b91176f101508b08d6c22ca39c65f62c0ae57c95a3c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-zone-moves-originals.py",
+        "sha256": "7311cfad4c39b221a8732e01e2f610f4618d4f581bb08d699c44172ff7c061e0"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-authenticator.mjs",
+        "sha256": "ce87034b912c50de87ff80bc68311cf828d2cbbedbd63caf4428d50cbe081133"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+        "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-acquisition.json.gz",
+        "sha256": "28706738deb8f0fe4ff5cdef88e9fcbd2edd5f3d6ddce1acac8d6473b970a2e6"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-authentication.json.gz",
+        "sha256": "0e8eb4b5dcc112b69024aee0ac27b773b22fe47a3866f2f05ce038f6f1633482"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-control-results.json",
+        "sha256": "de72e2b55dfa66c024df9b4c70095477ff378c61ce1cfdd6f16d7a63e8cf7273"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-controls.mjs",
+        "sha256": "ff02fb991b245999d15cb6621d6e58bb2bd401fbeabdb05e5fcb4aa0de5e274a"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-acquisition-checkpoint.json",
+        "sha256": "0f56870a585f667d203423172085e4df9875835f097a995c29f3b0aa4bf96984"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-intake.json",
+        "sha256": "63b375cdb296d8bcb733a8c5504c92ae56fe68becaf7954292ab6ba422e0e6fc"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-observation-pins.json.gz",
+        "sha256": "233903018312f589237200e66edb578a68de745b5c671e345ece1dcda6e5a0b7"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+        "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+        "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-controls.json",
+        "sha256": "de3ca290a067ec4a1be217f8c2206a23439c8752c60f2ba1ef878eb8e52ce2ac"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-python.log.gz",
+        "sha256": "aeb250f884e1a593b218d1839d39ceb7e6fed9ac7972862237dfac0faf03cdae"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-cyph-sanity.json",
+        "sha256": "603c0efe729c92c643cc449d783030e2bb3caaae35262a0f5dbb153b7f20dae4"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-zone-moves-source-review.mjs",
+      "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+    },
+    {
+      "path": "tests/mixed_zone_moves_source_probe.mjs",
+      "sha256": "a66dbd79a054f104331f6f90623b5765fcf9f2bd5169ca3c9baee10f79e8ce43"
+    },
+    {
+      "path": "tests/test_mixed_zone_moves_source.py",
+      "sha256": "1ed77b39490f22119af4388b92307c2cdc055c27ba549dfd887b62cfce345e96"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-qualification-record.py",
+      "sha256": "887a2e0e4c2134dba3f40b91176f101508b08d6c22ca39c65f62c0ae57c95a3c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-zone-moves-originals.py",
+      "sha256": "7311cfad4c39b221a8732e01e2f610f4618d4f581bb08d699c44172ff7c061e0"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-authenticator.mjs",
+      "sha256": "ce87034b912c50de87ff80bc68311cf828d2cbbedbd63caf4428d50cbe081133"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+      "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-acquisition.json.gz",
+      "sha256": "28706738deb8f0fe4ff5cdef88e9fcbd2edd5f3d6ddce1acac8d6473b970a2e6"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-authentication.json.gz",
+      "sha256": "0e8eb4b5dcc112b69024aee0ac27b773b22fe47a3866f2f05ce038f6f1633482"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-control-results.json",
+      "sha256": "de72e2b55dfa66c024df9b4c70095477ff378c61ce1cfdd6f16d7a63e8cf7273"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-controls.mjs",
+      "sha256": "ff02fb991b245999d15cb6621d6e58bb2bd401fbeabdb05e5fcb4aa0de5e274a"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-acquisition-checkpoint.json",
+      "sha256": "0f56870a585f667d203423172085e4df9875835f097a995c29f3b0aa4bf96984"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-intake.json",
+      "sha256": "63b375cdb296d8bcb733a8c5504c92ae56fe68becaf7954292ab6ba422e0e6fc"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-observation-pins.json.gz",
+      "sha256": "233903018312f589237200e66edb578a68de745b5c671e345ece1dcda6e5a0b7"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+      "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+      "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-controls.json",
+      "sha256": "de3ca290a067ec4a1be217f8c2206a23439c8752c60f2ba1ef878eb8e52ce2ac"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-python.log.gz",
+      "sha256": "aeb250f884e1a593b218d1839d39ceb7e6fed9ac7972862237dfac0faf03cdae"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-cyph-sanity.json",
+      "sha256": "603c0efe729c92c643cc449d783030e2bb3caaae35262a0f5dbb153b7f20dae4"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

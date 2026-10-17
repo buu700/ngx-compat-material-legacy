@@ -1,0 +1,1665 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "04d3b63de2fb843beb55836e39e930c3342d26f1",
+  "subject": "test: Move more CDK tests to zoneless (#29144)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "8af57b940bd1ff0c2a9eeaf675c0e74370ae4955",
+      "after_blob": "a0d3b07df439de817b60280c2d821092cee8b0ea"
+    },
+    {
+      "path": "src/cdk/menu/menu-base.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "4af909003931a9951370147968ae76a4b66b35e9",
+      "after_blob": "031e323abec30c17019c4e09280cbe38810617d1"
+    },
+    {
+      "path": "src/cdk/menu/menu-trigger.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "00f0a902171af685bd9b9e7629585d3d15286e9b",
+      "after_blob": "a7a681d236e30e358053ec98c4167c9e6c56eace"
+    },
+    {
+      "path": "src/cdk/menu/menu.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "122d8bef7795b4b957dc98bb0180162945024e55",
+      "after_blob": "ce117ca6bf62ef9f0f2d1828f581b5e956b0222e"
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "247163a324e1b56e723b7faf3ca0682b26f3059d",
+      "after_blob": "41b3cb86254f517ce236684acf004b08ec91082a"
+    },
+    {
+      "path": "src/cdk/table/text-column.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "9d0f06f89ae75ca30569fbfaeac54520c99b7bcb",
+      "after_blob": "3bdd9616204fe18b522e105dfbafedf3a9bbc7f7"
+    },
+    {
+      "path": "src/cdk/text-field/autofill.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "2268559e1ac4f6034f6fa7743b3dfcf56de535ea",
+      "after_blob": "6f14e907430c2fac74a2d02235c4fd094ca608ee"
+    },
+    {
+      "path": "src/cdk/text-field/autofill.zone.spec.ts",
+      "status": "A",
+      "before_mode": "000000",
+      "after_mode": "100644",
+      "before_blob": "0000000000000000000000000000000000000000",
+      "after_blob": "5efa4704cca551621a763b8ec6805377e868bcc8"
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "7338b5dc5faa62e777541ad58c1341a3c35d255d",
+      "after_blob": "ad3b159484d9d497c1916d36bd1d235d26810f47"
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "2e21b1bb1a6223704f09fdfd40fbf47400a85f6a",
+      "after_blob": "db8d9eedbb1518829145ffcefc1e44de034a10fe"
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "2b1ee04a1772662e629dce2432df3886b03e0f2b",
+      "after_blob": "9746981bdf4f6065cb41115886dadc5abe63dadd"
+    }
+  ],
+  "original_files": 11,
+  "original_hunks": 112,
+  "raw_commit_sha256": "831bab0f7edada7a515d1e607f3e5ec579d673fba2a73c98bf60efb4b483ce46",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+    "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+  },
+  "patch_file": "compatibility/rc/mixed-zone-moves-source-04d3b63de2fb843beb55836e39e930c3342d26f1.original.patch",
+  "diff_sha256": "61f0e89dd129ae366e2b62ff7131136fea08468bb1e15ab28525a41a405a7ee3",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "status": "M",
+      "header": "@@ -1,21 +1,19 @@",
+      "sha256": "4359ef24919901f53d8a0f5333da2e471bfaa4a0cac5eefc12365017adde895e",
+      "judgment": "Removes explicit zoneful provider and adds marks; four asynchronous destruction cases now set showTrappedRegion=false and render rather than destroying the fixture. Preserve the historical destruction boundary and require real lifecycle execution."
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "status": "M",
+      "header": "@@ -106,6 +104,7 @@ describe('FocusTrap', () => {",
+      "sha256": "5138c9dcdb178d5f9585043f9a1ff4aadedb16551ae647104b6a173f1a4f30d3",
+      "judgment": "Removes explicit zoneful provider and adds marks; four asynchronous destruction cases now set showTrappedRegion=false and render rather than destroying the fixture. Preserve the historical destruction boundary and require real lifecycle execution."
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "status": "M",
+      "header": "@@ -120,6 +119,7 @@ describe('FocusTrap', () => {",
+      "sha256": "39003a1fe89dcf834adaa60debe935a6aa70978a3ec406da5c970d1fbd3fd2da",
+      "judgment": "Removes explicit zoneful provider and adds marks; four asynchronous destruction cases now set showTrappedRegion=false and render rather than destroying the fixture. Preserve the historical destruction boundary and require real lifecycle execution."
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "status": "M",
+      "header": "@@ -216,12 +216,16 @@ describe('FocusTrap', () => {",
+      "sha256": "02de478c1a32cc10d7b1d9a859cacf9583c9a11ebe8e67334a8850fd80ac4741",
+      "judgment": "Removes explicit zoneful provider and adds marks; four asynchronous destruction cases now set showTrappedRegion=false and render rather than destroying the fixture. Preserve the historical destruction boundary and require real lifecycle execution."
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "status": "M",
+      "header": "@@ -230,6 +234,7 @@ describe('FocusTrap', () => {",
+      "sha256": "a2061c863752cab0d44f8d2003d506ea4ce542be1f1a421711eeaf47302bdd55",
+      "judgment": "Removes explicit zoneful provider and adds marks; four asynchronous destruction cases now set showTrappedRegion=false and render rather than destroying the fixture. Preserve the historical destruction boundary and require real lifecycle execution."
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "status": "M",
+      "header": "@@ -237,12 +242,16 @@ describe('FocusTrap', () => {",
+      "sha256": "0cb73ef74737bfad019aca24abbd6b2cc372a5e067dd54b57cd57417f95ff2c3",
+      "judgment": "Removes explicit zoneful provider and adds marks; four asynchronous destruction cases now set showTrappedRegion=false and render rather than destroying the fixture. Preserve the historical destruction boundary and require real lifecycle execution."
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "status": "M",
+      "header": "@@ -260,12 +269,16 @@ describe('FocusTrap', () => {",
+      "sha256": "118221a83d656ee7ebb55de22528fc459835ff54794003a3f99d99991c6ed5f1",
+      "judgment": "Removes explicit zoneful provider and adds marks; four asynchronous destruction cases now set showTrappedRegion=false and render rather than destroying the fixture. Preserve the historical destruction boundary and require real lifecycle execution."
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "status": "M",
+      "header": "@@ -278,6 +291,7 @@ describe('FocusTrap', () => {",
+      "sha256": "82979219067e1c95eb64672aa41a3fa2cfffde6008fa5825fe66eb1e84f78dc0",
+      "judgment": "Removes explicit zoneful provider and adds marks; four asynchronous destruction cases now set showTrappedRegion=false and render rather than destroying the fixture. Preserve the historical destruction boundary and require real lifecycle execution."
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "status": "M",
+      "header": "@@ -285,12 +299,16 @@ describe('FocusTrap', () => {",
+      "sha256": "8ae5ce75aa9cef5331272482cc35c43aa0c2cd039201cc5920e8c416a0527767",
+      "judgment": "Removes explicit zoneful provider and adds marks; four asynchronous destruction cases now set showTrappedRegion=false and render rather than destroying the fixture. Preserve the historical destruction boundary and require real lifecycle execution."
+    },
+    {
+      "path": "src/cdk/menu/menu-base.ts",
+      "status": "M",
+      "header": "@@ -6,27 +6,29 @@",
+      "sha256": "3a0b0fd0dbd9242a29c1da49f543c1074310141d0532c8245dae1fbcd3728f05",
+      "judgment": "Exact runtime change: boolean focus state becomes signal(false), computed tabindex derives from isInline/focus, getter reads it, and stack subscription calls set. Record complete import/member frames; all other AST operations unchanged. Owned legacy menu has no CDK menu dependency or fork."
+    },
+    {
+      "path": "src/cdk/menu/menu-base.ts",
+      "status": "M",
+      "header": "@@ -97,7 +99,12 @@ export abstract class CdkMenuBase",
+      "sha256": "150ba55fd7ccb5d0dc9cfd967d2d90b7b8cbb1cd2b014dca827ade53272e6246",
+      "judgment": "Exact runtime change: boolean focus state becomes signal(false), computed tabindex derives from isInline/focus, getter reads it, and stack subscription calls set. Record complete import/member frames; all other AST operations unchanged. Owned legacy menu has no CDK menu dependency or fork."
+    },
+    {
+      "path": "src/cdk/menu/menu-base.ts",
+      "status": "M",
+      "header": "@@ -137,8 +144,7 @@ export abstract class CdkMenuBase",
+      "sha256": "74e37c39e9baa254119800ccace260865a49a2762e67f5c94708c0e94d770fbe",
+      "judgment": "Exact runtime change: boolean focus state becomes signal(false), computed tabindex derives from isInline/focus, getter reads it, and stack subscription calls set. Record complete import/member frames; all other AST operations unchanged. Owned legacy menu has no CDK menu dependency or fork."
+    },
+    {
+      "path": "src/cdk/menu/menu-base.ts",
+      "status": "M",
+      "header": "@@ -211,7 +217,7 @@ export abstract class CdkMenuBase",
+      "sha256": "5ca5743b188125b2472d089b3d415c641fd341c4ea7ce153601ca493d8d653ab",
+      "judgment": "Exact runtime change: boolean focus state becomes signal(false), computed tabindex derives from isInline/focus, getter reads it, and stack subscription calls set. Record complete import/member frames; all other AST operations unchanged. Owned legacy menu has no CDK menu dependency or fork."
+    },
+    {
+      "path": "src/cdk/menu/menu-trigger.spec.ts",
+      "status": "M",
+      "header": "@@ -1,13 +1,5 @@",
+      "sha256": "e0cd994ef97a8ab6b49bd83969a61b67d06bb4ce0414cc96cd20a219a76087ab",
+      "judgment": "Removes zoneful test provider from modern CDK menu trigger fixture. Provider preparation differs even where callbacks are equal; do not replace legacy menu trigger tests."
+    },
+    {
+      "path": "src/cdk/menu/menu-trigger.spec.ts",
+      "status": "M",
+      "header": "@@ -122,7 +114,6 @@ describe('MenuTrigger', () => {",
+      "sha256": "a5e82ecce98eb916c1dd922e0e92a51143acd43868bce611799527314b6256ba",
+      "judgment": "Removes zoneful test provider from modern CDK menu trigger fixture. Provider preparation differs even where callbacks are equal; do not replace legacy menu trigger tests."
+    },
+    {
+      "path": "src/cdk/menu/menu-trigger.spec.ts",
+      "status": "M",
+      "header": "@@ -161,6 +152,7 @@ describe('MenuTrigger', () => {",
+      "sha256": "a0e4f6a7755f92073dca8fb68a7ae3eb165f6d8a4ec7528a1c2e5ab1a54ed707",
+      "judgment": "Removes zoneful test provider from modern CDK menu trigger fixture. Provider preparation differs even where callbacks are equal; do not replace legacy menu trigger tests."
+    },
+    {
+      "path": "src/cdk/menu/menu.spec.ts",
+      "status": "M",
+      "header": "@@ -1,12 +1,5 @@",
+      "sha256": "c9c9218e0adcd1910ea55eb5effedaad95c3c00f28f59c4e1c41e77596af286a",
+      "judgment": "Removes zoneful provider and adds an explicit notification mark in modern CDK menu tests. Runtime menu focus change is separately reviewed; preserve legacy constructor/structure and owned fixture behavior."
+    },
+    {
+      "path": "src/cdk/menu/menu.spec.ts",
+      "status": "M",
+      "header": "@@ -145,7 +138,6 @@ describe('Menu', () => {",
+      "sha256": "22153267aec0265ea1081dc328896e8765dc53fc72eb5a51b0be77cc2e881290",
+      "judgment": "Removes zoneful provider and adds an explicit notification mark in modern CDK menu tests. Runtime menu focus change is separately reviewed; preserve legacy constructor/structure and owned fixture behavior."
+    },
+    {
+      "path": "src/cdk/menu/menu.spec.ts",
+      "status": "M",
+      "header": "@@ -337,7 +329,6 @@ describe('Menu', () => {",
+      "sha256": "b21ff574eb63c4fea286df84491c70eecd07c17cdb39f1990c151d17b03ba7f5",
+      "judgment": "Removes zoneful provider and adds an explicit notification mark in modern CDK menu tests. Runtime menu focus change is separately reviewed; preserve legacy constructor/structure and owned fixture behavior."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1,6 +1,10 @@",
+      "sha256": "f82a2b72f8a0ca25190a571e3515033819390eb3414bab4a93bd42533ff7908f",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -8,12 +12,10 @@ import {",
+      "sha256": "3365f6875d621d987d612ef757c26ca38fe5b73b8bcf24529bdd846e358dc63f",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -22,7 +24,7 @@ import {",
+      "sha256": "ae6838d081f0f0f6ec279115701d35f9468e202ecea7cfb8f791fa21a972b4fd",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -32,7 +34,6 @@ import {",
+      "sha256": "d62e65a490ed1f41811374da4ae7fd9702c9c4aeaa835dcf830bfa8ddb60c825",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -44,7 +45,6 @@ describe('CdkTable', () => {",
+      "sha256": "88ffc80c120e03d9038b0625073a8879642fbef1615381393a9cee9d030f2c2b",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -285,6 +285,7 @@ describe('CdkTable', () => {",
+      "sha256": "0be716893f38f842b95da12ec95454fe1a91f5eb8b644fce394933725dff97b1",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -389,6 +390,7 @@ describe('CdkTable', () => {",
+      "sha256": "b0b43ea6522ef0c2367b1f6256fadfa2f8a5aa5845803f2d1853036c7ff885b3",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -420,12 +422,14 @@ describe('CdkTable', () => {",
+      "sha256": "0e3231a1bf5f12adba4f80a5ac9672a82a12f4df03019b8dff752a5af4eec75e",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -435,6 +439,7 @@ describe('CdkTable', () => {",
+      "sha256": "e053ae045a1b2a256e657e7417c067c6531054cd83b3f08375786dccc410317d",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -470,12 +475,14 @@ describe('CdkTable', () => {",
+      "sha256": "68b0902eceaee461418819ae9eb156932755b49b2180f0f17834c08ea5b9f755",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -483,12 +490,14 @@ describe('CdkTable', () => {",
+      "sha256": "907958688edf57124d180215c8169b99cdadac48e71a1da0c4f01f8aba0d5c29",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -720,6 +729,7 @@ describe('CdkTable', () => {",
+      "sha256": "030c10c1c86b5b752e7692560da5456873512d61f213224b8243e9b25e4d7b44",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -731,6 +741,7 @@ describe('CdkTable', () => {",
+      "sha256": "ad1e2b2b768796538fd3712e2b99e0af39c309f8ff93b70bc948e8447889fe8d",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -741,6 +752,7 @@ describe('CdkTable', () => {",
+      "sha256": "3cddd2698f638a2b96493ea2326c1e0d4de1e884b32cc4784201025f96426920",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -791,12 +803,9 @@ describe('CdkTable', () => {",
+      "sha256": "b4b0da617ae07ce2eaa68ad63e9c5f6ebb0d48e70cb59030ba95dc4b5a9edaba",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -812,6 +821,7 @@ describe('CdkTable', () => {",
+      "sha256": "2eb73b5f069476a93445f6b7bf7bbfe5f9fd2197570848411f935efdbf0203c4",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -829,6 +839,7 @@ describe('CdkTable', () => {",
+      "sha256": "6fc96d6e723d2624af4b06d2d9d016f69592540ed4a8635e72e11b8b71bd0ad5",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -849,6 +860,7 @@ describe('CdkTable', () => {",
+      "sha256": "1cdd97e4cc5c1e0369c26488c30099cd60f570f274257430e09567c6560fb282",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -970,6 +982,7 @@ describe('CdkTable', () => {",
+      "sha256": "f78a2843eb12fd57e4ae60021eac3645f8a39d786db9f69a108209b97fc17108",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -998,6 +1011,7 @@ describe('CdkTable', () => {",
+      "sha256": "5c48be7114d36a692e975b590c2cf2bef33eb9d4696a4cc91825a54c3ba3700d",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1017,6 +1031,7 @@ describe('CdkTable', () => {",
+      "sha256": "3d17ee9483c3a41ed5ee4cf38237ebc06829bf031a12c556d251b332a6ef992e",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1045,6 +1060,7 @@ describe('CdkTable', () => {",
+      "sha256": "b1d0c31eea935698856bad8051e6f7fcfc901cbbfddb52ec0d9e66c79a574f9c",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1064,6 +1080,7 @@ describe('CdkTable', () => {",
+      "sha256": "8f8f9a4faf727b46b5beb50c18ccc36f1296951cf1bec40059fd337f74125787",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1074,6 +1091,7 @@ describe('CdkTable', () => {",
+      "sha256": "5ff4b2e676d3dcaf5f4ab67f0cf3440ecb65c78ee0a967479e79900c8d70a7b2",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1121,6 +1139,7 @@ describe('CdkTable', () => {",
+      "sha256": "48f9bea35d31a15781442c86f20e3637b28d6ed5c9af6fd02bc772f962ce0934",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1142,6 +1161,7 @@ describe('CdkTable', () => {",
+      "sha256": "bc976e6deb2e2239829a9b2c368d45846cc5f8f2421d3ddc8b4cd828f069e527",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1189,6 +1209,7 @@ describe('CdkTable', () => {",
+      "sha256": "56eb67d6ba54f62993511dd426d82a5ace8021cf512479511cdd2183a6a418c3",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1212,6 +1233,7 @@ describe('CdkTable', () => {",
+      "sha256": "2b725a85d9a400fd32c19fad61cf34c092186e1141c6a514781472aa27c53503",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1256,6 +1278,7 @@ describe('CdkTable', () => {",
+      "sha256": "1137c37226cc30ce4bc8bca343935aa875b4b2515ec0377c7e07dfa1b547a7b3",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1309,6 +1332,7 @@ describe('CdkTable', () => {",
+      "sha256": "f41b59a34505e5ea6562a3fc557b7c9b6d1bdbd9481d328726017ba1f8f05bf6",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1346,6 +1370,7 @@ describe('CdkTable', () => {",
+      "sha256": "d7dbabaaf955fd169cfdc3a48cc6453bb2479668522010771e28052453c6e5a6",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1378,6 +1403,7 @@ describe('CdkTable', () => {",
+      "sha256": "5d01bc1bb6c896dcfa515788ad8d07c2b83e2021bc23d681b9279ec91cea7dff",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1398,6 +1424,7 @@ describe('CdkTable', () => {",
+      "sha256": "12cc92f24fd99c2f5cc152db956b506c745d304c8ff17f28eb86fbf6fe8e636c",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1430,6 +1457,7 @@ describe('CdkTable', () => {",
+      "sha256": "59e5f828c52ba67ce9e9b1039f7f52b173e5bca899cacf78566bd52f09edbcb3",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1451,17 +1479,20 @@ describe('CdkTable', () => {",
+      "sha256": "f029bbb43ec697306e3d14ae65062a376bbe1f52c04c6083f5c3ef9673a619d0",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1469,6 +1500,7 @@ describe('CdkTable', () => {",
+      "sha256": "714a7ab0aa60e873aa1341e171b72401ddc38e6b173f6531619734ae17548c13",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1516,6 +1548,7 @@ describe('CdkTable', () => {",
+      "sha256": "93c3f41d5adfcc624b61d8c33bd7c0b64e8a14e13cbf87d484e8e5496a9147f8",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1537,6 +1570,7 @@ describe('CdkTable', () => {",
+      "sha256": "b5414bc8973c3c4cc531ea55f5815355e1c127a2e9562d5da9c77f6101b331b1",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1584,6 +1618,7 @@ describe('CdkTable', () => {",
+      "sha256": "e7fbb1ca3ee117c3001eca288a11f4f0258a1765e0d3ffc16e4e8916b2b2e2a5",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1608,6 +1643,7 @@ describe('CdkTable', () => {",
+      "sha256": "42bc6651a977acdcca4437e6643dbf7cc1dd86c1589cd7f69c3bbe11e3154d67",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1671,6 +1707,7 @@ describe('CdkTable', () => {",
+      "sha256": "f8972dc90d8931ad9b408b709dec96e968f12d4e3e9908a75a3307724bbaa938",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1837,6 +1874,7 @@ describe('CdkTable', () => {",
+      "sha256": "bda4cc9f9427eaa9cde50cc8ed2f55496e315a0383904235fc1734c7050a77ad",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1845,6 +1883,7 @@ describe('CdkTable', () => {",
+      "sha256": "d2b191b730194ca4c6e18b9f833a2c7a824febf83208b47ebd12db0f1154a6ce",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1854,6 +1893,7 @@ describe('CdkTable', () => {",
+      "sha256": "3af433b66c4d781340c497c7cbf4908c3646f721039dc81aecc8800a27a0a421",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1881,6 +1921,7 @@ describe('CdkTable', () => {",
+      "sha256": "1994f3c44355481f8d4ee8c9d63d945ba3f60351334751808b6e9c6f29d03fca",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -1917,6 +1958,7 @@ describe('CdkTable', () => {",
+      "sha256": "cc6c8753019492eda73bdaf39a0d1c939b6bf8d1895a438cd2c738d26d7d4729",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -2205,6 +2247,7 @@ class WhenRowCdkTableApp {",
+      "sha256": "fa0e9b7ef0ee646777b304bdfd70d1dd10a65b5bd08e9cc299880fb689e4d478",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -2217,6 +2260,7 @@ class WhenRowCdkTableApp {",
+      "sha256": "f5fa0a0783ef90010d1cbd0c9a8f321831146285f4a4260dce5ef8339ccac7b7",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -2669,10 +2713,12 @@ class MissingColumnDefCdkTableApp {",
+      "sha256": "2f319962bca3c30a60b127b177672bb4faf360b6dcd7eb1c89c6dcb2014515e9",
+      "judgment": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/text-column.spec.ts",
+      "status": "M",
+      "header": "@@ -1,9 +1,9 @@",
+      "sha256": "ef2b5796357ccf08c6e251062e17185b4c684894b4110dd92441a8cbc526fac4",
+      "judgment": "Provider removal and explicit fixture notification marks for text-column changes. Equal assertions do not establish equal scheduling; no owned CDK table fork or historical fixture rewrite."
+    },
+    {
+      "path": "src/cdk/table/text-column.spec.ts",
+      "status": "M",
+      "header": "@@ -16,7 +16,6 @@ describe('CdkTextColumn', () => {",
+      "sha256": "5b38dcd247f218bb0f6663a3eb166474520bbae843271554ee2efba5a5029f94",
+      "judgment": "Provider removal and explicit fixture notification marks for text-column changes. Equal assertions do not establish equal scheduling; no owned CDK table fork or historical fixture rewrite."
+    },
+    {
+      "path": "src/cdk/table/text-column.spec.ts",
+      "status": "M",
+      "header": "@@ -51,6 +50,7 @@ describe('CdkTextColumn', () => {",
+      "sha256": "ced300d34342bd0333d48cc966f4350e406dc6ae5cec58e5f29e9212677f6526",
+      "judgment": "Provider removal and explicit fixture notification marks for text-column changes. Equal assertions do not establish equal scheduling; no owned CDK table fork or historical fixture rewrite."
+    },
+    {
+      "path": "src/cdk/table/text-column.spec.ts",
+      "status": "M",
+      "header": "@@ -62,6 +62,7 @@ describe('CdkTextColumn', () => {",
+      "sha256": "66d31d3a81b457a811f6a295aeec56bfd987afcee749ccd933275ff4788c5716",
+      "judgment": "Provider removal and explicit fixture notification marks for text-column changes. Equal assertions do not establish equal scheduling; no owned CDK table fork or historical fixture rewrite."
+    },
+    {
+      "path": "src/cdk/table/text-column.spec.ts",
+      "status": "M",
+      "header": "@@ -73,6 +74,7 @@ describe('CdkTextColumn', () => {",
+      "sha256": "5838cce6e46017274793b3efad1e6afd2dc3e22bd4db09d922cf1767668b2a84",
+      "judgment": "Provider removal and explicit fixture notification marks for text-column changes. Equal assertions do not establish equal scheduling; no owned CDK table fork or historical fixture rewrite."
+    },
+    {
+      "path": "src/cdk/table/text-column.spec.ts",
+      "status": "M",
+      "header": "@@ -87,6 +89,7 @@ describe('CdkTextColumn', () => {",
+      "sha256": "69157af94ee20f715dd0077a1defe85e5bd3a4ce26b4f2903456e36bc029b802",
+      "judgment": "Provider removal and explicit fixture notification marks for text-column changes. Equal assertions do not establish equal scheduling; no owned CDK table fork or historical fixture rewrite."
+    },
+    {
+      "path": "src/cdk/text-field/autofill.spec.ts",
+      "status": "M",
+      "header": "@@ -7,8 +7,8 @@",
+      "sha256": "63a6e8a1a4da3cfb282e66603e89aa4760851efdb87c0a427d611e73e367414b",
+      "judgment": "Moves the single inside-NgZone stream case out, removes explicit zoneful provider/import and retains all remaining cases. Pair the removed callback only with its exact added-zone counterpart, not with a filtered population."
+    },
+    {
+      "path": "src/cdk/text-field/autofill.spec.ts",
+      "status": "M",
+      "header": "@@ -22,7 +22,6 @@ describe('AutofillMonitor', () => {",
+      "sha256": "93b7adcfdb2291d881e68811900ed26e9b849f14a71869785b51bc61a7b38540",
+      "judgment": "Moves the single inside-NgZone stream case out, removes explicit zoneful provider/import and retains all remaining cases. Pair the removed callback only with its exact added-zone counterpart, not with a filtered population."
+    },
+    {
+      "path": "src/cdk/text-field/autofill.spec.ts",
+      "status": "M",
+      "header": "@@ -154,22 +153,6 @@ describe('AutofillMonitor', () => {",
+      "sha256": "3fbd85655b9b496d88660bc6ed9f9de7dc4cccc9c27398ec78148bfd363959b6",
+      "judgment": "Moves the single inside-NgZone stream case out, removes explicit zoneful provider/import and retains all remaining cases. Pair the removed callback only with its exact added-zone counterpart, not with a filtered population."
+    },
+    {
+      "path": "src/cdk/text-field/autofill.zone.spec.ts",
+      "status": "A",
+      "header": "@@ -0,0 +1,61 @@",
+      "sha256": "b990ab8e93f836adb9390ef9bab8dd0c2fe75c36962ce8efcd4c36537c3ba47f",
+      "judgment": "New complete standalone Inputs fixture with TextFieldModule and provideZoneChangeDetection, preserving the exact moved stream callback. Added file has an authenticated absent before-image. Fixture setup is separately captured; callback equality is not provider/lifetime equivalence."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -1,16 +1,16 @@",
+      "sha256": "29222ee82c3fd7e8e4eb37adf9a23b247e72458c8438c01ef654292f35b43518",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -21,7 +21,6 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "cdcc8c68a06a99df9c2607be5d78ed6f85a49bb87dccd35c6a1edbc5784d92f1",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -103,6 +102,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "5302d9007983319dab17753d496ef5c25313f3b7622fe339c836efba886ccef8",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -127,6 +127,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "6398541e60b340766a038ba8134a1ff63981aea31ae0e05a087cde64dbe257b6",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -135,6 +136,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "4d53bf0e08ec655c1225fa4a5e9926c17ca7d6adf542d7e8287b5b1001779ede",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -146,6 +148,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "f06580250461a906dc471e219b3610e987551c4f22d4aae3f4b93cb9044194fd",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -154,6 +157,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "7492d8dc9e61e389e789b06b1deb464d51de972fe6146b5c4141dab39cbd7622",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -165,6 +169,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "a75dd87218adb4da2ca65d98866a88d29a989e2451b01c82049f910c254341dd",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -173,6 +178,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "5af5fe67995502749ab1334b741402d697d2b91b6b5ab68f1f0e0cf444868fd7",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -191,6 +197,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "befe04b20d95ae0835eb0a02304b3fc13d16a00fae5183e7a2f988cadfaa02f3",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -200,6 +207,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "57d6e5446a225e4dd914f7943f9d78c3457cdd886b4755b29a5aa60fc06985c9",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -224,6 +232,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "4f9bc98ac27895c2113609341a957a746e9b948aacddd0570ce4bb3763baa455",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -246,6 +255,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "8a34e8153f97d1dab4ad6215c03d7d61347cf27337eca4b4c894f7226ad97438",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -269,6 +279,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "755573d914a4ff35561a92f173e844cfea488212fabc940558fc7e21407e8062",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -291,6 +302,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "2eb440ff8f77d59917cb13daeefcf97397bee429a09273230d4d8c9c94904f41",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -308,6 +320,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "221de867881152ee8bafb7676052b821f85a38ed7c2c18390310031c410c8693",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -343,6 +356,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "9ee546b7254bcdbedefbf3f96bc569d205e87f1b72dea580dca92160161c3c9f",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "status": "M",
+      "header": "@@ -377,6 +391,7 @@ describe('CdkTextareaAutosize', () => {",
+      "sha256": "e341e31326901af471d70f5b90a86664719139a606c2f01e0f12ba0309fe3a3e",
+      "judgment": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -5,28 +5,29 @@",
+      "sha256": "0b193507b60914e6c419d7900ef97e163f442f74beec8b6402642b434a082961",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -43,7 +44,6 @@ describe('CdkTree', () => {",
+      "sha256": "7b60b7cbfa7d80d7ab96ee5a3a7d223345063de740faea0565286971fc22bfeb",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -134,6 +134,7 @@ describe('CdkTree', () => {",
+      "sha256": "a1925fbb21a7efbadbeaff02a4e3d0b1fbdc8735968e7395698cfafc1242e697",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -191,6 +192,7 @@ describe('CdkTree', () => {",
+      "sha256": "ee3f2b3edbcaa10bb5457e0c78e1ca4768d496f1031cd74e5260f6eb1630c024",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -207,6 +209,7 @@ describe('CdkTree', () => {",
+      "sha256": "9d54aaf6e6bcfbf1e154f64f5c5810f4afc745b6b52d0b1bbae785165ccc4614",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -241,6 +244,7 @@ describe('CdkTree', () => {",
+      "sha256": "13f199378fbdea425f632fd98d31ff877ba36f774d347e7ac9dc59337220af84",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -279,6 +283,7 @@ describe('CdkTree', () => {",
+      "sha256": "50e8ded14847cc159b46fcad274113f538ec96c4e7085748329eea90d4e91963",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -807,6 +812,7 @@ describe('CdkTree', () => {",
+      "sha256": "23bb6fcf7ce8a9a552c3186d593605c7ebb0002b232f520a06ed32eaca58f7cc",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -821,6 +827,7 @@ describe('CdkTree', () => {",
+      "sha256": "68c618010ed044bc9e3bd2a56dc0f66c6281fedcb8eb0ac9f077ac6419e383f3",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -1136,8 +1143,6 @@ describe('CdkTree', () => {",
+      "sha256": "5195efa30fac6a1ad9b0321059b4664af9797cfb60828e06c281c595cbddb72b",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -1147,12 +1152,8 @@ describe('CdkTree', () => {",
+      "sha256": "62902fce696d3dd66208863392b9d42011a4c320e4bd6f6484b6a35938bf5467",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "status": "M",
+      "header": "@@ -1574,6 +1575,14 @@ class ArrayDataSourceCdkTreeApp {",
+      "sha256": "86e7a2f49a175695d6b265f59462cf9352c9303221ddd00f4ef59498ead5a26f",
+      "judgment": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "status": "M",
+      "header": "@@ -26,17 +26,18 @@ import {",
+      "sha256": "01dbc5a7b473a9b72936c0f6220b1016b047cab48fbc26b3b8b5815b9072337b",
+      "judgment": "CdkTreeNode injects ChangeDetectorRef and ngOnInit subscribes to expansionModel.changed, maps isExpanded, distinctUntilChanged and marks. Existing parent/ARIA operations remain. This patch adds no corresponding unsubscribe; do not claim teardown equivalence. No owned CDK tree dependency/fork."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "status": "M",
+      "header": "@@ -255,6 +256,8 @@ export class CdkTree<T, K = T> implements AfterContentChecked, CollectionViewer,",
+      "sha256": "98d148990bc7f286411532e948c39fc04e52e818563d2745fd1a66ef5818134b",
+      "judgment": "CdkTreeNode injects ChangeDetectorRef and ngOnInit subscribes to expansionModel.changed, maps isExpanded, distinctUntilChanged and marks. Existing parent/ARIA operations remain. This patch adds no corresponding unsubscribe; do not claim teardown equivalence. No owned CDK tree dependency/fork."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "status": "M",
+      "header": "@@ -381,6 +384,8 @@ export class CdkTreeNode<T, K = T> implements FocusableOption, OnDestroy, OnInit",
+      "sha256": "d0f1bc2ed6470b468ef8b23487125a194b1f4dcaee78be332dcf7f801ee16b23",
+      "judgment": "CdkTreeNode injects ChangeDetectorRef and ngOnInit subscribes to expansionModel.changed, maps isExpanded, distinctUntilChanged and marks. Existing parent/ARIA operations remain. This patch adds no corresponding unsubscribe; do not claim teardown equivalence. No owned CDK tree dependency/fork."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "status": "M",
+      "header": "@@ -392,6 +397,14 @@ export class CdkTreeNode<T, K = T> implements FocusableOption, OnDestroy, OnInit",
+      "sha256": "ce93bdfbcae85f397967734848b92cd64546a2dbbc541558fcdcab85375a7c7a",
+      "judgment": "CdkTreeNode injects ChangeDetectorRef and ngOnInit subscribes to expansionModel.changed, maps isExpanded, distinctUntilChanged and marks. Existing parent/ARIA operations remain. This patch adds no corresponding unsubscribe; do not claim teardown equivalence. No owned CDK tree dependency/fork."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "review": "Removes explicit zoneful provider and adds marks; four asynchronous destruction cases now set showTrappedRegion=false and render rather than destroying the fixture. Preserve the historical destruction boundary and require real lifecycle execution."
+    },
+    {
+      "path": "src/cdk/menu/menu-base.ts",
+      "review": "Exact runtime change: boolean focus state becomes signal(false), computed tabindex derives from isInline/focus, getter reads it, and stack subscription calls set. Record complete import/member frames; all other AST operations unchanged. Owned legacy menu has no CDK menu dependency or fork."
+    },
+    {
+      "path": "src/cdk/menu/menu-trigger.spec.ts",
+      "review": "Removes zoneful test provider from modern CDK menu trigger fixture. Provider preparation differs even where callbacks are equal; do not replace legacy menu trigger tests."
+    },
+    {
+      "path": "src/cdk/menu/menu.spec.ts",
+      "review": "Removes zoneful provider and adds an explicit notification mark in modern CDK menu tests. Runtime menu focus change is separately reviewed; preserve legacy constructor/structure and owned fixture behavior."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "review": "Provider removal plus many markForCheck/render calls and two fixture ChangeDetectorRef injections with data-source marks. One error case removes catch/flush fallback and directly detects/flushes. Full case/helper/hook frames retained; no claim of equal errors, lifetime or scheduling."
+    },
+    {
+      "path": "src/cdk/table/text-column.spec.ts",
+      "review": "Provider removal and explicit fixture notification marks for text-column changes. Equal assertions do not establish equal scheduling; no owned CDK table fork or historical fixture rewrite."
+    },
+    {
+      "path": "src/cdk/text-field/autofill.spec.ts",
+      "review": "Moves the single inside-NgZone stream case out, removes explicit zoneful provider/import and retains all remaining cases. Pair the removed callback only with its exact added-zone counterpart, not with a filtered population."
+    },
+    {
+      "path": "src/cdk/text-field/autofill.zone.spec.ts",
+      "review": "New complete standalone Inputs fixture with TextFieldModule and provideZoneChangeDetection, preserving the exact moved stream callback. Added file has an authenticated absent before-image. Fixture setup is separately captured; callback equality is not provider/lifetime equivalence."
+    },
+    {
+      "path": "src/cdk/text-field/autosize.spec.ts",
+      "review": "Removes explicit zoneful provider and adds exact notification marks in default, forms and without-autosize fixture contexts. Preserve complete fixtures/cases; no legacy input/autosize behavior execution is claimed."
+    },
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "review": "Provider removal plus fixture ChangeDetectorRef/data-source subscription/marks and renders. Error cases remove catch/flush wrappers in favor of direct detect/flush. Preserve exact hooks and fixture frames; runtime notification change is separately bounded."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "review": "CdkTreeNode injects ChangeDetectorRef and ngOnInit subscribes to expansionModel.changed, maps isExpanded, distinctUntilChanged and marks. Existing parent/ARIA operations remain. This patch adds no corresponding unsubscribe; do not claim teardown equivalence. No owned CDK tree dependency/fork."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+    "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+  },
+  "source_semantics": {
+    "sha": "04d3b63de2fb843beb55836e39e930c3342d26f1",
+    "runtime": [
+      {
+        "path": "src/cdk/menu/menu-base.ts",
+        "before": {
+          "semantic_sha256": "3c8427c5000ad74a2336d1e3cce53ab887e04fe897c260cdc0aca04273f4eb51",
+          "removed": [
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {CdkMenuGroup} from './menu-group';",
+              "sha256": "9a51e6bef30920f51ab36f15ced627cee2c07dc4780fca6977362382ae08ca17",
+              "semantic_sha256": "f6fcb49e047cbc799c2780478b17f59104865b15fade4d1cb9f43d216d14dc56"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {\n  AfterContentInit,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  inject,\n  Input,\n  NgZone,\n  OnDestroy,\n  QueryList,\n} from '@angular/core';",
+              "sha256": "e955b52decf3a85c80b09855b60f380518689f9b8aa84f347e00978f28d484db",
+              "semantic_sha256": "b2efc6cc3b80e9f486d95b5228130fdef770133492fd5e0e2749024a7d626751"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {FocusKeyManager, FocusOrigin} from '@angular/cdk/a11y';",
+              "sha256": "d7f08ba0a8c1da166e68bbb781e730816161e0e99193c0c440e3e25092b7fec6",
+              "semantic_sha256": "c64ed764c35431c7929232f4a3d857e62f083aa0d52b19d0e0d9354144c7680b"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {CdkMenuItem} from './menu-item';",
+              "sha256": "de07f8cabdd82152c42371a83b4d97a200f982b68a61be70db1353899cb52472",
+              "semantic_sha256": "fed98d1dd2320df75172e47199870b3db95eaf8a595219057af4f14a0c9eaf17"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {merge, Subject} from 'rxjs';",
+              "sha256": "3625334120635061ab8b4cfc8a529bdecbd4cb2526815cdc718d1412f9be7d4e",
+              "semantic_sha256": "c77fde233ca1070f54d7c8c4540d4730d4e5ac9930cee3ac4a07080e31a43047"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {Directionality} from '@angular/cdk/bidi';",
+              "sha256": "c6b47317853460f9b8e4386735d04dcccea7c0311d8c2449484d2715b275676f",
+              "semantic_sha256": "595691978d28ea21649be5aa39e0b3f567915c9c9756576ed9b2289d108c7401"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {mapTo, mergeAll, mergeMap, startWith, switchMap, takeUntil} from 'rxjs/operators';",
+              "sha256": "b9276df846f957fe09a284655d0bd6f60d53b9bbbbc874138bb3260e5a25cb8f",
+              "semantic_sha256": "f85cdcd81e1030c6306e3aba8f4eedaf4763585d80ad3acb6d7f3d19ac13533b"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {MENU_STACK, MenuStack, MenuStackItem} from './menu-stack';",
+              "sha256": "d0cd6d39681d4ba57799333d70de0ddf3565bd706d2f23b143b76bb24dd20a13",
+              "semantic_sha256": "f9e6fb8e3391edd7f24fbfaaf0b83aae614c4d06dc8953be7bde068f9d8610d7"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {Menu} from './menu-interface';",
+              "sha256": "0eb2afae02ed0bf7d315b42da685ebc5391a63391b09914ef4d953bdad35b4c1",
+              "semantic_sha256": "9ddb5913d511867070fcc5671842da9e076d0270dd438a95aca0756dc5387648"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {PointerFocusTracker} from './pointer-focus-tracker';",
+              "sha256": "5b5274eaabd4d4bbd53b5681157fa25b275b2e8d37435f6197ff04677434559f",
+              "semantic_sha256": "ebb1011352e6e38e943219495f52de69f486d855cb51554351f2a4f3412a2f61"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {MENU_AIM} from './menu-aim';",
+              "sha256": "1837d9de3a88998e7d8e6c16d59f0c515aca89eab0f04d4308f16b2b000a94a5",
+              "semantic_sha256": "659e45a703cab866e4000b5d71b73b74c3a059dae3d47997a64abb8562627546"
+            },
+            {
+              "kind": "PropertyDeclaration",
+              "raw": "private _menuStackHasFocus = false;",
+              "sha256": "f129a38c4ab506012afc718a545e8534bcec1aca498515b2de3d888eb4c4055c",
+              "semantic_sha256": "3ea55fdebbac9d1244837bd4e3d5d9a550fa2c6153a08270210c91d87fcb04f3"
+            },
+            {
+              "kind": "MethodDeclaration",
+              "raw": "_getTabIndex() {\n    const tabindexIfInline = this._menuStackHasFocus ? -1 : 0;\n    return this.isInline ? tabindexIfInline : null;\n  }",
+              "sha256": "154a5704ae41db5975d42791ac2c57b4e491dc22c1ba4b6e793c7dece5e5ef39",
+              "semantic_sha256": "5e6d2863e2d5d4057f7ed1c6a09b0844a513247ccdb4d83515f388eb68c9bcc1"
+            },
+            {
+              "kind": "MethodDeclaration",
+              "raw": "private _subscribeToMenuStackHasFocus() {\n    if (this.isInline) {\n      this.menuStack.hasFocus.pipe(takeUntil(this.destroyed)).subscribe(hasFocus => {\n        this._menuStackHasFocus = hasFocus;\n      });\n    }\n  }",
+              "sha256": "eaab533ff6267a902fabd232df761dacae58d5898486898a32e17437f25a8d28",
+              "semantic_sha256": "eecb4efc522882cd77b959daeff7117d758b5b9ed57ad5b3d490b8b6dce653b5"
+            }
+          ]
+        },
+        "after": {
+          "semantic_sha256": "3c8427c5000ad74a2336d1e3cce53ab887e04fe897c260cdc0aca04273f4eb51",
+          "removed": [
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {FocusKeyManager, FocusOrigin} from '@angular/cdk/a11y';",
+              "sha256": "d7f08ba0a8c1da166e68bbb781e730816161e0e99193c0c440e3e25092b7fec6",
+              "semantic_sha256": "c64ed764c35431c7929232f4a3d857e62f083aa0d52b19d0e0d9354144c7680b"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {Directionality} from '@angular/cdk/bidi';",
+              "sha256": "c6b47317853460f9b8e4386735d04dcccea7c0311d8c2449484d2715b275676f",
+              "semantic_sha256": "595691978d28ea21649be5aa39e0b3f567915c9c9756576ed9b2289d108c7401"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {\n  AfterContentInit,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  Input,\n  NgZone,\n  OnDestroy,\n  QueryList,\n  computed,\n  inject,\n  signal,\n} from '@angular/core';",
+              "sha256": "f746ec1875e6f3468ef6b8b97a5564a0488f247fdc3523c7f373ca526fc8d42b",
+              "semantic_sha256": "31b8acb1b5f824a1236c6098c0ad5a0bfea678c1565ab421b5af779f72552bc7"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {Subject, merge} from 'rxjs';",
+              "sha256": "12fd6a5b48d6bd17fd55143f7b8fbe2dcf330332d5fb3a6198223ba18ab4afbb",
+              "semantic_sha256": "5c2a74dc5dd791c510ab486e33f307774dd239f57b633000f39d75c156eae53d"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {mapTo, mergeAll, mergeMap, startWith, switchMap, takeUntil} from 'rxjs/operators';",
+              "sha256": "b9276df846f957fe09a284655d0bd6f60d53b9bbbbc874138bb3260e5a25cb8f",
+              "semantic_sha256": "f85cdcd81e1030c6306e3aba8f4eedaf4763585d80ad3acb6d7f3d19ac13533b"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {MENU_AIM} from './menu-aim';",
+              "sha256": "1837d9de3a88998e7d8e6c16d59f0c515aca89eab0f04d4308f16b2b000a94a5",
+              "semantic_sha256": "659e45a703cab866e4000b5d71b73b74c3a059dae3d47997a64abb8562627546"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {CdkMenuGroup} from './menu-group';",
+              "sha256": "9a51e6bef30920f51ab36f15ced627cee2c07dc4780fca6977362382ae08ca17",
+              "semantic_sha256": "f6fcb49e047cbc799c2780478b17f59104865b15fade4d1cb9f43d216d14dc56"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {Menu} from './menu-interface';",
+              "sha256": "0eb2afae02ed0bf7d315b42da685ebc5391a63391b09914ef4d953bdad35b4c1",
+              "semantic_sha256": "9ddb5913d511867070fcc5671842da9e076d0270dd438a95aca0756dc5387648"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {CdkMenuItem} from './menu-item';",
+              "sha256": "de07f8cabdd82152c42371a83b4d97a200f982b68a61be70db1353899cb52472",
+              "semantic_sha256": "fed98d1dd2320df75172e47199870b3db95eaf8a595219057af4f14a0c9eaf17"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {MENU_STACK, MenuStack, MenuStackItem} from './menu-stack';",
+              "sha256": "d0cd6d39681d4ba57799333d70de0ddf3565bd706d2f23b143b76bb24dd20a13",
+              "semantic_sha256": "f9e6fb8e3391edd7f24fbfaaf0b83aae614c4d06dc8953be7bde068f9d8610d7"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {PointerFocusTracker} from './pointer-focus-tracker';",
+              "sha256": "5b5274eaabd4d4bbd53b5681157fa25b275b2e8d37435f6197ff04677434559f",
+              "semantic_sha256": "ebb1011352e6e38e943219495f52de69f486d855cb51554351f2a4f3412a2f61"
+            },
+            {
+              "kind": "PropertyDeclaration",
+              "raw": "private _menuStackHasFocus = signal(false);",
+              "sha256": "044b2645fed83e5fb08a8ca9c5b7a73673e6e3dbc8c945ae0caf15ee8a6115f1",
+              "semantic_sha256": "e4c76d2d85fbc84850f167eb21f0decf79af9596b8c35bcb56f8033a7df37e65"
+            },
+            {
+              "kind": "PropertyDeclaration",
+              "raw": "private _tabIndexSignal = computed(() => {\n    const tabindexIfInline = this._menuStackHasFocus() ? -1 : 0;\n    return this.isInline ? tabindexIfInline : null;\n  });",
+              "sha256": "6ed61241198b2d0f7b3355fec2f2d6fd23eb6debb061455224a944d8987442e3",
+              "semantic_sha256": "50d54607afee77e999630bd6c86bed6dc04f3a468691d71455d8b193875f4635"
+            },
+            {
+              "kind": "MethodDeclaration",
+              "raw": "_getTabIndex() {\n    return this._tabIndexSignal();\n  }",
+              "sha256": "6fed95a0b539cb6eb46c180f18c6673e507e9247dd03123d6069b46a02933f4a",
+              "semantic_sha256": "6c63f29743fc96df92d6023b17fde9a5bbe0fddb75e9c080704c84f1fa03f2bd"
+            },
+            {
+              "kind": "MethodDeclaration",
+              "raw": "private _subscribeToMenuStackHasFocus() {\n    if (this.isInline) {\n      this.menuStack.hasFocus.pipe(takeUntil(this.destroyed)).subscribe(hasFocus => {\n        this._menuStackHasFocus.set(hasFocus);\n      });\n    }\n  }",
+              "sha256": "1d36dcf2af5f1e690809bcefac7f28e39f4c5c941ebbfec8b00701d363da528f",
+              "semantic_sha256": "4e226c950407ebc2ed94a450ee03b3befac33bc1993bebbaf68b73b4215451fc"
+            }
+          ]
+        }
+      },
+      {
+        "path": "src/cdk/tree/tree.ts",
+        "before": {
+          "semantic_sha256": "30577e5854f44665b9a0ccbe1bea640e6eb5de365cef862fc548410c8c282092",
+          "removed": [
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {FocusableOption} from '@angular/cdk/a11y';",
+              "sha256": "e95f569827a563cd1849d86f410e6e8c0d8be774e8f50a0bf7659131c80361b7",
+              "semantic_sha256": "9a8df5b76c1e84a7a318e21105ecd4efb256346176d33e96316d5c3d38812fc7"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {CollectionViewer, DataSource, isDataSource} from '@angular/cdk/collections';",
+              "sha256": "abe5c2955494e8f6c81036a238b11df9ade28f53763eb80b5029875ead617b66",
+              "semantic_sha256": "303f99a2cc30dc45de2e3cf2a636d3e945c7a05a88517bbc0c6d34eb0722e8dd"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {\n  AfterContentChecked,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  Input,\n  IterableChangeRecord,\n  IterableDiffer,\n  IterableDiffers,\n  OnDestroy,\n  OnInit,\n  QueryList,\n  TrackByFunction,\n  ViewChild,\n  ViewContainerRef,\n  ViewEncapsulation,\n  numberAttribute,\n} from '@angular/core';",
+              "sha256": "0551e95795284e267bd62163992ec1c940afc58c0c14dee2a0d4b7766d958094",
+              "semantic_sha256": "534ce4285b4acef927e4fae5238ef472b99053c9dd71431ad8cfd5a855b404fe"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {\n  BehaviorSubject,\n  isObservable,\n  Observable,\n  of as observableOf,\n  Subject,\n  Subscription,\n} from 'rxjs';",
+              "sha256": "8bbb1d084e048bd5ebdc56a24f2a0c1b01a9b851a0b0d3b4cf869a124ce62394",
+              "semantic_sha256": "0bb1d330a75d0dcb78883797e414c0615773bd42539fe43427903fa2d180a5bb"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {takeUntil} from 'rxjs/operators';",
+              "sha256": "8adb95bd6a091ee4022578b642912ebcbf866f84a2d193eec66bc1b8cbc40ade",
+              "semantic_sha256": "5be1e808c00c2fcaec75b265cf69eadfe29286db20d1360db96574f9490bbc51"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {TreeControl} from './control/tree-control';",
+              "sha256": "a1257493f6de13a1e9210a818821976239651da265c2b72a19cf9f2429d0d795",
+              "semantic_sha256": "f09e9d30341d7a4c6cb8f111d7e0cefda862a2258e8851e9e18712a2e0a2b794"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {CdkTreeNodeDef, CdkTreeNodeOutletContext} from './node';",
+              "sha256": "521c646314c74598e9b5593257126b60f9a7f9c3058242879a21fd346d34f907",
+              "semantic_sha256": "3709bb73318eabfd9768eed8407774d64cfe6d334a756dbbcda28d029afe21e5"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {CdkTreeNodeOutlet} from './outlet';",
+              "sha256": "15e887a220cff6ddacf14b4bec0f3c463193714dfa921b6127cbeb362285354b",
+              "semantic_sha256": "e9bd5fd922f54cc1a3e6a337ddd76bbb1d01b5e15663b438c5ff69a7e2fd2656"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {\n  getTreeControlFunctionsMissingError,\n  getTreeControlMissingError,\n  getTreeMissingMatchingNodeDefError,\n  getTreeMultipleDefaultNodeDefsError,\n  getTreeNoValidDataSourceError,\n} from './tree-errors';",
+              "sha256": "e60f9fd8dd18f83ae9ae8d9757fdf2ca532a8805c42fe1429f77116f92739688",
+              "semantic_sha256": "762adc6c847e7fe980692ae078e5cecc9c795c469c344541906f2cf0bbc9193b"
+            },
+            {
+              "kind": "MethodDeclaration",
+              "raw": "ngOnInit(): void {\n    this._parentNodeAriaLevel = getParentNodeAriaLevel(this._elementRef.nativeElement);\n    this._elementRef.nativeElement.setAttribute('aria-level', `${this.level + 1}`);\n  }",
+              "sha256": "6e8c04b28bcb18b88fb2a536d6ba083f3891f60388b0bdeaad4212aa0cecdf08",
+              "semantic_sha256": "1a0d0a5a2d5c3231fb39206194662ca7a2c7dbe02fa7cf09e723243a7d3b2a52"
+            }
+          ]
+        },
+        "after": {
+          "semantic_sha256": "30577e5854f44665b9a0ccbe1bea640e6eb5de365cef862fc548410c8c282092",
+          "removed": [
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {FocusableOption} from '@angular/cdk/a11y';",
+              "sha256": "e95f569827a563cd1849d86f410e6e8c0d8be774e8f50a0bf7659131c80361b7",
+              "semantic_sha256": "9a8df5b76c1e84a7a318e21105ecd4efb256346176d33e96316d5c3d38812fc7"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {CollectionViewer, DataSource, isDataSource} from '@angular/cdk/collections';",
+              "sha256": "abe5c2955494e8f6c81036a238b11df9ade28f53763eb80b5029875ead617b66",
+              "semantic_sha256": "303f99a2cc30dc45de2e3cf2a636d3e945c7a05a88517bbc0c6d34eb0722e8dd"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {\n  AfterContentChecked,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ContentChildren,\n  Directive,\n  ElementRef,\n  Input,\n  IterableChangeRecord,\n  IterableDiffer,\n  IterableDiffers,\n  OnDestroy,\n  OnInit,\n  QueryList,\n  TrackByFunction,\n  ViewChild,\n  ViewContainerRef,\n  ViewEncapsulation,\n  inject,\n  numberAttribute,\n} from '@angular/core';",
+              "sha256": "530f4f5a1ec0fee423b9410bdf2faa6168f64f299205b1a376a6a2f64cae4072",
+              "semantic_sha256": "75e7e9a0031f5384fa6fd2d5a9edcd10def94a3e72b961b8cad147dc5ce943a3"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {\n  BehaviorSubject,\n  Observable,\n  Subject,\n  Subscription,\n  isObservable,\n  of as observableOf,\n} from 'rxjs';",
+              "sha256": "ad104e541f227bc179f16d474fd8e623a787b8587ea2110d9a5987bb5368fa9c",
+              "semantic_sha256": "c0b611b8660b3b0d20fd8bee8f2e1df98dce0d4ece99ad99df7089f27c77e057"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {distinctUntilChanged, map, takeUntil} from 'rxjs/operators';",
+              "sha256": "3b8fcd080c72b8c007101b950ba14068ef3b8137646cc9e0776350bde9cb2503",
+              "semantic_sha256": "45edc4968dd71db461f5794ef3ad216cf60e03286c7b9ab08d746bb63dfb16bd"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {TreeControl} from './control/tree-control';",
+              "sha256": "a1257493f6de13a1e9210a818821976239651da265c2b72a19cf9f2429d0d795",
+              "semantic_sha256": "f09e9d30341d7a4c6cb8f111d7e0cefda862a2258e8851e9e18712a2e0a2b794"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {CdkTreeNodeDef, CdkTreeNodeOutletContext} from './node';",
+              "sha256": "521c646314c74598e9b5593257126b60f9a7f9c3058242879a21fd346d34f907",
+              "semantic_sha256": "3709bb73318eabfd9768eed8407774d64cfe6d334a756dbbcda28d029afe21e5"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {CdkTreeNodeOutlet} from './outlet';",
+              "sha256": "15e887a220cff6ddacf14b4bec0f3c463193714dfa921b6127cbeb362285354b",
+              "semantic_sha256": "e9bd5fd922f54cc1a3e6a337ddd76bbb1d01b5e15663b438c5ff69a7e2fd2656"
+            },
+            {
+              "kind": "ImportDeclaration",
+              "raw": "import {\n  getTreeControlFunctionsMissingError,\n  getTreeControlMissingError,\n  getTreeMissingMatchingNodeDefError,\n  getTreeMultipleDefaultNodeDefsError,\n  getTreeNoValidDataSourceError,\n} from './tree-errors';",
+              "sha256": "e60f9fd8dd18f83ae9ae8d9757fdf2ca532a8805c42fe1429f77116f92739688",
+              "semantic_sha256": "762adc6c847e7fe980692ae078e5cecc9c795c469c344541906f2cf0bbc9193b"
+            },
+            {
+              "kind": "PropertyDeclaration",
+              "raw": "private _changeDetectorRef = inject(ChangeDetectorRef);",
+              "sha256": "bfef63600ef9bfa3c0a48bb11a9a7e7724c59041893705142f5f06f024bc285b",
+              "semantic_sha256": "a77449e63f853f5c64ea4e65226ae9c15d527d68b4c38ed77bb8c81c93441995"
+            },
+            {
+              "kind": "MethodDeclaration",
+              "raw": "ngOnInit(): void {\n    this._parentNodeAriaLevel = getParentNodeAriaLevel(this._elementRef.nativeElement);\n    this._elementRef.nativeElement.setAttribute('aria-level', `${this.level + 1}`);\n    this._tree.treeControl.expansionModel.changed\n      .pipe(\n        map(() => this.isExpanded),\n        distinctUntilChanged(),\n      )\n      .subscribe(() => {\n        this._changeDetectorRef.markForCheck();\n      });\n  }",
+              "sha256": "8fdd3c9f4bcc81c02125a161ac2a322208659a0531b7f03949553a4aea385956",
+              "semantic_sha256": "d08b4c55997e8a9968762785c019c3f745e8d4fe92df2feb203a2827ea45e1f2"
+            }
+          ]
+        }
+      }
+    ],
+    "lifecycle": [
+      {
+        "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "fa25760e623c646ca582d9647b4d4ccbfb37862fc9f602c89c095f90101e4299",
+        "after_sha256": "56a39d33606b3090dc5418b67feed47cb1aac689d332031f5deaba1f1452851b"
+      },
+      {
+        "path": "src/cdk/menu/menu-base.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "a4a6b21dfff7ccf9b91fe1c811653f5f7e0eeebf31b4715c8d965444497f2bf6",
+        "after_sha256": "010f8db522f524dbfa9b667590cc42be324995281ed9d8a8aa909e199fe32876"
+      },
+      {
+        "path": "src/cdk/menu/menu-trigger.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "92d16aa5a41f3fd8d363056e6826d2c241460b207a7c88c01563685cb88fc936",
+        "after_sha256": "88a7dc4fd3cbfc7a8c52bc2b293641e3358dc64461123fb2e024915002da9587"
+      },
+      {
+        "path": "src/cdk/menu/menu.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "9a04e335aaa3f7d073e935a3111836a6a1e95c724cb37ddb274d35d9f2b424b9",
+        "after_sha256": "722ef45a1423613ddff25d33531d0205f5aa4af9cf4869613f9ce7bbad7068f8"
+      },
+      {
+        "path": "src/cdk/table/table.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "d817da237d9bd993e06183324b543acbac510922ce3e1e5f73cac23c98e66a96",
+        "after_sha256": "16d3f92da5e1f3265e25c8041332803e6b251a7e7735b64aded3ade7ced7da3e"
+      },
+      {
+        "path": "src/cdk/table/text-column.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "c31dfe891664d5e3aee656c11bbce0ed74acb4bbed5225ca906eb0c66cf3b742",
+        "after_sha256": "cacd7869e4bd02703c98add8bd82733a5fbac33dfedf226ce9cbaa9db86f6034"
+      },
+      {
+        "path": "src/cdk/text-field/autofill.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "29d48667223df786ef2419c9cb1cfbe382f5efbe0d7fe7a42f6706d5a780da55",
+        "after_sha256": "aba77fb932b4fd4b94cc4b04c0de6cf91fb68d27238ca5412806c19972fd7ea4"
+      },
+      {
+        "path": "src/cdk/text-field/autofill.zone.spec.ts",
+        "status": "A",
+        "before_present": false,
+        "after_present": true,
+        "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_sha256": "071a432cd25cbdc7a4f3eaf2561b294802fd322cf698abdab5ae99879c77918a"
+      },
+      {
+        "path": "src/cdk/text-field/autosize.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "8340214f4521a4adfbd181a6924829373cc5df55a8e07355cce423826fd88a6d",
+        "after_sha256": "b2a011bd1006b619d79048c05b62e927a8c9331f87a8fe08909183cc10cbe5f1"
+      },
+      {
+        "path": "src/cdk/tree/tree.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "75cf25812f4ad95efd5719cab8dd2432c2642a768cb414ef7fcccbb30a55b730",
+        "after_sha256": "5cd69846cacffd1e8596a1c917882ae0e3771e2d8fe46dde258582d3617ca1e3"
+      },
+      {
+        "path": "src/cdk/tree/tree.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "94ac21f6f7b19c3ac216fff97909b73c051d718bc6a0dbd6c05436860c02d655",
+        "after_sha256": "eacebcae45da178d842efbf7cc2d5fc27d17a40dfcc157632f1d0ceeacfa9f40"
+      }
+    ],
+    "cases_before": 219,
+    "cases_after": 219,
+    "unchanged_complete_callbacks": 161,
+    "exact_reviewed_relocations": 1,
+    "fixture_provider_notification_error_or_lifecycle_equivalence_proved": false,
+    "actual_Angular_native_artifact_browser_SSR_or_floor_qualified": false,
+    "review": "Do not wholesale adopt this mixed CDK runtime and zoneless test migration. Runtime MenuBase changes focus state to a signal/computed tabindex and TreeNode adds ChangeDetectorRef expansion notifications without adding teardown in this patch. Those exact operations are individually bounded; all other runtime AST operations remain equal after removing only the reviewed import/member frames. The owned product imports neither CDK menu nor tree and contains no fork of those classes. Test preparation changes are substantive: four focus-trap cases hide a region instead of destroying the fixture, table/tree error cases remove catch/flush wrappers, fixtures add marks/renders and source subscriptions, and one exact autofill callback moves to a new zone-specific standalone fixture. All 219 cases survive, with 161 equal complete callbacks including the move, but provider, notification, error and destruction semantics are not proved equivalent. Retain historical fixture/lifetime/error contracts and explicit zoneful bootstrap; no CDK fork or modern test replacement."
+  },
+  "decision": "Do not wholesale adopt this mixed CDK runtime and zoneless test migration. Runtime MenuBase changes focus state to a signal/computed tabindex and TreeNode adds ChangeDetectorRef expansion notifications without adding teardown in this patch. Those exact operations are individually bounded; all other runtime AST operations remain equal after removing only the reviewed import/member frames. The owned product imports neither CDK menu nor tree and contains no fork of those classes. Test preparation changes are substantive: four focus-trap cases hide a region instead of destroying the fixture, table/tree error cases remove catch/flush wrappers, fixtures add marks/renders and source subscriptions, and one exact autofill callback moves to a new zone-specific standalone fixture. All 219 cases survive, with 161 equal complete callbacks including the move, but provider, notification, error and destruction semantics are not proved equivalent. Retain historical fixture/lifetime/error contracts and explicit zoneful bootstrap; no CDK fork or modern test replacement. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "owned_context": {
+    "source_members": 1028,
+    "members_sha256": "4eea094fdf39828468fc9dfd4d4ae09009e78c4c6d26ce619d9d8a4b3b4dcbd3",
+    "owned_context": [
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+      },
+      {
+        "path": "testing/legacy-runner/shims/mock-ng-zone.ts",
+        "sha256": "bf04242c0e44a37b6770f9b718b21ce9320cf5dbbc9e60dc4e30469d1cc5eb56"
+      },
+      {
+        "path": "testing/legacy-runner/shims/cdk-testing-private.ts",
+        "sha256": "a2ab9af08d1e5e1756a92e6dfd193b1fdcf48cb995ad34de3e05383ac6fc116c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+        "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "413601de7ed5123e022613374e79680c492653fe2e2491a4f5b03db40b0d1b2a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+        "sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945"
+      }
+    ],
+    "retained_deleted_helper_class": {
+      "kind": "ClassDeclaration",
+      "raw": "@Injectable()\nexport class MockNgZone extends NgZone {\n  override readonly onStable = new EventEmitter(false);\n\n  constructor() {\n    super({enableLongStackTrace: false});\n  }\n\n  override run(fn: Function): any {\n    return fn();\n  }\n\n  override runOutsideAngular(fn: Function): any {\n    return fn();\n  }\n\n  simulateZoneExit(): void {\n    this.onStable.emit(null);\n  }\n}",
+      "sha256": "a6a4860f289cd7c067232c3aac65ec6223b5960388f1550233cfdc187f1bb278",
+      "semantic_sha256": "d59f8189b969fb1f0cf660fd6017708c4eb075b4172baa0ae6c48bca4d161adb"
+    },
+    "historical_deleted_class_semantics_equal": true,
+    "current_owned_test_event_mock": {
+      "kind": "ClassDeclaration",
+      "raw": "export class MockNgZone extends NgZone {\n  constructor() {\n    super({enableLongStackTrace: false});\n  }\n\n  override run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T {\n    return fn.apply(applyThis, applyArgs ?? []);\n  }\n\n  override runOutsideAngular<T>(fn: (...args: any[]) => T): T {\n    return fn();\n  }\n\n  simulateZoneExit(): void {\n    (this.onStable as EventEmitter<any>).emit(null);\n  }\n}",
+      "sha256": "19ac1fe5319abb471c73ae63cfa9b6bdad716684dece889e68bd9e04779b9351",
+      "semantic_sha256": "d2a680b25769dab0a8579fccb19dd11c2250b7244268d9df531927d273c3838e"
+    },
+    "explicit_legacy_zoneful_preparation": true,
+    "public_fixture_stability_untouched": true,
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "actual_fixture_Angular_native_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "04d3b63de2fb843beb55836e39e930c3342d26f1",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test: Move more CDK tests to zoneless (#29144)",
+    "files": [
+      "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+      "src/cdk/table/table.spec.ts",
+      "src/cdk/table/text-column.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+    "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-zone-moves-source-applicability",
+    "diff_sha256": "61f0e89dd129ae366e2b62ff7131136fea08468bb1e15ab28525a41a405a7ee3",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Do not wholesale adopt this mixed CDK runtime and zoneless test migration. Runtime MenuBase changes focus state to a signal/computed tabindex and TreeNode adds ChangeDetectorRef expansion notifications without adding teardown in this patch. Those exact operations are individually bounded; all other runtime AST operations remain equal after removing only the reviewed import/member frames. The owned product imports neither CDK menu nor tree and contains no fork of those classes. Test preparation changes are substantive: four focus-trap cases hide a region instead of destroying the fixture, table/tree error cases remove catch/flush wrappers, fixtures add marks/renders and source subscriptions, and one exact autofill callback moves to a new zone-specific standalone fixture. All 219 cases survive, with 161 equal complete callbacks including the move, but provider, notification, error and destruction semantics are not proved equivalent. Retain historical fixture/lifetime/error contracts and explicit zoneful bootstrap; no CDK fork or modern test replacement. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-zone-moves-source-review.mjs",
+        "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+      },
+      {
+        "path": "tests/mixed_zone_moves_source_probe.mjs",
+        "sha256": "a66dbd79a054f104331f6f90623b5765fcf9f2bd5169ca3c9baee10f79e8ce43"
+      },
+      {
+        "path": "tests/test_mixed_zone_moves_source.py",
+        "sha256": "1ed77b39490f22119af4388b92307c2cdc055c27ba549dfd887b62cfce345e96"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-qualification-record.py",
+        "sha256": "887a2e0e4c2134dba3f40b91176f101508b08d6c22ca39c65f62c0ae57c95a3c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-zone-moves-originals.py",
+        "sha256": "7311cfad4c39b221a8732e01e2f610f4618d4f581bb08d699c44172ff7c061e0"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-authenticator.mjs",
+        "sha256": "ce87034b912c50de87ff80bc68311cf828d2cbbedbd63caf4428d50cbe081133"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+        "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-acquisition.json.gz",
+        "sha256": "28706738deb8f0fe4ff5cdef88e9fcbd2edd5f3d6ddce1acac8d6473b970a2e6"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-authentication.json.gz",
+        "sha256": "0e8eb4b5dcc112b69024aee0ac27b773b22fe47a3866f2f05ce038f6f1633482"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-control-results.json",
+        "sha256": "de72e2b55dfa66c024df9b4c70095477ff378c61ce1cfdd6f16d7a63e8cf7273"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-controls.mjs",
+        "sha256": "ff02fb991b245999d15cb6621d6e58bb2bd401fbeabdb05e5fcb4aa0de5e274a"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-acquisition-checkpoint.json",
+        "sha256": "0f56870a585f667d203423172085e4df9875835f097a995c29f3b0aa4bf96984"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-intake.json",
+        "sha256": "63b375cdb296d8bcb733a8c5504c92ae56fe68becaf7954292ab6ba422e0e6fc"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-observation-pins.json.gz",
+        "sha256": "233903018312f589237200e66edb578a68de745b5c671e345ece1dcda6e5a0b7"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+        "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+        "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-controls.json",
+        "sha256": "de3ca290a067ec4a1be217f8c2206a23439c8752c60f2ba1ef878eb8e52ce2ac"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-python.log.gz",
+        "sha256": "aeb250f884e1a593b218d1839d39ceb7e6fed9ac7972862237dfac0faf03cdae"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-cyph-sanity.json",
+        "sha256": "603c0efe729c92c643cc449d783030e2bb3caaae35262a0f5dbb153b7f20dae4"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-zone-moves-source-review.mjs",
+      "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+    },
+    {
+      "path": "tests/mixed_zone_moves_source_probe.mjs",
+      "sha256": "a66dbd79a054f104331f6f90623b5765fcf9f2bd5169ca3c9baee10f79e8ce43"
+    },
+    {
+      "path": "tests/test_mixed_zone_moves_source.py",
+      "sha256": "1ed77b39490f22119af4388b92307c2cdc055c27ba549dfd887b62cfce345e96"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-qualification-record.py",
+      "sha256": "887a2e0e4c2134dba3f40b91176f101508b08d6c22ca39c65f62c0ae57c95a3c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-zone-moves-originals.py",
+      "sha256": "7311cfad4c39b221a8732e01e2f610f4618d4f581bb08d699c44172ff7c061e0"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-authenticator.mjs",
+      "sha256": "ce87034b912c50de87ff80bc68311cf828d2cbbedbd63caf4428d50cbe081133"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+      "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-acquisition.json.gz",
+      "sha256": "28706738deb8f0fe4ff5cdef88e9fcbd2edd5f3d6ddce1acac8d6473b970a2e6"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-authentication.json.gz",
+      "sha256": "0e8eb4b5dcc112b69024aee0ac27b773b22fe47a3866f2f05ce038f6f1633482"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-control-results.json",
+      "sha256": "de72e2b55dfa66c024df9b4c70095477ff378c61ce1cfdd6f16d7a63e8cf7273"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-controls.mjs",
+      "sha256": "ff02fb991b245999d15cb6621d6e58bb2bd401fbeabdb05e5fcb4aa0de5e274a"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-acquisition-checkpoint.json",
+      "sha256": "0f56870a585f667d203423172085e4df9875835f097a995c29f3b0aa4bf96984"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-intake.json",
+      "sha256": "63b375cdb296d8bcb733a8c5504c92ae56fe68becaf7954292ab6ba422e0e6fc"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-observation-pins.json.gz",
+      "sha256": "233903018312f589237200e66edb578a68de745b5c671e345ece1dcda6e5a0b7"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+      "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+      "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-controls.json",
+      "sha256": "de3ca290a067ec4a1be217f8c2206a23439c8752c60f2ba1ef878eb8e52ce2ac"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-python.log.gz",
+      "sha256": "aeb250f884e1a593b218d1839d39ceb7e6fed9ac7972862237dfac0faf03cdae"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-cyph-sanity.json",
+      "sha256": "603c0efe729c92c643cc449d783030e2bb3caaae35262a0f5dbb153b7f20dae4"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
