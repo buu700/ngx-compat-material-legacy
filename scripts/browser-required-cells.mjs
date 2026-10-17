@@ -23,6 +23,8 @@ import {legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTool
 import {legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay, readLegacyInkBarNative} from './legacy-ink-bar-native-contract.mjs';
 import {legacySelectFontNativeOkay, readLegacySelectFontNative} from './legacy-select-font-native-contract.mjs';
 import {legacyChipBlurNativeOkay} from './legacy-chip-blur-native-contract.mjs';
+import {chipFocusLifecycleNativeOkay} from './chip-focus-lifecycle-native-contract.mjs';
+import {chipFocusLifecycleFixtureMembers} from './chip-focus-lifecycle-fixture.mjs';
 import {tabPaginationNativeOkay, readTabPaginationNative} from './tab-pagination-native-contract.mjs';
 import {legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative, legacyFormFieldNoLabelNativeOkay, readLegacyFormFieldNoLabelNative} from './legacy-form-field-outline-native-contract.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild,announcedFirefoxEndpoint} from './chromium-debug-endpoint.mjs';
@@ -64,7 +66,7 @@ function firefoxBin() {
 /** The browser executes this exact contract and probe, without npm imports. */
 export function requiredProbeSource() {
   return [legacyTooltipAriaLifetimeNativeOkay, legacyTooltipNativeOkay, legacyTooltipMessageSequenceOkay, readLegacyTooltipNative, legacyInkBarNativeOkay, legacyInkBarSelectionSequenceOkay,
-    readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay,
+    readLegacyInkBarNative, legacySelectFontNativeOkay, readLegacySelectFontNative, legacyChipBlurNativeOkay, chipFocusLifecycleNativeOkay,
     legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, readLegacyFormFieldOutlineNative, legacyFormFieldOutlineBoundaryNativeOkay, readLegacyFormFieldOutlineBoundaryNative, legacyFormFieldNoLabelNativeOkay, readLegacyFormFieldNoLabelNative,
     legacyFormFieldDirectionLifetimeNativeOkay, legacyCheckboxTimerLifetimeNativeOkay, legacyRippleDelegationLifetimeNativeOkay,
     tabPaginationNativeOkay, readTabPaginationNative, legacySnackMotionNativeOkay,
@@ -159,13 +161,13 @@ function labHtml() {
     '</div>',
     '<div id="wrap-chips" *ngIf="!cspOnly">',
     '<button id="p-mark-invalid" type="button" (click)="markInvalid()">Mark invalid</button>',
-    '<mat-chip-list id="p-chip-list" #chipList="matChipList" [formControl]="chipControl" [errorStateMatcher]="matcher"><mat-chip>One</mat-chip></mat-chip-list>',
+    '<mat-chip-list id="p-chip-list" #chipList="matChipList" [formControl]="chipControl" [errorStateMatcher]="matcher"><mat-chip #focusLifecycleChip="matChip" data-chip-focus-lifecycle>One</mat-chip></mat-chip-list>',
     '<mat-chip-list disabled><mat-chip>Off</mat-chip></mat-chip-list>',
     '</div>',
     '<div id="wrap-core" *ngIf="!cspOnly"><mat-pseudo-checkbox id="p-core" state="checked"></mat-pseudo-checkbox><lab-ripple-frame></lab-ripple-frame></div>',
     '<div id="wrap-dialog"><button id="p-dialog-open" type="button" (click)="openDialog()">Open dialog</button></div>',
     '<div id="wrap-field" *ngIf="!cspOnly">',
-    '<mat-form-field id="p-field"><mat-label>Name</mat-label><input id="p-field-input" matInput [errorStateMatcher]="matcher"><mat-hint id="p-hint">Hint text</mat-hint></mat-form-field>',
+    '<mat-form-field id="p-field"><mat-label>Name</mat-label><input id="p-field-input" data-chip-focus-outside matInput [errorStateMatcher]="matcher"><mat-hint id="p-hint">Hint text</mat-hint></mat-form-field>',
     '<mat-form-field id="p-field-disabled" floatLabel="always"><input matInput disabled value="off"></mat-form-field>',
     '<lab-field-direction-lifetime></lab-field-direction-lifetime>',
     '<div id="p-outline-wrapper" [style.display]="outlineVisible() ? \'\' : \'none\'" [dir]="outlineDirection()">',
@@ -259,7 +261,7 @@ import {MatLegacyAutocompleteModule} from '@ngx-compat/material-legacy/legacy-au
 import {MatLegacyButtonModule} from '@ngx-compat/material-legacy/legacy-button';
 import {MatLegacyCardModule} from '@ngx-compat/material-legacy/legacy-card';
 import {MatLegacyCheckbox, MatLegacyCheckboxModule} from '@ngx-compat/material-legacy/legacy-checkbox';
-import {MatLegacyChipList, MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
+import {MatLegacyChip, MatLegacyChipList, MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
 import {MatLegacyPseudoCheckboxModule} from '@ngx-compat/material-legacy/legacy-core';
 import {MatLegacyDialog, MatLegacyDialogModule} from '@ngx-compat/material-legacy/legacy-dialog';
 import {MatLegacyFormField, MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
@@ -323,6 +325,7 @@ export class LabRoot {
   sliderValue = 20;
   readonly autoSelection = signal<string | null>(null);
   readonly chipControl = new FormControl<string | null>(null);
+${chipFocusLifecycleFixtureMembers()}
   readonly tipMessage = signal('Hello tip');
   readonly outlineVisible = signal(true);
   readonly outlinePrefix = signal(false);
@@ -377,6 +380,7 @@ export class LabRoot {
         lab.paginationEpoch.update(value => value + 1);
         lab.outlineVisible.set(true); lab.outlinePrefix.set(false); lab.outlineDirection.set('ltr');
       },
+      runChipFocusLifecycle() { return lab.runChipFocusLifecycle(); },
       openDialog() { lab.openDialog(); },
       openMenu() { lab.openMenu(); },
       openSnack() { lab.openSnack(); },

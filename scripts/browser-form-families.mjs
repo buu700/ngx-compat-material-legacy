@@ -14,6 +14,8 @@ import {npmToolingOptions} from './npm-tooling-options.mjs';
 import {createHash} from 'node:crypto';
 import {legacyFormFieldOutlineNativeOkay, legacyFormFieldOutlineSequenceOkay, observeLegacyFormFieldOutlineNative} from './legacy-form-field-outline-native-contract.mjs';
 import {legacyChipBlurNativeOkay, observeLegacyChipBlurNative} from './legacy-chip-blur-native-contract.mjs';
+import {chipFocusLifecycleNativeOkay} from './chip-focus-lifecycle-native-contract.mjs';
+import {chipFocusLifecycleFixtureMembers} from './chip-focus-lifecycle-fixture.mjs';
 import {announcedChromeEndpoint,debuggerMatchesChild} from './chromium-debug-endpoint.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
@@ -112,12 +114,12 @@ if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Libra
 
 mkdirSync(join(consumer, 'src'), {recursive: true});
 writeFileSync(join(consumer, 'src/main.ts'), `${zoneless ? '' : `import 'zone.js';
-`}import {Component, NgModule${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
+`}import {Component, NgModule, NgZone, ViewChild, inject${zoneless ? ', provideZonelessChangeDetection' : ''}} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MATERIAL_ANIMATIONS} from '@angular/material/core';
-import {MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
+import {MatLegacyChip, MatLegacyChipsModule} from '@ngx-compat/material-legacy/legacy-chips';
 import {MatLegacyFormFieldModule} from '@ngx-compat/material-legacy/legacy-form-field';
 import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
 
@@ -126,14 +128,14 @@ import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
   selector: 'lab-root',
   template: \`
     <mat-chip-list id="chip-list" #labChips="matChipList" [formControl]="chipControl" selectable>
-      <mat-chip id="chip-a">Alpha</mat-chip>
+      <mat-chip id="chip-a" #focusLifecycleChip="matChip" data-chip-focus-lifecycle>Alpha</mat-chip>
       <mat-chip id="chip-b">Beta</mat-chip>
     </mat-chip-list>
     <output id="chip-form-state" [attr.data-focused]="labChips.focused" [attr.data-touched]="chipControl.touched"></output>
 
     <mat-form-field id="ff" appearance="fill" floatLabel="auto">
       <mat-label>Name</mat-label>
-      <input id="ff-input" matInput [(ngModel)]="name" required>
+      <input id="ff-input" data-chip-focus-outside matInput [(ngModel)]="name" required>
       <mat-hint id="ff-hint">Hint text</mat-hint>
     </mat-form-field>
     <div id="outline-wrapper" [style.display]="outlineVisible ? '' : 'none'" [dir]="outlineDirection">
@@ -151,6 +153,11 @@ import {MatLegacyInputModule} from '@ngx-compat/material-legacy/legacy-input';
 })
 export class LabRoot {
   readonly chipControl = new FormControl<string | null>(null);
+${chipFocusLifecycleFixtureMembers()}
+  ngAfterViewInit(): void {
+    (window as unknown as {__chipFocusLifecycle: () => unknown}).__chipFocusLifecycle =
+      () => this.runChipFocusLifecycle();
+  }
   name = '';
   outlineVisible = true;
   outlinePrefix = false;
@@ -317,8 +324,8 @@ function send(method, params = {}) {
     ws.send(JSON.stringify({id, method, params}));
   });
 }
-async function evaluate(expression) {
-  const result = await send('Runtime.evaluate', {expression, returnByValue: true, awaitPromise: false});
+async function evaluate(expression, awaitPromise = false) {
+  const result = await send('Runtime.evaluate', {expression, returnByValue: true, awaitPromise});
   return result.result?.value;
 }
 async function waitFor(predicateExpr, attempts = 50, delayMs = 100) {
@@ -362,6 +369,9 @@ try {
   families.chips.chip_clicked = true; // key-activated selection
   families.chips.chip_selected_class = await waitFor(
     '!!document.getElementById("chip-a")?.classList.contains("mat-chip-selected")',
+  );
+  families.chips.focus_lifecycle = await evaluate(
+    'window.__chipFocusLifecycle()', true,
   );
   families.chips.blur = await observeLegacyChipBlurNative({evaluate,waitFor});
 
@@ -430,6 +440,7 @@ const ok =
   && zoneOk
   && families.chips.list_present && families.chips.chip_clicked && families.chips.chip_selected_class
   && legacyChipBlurNativeOkay(families.chips.blur)
+  && chipFocusLifecycleNativeOkay(families.chips.focus_lifecycle)
   && families['form-field'].present && families['form-field'].hint_visible
   && families['form-field'].input_focused && families['form-field'].focused_class
   && families['form-field'].label_floating

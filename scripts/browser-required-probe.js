@@ -210,26 +210,37 @@
       if (!chip || !target || typeof lab.readChipFormState !== 'function' || typeof lab.resetChipFormState !== 'function') {
         finish(false, 'chip blur fixture missing'); return;
       }
-      target.focus();
-      waitFor(() => lab.readChipFormState().focused === false, 1500, unfocused => {
-        if (!unfocused) {finish(false, 'chip list did not reset focus'); return;}
-        lab.resetChipFormState();
-        chip.focus();
-        waitFor(() => lab.readChipFormState().focused === true, 1500, focused => {
-          if (!focused) {finish(false, 'chip list did not receive native focus'); return;}
-          const before = lab.readChipFormState();
-          target.focus();
-          waitFor(() => {
-            const state = lab.readChipFormState();
-            return state.focused === false && state.touched === true ? state : null;
-          }, 1500, after => {
-            const observation = {focused_before: before.focused, touched_before: before.touched,
-              focused_after: after && after.focused, touched_after: after && after.touched,
-              dom_focus_moved: document.activeElement === target};
-            finish(legacyChipBlurNativeOkay(observation), 'mat-chip-list; blur/form state ' + JSON.stringify(observation));
+      const owner = window.__status;
+      if (typeof lab.runChipFocusLifecycle !== 'function') {
+        finish(false, 'chip focus lifecycle fixture missing'); return;
+      }
+      Promise.resolve().then(() => lab.runChipFocusLifecycle()).then(lifecycle => {
+        if (window.__status !== owner) return;
+        if (!chipFocusLifecycleNativeOkay(lifecycle)) {
+          finish(false, 'chip focus lifecycle ' + JSON.stringify(lifecycle)); return;
+        }
+        target.focus();
+        waitFor(() => lab.readChipFormState().focused === false, 1500, unfocused => {
+          if (!unfocused) {finish(false, 'chip list did not reset focus'); return;}
+          lab.resetChipFormState();
+          chip.focus();
+          waitFor(() => lab.readChipFormState().focused === true, 1500, focused => {
+            if (!focused) {finish(false, 'chip list did not receive native focus'); return;}
+            const before = lab.readChipFormState();
+            target.focus();
+            waitFor(() => {
+              const state = lab.readChipFormState();
+              return state.focused === false && state.touched === true ? state : null;
+            }, 1500, after => {
+              const observation = {focused_before: before.focused, touched_before: before.touched,
+                focused_after: after && after.focused, touched_after: after && after.touched,
+                dom_focus_moved: document.activeElement === target};
+              finish(legacyChipBlurNativeOkay(observation) && chipFocusLifecycleNativeOkay(lifecycle),
+                'mat-chip-list; focus and blur ' + JSON.stringify({focus_lifecycle: lifecycle, blur: observation}));
+            });
           });
         });
-      });
+      }, error => { if (window.__status === owner) finish(false, String(error)); });
       return;
     }
     if (family === 'core') {
