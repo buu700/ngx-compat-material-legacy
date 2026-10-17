@@ -25,6 +25,9 @@ class InheritedHelperExecution(unittest.TestCase):
 
     def test_exact_finite_dispatch_extension_and_unchanged_reviews(self):
         read = lambda p: (ROOT / p).read_bytes()
+        if (ROOT / 'compatibility/rc/content-observer-native-worksheet.json').exists():
+            from tests.test_content_observer_native import project_content_observer_native_context
+            _, read = project_content_observer_native_context(ROOT)
         task = json.loads(read('compatibility/rc/inherited-helper-execution-worksheet.json'))
         parent = task['source_parent']
         git = lambda *args: subprocess.check_output(['git', *args], cwd=ROOT)
