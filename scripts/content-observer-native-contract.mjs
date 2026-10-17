@@ -123,14 +123,16 @@ export class ContentObserverNativeProbe implements ObserverAfterViewInit {
   }
 }
 function createContentObserverNativeProbe(group:ObserverLegacyTabGroup,host:HTMLElement,observer:PublicContentObserver,zone:ObserverNgZone,destroyOwned:()=>void){
-  const trace=(window as any).__closeoutNativeObserverTrace,header=(group as any)._tabHeader;
-  const element=host.querySelector('.mat-tab-list') as HTMLElement;
-  const headerElement=host.querySelector('mat-tab-header') as HTMLElement;
-  const label=host.querySelector('.mat-tab-label-content') as HTMLElement;
+  const trace=(window as any).__closeoutNativeObserverTrace;
   const settle=async()=>{for(let i=0;i<3;i++)await new Promise<void>(done=>zone.runOutsideAngular(()=>setTimeout(done,0)));};
   const record=(r:MutationRecord)=>({native:r instanceof MutationRecord,type:r.type,target_type:r.target.nodeType,
     added_types:Array.from(r.addedNodes,node=>node.nodeType),removed_types:Array.from(r.removedNodes,node=>node.nodeType)});
   return {exercise:async()=>{
+    await settle();
+    const header=(group as any)._tabHeader;
+    const element=host.querySelector('.mat-tab-list') as HTMLElement;
+    const headerElement=host.querySelector('mat-tab-header') as HTMLElement;
+    const label=host.querySelector('.mat-tab-label-content') as HTMLElement;
     const result:any={execution:'packed-native-content-observer-legacy-header',error:null,zoneless:typeof (window as any).Zone==='undefined',
       identity:{public_content_observer:observer instanceof PublicContentObserver,owned_legacy_header:header instanceof ObserverLegacyTabHeader,
         legacy_structure:!!element&&!!headerElement&&!!label&&element.getAttribute('role')==='tablist'&&!!element.querySelector('.mat-tab-labels')&&!!element.querySelector('mat-ink-bar'),
