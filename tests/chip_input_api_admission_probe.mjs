@@ -8,6 +8,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {createRequire} from 'node:module';
 import {spawnSync} from 'node:child_process';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -50,7 +51,9 @@ for(const path of integrity){assert.equal(chipInputApiScopeEvidenceOk(body,entri
 const source='projects/ngx-material-legacy/legacy-chips/chip.ts';
 assert.equal(chipInputApiScopeEvidenceOk(body,entries[0],p=>p===source?Buffer.from("import {MatChipRow as OtherRow} from '@angular/material/chips';\n"+read(source)):read(p),paths,line),false);controls.push({id:'new-aliased-peer-row',result:'rejected'});
 const addition='projects/ngx-material-legacy/legacy-chips/added-api.ts';
-assert.equal(chipInputApiScopeEvidenceOk(body,entries[0],p=>p===addition?Buffer.from('<button matChipInputApi></button>'):read(p),[...paths,addition].sort(),line),false);controls.push({id:'added-separator-type',result:'rejected'});
+const addedSource='interface SeparatorKey {keyCode:number;modifiers:string[];}',ts=createRequire(import.meta.url)('typescript');
+assert.equal(ts.createSourceFile(addition,addedSource,ts.ScriptTarget.Latest,true).parseDiagnostics.length,0,'added source must be valid TypeScript');
+assert.equal(chipInputApiScopeEvidenceOk(body,entries[0],p=>p===addition?Buffer.from(addedSource):read(p),[...paths,addition].sort(),line),false);controls.push({id:'added-separator-type',result:'rejected'});
 const unrelated='projects/ngx-material-legacy/internal/common-behaviors/color.ts';
 assert.equal(chipInputApiScopeEvidenceOk(body,entries[0],p=>p===unrelated?Buffer.concat([read(p),Buffer.from('\n// new reviewed source epoch required\n')]):read(p),paths,line),false);controls.push({id:'stale-valid-source-identity',result:'rejected'});
 const work=mkdtempSync(join(tmpdir(),'ngx-chip-input-api-admission-')),cli=[];
