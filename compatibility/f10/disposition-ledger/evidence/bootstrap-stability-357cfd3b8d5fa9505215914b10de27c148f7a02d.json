@@ -1,0 +1,880 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "357cfd3b8d5fa9505215914b10de27c148f7a02d",
+  "subject": "test(multiple): rework whenStable usages (#30878)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "diff_sha256": "ae8f62176ca3b686f47105178f4f134f9c07881cb14aef28c5c6bd1913e44999",
+  "patch_file": "compatibility/rc/spec-final-fixture-source-357cfd3b8d5fa9505215914b10de27c148f7a02d.original.patch",
+  "decision": "Decline the upstream whenStable rewrite after reviewing all 11 complete files and 23 hunks. Individually record flattened focus/form continuations, viewport awaits, the retained real overlay timeout, date-model setup, lazy-menu explicit detection, removed tab timers, immediate tooltip cancellation observations and the toolbar rejection-to-synchronous-throw phase change. Preserve historical asynchronous error/focus/lifetime contracts rather than copying changed modern observation times. No HTML/CSS/SCSS or TypeScript product change is required by these private test preparations. Read-only Cyph sanity confirms existing legacy module/markup/style bindings; no consumer edit. Actual packed/native/browser/SSR/compiler/Node/RxJS/exact-peer floors and independent audit remain required.",
+  "original_source_review": {
+    "path": "compatibility/f10/disposition-ledger/evidence/spec-final-fixture-357cfd3b8d5fa9505215914b10de27c148f7a02d.json",
+    "sha256": "a90f9ee07faf78faf1c6aa596451b2977f207eba8c680b997e81c44a7cd5c7d1"
+  },
+  "historical_source_review": {
+    "schema_version": 1,
+    "line": "main",
+    "sha": "357cfd3b8d5fa9505215914b10de27c148f7a02d",
+    "subject": "test(multiple): rework whenStable usages (#30878)",
+    "status": "reviewed",
+    "final_disposition": "do-not-adopt",
+    "review_depth": "individual-compatibility",
+    "source_conclusion_only": true,
+    "complete_changed_files": [
+      {
+        "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "129b8fb881ea64c731a2b681740ab882373720e3",
+        "after_blob": "fac1eb3cc9d867bea320fff827e8b1c442db6f29"
+      },
+      {
+        "path": "src/cdk/overlay/overlay.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "6de5ca46f7598c68252bd7470cb54b5c7b209306",
+        "after_blob": "53f6b36fa3c792d49e883cc2da5d2eed7d45e653"
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "4f3137f7ac391d290a1722de999d81858aa475e3",
+        "after_blob": "a023cb7184390c78b65f6f07f84445016b2e80d5"
+      },
+      {
+        "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "16fcd939b9c4cf9d05fc796cf9a10386f2ee7a04",
+        "after_blob": "f0de4f69426bf9dab068082bbb8c266b51bbddbf"
+      },
+      {
+        "path": "src/material/chips/chip-grid.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "f11f2691735d0eba12b5d37287ec3ad72df9af9d",
+        "after_blob": "476d19ef4c50ac9f0ec87092024897fcd4281545"
+      },
+      {
+        "path": "src/material/datepicker/datepicker.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "54be77ddf40efc186092b59b38323189d61504ce",
+        "after_blob": "1b4675bf3705822f178abcabfd80f8fa08c523de"
+      },
+      {
+        "path": "src/material/dialog/testing/dialog-opener.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "7f8877f310ba5b0e9d66ff316c763526c53b605f",
+        "after_blob": "c4c6a6bcada3b490daf93a617fd6d68df390382f"
+      },
+      {
+        "path": "src/material/menu/menu.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "ee8f79e6acfff749ae37fe5f53677a4bdce6411a",
+        "after_blob": "d9920dcaefb459e3ad24ea775638016a4e944537"
+      },
+      {
+        "path": "src/material/tabs/tab-group.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "dee6686d6af72007438f2b5022dc4fd9e5c890ca",
+        "after_blob": "785ab44523654ccd4df2511b3602034c48af6f39"
+      },
+      {
+        "path": "src/material/toolbar/toolbar.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "42f2e5a053a973f42058f252c4e136eefc45d0db",
+        "after_blob": "e6bd242f6293a4f4a76cca99097b0acbcafb6b4e"
+      },
+      {
+        "path": "src/material/tooltip/tooltip.spec.ts",
+        "status": "M",
+        "before_mode": "100644",
+        "after_mode": "100644",
+        "before_blob": "d8b60d5d8cb9aeeaad9179c1d0fb4316ffff495a",
+        "after_blob": "6f11bfd899c823c086f743ba1ea314d0e1adb525"
+      }
+    ],
+    "original_files": 11,
+    "original_hunks": 23,
+    "raw_commit_sha256": "1e3e5350ef4a04ecf2a2bec016612ca7f51f86c89699e7330e922ff117d3a354",
+    "original_sources": {
+      "path": "compatibility/rc/spec-final-fixture-source-subjects.json.gz",
+      "sha256": "b541556a8ba5d3d35a22dd9dee621a23fc8811584c8589cce65f830e90dbeb9f"
+    },
+    "patch_file": "compatibility/rc/spec-final-fixture-source-357cfd3b8d5fa9505215914b10de27c148f7a02d.original.patch",
+    "diff_sha256": "ae8f62176ca3b686f47105178f4f134f9c07881cb14aef28c5c6bd1913e44999",
+    "hunk_reviews": [
+      {
+        "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "header": "@@ -6,7 +6,7 @@ import {",
+        "sha256": "66904cec1b9de4edfb0e444117e85df266eebd77e391f6a634000ce4ce11f30b",
+        "judgment": "Four auto-capture/restore cases flatten whenStable().then bodies into the existing waitForAsync callback. The Core inject alias is renamed consistently. This advances focus observations and destruction relative to stabilization; do not transfer that timing to historical dialog/overlay behavior."
+      },
+      {
+        "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "header": "@@ -217,16 +217,13 @@ describe('FocusTrap', () => {",
+        "sha256": "20f67f7eaab0a12069b2316ddeed94d18b1ce1050640802731aad4fcf3c5562e",
+        "judgment": "Four auto-capture/restore cases flatten whenStable().then bodies into the existing waitForAsync callback. The Core inject alias is renamed consistently. This advances focus observations and destruction relative to stabilization; do not transfer that timing to historical dialog/overlay behavior."
+      },
+      {
+        "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "header": "@@ -243,16 +240,13 @@ describe('FocusTrap', () => {",
+        "sha256": "18fdf944a1e80bc0149bc1f52e1e85fbac0aa52b4e5b594569c73bf9bf209a3b",
+        "judgment": "Four auto-capture/restore cases flatten whenStable().then bodies into the existing waitForAsync callback. The Core inject alias is renamed consistently. This advances focus observations and destruction relative to stabilization; do not transfer that timing to historical dialog/overlay behavior."
+      },
+      {
+        "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "header": "@@ -270,16 +264,13 @@ describe('FocusTrap', () => {",
+        "sha256": "7b9abdd9c4ebd5ea3cbddf0bb0b32edf165d145d53b767438763a3db3aed4644",
+        "judgment": "Four auto-capture/restore cases flatten whenStable().then bodies into the existing waitForAsync callback. The Core inject alias is renamed consistently. This advances focus observations and destruction relative to stabilization; do not transfer that timing to historical dialog/overlay behavior."
+      },
+      {
+        "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "header": "@@ -300,16 +291,13 @@ describe('FocusTrap', () => {",
+        "sha256": "9f8ec271790da37cc3bd417002f52008e259484d8475ce0ff61ccf9619245e62",
+        "judgment": "Four auto-capture/restore cases flatten whenStable().then bodies into the existing waitForAsync callback. The Core inject alias is renamed consistently. This advances focus observations and destruction relative to stabilization; do not transfer that timing to historical dialog/overlay behavior."
+      },
+      {
+        "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "header": "@@ -473,7 +461,7 @@ class FocusTrapWithoutFocusableElements {",
+        "sha256": "27a3bd55c85de16e731d0cf67403257be88693a3735a957bbcd18f3fac781de2",
+        "judgment": "Four auto-capture/restore cases flatten whenStable().then bodies into the existing waitForAsync callback. The Core inject alias is renamed consistently. This advances focus observations and destruction relative to stabilization; do not transfer that timing to historical dialog/overlay behavior."
+      },
+      {
+        "path": "src/cdk/overlay/overlay.spec.ts",
+        "header": "@@ -955,7 +955,6 @@ describe('Overlay', () => {",
+        "sha256": "91e0feed65c1bac9c7799e93ab9a664d9a3439ee348644b28ccd2e2c08eda101",
+        "judgment": "Remove two awaits around panel-class retention; keep the explicit child removal and real setTimeout barrier before final observation. The peer overlay detach contract and owned menu/select teardown obligations remain independently required."
+      },
+      {
+        "path": "src/cdk/overlay/overlay.spec.ts",
+        "header": "@@ -968,7 +967,6 @@ describe('Overlay', () => {",
+        "sha256": "1ca3c41ab758107bc3cc39866b2e4f4f68a5eadc1812fb1f3afb97a90383dae1",
+        "judgment": "Remove two awaits around panel-class retention; keep the explicit child removal and real setTimeout barrier before final observation. The peer overlay detach contract and owned menu/select teardown obligations remain independently required."
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "header": "@@ -237,7 +237,7 @@ describe('CdkVirtualScrollViewport', () => {",
+        "sha256": "8cdcd9c7be12d4cf22a438e8994e60abc2ebfdd949e86d13d0686da4836ce4c4",
+        "judgment": "Two fakeAsync callbacks stop being async and drop whenStable after flush while preserving content-offset actions and predicates. No supported runtime viewport scheduling equivalence follows."
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "header": "@@ -245,7 +245,6 @@ describe('CdkVirtualScrollViewport', () => {",
+        "sha256": "91b7e8039e244566ca45312fe9cfb8f764ee0eb85a64684ae75b4642325ce773",
+        "judgment": "Two fakeAsync callbacks stop being async and drop whenStable after flush while preserving content-offset actions and predicates. No supported runtime viewport scheduling equivalence follows."
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "header": "@@ -1066,7 +1065,7 @@ describe('CdkVirtualScrollViewport', () => {",
+        "sha256": "845aa464045768b4059e63679c46dd865c9bae39b7f493fb8a6219cb771a89ea",
+        "judgment": "Two fakeAsync callbacks stop being async and drop whenStable after flush while preserving content-offset actions and predicates. No supported runtime viewport scheduling equivalence follows."
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "header": "@@ -1074,7 +1073,6 @@ describe('CdkVirtualScrollViewport', () => {",
+        "sha256": "184e742625dd3d8ca6c024d91982729151bac152c9cb6c4469576957d31f642a",
+        "judgment": "Two fakeAsync callbacks stop being async and drop whenStable after flush while preserving content-offset actions and predicates. No supported runtime viewport scheduling equivalence follows."
+      },
+      {
+        "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+        "header": "@@ -650,24 +650,18 @@ describe('MatBottomSheet', () => {",
+        "sha256": "3cc87f9b19cd2eaa02b5f7839b5eccdf22d2b3887f4c4c4a8cf6bdbb75d04b22",
+        "judgment": "The first-tabbable case drops async/whenStable and a repeated detectChanges; its joined name also inserts a missing space. The same INPUT focus target remains. Bottom-sheet is not part of the retained add-on, and historical dialog focus still has its own gates."
+      },
+      {
+        "path": "src/material/chips/chip-grid.spec.ts",
+        "header": "@@ -935,20 +935,18 @@ describe('MatChipGrid', () => {",
+        "sha256": "de45e3db1e4de143cf5a2329c17d4a7495da3edb8e44c61f38aaf4c24ef34745",
+        "judgment": "Two form-error tests flatten nested whenStable continuations and retain their explicit flush/render calls and error/hint/aria predicates. Modern grid is not the historical chip-list; preserve the owned historical form and error-state contracts."
+      },
+      {
+        "path": "src/material/chips/chip-grid.spec.ts",
+        "header": "@@ -957,36 +955,32 @@ describe('MatChipGrid', () => {",
+        "sha256": "de891bca99170d0d488986ea948f327d199ecf7055674d1e76b9c2d39caf8814",
+        "judgment": "Two form-error tests flatten nested whenStable continuations and retain their explicit flush/render calls and error/hint/aria predicates. Modern grid is not the historical chip-list; preserve the owned historical form and error-state contracts."
+      },
+      {
+        "path": "src/material/datepicker/datepicker.spec.ts",
+        "header": "@@ -389,34 +389,28 @@ describe('MatDatepicker', () => {",
+        "sha256": "8dc709466741bda22db4c6837cdb49fab1619c3be4fad89700218acc57bec71e",
+        "judgment": "One selected-date test flattens its continuation and joins a name; its unsubscribe remains after the same predicates. The ngModel setup also drops a continuation and a repeated render before retrieving the date model. Public peer initialization timing remains unqualified."
+      },
+      {
+        "path": "src/material/datepicker/datepicker.spec.ts",
+        "header": "@@ -885,15 +879,10 @@ describe('MatDatepicker', () => {",
+        "sha256": "5415e398840b374540ad96c3bdb97d5690283be5fd3d2ecc02e5c29e6acbe52a",
+        "judgment": "One selected-date test flattens its continuation and joins a name; its unsubscribe remains after the same predicates. The ngModel setup also drops a continuation and a repeated render before retrieving the date model. Public peer initialization timing remains unqualified."
+      },
+      {
+        "path": "src/material/dialog/testing/dialog-opener.spec.ts",
+        "header": "@@ -17,13 +17,12 @@ describe('MatTestDialogOpener', () => {",
+        "sha256": "db63f772a11e81f65fd125598487e5daf03def850b10c404cdb51242a4aa5a2d",
+        "judgment": "The data-transfer case drops async and whenStable after rendering. Keep the historical opener/caller contract and the same data predicate; this does not prove early content or close/focus timing."
+      },
+      {
+        "path": "src/material/menu/menu.spec.ts",
+        "header": "@@ -1261,13 +1261,13 @@ describe('MatMenu', () => {",
+        "sha256": "8662d5c93e667c7ce90150bf6700230d94b172c2922760ca0fa0f9ca1102a423",
+        "judgment": "The lazy keyboard-open focus case replaces autoDetectChanges/whenStable with explicit detectChanges before and after click. Keep the historical lazy menu and first-item focus semantics, and independently validate its actual deferred render/lifetime behavior."
+      },
+      {
+        "path": "src/material/tabs/tab-group.spec.ts",
+        "header": "@@ -102,20 +102,14 @@ describe('MatTabGroup', () => {",
+        "sha256": "cab701cec69e54db1ea7bac2275e3086f04b57f906ce22d9a929cb57b68cafc2",
+        "judgment": "The round-trip selectedIndex case removes two nested one-millisecond timers and a whenStable continuation. This is a real scheduling/observation change, not a semantic-equivalence proof. Retain historical tab state/lifecycle tests and CSS."
+      },
+      {
+        "path": "src/material/toolbar/toolbar.spec.ts",
+        "header": "@@ -72,20 +72,16 @@ describe('MatToolbar', () => {",
+        "sha256": "3212c1ca094800dbe2200127d3657104c7f6a106e6cbaf22a541c91798ad01b0",
+        "judgment": "The mixed-row error case changes expectAsync(...).toBeRejectedWithError into expect(...).toThrowError, with the same /attempting to combine different/i pattern. This explicitly changes the error phase and must not weaken historical asynchronous error/rethrow contracts. Toolbar remains a peer."
+      },
+      {
+        "path": "src/material/tooltip/tooltip.spec.ts",
+        "header": "@@ -434,7 +434,7 @@ describe('MatTooltip', () => {",
+        "sha256": "79fd057bafdfc1cbe5b6c9a13d42977c5c258666c71cf46930a948a3b8b3fcc7",
+        "judgment": "The hide-before-delay case drops waitForAsync and observes visibility immediately instead of after whenStable. The predicate is unchanged but its observation time advances. Preserve historical delayed show/hide cancellation and real lifecycle tests."
+      },
+      {
+        "path": "src/material/tooltip/tooltip.spec.ts",
+        "header": "@@ -446,10 +446,8 @@ describe('MatTooltip', () => {",
+        "sha256": "0bbad89354553cbef2c121052c23ddb27945451d13d4959f763bdba1f1eb8690",
+        "judgment": "The hide-before-delay case drops waitForAsync and observes visibility immediately instead of after whenStable. The predicate is unchanged but its observation time advances. Preserve historical delayed show/hide cancellation and real lifecycle tests."
+      }
+    ],
+    "per_file_reviews": [
+      {
+        "path": "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "judgment": "Four auto-capture/restore cases flatten whenStable().then bodies into the existing waitForAsync callback. The Core inject alias is renamed consistently. This advances focus observations and destruction relative to stabilization; do not transfer that timing to historical dialog/overlay behavior."
+      },
+      {
+        "path": "src/cdk/overlay/overlay.spec.ts",
+        "judgment": "Remove two awaits around panel-class retention; keep the explicit child removal and real setTimeout barrier before final observation. The peer overlay detach contract and owned menu/select teardown obligations remain independently required."
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "judgment": "Two fakeAsync callbacks stop being async and drop whenStable after flush while preserving content-offset actions and predicates. No supported runtime viewport scheduling equivalence follows."
+      },
+      {
+        "path": "src/material/bottom-sheet/bottom-sheet.spec.ts",
+        "judgment": "The first-tabbable case drops async/whenStable and a repeated detectChanges; its joined name also inserts a missing space. The same INPUT focus target remains. Bottom-sheet is not part of the retained add-on, and historical dialog focus still has its own gates."
+      },
+      {
+        "path": "src/material/chips/chip-grid.spec.ts",
+        "judgment": "Two form-error tests flatten nested whenStable continuations and retain their explicit flush/render calls and error/hint/aria predicates. Modern grid is not the historical chip-list; preserve the owned historical form and error-state contracts."
+      },
+      {
+        "path": "src/material/datepicker/datepicker.spec.ts",
+        "judgment": "One selected-date test flattens its continuation and joins a name; its unsubscribe remains after the same predicates. The ngModel setup also drops a continuation and a repeated render before retrieving the date model. Public peer initialization timing remains unqualified."
+      },
+      {
+        "path": "src/material/dialog/testing/dialog-opener.spec.ts",
+        "judgment": "The data-transfer case drops async and whenStable after rendering. Keep the historical opener/caller contract and the same data predicate; this does not prove early content or close/focus timing."
+      },
+      {
+        "path": "src/material/menu/menu.spec.ts",
+        "judgment": "The lazy keyboard-open focus case replaces autoDetectChanges/whenStable with explicit detectChanges before and after click. Keep the historical lazy menu and first-item focus semantics, and independently validate its actual deferred render/lifetime behavior."
+      },
+      {
+        "path": "src/material/tabs/tab-group.spec.ts",
+        "judgment": "The round-trip selectedIndex case removes two nested one-millisecond timers and a whenStable continuation. This is a real scheduling/observation change, not a semantic-equivalence proof. Retain historical tab state/lifecycle tests and CSS."
+      },
+      {
+        "path": "src/material/toolbar/toolbar.spec.ts",
+        "judgment": "The mixed-row error case changes expectAsync(...).toBeRejectedWithError into expect(...).toThrowError, with the same /attempting to combine different/i pattern. This explicitly changes the error phase and must not weaken historical asynchronous error/rethrow contracts. Toolbar remains a peer."
+      },
+      {
+        "path": "src/material/tooltip/tooltip.spec.ts",
+        "judgment": "The hide-before-delay case drops waitForAsync and observes visibility immediately instead of after whenStable. The predicate is unchanged but its observation time advances. Preserve historical delayed show/hide cancellation and real lifecycle tests."
+      }
+    ],
+    "semantics": {
+      "sha": "357cfd3b8d5fa9505215914b10de27c148f7a02d",
+      "complete_original_files": 11,
+      "complete_original_hunks": 23,
+      "cases_before": 671,
+      "cases_after": 671,
+      "same_position_complete_callbacks": 655,
+      "case_identity_changes": [
+        {
+          "before_key": "[\"src/material/bottom-sheet/bottom-sheet.spec.ts\",\"it\",[\"9f0e45d191a13be2061dae254f3edc105b35dccec9d5f78af447f056e6bf5154\",\"c44aeff5ccf54b8ee5c62b6d4e4e9ef971b68c78d490906cd442d9dcb973e960\"],\"b13bf6e1f33de299c5a597b4557ff9255d85dc3b36388d77f88deb776ce0bcd0\"]#0",
+          "after_key": "[\"src/material/bottom-sheet/bottom-sheet.spec.ts\",\"it\",[\"9f0e45d191a13be2061dae254f3edc105b35dccec9d5f78af447f056e6bf5154\",\"c44aeff5ccf54b8ee5c62b6d4e4e9ef971b68c78d490906cd442d9dcb973e960\"],\"0b0ce7305433f95621abf5dd87eb02984518d4eb1e29b2169ad8789c7e471cce\"]#0",
+          "callback_semantics_equal": false
+        },
+        {
+          "before_key": "[\"src/material/datepicker/datepicker.spec.ts\",\"it\",[\"a7fe1517858443f858ce6a68ac873a5a7c5d9da781dbfdb79e5ed48f131df162\",\"1fc356ea35fe938e69bf89e435b728a33286c1716a914563c77061e37fdf2764\",\"af9126b90590923f273d0b218b1e1382242b9d8bab7689d747f81d1001f2df82\"],\"5cf920a4ddc8127f1e523f267b199c6ce76f671e0b3149bd0a2e626a65410b67\"]#0",
+          "after_key": "[\"src/material/datepicker/datepicker.spec.ts\",\"it\",[\"a7fe1517858443f858ce6a68ac873a5a7c5d9da781dbfdb79e5ed48f131df162\",\"1fc356ea35fe938e69bf89e435b728a33286c1716a914563c77061e37fdf2764\",\"af9126b90590923f273d0b218b1e1382242b9d8bab7689d747f81d1001f2df82\"],\"46a878c95f3f8affcfc61b100d0a768de1eb29674193e2330acac97a7e523c03\"]#0",
+          "callback_semantics_equal": false
+        }
+      ],
+      "hooks_before": 94,
+      "hooks_after": 94,
+      "decision": "Decline the upstream whenStable rewrite after reviewing all 11 complete files and 23 hunks. Individually record flattened focus/form continuations, viewport awaits, the retained real overlay timeout, date-model setup, lazy-menu explicit detection, removed tab timers, immediate tooltip cancellation observations and the toolbar rejection-to-synchronous-throw phase change. Preserve historical asynchronous error/focus/lifetime contracts rather than copying changed modern observation times. No HTML/CSS/SCSS or TypeScript product change is required by these private test preparations.",
+      "source_conclusion_only": true,
+      "actual_Angular_native_artifact_or_floor_qualified": false
+    },
+    "whole_original_frames": {
+      "path": "compatibility/rc/spec-final-fixture-source-review.json.gz",
+      "sha256": "4069bf256c4ce8810e571bee23c572bb366e3e83937351d208c24686f6b715f7"
+    },
+    "decision": "Decline the upstream whenStable rewrite after reviewing all 11 complete files and 23 hunks. Individually record flattened focus/form continuations, viewport awaits, the retained real overlay timeout, date-model setup, lazy-menu explicit detection, removed tab timers, immediate tooltip cancellation observations and the toolbar rejection-to-synchronous-throw phase change. Preserve historical asynchronous error/focus/lifetime contracts rather than copying changed modern observation times. No HTML/CSS/SCSS or TypeScript product change is required by these private test preparations. Read-only Cyph sanity confirms existing legacy module/markup/style bindings; no consumer edit. Actual packed/native/browser/SSR/compiler/Node/RxJS/exact-peer floors and independent audit remain required.",
+    "prior_entry": {
+      "sha": "357cfd3b8d5fa9505215914b10de27c148f7a02d",
+      "bucket": "test-only-batch-candidate",
+      "subject": "test(multiple): rework whenStable usages (#30878)",
+      "final_disposition": "irrelevant",
+      "reason": "Inspected upstream patch content (sha256=7860d246feff11ec984e0b745a47e35df975bc1b19a9612aa7dd3bdacb613868, bytes=21290). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/a11y/focus-trap/focus-trap.spec.ts, src/cdk/overlay/overlay.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts, src/material/bottom-sheet/bottom-sheet.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/datepicker/datepicker.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+      "read_note_disposition": null,
+      "files": [
+        "src/cdk/a11y/focus-trap/focus-trap.spec.ts",
+        "src/cdk/overlay/overlay.spec.ts",
+        "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "src/material/bottom-sheet/bottom-sheet.spec.ts",
+        "src/material/chips/chip-grid.spec.ts",
+        "src/material/datepicker/datepicker.spec.ts",
+        "src/material/dialog/testing/dialog-opener.spec.ts",
+        "src/material/menu/menu.spec.ts",
+        "src/material/tabs/tab-group.spec.ts",
+        "src/material/toolbar/toolbar.spec.ts",
+        "src/material/tooltip/tooltip.spec.ts"
+      ],
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/357cfd3b8d5fa9505215914b10de27c148f7a02d.json",
+      "batch_id": "test-only-clear-wave1-2026-10-01",
+      "recorded_at_utc": "2026-10-01T18:25:29Z",
+      "g11_claim": "not-passed",
+      "patch_sha256": "7860d246feff11ec984e0b745a47e35df975bc1b19a9612aa7dd3bdacb613868",
+      "individual_proof": {
+        "diff_sha256": "1be9f186c5e47108f8bb1189ca090815e538334242ec9ad25c1f43db78959e86",
+        "review_depth": "individual-semantic",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Read upstream patch 357cfd3b8d5fa9505215914b10de27c148f7a02d (test(multiple): rework whenStable usages (#30878)). It touches 11 paths: src/cdk/a11y/focus-trap/focus-trap.spec.ts, src/cdk/overlay/overlay.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts, src/material/bottom-sheet/bottom-sheet.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/datepicker/datepicker.spec.ts and 5 more. No path is under src/material/legacy- or projects/ngx-material-legacy. Final disposition stays irrelevant. This is a per-commit read of that patch, not a batch close and not security clearance.",
+        "proof_kind": "diff-read"
+      }
+    },
+    "prior_snapshot": {
+      "path": "compatibility/rc/spec-final-fixture-source-prior.json.gz",
+      "sha256": "41ca0d44884d85ba73c121ebe043ff745cd0c266cc193ee5aceb502a61d2007b"
+    },
+    "individual_proof": {
+      "proof_kind": "individual-complete-spec-source-applicability",
+      "diff_sha256": "ae8f62176ca3b686f47105178f4f134f9c07881cb14aef28c5c6bd1913e44999",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Decline the upstream whenStable rewrite after reviewing all 11 complete files and 23 hunks. Individually record flattened focus/form continuations, viewport awaits, the retained real overlay timeout, date-model setup, lazy-menu explicit detection, removed tab timers, immediate tooltip cancellation observations and the toolbar rejection-to-synchronous-throw phase change. Preserve historical asynchronous error/focus/lifetime contracts rather than copying changed modern observation times. No HTML/CSS/SCSS or TypeScript product change is required by these private test preparations. Read-only Cyph sanity confirms existing legacy module/markup/style bindings; no consumer edit. Actual packed/native/browser/SSR/compiler/Node/RxJS/exact-peer floors and independent audit remain required.",
+      "source_conclusion_only": true,
+      "source_evidence": [
+        {
+          "path": "scripts/spec-final-fixture-source-review.mjs",
+          "sha256": "82d68f6699a1a0bafafb3c5b68d13e40a0179450816301e883f0db222d8dd182"
+        },
+        {
+          "path": "tests/spec_final_fixture_source_probe.mjs",
+          "sha256": "303a8f64e1e1508efbca860e86cc6af6049f42ffa8f7759062fb6f55f658bb2e"
+        },
+        {
+          "path": "tests/test_spec_final_fixture_source.py",
+          "sha256": "aeefaa715cda333a5dac665987a233328b84ffcc77676f6efef6d72fc8e8b53c"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-qualification-inspector.py",
+          "sha256": "07c488b8978e0bbe7ae335bb28629e1f9a009b01606841440e77b3f08e38640f"
+        },
+        {
+          "path": "scripts/acquire-final-fixture-originals.py",
+          "sha256": "886a89742f6fe8d3804b82b06ac3d305704255d08815e45ee2a7ce71d93cc435"
+        },
+        {
+          "path": "scripts/authenticated-single-spec-review.mjs",
+          "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+        },
+        {
+          "path": "scripts/spec-test-environment-source-review.mjs",
+          "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+        },
+        {
+          "path": "scripts/spec-overlay-async-source-review.mjs",
+          "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+        },
+        {
+          "path": "scripts/spec-stability-chip-repair.mjs",
+          "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+        },
+        {
+          "path": "testing/legacy-runner/adapt-spec.mjs",
+          "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+        },
+        {
+          "path": "testing/legacy-runner/init-test-env.ts",
+          "sha256": "0eed39e86075f38a2f0e3c65bc0db1ec58da7b3d3e565ca87e1750071522913b"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+          "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+          "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+          "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+          "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+          "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-subjects.json.gz",
+          "sha256": "b541556a8ba5d3d35a22dd9dee621a23fc8811584c8589cce65f830e90dbeb9f"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-acquisition.json.gz",
+          "sha256": "f29ca51619f3f3fe0980ee26e8f7d99d74719035b00afeb96e198e28feeb3273"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-authentication.json.gz",
+          "sha256": "77c73d20626a673318eaed3410546347061c38fe8c295a1f00fbb907f25a6e53"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-acquisition-checkpoint.json",
+          "sha256": "e6ade8bdb6f79187c12a0c08aeaff4e65a6ce242a41ceaab01ed227a62bf8a1d"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-observation-pins.json.gz",
+          "sha256": "ea846e2253ad4b2e9785c320e9cf264bfd09acd3301434075d7f91061e830306"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-prior.json.gz",
+          "sha256": "41ca0d44884d85ba73c121ebe043ff745cd0c266cc193ee5aceb502a61d2007b"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-review.json.gz",
+          "sha256": "4069bf256c4ce8810e571bee23c572bb366e3e83937351d208c24686f6b715f7"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-controls.json",
+          "sha256": "5d45f739efb7983730d1de726d4a9be97dd2b3291e726e8f1020046523ef12de"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-python.log.gz",
+          "sha256": "bd6afc3d252035170b320a9ee6183ba389d12689bb8eaeede35d935187b3a29f"
+        },
+        {
+          "path": "compatibility/rc/spec-final-fixture-source-cyph-sanity.json",
+          "sha256": "c1427eb7c120feda275d55d9df3587754c6dfc9ed64017f53d9b43ec4fe017f5"
+        }
+      ],
+      "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+    },
+    "independent_source_evidence": [
+      {
+        "path": "scripts/spec-final-fixture-source-review.mjs",
+        "sha256": "82d68f6699a1a0bafafb3c5b68d13e40a0179450816301e883f0db222d8dd182"
+      },
+      {
+        "path": "tests/spec_final_fixture_source_probe.mjs",
+        "sha256": "303a8f64e1e1508efbca860e86cc6af6049f42ffa8f7759062fb6f55f658bb2e"
+      },
+      {
+        "path": "tests/test_spec_final_fixture_source.py",
+        "sha256": "aeefaa715cda333a5dac665987a233328b84ffcc77676f6efef6d72fc8e8b53c"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-qualification-inspector.py",
+        "sha256": "07c488b8978e0bbe7ae335bb28629e1f9a009b01606841440e77b3f08e38640f"
+      },
+      {
+        "path": "scripts/acquire-final-fixture-originals.py",
+        "sha256": "886a89742f6fe8d3804b82b06ac3d305704255d08815e45ee2a7ce71d93cc435"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "testing/legacy-runner/adapt-spec.mjs",
+        "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+      },
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "0eed39e86075f38a2f0e3c65bc0db1ec58da7b3d3e565ca87e1750071522913b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+        "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+        "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+        "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+        "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-subjects.json.gz",
+        "sha256": "b541556a8ba5d3d35a22dd9dee621a23fc8811584c8589cce65f830e90dbeb9f"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-acquisition.json.gz",
+        "sha256": "f29ca51619f3f3fe0980ee26e8f7d99d74719035b00afeb96e198e28feeb3273"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-authentication.json.gz",
+        "sha256": "77c73d20626a673318eaed3410546347061c38fe8c295a1f00fbb907f25a6e53"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-acquisition-checkpoint.json",
+        "sha256": "e6ade8bdb6f79187c12a0c08aeaff4e65a6ce242a41ceaab01ed227a62bf8a1d"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-observation-pins.json.gz",
+        "sha256": "ea846e2253ad4b2e9785c320e9cf264bfd09acd3301434075d7f91061e830306"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-prior.json.gz",
+        "sha256": "41ca0d44884d85ba73c121ebe043ff745cd0c266cc193ee5aceb502a61d2007b"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-review.json.gz",
+        "sha256": "4069bf256c4ce8810e571bee23c572bb366e3e83937351d208c24686f6b715f7"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-controls.json",
+        "sha256": "5d45f739efb7983730d1de726d4a9be97dd2b3291e726e8f1020046523ef12de"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-python.log.gz",
+        "sha256": "bd6afc3d252035170b320a9ee6183ba389d12689bb8eaeede35d935187b3a29f"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-cyph-sanity.json",
+        "sha256": "c1427eb7c120feda275d55d9df3587754c6dfc9ed64017f53d9b43ec4fe017f5"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed"
+  },
+  "current_bootstrap_preparation": {
+    "path": "compatibility/rc/bootstrap-stability-current-qualification.json",
+    "sha256": "0d17d6731c9e648f6c7e49571b188262f57e10fc72c2bbd7692cdc5ebaf3b5e6"
+  },
+  "preparation_scope": "Original source programs, inputs and assertions remain in their historical views. Actual current bootstrap separately preserves public pending/error promise delegation. No historical bytes are presented as current, no original golden or callback was changed, and no native/floor admission is claimed.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "ae8f62176ca3b686f47105178f4f134f9c07881cb14aef28c5c6bd1913e44999",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Decline the upstream whenStable rewrite after reviewing all 11 complete files and 23 hunks. Individually record flattened focus/form continuations, viewport awaits, the retained real overlay timeout, date-model setup, lazy-menu explicit detection, removed tab timers, immediate tooltip cancellation observations and the toolbar rejection-to-synchronous-throw phase change. Preserve historical asynchronous error/focus/lifetime contracts rather than copying changed modern observation times. No HTML/CSS/SCSS or TypeScript product change is required by these private test preparations. Read-only Cyph sanity confirms existing legacy module/markup/style bindings; no consumer edit. Actual packed/native/browser/SSR/compiler/Node/RxJS/exact-peer floors and independent audit remain required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-final-fixture-source-review.mjs",
+        "sha256": "82d68f6699a1a0bafafb3c5b68d13e40a0179450816301e883f0db222d8dd182"
+      },
+      {
+        "path": "tests/spec_final_fixture_source_probe.mjs",
+        "sha256": "303a8f64e1e1508efbca860e86cc6af6049f42ffa8f7759062fb6f55f658bb2e"
+      },
+      {
+        "path": "tests/test_spec_final_fixture_source.py",
+        "sha256": "aeefaa715cda333a5dac665987a233328b84ffcc77676f6efef6d72fc8e8b53c"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-qualification-inspector.py",
+        "sha256": "07c488b8978e0bbe7ae335bb28629e1f9a009b01606841440e77b3f08e38640f"
+      },
+      {
+        "path": "scripts/acquire-final-fixture-originals.py",
+        "sha256": "886a89742f6fe8d3804b82b06ac3d305704255d08815e45ee2a7ce71d93cc435"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "testing/legacy-runner/adapt-spec.mjs",
+        "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+      },
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+        "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+        "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+        "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+        "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-subjects.json.gz",
+        "sha256": "b541556a8ba5d3d35a22dd9dee621a23fc8811584c8589cce65f830e90dbeb9f"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-acquisition.json.gz",
+        "sha256": "f29ca51619f3f3fe0980ee26e8f7d99d74719035b00afeb96e198e28feeb3273"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-authentication.json.gz",
+        "sha256": "77c73d20626a673318eaed3410546347061c38fe8c295a1f00fbb907f25a6e53"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-acquisition-checkpoint.json",
+        "sha256": "e6ade8bdb6f79187c12a0c08aeaff4e65a6ce242a41ceaab01ed227a62bf8a1d"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-observation-pins.json.gz",
+        "sha256": "ea846e2253ad4b2e9785c320e9cf264bfd09acd3301434075d7f91061e830306"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-prior.json.gz",
+        "sha256": "41ca0d44884d85ba73c121ebe043ff745cd0c266cc193ee5aceb502a61d2007b"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-review.json.gz",
+        "sha256": "4069bf256c4ce8810e571bee23c572bb366e3e83937351d208c24686f6b715f7"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-controls.json",
+        "sha256": "5d45f739efb7983730d1de726d4a9be97dd2b3291e726e8f1020046523ef12de"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-python.log.gz",
+        "sha256": "bd6afc3d252035170b320a9ee6183ba389d12689bb8eaeede35d935187b3a29f"
+      },
+      {
+        "path": "compatibility/rc/spec-final-fixture-source-cyph-sanity.json",
+        "sha256": "c1427eb7c120feda275d55d9df3587754c6dfc9ed64017f53d9b43ec4fe017f5"
+      },
+      {
+        "path": "compatibility/rc/bootstrap-stability-current-qualification.json",
+        "sha256": "0d17d6731c9e648f6c7e49571b188262f57e10fc72c2bbd7692cdc5ebaf3b5e6"
+      },
+      {
+        "path": "compatibility/rc/bootstrap-stability-qualification-inputs.json",
+        "sha256": "59d6008a1f0916528d74ef2c9f262fa4dcafed1e54a2e633f676783171b766b5"
+      },
+      {
+        "path": "scripts/bootstrap-stability-evidence.mjs",
+        "sha256": "77f92fbe24c7286401231d3165765e7586d52bdc5354572478a5c62a3d3d9bed"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "current_bootstrap_preparation": {
+      "path": "compatibility/rc/bootstrap-stability-current-qualification.json",
+      "sha256": "0d17d6731c9e648f6c7e49571b188262f57e10fc72c2bbd7692cdc5ebaf3b5e6"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-final-fixture-source-review.mjs",
+      "sha256": "82d68f6699a1a0bafafb3c5b68d13e40a0179450816301e883f0db222d8dd182"
+    },
+    {
+      "path": "tests/spec_final_fixture_source_probe.mjs",
+      "sha256": "303a8f64e1e1508efbca860e86cc6af6049f42ffa8f7759062fb6f55f658bb2e"
+    },
+    {
+      "path": "tests/test_spec_final_fixture_source.py",
+      "sha256": "aeefaa715cda333a5dac665987a233328b84ffcc77676f6efef6d72fc8e8b53c"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-qualification-inspector.py",
+      "sha256": "07c488b8978e0bbe7ae335bb28629e1f9a009b01606841440e77b3f08e38640f"
+    },
+    {
+      "path": "scripts/acquire-final-fixture-originals.py",
+      "sha256": "886a89742f6fe8d3804b82b06ac3d305704255d08815e45ee2a7ce71d93cc435"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "testing/legacy-runner/adapt-spec.mjs",
+      "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+    },
+    {
+      "path": "testing/legacy-runner/init-test-env.ts",
+      "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+      "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+      "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+      "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+      "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+      "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-subjects.json.gz",
+      "sha256": "b541556a8ba5d3d35a22dd9dee621a23fc8811584c8589cce65f830e90dbeb9f"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-acquisition.json.gz",
+      "sha256": "f29ca51619f3f3fe0980ee26e8f7d99d74719035b00afeb96e198e28feeb3273"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-authentication.json.gz",
+      "sha256": "77c73d20626a673318eaed3410546347061c38fe8c295a1f00fbb907f25a6e53"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-acquisition-checkpoint.json",
+      "sha256": "e6ade8bdb6f79187c12a0c08aeaff4e65a6ce242a41ceaab01ed227a62bf8a1d"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-observation-pins.json.gz",
+      "sha256": "ea846e2253ad4b2e9785c320e9cf264bfd09acd3301434075d7f91061e830306"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-prior.json.gz",
+      "sha256": "41ca0d44884d85ba73c121ebe043ff745cd0c266cc193ee5aceb502a61d2007b"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-review.json.gz",
+      "sha256": "4069bf256c4ce8810e571bee23c572bb366e3e83937351d208c24686f6b715f7"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-controls.json",
+      "sha256": "5d45f739efb7983730d1de726d4a9be97dd2b3291e726e8f1020046523ef12de"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-python.log.gz",
+      "sha256": "bd6afc3d252035170b320a9ee6183ba389d12689bb8eaeede35d935187b3a29f"
+    },
+    {
+      "path": "compatibility/rc/spec-final-fixture-source-cyph-sanity.json",
+      "sha256": "c1427eb7c120feda275d55d9df3587754c6dfc9ed64017f53d9b43ec4fe017f5"
+    },
+    {
+      "path": "compatibility/rc/bootstrap-stability-current-qualification.json",
+      "sha256": "0d17d6731c9e648f6c7e49571b188262f57e10fc72c2bbd7692cdc5ebaf3b5e6"
+    },
+    {
+      "path": "compatibility/rc/bootstrap-stability-qualification-inputs.json",
+      "sha256": "59d6008a1f0916528d74ef2c9f262fa4dcafed1e54a2e633f676783171b766b5"
+    },
+    {
+      "path": "scripts/bootstrap-stability-evidence.mjs",
+      "sha256": "77f92fbe24c7286401231d3165765e7586d52bdc5354572478a5c62a3d3d9bed"
+    }
+  ],
+  "actual_current_native_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

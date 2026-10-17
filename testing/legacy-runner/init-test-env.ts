@@ -1,4 +1,11 @@
 /**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
  * Browser TestBed bootstrap for historical legacy specs.
  * Uses public Angular testing APIs only (no Bazel).
  *
@@ -31,7 +38,7 @@ import 'zone.js/testing';
 
 import {CommonModule} from '@angular/common';
 import {NgModule, provideZoneChangeDetection} from '@angular/core';
-import {ComponentFixture, getTestBed} from '@angular/core/testing';
+import {getTestBed} from '@angular/core/testing';
 import {
   BrowserTestingModule,
   platformBrowserTesting,
@@ -50,17 +57,6 @@ getTestBed().initTestEnvironment(LegacyZoneTestingModule, platformBrowserTesting
 // Historical specs use *ngIf and *ngFor without importing CommonModule.
 // The Material 16 test modules did not re-export it, and current JIT reports
 // the missing directive instead of rendering the element.
-// whenStable() promises that outlive fakeAsync become afterAll errors and stop
-// the Karma run. Inside a fakeAsync zone, resolve on the fake microtask queue.
-const whenStable = ComponentFixture.prototype.whenStable;
-ComponentFixture.prototype.whenStable = function (this: ComponentFixture<unknown>) {
-  const zone = (globalThis as any).Zone;
-  if (zone?.current?.get?.('FakeAsyncTestZoneSpec')) {
-    return Promise.resolve(false);
-  }
-  return whenStable.call(this);
-};
-
 // TestBed.configureTestingModule is static and forwards to the TestBed instance.
 // resetTestingModule() returns that instance, so chained configureTestingModule
 // calls never hit a static wrapper. Patch the instance method once.
