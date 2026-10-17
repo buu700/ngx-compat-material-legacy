@@ -16,7 +16,7 @@ import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export const HISTORICAL_REPLAY_INPUTS='compatibility/rc/historical-source-replay-inputs.json';
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'2342431d3372ef1ad550301f53e043775c35e2c65f64a91bd8737df90d852396','21.x':'24a021146b62f55d6fea6fb1b3b6f75e217a00a2dac3f5bc61a0d9bca23db09b'};
+const pins={main:'0f6d8ac28693f3bd89f564d4d90c4e42ea8a826ab233f286895308f3d01cb248','21.x':'ba419a7400ec2bb85934dfe6520af99489a073fce87ef447ecc10aa3ba30e6b9'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
  'native-individual-source','native-individual-admission','spec-fixture-context',
  'small-spec-source','followup-spec-source','peer-spec-source','control-case-context',
