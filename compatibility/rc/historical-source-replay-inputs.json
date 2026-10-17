@@ -1,12 +1,12 @@
 {
-  "schema_version": 8,
+  "schema_version": 9,
   "line": "21.x",
-  "scope": "Finite original historical source probes only. Current-source coherence is mandatory; historical execution never admits current source, runtime, compiler, peer floors or G11.",
+  "scope": "Finite original historical source probes only. Current-source coherence is mandatory; historical execution never admits current source, runtime, compiler, peer floors or G11. Two additional unchanged source programs use the exact pre-harness-preparation frame; current preparation requires its separate current qualification.",
   "current_frame": {
-    "commit": "e6980b20d67a6b10d3484bcce370fda1ef935289",
-    "tree": "6ba972de3969e86fa596eef363a1dc87f90a6f19",
-    "tree_listing_sha256": "5db23ea6ebffed7fc1bb0ff423903a4551652a426ccdb2547c3dd6239f128a45",
-    "members": 6735
+    "commit": "f08abe2bd83ffc02790884a51cc6233d85eebaa5",
+    "tree": "685f1a6a95e817d56f8446684d6f11855fc1a65e",
+    "tree_listing_sha256": "91ab246c35260859dd3ed40c1832ced25de7d1c3a0ed3666a4aebd16049ee912",
+    "members": 6757
   },
   "mutable_progress_paths": [
     "compatibility/rc/remaining-native-admission-worksheet.json",
@@ -292,6 +292,30 @@
         "members": 5776
       },
       "timeout_ms": 180000
+    },
+    {
+      "id": "test-consolidation-source",
+      "probe": "tests/upstream_test_consolidation_probe.mjs",
+      "probe_sha256": "3fb2134a4ea154c94ba160bb440f7bd8b904d884089f8c4e93c4ede27e4aa015",
+      "frame": {
+        "commit": "b1b9daed1ed3dffd898f8f5e1d099dccc5672d33",
+        "tree": "375ef878e5b6e2c0b216a862734ab8be6ce2daee",
+        "tree_listing_sha256": "53fb4d1ad1c8a4c1fb92ecc3f6eb9de57c735575174bb76f8c9417d0756a247f",
+        "members": 6738
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "id": "deferred-control-upstream-source",
+      "probe": "tests/deferred_control_upstream_admission_probe.mjs",
+      "probe_sha256": "4bfadf400a5acbab1b1a888780ab210682a2d94ca671a6d78da0e811c0e7209c",
+      "frame": {
+        "commit": "b1b9daed1ed3dffd898f8f5e1d099dccc5672d33",
+        "tree": "375ef878e5b6e2c0b216a862734ab8be6ce2daee",
+        "tree_listing_sha256": "53fb4d1ad1c8a4c1fb92ecc3f6eb9de57c735575174bb76f8c9417d0756a247f",
+        "members": 6738
+      },
+      "timeout_ms": 120000
     }
   ],
   "wrapper_edits": [
@@ -545,6 +569,18 @@
           "after": "['node', 'scripts/run-historical-source-probe.mjs', 'historical-native-admission']"
         }
       ]
+    },
+    {
+      "path": "tests/test_upstream_test_consolidation.py",
+      "reference_commit": "b1b9daed1ed3dffd898f8f5e1d099dccc5672d33",
+      "before_sha256": "aadd94ae201295803434b30d3a68d8b1f8ed9318f25b58f82374a613683060a3",
+      "after_sha256": "172553ed313ce0258c9e92856aa125a04df1382d13f88d9dfbbaf93399f8a433",
+      "edits": [
+        {
+          "before": "['node', 'tests/upstream_test_consolidation_probe.mjs']",
+          "after": "['node', 'scripts/run-historical-source-probe.mjs', 'test-consolidation-source']"
+        }
+      ]
     }
   ],
   "source_phase_reports": {
@@ -570,7 +606,8 @@
     "test_environment_zone_source": "compatibility/rc/spec-test-environment-source-zone-checkpoint.json",
     "standalone_environment_source": "compatibility/rc/spec-test-environment-source-standalone-checkpoint.json",
     "chip_method_source": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
-    "chip_context_source": "compatibility/rc/spec-stability-context-checkpoint.json"
+    "chip_context_source": "compatibility/rc/spec-stability-context-checkpoint.json",
+    "current_harness_preparation": "compatibility/rc/harness-animation-preparation-qualification-checkpoint.json"
   },
   "no_install_build_publish_or_remote_operations": true,
   "original_js_programs_and_assertions_unchanged": true,
