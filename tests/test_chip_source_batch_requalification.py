@@ -13,6 +13,7 @@ from pathlib import Path
 import subprocess
 import unittest
 import tests.audit_test_context as context
+from tests.chip_batch_history import batch_recorded_stage_subject
 
 ROOT=Path(__file__).resolve().parents[1]
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -67,5 +68,6 @@ class ChipSourceBatchRequalification(unittest.TestCase):
         for (previous,a),(actual,b) in zip(old,new):
             if actual['sha'] in changed:self.assertEqual(restored.count(b),1);restored=restored.replace(b,a,1)
         self.assertEqual(restored,prior['ledger_text'])
-        for member in prior['reviews']+prior['sources']+prior['authored_stores']+prior['authored_reviews']:self.assertEqual((ROOT/member['path']).read_bytes(),member['text'].encode())
+        for member in prior['reviews']+prior['authored_stores']+prior['authored_reviews']:self.assertEqual((ROOT/member['path']).read_bytes(),member['text'].encode())
+        for member in prior['sources']:self.assertEqual(batch_recorded_stage_subject(ROOT,'chip-source-batch-requalification',member['path']),member['text'].encode())
         for group in ['projects','testing','reference','fixtures']:self.assertEqual(subprocess.check_output(['git','--no-replace-objects','diff',task['source_parent'],'--',group],cwd=ROOT),b'')

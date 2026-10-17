@@ -14,6 +14,7 @@ from unittest.mock import patch
 from tests.chip_history_union import (chip_history_union_context,chip_history_read,
     validate_chip_history_current,recorded_stage_subject,historical_product_diff,INPUT)
 from tests.recorded_execution_source_context import recorded_implementation_subject
+from tests.chip_batch_history import batch_history_read
 
 ROOT=Path(__file__).resolve().parents[1]
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -32,7 +33,7 @@ class ChipHistoryUnion(unittest.TestCase):
         self.assertFalse(report['actual_native_packed_or_floor_qualified']);self.assertEqual(report['new_SHA_or_role_decisions'],0)
 
     def test_Python_unknown_bytes_stages_and_late_capsule_corruption(self):
-        read=lambda p:(ROOT/p).read_bytes();data,before=validate_chip_history_current(ROOT,read,required=True)
+        read=batch_history_read(ROOT,lambda p:(ROOT/p).read_bytes());data,before=validate_chip_history_current(ROOT,read,required=True)
         history=chip_history_read(ROOT,read)
         for member in before['members']:
             self.assertEqual(history(member['path']),member['before_text'].encode());unknown=read(member['path'])+b'\n unreviewed history input'

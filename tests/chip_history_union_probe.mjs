@@ -7,6 +7,7 @@
  */
 /** Current subjects and finite historical views are independently checked. No product execution. */
 import assert from 'node:assert/strict';
+import {batchHistoryRead} from '../scripts/chip-batch-history.mjs';
 import {nativeDateSourceContext} from '../scripts/native-date-packed-source-context.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -14,7 +15,7 @@ import {execFileSync} from 'node:child_process';
 import {CHIP_HISTORY_INPUT,chipHistoryUnionContext,chipHistoryRead,validateChipHistoryCurrent,recordedStageSubject} from '../scripts/chip-history-union.mjs';
 import {recordedImplementationSubject} from '../scripts/recorded-execution-source-context.mjs';
 import {currentChipAuditNativeDefinitions} from '../scripts/chip-audit-source-requalification.mjs';
-const read=p=>readFileSync(p),hash=b=>createHash('sha256').update(b).digest('hex');
+const read=batchHistoryRead(p=>readFileSync(p)),hash=b=>createHash('sha256').update(b).digest('hex');
 const {data,before}=validateChipHistoryCurrent(read,{required:true}),history=chipHistoryRead(read),controls=[];
 const git=(...args)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{maxBuffer:32*1024*1024});
 assert.equal(before.members.length,30);
