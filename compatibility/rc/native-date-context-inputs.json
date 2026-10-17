@@ -1,0 +1,3086 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "1d9ac1a93dfc190b0c0d83dc756afcd280fe3667",
+  "baseline": "f6f9557a2fdd14811d67b951755db19985b94b7b",
+  "prior": {
+    "path": "compatibility/rc/native-date-context-prior.json.gz",
+    "sha256": "59af36d6511fb83201c9bab55d069a42fc70fe58e34c9ceb2e1a4a03fa9d8c89",
+    "raw_sha256": "5759a03ca92312954bdd0c6a020ada903dc7e5da337417cb9b538ec4a392d9dc"
+  },
+  "changes": [
+    {
+      "path": "scripts/bidi-isolated-packed-evidence-requalification.mjs",
+      "before_sha256": "ebe0e1614336e5fcf4b088a83f4f2968b52400808d7b975f6605a701ebce1333",
+      "current_sha256": "cfe4a91ab31cb5c3db1db81648ccd5b57623cba736745ea4abb25a8b85b59794",
+      "edits": [
+        {
+          "start": 355,
+          "end": 471,
+          "before": "",
+          "after": "import {readNativeDatePackedBefore,nativeDateHistoricalProductRead} from './native-date-packed-source-context.mjs';\n"
+        },
+        {
+          "start": 1016,
+          "end": 1140,
+          "before": "import {selectionRequirementsBefore} from './selection-comparator-packed-source-context.mjs';\n",
+          "after": "import {selectionRequirementsBefore,readSelectionComparatorBefore} from './selection-comparator-packed-source-context.mjs';\n"
+        },
+        {
+          "start": 3103,
+          "end": 3495,
+          "before": "  const read = path => readMember ? readMember(path) : readFileSync(resolve(root, path));\n",
+          "after": "  const actualRead = path => readMember ? readMember(path) : readFileSync(resolve(root, path));\n  const historicalRead = readMember || (path => readSelectionComparatorBefore(path, name => readNativeDatePackedBefore(name, actualRead)));\n  const productParent = JSON.parse(historicalRead(inputPath)).source_parent;\n  const read = nativeDateHistoricalProductRead(productParent, historicalRead);\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-source-requalification.mjs",
+      "before_sha256": "8af454d84a753f57d57af6df261527dfbabc9c940f06410080d614d3fa28e266",
+      "current_sha256": "45f81a6840c60c7139724294b073c8da95e4bddf9ca9b5dea125dc3c62a03302",
+      "edits": [
+        {
+          "start": 358,
+          "end": 437,
+          "before": "",
+          "after": "import {nativeDateCurrentRead} from './native-date-packed-source-context.mjs';\n"
+        },
+        {
+          "start": 5682,
+          "end": 5732,
+          "before": "",
+          "after": "  readMember = nativeDateCurrentRead(readMember);\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/bidi-peer-source-context.mjs",
+      "before_sha256": "59557039efc69fb2568b973165a9b3f71115ead69a9d99e30247c48f54180fae",
+      "current_sha256": "4b4fe128f56b63bb9cab9aa406dd6f70ca5480923747cbba1dbc009e45062a11",
+      "edits": [
+        {
+          "start": 355,
+          "end": 458,
+          "before": "",
+          "after": "import {nativeDateCurrentRead,nativeDateSourceContext} from './native-date-packed-source-context.mjs';\n"
+        },
+        {
+          "start": 3673,
+          "end": 4284,
+          "before": "",
+          "after": "  readMember = nativeDateCurrentRead(readMember);\n  if(path==='scripts/check-upstream-audit-disposition.mjs'){\n    const supplied=readMember(path),native=nativeDateSourceContext(readMember);\n    const previous=native.before.sources.find(row=>row.path===path),current=native.data.changes.find(row=>row.path===path);\n    if([previous.sha256,current.current_sha256].includes(hash(supplied))){\n      const {prior}=bidiPeerSourceContext(readMember),subject=prior.members.find(row=>row.path===path);\n      assert.ok(subject);assert.equal(hash(subject.text),subject.sha256);return Buffer.from(subject.text);\n    }\n  }\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "before_sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2",
+      "current_sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25",
+      "edits": [
+        {
+          "start": 2699,
+          "end": 2790,
+          "before": "",
+          "after": "import {requiresNativeDate,validateNativeDate} from './upstream-native-date-evidence.mjs';\n"
+        },
+        {
+          "start": 16453,
+          "end": 16655,
+          "before": "",
+          "after": "  if (requiresNativeDate(entry, proof)) {\n    const result = validateNativeDate({root, entry, proof, request});\n    artifactBehaviorResults.set(entry.sha, result);\n    if (!result.ok) return false;\n  }\n"
+        },
+        {
+          "start": 20984,
+          "end": 21308,
+          "before": "  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n",
+          "after": "  const sensitive = sensitiveClass(entry) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/chip-menu-tooltip-packed-evidence-requalification.mjs",
+      "before_sha256": "8a8e3ae28c8c0c3d60f44e6fe09b80e69bca2733b9dd59ec575be23532546482",
+      "current_sha256": "4e8f3abc80138b18497b918c3393c5998ce8bff97609de8d98870f541771ed18",
+      "edits": [
+        {
+          "start": 356,
+          "end": 568,
+          "before": "",
+          "after": "import {readNativeDatePackedBefore,nativeDateHistoricalProductRead} from './native-date-packed-source-context.mjs';\nimport {readBidiIsolatedReviewBefore} from './bidi-isolated-packed-source-requalification.mjs';\n"
+        },
+        {
+          "start": 2879,
+          "end": 3266,
+          "before": " const read=p=>readMember?readMember(p):readFileSync(resolve(root,p));\n",
+          "after": " const actualRead = path => readMember ? readMember(path) : readFileSync(resolve(root, path));\n const historicalRead = readMember || (path => readBidiIsolatedReviewBefore(path, name => readNativeDatePackedBefore(name, actualRead)));\n const productParent = JSON.parse(historicalRead(inputPath)).source_parent;\n const read = nativeDateHistoricalProductRead(productParent, historicalRead);\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/chip-menu-tooltip-packed-source-requalification.mjs",
+      "before_sha256": "3a8d9a15efedc7593ff95afbb96d4d7a8faf81111431a09f25a2bd66c416d03d",
+      "current_sha256": "f025d480bd328f895fcf0b6d85f735e60617495685d8fea7ed71e95ea5f88030",
+      "edits": [
+        {
+          "start": 374,
+          "end": 461,
+          "before": "",
+          "after": "import {reverseNativeDatePackedSource} from './native-date-packed-source-context.mjs';\n"
+        },
+        {
+          "start": 1285,
+          "end": 1285,
+          "before": " raw=reverseBidiIsolatedPackedSource(member,raw,line,{readMember});\n",
+          "after": ""
+        },
+        {
+          "start": 2420,
+          "end": 2586,
+          "before": "",
+          "after": " if(hash(raw)!==record.current_sha256){raw=reverseNativeDatePackedSource(member,raw,{readMember});raw=reverseBidiIsolatedPackedSource(member,raw,line,{readMember});}\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "before_sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591",
+      "current_sha256": "b2f618b78c2df350d3e3dc235626b772f7440877a37627dd0329097b3ebfee91",
+      "edits": [
+        {
+          "start": 2802,
+          "end": 2988,
+          "before": "",
+          "after": "import {nativeDatePackedFixture} from './native-date-packed-fixture.mjs';\nimport {packedNativeDateConstructorCase,packedNativeDateProviderCase} from './native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 19813,
+          "end": 19963,
+          "before": "",
+          "after": "    packedNativeDateConstructorCase(parsed.nativeDateConstructorObservation),\n    packedNativeDateProviderCase(parsed.nativeDateProviderObservation),\n"
+        },
+        {
+          "start": 42865,
+          "end": 43091,
+          "before": "",
+          "after": "    writeFileSync(join(consumer, 'src/native-date-probe.ts'), nativeDatePackedFixture());\n    writeFileSync(join(consumer, 'src/native-date-contract.mjs'), readFileSync(join(root, 'scripts/native-date-packed-contract.mjs')));\n"
+        },
+        {
+          "start": 46167,
+          "end": 46372,
+          "before": "",
+          "after": "import {observePackedNativeDateManual,observePackedNativeDateProviders} from './native-date-probe';\nimport {packedNativeDateConstructorCase,packedNativeDateProviderCase} from './native-date-contract.mjs';\n"
+        },
+        {
+          "start": 64086,
+          "end": 64212,
+          "before": "",
+          "after": "  const nativeDateManual=observePackedNativeDateManual();\n  const nativeDateConstructorObservation=nativeDateManual.observed;\n"
+        },
+        {
+          "start": 65118,
+          "end": 65215,
+          "before": "",
+          "after": "  const nativeDateProviderObservation=observePackedNativeDateProviders(nativeDateManual.direct);\n"
+        },
+        {
+          "start": 121467,
+          "end": 121718,
+          "before": "    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed),packedSelectionComparatorCase(selectionComparator.observed)]\n",
+          "after": "    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed),packedSelectionComparatorCase(selectionComparator.observed),\n    packedNativeDateConstructorCase(nativeDateConstructorObservation),packedNativeDateProviderCase(nativeDateProviderObservation)]\n"
+        },
+        {
+          "start": 121961,
+          "end": 122029,
+          "before": "",
+          "after": "    nativeDateConstructorObservation,nativeDateProviderObservation,\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/selection-comparator-packed-source-context.mjs",
+      "before_sha256": "d1fc5106e9591c48f0118eec4fb06503390369e68499b0315ddc049dd94cc512",
+      "current_sha256": "1fb3a3d7a0806b1b26c876ccdb4a00a6e2708a4a40cf952152a00388bd8125f3",
+      "edits": [
+        {
+          "start": 362,
+          "end": 478,
+          "before": "",
+          "after": "import {reverseNativeDatePackedSource,nativeDateRequirementsBefore} from './native-date-packed-source-context.mjs';\n"
+        },
+        {
+          "start": 3886,
+          "end": 3975,
+          "before": "  if (!sourcePaths.has(path)) return text;\n",
+          "after": "  if (!sourcePaths.has(path)) return reverseNativeDatePackedSource(path, text, options);\n"
+        },
+        {
+          "start": 4176,
+          "end": 4286,
+          "before": "",
+          "after": "  text = reverseNativeDatePackedSource(path, text, options);\n  if (hash(text) === before.sha256) return text;\n"
+        },
+        {
+          "start": 5996,
+          "end": 6173,
+          "before": "",
+          "after": "  current = nativeDateRequirementsBefore(sha, current, line, options);\n  if (JSON.stringify(current) === JSON.stringify(row.definition)) return structuredClone(row.definition);\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+      "before_sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06",
+      "current_sha256": "97196bb8c7a27e3501da839bd15ef612db4ee0134db5b9d8a1c2ab3de57d51df",
+      "edits": [
+        {
+          "start": 1817,
+          "end": 1904,
+          "before": "",
+          "after": "  'scripts/native-date-packed-contract.mjs', 'scripts/native-date-packed-fixture.mjs',\n"
+        },
+        {
+          "start": 2929,
+          "end": 3016,
+          "before": "",
+          "after": "  'scripts/native-date-packed-contract.mjs', 'scripts/native-date-packed-fixture.mjs',\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-bidi-evidence.mjs",
+      "before_sha256": "146b245f86532b11330b863827f11fbb9792bc8e024a54251d8f600b2dc97fa8",
+      "current_sha256": "c1c12a976109f1e6f64718494c3b0d55fec1217f2dd983242bc1e468f0bada9e",
+      "edits": [
+        {
+          "start": 7822,
+          "end": 7909,
+          "before": "",
+          "after": "  'scripts/native-date-packed-contract.mjs', 'scripts/native-date-packed-fixture.mjs',\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-generated-identity-evidence.mjs",
+      "before_sha256": "442dd7910576051ce98d2bf4ad90fe1e1dbf648adc63dc05703bcb40fc8688fd",
+      "current_sha256": "c8b33d05150afe6c4a1d3e0ee59b0becdd0631f092a5758e38b5bb5932b073a1",
+      "edits": [
+        {
+          "start": 1211,
+          "end": 1298,
+          "before": "",
+          "after": "  'scripts/native-date-packed-contract.mjs', 'scripts/native-date-packed-fixture.mjs',\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-selection-evidence.mjs",
+      "before_sha256": "ad26403d8e4b2ebfa8b9d98aaa6e3ef844e8cebaeee56ce6f3432fec0d226fb2",
+      "current_sha256": "3520e4504dd31914f0899c2736c41229a972f9b68a75249e5fe44711f04615a5",
+      "edits": [
+        {
+          "start": 14743,
+          "end": 14830,
+          "before": "",
+          "after": "  'scripts/native-date-packed-contract.mjs', 'scripts/native-date-packed-fixture.mjs',\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/audit_test_context.py",
+      "before_sha256": "523d0a34e315199301a78a013873e02b0aa6feb3eeca8baffc0a4b2accda45ea",
+      "current_sha256": "fe7f4552b7651c72d7b566737f955e51e3acc0b9f1e0f90d866f866a63f799b5",
+      "edits": [
+        {
+          "start": 2324,
+          "end": 2430,
+          "before": "",
+          "after": " ['native-date','NATIVE_DATE_KIND','native_date_behavior','nativeDateRequirements','validateNativeDate'],\n"
+        },
+        {
+          "start": 3103,
+          "end": 3209,
+          "before": "assert.equal(rows.length,line==='main'?23:22);assert.equal(new Set(rows.map(r=>r.sha)).size,rows.length);\n",
+          "after": "assert.equal(rows.length,line==='main'?24:23);assert.equal(new Set(rows.map(r=>r.sha)).size,rows.length);\n"
+        },
+        {
+          "start": 8060,
+          "end": 8146,
+          "before": "",
+          "after": "        priors.append(review.get('native_date_source_context',{}).get('prior_entry'))\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/bidi_isolated_packed_probe.mjs",
+      "before_sha256": "6b5a1ff2b2cffea149930970dac2e8b9ac5e0d48a4115b28ca71bf1af8e01f77",
+      "current_sha256": "b8127d07d05bc4b06555e578899cd90e6125534102f577d59f2f39dc4830d2f4",
+      "edits": [
+        {
+          "start": 899,
+          "end": 1020,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 4061,
+          "end": 4300,
+          "before": "  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',\n",
+          "after": "  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',\n"
+        },
+        {
+          "start": 4569,
+          "end": 4791,
+          "before": "  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/chip_menu_tooltip_packed_contract_probe.mjs",
+      "before_sha256": "918a0e6b1e78b31a8902897bad010f7aafe3ce2693578df949ece11a00a75e62",
+      "current_sha256": "4cd422bfb98a194eb143dfd45a129be48632d1437407e918f4c2ad6433f6e09d",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 2990,
+          "end": 3179,
+          "before": " packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase,packedSelectionComparatorCase};\n",
+          "after": " packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase,packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase};\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/generated_identity_packed_contract_probe.mjs",
+      "before_sha256": "cd9866ffb0e3bfb99c983cb5c6bc00f03db5cda350117b3e7bc97604f645eec1",
+      "current_sha256": "cb72f1fa75f8e9213f992df2316eb60fcd892a31456d7b535221be980fa0d482",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 8779,
+          "end": 9751,
+          "before": "const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(\n  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(\n  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/menu_item_token_packed_contract_probe.mjs",
+      "before_sha256": "5f61c1cf172915d2f8caceb9554e3b916318a1f0fb69ca6600491eafaab66c79",
+      "current_sha256": "ca54096b0f7d2a3e8bbb245f726904eaeea210de590a726c28e24647185f2f81",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5530,
+          "end": 6497,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/native_date_packed_probe.mjs",
+      "before_sha256": "e3a22b803eace3645eb6f1ec7bc93ba8ff704414b5506e88f3be6b4bd9e06c4e",
+      "current_sha256": "39e43263760e4929da63c964f1b65a69d5ac622109f4e032eaf95a838a551930",
+      "edits": [
+        {
+          "start": 11072,
+          "end": 11231,
+          "before": "  packed_collector_integrated:false,actual_Angular_DI_or_artifact_factory_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};\n",
+          "after": "  packed_collector_exercised:false,actual_Angular_DI_or_artifact_factory_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/original_patch_storage_probe.mjs",
+      "before_sha256": "22eeb514c84b552b9e7f94aa642961366947007db090c2f84b12b4f331133305",
+      "current_sha256": "1ff864698dd78955025ce290010a416473be33416c137ffbc9ab960098ed5c85",
+      "edits": [
+        {
+          "start": 1528,
+          "end": 1656,
+          "before": "const ids=[...packet.subjects.map(row=>row.sha),'b423c0e0b754b1f1d118d17e022981c357c3aa68'];\n",
+          "after": "const nativeDateSha='b423c0e0b754b1f1d118d17e022981c357c3aa68';\nconst ids=[...packet.subjects.map(row=>row.sha),nativeDateSha];\n"
+        },
+        {
+          "start": 4460,
+          "end": 4600,
+          "before": "",
+          "after": "  if(sha===nativeDateSha)for(const member of entry.individual_proof.native_date_behavior.source_members)put(member.path,read(member.path));\n"
+        },
+        {
+          "start": 5554,
+          "end": 6008,
+          "before": "   const body=JSON.parse(child.stdout);assert.equal(body.insufficient_sensitive,valid?0:1,name+': '+child.stderr);\n",
+          "after": "   const body=JSON.parse(child.stdout),detail=JSON.parse(readFileSync(out));\n   const nativeCurrentRequired=sha===nativeDateSha;\n   assert.equal(body.insufficient_sensitive,valid&&!nativeCurrentRequired?0:1,name+': '+child.stderr);\n   if(nativeCurrentRequired)assert.equal(detail.artifact_behavior_evidence.some(row=>row.sha===sha&&row.ok===false&&row.detail==='missing coordinator run'),valid,name+': current native admission must remain unqualified');\n"
+        },
+        {
+          "start": 6122,
+          "end": 6275,
+          "before": "   assert.equal(body.current_authored_use_inventory.current_source_files,1);assert.equal(body.disposition_admission,'incomplete');\n",
+          "after": "   assert.equal(body.current_authored_use_inventory.current_source_files,sha===nativeDateSha?4:1);assert.equal(body.disposition_admission,'incomplete');\n"
+        },
+        {
+          "start": 6372,
+          "end": 6575,
+          "before": "   cases.push({name,individual_patch_binding:valid?'accepted':'rejected',overall_admission:'incomplete',fixture_only:true,child_exit:child.status});\n",
+          "after": "   cases.push({name,individual_patch_binding:valid?'accepted':'rejected',native_current_run_still_required:sha===nativeDateSha,overall_admission:'incomplete',fixture_only:true,child_exit:child.status});\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/packed_required_contract_admission.mjs",
+      "before_sha256": "85cd54b0f9b2b17702dfbbf4cb982994b9729dfaa42ebdcb3e8a24ebc296c0dd",
+      "current_sha256": "39aed491735b270aba97224432dbc13e92a4f51aa2993536906e912dbae85187",
+      "edits": [
+        {
+          "start": 587,
+          "end": 708,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 3305,
+          "end": 4271,
+          "before": " const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": " const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/radio_identity_packed_contract_probe.mjs",
+      "before_sha256": "28ae025e716312b854405c79ba51eb07c5cc329b5f702e14bdcf74ceef2e04a2",
+      "current_sha256": "ba983f89f61d416ac3d24287bd8e451f9e0dffadcb022dc89821600f2de412af",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5801,
+          "end": 6766,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/select_detach_packed_contract_probe.mjs",
+      "before_sha256": "84e0ada3beab48575759a74aacb264bfd7f35e553a5c3b493f58811b4fd8be67",
+      "current_sha256": "ba952835e6e4eb4df966a76831d7abdf2e495ccece0ce281ca7b4a9715f4e10c",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5322,
+          "end": 6289,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/select_focus_click_packed_contract_probe.mjs",
+      "before_sha256": "4dff316d3fedd6218011a429434245e8312084325e63c2416f66ea1260b64c49",
+      "current_sha256": "528f8edba50e80f8c6333816e4ed1e59d58b85e67268ba5af8a0ee59043ec17a",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5056,
+          "end": 6023,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/selection_comparator_packed_probe.mjs",
+      "before_sha256": "7014d4257c7381a7dfe8acd7299b37a3c98433c7c0a79f6ab9070ac4ac6eafb4",
+      "current_sha256": "9dcfc6c8a32f17406fc53b0b0a942d8b3e614013d1cab32fd577ca88c3df58c5",
+      "edits": [
+        {
+          "start": 354,
+          "end": 450,
+          "before": "",
+          "after": "import {reverseNativeDatePackedSource} from '../scripts/native-date-packed-source-context.mjs';\n"
+        },
+        {
+          "start": 869,
+          "end": 990,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 3264,
+          "end": 3503,
+          "before": "  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',\n",
+          "after": "  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',\n"
+        },
+        {
+          "start": 3772,
+          "end": 3994,
+          "before": "  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        },
+        {
+          "start": 12100,
+          "end": 12529,
+          "before": "const change = JSON.parse(read('compatibility/rc/selection-comparator-packed-producer-change.json')); assert.equal(hash(raw), change.current_sha256);\nlet recovered = raw; for (const [before, after] of [...change.edits].reverse()) {assert.equal(recovered.split(after).length, 2); recovered = recovered.replace(after, () => before);}\n",
+          "after": "const change = JSON.parse(read('compatibility/rc/selection-comparator-packed-producer-change.json'));\nlet recovered = reverseNativeDatePackedSource('scripts/packed-consumer-aot-smoke.mjs', raw, {readMember:read});\nassert.equal(hash(recovered), change.current_sha256); for (const [before, after] of [...change.edits].reverse()) {assert.equal(recovered.split(after).length, 2); recovered = recovered.replace(after, () => before);}\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/table_onpush_packed_contract_probe.mjs",
+      "before_sha256": "1b44c359ed3c283fb0695e93a5077ad6437584733a3ab245682c69031283ffb8",
+      "current_sha256": "ac39627b30e36680213d99ffb94471fab223275c73b8b16222573d012750a5b4",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5179,
+          "end": 6147,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')\n  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')\n  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_audit_test_context.py",
+      "before_sha256": "da968974e8de23bbbb241db74e8ec4a2ad03be904ffaa32f577ebee227ae13c7",
+      "current_sha256": "a864a9c482bc9bc5f1a4ea8908a35fae59d2e8d08230eea4477dc9d91855a1e3",
+      "edits": [
+        {
+          "start": 420,
+          "end": 493,
+          "before": "",
+          "after": "from tests.native_date_source_context import project_native_date_context\n"
+        },
+        {
+          "start": 968,
+          "end": 1109,
+          "before": "        task=json.loads((ROOT/'compatibility/rc/audit-test-current-context-worksheet.json').read_bytes())\n",
+          "after": "        _,read=project_native_date_context(ROOT)\n        task=json.loads(read('compatibility/rc/audit-test-current-context-worksheet.json'))\n"
+        },
+        {
+          "start": 2915,
+          "end": 3040,
+          "before": "            self.assertEqual((ROOT/member).read_bytes(),subprocess.check_output(['git','show',task['source_parent']+':'+member],cwd=ROOT))\n",
+          "after": "            self.assertEqual(read(member),subprocess.check_output(['git','show',task['source_parent']+':'+member],cwd=ROOT))\n"
+        },
+        {
+          "start": 3342,
+          "end": 3714,
+          "before": "        self.assertTrue(set(changed)<={'scripts/historical-source-replay.mjs'})\n",
+          "after": "        new_context={p for p in changed if read(p)!=(ROOT/p).read_bytes()}\n        new_files={'scripts/upstream-native-date-evidence.mjs','scripts/native-date-packed-contract.mjs','scripts/native-date-packed-fixture.mjs','scripts/native-date-packed-source-context.mjs'}\n        self.assertTrue(set(changed)-new_context-new_files<={'scripts/historical-source-replay.mjs'})\n"
+        },
+        {
+          "start": 4607,
+          "end": 4696,
+          "before": "        self.assertEqual(len(contracts['rows']),23 if contracts['line']=='main' else 22)\n",
+          "after": "        self.assertEqual(len(contracts['rows']),24 if contracts['line']=='main' else 23)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_media_matcher_admission.py",
+      "before_sha256": "ea4518d44024518c7b3d034519595fd461488e80fb90b0abd4af5cfb59aeb2f0",
+      "current_sha256": "3d0c41b4828db991f8cb97c06e6984a84f82d23bcb21ed2bb38efbe07cf937fe",
+      "edits": [
+        {
+          "start": 413,
+          "end": 486,
+          "before": "",
+          "after": "from tests.native_date_source_context import project_native_date_context\n"
+        },
+        {
+          "start": 1345,
+          "end": 1402,
+          "before": "    read=read_member or (lambda p:(root/p).read_bytes())\n",
+          "after": "    _,read=project_native_date_context(root,read_member)\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_native_date_packed.py",
+      "before_sha256": "84eac5caefabb2d8b0b032fbe9358506f04ff23530803b7c8971cc1791d39701",
+      "current_sha256": "a8f7cf591b5139ec4941014fc0ae004f31bc26b91cbf2bcf2d71d4e4498ab142",
+      "edits": [
+        {
+          "start": 221,
+          "end": 308,
+          "before": "\"\"\"Native date observation foundation; actual packed collector integration is pending.\"\"\"\n",
+          "after": "\"\"\"Native date observation foundation; collector integration has separate controls.\"\"\"\n"
+        },
+        {
+          "start": 1391,
+          "end": 1462,
+          "before": "                self.assertFalse(report['packed_collector_integrated'])\n",
+          "after": "                self.assertFalse(report['packed_collector_exercised'])\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_original_patch_storage.py",
+      "before_sha256": "e6a5b728a933882e0377f40ebaf424c3247fa9703d556228a075ee9225f7b5c2",
+      "current_sha256": "44c523f71167cacbaf6b4444468816f5cc23358771e37f09381414f26b75e3a1",
+      "edits": [
+        {
+          "start": 390,
+          "end": 463,
+          "before": "",
+          "after": "from tests.native_date_source_context import project_native_date_context\n"
+        },
+        {
+          "start": 1266,
+          "end": 1517,
+          "before": "        task=json.loads((ROOT/'compatibility/rc/original-patch-storage-worksheet.json').read_bytes());parent=task['source_parent'];line=task['line']\n        entries={e['sha']:e for e in json.loads((ROOT/'compatibility/f10/disposition-ledger/ledger.json').read_bytes())['entries']}\n",
+          "after": "        projected,read=project_native_date_context(ROOT)\n        task=json.loads(read('compatibility/rc/original-patch-storage-worksheet.json'));parent=task['source_parent'];line=task['line']\n        entries={e['sha']:e for e in projected['entries']}\n"
+        },
+        {
+          "start": 3166,
+          "end": 3199,
+          "before": "        after=(ROOT/rule['path']).read_bytes()\n",
+          "after": "        after=read(rule['path'])\n"
+        },
+        {
+          "start": 3958,
+          "end": 4068,
+          "before": "            self.assertEqual((ROOT/member).read_bytes(),subprocess.check_output(['git','show',parent+':'+member],cwd=ROOT))\n",
+          "after": "            self.assertEqual(read(member),subprocess.check_output(['git','show',parent+':'+member],cwd=ROOT))\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/value_accessor_packed_contract_probe.mjs",
+      "before_sha256": "e28ea11bbf9a7af45c66cd3fc9c0e7ab18b76c8672b5a688ca3c203fa5ac3cef",
+      "current_sha256": "6d61796e2dd50b453fbf7782bbdf220f1935dbed8b77ebca8b270e3131bd167d",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 3884,
+          "end": 4851,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')\n (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')\n (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    }
+  ],
+  "before_requirements": [
+    {
+      "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+        "patch": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+        "kind": "chip-disabled-own-input-isolation",
+        "case_ids": [
+          "packed-consumer/harness/chip-individual-disabled-form-isolation"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-chips/chip.ts",
+          "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+          "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+          "reference/material-16.2.14/chips-keyboard-sources/chip.ts",
+          "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "chipDisabledObservation",
+        "legacy_field": "chipDisabledIsolation"
+      }
+    },
+    {
+      "sha": "86a96c9290e3896485c6b6c0d039873652f543df",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "86a96c9290e3896485c6b6c0d039873652f543df",
+        "patch": "43ed5d9c6e88c0275fd0acd049ddeb31a34f56e1268806db5c5b65371afa9c29",
+        "kind": "menu-lazy-owned-view-detach",
+        "case_ids": [
+          "packed-consumer/harness/menu-lazy-item-destruction"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-menu/menu.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.html",
+          "projects/ngx-material-legacy/legacy-menu/menu.scss",
+          "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+          "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+          "compatibility/rc/menu-overlay-exit-original-trigger.ts.gz",
+          "compatibility/rc/menu-overlay-exit-original-animations.ts.gz",
+          "compatibility/rc/menu-overlay-exit-source-proof.json",
+          "compatibility/rc/menu-overlay-exit-accepted-protocol.json",
+          "compatibility/rc/menu-overlay-exit-native-accepted.json",
+          "scripts/native-motion-consumer.ts",
+          "scripts/native-motion-roster.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "menuLazyObservation",
+        "legacy_field": "lazyMenuLifecycle"
+      }
+    },
+    {
+      "sha": "68b267dd59f3addf92a3b9f8ce9e8baa479df7f4",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "68b267dd59f3addf92a3b9f8ce9e8baa479df7f4",
+        "patch": "18b8d7b47b2f26e04cf1d50df6cc26d773af0cb8760c9f1015487e4af356cd90",
+        "kind": "tooltip-eager-view-container",
+        "case_ids": [
+          "packed-consumer/harness/tooltip-original-eager-dependencies"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+          "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+          "projects/ngx-material-legacy/legacy-tooltip/tooltip.html",
+          "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+          "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+          "reference/material-16.2.14/tooltip-render-sources/tooltip.ts",
+          "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-portal.mjs",
+          "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-_portal-directives-chunk.d.ts",
+          "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-portal.mjs",
+          "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-_portal-directives-chunk.d.ts",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "tooltipContainerObservation",
+        "legacy_field": "tooltipOriginalEagerDependencies"
+      }
+    },
+    {
+      "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
+        "patch": "b443861e8eabbfa6c7613fc26349a89e59d2b364493d426461957beb247b691a",
+        "kind": "select-close-on-real-scroll-detach",
+        "case_ids": [
+          "packed-consumer/harness/select-close-on-real-scroll-detach"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-select/select.html",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-select/select.ts",
+          "scripts/select-detach-packed-fixture.mjs",
+          "scripts/select-detach-packed-contract.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "selectScrollDetach",
+        "legacy_field": null
+      }
+    },
+    {
+      "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+        "patch": "3630c1798278c09cfd65afa8a4d5853034cfd2a0bd67eff9dc2edd6aa4d8808f",
+        "kind": "table-no-data-row-on-push",
+        "case_ids": [
+          "packed-consumer/harness/table-no-data-row-on-push-rendering"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-table/table.ts",
+          "projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts",
+          "projects/ngx-material-legacy/legacy-table/row.ts",
+          "projects/ngx-material-legacy/legacy-table/table-module.ts",
+          "projects/ngx-material-legacy/legacy-table/table-data-source.ts",
+          "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+          "scripts/table-onpush-packed-fixture.mjs",
+          "scripts/table-onpush-packed-contract.mjs",
+          "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+          "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "tableOnPushRendering",
+        "legacy_field": null
+      }
+    },
+    {
+      "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+        "patch": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+        "kind": "select-focus-before-click",
+        "case_ids": [
+          "packed-consumer/harness/legacy-select"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-select/select.html",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-select/select.ts",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/select-focus-click-packed-fixture.mjs",
+          "scripts/select-focus-click-packed-contract.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "selectFocusClick",
+        "legacy_field": null
+      }
+    },
+    {
+      "sha": "77ffdf98ba71c11d908b29e02b516dddf487ae0b",
+      "field": "historical_behavior",
+      "definition": {
+        "patch": "651a4d5c27086e2011a17b2d97a58a7a0f32f8dc8000bc3d7ee5ffd98b3d098b",
+        "kind": "autocomplete-required-selection-model",
+        "members": [
+          "scripts/rc-test-legacy-family.mjs",
+          "scripts/historical-case-roster.mjs",
+          "scripts/resolve-run-library.mjs",
+          "scripts/rc-verify.py",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-historical-behavior-evidence.mjs",
+          "testing/legacy-runner/build.mjs",
+          "testing/legacy-runner/adapt-spec.mjs",
+          "testing/legacy-runner/entry.ts",
+          "testing/legacy-runner/init-test-env.ts",
+          "testing/legacy-runner/karma.conf.cjs",
+          "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "testing/legacy-runner/historical-inventory.json",
+          "testing/legacy-runner/historical-specs.json",
+          "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "compatibility/rc/matrices/full-verify.json",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts"
+        ],
+        "cases": [
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#37",
+            "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "full_name": "MatAutocomplete > forms integration > should retain the selected model while typing when selection is required"
+          },
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#38",
+            "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "full_name": "MatAutocomplete > forms integration > should publish the chosen option once after required-selection typing"
+          },
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#39",
+            "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "full_name": "MatAutocomplete > forms integration > should reset unmatched required-selection text once on outside click"
+          }
+        ]
+      }
+    },
+    {
+      "sha": "db06fa8d8939d793f598bc3dbedc96a5a71c0db0",
+      "field": "historical_behavior",
+      "definition": {
+        "patch": "097bc267621c07d520fd9aac2e3329a90c05c0ca308a9cc4e3aa4ecb43dc68b7",
+        "kind": "autocomplete-empty-required-selection",
+        "members": [
+          "scripts/rc-test-legacy-family.mjs",
+          "scripts/historical-case-roster.mjs",
+          "scripts/resolve-run-library.mjs",
+          "scripts/rc-verify.py",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-historical-behavior-evidence.mjs",
+          "testing/legacy-runner/build.mjs",
+          "testing/legacy-runner/adapt-spec.mjs",
+          "testing/legacy-runner/entry.ts",
+          "testing/legacy-runner/init-test-env.ts",
+          "testing/legacy-runner/karma.conf.cjs",
+          "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "testing/legacy-runner/historical-inventory.json",
+          "testing/legacy-runner/historical-specs.json",
+          "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "compatibility/rc/matrices/full-verify.json",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts"
+        ],
+        "cases": [
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#172",
+            "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "full_name": "MatAutocomplete > should not throw errors when closing without options"
+          }
+        ]
+      }
+    },
+    {
+      "sha": "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+      "field": "historical_behavior",
+      "definition": {
+        "patch": "ee5e90a8d85ee282ae185775732e8e6a56e907bb60cda7c9fe36923d406006bf",
+        "kind": "tab-link-enter-activation",
+        "members": [
+          "scripts/rc-test-legacy-family.mjs",
+          "scripts/historical-case-roster.mjs",
+          "scripts/resolve-run-library.mjs",
+          "scripts/rc-verify.py",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-historical-behavior-evidence.mjs",
+          "testing/legacy-runner/build.mjs",
+          "testing/legacy-runner/adapt-spec.mjs",
+          "testing/legacy-runner/entry.ts",
+          "testing/legacy-runner/init-test-env.ts",
+          "testing/legacy-runner/karma.conf.cjs",
+          "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "testing/legacy-runner/historical-inventory.json",
+          "testing/legacy-runner/historical-specs.json",
+          "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "compatibility/rc/matrices/full-verify.json",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts"
+        ],
+        "cases": [
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#21",
+            "historical_path": "src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "full_name": "MatTabNavBar > should activate a tab-panel link on enter without preventing navigation"
+          },
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#22",
+            "historical_path": "src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "full_name": "MatTabNavBar > should prevent enter on disabled tab-panel links without activating them"
+          },
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#33",
+            "historical_path": "src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "full_name": "MatTabNavBar > without panel > should leave native enter navigation alone without a tab panel"
+          }
+        ]
+      }
+    },
+    {
+      "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+      "field": "historical_behavior",
+      "definition": {
+        "patch": "e237a5b4d0aeb7afb5765e852a89945691ffa98604ba9bfddd2988e5068d3414",
+        "kind": "select-unresolved-panel-close",
+        "members": [
+          "scripts/rc-test-legacy-family.mjs",
+          "scripts/historical-case-roster.mjs",
+          "scripts/resolve-run-library.mjs",
+          "scripts/rc-verify.py",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-historical-behavior-evidence.mjs",
+          "testing/legacy-runner/build.mjs",
+          "testing/legacy-runner/adapt-spec.mjs",
+          "testing/legacy-runner/entry.ts",
+          "testing/legacy-runner/init-test-env.ts",
+          "testing/legacy-runner/karma.conf.cjs",
+          "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "testing/legacy-runner/historical-inventory.json",
+          "testing/legacy-runner/historical-specs.json",
+          "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "compatibility/rc/matrices/full-verify.json",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+          "projects/ngx-material-legacy/legacy-select/select.ts",
+          "projects/ngx-material-legacy/legacy-select/select.html",
+          "projects/ngx-material-legacy/legacy-select/select.scss",
+          "projects/ngx-material-legacy/legacy-select/select.spec.ts"
+        ],
+        "cases": [
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-select/select.spec.ts#70",
+            "historical_path": "src/material/legacy-select/select.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "full_name": "MatSelect > core > overlay panel > should close an enabled-motion panel before its view is resolved"
+          }
+        ]
+      }
+    },
+    {
+      "sha": "938f478efdc96ef0de1217e806f98939beb027cd",
+      "field": "generated_identity_behavior",
+      "definition": {
+        "kind": "owned-identity-independent-of-private-cdk-generator",
+        "patch": "e756cce5271186044ae2f18746d6685f7bee5a83328605800cea0817b761cb35",
+        "members": [
+          "scripts/upstream-generated-identity-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/generated-identity-packed-fixture.mjs",
+          "scripts/generated-identity-packed-contract.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.html",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "compatibility/rc/remaining-identity-public-subjects.json",
+          "compatibility/rc/remaining-identity-source-proof.json",
+          "compatibility/rc/snack-modal-identity-source-proof.json",
+          "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json"
+        ],
+        "case_ids": [
+          "packed-consumer/harness/generated-identity-coexistence"
+        ]
+      }
+    },
+    {
+      "sha": "ea0aed5a0cba3288d89e7448073e0a5556487313",
+      "field": "generated_identity_behavior",
+      "definition": {
+        "kind": "owned-menu-panel-identity-coexistence",
+        "patch": "61e21a3d1846f725b6a048fe434d74e0bd173a6fc3e90bca79091c349a39c7ec",
+        "members": [
+          "scripts/upstream-generated-identity-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/generated-identity-packed-fixture.mjs",
+          "scripts/generated-identity-packed-contract.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.html",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "compatibility/rc/remaining-identity-public-subjects.json",
+          "compatibility/rc/remaining-identity-source-proof.json",
+          "compatibility/rc/snack-modal-identity-source-proof.json",
+          "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json"
+        ],
+        "case_ids": [
+          "packed-consumer/harness/generated-identity-coexistence"
+        ]
+      }
+    },
+    {
+      "sha": "69968510fb0222ee565f57171640a99768efa972",
+      "field": "generated_identity_behavior",
+      "definition": {
+        "kind": "owned-snack-live-identity-and-modal-ownership",
+        "patch": "3809a4c8be10fbe0e99531fda686e37f32dc153640055c86b612be0668849dbe",
+        "members": [
+          "scripts/upstream-generated-identity-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/generated-identity-packed-fixture.mjs",
+          "scripts/generated-identity-packed-contract.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.html",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "compatibility/rc/remaining-identity-public-subjects.json",
+          "compatibility/rc/remaining-identity-source-proof.json",
+          "compatibility/rc/snack-modal-identity-source-proof.json",
+          "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json"
+        ],
+        "case_ids": [
+          "packed-consumer/harness/generated-identity-coexistence"
+        ]
+      }
+    },
+    {
+      "sha": "9494ff2d65c98726046e6a20dd6a6d938e97a2f6",
+      "field": "selection_behavior",
+      "definition": {
+        "sha": "9494ff2d65c98726046e6a20dd6a6d938e97a2f6",
+        "patch": "cf574324e4e76ccd1ea45bf25e3bddf9e28b9db07d9fce40e804d04b0a55a73c",
+        "kind": "public-comparator-retains-real-legacy-list-option",
+        "case_ids": [
+          "packed-consumer/harness/selection-model-comparator-public-list"
+        ],
+        "members": [
+          "scripts/upstream-selection-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/selection-model-use-review.mjs",
+          "compatibility/rc/selection-model-public-subjects.json",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-list/selection-list.ts",
+          "projects/ngx-material-legacy/legacy-list/list-module.ts",
+          "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "reference/material-16.2.14/value-accessor-token-sources/legacy-list/selection-list.ts",
+          "compatibility/rc/selection-model-public-source-members/31d219c893ebad02623af3fbbd63cb9474de9d165d2936f07f9e9bb91ae4780f.gz",
+          "compatibility/rc/selection-model-public-source-members/abdfe679ed7fc91cb4495428e82a8ad329bceca2766d9f5ecc6c5fb77dab2679.gz",
+          "compatibility/rc/selection-model-public-source-members/b203e04cedb6c811df181722f22039f8a7cc28faeb6b264b923b0289eb2b88be.gz",
+          "compatibility/rc/selection-model-public-source-members/50b8f7f87988cb7688ec24e672a603feefdfeeb667db63f37d1ff76c332b2c79.gz",
+          "compatibility/rc/selection-model-public-source-members/257ec72a8f6840fe9a9d0e2233dc5274f5131088ec36a8d03e61a7015792be2c.gz",
+          "compatibility/rc/selection-model-public-source-members/6606304e6fdfb161997bb3835f2f01b132cc9d8776c6ab941aa6495629fe5624.gz",
+          "compatibility/rc/selection-model-public-source-members/ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933.gz",
+          "compatibility/rc/selection-model-public-source-members/581228c64dea7a741cd82cc867dbc74aaf333f00a415a542c94f32904ca40737.gz",
+          "compatibility/rc/selection-model-public-source-members/49a973c9bf6f3cf5ca945ebd76a663b66f31c99867deccff5063df5d7000303b.gz",
+          "compatibility/rc/selection-model-public-source-members/9d6a5b625752af00cccc5dbcd1df2a65c2a5b6791b2543a7cae6121bede71952.gz",
+          "compatibility/rc/selection-model-public-source-members/e96c88c22a213451ae8c5ad9c283539e2c43f48557092c0cbfe8a019d0890df0.gz",
+          "compatibility/rc/selection-model-public-source-members/19bbd91064ebe0469f554155572a0b4bb4713ad7cafbc0af9d31cbafdbf223bb.gz"
+        ],
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "path": "compatibility/rc/selection-model-public-source-members/50b8f7f87988cb7688ec24e672a603feefdfeeb667db63f37d1ff76c332b2c79.gz",
+          "sha256": "50b8f7f87988cb7688ec24e672a603feefdfeeb667db63f37d1ff76c332b2c79",
+          "member": "SelectionModel.setSelection"
+        }
+      }
+    },
+    {
+      "sha": "8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc",
+      "field": "bidi_behavior",
+      "definition": {
+        "sha": "8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc",
+        "kind": "public-standalone-bidi-module-reexport",
+        "patch": "b5b2f1fe9262a0764c4aefac3eec4920caf3a88965f52708130348cda8906a41",
+        "case_ids": [
+          "packed-consumer/harness/bidi-module-legacy-node-scope"
+        ],
+        "members": [
+          "scripts/upstream-bidi-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/bidi-module-use-review.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/material-public-subjects.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+          "projects/ngx-material-legacy/legacy-input/input-module.ts",
+          "projects/ngx-material-legacy/legacy-input/input.ts",
+          "projects/ngx-material-legacy/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-card/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-tooltip/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-paginator/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-table/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-slider/internal/common-module.ts",
+          "projects/ngx-material-legacy/src/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-button/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-checkbox/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts",
+          "projects/ngx-material-legacy/legacy-list/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-radio/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-progress-bar/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-slide-toggle/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-input/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-chips/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-form-field/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-dialog/internal/common-module.ts",
+          "compatibility/rc/material-public-source-members/0db67adbfeeb1d633a999e8cf603ae6f8f26e66191e450e86284f0119652b07e.gz",
+          "compatibility/rc/material-public-source-members/385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740.gz",
+          "compatibility/rc/material-public-source-members/0268e701ec17daa78e322d73365861673a4f1238ba8673c2f1dc0996e60bfa90.gz",
+          "compatibility/rc/material-public-source-members/769187ce194c8dc07761a9e7d3576475e8ace31b42cbc2e2935e3a74f3e4a9b5.gz"
+        ],
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "path": "compatibility/rc/material-public-source-members/385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740.gz",
+          "sha256": "385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740",
+          "member": "BidiModule"
+        }
+      }
+    },
+    {
+      "sha": "25f391a3c545a1b829a74584c4f9235ab8d18497",
+      "field": "bidi_behavior",
+      "definition": {
+        "sha": "25f391a3c545a1b829a74584c4f9235ab8d18497",
+        "kind": "public-dir-strict-initialization-and-behavior",
+        "patch": "c059a453336395d30e1f19ee20ad5f2420f8ead0762ecec24087d218019697e1",
+        "case_ids": [
+          "packed-consumer/harness/bidi-module-legacy-node-scope"
+        ],
+        "members": [
+          "scripts/upstream-bidi-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/bidi-module-use-review.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/material-public-subjects.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+          "projects/ngx-material-legacy/legacy-input/input-module.ts",
+          "projects/ngx-material-legacy/legacy-input/input.ts",
+          "projects/ngx-material-legacy/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-card/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-tooltip/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-paginator/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-table/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-slider/internal/common-module.ts",
+          "projects/ngx-material-legacy/src/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-button/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-checkbox/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts",
+          "projects/ngx-material-legacy/legacy-list/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-radio/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-progress-bar/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-slide-toggle/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-input/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-chips/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-form-field/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-dialog/internal/common-module.ts",
+          "compatibility/rc/material-public-source-members/0db67adbfeeb1d633a999e8cf603ae6f8f26e66191e450e86284f0119652b07e.gz",
+          "compatibility/rc/material-public-source-members/385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740.gz",
+          "compatibility/rc/material-public-source-members/0268e701ec17daa78e322d73365861673a4f1238ba8673c2f1dc0996e60bfa90.gz",
+          "compatibility/rc/material-public-source-members/769187ce194c8dc07761a9e7d3576475e8ace31b42cbc2e2935e3a74f3e4a9b5.gz"
+        ],
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "path": "compatibility/rc/material-public-source-members/385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740.gz",
+          "sha256": "385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740",
+          "member": "Dir"
+        }
+      }
+    },
+    {
+      "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
+      "field": "progress_csp_behavior",
+      "definition": {
+        "patch": "18842b79bf257366ae8e8dcd2c2a2ce43401dfb91d7a2efd29e98598649f6fdf",
+        "kind": "progress-non-buffer-dot-resource-isolation",
+        "members": [
+          "scripts/upstream-progress-csp-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-surface-families.mjs",
+          "scripts/progress-csp-style-contract.mjs",
+          "scripts/legacy-core-high-contrast-contract.mjs",
+          "scripts/peer-icon-tt-admission.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.html",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.scss",
+          "projects/ngx-material-legacy/styles/progress-bar/_progress-bar-theme.scss",
+          "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_linear-progress.scss",
+          "projects/ngx-material-legacy/styles/vendor/mdc/linear-progress/_linear-progress-theme.scss",
+          "projects/ngx-material-legacy/styles/vendor/mdc/dom/_dom.scss",
+          "compatibility/rc/progress-csp-admission-peer-fesm2022--progress-bar.mjs.gz",
+          "compatibility/rc/progress-csp-admission-peer-progress-bar--_m2-progress-bar.scss.gz",
+          "compatibility/rc/progress-csp-admission-peer-progress-bar--_progress-bar-theme.scss.gz"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "modes": [
+          "determinate",
+          "buffer",
+          "query",
+          "indeterminate"
+        ]
+      }
+    },
+    {
+      "sha": "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
+      "field": "progress_csp_behavior",
+      "definition": {
+        "patch": "020fb04d57aa9aeb6199fd2d0f6a8ae11a27a4a55312efd3ce9e7134f924aabf",
+        "kind": "progress-buffer-gradient-resource-isolation",
+        "members": [
+          "scripts/upstream-progress-csp-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-surface-families.mjs",
+          "scripts/progress-csp-style-contract.mjs",
+          "scripts/legacy-core-high-contrast-contract.mjs",
+          "scripts/peer-icon-tt-admission.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.html",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.scss",
+          "projects/ngx-material-legacy/styles/progress-bar/_progress-bar-theme.scss",
+          "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_linear-progress.scss",
+          "projects/ngx-material-legacy/styles/vendor/mdc/linear-progress/_linear-progress-theme.scss",
+          "projects/ngx-material-legacy/styles/vendor/mdc/dom/_dom.scss",
+          "compatibility/rc/progress-csp-admission-peer-fesm2022--progress-bar.mjs.gz",
+          "compatibility/rc/progress-csp-admission-peer-progress-bar--_m2-progress-bar.scss.gz",
+          "compatibility/rc/progress-csp-admission-peer-progress-bar--_progress-bar-theme.scss.gz"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "modes": [
+          "determinate",
+          "buffer",
+          "query",
+          "indeterminate"
+        ]
+      }
+    },
+    {
+      "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+      "field": "form_field_hover_behavior",
+      "definition": {
+        "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+        "patch": "e2ca404fabad6af81c12ef841957e5d3a05a9439627b3302751baccde7ec9d69",
+        "kind": "historical-exported-form-field-host-hover",
+        "members": [
+          "scripts/upstream-form-field-hover-evidence.mjs",
+          "scripts/upstream-browser-run-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-required-cells.mjs",
+          "scripts/browser-surface-families.mjs",
+          "scripts/form-field-state-style-observation.mjs",
+          "scripts/sass-form-field-state-contract.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+          "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+          "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-theme.scss",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "reference/material-16.2.14/error-helper-sources/form-field-focus-overlay.scss",
+          "compatibility/rc/form-field-hover-followup-peer-members/8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85.mjs.gz"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "themes": [
+          "peer-form-hover",
+          "peer-form-hover-dark"
+        ],
+        "installed_member": {
+          "package": "@angular/material",
+          "version": "22.1.7",
+          "path": "compatibility/rc/form-field-hover-followup-peer-members/8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85.mjs.gz",
+          "sha256": "8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85",
+          "member": "MatFormField structural styles"
+        }
+      }
+    },
+    {
+      "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+      "field": "tab_completion_behavior",
+      "definition": {
+        "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+        "patch": "8c5c7c7e24faef142a0320faf51bd61cecd10c7e06eeeeb15ddc0f53cb654083",
+        "kind": "historical-tab-completion-state-filter",
+        "engines": [
+          "chromium",
+          "firefox",
+          "webkit"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "modes": [
+          "enabled",
+          "provider-disabled",
+          "reduced",
+          "zero"
+        ],
+        "case_ids": [
+          "native-motion/main/chromium/zoneful/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/firefox/zoneful/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/webkit/zoneful/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/chromium/zoneless/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/firefox/zoneless/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/webkit/zoneless/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/chromium/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/firefox/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/webkit/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/chromium/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/firefox/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/webkit/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/chromium/zoneful/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/firefox/zoneful/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/webkit/zoneful/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/chromium/zoneless/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/firefox/zoneless/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/webkit/zoneless/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/chromium/zoneful/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/firefox/zoneful/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/webkit/zoneful/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/chromium/zoneless/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/firefox/zoneless/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/webkit/zoneless/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/chromium/zoneful/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/firefox/zoneful/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/webkit/zoneful/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/chromium/zoneless/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/firefox/zoneless/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/webkit/zoneless/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/firefox/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/webkit/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/chromium/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/firefox/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/webkit/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/chromium/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/firefox/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/webkit/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/chromium/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/firefox/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/webkit/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/chromium/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/firefox/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/webkit/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/chromium/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/firefox/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/webkit/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/chromium/zoneful/exactly-once-notification/tabs/animationDone/zero",
+          "native-motion/main/firefox/zoneful/exactly-once-notification/tabs/animationDone/zero",
+          "native-motion/main/webkit/zoneful/exactly-once-notification/tabs/animationDone/zero",
+          "native-motion/main/chromium/zoneless/exactly-once-notification/tabs/animationDone/zero",
+          "native-motion/main/firefox/zoneless/exactly-once-notification/tabs/animationDone/zero",
+          "native-motion/main/webkit/zoneless/exactly-once-notification/tabs/animationDone/zero"
+        ],
+        "members": [
+          "scripts/upstream-tab-completion-evidence.mjs",
+          "scripts/upstream-native-motion-run-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/native-motion-acceptance.mjs",
+          "scripts/native-motion-roster.mjs",
+          "scripts/native-motion-run.mjs",
+          "scripts/native-motion-page.mjs",
+          "scripts/native-motion-consumer.ts",
+          "scripts/browser-matrix-roster.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-body.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-group.html",
+          "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+          "projects/ngx-material-legacy/legacy-tabs/tab-body.scss",
+          "reference/material-16.2.14/component-motion-sources/tabs/tab-body.ts",
+          "compatibility/rc/tab-completion-peer-sources/22.1.7.tabs.mjs.gz"
+        ],
+        "peer_reference": {
+          "package": "@angular/material",
+          "version": "22.1.7",
+          "path": "compatibility/rc/tab-completion-peer-sources/22.1.7.tabs.mjs.gz",
+          "sha256": "bd6314ac06a0eed5cf0fe3a8e4c5cf69526df9541df5e40dc01a406af257fb09",
+          "member": "unmodified peer tabs module"
+        }
+      }
+    },
+    {
+      "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+      "field": "ripple_replay_behavior",
+      "definition": {
+        "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+        "patch": "c5a3cab8777ece5990a5e00eaa506a871971176c33e8ade45277d7a2a169b037",
+        "kind": "owned-replay-fallback-and-distinct-public-native-route",
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "members": [
+          "scripts/upstream-ripple-replay-evidence.mjs",
+          "scripts/upstream-browser-run-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-required-cells.mjs",
+          "scripts/ripple-hydration-replay.mjs",
+          "scripts/ripple-hydration-application.mjs",
+          "scripts/ripple-hydration-component-fixture.mjs",
+          "scripts/ripple-native-event-probe.mjs",
+          "scripts/ripple-public-replay-probe.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-core/public-api.ts",
+          "projects/ngx-material-legacy/legacy-core/ripple/index.ts",
+          "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+          "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts",
+          "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts",
+          "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts",
+          "compatibility/rc/material-public-subjects.json",
+          "compatibility/rc/material-public-source-members/ba6a8afdd5fde4736ff8fe14ed7c2caaf06041a247ab20d083b7fc7bc4309f8a.gz",
+          "compatibility/rc/material-public-source-members/a5da707a2f05673bccfe9fe92f4384ddff0d4d5d7c77bd7cf65ad62eeaa339ae.gz"
+        ],
+        "peer_reference": {
+          "public_route": "@angular/material/core#MatRipple",
+          "core_version": "22.1.7",
+          "cdk_version": "22.1.7",
+          "material_version": "22.1.7",
+          "helper_has_replay_catch": true,
+          "helper": {
+            "path": "compatibility/rc/material-public-source-members/ba6a8afdd5fde4736ff8fe14ed7c2caaf06041a247ab20d083b7fc7bc4309f8a.gz",
+            "sha256": "ba6a8afdd5fde4736ff8fe14ed7c2caaf06041a247ab20d083b7fc7bc4309f8a"
+          },
+          "caller": {
+            "path": "compatibility/rc/material-public-source-members/a5da707a2f05673bccfe9fe92f4384ddff0d4d5d7c77bd7cf65ad62eeaa339ae.gz",
+            "sha256": "a5da707a2f05673bccfe9fe92f4384ddff0d4d5d7c77bd7cf65ad62eeaa339ae"
+          }
+        }
+      }
+    },
+    {
+      "sha": "d8a6c3edd8d406b3f1b1c26805612eac8856b745",
+      "field": "content_observer_behavior",
+      "definition": {
+        "sha": "d8a6c3edd8d406b3f1b1c26805612eac8856b745",
+        "patch": "00c3c8215628119ebf9f173e7379adcd4f3b311b7cccbbc9a243b36254a3eea8",
+        "kind": "native-public-comment-filter-and-owned-header",
+        "case_ids": [
+          "browser-diagnostic/content-observer/legacy-header-native"
+        ],
+        "stages": [
+          "comment-add",
+          "comment-edit",
+          "comment-remove",
+          "text-add",
+          "text-edit",
+          "text-same",
+          "text-remove",
+          "mixed-add",
+          "mixed-remove",
+          "shared-after-unsubscribe",
+          "destroyed-owner",
+          "reobserve-detached",
+          "final-unsubscribe"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "members": [
+          "scripts/upstream-content-observer-evidence.mjs",
+          "scripts/upstream-browser-run-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-required-cells.mjs",
+          "scripts/browser-surface-families.mjs",
+          "scripts/content-observer-native-contract.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-tabs/tabs-module.ts",
+          "projects/ngx-material-legacy/legacy-tabs/public-api.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-group.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-header.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-header.html",
+          "projects/ngx-material-legacy/legacy-tabs/tab-header.scss",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts",
+          "compatibility/rc/material-public-source-members/8991cf56e1d55d6e784280fb658546b15999a4ea803e599a6a6c905fc7c47746.gz",
+          "compatibility/rc/material-public-source-members/5f0573712362469c94921044786089b44009577af1143942f6a3991d9e0eeacb.gz"
+        ],
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "path": "compatibility/rc/material-public-source-members/8991cf56e1d55d6e784280fb658546b15999a4ea803e599a6a6c905fc7c47746.gz",
+          "sha256": "8991cf56e1d55d6e784280fb658546b15999a4ea803e599a6a6c905fc7c47746",
+          "member": "ContentObserver.observe / CdkObserveContent"
+        },
+        "public_declaration": {
+          "path": "compatibility/rc/material-public-source-members/5f0573712362469c94921044786089b44009577af1143942f6a3991d9e0eeacb.gz",
+          "sha256": "5f0573712362469c94921044786089b44009577af1143942f6a3991d9e0eeacb"
+        },
+        "consumer_peer": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "runtime_member": "fesm2022/observers.mjs",
+          "runtime_sha256": "8991cf56e1d55d6e784280fb658546b15999a4ea803e599a6a6c905fc7c47746",
+          "types_member": "types/observers.d.ts",
+          "types_sha256": "5f0573712362469c94921044786089b44009577af1143942f6a3991d9e0eeacb"
+        }
+      }
+    },
+    {
+      "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+      "field": "media_matcher_behavior",
+      "definition": {
+        "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+        "patch": "a89ab37d4dd3819592854002413e12b1840bb047195528455ea90cea8cbcdc44",
+        "kind": "native-public-exact-brace-filter",
+        "case_ids": [
+          "browser-diagnostic/media-matcher/native-brace-filter"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "members": [
+          "scripts/upstream-media-matcher-evidence.mjs",
+          "scripts/media-matcher-peer-identity.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-browser-run-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-required-cells.mjs",
+          "scripts/browser-surface-families.mjs",
+          "scripts/rc-verify.py",
+          "scripts/packed-consumer-evidence.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+          "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+          "compatibility/rc/material-public-source-members/ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933.gz",
+          "compatibility/rc/material-public-source-members/2ee894e12f9c4bedfea46aff56f317bb3d4f874e76a95b6b98e304b89866d6f6.gz",
+          "compatibility/rc/material-public-source-members/39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2.gz",
+          "compatibility/rc/material-public-source-members/a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01.gz"
+        ],
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "path": "compatibility/rc/material-public-source-members/39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2.gz",
+          "sha256": "39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2",
+          "member": "MediaMatcher.matchMedia / createEmptyStyleRule"
+        },
+        "public_declaration": {
+          "path": "compatibility/rc/material-public-source-members/a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01.gz",
+          "sha256": "a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01"
+        },
+        "consumer_peer": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "package_json_sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933",
+          "runtime_member": "fesm2022/layout.mjs",
+          "runtime_sha256": "2ee894e12f9c4bedfea46aff56f317bb3d4f874e76a95b6b98e304b89866d6f6",
+          "implementation_member": "fesm2022/_breakpoints-observer-chunk.mjs",
+          "implementation_sha256": "39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2",
+          "types_member": "types/layout.d.ts",
+          "types_sha256": "a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01"
+        }
+      }
+    }
+  ],
+  "after_requirements": [
+    {
+      "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+        "patch": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+        "kind": "chip-disabled-own-input-isolation",
+        "case_ids": [
+          "packed-consumer/harness/chip-individual-disabled-form-isolation"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-chips/chip.ts",
+          "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+          "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+          "reference/material-16.2.14/chips-keyboard-sources/chip.ts",
+          "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "chipDisabledObservation",
+        "legacy_field": "chipDisabledIsolation"
+      }
+    },
+    {
+      "sha": "86a96c9290e3896485c6b6c0d039873652f543df",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "86a96c9290e3896485c6b6c0d039873652f543df",
+        "patch": "43ed5d9c6e88c0275fd0acd049ddeb31a34f56e1268806db5c5b65371afa9c29",
+        "kind": "menu-lazy-owned-view-detach",
+        "case_ids": [
+          "packed-consumer/harness/menu-lazy-item-destruction"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-menu/menu.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu-content.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.html",
+          "projects/ngx-material-legacy/legacy-menu/menu.scss",
+          "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+          "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+          "compatibility/rc/menu-overlay-exit-original-trigger.ts.gz",
+          "compatibility/rc/menu-overlay-exit-original-animations.ts.gz",
+          "compatibility/rc/menu-overlay-exit-source-proof.json",
+          "compatibility/rc/menu-overlay-exit-accepted-protocol.json",
+          "compatibility/rc/menu-overlay-exit-native-accepted.json",
+          "scripts/native-motion-consumer.ts",
+          "scripts/native-motion-roster.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "menuLazyObservation",
+        "legacy_field": "lazyMenuLifecycle"
+      }
+    },
+    {
+      "sha": "68b267dd59f3addf92a3b9f8ce9e8baa479df7f4",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "68b267dd59f3addf92a3b9f8ce9e8baa479df7f4",
+        "patch": "18b8d7b47b2f26e04cf1d50df6cc26d773af0cb8760c9f1015487e4af356cd90",
+        "kind": "tooltip-eager-view-container",
+        "case_ids": [
+          "packed-consumer/harness/tooltip-original-eager-dependencies"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+          "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+          "projects/ngx-material-legacy/legacy-tooltip/tooltip.html",
+          "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+          "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+          "reference/material-16.2.14/tooltip-render-sources/tooltip.ts",
+          "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-portal.mjs",
+          "compatibility/rc/dialog-public-container-peer-sources/cdk-21.2.14-_portal-directives-chunk.d.ts",
+          "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-portal.mjs",
+          "compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-_portal-directives-chunk.d.ts",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "tooltipContainerObservation",
+        "legacy_field": "tooltipOriginalEagerDependencies"
+      }
+    },
+    {
+      "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
+        "patch": "b443861e8eabbfa6c7613fc26349a89e59d2b364493d426461957beb247b691a",
+        "kind": "select-close-on-real-scroll-detach",
+        "case_ids": [
+          "packed-consumer/harness/select-close-on-real-scroll-detach"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-select/select.html",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-select/select.ts",
+          "scripts/select-detach-packed-fixture.mjs",
+          "scripts/select-detach-packed-contract.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "selectScrollDetach",
+        "legacy_field": null
+      }
+    },
+    {
+      "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "ca9c490ee30dbf7c9c147079197d0dbc0abcd611",
+        "patch": "3630c1798278c09cfd65afa8a4d5853034cfd2a0bd67eff9dc2edd6aa4d8808f",
+        "kind": "table-no-data-row-on-push",
+        "case_ids": [
+          "packed-consumer/harness/table-no-data-row-on-push-rendering"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-table/table.ts",
+          "projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts",
+          "projects/ngx-material-legacy/legacy-table/row.ts",
+          "projects/ngx-material-legacy/legacy-table/table-module.ts",
+          "projects/ngx-material-legacy/legacy-table/table-data-source.ts",
+          "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+          "scripts/table-onpush-packed-fixture.mjs",
+          "scripts/table-onpush-packed-contract.mjs",
+          "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+          "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "tableOnPushRendering",
+        "legacy_field": null
+      }
+    },
+    {
+      "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+      "field": "artifact_behavior",
+      "definition": {
+        "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+        "patch": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+        "kind": "select-focus-before-click",
+        "case_ids": [
+          "packed-consumer/harness/legacy-select"
+        ],
+        "members": [
+          "projects/ngx-material-legacy/legacy-select/select.html",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-select/select.ts",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "scripts/upstream-artifact-behavior-evidence.mjs",
+          "scripts/select-focus-click-packed-fixture.mjs",
+          "scripts/select-focus-click-packed-contract.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/matrices/full-verify.json"
+        ],
+        "harness": "selectFocusClick",
+        "legacy_field": null
+      }
+    },
+    {
+      "sha": "77ffdf98ba71c11d908b29e02b516dddf487ae0b",
+      "field": "historical_behavior",
+      "definition": {
+        "patch": "651a4d5c27086e2011a17b2d97a58a7a0f32f8dc8000bc3d7ee5ffd98b3d098b",
+        "kind": "autocomplete-required-selection-model",
+        "members": [
+          "scripts/rc-test-legacy-family.mjs",
+          "scripts/historical-case-roster.mjs",
+          "scripts/resolve-run-library.mjs",
+          "scripts/rc-verify.py",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-historical-behavior-evidence.mjs",
+          "testing/legacy-runner/build.mjs",
+          "testing/legacy-runner/adapt-spec.mjs",
+          "testing/legacy-runner/entry.ts",
+          "testing/legacy-runner/init-test-env.ts",
+          "testing/legacy-runner/karma.conf.cjs",
+          "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "testing/legacy-runner/historical-inventory.json",
+          "testing/legacy-runner/historical-specs.json",
+          "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "compatibility/rc/matrices/full-verify.json",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts"
+        ],
+        "cases": [
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#37",
+            "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "full_name": "MatAutocomplete > forms integration > should retain the selected model while typing when selection is required"
+          },
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#38",
+            "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "full_name": "MatAutocomplete > forms integration > should publish the chosen option once after required-selection typing"
+          },
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#39",
+            "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "full_name": "MatAutocomplete > forms integration > should reset unmatched required-selection text once on outside click"
+          }
+        ]
+      }
+    },
+    {
+      "sha": "db06fa8d8939d793f598bc3dbedc96a5a71c0db0",
+      "field": "historical_behavior",
+      "definition": {
+        "patch": "097bc267621c07d520fd9aac2e3329a90c05c0ca308a9cc4e3aa4ecb43dc68b7",
+        "kind": "autocomplete-empty-required-selection",
+        "members": [
+          "scripts/rc-test-legacy-family.mjs",
+          "scripts/historical-case-roster.mjs",
+          "scripts/resolve-run-library.mjs",
+          "scripts/rc-verify.py",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-historical-behavior-evidence.mjs",
+          "testing/legacy-runner/build.mjs",
+          "testing/legacy-runner/adapt-spec.mjs",
+          "testing/legacy-runner/entry.ts",
+          "testing/legacy-runner/init-test-env.ts",
+          "testing/legacy-runner/karma.conf.cjs",
+          "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "testing/legacy-runner/historical-inventory.json",
+          "testing/legacy-runner/historical-specs.json",
+          "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "compatibility/rc/matrices/full-verify.json",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts"
+        ],
+        "cases": [
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#172",
+            "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+            "full_name": "MatAutocomplete > should not throw errors when closing without options"
+          }
+        ]
+      }
+    },
+    {
+      "sha": "5dd614aa100e28f0815fdd83e5b68f4239ef01f9",
+      "field": "historical_behavior",
+      "definition": {
+        "patch": "ee5e90a8d85ee282ae185775732e8e6a56e907bb60cda7c9fe36923d406006bf",
+        "kind": "tab-link-enter-activation",
+        "members": [
+          "scripts/rc-test-legacy-family.mjs",
+          "scripts/historical-case-roster.mjs",
+          "scripts/resolve-run-library.mjs",
+          "scripts/rc-verify.py",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-historical-behavior-evidence.mjs",
+          "testing/legacy-runner/build.mjs",
+          "testing/legacy-runner/adapt-spec.mjs",
+          "testing/legacy-runner/entry.ts",
+          "testing/legacy-runner/init-test-env.ts",
+          "testing/legacy-runner/karma.conf.cjs",
+          "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "testing/legacy-runner/historical-inventory.json",
+          "testing/legacy-runner/historical-specs.json",
+          "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "compatibility/rc/matrices/full-verify.json",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts"
+        ],
+        "cases": [
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#21",
+            "historical_path": "src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "full_name": "MatTabNavBar > should activate a tab-panel link on enter without preventing navigation"
+          },
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#22",
+            "historical_path": "src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "full_name": "MatTabNavBar > should prevent enter on disabled tab-panel links without activating them"
+          },
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts#33",
+            "historical_path": "src/material/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+            "full_name": "MatTabNavBar > without panel > should leave native enter navigation alone without a tab panel"
+          }
+        ]
+      }
+    },
+    {
+      "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+      "field": "historical_behavior",
+      "definition": {
+        "patch": "e237a5b4d0aeb7afb5765e852a89945691ffa98604ba9bfddd2988e5068d3414",
+        "kind": "select-unresolved-panel-close",
+        "members": [
+          "scripts/rc-test-legacy-family.mjs",
+          "scripts/historical-case-roster.mjs",
+          "scripts/resolve-run-library.mjs",
+          "scripts/rc-verify.py",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-historical-behavior-evidence.mjs",
+          "testing/legacy-runner/build.mjs",
+          "testing/legacy-runner/adapt-spec.mjs",
+          "testing/legacy-runner/entry.ts",
+          "testing/legacy-runner/init-test-env.ts",
+          "testing/legacy-runner/karma.conf.cjs",
+          "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "testing/legacy-runner/historical-inventory.json",
+          "testing/legacy-runner/historical-specs.json",
+          "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "compatibility/rc/matrices/full-verify.json",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+          "projects/ngx-material-legacy/legacy-select/select.ts",
+          "projects/ngx-material-legacy/legacy-select/select.html",
+          "projects/ngx-material-legacy/legacy-select/select.scss",
+          "projects/ngx-material-legacy/legacy-select/select.spec.ts"
+        ],
+        "cases": [
+          {
+            "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-select/select.spec.ts#70",
+            "historical_path": "src/material/legacy-select/select.spec.ts",
+            "candidate": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "full_name": "MatSelect > core > overlay panel > should close an enabled-motion panel before its view is resolved"
+          }
+        ]
+      }
+    },
+    {
+      "sha": "938f478efdc96ef0de1217e806f98939beb027cd",
+      "field": "generated_identity_behavior",
+      "definition": {
+        "kind": "owned-identity-independent-of-private-cdk-generator",
+        "patch": "e756cce5271186044ae2f18746d6685f7bee5a83328605800cea0817b761cb35",
+        "members": [
+          "scripts/upstream-generated-identity-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/generated-identity-packed-fixture.mjs",
+          "scripts/generated-identity-packed-contract.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.html",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "compatibility/rc/remaining-identity-public-subjects.json",
+          "compatibility/rc/remaining-identity-source-proof.json",
+          "compatibility/rc/snack-modal-identity-source-proof.json",
+          "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json"
+        ],
+        "case_ids": [
+          "packed-consumer/harness/generated-identity-coexistence"
+        ]
+      }
+    },
+    {
+      "sha": "ea0aed5a0cba3288d89e7448073e0a5556487313",
+      "field": "generated_identity_behavior",
+      "definition": {
+        "kind": "owned-menu-panel-identity-coexistence",
+        "patch": "61e21a3d1846f725b6a048fe434d74e0bd173a6fc3e90bca79091c349a39c7ec",
+        "members": [
+          "scripts/upstream-generated-identity-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/generated-identity-packed-fixture.mjs",
+          "scripts/generated-identity-packed-contract.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.html",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "compatibility/rc/remaining-identity-public-subjects.json",
+          "compatibility/rc/remaining-identity-source-proof.json",
+          "compatibility/rc/snack-modal-identity-source-proof.json",
+          "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json"
+        ],
+        "case_ids": [
+          "packed-consumer/harness/generated-identity-coexistence"
+        ]
+      }
+    },
+    {
+      "sha": "69968510fb0222ee565f57171640a99768efa972",
+      "field": "generated_identity_behavior",
+      "definition": {
+        "kind": "owned-snack-live-identity-and-modal-ownership",
+        "patch": "3809a4c8be10fbe0e99531fda686e37f32dc153640055c86b612be0668849dbe",
+        "members": [
+          "scripts/upstream-generated-identity-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/generated-identity-packed-fixture.mjs",
+          "scripts/generated-identity-packed-contract.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "compatibility/rc/matrices/library-exports.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.ts",
+          "projects/ngx-material-legacy/legacy-menu/menu.html",
+          "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-base.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-nav-bar-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.ts",
+          "compatibility/rc/remaining-identity-public-subjects.json",
+          "compatibility/rc/remaining-identity-source-proof.json",
+          "compatibility/rc/snack-modal-identity-source-proof.json",
+          "compatibility/f10/disposition-ledger/evidence/closeout-remaining-identity-generator-review.json"
+        ],
+        "case_ids": [
+          "packed-consumer/harness/generated-identity-coexistence"
+        ]
+      }
+    },
+    {
+      "sha": "9494ff2d65c98726046e6a20dd6a6d938e97a2f6",
+      "field": "selection_behavior",
+      "definition": {
+        "sha": "9494ff2d65c98726046e6a20dd6a6d938e97a2f6",
+        "patch": "cf574324e4e76ccd1ea45bf25e3bddf9e28b9db07d9fce40e804d04b0a55a73c",
+        "kind": "public-comparator-retains-real-legacy-list-option",
+        "case_ids": [
+          "packed-consumer/harness/selection-model-comparator-public-list"
+        ],
+        "members": [
+          "scripts/upstream-selection-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "scripts/selection-model-use-review.mjs",
+          "compatibility/rc/selection-model-public-subjects.json",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-list/selection-list.ts",
+          "projects/ngx-material-legacy/legacy-list/list-module.ts",
+          "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "reference/material-16.2.14/value-accessor-token-sources/legacy-list/selection-list.ts",
+          "compatibility/rc/selection-model-public-source-members/31d219c893ebad02623af3fbbd63cb9474de9d165d2936f07f9e9bb91ae4780f.gz",
+          "compatibility/rc/selection-model-public-source-members/abdfe679ed7fc91cb4495428e82a8ad329bceca2766d9f5ecc6c5fb77dab2679.gz",
+          "compatibility/rc/selection-model-public-source-members/b203e04cedb6c811df181722f22039f8a7cc28faeb6b264b923b0289eb2b88be.gz",
+          "compatibility/rc/selection-model-public-source-members/50b8f7f87988cb7688ec24e672a603feefdfeeb667db63f37d1ff76c332b2c79.gz",
+          "compatibility/rc/selection-model-public-source-members/257ec72a8f6840fe9a9d0e2233dc5274f5131088ec36a8d03e61a7015792be2c.gz",
+          "compatibility/rc/selection-model-public-source-members/6606304e6fdfb161997bb3835f2f01b132cc9d8776c6ab941aa6495629fe5624.gz",
+          "compatibility/rc/selection-model-public-source-members/ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933.gz",
+          "compatibility/rc/selection-model-public-source-members/581228c64dea7a741cd82cc867dbc74aaf333f00a415a542c94f32904ca40737.gz",
+          "compatibility/rc/selection-model-public-source-members/49a973c9bf6f3cf5ca945ebd76a663b66f31c99867deccff5063df5d7000303b.gz",
+          "compatibility/rc/selection-model-public-source-members/9d6a5b625752af00cccc5dbcd1df2a65c2a5b6791b2543a7cae6121bede71952.gz",
+          "compatibility/rc/selection-model-public-source-members/e96c88c22a213451ae8c5ad9c283539e2c43f48557092c0cbfe8a019d0890df0.gz",
+          "compatibility/rc/selection-model-public-source-members/19bbd91064ebe0469f554155572a0b4bb4713ad7cafbc0af9d31cbafdbf223bb.gz"
+        ],
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "path": "compatibility/rc/selection-model-public-source-members/50b8f7f87988cb7688ec24e672a603feefdfeeb667db63f37d1ff76c332b2c79.gz",
+          "sha256": "50b8f7f87988cb7688ec24e672a603feefdfeeb667db63f37d1ff76c332b2c79",
+          "member": "SelectionModel.setSelection"
+        }
+      }
+    },
+    {
+      "sha": "8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc",
+      "field": "bidi_behavior",
+      "definition": {
+        "sha": "8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc",
+        "kind": "public-standalone-bidi-module-reexport",
+        "patch": "b5b2f1fe9262a0764c4aefac3eec4920caf3a88965f52708130348cda8906a41",
+        "case_ids": [
+          "packed-consumer/harness/bidi-module-legacy-node-scope"
+        ],
+        "members": [
+          "scripts/upstream-bidi-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/bidi-module-use-review.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/material-public-subjects.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+          "projects/ngx-material-legacy/legacy-input/input-module.ts",
+          "projects/ngx-material-legacy/legacy-input/input.ts",
+          "projects/ngx-material-legacy/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-card/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-tooltip/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-paginator/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-table/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-slider/internal/common-module.ts",
+          "projects/ngx-material-legacy/src/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-button/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-checkbox/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts",
+          "projects/ngx-material-legacy/legacy-list/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-radio/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-progress-bar/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-slide-toggle/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-input/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-chips/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-form-field/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-dialog/internal/common-module.ts",
+          "compatibility/rc/material-public-source-members/0db67adbfeeb1d633a999e8cf603ae6f8f26e66191e450e86284f0119652b07e.gz",
+          "compatibility/rc/material-public-source-members/385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740.gz",
+          "compatibility/rc/material-public-source-members/0268e701ec17daa78e322d73365861673a4f1238ba8673c2f1dc0996e60bfa90.gz",
+          "compatibility/rc/material-public-source-members/769187ce194c8dc07761a9e7d3576475e8ace31b42cbc2e2935e3a74f3e4a9b5.gz"
+        ],
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "path": "compatibility/rc/material-public-source-members/385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740.gz",
+          "sha256": "385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740",
+          "member": "BidiModule"
+        }
+      }
+    },
+    {
+      "sha": "25f391a3c545a1b829a74584c4f9235ab8d18497",
+      "field": "bidi_behavior",
+      "definition": {
+        "sha": "25f391a3c545a1b829a74584c4f9235ab8d18497",
+        "kind": "public-dir-strict-initialization-and-behavior",
+        "patch": "c059a453336395d30e1f19ee20ad5f2420f8ead0762ecec24087d218019697e1",
+        "case_ids": [
+          "packed-consumer/harness/bidi-module-legacy-node-scope"
+        ],
+        "members": [
+          "scripts/upstream-bidi-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/packed-consumer-aot-smoke.mjs",
+          "scripts/bidi-isolated-packed-contract.mjs",
+          "scripts/bidi-isolated-packed-fixture.mjs",
+          "scripts/bidi-module-use-review.mjs",
+          "scripts/selection-comparator-packed-contract.mjs",
+          "scripts/selection-comparator-packed-fixture.mjs",
+          "scripts/native-date-packed-contract.mjs",
+          "scripts/native-date-packed-fixture.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "compatibility/rc/material-public-subjects.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+          "projects/ngx-material-legacy/legacy-input/input-module.ts",
+          "projects/ngx-material-legacy/legacy-input/input.ts",
+          "projects/ngx-material-legacy/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-card/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-tooltip/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-progress-spinner/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-paginator/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-table/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-slider/internal/common-module.ts",
+          "projects/ngx-material-legacy/src/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-button/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-checkbox/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts",
+          "projects/ngx-material-legacy/legacy-list/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-radio/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-progress-bar/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-slide-toggle/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-input/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-select/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-chips/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-menu/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-form-field/internal/common-module.ts",
+          "projects/ngx-material-legacy/legacy-dialog/internal/common-module.ts",
+          "compatibility/rc/material-public-source-members/0db67adbfeeb1d633a999e8cf603ae6f8f26e66191e450e86284f0119652b07e.gz",
+          "compatibility/rc/material-public-source-members/385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740.gz",
+          "compatibility/rc/material-public-source-members/0268e701ec17daa78e322d73365861673a4f1238ba8673c2f1dc0996e60bfa90.gz",
+          "compatibility/rc/material-public-source-members/769187ce194c8dc07761a9e7d3576475e8ace31b42cbc2e2935e3a74f3e4a9b5.gz"
+        ],
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "path": "compatibility/rc/material-public-source-members/385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740.gz",
+          "sha256": "385049f55ab01a2a2e05b0c417e921296f167f285ec55bf05e1643f2cdd03740",
+          "member": "Dir"
+        }
+      }
+    },
+    {
+      "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
+      "field": "progress_csp_behavior",
+      "definition": {
+        "patch": "18842b79bf257366ae8e8dcd2c2a2ce43401dfb91d7a2efd29e98598649f6fdf",
+        "kind": "progress-non-buffer-dot-resource-isolation",
+        "members": [
+          "scripts/upstream-progress-csp-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-surface-families.mjs",
+          "scripts/progress-csp-style-contract.mjs",
+          "scripts/legacy-core-high-contrast-contract.mjs",
+          "scripts/peer-icon-tt-admission.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.html",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.scss",
+          "projects/ngx-material-legacy/styles/progress-bar/_progress-bar-theme.scss",
+          "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_linear-progress.scss",
+          "projects/ngx-material-legacy/styles/vendor/mdc/linear-progress/_linear-progress-theme.scss",
+          "projects/ngx-material-legacy/styles/vendor/mdc/dom/_dom.scss",
+          "compatibility/rc/progress-csp-admission-peer-fesm2022--progress-bar.mjs.gz",
+          "compatibility/rc/progress-csp-admission-peer-progress-bar--_m2-progress-bar.scss.gz",
+          "compatibility/rc/progress-csp-admission-peer-progress-bar--_progress-bar-theme.scss.gz"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "modes": [
+          "determinate",
+          "buffer",
+          "query",
+          "indeterminate"
+        ]
+      }
+    },
+    {
+      "sha": "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
+      "field": "progress_csp_behavior",
+      "definition": {
+        "patch": "020fb04d57aa9aeb6199fd2d0f6a8ae11a27a4a55312efd3ce9e7134f924aabf",
+        "kind": "progress-buffer-gradient-resource-isolation",
+        "members": [
+          "scripts/upstream-progress-csp-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-surface-families.mjs",
+          "scripts/progress-csp-style-contract.mjs",
+          "scripts/legacy-core-high-contrast-contract.mjs",
+          "scripts/peer-icon-tt-admission.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.html",
+          "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.scss",
+          "projects/ngx-material-legacy/styles/progress-bar/_progress-bar-theme.scss",
+          "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_linear-progress.scss",
+          "projects/ngx-material-legacy/styles/vendor/mdc/linear-progress/_linear-progress-theme.scss",
+          "projects/ngx-material-legacy/styles/vendor/mdc/dom/_dom.scss",
+          "compatibility/rc/progress-csp-admission-peer-fesm2022--progress-bar.mjs.gz",
+          "compatibility/rc/progress-csp-admission-peer-progress-bar--_m2-progress-bar.scss.gz",
+          "compatibility/rc/progress-csp-admission-peer-progress-bar--_progress-bar-theme.scss.gz"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "modes": [
+          "determinate",
+          "buffer",
+          "query",
+          "indeterminate"
+        ]
+      }
+    },
+    {
+      "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+      "field": "form_field_hover_behavior",
+      "definition": {
+        "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+        "patch": "e2ca404fabad6af81c12ef841957e5d3a05a9439627b3302751baccde7ec9d69",
+        "kind": "historical-exported-form-field-host-hover",
+        "members": [
+          "scripts/upstream-form-field-hover-evidence.mjs",
+          "scripts/upstream-browser-run-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-required-cells.mjs",
+          "scripts/browser-surface-families.mjs",
+          "scripts/form-field-state-style-observation.mjs",
+          "scripts/sass-form-field-state-contract.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+          "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+          "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-theme.scss",
+          "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "reference/material-16.2.14/error-helper-sources/form-field-focus-overlay.scss",
+          "compatibility/rc/form-field-hover-followup-peer-members/8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85.mjs.gz"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "themes": [
+          "peer-form-hover",
+          "peer-form-hover-dark"
+        ],
+        "installed_member": {
+          "package": "@angular/material",
+          "version": "22.1.7",
+          "path": "compatibility/rc/form-field-hover-followup-peer-members/8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85.mjs.gz",
+          "sha256": "8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85",
+          "member": "MatFormField structural styles"
+        }
+      }
+    },
+    {
+      "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+      "field": "tab_completion_behavior",
+      "definition": {
+        "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+        "patch": "8c5c7c7e24faef142a0320faf51bd61cecd10c7e06eeeeb15ddc0f53cb654083",
+        "kind": "historical-tab-completion-state-filter",
+        "engines": [
+          "chromium",
+          "firefox",
+          "webkit"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "modes": [
+          "enabled",
+          "provider-disabled",
+          "reduced",
+          "zero"
+        ],
+        "case_ids": [
+          "native-motion/main/chromium/zoneful/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/firefox/zoneful/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/webkit/zoneful/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/chromium/zoneless/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/firefox/zoneless/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/webkit/zoneless/enabled-disabled-reduced/tabs/enabled",
+          "native-motion/main/chromium/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/firefox/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/webkit/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/chromium/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/firefox/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/webkit/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+          "native-motion/main/chromium/zoneful/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/firefox/zoneful/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/webkit/zoneful/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/chromium/zoneless/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/firefox/zoneless/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/webkit/zoneless/enabled-disabled-reduced/tabs/reduced",
+          "native-motion/main/chromium/zoneful/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/firefox/zoneful/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/webkit/zoneful/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/chromium/zoneless/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/firefox/zoneless/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/webkit/zoneless/enabled-disabled-reduced/tabs/zero",
+          "native-motion/main/chromium/zoneful/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/firefox/zoneful/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/webkit/zoneful/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/chromium/zoneless/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/firefox/zoneless/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/webkit/zoneless/interruption-destruction/tabs/rapid-reversal",
+          "native-motion/main/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/firefox/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/webkit/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/chromium/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/firefox/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/webkit/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+          "native-motion/main/chromium/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/firefox/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/webkit/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/chromium/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/firefox/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/webkit/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+          "native-motion/main/chromium/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/firefox/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/webkit/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/chromium/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/firefox/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/webkit/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+          "native-motion/main/chromium/zoneful/exactly-once-notification/tabs/animationDone/zero",
+          "native-motion/main/firefox/zoneful/exactly-once-notification/tabs/animationDone/zero",
+          "native-motion/main/webkit/zoneful/exactly-once-notification/tabs/animationDone/zero",
+          "native-motion/main/chromium/zoneless/exactly-once-notification/tabs/animationDone/zero",
+          "native-motion/main/firefox/zoneless/exactly-once-notification/tabs/animationDone/zero",
+          "native-motion/main/webkit/zoneless/exactly-once-notification/tabs/animationDone/zero"
+        ],
+        "members": [
+          "scripts/upstream-tab-completion-evidence.mjs",
+          "scripts/upstream-native-motion-run-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/native-motion-acceptance.mjs",
+          "scripts/native-motion-roster.mjs",
+          "scripts/native-motion-run.mjs",
+          "scripts/native-motion-page.mjs",
+          "scripts/native-motion-consumer.ts",
+          "scripts/browser-matrix-roster.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-body.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-group.html",
+          "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+          "projects/ngx-material-legacy/legacy-tabs/tab-body.scss",
+          "reference/material-16.2.14/component-motion-sources/tabs/tab-body.ts",
+          "compatibility/rc/tab-completion-peer-sources/22.1.7.tabs.mjs.gz"
+        ],
+        "peer_reference": {
+          "package": "@angular/material",
+          "version": "22.1.7",
+          "path": "compatibility/rc/tab-completion-peer-sources/22.1.7.tabs.mjs.gz",
+          "sha256": "bd6314ac06a0eed5cf0fe3a8e4c5cf69526df9541df5e40dc01a406af257fb09",
+          "member": "unmodified peer tabs module"
+        }
+      }
+    },
+    {
+      "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+      "field": "ripple_replay_behavior",
+      "definition": {
+        "sha": "10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb",
+        "patch": "c5a3cab8777ece5990a5e00eaa506a871971176c33e8ade45277d7a2a169b037",
+        "kind": "owned-replay-fallback-and-distinct-public-native-route",
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "members": [
+          "scripts/upstream-ripple-replay-evidence.mjs",
+          "scripts/upstream-browser-run-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-required-cells.mjs",
+          "scripts/ripple-hydration-replay.mjs",
+          "scripts/ripple-hydration-application.mjs",
+          "scripts/ripple-hydration-component-fixture.mjs",
+          "scripts/ripple-native-event-probe.mjs",
+          "scripts/ripple-public-replay-probe.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-core/public-api.ts",
+          "projects/ngx-material-legacy/legacy-core/ripple/index.ts",
+          "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+          "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts",
+          "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts",
+          "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts",
+          "compatibility/rc/material-public-subjects.json",
+          "compatibility/rc/material-public-source-members/ba6a8afdd5fde4736ff8fe14ed7c2caaf06041a247ab20d083b7fc7bc4309f8a.gz",
+          "compatibility/rc/material-public-source-members/a5da707a2f05673bccfe9fe92f4384ddff0d4d5d7c77bd7cf65ad62eeaa339ae.gz"
+        ],
+        "peer_reference": {
+          "public_route": "@angular/material/core#MatRipple",
+          "core_version": "22.1.7",
+          "cdk_version": "22.1.7",
+          "material_version": "22.1.7",
+          "helper_has_replay_catch": true,
+          "helper": {
+            "path": "compatibility/rc/material-public-source-members/ba6a8afdd5fde4736ff8fe14ed7c2caaf06041a247ab20d083b7fc7bc4309f8a.gz",
+            "sha256": "ba6a8afdd5fde4736ff8fe14ed7c2caaf06041a247ab20d083b7fc7bc4309f8a"
+          },
+          "caller": {
+            "path": "compatibility/rc/material-public-source-members/a5da707a2f05673bccfe9fe92f4384ddff0d4d5d7c77bd7cf65ad62eeaa339ae.gz",
+            "sha256": "a5da707a2f05673bccfe9fe92f4384ddff0d4d5d7c77bd7cf65ad62eeaa339ae"
+          }
+        }
+      }
+    },
+    {
+      "sha": "d8a6c3edd8d406b3f1b1c26805612eac8856b745",
+      "field": "content_observer_behavior",
+      "definition": {
+        "sha": "d8a6c3edd8d406b3f1b1c26805612eac8856b745",
+        "patch": "00c3c8215628119ebf9f173e7379adcd4f3b311b7cccbbc9a243b36254a3eea8",
+        "kind": "native-public-comment-filter-and-owned-header",
+        "case_ids": [
+          "browser-diagnostic/content-observer/legacy-header-native"
+        ],
+        "stages": [
+          "comment-add",
+          "comment-edit",
+          "comment-remove",
+          "text-add",
+          "text-edit",
+          "text-same",
+          "text-remove",
+          "mixed-add",
+          "mixed-remove",
+          "shared-after-unsubscribe",
+          "destroyed-owner",
+          "reobserve-detached",
+          "final-unsubscribe"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "members": [
+          "scripts/upstream-content-observer-evidence.mjs",
+          "scripts/upstream-browser-run-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/rc-verify.py",
+          "scripts/packed-consumer-evidence.mjs",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-required-cells.mjs",
+          "scripts/browser-surface-families.mjs",
+          "scripts/content-observer-native-contract.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-tabs/tabs-module.ts",
+          "projects/ngx-material-legacy/legacy-tabs/public-api.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-group.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-header.ts",
+          "projects/ngx-material-legacy/legacy-tabs/tab-header.html",
+          "projects/ngx-material-legacy/legacy-tabs/tab-header.scss",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/tab-header-base.ts",
+          "projects/ngx-material-legacy/legacy-tabs/internal/paginated-tab-header.ts",
+          "compatibility/rc/material-public-source-members/8991cf56e1d55d6e784280fb658546b15999a4ea803e599a6a6c905fc7c47746.gz",
+          "compatibility/rc/material-public-source-members/5f0573712362469c94921044786089b44009577af1143942f6a3991d9e0eeacb.gz"
+        ],
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "path": "compatibility/rc/material-public-source-members/8991cf56e1d55d6e784280fb658546b15999a4ea803e599a6a6c905fc7c47746.gz",
+          "sha256": "8991cf56e1d55d6e784280fb658546b15999a4ea803e599a6a6c905fc7c47746",
+          "member": "ContentObserver.observe / CdkObserveContent"
+        },
+        "public_declaration": {
+          "path": "compatibility/rc/material-public-source-members/5f0573712362469c94921044786089b44009577af1143942f6a3991d9e0eeacb.gz",
+          "sha256": "5f0573712362469c94921044786089b44009577af1143942f6a3991d9e0eeacb"
+        },
+        "consumer_peer": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "runtime_member": "fesm2022/observers.mjs",
+          "runtime_sha256": "8991cf56e1d55d6e784280fb658546b15999a4ea803e599a6a6c905fc7c47746",
+          "types_member": "types/observers.d.ts",
+          "types_sha256": "5f0573712362469c94921044786089b44009577af1143942f6a3991d9e0eeacb"
+        }
+      }
+    },
+    {
+      "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+      "field": "media_matcher_behavior",
+      "definition": {
+        "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+        "patch": "a89ab37d4dd3819592854002413e12b1840bb047195528455ea90cea8cbcdc44",
+        "kind": "native-public-exact-brace-filter",
+        "case_ids": [
+          "browser-diagnostic/media-matcher/native-brace-filter"
+        ],
+        "runtimes": [
+          "zoneful",
+          "zoneless"
+        ],
+        "members": [
+          "scripts/upstream-media-matcher-evidence.mjs",
+          "scripts/media-matcher-peer-identity.mjs",
+          "scripts/check-upstream-audit-disposition.mjs",
+          "scripts/upstream-browser-run-evidence.mjs",
+          "scripts/upstream-packed-run-evidence.mjs",
+          "scripts/browser-matrix-acceptance.mjs",
+          "scripts/browser-matrix-roster.mjs",
+          "scripts/browser-required-cells.mjs",
+          "scripts/browser-surface-families.mjs",
+          "scripts/rc-verify.py",
+          "scripts/packed-consumer-evidence.mjs",
+          "compatibility/rc/matrices/full-verify.json",
+          "compatibility/rc/matrices/library-exports.json",
+          "testing/legacy-runner/historical-inventory.json",
+          "projects/ngx-material-legacy/package.json",
+          "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+          "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+          "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+          "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+          "compatibility/rc/material-public-source-members/ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933.gz",
+          "compatibility/rc/material-public-source-members/2ee894e12f9c4bedfea46aff56f317bb3d4f874e76a95b6b98e304b89866d6f6.gz",
+          "compatibility/rc/material-public-source-members/39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2.gz",
+          "compatibility/rc/material-public-source-members/a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01.gz"
+        ],
+        "installed_member": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "path": "compatibility/rc/material-public-source-members/39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2.gz",
+          "sha256": "39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2",
+          "member": "MediaMatcher.matchMedia / createEmptyStyleRule"
+        },
+        "public_declaration": {
+          "path": "compatibility/rc/material-public-source-members/a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01.gz",
+          "sha256": "a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01"
+        },
+        "consumer_peer": {
+          "package": "@angular/cdk",
+          "version": "22.1.7",
+          "package_json_sha256": "ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933",
+          "runtime_member": "fesm2022/layout.mjs",
+          "runtime_sha256": "2ee894e12f9c4bedfea46aff56f317bb3d4f874e76a95b6b98e304b89866d6f6",
+          "implementation_member": "fesm2022/_breakpoints-observer-chunk.mjs",
+          "implementation_sha256": "39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2",
+          "types_member": "types/layout.d.ts",
+          "types_sha256": "a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01"
+        }
+      }
+    }
+  ],
+  "native_definition": {
+    "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
+    "field": "native_date_behavior",
+    "definition": {
+      "kind": "owned-original-native-date-constructor-and-isolated-providers",
+      "patch": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d",
+      "members": [
+        "scripts/upstream-native-date-evidence.mjs",
+        "scripts/check-upstream-audit-disposition.mjs",
+        "scripts/upstream-packed-run-evidence.mjs",
+        "scripts/packed-consumer-evidence.mjs",
+        "scripts/packed-consumer-aot-smoke.mjs",
+        "scripts/native-date-packed-fixture.mjs",
+        "scripts/native-date-packed-contract.mjs",
+        "compatibility/rc/matrices/full-verify.json",
+        "compatibility/rc/matrices/library-exports.json",
+        "projects/ngx-material-legacy/package.json",
+        "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts",
+        "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+        "projects/ngx-material-legacy/legacy-core/public-api.ts",
+        "reference/material-16.2.14/datetime/native-date-adapter.ts",
+        "reference/material-16.2.14/datetime/source-provenance.json",
+        "reference/material-16.2.14/factory-metadata.json",
+        "compatibility/f10/disposition-ledger/evidence/closeout-native-date-source-review.json",
+        "compatibility/f10/disposition-ledger/evidence/patches/b423c0e0b754b1f1d118d17e022981c357c3aa68.patch"
+      ],
+      "case_ids": [
+        "packed-consumer/harness/native-date-constructor",
+        "packed-consumer/harness/native-date-provider"
+      ]
+    }
+  },
+  "new_dependencies": [
+    {
+      "path": "scripts/native-date-packed-contract.mjs",
+      "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+    },
+    {
+      "path": "scripts/native-date-packed-fixture.mjs",
+      "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
+    }
+  ],
+  "new_runtime_source": {
+    "path": "scripts/upstream-native-date-evidence.mjs",
+    "sha256": "5ca276bb33b14048781b161937aa76dc04f7a2e0a3e4e7da75d00f4c09eb17cf"
+  },
+  "historical_matrix": {
+    "path": "compatibility/rc/matrices/full-verify.json",
+    "reference_commit": "32a5f247e7b5e1d7f943ebe67a6da95eb58642d4",
+    "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83",
+    "current_sha256": "ce5746a3721935ab59e5c10087341c661b2b477a8f17f8c49e589c5b3410584b",
+    "added_current_cases": [
+      "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#172",
+      "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#87",
+      "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-table/table-data-source.spec.ts#6"
+    ],
+    "live_matrix_unchanged": true
+  },
+  "expected_ledger_sha256": "37686b72a45b7dcd678b2b343f40628755f328b5bc5b651eb85b9e27ed520235",
+  "existing_scopes": 23,
+  "new_source_or_role_closures": 0,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

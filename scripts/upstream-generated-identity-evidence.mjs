@@ -17,6 +17,7 @@ const members = [
   'scripts/generated-identity-packed-contract.mjs', 'compatibility/rc/matrices/full-verify.json',
   'scripts/bidi-isolated-packed-contract.mjs', 'scripts/bidi-isolated-packed-fixture.mjs',
   'scripts/selection-comparator-packed-contract.mjs', 'scripts/selection-comparator-packed-fixture.mjs',
+  'scripts/native-date-packed-contract.mjs', 'scripts/native-date-packed-fixture.mjs',
   'compatibility/rc/matrices/library-exports.json', 'projects/ngx-material-legacy/package.json',
   'projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts',
   'projects/ngx-material-legacy/legacy-menu/menu.ts', 'projects/ngx-material-legacy/legacy-menu/menu.html',

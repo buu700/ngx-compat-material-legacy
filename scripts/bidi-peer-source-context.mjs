@@ -7,6 +7,7 @@
  */
 /** Exact additive dispatch projection for earlier immutable source reviews. */
 import assert from 'node:assert/strict';
+import {nativeDateCurrentRead,nativeDateSourceContext} from './native-date-packed-source-context.mjs';
 import {reverseSelectionComparatorSource, readSelectionComparatorBefore} from './selection-comparator-packed-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
@@ -51,6 +52,15 @@ export function reverseBidiPeerChecker(text, options = {}) {
 /** Only for replaying the previous write-once source review's own subject.
  * Current production/CLI readers are tested separately against current files. */
 export function readBidiPeerReviewSubject(path, readMember) {
+  readMember = nativeDateCurrentRead(readMember);
+  if(path==='scripts/check-upstream-audit-disposition.mjs'){
+    const supplied=readMember(path),native=nativeDateSourceContext(readMember);
+    const previous=native.before.sources.find(row=>row.path===path),current=native.data.changes.find(row=>row.path===path);
+    if([previous.sha256,current.current_sha256].includes(hash(supplied))){
+      const {prior}=bidiPeerSourceContext(readMember),subject=prior.members.find(row=>row.path===path);
+      assert.ok(subject);assert.equal(hash(subject.text),subject.sha256);return Buffer.from(subject.text);
+    }
+  }
   const precedingRead = target => readSelectionComparatorBefore(target, readMember);
   if (!reviewSubjectPaths.has(path)) return precedingRead(path);
   const {inputs, prior} = bidiPeerSourceContext(precedingRead);

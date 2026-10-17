@@ -31,6 +31,7 @@ const definitions=[
  ['ripple-replay','RIPPLE_REPLAY_KIND','ripple_replay_behavior','rippleReplayRequirements','validateRippleReplay'],
  ['content-observer','CONTENT_OBSERVER_KIND','content_observer_behavior','contentObserverRequirements','validateContentObserver'],
  ['media-matcher','MEDIA_MATCHER_KIND','media_matcher_behavior','mediaMatcherRequirements','validateMediaMatcher'],
+ ['native-date','NATIVE_DATE_KIND','native_date_behavior','nativeDateRequirements','validateNativeDate'],
 ];
 const rows=[];
 for(const[name,kind,field,requirements,validator]of definitions){
@@ -42,7 +43,7 @@ for(const[name,kind,field,requirements,validator]of definitions){
   rows.push({sha:entry.sha,kind:m[kind],field,definition,no_run:noRun});
  }
 }
-assert.equal(rows.length,line==='main'?23:22);assert.equal(new Set(rows.map(r=>r.sha)).size,rows.length);
+assert.equal(rows.length,line==='main'?24:23);assert.equal(new Set(rows.map(r=>r.sha)).size,rows.length);
 console.log(JSON.stringify({line,rows,actual_native_or_packed_qualified:false}));
 '''
 
@@ -124,6 +125,7 @@ def source_history(root,entry):
         body,review=read_review(root,current)
         yield current,body,review
         priors=[*current.get('prior_dispositions',[]),*current.get('superseded_closeout_source_judgments',[]),review.get('prior_entry'),review.get('previous_row')]
+        priors.append(review.get('native_date_source_context',{}).get('prior_entry'))
         if 'original_source_review' in review:
             ref=review['original_source_review'];raw=member_path(root,ref['path']).read_bytes()
             assert hashlib.sha256(raw).hexdigest()==ref['sha256']

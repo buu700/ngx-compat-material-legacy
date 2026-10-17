@@ -269,6 +269,7 @@ const commonMembers = [
   'scripts/upstream-selection-evidence.mjs', 'scripts/check-upstream-audit-disposition.mjs',
   'scripts/upstream-packed-run-evidence.mjs', 'scripts/packed-consumer-evidence.mjs', 'scripts/packed-consumer-aot-smoke.mjs',
   'scripts/selection-comparator-packed-contract.mjs', 'scripts/selection-comparator-packed-fixture.mjs',
+  'scripts/native-date-packed-contract.mjs', 'scripts/native-date-packed-fixture.mjs',
   'scripts/selection-model-use-review.mjs', 'compatibility/rc/selection-model-public-subjects.json',
   'compatibility/rc/matrices/full-verify.json', 'compatibility/rc/matrices/library-exports.json',
   'projects/ngx-material-legacy/package.json', 'projects/ngx-material-legacy/legacy-list/selection-list.ts',

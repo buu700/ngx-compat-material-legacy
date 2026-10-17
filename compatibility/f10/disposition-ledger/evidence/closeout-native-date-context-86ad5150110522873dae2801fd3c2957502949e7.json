@@ -1,0 +1,1306 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+  "status": "reviewed",
+  "final_disposition": "already-adapted",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent complete audit remains separate",
+  "recorded_at_utc": "2026-10-16T02:41:33.464421+00:00",
+  "patch_file": "compatibility/rc/resource-style-upstream-patches/86ad5150110522873dae2801fd3c2957502949e7.patch",
+  "diff_sha256": "e237a5b4d0aeb7afb5765e852a89945691ffa98604ba9bfddd2988e5068d3414",
+  "full_original_patch_verified_against_cached_Git_object": true,
+  "original_files": 2,
+  "original_hunks": 2,
+  "hunk_reviews": [
+    {
+      "path": "src/material/select/select.spec.ts",
+      "header": "@@ -1457,6 +1457,26 @@ describe('MatSelect', () => {",
+      "hunk_sha256": "9eaa4690f6b6e9e856ee08beea8a5e74b48a0c350ec0bfcce9568b29ea4104f6",
+      "judgment": "Regression assertion or enabled-motion TestBed setup reviewed in full. The current finite native requirements use the real owned legacy component and legacy classes while retaining the upstream behavior assertion. Actual artifact execution remains mandatory."
+    },
+    {
+      "path": "src/material/select/select.ts",
+      "header": "@@ -844,7 +844,7 @@ export class MatSelect",
+      "hunk_sha256": "0c6c0509ca3de01eee90802c6ffd958511366dd4480cb25caca980ce287a3808",
+      "judgment": "The full two-file patch guards exit when the panel view is unavailable immediately after open. The current owned exit method tests !animationsEnabled || !this.panel before accessing nativeElement, cancels prior exit resources and completes the matching owned sequence. Completion clears _overlayAttached, emits one void state and the unchanged public CdkConnectedOverlay template binding applies detachment; it does not import the modern private detach method. The real native test recreates the owned enabled-motion configuration and calls public open/close before a panel view resolves, then checks closed/unattached state and absence of a panel after flushing. Source/protocol diagnostics cannot substitute for that Angular artifact test. No product or consumer structure/style/API edit is required."
+    }
+  ],
+  "decision": "The full two-file patch guards exit when the panel view is unavailable immediately after open. The current owned exit method tests !animationsEnabled || !this.panel before accessing nativeElement, cancels prior exit resources and completes the matching owned sequence. Completion clears _overlayAttached, emits one void state and the unchanged public CdkConnectedOverlay template binding applies detachment; it does not import the modern private detach method. The real native test recreates the owned enabled-motion configuration and calls public open/close before a panel view resolves, then checks closed/unattached state and absence of a panel after flushing. Source/protocol diagnostics cannot substitute for that Angular artifact test. No product or consumer structure/style/API edit is required.",
+  "required_behavior": "Closing immediately after open with enabled motion and no resolved panel must not throw, remain open, retain an attached overlay, or schedule stale exit work.",
+  "required_native_cases": [
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-select/select.spec.ts#70",
+      "historical_path": "src/material/legacy-select/select.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+      "full_name": "MatSelect > core > overlay panel > should close an enabled-motion panel before its view is resolved"
+    }
+  ],
+  "individual_proof": {
+    "proof_kind": "historical-required-individual-behavior",
+    "review_depth": "individual-compatibility",
+    "diff_sha256": "e237a5b4d0aeb7afb5765e852a89945691ffa98604ba9bfddd2988e5068d3414",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The full two-file patch guards exit when the panel view is unavailable immediately after open. The current owned exit method tests !animationsEnabled || !this.panel before accessing nativeElement, cancels prior exit resources and completes the matching owned sequence. Completion clears _overlayAttached, emits one void state and the unchanged public CdkConnectedOverlay template binding applies detachment; it does not import the modern private detach method. The real native test recreates the owned enabled-motion configuration and calls public open/close before a panel view resolves, then checks closed/unattached state and absence of a panel after flushing. Source/protocol diagnostics cannot substitute for that Angular artifact test. No product or consumer structure/style/API edit is required.",
+    "historical_behavior": {
+      "kind": "select-unresolved-panel-close",
+      "case_ids": [
+        "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-select/select.spec.ts#70"
+      ],
+      "source_members": [
+        {
+          "path": "scripts/rc-test-legacy-family.mjs",
+          "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+        },
+        {
+          "path": "scripts/historical-case-roster.mjs",
+          "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+        },
+        {
+          "path": "scripts/resolve-run-library.mjs",
+          "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+        },
+        {
+          "path": "scripts/rc-verify.py",
+          "sha256": "3e51512d06909dd6abcdef4df47dad431b5f82fd1ae607f362380132b8f57150"
+        },
+        {
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
+        },
+        {
+          "path": "scripts/upstream-historical-behavior-evidence.mjs",
+          "sha256": "42055455a9c74623f1c2ac646f1640b098c0471a818141e6127fa97ff5f58fd3"
+        },
+        {
+          "path": "testing/legacy-runner/build.mjs",
+          "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+        },
+        {
+          "path": "testing/legacy-runner/adapt-spec.mjs",
+          "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+        },
+        {
+          "path": "testing/legacy-runner/entry.ts",
+          "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+        },
+        {
+          "path": "testing/legacy-runner/init-test-env.ts",
+          "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+        },
+        {
+          "path": "testing/legacy-runner/karma.conf.cjs",
+          "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+        },
+        {
+          "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+        },
+        {
+          "path": "testing/legacy-runner/historical-inventory.json",
+          "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+        },
+        {
+          "path": "testing/legacy-runner/historical-specs.json",
+          "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+        },
+        {
+          "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "ce5746a3721935ab59e5c10087341c661b2b477a8f17f8c49e589c5b3410584b"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+          "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+          "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.html",
+          "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+          "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+          "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+        }
+      ]
+    },
+    "adapter_source_context": {
+      "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+      "sha256": "0cec5e2cf1b3a762218be1d53d1bb7692405772f7b3f275333e432092fd277be"
+    },
+    "historical_roster_source_context": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "7694977ba8e20050d29e2d1c605a9b168f5232345a42f589eb70f0977c5f172b"
+    }
+  },
+  "independent_evidence": [
+    {
+      "path": "compatibility/rc/reopened-native-behavior-inputs.json",
+      "sha256": "3d5250e048e374fb62c6b44c5f49fb2110d1187d8930c5c08781ccca18a727b6"
+    },
+    {
+      "path": "compatibility/rc/reopened-native-behavior-diagnostics.json.gz",
+      "sha256": "a65486352901a9bcfd6e85bd1b01743d2a4405270a12cfa0255380b3d5d1e5ed",
+      "compression": "gzip",
+      "uncompressed_sha256": "e1c87768ffee5fb40a847c783f1e6ab05cd1961cb88d146dfad34006e11300e8"
+    },
+    {
+      "path": "compatibility/rc/historical-behavior-admission-final-controls.json",
+      "sha256": "a798c66b3f9e1c1d318d77bc58d4de2fe0e5b03eeedd47862e8defa84bb42e63"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-stale-source-proof-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "3d1c268bdc4c02fcaf53eff1eda2b2bb9e32fcbbc8eccbf00f3625f7f139a610"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-reopened-select-source-review.json",
+      "sha256": "42f4d83bb426b359d5a9ac63dce3259067aa64d8c8a2fff035007f021de6cbb3"
+    },
+    {
+      "path": "compatibility/rc/progress-csp-coordinator-checkpoint.json",
+      "sha256": "0f0fb2f22b61936101808d0d8d5c647bf76ea4f1bf7eaaaf6b396e731afd8b50"
+    },
+    {
+      "path": "compatibility/rc/progress-csp-coordinator-source-proof.json",
+      "sha256": "bcfcc468ccd6ae1dbb242fb94c141a6c78cbe0e1177fc79912c75cf05e896a89"
+    },
+    {
+      "path": "compatibility/rc/progress-csp-style-guard-proof.json",
+      "sha256": "549e34d06050fbc7784c6893bcf8b9da8747328e8b0971df6bfc123293e06099"
+    },
+    {
+      "path": "compatibility/rc/progress-public-color-slot-source-proof.json",
+      "sha256": "fe50b448751525b5009636e3310d80cf0e5c89ca08010479a69a9ce0efe7f1d5"
+    },
+    {
+      "path": "scripts/upstream-progress-csp-evidence.mjs",
+      "sha256": "e48cb0dcebcf7440d1026b7eced2fe52ba3939b5af1ff7698e376da05fffb67d"
+    },
+    {
+      "path": "scripts/progress-csp-style-contract.mjs",
+      "sha256": "e4dbf8db4853f18a328c4146983a2619e5ae71e2178bd726909148b98c7cb321"
+    },
+    {
+      "path": "scripts/browser-matrix-roster.mjs",
+      "sha256": "370350b69325c8b9a54c6c5cffa2c62c7e4b616096598d78a5c87345116b0c8c"
+    },
+    {
+      "path": "tests/upstream/progress-csp-source-context.mjs",
+      "sha256": "ac5b5312ba2f24a003f60dee2973d221b86c6f4045d8922087f57e82fff2d635"
+    },
+    {
+      "path": "compatibility/rc/progress-csp-admission-source-proof.json",
+      "sha256": "b81ab6e01303f3dd99e814384d15760c2d11a490fc7446dd70cedd9552c1996f"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-unresolved-native-source-judgment.json",
+      "sha256": "a5f73c35cb1c4ff576b49e307d197cdb9919c1734f9357b400b29cf2fba77649"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-progress-context-select-source-judgment.json",
+      "sha256": "9645cd741e62bd9aa786cb8643c3f0818bd79d8b73045e823279f46b878702d6"
+    },
+    {
+      "path": "compatibility/rc/generated-identity-packed-source-proof.json",
+      "sha256": "2cf34c00d8f6f494f229f74639af6d83d5f0909b217a53e1b9b3c8da96c48bb8"
+    },
+    {
+      "path": "compatibility/rc/remaining-identity-source-proof.json",
+      "sha256": "43a96a1a8d4f2b15b3c146451cddf2ae42dea37ecfc571e523803580422b5d64"
+    },
+    {
+      "path": "compatibility/rc/remaining-identity-public-subjects.json",
+      "sha256": "c3600dff7acf9eeb0a0bbd0fd893273e392592fc1bae06110fb792ffe673a8fc"
+    },
+    {
+      "path": "compatibility/rc/snack-modal-identity-source-proof.json",
+      "sha256": "af946b53ecedbeea8d0d7ff94c5cceb89d86aaa4690462909956f98a965672ff"
+    },
+    {
+      "path": "compatibility/rc/remaining-identity-generator-worksheet.json",
+      "sha256": "7223eadf6162cb53f7c1f75d632a186d6156284dc20083f87d25159024fddac8"
+    },
+    {
+      "path": "scripts/upstream-generated-identity-evidence.mjs",
+      "sha256": "442dd7910576051ce98d2bf4ad90fe1e1dbf648adc63dc05703bcb40fc8688fd"
+    },
+    {
+      "path": "scripts/generated-identity-packed-contract.mjs",
+      "sha256": "82dc83d16dc6f1fc882df001407f8896bdb8e62a9fb4220ed0663f5f0d494301"
+    },
+    {
+      "path": "tests/upstream/identity-source-context.mjs",
+      "sha256": "8c59412ab4d5e44f5ae6d17761ab378404e06d5266b16784e052b5f1cc2643cf"
+    },
+    {
+      "path": "compatibility/rc/identity-source-admission-source-proof.json",
+      "sha256": "aedfb0aa458b6190636c994c43ba35b1c8a0fb4fd747b22f4c5aaad92572aabc"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-identity-context-select-source-judgment.json",
+      "sha256": "1e05213984ae2d7f330f8831353b3902538f4c7984fd24f850eb86e7ea28df65"
+    },
+    {
+      "path": "compatibility/rc/bidi-peer-admission-source-proof.json",
+      "sha256": "f3069c67b4f97e0d4945cc537edddb30bf4b727cfae979136feb8739382dcdb9"
+    },
+    {
+      "path": "scripts/upstream-bidi-evidence.mjs",
+      "sha256": "146b245f86532b11330b863827f11fbb9792bc8e024a54251d8f600b2dc97fa8"
+    },
+    {
+      "path": "scripts/bidi-peer-source-context.mjs",
+      "sha256": "59557039efc69fb2568b973165a9b3f71115ead69a9d99e30247c48f54180fae"
+    },
+    {
+      "path": "scripts/bidi-peer-source-judgments.mjs",
+      "sha256": "9c4badc90d27d0f17e2b4b1cac6204b3e26e73f1baf5fe5a7d5d27e51a2c0a36"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-source-requalification.mjs",
+      "sha256": "8af454d84a753f57d57af6df261527dfbabc9c940f06410080d614d3fa28e266"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-peer-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "810a5dc3c891e6cc15e2e6baefa7fb7b94e78e11d245bf0ccfed033aa6abe2bc"
+    },
+    {
+      "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+      "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+    },
+    {
+      "path": "scripts/selection-comparator-source-judgments.mjs",
+      "sha256": "75e7e1714918123085897d39692cd586f997ad14ef38a7e68d055fb61119d473"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-source-context.mjs",
+      "sha256": "d1fc5106e9591c48f0118eec4fb06503390369e68499b0315ddc049dd94cc512"
+    },
+    {
+      "path": "scripts/upstream-selection-evidence.mjs",
+      "sha256": "ad26403d8e4b2ebfa8b9d98aaa6e3ef844e8cebaeee56ce6f3432fec0d226fb2"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-contract.mjs",
+      "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-fixture.mjs",
+      "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-source-proof.json",
+      "sha256": "5526eabae45cf015ab58df754014c929e0daaca8a48cab8a4ab456e39a38b46f"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-context-proof.json",
+      "sha256": "72b63f593128d86380682ad88cb060f7c076df8daef372aa1ba632578b62b374"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-proof.json",
+      "sha256": "835ff94c0a8ffdd4c49f6e3816bb908c35f6464c8a5017c76b9e4fcaeca91888"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    }
+  ],
+  "source_conclusion_only": true,
+  "actual_native_or_packed_or_floor_qualified": false,
+  "semantic_pass": false,
+  "runtime_admission": "Required by the registered historical-required-individual-behavior guard. Complete current packed-consumer and2225-case historical artifact results must share the current clean coordinator run; missing runtime never admits this source conclusion. Consumer/runtime/compiler/RxJS floors and independent audit remain separate gates.",
+  "separate_keyboard_adaptation": null,
+  "cyph_sanity_check": {
+    "source_commit": "a56a0603636cac5aaabe8fe408f7429b4224f011",
+    "read_only": true,
+    "full_build_executed": false,
+    "inspected_members": [
+      {
+        "path": "shared/js/cyph/components/search-bar/search-bar.component.html",
+        "sha256": "f733c8a7b4864e9054adae72f467f0511055eac4b55d40b667c610a347201e4c"
+      },
+      {
+        "path": "shared/js/cyph/components/account-menu/account-menu.component.html",
+        "sha256": "a97ccd98fe1679bd8d237485d8e86d2315979de875661ad63682ccdaa79ed595"
+      },
+      {
+        "path": "shared/js/cyph/components/account-menu/account-menu.component.scss",
+        "sha256": "dd3ba40e9fb8bcada3d57381894dfe520dc29e9b4d6ea3ec31d4768b892c4762"
+      },
+      {
+        "path": "shared/js/cyph/components/dynamic-form/dynamic-form.component.html",
+        "sha256": "78d27ff78c2d622ed2cb0cf09fefca1f3ee9e1192b4e234a7067bc6ed7569df3"
+      },
+      {
+        "path": "shared/js/cyph/components/email-compose/email-compose.component.scss",
+        "sha256": "0f4f63c2ec19ea8c317930411a3ba39d63e95efb34fde4b8d1397f943e02cea2"
+      }
+    ],
+    "finding": "Search-bar autocomplete uses the default selection mode and its existing FormControl/optionSelected route. Account menu/dynamic form use legacy select, and consumer styles select .mat-select-value-text, .mat-select-arrow and .mat-select-panel. This packet changes no product, template or resource bytes and requires no consumer HTML/CSS/SCSS changes. No full consumer build or browser claim."
+  },
+  "prior_entry": {
+    "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): avoid error if panel is closed too quickly (#30408)",
+    "final_disposition": "needs-individual-review",
+    "reason": "Fresh individual source and targeted behavior review recorded at compatibility/f10/disposition-ledger/evidence/closeout-reopened-select-source-review.json. Keep pending until current native/floor and independent admission; preserve stale original proof and its finding.",
+    "read_note_disposition": "prior-source-proof-stale-reopened",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-stale-source-proof-86ad5150110522873dae2801fd3c2957502949e7.json",
+    "source_check": "Owned close already skips the exit animation when the panel is missing (legacy-select/internal/select-base",
+    "files": [
+      "src/material/select/select.ts"
+    ],
+    "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+    "recorded_at_utc": "2026-10-09T16:45:16.150774+00:00",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "source_review_followup": "compatibility/f10/disposition-ledger/evidence/closeout-reopened-select-source-review.json"
+  },
+  "g11_claim": "not-passed",
+  "progress_csp_context_requalification": {
+    "source_parent": "e89d9e0cd8877036e368e431cc4ac3cc712963fa",
+    "prior_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-unresolved-native-source-judgment.json",
+      "sha256": "a5f73c35cb1c4ff576b49e307d197cdb9919c1734f9357b400b29cf2fba77649"
+    },
+    "complete_old_checker_coordinator_and_historical_assertions_recovered": true,
+    "source_context_conclusion": "The root checker additions dispatch and enforce a pure finite registry for the two different progress SHAs even if their metadata is relabeled, parse its captured browser outcome and preserve every original historical/packed guard in place. The only coordinator addition captures the earlier browser-matrix invocation/exit without altering packed or historical capture. Complete preceding files are recovered byte for byte after removing those exact additions. All old historical assertions and pins remain after finite context reversal. The retained source comparison additionally recovers the exact earlier three-scope guard from its already authenticated six-scope change capsule, preserving the original expected hash. The three original patch/hunk decisions, named historical requirements and every prior receipt remain unchanged. No runtime or floor credit follows.",
+    "added_dependencies": [
+      {
+        "path": "scripts/upstream-progress-csp-evidence.mjs",
+        "sha256": "e48cb0dcebcf7440d1026b7eced2fe52ba3939b5af1ff7698e376da05fffb67d"
+      },
+      {
+        "path": "scripts/progress-csp-style-contract.mjs",
+        "sha256": "e4dbf8db4853f18a328c4146983a2619e5ae71e2178bd726909148b98c7cb321"
+      },
+      {
+        "path": "scripts/browser-matrix-roster.mjs",
+        "sha256": "370350b69325c8b9a54c6c5cffa2c62c7e4b616096598d78a5c87345116b0c8c"
+      },
+      {
+        "path": "tests/upstream/progress-csp-source-context.mjs",
+        "sha256": "29d7911fa86081780de4fdccaf1f8b6f6001f333671271a41a6d892491194c52"
+      }
+    ],
+    "actual_runtime_qualified": false
+  },
+  "generated_identity_context_requalification": {
+    "source_parent": "56ba5ab801caca63c9c906318a420d60422affa7",
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-progress-context-select-source-judgment.json",
+      "sha256": "9645cd741e62bd9aa786cb8643c3f0818bd79d8b73045e823279f46b878702d6"
+    },
+    "dependencies": [
+      {
+        "path": "scripts/upstream-generated-identity-evidence.mjs",
+        "sha256": "2d9b474e22a4192f87c4710ca191142910cb976805e97cbcd55cce3470960a1d"
+      },
+      {
+        "path": "scripts/generated-identity-packed-contract.mjs",
+        "sha256": "82dc83d16dc6f1fc882df001407f8896bdb8e62a9fb4220ed0663f5f0d494301"
+      },
+      {
+        "path": "tests/upstream/identity-source-context.mjs",
+        "sha256": "8acf80824111dcfdb3387f757c51fea02b950859957588d6b780aa2ba3471fd9"
+      }
+    ],
+    "conclusion": "The sole production source context change adds a pure finite three-SHA packed-ID reader and mandatory classification to the root checker. Every earlier packed, historical and CSP predicate and coordinator capture remains unchanged. Removing only those exact additions recovers the complete preceding checker byte for byte. Both earlier test files recover exactly after removal of their explicit read context; original expected hashes and every assertion remain. The five original whole-patch decisions, hunk judgments, source receipts and actual runtime requirements are retained. No new product/native/browser/packed/floor qualification follows.",
+    "actual_runtime_qualified": false
+  },
+  "bidi_peer_context_requalification": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-identity-context-select-source-judgment.json",
+      "sha256": "1e05213984ae2d7f330f8831353b3902538f4c7984fd24f850eb86e7ea28df65"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/bidi-peer-admission-source-proof.json",
+      "sha256": "f3069c67b4f97e0d4945cc537edddb30bf4b727cfae979136feb8739382dcdb9"
+    },
+    "complete_preceding_root_and_assertions_recovered": true,
+    "original_runtime_validation_bodies_and_hunk_decisions_retained": true,
+    "actual_runtime_qualified": false
+  },
+  "selection_comparator_context_requalification": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-peer-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "810a5dc3c891e6cc15e2e6baefa7fb7b94e78e11d245bf0ccfed033aa6abe2bc"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+      "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+    },
+    "complete_preceding_source_and_scope_recovered": true,
+    "original_runtime_predicate_and_hunk_decisions_retained": true,
+    "actual_runtime_qualified": false
+  },
+  "remaining_native_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "682be319d595b478826277b5f239d53f9fd9fe06",
+    "release_reference_parent": "a0d5b5dff1365971e172a1126c3613fdf923e901",
+    "inputs": {
+      "path": "compatibility/rc/remaining-native-admission-source-inputs.json",
+      "sha256": "cac82c2c3b1df2b94d1c7ee1a9b6e7e2a7af4204cce0720c75eb7d20b8c3190d"
+    },
+    "prior": {
+      "path": "compatibility/rc/remaining-native-admission-integration-prior.json.gz",
+      "sha256": "c308ad0dce673dc6be50eea0aa332ee9d86fde9fb353ab23fc2d31b31478b137",
+      "source_parent": "a0d5b5dff1365971e172a1126c3613fdf923e901"
+    },
+    "changed_product": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+        "before_sha256": "bf02faabd1d0fff61c0e756ee6422af4d417b4d045c475179807c195b4edf7b4",
+        "current_sha256": "7a84291a13db6e907e84b42a581f993d81e6da1f28966696861d0b325e6def14"
+      }
+    ],
+    "unchanged_product_members": 1140,
+    "original_decisions_hunks_and_analyses_retained": true,
+    "public_tab_boundary_roles": 13,
+    "implementation_evidence": [
+      {
+        "path": "compatibility/rc/remaining-native-admission-root-dispatch-controls.json",
+        "sha256": "bc8ce291677399ff4c296383a4f4267d26638bdf517e1ae5a655d24c219ca7ea"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-ripple-controls.json",
+        "sha256": "d80df1f440981a296dc8c2c841890d13e61d7688506f237b8f98b1e66bf4fdb9"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-lifecycle.json",
+        "sha256": "d8a6d6fd6a38cc128188b6c569d49b9c4e1e6bf60fae67f68b5981bdf5c52e43"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-controls.json",
+        "sha256": "be8bbecaea4ef23780a4952f585d42e99b043e1c2823d313957eed6dd44f1ffb"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-layout-native-css.json.gz",
+        "sha256": "bff5c3857027bac41978d1e6be34276364b6550fe48074cbe8198ef99e5b1651"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-cyph-style-sanity.json",
+        "sha256": "b38b616b01a0d43009b39e944caa46c3a8f6eb43054a583a2015e9482035d583"
+      }
+    ],
+    "scope": "The exact11-line private incoming-pane layout insertion changes no package membership, peer import/API, constructor, decorator, build input or resource. Original build/test/slider exclusions remain unchanged; no new upstream/runtime/security decision.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-selection-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "5a77405322405e40ebd24160a10601b62afe5575a74d9eead0241501bdb245d7"
+    },
+    "prior_individual_proof": {
+      "proof_kind": "historical-required-individual-behavior",
+      "review_depth": "individual-compatibility",
+      "diff_sha256": "e237a5b4d0aeb7afb5765e852a89945691ffa98604ba9bfddd2988e5068d3414",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "The full two-file patch guards exit when the panel view is unavailable immediately after open. The current owned exit method tests !animationsEnabled || !this.panel before accessing nativeElement, cancels prior exit resources and completes the matching owned sequence. Completion clears _overlayAttached, emits one void state and the unchanged public CdkConnectedOverlay template binding applies detachment; it does not import the modern private detach method. The real native test recreates the owned enabled-motion configuration and calls public open/close before a panel view resolves, then checks closed/unattached state and absence of a panel after flushing. Source/protocol diagnostics cannot substitute for that Angular artifact test. No product or consumer structure/style/API edit is required.",
+      "historical_behavior": {
+        "kind": "select-unresolved-panel-close",
+        "case_ids": [
+          "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-select/select.spec.ts#70"
+        ],
+        "source_members": [
+          {
+            "path": "scripts/rc-test-legacy-family.mjs",
+            "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/resolve-run-library.mjs",
+            "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+          },
+          {
+            "path": "scripts/rc-verify.py",
+            "sha256": "21c2e1ffae02d9c10e261512a588b86febaa134fc60ed41e54ce4aee2989098c"
+          },
+          {
+            "path": "scripts/check-upstream-audit-disposition.mjs",
+            "sha256": "ce4add8d1a5e896b3094c2ec4cbab95e71fd7ed01b2800d8ca3447a16e0770e2"
+          },
+          {
+            "path": "scripts/upstream-historical-behavior-evidence.mjs",
+            "sha256": "862a712b0d0bdbe0869889cb87f80ce71d2ac18a26cf936db09c0a6c72c97b6b"
+          },
+          {
+            "path": "testing/legacy-runner/build.mjs",
+            "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+          },
+          {
+            "path": "testing/legacy-runner/adapt-spec.mjs",
+            "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+          },
+          {
+            "path": "testing/legacy-runner/entry.ts",
+            "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+          },
+          {
+            "path": "testing/legacy-runner/init-test-env.ts",
+            "sha256": "0eed39e86075f38a2f0e3c65bc0db1ec58da7b3d3e565ca87e1750071522913b"
+          },
+          {
+            "path": "testing/legacy-runner/karma.conf.cjs",
+            "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+          },
+          {
+            "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+            "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "0d1d0fd2757060ea9f4b6fbe77f08aa732ca562cc91330b65c0085dbb6d00ed6"
+          },
+          {
+            "path": "testing/legacy-runner/historical-specs.json",
+            "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+            "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+          },
+          {
+            "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+            "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+          },
+          {
+            "path": "compatibility/rc/matrices/full-verify.json",
+            "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+            "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+            "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+            "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+          }
+        ]
+      }
+    },
+    "original_hunk_and_branch_judgments_retained": true
+  },
+  "tab_lifecycle_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "f1615ad0cbdfbc122e696421b4afd47ddb55c68f",
+    "release_reference_parent": "960d98d87aeac3a24b312cf9112abc6d6383a7fd",
+    "inputs": {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-inputs.json",
+      "sha256": "92a1e6c683bf36815471b90674b949f8972f1fbdc7c1d736c60ec79de7d1ce0e"
+    },
+    "prior": {
+      "path": "compatibility/rc/remaining-native-admission-tab-lifecycle-repair-prior.json.gz",
+      "sha256": "13b9222a165a1bb9a875e523c9cd24ef0f19960d4890060bc5a05833cab0bbeb"
+    },
+    "changed_product": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+        "before_sha256": "7a84291a13db6e907e84b42a581f993d81e6da1f28966696861d0b325e6def14",
+        "current_sha256": "9133c2404db7ef40b39819969e310a71caf660c9d9c05ecfd16a8a4fe6ea0154"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+        "before_sha256": "fb4e59b10d5d2f72cf8aa00688a67ad21a415928e588957d9e5ae0b00782aa53",
+        "current_sha256": "c4d86c99bfeed0a10d6451e034ade808bfb52b4240471e1aef5ccd47e3f124f1"
+      }
+    ],
+    "unchanged_product_members": 1139,
+    "original_decisions_hunks_and_analyses_retained": true,
+    "public_tab_boundary_roles": 13,
+    "implementation_evidence": [
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-lifecycle-controls.json",
+        "sha256": "7a855591fe8cc4bcb66c0b7c2900820fa54ac862d2168bf832d0859747a0c96d"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-producer-controls.json",
+        "sha256": "e2d96d2d159ba09bc3599cc8600d4e337e3b0640445f1ba9400b7f71b5f3884e"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-admission-controls.json",
+        "sha256": "7d73b061d54176ee0545c6a2957b948f7c041f3bde33e65e0aa9187a5aaaf8ef"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-dispatch-controls.json",
+        "sha256": "bc8ce291677399ff4c296383a4f4267d26638bdf517e1ae5a655d24c219ca7ea"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-source-controls.json",
+        "sha256": "0c9625aba2c20522df499d7263214efdfc85d9f8129c301cd23a1c2f84e6e98c"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-cyph-style.json",
+        "sha256": "8512aa2ccd9dda09e550386a3da93866887ecf5c472179e91f6d65d89d22a286"
+      }
+    ],
+    "scope": "The independently reviewed departure/origin lifecycle repair changes four owned method bodies, adds four owned members and changes exactly one private visibility expression. All existing imports/reference roles, constructor, metadata, outputs, element/class structure, CSS/SCSS, package membership and build inputs remain exact. Tagged lifecycle and focused controls support the bounded repair; original build/test/slider exclusions remain unchanged. No new SHA/use closure or runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "07cfe2a0c00506dc65a004606b7c061a58d2f89ad4bef30cc2d01e55b612ba40"
+    },
+    "prior_individual_proof": {
+      "proof_kind": "historical-required-individual-behavior",
+      "review_depth": "individual-compatibility",
+      "diff_sha256": "e237a5b4d0aeb7afb5765e852a89945691ffa98604ba9bfddd2988e5068d3414",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "The full two-file patch guards exit when the panel view is unavailable immediately after open. The current owned exit method tests !animationsEnabled || !this.panel before accessing nativeElement, cancels prior exit resources and completes the matching owned sequence. Completion clears _overlayAttached, emits one void state and the unchanged public CdkConnectedOverlay template binding applies detachment; it does not import the modern private detach method. The real native test recreates the owned enabled-motion configuration and calls public open/close before a panel view resolves, then checks closed/unattached state and absence of a panel after flushing. Source/protocol diagnostics cannot substitute for that Angular artifact test. No product or consumer structure/style/API edit is required.",
+      "historical_behavior": {
+        "kind": "select-unresolved-panel-close",
+        "case_ids": [
+          "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-select/select.spec.ts#70"
+        ],
+        "source_members": [
+          {
+            "path": "scripts/rc-test-legacy-family.mjs",
+            "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/resolve-run-library.mjs",
+            "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+          },
+          {
+            "path": "scripts/rc-verify.py",
+            "sha256": "3e51512d06909dd6abcdef4df47dad431b5f82fd1ae607f362380132b8f57150"
+          },
+          {
+            "path": "scripts/check-upstream-audit-disposition.mjs",
+            "sha256": "5021aee6224fe16f9ff8030c9503e90c6359a4fd96cd3fe3d1ffdece41a0f4be"
+          },
+          {
+            "path": "scripts/upstream-historical-behavior-evidence.mjs",
+            "sha256": "862a712b0d0bdbe0869889cb87f80ce71d2ac18a26cf936db09c0a6c72c97b6b"
+          },
+          {
+            "path": "testing/legacy-runner/build.mjs",
+            "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+          },
+          {
+            "path": "testing/legacy-runner/adapt-spec.mjs",
+            "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+          },
+          {
+            "path": "testing/legacy-runner/entry.ts",
+            "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+          },
+          {
+            "path": "testing/legacy-runner/init-test-env.ts",
+            "sha256": "0eed39e86075f38a2f0e3c65bc0db1ec58da7b3d3e565ca87e1750071522913b"
+          },
+          {
+            "path": "testing/legacy-runner/karma.conf.cjs",
+            "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+          },
+          {
+            "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+            "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+          },
+          {
+            "path": "testing/legacy-runner/historical-inventory.json",
+            "sha256": "0d1d0fd2757060ea9f4b6fbe77f08aa732ca562cc91330b65c0085dbb6d00ed6"
+          },
+          {
+            "path": "testing/legacy-runner/historical-specs.json",
+            "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+          },
+          {
+            "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+            "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+          },
+          {
+            "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+            "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+          },
+          {
+            "path": "compatibility/rc/matrices/full-verify.json",
+            "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+            "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+            "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+            "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+            "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+          }
+        ]
+      }
+    },
+    "original_hunk_and_branch_judgments_retained": true
+  },
+  "spec_fixture_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "ee94710c4e98c5c30c89d0e1710370674d3ac0ba",
+    "qualified_reference_parent": "251b24059fe51c340f484002a25399f7d53290fb",
+    "inputs": {
+      "path": "compatibility/rc/spec-small-context-inputs.json",
+      "sha256": "517745e4e287814633468cb8ab5b75bfb79083d2e98047941863c3f77d34bad0"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "84e5ca0c5060c756ac186c409097556315882a88b280a12e34def1080e5a1dcf",
+        "current_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "0d1d0fd2757060ea9f4b6fbe77f08aa732ca562cc91330b65c0085dbb6d00ed6",
+        "current_sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a"
+      }
+    ],
+    "fixture_controls": {
+      "path": "compatibility/rc/spec-small-source-controls.json",
+      "sha256": "b81aa3d32cbce32f51164dcc63776ada5c1e7e63537ae150c8693783b6d666ba"
+    },
+    "unchanged_other_product_members": 1140,
+    "changed_private_fixture_data_names": 3,
+    "historical_paths": 57,
+    "case_identities_order_names": 2220,
+    "discovery_controls": 5,
+    "all_original_hunks_decisions_and_runtime_requirements_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only three private test-data keys and their explicit current source snapshot differ. Complete tagged templates, states/label values, all cases/assertions, all other product sources and all production peer uses stay exact. The48 source/semantic/adapter controls support this finite source repair. Current packed/native/floor qualification remains mandatory.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_entry": {
+      "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): avoid error if panel is closed too quickly (#30408)",
+      "final_disposition": "already-adapted",
+      "reason": "Current complete individual source judgment recorded at compatibility/f10/disposition-ledger/evidence/closeout-select-unresolved-native-source-judgment.json. Admission requires the exact registered same-run full historical artifact behavior; no runtime/floor qualification is claimed by this source review.",
+      "read_note_disposition": "individual-source-judgment-runtime-required",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "source_check": {
+        "kind": "individual-source-reviewed-runtime-required",
+        "diff_sha256": "e237a5b4d0aeb7afb5765e852a89945691ffa98604ba9bfddd2988e5068d3414",
+        "patch_path": "compatibility/rc/resource-style-upstream-patches/86ad5150110522873dae2801fd3c2957502949e7.patch",
+        "evidence_report_sha256": "5a77405322405e40ebd24160a10601b62afe5575a74d9eead0241501bdb245d7"
+      },
+      "files": [
+        "src/material/select/select.ts"
+      ],
+      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+      "recorded_at_utc": "2026-10-16T02:41:33.464421+00:00",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "source_review_followup": "compatibility/f10/disposition-ledger/evidence/closeout-reopened-select-source-review.json",
+      "individual_proof": {
+        "proof_kind": "historical-required-individual-behavior",
+        "review_depth": "individual-compatibility",
+        "diff_sha256": "e237a5b4d0aeb7afb5765e852a89945691ffa98604ba9bfddd2988e5068d3414",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The full two-file patch guards exit when the panel view is unavailable immediately after open. The current owned exit method tests !animationsEnabled || !this.panel before accessing nativeElement, cancels prior exit resources and completes the matching owned sequence. Completion clears _overlayAttached, emits one void state and the unchanged public CdkConnectedOverlay template binding applies detachment; it does not import the modern private detach method. The real native test recreates the owned enabled-motion configuration and calls public open/close before a panel view resolves, then checks closed/unattached state and absence of a panel after flushing. Source/protocol diagnostics cannot substitute for that Angular artifact test. No product or consumer structure/style/API edit is required.",
+        "historical_behavior": {
+          "kind": "select-unresolved-panel-close",
+          "case_ids": [
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-select/select.spec.ts#70"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/rc-test-legacy-family.mjs",
+              "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+            },
+            {
+              "path": "scripts/historical-case-roster.mjs",
+              "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+            },
+            {
+              "path": "scripts/resolve-run-library.mjs",
+              "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "3e51512d06909dd6abcdef4df47dad431b5f82fd1ae607f362380132b8f57150"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "5021aee6224fe16f9ff8030c9503e90c6359a4fd96cd3fe3d1ffdece41a0f4be"
+            },
+            {
+              "path": "scripts/upstream-historical-behavior-evidence.mjs",
+              "sha256": "862a712b0d0bdbe0869889cb87f80ce71d2ac18a26cf936db09c0a6c72c97b6b"
+            },
+            {
+              "path": "testing/legacy-runner/build.mjs",
+              "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+            },
+            {
+              "path": "testing/legacy-runner/adapt-spec.mjs",
+              "sha256": "5eae6132be50c169c2a010ffd63bf04b86b1c2599792b2ae72037edb7595c960"
+            },
+            {
+              "path": "testing/legacy-runner/entry.ts",
+              "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+            },
+            {
+              "path": "testing/legacy-runner/init-test-env.ts",
+              "sha256": "0eed39e86075f38a2f0e3c65bc0db1ec58da7b3d3e565ca87e1750071522913b"
+            },
+            {
+              "path": "testing/legacy-runner/karma.conf.cjs",
+              "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+            },
+            {
+              "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+              "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "0d1d0fd2757060ea9f4b6fbe77f08aa732ca562cc91330b65c0085dbb6d00ed6"
+            },
+            {
+              "path": "testing/legacy-runner/historical-specs.json",
+              "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+              "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+              "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+              "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+              "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+              "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/select.html",
+              "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+              "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+              "sha256": "f96cb38f85bcbb73138f7a2f05eb713087181ca09037a7832f1c271e2ec63a13"
+            }
+          ]
+        }
+      },
+      "native_source_judgment_context": {
+        "path": "compatibility/rc/reopened-native-behavior-inputs.json",
+        "sha256": "3d5250e048e374fb62c6b44c5f49fb2110d1187d8930c5c08781ccca18a727b6"
+      },
+      "progress_csp_source_context": {
+        "inputs": {
+          "path": "compatibility/rc/progress-csp-admission-inputs.json",
+          "sha256": "ab738de4ca939d371e5e9622191a9a79bc3b6a77d0c8ab5880deb9f676014df5"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/progress-csp-admission-source-proof.json",
+          "sha256": "b81ab6e01303f3dd99e814384d15760c2d11a490fc7446dd70cedd9552c1996f"
+        },
+        "prior_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-unresolved-native-source-judgment.json",
+          "sha256": "a5f73c35cb1c4ff576b49e307d197cdb9919c1734f9357b400b29cf2fba77649"
+        }
+      },
+      "generated_identity_source_context": {
+        "inputs": {
+          "path": "compatibility/rc/identity-source-admission-inputs.json",
+          "sha256": "be73f929ded213e0cbbbbf8170152635aa927c6e2ad9ab33d0256fa643a0759e"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/identity-source-admission-source-proof.json",
+          "sha256": "aedfb0aa458b6190636c994c43ba35b1c8a0fb4fd747b22f4c5aaad92572aabc"
+        },
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-progress-context-select-source-judgment.json",
+          "sha256": "9645cd741e62bd9aa786cb8643c3f0818bd79d8b73045e823279f46b878702d6"
+        }
+      },
+      "bidi_peer_source_context": {
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-identity-context-select-source-judgment.json",
+          "sha256": "1e05213984ae2d7f330f8831353b3902538f4c7984fd24f850eb86e7ea28df65"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/bidi-peer-admission-source-proof.json",
+          "sha256": "f3069c67b4f97e0d4945cc537edddb30bf4b727cfae979136feb8739382dcdb9"
+        }
+      },
+      "selection_comparator_source_context": {
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-peer-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+          "sha256": "810a5dc3c891e6cc15e2e6baefa7fb7b94e78e11d245bf0ccfed033aa6abe2bc"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+          "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+        }
+      }
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "38ed9ad57f239239362a4b7bb78e94beed4ce3e7a4ea51f5b536e1c7ca13ebf5"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "control_case_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "05500bf4d60693c715030349d818440465c57b6d",
+    "qualified_reference_parent": "804b5c68b177c8eff2ed0fdac92caa73d5e9aaf1",
+    "inputs": {
+      "path": "compatibility/rc/spec-control-context-inputs.json",
+      "sha256": "c68029f9ff43fb4c47f58cfa21c9924400f1fbdd142c54c37457399272685fbb"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+        "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54",
+        "current_sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a",
+        "current_sha256": "766c955ca56694fcf3c82ab00296194103bb0fac812cd22571bf89a960f1d9c7"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+    },
+    "unchanged_other_product_members": 1139,
+    "original_cases_preserved": 2220,
+    "additional_cases": 2,
+    "current_case_cells": 2227,
+    "all_original_hunks_decisions_and_runtime_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only two appended candidate cases and their exact two-row inventory update differ. Preserve every prior case/body/template, all production resources and all original source judgments. This is source-context qualification, never actual Angular/native/packed/floor or complete G11 admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    "prior_entry": {
+      "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "804b5c68b177c8eff2ed0fdac92caa73d5e9aaf1",
+      "entry_sha256": "be46b64fbe7d445c60c13739b15b3778a68b897de108237015897f28ff957ee0"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-spec-fixture-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "493e814ac3acf7563b8fb5d2f16a754cc406347693212b8f4707846cf0bb7e84"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "chip_empty_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "e89625fa8145b1d746f24728a83ba25bbfe81871",
+    "qualified_reference_parent": "00fd476b50ad0eb6777e709d13b990e22a785717",
+    "inputs": {
+      "path": "compatibility/rc/spec-stability-context-inputs.json",
+      "sha256": "7259c44866d5e9f1d7c69a8685ad4682c6a0cfbb26eb9330a10879ac6a2b6638"
+    },
+    "prequalified_wrapper_receipt_transitions": [
+      {
+        "path": "tests/test_spec_standalone_environment_source.py",
+        "reference_commit": "a95969e7b493b70141ffa25e5c98f8b9499ace7a",
+        "before_sha256": "3e74aaee57ff849163758989b2f59f588fc975d95504ca3f6cb3ce0ce32923d9",
+        "after_sha256": "7717141028f282aeb800a7e045b7f6a1009fd4ed60974d1cab3c26e553ef23c8",
+        "edits": [
+          {
+            "before": "['node', 'tests/spec_standalone_environment_source_probe.mjs']",
+            "after": "['node', 'scripts/run-historical-source-probe.mjs', 'standalone-environment-source']"
+          }
+        ],
+        "affected_shas": [
+          "31077c2eae76b0bc0bc348ee2bd2801864aa409a",
+          "83006db94a2912fa3cd3b7e1f1dcca9be064d183"
+        ],
+        "qualification": {
+          "path": "compatibility/rc/historical-stability-source-replay-checkpoint.json",
+          "sha256": "7af49a12a6dcda906fc1a8fbf21817a60bf3cee09550ef38074b6e61c282dde1"
+        }
+      }
+    ],
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "before_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "current_sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "before_sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+        "current_sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "766c955ca56694fcf3c82ab00296194103bb0fac812cd22571bf89a960f1d9c7",
+        "current_sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-source-proof.json",
+      "sha256": "f6ea8843244aee5e2eb3a20632ad8d30c27627e151ab912d61ad7272564d3506"
+    },
+    "original_cases_preserved": 2222,
+    "additional_cases": 1,
+    "current_case_cells": 2228,
+    "all_original_branch_hunk_verdicts_and_native_requirement_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only the authenticated chip empty-query reset, one appended Angular lifecycle case and exact inventory refresh differ. Current API call details are qualified against both fixed public minima; every prior verdict and actual native/packed/compiler/floor requirement remains. No source-only runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    },
+    "prior_entry": {
+      "sha": "86ad5150110522873dae2801fd3c2957502949e7",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "00fd476b50ad0eb6777e709d13b990e22a785717",
+      "entry_sha256": "e476a1c15e67b55137ba516cb968b36cd5c10ae97c6cf31f4043cb4840b53ba9"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-control-case-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "7e5d307e9f41a1aff85af169b799325d01a7a7db090e7b38caf43964400ac181"
+    },
+    "original_judgments_preserved": true
+  },
+  "adapter_eager_source_requalification": {
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-wide-fixture-source-adapter-proof.json",
+      "sha256": "0cec5e2cf1b3a762218be1d53d1bb7692405772f7b3f275333e432092fd277be"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-stability-chip-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "916e13c662a8d80f91546862e40856b8710ab9c52cba6d56f46bcd8b65fdebfb"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "e8efdfdb25881e1688fcc237dfb8c075cf22e562",
+      "entry_sha256": "b75345ef66be6befd186a824cd523974318f066d795b282d28425fd4549e5c3c"
+    },
+    "source_judgment_and_runtime_requirements_preserved": true
+  },
+  "historical_roster_reconciliation": {
+    "qualification": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "7694977ba8e20050d29e2d1c605a9b168f5232345a42f589eb70f0977c5f172b"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-wide-fixture-adapter-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "328d46b8326f0533763ad1f912404997b6c09e4ac518a87999499272e0f5e343"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "44365daf1ce5985fb2b178bf6882b6ae24b6ddc1",
+      "entry_sha256": "94f57d9768f580e60e9e3766c04db3a714ea31e240e7eab335a5c84b658c81be"
+    },
+    "source_judgment_and_actual_runtime_obligations_preserved": true
+  },
+  "bootstrap_stability_input_refresh": {
+    "path": "compatibility/rc/bootstrap-stability-native-input-refresh.json",
+    "sha256": "89647e17082a568132af362b11cd9d9118628151dfc2f9b8ca1bd85be66da84a"
+  },
+  "actual_current_native_or_floor_qualified": false,
+  "autocomplete_empty_selection_source_context": {
+    "path": "compatibility/rc/autocomplete-empty-selection-context.json.gz",
+    "sha256": "1f176f656b8b5721165fed24db4dfe8fabcc52dd2ae6ebaa08f52386643e59d9",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/bootstrap-stability-native-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "9608df0caadef72051ba56b6a289b1f28770c7fb039f90a5da1530457954c19f"
+    },
+    "conclusion_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "slider_range_followup_source_context": {
+    "path": "compatibility/rc/slider-range-followup-native-prior.json.gz",
+    "sha256": "a710dc77d8db2836c347e99034e3886f648b72c6153481a506f0fa8b8c1516ac",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-empty-selection-context-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "2c7ea61469c7be0b5dd6caa852fe79b87b41000ad0e958ec72edaf8649391847"
+    },
+    "only_current_root_source_dispatch_added": true,
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "slider_range_followup_native_context_materialization": {
+    "group": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-slider-range-followup-native-context.json",
+      "sha256": "862898e50f5a5bf1018fcaab62448d40922dda73ceb50940f49cc22af867ee98"
+    },
+    "individual_document_interface_preserved": true
+  },
+  "inherited_execution_admission_source_context": {
+    "prior": {
+      "path": "compatibility/rc/inherited-execution-admission-native-prior.json.gz",
+      "sha256": "f6a947e5deae3de8da5198733ce1461ecf7199c057b317cb05b3075d8b8863b7"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-slider-range-followup-native-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "1ec1e8cc57255c1ba9fcef062e66f6f5e54ef5bc4709702da019d9c5d57d2810"
+    },
+    "changed_member": {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "before_sha256": "4f6065b4a867df90e4189343cf1d7e5623ff0f54a9050f64b8fec563cca51e47",
+      "after_sha256": "f9d61a1f3ab771d273117126fba137ad91eae0268e695e6fb58e4486fee98cef"
+    },
+    "finite_inherited_gate": {
+      "path": "scripts/upstream-inherited-execution-evidence.mjs",
+      "sha256": "5e1753ee092510acf4d6253d73bda21e8646914a343e8c03209b5c76e0dbcbbb"
+    },
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "content_observer_admission_source_context": {
+    "prior": {
+      "path": "compatibility/rc/content-observer-admission-context-prior.json.gz",
+      "sha256": "f79c549df7896225e312ad8b45daa1653e181888491200278f6e675184feea65"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-inherited-execution-native-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "4a00f0cfa67a7d91c1166550ae23eb790bec54d76b814f0287e63d4e37a94ea8"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "before_sha256": "f9d61a1f3ab771d273117126fba137ad91eae0268e695e6fb58e4486fee98cef",
+        "after_sha256": "5e80c5b606e4b04b4591f4b5547b4a7d081b19a4b61197b8968c600f3f49a8f9"
+      }
+    ],
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "media_matcher_admission_source_context": {
+    "prior": {
+      "path": "compatibility/rc/media-matcher-admission-context-prior.json.gz",
+      "sha256": "c9d1e3e188a920d9a75efa7867c1a649aa1843454976082afa882fcdf542d72d"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-content-observer-admission-native-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "650d12e9e009cd3d975caeb06d2f39d3f863d32947830eebe362ef170d492f8c"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "before_sha256": "5e80c5b606e4b04b4591f4b5547b4a7d081b19a4b61197b8968c600f3f49a8f9",
+        "after_sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+      }
+    ],
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "native_date_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/native-date-context-inputs.json",
+      "sha256": "454c1b7b78cf9fa0444e206c7ab45638ef118922270a2a34619e29992f5df521"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "f6f9557a2fdd14811d67b951755db19985b94b7b",
+      "entry_sha256": "ed2fbbfc0762715eb3aaa45ee1cbdba5901b9d023a706ae937f1b4d8678f5983"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "sha256": "77444896cf2dce85affa924824537173867ecddf92e369a42a1c63876a5f9ed5"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "before_sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2",
+        "after_sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
+      }
+    ],
+    "original_verdict_and_runtime_requirements_unchanged": true,
+    "new_fixture_dependencies_bound": false,
+    "actual_native_packed_or_floor_qualified": false
+  }
+}

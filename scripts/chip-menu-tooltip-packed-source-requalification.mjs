@@ -7,6 +7,7 @@
  */
 import {reverseBidiIsolatedPackedSource} from './bidi-isolated-packed-source-requalification.mjs';
 import assert from 'node:assert/strict';
+import {reverseNativeDatePackedSource} from './native-date-packed-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
@@ -21,7 +22,6 @@ let cached;
 /** Compose before the unchanged earlier guards; never admit a runtime result. */
 export function reverseChipMenuTooltipPackedSource(member,raw,line,{readMember}={}){
  assert.ok(Object.hasOwn(pins,line),'unknown packed observation source line');
- raw=reverseBidiIsolatedPackedSource(member,raw,line,{readMember});
  const read=readMember||((p)=>readFileSync(resolve(root,p)));
  const input=read(path);assert.equal(hash(input),pins[line],'packed observation source inputs changed');
  let capsule;
@@ -37,6 +37,7 @@ export function reverseChipMenuTooltipPackedSource(member,raw,line,{readMember}=
   if(!readMember)cached=capsule;
  }
  const record=capsule.members.find(m=>m.path===member);assert.ok(record,'foreign packed observation source path');
+ if(hash(raw)!==record.current_sha256){raw=reverseNativeDatePackedSource(member,raw,{readMember});raw=reverseBidiIsolatedPackedSource(member,raw,line,{readMember});}
  assert.equal(typeof raw,'string');assert.equal(hash(raw),record.current_sha256,'unreviewed packed observation source change');
  let restored=raw;
  for(const [before,after]of [...record.edits].reverse()){
