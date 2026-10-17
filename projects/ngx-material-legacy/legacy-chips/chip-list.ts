@@ -540,12 +540,7 @@ export class MatLegacyChipList
     if (this._chipInput && this._chipInput.focused) {
       // do nothing
     } else if (this.chips.length > 0) {
-      const activeItem = this._keyManager.activeItem;
-      if (activeItem) {
-        activeItem.focus();
-      } else {
-        this._keyManager.setFirstItemActive();
-      }
+      this._keyManager.setFirstItemActive();
       this.stateChanges.next();
     } else {
       this._focusInput(options);

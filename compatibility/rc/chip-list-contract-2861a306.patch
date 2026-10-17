@@ -1,0 +1,21 @@
+diff --git a/src/material/chips/chip-grid.ts b/src/material/chips/chip-grid.ts
+index d3d84d469bbcac881389361c7ee3784409d9798a..8083c3c6b899c3241bec8d09aeb82847685e3fbd 100644
+--- a/src/material/chips/chip-grid.ts
++++ b/src/material/chips/chip-grid.ts
+@@ -336,8 +336,14 @@ export class MatChipGrid
+       // Delay until the next tick, because this can cause a "changed after checked"
+       // error if the input does something on focus (e.g. opens an autocomplete).
+       Promise.resolve().then(() => this._chipInput.focus());
+-    } else if (this._chips.length && this._keyManager.activeItemIndex !== 0) {
+-      this._keyManager.setFirstItemActive();
++    } else {
++      const activeItem = this._keyManager.activeItem;
++
++      if (activeItem) {
++        activeItem.focus();
++      } else {
++        this._keyManager.setFirstItemActive();
++      }
+     }
+ 
+     this.stateChanges.next();

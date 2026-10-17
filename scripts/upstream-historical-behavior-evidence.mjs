@@ -8,11 +8,12 @@
 import {createHash} from 'node:crypto';
 import {isDeepStrictEqual} from 'node:util';
 import {readEvidenceMember, validatePackedConsumerRun} from './upstream-packed-run-evidence.mjs';
+import {CHIP_LIST_SOURCE,CHIP_LIST_REFERENCE,CHIP_LIST_ORIGINALS,inspectChipListFocusContract} from './chip-list-focus-contract.mjs';
 
 export const HISTORICAL_BEHAVIOR_KIND = 'historical-required-individual-behavior';
 const checkId = 'historical-legacy-artifact';
 // Expansion requires reviewing this finite contract alongside its indexed names.
-const requiredCaseCount = 2228;
+const requiredCaseCount = 2232;
 const casePrefix = checkId + '/original-and-shared-cases/';
 const commonMembers = [
   'scripts/rc-test-legacy-family.mjs', 'scripts/historical-case-roster.mjs',
@@ -46,6 +47,53 @@ export function historicalRegressionRequirements() {
 // Names are checked in addition to indexed ids: an inserted test cannot silently
 // turn the same numeric id into an unrelated behavior assertion.
 const scopes = new Map([
+  ['e69b2b09efaf577cd5fe92b70808479f975913af', {
+    patch: '896c8735f0eb1e9afa6c49c70c84050af0d62d91c0085522eab07e7a6a90ec4b',
+    kind: 'classic-first-chip-refocus',
+    required_disposition: 'do-not-adopt',
+    source_contract: 'classic-chip-list-focus-and-state',
+    members: [...commonMembers, CHIP_LIST_SOURCE, CHIP_LIST_REFERENCE, CHIP_LIST_ORIGINALS,
+      'scripts/chip-list-focus-contract.mjs',
+      'projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts',
+      'projects/ngx-material-legacy/legacy-chips/chip.ts',
+      'projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/index.ts',
+      'projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/error-state.ts',
+      'projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/constructor.ts',
+    ],
+    cases: [nativeCase('legacy-chips/chip-list.spec.ts', 90, "MatChipList > classic focus and state contract > should refocus the first chip after focus leaves while index zero remains active")],
+  }],
+  ['2861a306aebc54eafe4a72b4a53860d8612af5d4', {
+    patch: '37a1205e60a79f7f051873c1bb55e2df73b5332087d9e5e56562359964c8555a',
+    kind: 'classic-first-enabled-over-active-retention',
+    required_disposition: 'do-not-adopt',
+    source_contract: 'classic-chip-list-focus-and-state',
+    members: [...commonMembers, CHIP_LIST_SOURCE, CHIP_LIST_REFERENCE, CHIP_LIST_ORIGINALS,
+      'scripts/chip-list-focus-contract.mjs',
+      'projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts',
+      'projects/ngx-material-legacy/legacy-chips/chip.ts',
+      'projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/index.ts',
+      'projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/error-state.ts',
+      'projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/constructor.ts',
+    ],
+    cases: [nativeCase('legacy-chips/chip-list.spec.ts', 88, "MatChipList > classic focus and state contract > should focus the first enabled chip when a later chip was active"),
+      nativeCase('legacy-chips/chip-list.spec.ts', 89, "MatChipList > classic focus and state contract > should skip the disabled first and active chips when focusing"),
+      nativeCase('legacy-chips/chip-list.spec.ts', 90, "MatChipList > classic focus and state contract > should refocus the first chip after focus leaves while index zero remains active")],
+  }],
+  ['8980ad584c7ab7d8a0553528cbff88958e94a22a', {
+    patch: '2ce04e1fed9b79e0e4c765e2ceba70a163efe978c5eaf72505422761cfaea2ca',
+    kind: 'classic-disabled-state-notification',
+    required_disposition: 'already-adapted',
+    source_contract: 'classic-chip-list-focus-and-state',
+    members: [...commonMembers, CHIP_LIST_SOURCE, CHIP_LIST_REFERENCE, CHIP_LIST_ORIGINALS,
+      'scripts/chip-list-focus-contract.mjs',
+      'projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts',
+      'projects/ngx-material-legacy/legacy-chips/chip.ts',
+      'projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/index.ts',
+      'projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/error-state.ts',
+      'projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/constructor.ts',
+    ],
+    cases: [nativeCase('legacy-chips/chip-list.spec.ts', 91, "MatChipList > classic focus and state contract > should notify disabled state after propagating it to chips and render the form field state")],
+  }],
   ['db06fa8d8939d793f598bc3dbedc96a5a71c0db0', {
     patch: '097bc267621c07d520fd9aac2e3329a90c05c0ca308a9cc4e3aa4ecb43dc68b7',
     kind: 'autocomplete-empty-required-selection',
@@ -123,6 +171,10 @@ export function validateHistoricalBehavior({root, entry, proof, request}) {
     const registered = scopes.get(entry?.sha);
     demand(registered && proof?.proof_kind === HISTORICAL_BEHAVIOR_KIND
       && proof.diff_sha256 === registered.patch, 'unregistered historical behavior subject');
+    if (registered.source_contract === 'classic-chip-list-focus-and-state') {
+      demand(entry.final_disposition === registered.required_disposition, 'wrong classic chip-list disposition');
+      inspectChipListFocusContract({root,readSource:relative=>readEvidenceMember(root,relative).toString('utf8')});
+    }
     const scope = proof.historical_behavior;
     demand(object(scope) && scope.kind === registered.kind
       && sameIds(scope.case_ids, registered.cases.map(row => row.case_id)), 'wrong historical behavior scope');

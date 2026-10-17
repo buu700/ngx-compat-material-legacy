@@ -1,0 +1,604 @@
+{
+  "schema_version": 1,
+  "role": "individual-whole-original-patch-classic-chip-list-focus-and-state-review",
+  "line": "main",
+  "status": "reviewed",
+  "g11_claim": "not-passed",
+  "scope_sha_ids": [
+    "e69b2b09efaf577cd5fe92b70808479f975913af",
+    "2861a306aebc54eafe4a72b4a53860d8612af5d4",
+    "8980ad584c7ab7d8a0553528cbff88958e94a22a"
+  ],
+  "prior": {
+    "path": "compatibility/rc/chip-list-contract-prior.json.gz",
+    "sha256": "1c7784738aa8b96ba3e5915100d35f7ca9e72160317d98eabba13b2260482481",
+    "raw_sha256": "2f6d41dc81575e7923845e0894652469369f1a0a57c47bad296d493ea72ff9e4"
+  },
+  "originals": {
+    "path": "compatibility/rc/chip-list-contract-originals.json.gz",
+    "sha256": "2de2e7e9bf24371b59527492a0e964562010e2f8afdc44df56fa9cf3ab86a5b5",
+    "raw_sha256": "58a931fcc841416392b299e17576a64cd1b48b9428e9d9b323973eacbd7857cc"
+  },
+  "retained_reviews": {
+    "path": "compatibility/rc/chip-list-contract-retained-reviews.json.gz",
+    "sha256": "dcff7c5b07043d02c63285698051751dd9c2006be75ad7d197ef831b94747c3f",
+    "raw_sha256": "2eef596413ba33c1e5e7e776f9d0aca9a5cc2b1451b5e95d3df8c0c3914607e7"
+  },
+  "source_contract": {
+    "reference": {
+      "path": "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+      "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414"
+    },
+    "source": {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+    },
+    "methods": [
+      "focus",
+      "_focusInput",
+      "_syncChipsState"
+    ],
+    "disabled_delta": "one appended stateChanges.next() after synchronous propagation",
+    "original_subjects": [
+      {
+        "sha": "e69b2b09efaf577cd5fe92b70808479f975913af",
+        "diff_sha256": "896c8735f0eb1e9afa6c49c70c84050af0d62d91c0085522eab07e7a6a90ec4b"
+      },
+      {
+        "sha": "2861a306aebc54eafe4a72b4a53860d8612af5d4",
+        "diff_sha256": "37a1205e60a79f7f051873c1bb55e2df73b5332087d9e5e56562359964c8555a"
+      },
+      {
+        "sha": "8980ad584c7ab7d8a0553528cbff88958e94a22a",
+        "diff_sha256": "2ce04e1fed9b79e0e4c765e2ceba70a163efe978c5eaf72505422761cfaea2ca"
+      }
+    ],
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "reviews": [
+    {
+      "sha": "e69b2b09efaf577cd5fe92b70808479f975913af",
+      "status": "reviewed",
+      "subject": "fix(material/chips): fix focus issue (#29427)",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "final_disposition": "do-not-adopt",
+      "decision": "Decline the modern grid skip-index-zero algorithm for the classic list. The untouched Material16 public focus contract activates and focuses the first enabled chip even when index zero was already active. Genuine public CDK16.2.14,21.2.14 and22.1.7 managers all refocus through setFirstItemActive. Restore the complete tagged focus method; the old source-label claim was insufficient and did not establish this contract.",
+      "diff": "diff --git a/src/material/chips/chip-grid.ts b/src/material/chips/chip-grid.ts\nindex 1c57110d6f5624067d218a6cbeca70f5e7c82741..60cb8f6af3bd7e2c29898eb6769dcbd4e006baf9 100644\n--- a/src/material/chips/chip-grid.ts\n+++ b/src/material/chips/chip-grid.ts\n@@ -340,7 +340,7 @@ export class MatChipGrid\n       // Delay until the next tick, because this can cause a \"changed after checked\"\n       // error if the input does something on focus (e.g. opens an autocomplete).\n       Promise.resolve().then(() => this._chipInput.focus());\n-    } else if (this._chips.length) {\n+    } else if (this._chips.length && this._keyManager.activeItemIndex !== 0) {\n       this._keyManager.setFirstItemActive();\n     }\n \n",
+      "diff_sha256": "896c8735f0eb1e9afa6c49c70c84050af0d62d91c0085522eab07e7a6a90ec4b",
+      "patch_file": "compatibility/rc/chip-list-contract-e69b2b09.patch",
+      "patch_paths": [
+        "src/material/chips/chip-grid.ts"
+      ],
+      "original_patch_review": {
+        "changed_paths": 1,
+        "hunks": 1,
+        "complete_source_blobs": 2,
+        "raw_commit_sha256": "54bc007279597b10279d3455da07069bc51a8d5f0a3f1c1f512b0a7802247f8c",
+        "before_blob": "1c57110d6f5624067d218a6cbeca70f5e7c82741",
+        "after_blob": "60cb8f6af3bd7e2c29898eb6769dcbd4e006baf9",
+        "hunk_review": "The sole hunk adds activeItemIndex !== 0 to the existing nonempty grid branch; input scheduling and state notification context are unchanged. The added condition suppresses a necessary classic refocus."
+      },
+      "prior_entry": {
+        "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+        "ledger_commit": "4fac5e56da621c9be9637e7b6a38994aaa0b65c4",
+        "entry_sha256": "fdb6dccad9ecd762ebd4dbf826fdef5badfac176995851630d588db4f0fdf606",
+        "entry": {
+          "sha": "e69b2b09efaf577cd5fe92b70808479f975913af",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/chips): fix focus issue (#29427)",
+          "final_disposition": "already-adapted",
+          "reason": "chip-list focus skips setFirstItemActive when activeItemIndex is already 0.",
+          "read_note_disposition": "owned-retained",
+          "files": [
+            "src/material/chips/chip-grid.ts"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "legacy-chips/chip-list.ts focus activeItemIndex !== 0",
+          "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+          "recorded_at_utc": "2026-10-01T17:10:57Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "product_adaptation": true
+        }
+      },
+      "prior_reviews": [
+        {
+          "path": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "sha256": "e407a0c71f67a8a85a8dc7b887a5e37349915549e34ac720783072fa7729be19"
+        }
+      ],
+      "individual_proof": {
+        "proof_kind": "historical-required-individual-behavior",
+        "diff_sha256": "896c8735f0eb1e9afa6c49c70c84050af0d62d91c0085522eab07e7a6a90ec4b",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline the modern grid skip-index-zero algorithm for the classic list. The untouched Material16 public focus contract activates and focuses the first enabled chip even when index zero was already active. Genuine public CDK16.2.14,21.2.14 and22.1.7 managers all refocus through setFirstItemActive. Restore the complete tagged focus method; the old source-label claim was insufficient and did not establish this contract.",
+        "historical_behavior": {
+          "kind": "classic-first-chip-refocus",
+          "case_ids": [
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#90"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/rc-test-legacy-family.mjs",
+              "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+            },
+            {
+              "path": "scripts/historical-case-roster.mjs",
+              "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+            },
+            {
+              "path": "scripts/resolve-run-library.mjs",
+              "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "1434d36fae6f72ec2f5460eb5fdeb158f5b14da9d722f4a5313573f49edb1ff0"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "ad958d3d93095f8d44dddcd98b35b726ec1ab89406459249676bb182283ffaef"
+            },
+            {
+              "path": "scripts/upstream-historical-behavior-evidence.mjs",
+              "sha256": "5b9c8e242fd4db1166f417652010c2a15293b5664b5718b7b151ce487127e023"
+            },
+            {
+              "path": "testing/legacy-runner/build.mjs",
+              "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+            },
+            {
+              "path": "testing/legacy-runner/adapt-spec.mjs",
+              "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+            },
+            {
+              "path": "testing/legacy-runner/entry.ts",
+              "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+            },
+            {
+              "path": "testing/legacy-runner/init-test-env.ts",
+              "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+            },
+            {
+              "path": "testing/legacy-runner/karma.conf.cjs",
+              "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+            },
+            {
+              "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+              "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+            },
+            {
+              "path": "testing/legacy-runner/historical-specs.json",
+              "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+              "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+              "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "cc6736be8df2d496443855154d59d7abc60b17ae5f72f9340bca420b02a90075"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+              "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+            },
+            {
+              "path": "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+              "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414"
+            },
+            {
+              "path": "compatibility/rc/chip-list-contract-originals.json.gz",
+              "sha256": "2de2e7e9bf24371b59527492a0e964562010e2f8afdc44df56fa9cf3ab86a5b5"
+            },
+            {
+              "path": "scripts/chip-list-focus-contract.mjs",
+              "sha256": "152c89e70c6b61f6f87240cd5564f96972bf2d0c3c4e58572aea6439a8daf313"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+              "sha256": "97cc73a8bd50c4ed037a651510549f5478642695c261e059f543ce0fd5887b99"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+              "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/index.ts",
+              "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/error-state.ts",
+              "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/constructor.ts",
+              "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a"
+            }
+          ]
+        }
+      },
+      "actual_native_packed_or_floor_qualified": false,
+      "runtime_obligation": "Complete same-run canonical packed consumer and complete2232-case historical artifact execution, with exact named case identities; source and protocol diagnostics grant no runtime admission."
+    },
+    {
+      "sha": "2861a306aebc54eafe4a72b4a53860d8612af5d4",
+      "status": "reviewed",
+      "subject": "fix(material/chips): chip grid not re-focusing first item",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "final_disposition": "do-not-adopt",
+      "decision": "Decline modern grid active-item retention for the classic list. The complete tagged Material16 focus method always selects the first enabled chip for a nonempty list. The preceding candidate incorrectly retained a later or disabled active item; replay with all three genuine public managers reproduces both differences. Restore the original method and require the named native regressions against the packed library.",
+      "diff": "diff --git a/src/material/chips/chip-grid.ts b/src/material/chips/chip-grid.ts\nindex d3d84d469bbcac881389361c7ee3784409d9798a..8083c3c6b899c3241bec8d09aeb82847685e3fbd 100644\n--- a/src/material/chips/chip-grid.ts\n+++ b/src/material/chips/chip-grid.ts\n@@ -336,8 +336,14 @@ export class MatChipGrid\n       // Delay until the next tick, because this can cause a \"changed after checked\"\n       // error if the input does something on focus (e.g. opens an autocomplete).\n       Promise.resolve().then(() => this._chipInput.focus());\n-    } else if (this._chips.length && this._keyManager.activeItemIndex !== 0) {\n-      this._keyManager.setFirstItemActive();\n+    } else {\n+      const activeItem = this._keyManager.activeItem;\n+\n+      if (activeItem) {\n+        activeItem.focus();\n+      } else {\n+        this._keyManager.setFirstItemActive();\n+      }\n     }\n \n     this.stateChanges.next();\n",
+      "diff_sha256": "37a1205e60a79f7f051873c1bb55e2df73b5332087d9e5e56562359964c8555a",
+      "patch_file": "compatibility/rc/chip-list-contract-2861a306.patch",
+      "patch_paths": [
+        "src/material/chips/chip-grid.ts"
+      ],
+      "original_patch_review": {
+        "changed_paths": 1,
+        "hunks": 1,
+        "complete_source_blobs": 2,
+        "raw_commit_sha256": "fc2bcde62a6db208e73224573cfb27d286f235e805512dece1c65b2e48106488",
+        "before_blob": "d3d84d469bbcac881389361c7ee3784409d9798a",
+        "after_blob": "8083c3c6b899c3241bec8d09aeb82847685e3fbd",
+        "hunk_review": "The sole hunk replaces the prior nonempty/skip-zero branch with activeItem.focus when present, otherwise setFirstItemActive. This solves modern grid retention but contradicts the classic first-enabled contract and can focus a disabled active item."
+      },
+      "prior_entry": {
+        "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+        "ledger_commit": "4fac5e56da621c9be9637e7b6a38994aaa0b65c4",
+        "entry_sha256": "01bcbcd41e4803c244b536ac58507b35d9f4ae8923bff73ab277e95826cbd6c1",
+        "entry": {
+          "sha": "2861a306aebc54eafe4a72b4a53860d8612af5d4",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/chips): chip grid not re-focusing first item",
+          "final_disposition": "already-adapted",
+          "reason": "Chip list focus re-focuses the active chip instead of only activating index 0.",
+          "read_note_disposition": "owned-retained",
+          "files": [
+            "src/material/chips/chip-grid.ts"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "legacy-chips/chip-list.ts focus activeItem.focus",
+          "batch_id": "product-adapt-residual-2026-10-01-k",
+          "recorded_at_utc": "2026-10-01T17:45:00Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "product_adaptation": true
+        }
+      },
+      "prior_reviews": [
+        {
+          "path": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "sha256": "e407a0c71f67a8a85a8dc7b887a5e37349915549e34ac720783072fa7729be19"
+        }
+      ],
+      "individual_proof": {
+        "proof_kind": "historical-required-individual-behavior",
+        "diff_sha256": "37a1205e60a79f7f051873c1bb55e2df73b5332087d9e5e56562359964c8555a",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Decline modern grid active-item retention for the classic list. The complete tagged Material16 focus method always selects the first enabled chip for a nonempty list. The preceding candidate incorrectly retained a later or disabled active item; replay with all three genuine public managers reproduces both differences. Restore the original method and require the named native regressions against the packed library.",
+        "historical_behavior": {
+          "kind": "classic-first-enabled-over-active-retention",
+          "case_ids": [
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#88",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#89",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#90"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/rc-test-legacy-family.mjs",
+              "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+            },
+            {
+              "path": "scripts/historical-case-roster.mjs",
+              "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+            },
+            {
+              "path": "scripts/resolve-run-library.mjs",
+              "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "1434d36fae6f72ec2f5460eb5fdeb158f5b14da9d722f4a5313573f49edb1ff0"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "ad958d3d93095f8d44dddcd98b35b726ec1ab89406459249676bb182283ffaef"
+            },
+            {
+              "path": "scripts/upstream-historical-behavior-evidence.mjs",
+              "sha256": "5b9c8e242fd4db1166f417652010c2a15293b5664b5718b7b151ce487127e023"
+            },
+            {
+              "path": "testing/legacy-runner/build.mjs",
+              "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+            },
+            {
+              "path": "testing/legacy-runner/adapt-spec.mjs",
+              "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+            },
+            {
+              "path": "testing/legacy-runner/entry.ts",
+              "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+            },
+            {
+              "path": "testing/legacy-runner/init-test-env.ts",
+              "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+            },
+            {
+              "path": "testing/legacy-runner/karma.conf.cjs",
+              "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+            },
+            {
+              "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+              "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+            },
+            {
+              "path": "testing/legacy-runner/historical-specs.json",
+              "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+              "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+              "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "cc6736be8df2d496443855154d59d7abc60b17ae5f72f9340bca420b02a90075"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+              "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+            },
+            {
+              "path": "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+              "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414"
+            },
+            {
+              "path": "compatibility/rc/chip-list-contract-originals.json.gz",
+              "sha256": "2de2e7e9bf24371b59527492a0e964562010e2f8afdc44df56fa9cf3ab86a5b5"
+            },
+            {
+              "path": "scripts/chip-list-focus-contract.mjs",
+              "sha256": "152c89e70c6b61f6f87240cd5564f96972bf2d0c3c4e58572aea6439a8daf313"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+              "sha256": "97cc73a8bd50c4ed037a651510549f5478642695c261e059f543ce0fd5887b99"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+              "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/index.ts",
+              "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/error-state.ts",
+              "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/constructor.ts",
+              "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a"
+            }
+          ]
+        }
+      },
+      "actual_native_packed_or_floor_qualified": false,
+      "runtime_obligation": "Complete same-run canonical packed consumer and complete2232-case historical artifact execution, with exact named case identities; source and protocol diagnostics grant no runtime admission."
+    },
+    {
+      "sha": "8980ad584c7ab7d8a0553528cbff88958e94a22a",
+      "status": "reviewed",
+      "subject": "fix(material/chips): emit state changes when chip grid is disabled (#30033)",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "final_disposition": "already-adapted",
+      "decision": "Retain the narrow disabled-state notification adaptation: the only setter delta from the untouched Material16 source is one stateChanges.next after _syncChipsState. The original local Subject contract promises form-field updates when component state changes. This preserves BooleanInput, child state propagation and all component resources. A named native fixture must observe synchronous propagated state and rendered form-field and chip ARIA state.",
+      "diff": "diff --git a/src/material/chips/chip-grid.ts b/src/material/chips/chip-grid.ts\nindex 772611f619c4ff52145ac08a8c30677576c93592..9e0132d0e5d2e05be4e199ea628420f66429c52a 100644\n--- a/src/material/chips/chip-grid.ts\n+++ b/src/material/chips/chip-grid.ts\n@@ -129,6 +129,7 @@ export class MatChipGrid\n   override set disabled(value: boolean) {\n     this._disabled = value;\n     this._syncChipsState();\n+    this.stateChanges.next();\n   }\n \n   /**\n",
+      "diff_sha256": "2ce04e1fed9b79e0e4c765e2ceba70a163efe978c5eaf72505422761cfaea2ca",
+      "patch_file": "compatibility/rc/chip-list-contract-8980ad58.patch",
+      "patch_paths": [
+        "src/material/chips/chip-grid.ts"
+      ],
+      "original_patch_review": {
+        "changed_paths": 1,
+        "hunks": 1,
+        "complete_source_blobs": 2,
+        "raw_commit_sha256": "3f342b49dbfcf5f9c698e2ca1026e5fbc15f5806b53e0e7df39d0f06e3cd6b96",
+        "before_blob": "772611f619c4ff52145ac08a8c30677576c93592",
+        "after_blob": "9e0132d0e5d2e05be4e199ea628420f66429c52a",
+        "hunk_review": "The sole hunk appends stateChanges.next immediately after assignment and child-state synchronization. Keep the equivalent classic setter delta; do not adopt the modern boolean-only declaration or grid implementation."
+      },
+      "prior_entry": {
+        "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+        "ledger_commit": "4fac5e56da621c9be9637e7b6a38994aaa0b65c4",
+        "entry_sha256": "fc60a76e0f85f0b3b1b77dee1e193b03d52e17c853b04912aadd0fa2d13db3d5",
+        "entry": {
+          "sha": "8980ad584c7ab7d8a0553528cbff88958e94a22a",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/chips): emit state changes when chip grid is disabled (#30033)",
+          "final_disposition": "already-adapted",
+          "reason": "Chip list disabled setter emits stateChanges so the parent form field updates.",
+          "read_note_disposition": "owned-retained",
+          "files": [
+            "src/material/chips/chip-grid.ts"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "legacy-chips/chip-list.ts disabled setter stateChanges.next",
+          "batch_id": "product-adapt-residual-2026-10-01-k",
+          "recorded_at_utc": "2026-10-01T17:45:00Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "product_adaptation": true
+        }
+      },
+      "prior_reviews": [
+        {
+          "path": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "sha256": "e407a0c71f67a8a85a8dc7b887a5e37349915549e34ac720783072fa7729be19"
+        }
+      ],
+      "individual_proof": {
+        "proof_kind": "historical-required-individual-behavior",
+        "diff_sha256": "2ce04e1fed9b79e0e4c765e2ceba70a163efe978c5eaf72505422761cfaea2ca",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Retain the narrow disabled-state notification adaptation: the only setter delta from the untouched Material16 source is one stateChanges.next after _syncChipsState. The original local Subject contract promises form-field updates when component state changes. This preserves BooleanInput, child state propagation and all component resources. A named native fixture must observe synchronous propagated state and rendered form-field and chip ARIA state.",
+        "historical_behavior": {
+          "kind": "classic-disabled-state-notification",
+          "case_ids": [
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#91"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/rc-test-legacy-family.mjs",
+              "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+            },
+            {
+              "path": "scripts/historical-case-roster.mjs",
+              "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+            },
+            {
+              "path": "scripts/resolve-run-library.mjs",
+              "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "1434d36fae6f72ec2f5460eb5fdeb158f5b14da9d722f4a5313573f49edb1ff0"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "ad958d3d93095f8d44dddcd98b35b726ec1ab89406459249676bb182283ffaef"
+            },
+            {
+              "path": "scripts/upstream-historical-behavior-evidence.mjs",
+              "sha256": "5b9c8e242fd4db1166f417652010c2a15293b5664b5718b7b151ce487127e023"
+            },
+            {
+              "path": "testing/legacy-runner/build.mjs",
+              "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+            },
+            {
+              "path": "testing/legacy-runner/adapt-spec.mjs",
+              "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+            },
+            {
+              "path": "testing/legacy-runner/entry.ts",
+              "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+            },
+            {
+              "path": "testing/legacy-runner/init-test-env.ts",
+              "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+            },
+            {
+              "path": "testing/legacy-runner/karma.conf.cjs",
+              "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+            },
+            {
+              "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+              "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+            },
+            {
+              "path": "testing/legacy-runner/historical-specs.json",
+              "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+              "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+              "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "cc6736be8df2d496443855154d59d7abc60b17ae5f72f9340bca420b02a90075"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+              "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+            },
+            {
+              "path": "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+              "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414"
+            },
+            {
+              "path": "compatibility/rc/chip-list-contract-originals.json.gz",
+              "sha256": "2de2e7e9bf24371b59527492a0e964562010e2f8afdc44df56fa9cf3ab86a5b5"
+            },
+            {
+              "path": "scripts/chip-list-focus-contract.mjs",
+              "sha256": "152c89e70c6b61f6f87240cd5564f96972bf2d0c3c4e58572aea6439a8daf313"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+              "sha256": "97cc73a8bd50c4ed037a651510549f5478642695c261e059f543ce0fd5887b99"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+              "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/index.ts",
+              "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/error-state.ts",
+              "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/internal/common-behaviors/constructor.ts",
+              "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a"
+            }
+          ]
+        }
+      },
+      "actual_native_packed_or_floor_qualified": false,
+      "runtime_obligation": "Complete same-run canonical packed consumer and complete2232-case historical artifact execution, with exact named case identities; source and protocol diagnostics grant no runtime admission."
+    }
+  ],
+  "actual_native_packed_or_floor_qualified": false,
+  "consumer_HTML_CSS_SCSS_changes": 0,
+  "public_TypeScript_declaration_changes": 0,
+  "limitations": [
+    "The original three source decisions are individually reviewed; their mandatory native artifact qualification has not executed.",
+    "Current source/role/history requalification is explicitly batched with related C04 work.",
+    "Borrowed host runtime diagnostics are not Node, TypeScript, RxJS or peer floor qualification."
+  ]
+}
