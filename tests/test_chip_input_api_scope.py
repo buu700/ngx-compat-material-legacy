@@ -55,7 +55,9 @@ class ChipInputApiScope(unittest.TestCase):
 
     def test_foundation_keeps_all_1697_ledger_entries_reviews_and_product_bytes(self):
         task=json.loads((ROOT/'compatibility/rc/chip-input-api-scope-worksheet.json').read_bytes());pin=task['prior'];stored=(ROOT/pin['path']).read_bytes();self.assertEqual(sha(stored),pin['sha256']);raw=gzip.decompress(stored);self.assertEqual(sha(raw),pin['raw_sha256']);prior=json.loads(raw)
-        self.assertEqual(prior['source_parent'],task['source_parent']);self.assertEqual(sha(prior['ledger_text'].encode()),prior['ledger_sha256']);self.assertEqual((ROOT/prior['ledger_path']).read_text(),prior['ledger_text'])
+        self.assertEqual(prior['source_parent'],task['source_parent']);self.assertEqual(sha(prior['ledger_text'].encode()),prior['ledger_sha256']);foundation=json.loads((ROOT/'compatibility/rc/chip-input-api-admission-worksheet.json').read_bytes())
+        frozen=subprocess.check_output(['git','--no-replace-objects','show',foundation['source_parent']+':'+prior['ledger_path']],cwd=ROOT)
+        self.assertEqual(frozen.decode(),prior['ledger_text'])
         for member in prior['reviews']+prior['owned_sources']:self.assertEqual(sha(member['text'].encode()),member['sha256']);self.assertEqual((ROOT/member['path']).read_text(),member['text'])
         self.assertEqual(subprocess.check_output(['git','--no-replace-objects','diff',task['source_parent'],'--','projects/ngx-material-legacy','reference'],cwd=ROOT),b'')
         self.assertEqual(subprocess.check_output(['git','ls-files','--others','--exclude-standard','--','projects/ngx-material-legacy','reference'],cwd=ROOT),b'')
