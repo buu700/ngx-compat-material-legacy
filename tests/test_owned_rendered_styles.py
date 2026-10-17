@@ -1,5 +1,6 @@
 """Wrong nonempty styles, missing elements and borrowed receipts cannot pass."""
 import copy
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -15,7 +16,7 @@ class OwnedRenderedStylesTests(unittest.TestCase):
         code=r'''
 import assert from 'node:assert/strict';
 import {OWNED_STYLE_PROBES, ownedStyleCaseIds, assessOwnedStyles} from './scripts/sass-owned-rendered.mjs';
-assert.equal(ownedStyleCaseIds().length,24);
+assert.equal(ownedStyleCaseIds().length,37);
 assert.equal(Object.values(OWNED_STYLE_PROBES).filter(p=>p.context==='typography').length,4);
 for(const probe of Object.values(OWNED_STYLE_PROBES).filter(p=>p.context==='typography'))for(const property of ['font-family','font-size','line-height','rect-height','rect-width'])assert.ok(probe.properties.includes(property));
 const reference=Object.fromEntries(Object.entries(OWNED_STYLE_PROBES).map(([id,p])=>[id,{found:true,values:Object.fromEntries(p.properties.map(k=>[k,k.startsWith('rect-')?'40':'tagged-value']))}]));
@@ -61,6 +62,79 @@ for(const id of Object.keys(negative)){const inert=structuredClone(negative);ine
                         for prop in bad['properties']:
                             if prop['property']=='rect-height':prop.update(reference=value,candidate=value)
                         self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
+
+                if body['context'] in ('theme-light','theme-dark'):
+                    for field,value in [('custom_theme',{}),('theme_frames',{}),('reference_kind','untouched-material-16.2.14-css')]:
+                        bad=copy.deepcopy(body);bad[field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
+                    for field,value in [('case_id','mixin-argument/all-legacy-component-themes/raw-color-config'),('line','foreign'),('identity',{}),('expected',{}),('actual',{})]:
+                        bad=copy.deepcopy(body);bad['custom_theme'][field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
+                    for mode in ('reference','candidate','negative'):
+                        for field,value in [('context','light'),('body_scope',False),('body_scope',1),('nested_scope',True),('overlay_in_body',False),('overlay_outside_nested',False),('mutation_present',mode!='negative'),('theme_stylesheet_sha256','f'*64)]:
+                            bad=copy.deepcopy(body);bad['theme_frames'][mode][field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'),(case,mode,field))
+
+    def test_added_cases_preserve_the_original_branch_roster(self):
+        task=json.loads((ROOT/'compatibility/rc/custom-owned-rendered-worksheet.json').read_bytes())
+        matrix_path='compatibility/rc/matrices/full-verify.json'
+        before=json.loads(subprocess.check_output(['git','show',task['source_parent']+':'+matrix_path],cwd=ROOT))
+        after=json.loads((ROOT/matrix_path).read_bytes())
+        groups=lambda data:next(row for row in data['checks'] if row['check_id']=='sass-seal')['acceptance']['cases_by_line']
+        old=groups(before)[task['line']]['owned-rendered'];new=groups(after)[task['line']]['owned-rendered']
+        self.assertEqual(len(old),24);self.assertEqual(new[:24],old);self.assertEqual(len(new),37)
+        expected=json.loads(subprocess.check_output(['node','--input-type=module','-e',"import {ownedStyleCaseIds} from './scripts/sass-owned-rendered.mjs';console.log(JSON.stringify(ownedStyleCaseIds()));"],cwd=ROOT))
+        self.assertEqual(new,expected)
+        groups(after)[task['line']]['owned-rendered']=old
+        self.assertEqual(after,before)
+
+    def test_actual_writer_preserves_current_theme_and_overlay_receipts(self):
+        subjects=[];inputs=[]
+        for line in ('main','21.x'):
+            version='22.1.7' if line=='main' else '21.2.14'
+            active=SimpleNamespace(binding={'source_line':line},manifest={'run_id':'synthetic','artifacts':[{'id':'library','sha256':'d'*64}],'oracles':{'current_peer':[{'id':'@angular/material','version':version},{'id':'@angular/cdk','version':version},{'id':'@angular/core','version':'22.1.7' if line=='main' else '21.2.23'}]}})
+            for suffix in ('light/snack-action','typography/snack-action','theme-light/snack-primary-action','theme-dark/snack-container'):
+                body=style_receipt(ROOT,active,'owned-style/'+suffix,'writer');context=body['context']
+                item={k:body[k] for k in ('case_id','group','kind','result','selector','context','reference_kind','found','properties','mutation_detected','mutation')}
+                rendered={k:body[k] for k in ('line','identities','versions','browser')}
+                rendered['settlement']={mode:{context:frame} for mode,frame in body['settlement'].items()}
+                if context=='typography':rendered['custom_typography_theme']=body['custom_typography_theme']
+                if context in ('theme-light','theme-dark'):
+                    rendered['custom_themes']={context:body['custom_theme']}
+                    rendered['theme_frames']={mode:{context:frame} for mode,frame in body['theme_frames'].items()}
+                inputs.append([item,rendered,dict(runId='synthetic',invocationId='writer',binding=active.binding,tarballSha256='d'*64)])
+                subjects.append((active,context))
+        code="import {readFileSync} from 'node:fs';import {ownedStyleAssertionBody} from './scripts/sass-seal.mjs';console.log(JSON.stringify(JSON.parse(readFileSync(0)).map(args=>ownedStyleAssertionBody(...args))));"
+        result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,input=json.dumps(inputs),capture_output=True,text=True,timeout=30)
+        self.assertEqual(result.returncode,0,result.stderr)
+        outputs=json.loads(result.stdout);self.assertEqual(len(outputs),8)
+        for (active,context),body in zip(subjects,outputs):
+            self.assertTrue(owned_rendered_ok(ROOT,active,body,'writer'))
+            if context in ('theme-light','theme-dark'):
+                for field in ('custom_theme','theme_frames'):
+                    bad=copy.deepcopy(body);del bad[field];self.assertFalse(owned_rendered_ok(ROOT,active,bad,'writer'))
+
+    def test_actual_context_program_scopes_body_overlays_and_resets_prior_sheets(self):
+        code=r"""
+import assert from 'node:assert/strict';
+import {OWNED_STYLE_CONTEXTS,ownedStyleContextProgram} from './scripts/sass-owned-rendered.mjs';
+const classes=()=>{const values=new Set();return {add:value=>values.add(value),toggle:(value,on)=>on?values.add(value):values.delete(value),contains:value=>values.has(value)}};
+const nodes=Object.fromEntries(['light-sheet','custom-sheet','typography-sheet','style-context'].map(id=>[id,{textContent:'stale',className:'stale'}]));
+const button={classList:classes()};
+globalThis.document={body:{classList:classes(),dataset:{}},getElementById:id=>nodes[id],querySelector:selector=>{assert.equal(selector,'.mat-simple-snackbar-action button');return button;}};
+globalThis.window={__ownedStyleSheets:Object.fromEntries(OWNED_STYLE_CONTEXTS.flatMap(context=>['reference','candidate'].map(mode=>[context+'-'+mode,context+'-'+mode+' CSS'])))};
+for(const context of [...OWNED_STYLE_CONTEXTS,...OWNED_STYLE_CONTEXTS.toReversed()])for(const mode of ['reference','candidate']){
+ assert.equal(eval(ownedStyleContextProgram(context,mode)),true);
+ assert.equal(nodes['light-sheet'].textContent,'light-'+mode+' CSS');
+ assert.equal(nodes['custom-sheet'].textContent,context==='custom'?'custom-'+mode+' CSS':'');
+ const full=['typography','theme-light','theme-dark'].includes(context);
+ assert.equal(nodes['typography-sheet'].textContent,full?context+'-'+mode+' CSS':'');
+ assert.equal(document.body.classList.contains('sass-argument-probe'),full);
+ assert.equal(nodes['style-context'].className,context==='custom'?'shell':'');
+ assert.equal(document.body.dataset.ownedStyleContext,context);assert.equal(button.classList.contains('mat-primary'),true);
+}
+assert.throws(()=>ownedStyleContextProgram('unknown','reference'));
+assert.throws(()=>ownedStyleContextProgram('light','negative'));
+"""
+        result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
 
     def test_actual_animation_and_font_wait_cannot_fake_settlement(self):
         code=r"""

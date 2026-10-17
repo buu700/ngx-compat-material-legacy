@@ -427,6 +427,16 @@ export function apiAssertionFileName(caseId) {
   return `${caseId.replace(/\//g, '__')}.json`;
 }
 
+export function ownedStyleAssertionBody(item,ownedRendered,{runId,invocationId,binding,tarballSha256}){
+  const modes=['reference','candidate','negative'];
+  return {...item,check_id:'sass-seal',run_id:runId,invocation_id:invocationId,binding,
+    line:ownedRendered.line,tarball_sha256:tarballSha256,source_kind:'packed',reference_kind:item.reference_kind,
+    ...(item.context==='typography'?{custom_typography_theme:ownedRendered.custom_typography_theme}:{}),
+    ...(['theme-light','theme-dark'].includes(item.context)?{custom_theme:ownedRendered.custom_themes[item.context],theme_frames:Object.fromEntries(modes.map(mode=>[mode,ownedRendered.theme_frames[mode][item.context]]))}:{}),
+    identities:ownedRendered.identities,versions:ownedRendered.versions,browser:ownedRendered.browser,strict_templates:true,skip_lib_check:false,
+    settlement:Object.fromEntries(modes.map(mode=>[mode,ownedRendered.settlement[mode][item.context]]))};
+}
+
 async function main() {
   const ownedIds = ownedStyleCaseIds();
   const request = coordinatorRequest('sass-seal');
@@ -656,12 +666,7 @@ async function main() {
     }
     for (const item of Object.values(ownedRendered.results || {})) {
       if (item.result !== 'pass') continue;
-      const body = {...item,check_id:'sass-seal',run_id:runId,invocation_id:invocation,binding,
-        line:ownedRendered.line,tarball_sha256:tarballSha,source_kind:'packed',
-        reference_kind:item.context==='typography'?'untouched-material-16.2.14-compiled-css':ownedRendered.reference_kind,
-        ...(item.context==='typography'?{custom_typography_theme:ownedRendered.custom_typography_theme}:{}),identities:ownedRendered.identities,
-        versions:ownedRendered.versions,browser:ownedRendered.browser,strict_templates:true,skip_lib_check:false,
-        settlement:Object.fromEntries(['reference','candidate','negative'].map(mode=>[mode,ownedRendered.settlement[mode][item.context]]))};
+      const body=ownedStyleAssertionBody(item,ownedRendered,identity);
       writeFileSync(join(outputDir,apiAssertionFileName(item.case_id)),JSON.stringify(body,null,2)+'\n');
     }
     return outputDir;
