@@ -52,7 +52,7 @@ class AuditTestContext(unittest.TestCase):
             self.assertEqual(read(member),subprocess.check_output(['git','show',task['source_parent']+':'+member],cwd=ROOT))
         self.assertEqual(subprocess.check_output(['git','diff',task['source_parent'],'--name-only','--','projects','testing','reference','fixtures'],cwd=ROOT),b'')
         # This exact earlier test transition is checked at its sealed source commit.
-        # The current complete28/27 guard census is checked independently below.
+        # The current complete31/30 guard census is checked independently below.
         historical_head=recorded_source_context(ROOT,lambda p:(ROOT/p).read_bytes())[0]['baseline']
         changed=subprocess.check_output(['git','diff',task['source_parent'],historical_head,'--name-only','--','scripts'],cwd=ROOT).decode().splitlines()
         new_context={p for p in changed if read(p)!=(ROOT/p).read_bytes()}
@@ -72,7 +72,7 @@ class AuditTestContext(unittest.TestCase):
 
     def test_all_registered_subjects_still_require_actual_coordinator_execution(self):
         contracts=native_contracts(ROOT)
-        self.assertEqual(len(contracts['rows']),28 if contracts['line']=='main' else 27)
+        self.assertEqual(len(contracts['rows']),31 if contracts['line']=='main' else 30)
         entries=json.loads((ROOT/LEDGER).read_bytes())['entries'];indexed={e['sha']:e for e in entries}
         self.assertEqual(len(indexed),1697)
         for row in contracts['rows']:

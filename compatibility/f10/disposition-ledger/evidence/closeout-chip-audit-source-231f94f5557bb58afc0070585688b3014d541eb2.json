@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+  "recorded_at_utc": "2026-10-07T07:42:41.341965+00:00",
+  "reviewer": "Codex primary implementer; fresh complete audit must challenge this decision",
+  "affected_branches": [
+    "main"
+  ],
+  "review_depth": "individual-compatibility",
+  "final_disposition": "inherited",
+  "diff_sha256": "a89ab37d4dd3819592854002413e12b1840bb047195528455ea90cea8cbcdc44",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/231f94f5557bb58afc0070585688b3014d541eb2.patch",
+  "decision": "Main inherits this exact CSS-query fix from its advertised minimum CDK22.1.7: the actual insertion string strips every literal brace with the same expression as the full original hunk. Reviewed owned direct and BreakpointObserver/high-contrast callers use fixed queries. Actual public MediaMatcher in packed zoneful Chromium confirms a valid query works, the malformed query has no marker effect and its insertion attempt has braces removed. No owned sanitizer, private API or CDK fork is introduced. This is a bounded disposition of this SHA on main, not a full security clearance;21.x21.2.14 retains raw insertion and reproduced injection, so its security review remains open.",
+  "peers": {
+    "main": {
+      "version": "22.1.7",
+      "cdk_version": "22.1.7",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "installed_member": {
+        "path": "package/fesm2022/_breakpoints-observer-chunk.mjs",
+        "sha256": "39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2"
+      }
+    }
+  },
+  "source_review": "Complete original one-function hunk and enclosing CSSStyleSheet insertion/caching/catch context reviewed. Authentic minimum implementation has identical brace sanitization. MediaMatcher only invokes the CSS workaround on Blink/WebKit. No adoption conclusion based on ancestry or a newer research tag.",
+  "owned_caller_triage": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-caller-triage.json",
+  "native_receipt": "compatibility/f10/disposition-ledger/evidence/closeout-browser-native-diagnostic-receipts.json",
+  "native_execution": {
+    "commit": "081b1e940",
+    "run": 37575386672,
+    "job": 112643003696,
+    "subject": "Run-local hashed packed artifact, public MediaMatcher, zoneful Chromium",
+    "valid_query_matches": true,
+    "unsafe_query_css_injected": false,
+    "before_marker": "",
+    "after_marker": "",
+    "cleanup_marker": "",
+    "attempted_rule": "@media (min-width: 0px) html --closeout-peer-query-css-probe: 1 /* {body{ }}"
+  },
+  "supersedes": "Earlier irrelevant/no-owned-path rationale omitted actual public peer reachability. Original archive and earlier per-SHA evidence are preserved.",
+  "limitations": [
+    "No native WebKit/Firefox payload test or general payload/CSP/security certification.",
+    "No21.x clearance or accepted residual-risk exception.",
+    "Authenticated logs reviewed; uploaded artifact archive not independently transferred/rehashed.",
+    "1697 SHA/1736 authored-use overall audit remains incomplete."
+  ],
+  "g11_claim": "not-passed",
+  "individual_proof": {
+    "proof_kind": "browser-required-individual-media-matcher",
+    "diff_sha256": "a89ab37d4dd3819592854002413e12b1840bb047195528455ea90cea8cbcdc44",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Main inherits this exact CSS-query fix from its advertised minimum CDK22.1.7: the actual insertion string strips every literal brace with the same expression as the full original hunk. Reviewed owned direct and BreakpointObserver/high-contrast callers use fixed queries. Actual public MediaMatcher in packed zoneful Chromium confirms a valid query works, the malformed query has no marker effect and its insertion attempt has braces removed. No owned sanitizer, private API or CDK fork is introduced. This is a bounded disposition of this SHA on main, not a full security clearance;21.x21.2.14 retains raw insertion and reproduced injection, so its security review remains open. Require both actual installed minimum-peer identities and the exact native brace-filter observations in the current complete clean same-library packed/browser run. This source document alone does not qualify execution.",
+    "installed_member": {
+      "package": "@angular/cdk",
+      "version": "22.1.7",
+      "path": "compatibility/rc/material-public-source-members/39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2.gz",
+      "sha256": "39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2",
+      "member": "MediaMatcher.matchMedia / createEmptyStyleRule"
+    },
+    "public_declaration": {
+      "path": "compatibility/rc/material-public-source-members/a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01.gz",
+      "sha256": "a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01"
+    },
+    "reachable_behavior": {
+      "kind": "executed-delegation",
+      "id": "browser-diagnostic/media-matcher/native-brace-filter"
+    },
+    "media_matcher_behavior": {
+      "kind": "native-public-exact-brace-filter",
+      "runtimes": [
+        "zoneful",
+        "zoneless"
+      ],
+      "case_ids": [
+        "browser-diagnostic/media-matcher/native-brace-filter"
+      ],
+      "source_members": [
+        {
+          "path": "scripts/upstream-media-matcher-evidence.mjs",
+          "sha256": "e5c17dd1757660af056c213ec49422e32d27464541882cc7f9669e3ee7c829cd"
+        },
+        {
+          "path": "scripts/media-matcher-peer-identity.mjs",
+          "sha256": "d1b524d251e7df16f94bea95f927a385f57b558387ebb800116753b1586ebced"
+        },
+        {
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "sha256": "ad958d3d93095f8d44dddcd98b35b726ec1ab89406459249676bb182283ffaef"
+        },
+        {
+          "path": "scripts/upstream-browser-run-evidence.mjs",
+          "sha256": "a60c4e7bb1c61de9c5672861a04ee57df229ff695d44298b85e3a6a6a7c4a886"
+        },
+        {
+          "path": "scripts/upstream-packed-run-evidence.mjs",
+          "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+        },
+        {
+          "path": "scripts/browser-matrix-acceptance.mjs",
+          "sha256": "89825af639a7d8dfae33cfec9849035b913adecd165d5cfe94ac300350178142"
+        },
+        {
+          "path": "scripts/browser-matrix-roster.mjs",
+          "sha256": "370350b69325c8b9a54c6c5cffa2c62c7e4b616096598d78a5c87345116b0c8c"
+        },
+        {
+          "path": "scripts/browser-required-cells.mjs",
+          "sha256": "f9b966720d7a49b9c1e59138dc6a3dd43b10ae13a8c5c1dea9cc095db812755f"
+        },
+        {
+          "path": "scripts/browser-surface-families.mjs",
+          "sha256": "cd90c75dd8c5dcc5c5f0af05d3a61a4c355ec73ee380a30f652cbe2ee0001cbd"
+        },
+        {
+          "path": "scripts/rc-verify.py",
+          "sha256": "1434d36fae6f72ec2f5460eb5fdeb158f5b14da9d722f4a5313573f49edb1ff0"
+        },
+        {
+          "path": "scripts/packed-consumer-evidence.mjs",
+          "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "cc6736be8df2d496443855154d59d7abc60b17ae5f72f9340bca420b02a90075"
+        },
+        {
+          "path": "compatibility/rc/matrices/library-exports.json",
+          "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+        },
+        {
+          "path": "testing/legacy-runner/historical-inventory.json",
+          "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+        },
+        {
+          "path": "projects/ngx-material-legacy/package.json",
+          "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+          "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+          "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-base.ts",
+          "sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+          "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6"
+        },
+        {
+          "path": "compatibility/rc/material-public-source-members/ec60a5803a214c9b9d8bcdc2de0b0c294ecdd420d680d0e95e686f7aa4d46933.gz",
+          "sha256": "fc88bdeee956bc2de19a44a3dc5e2db551accf392ab7f0ba39868c468bf51f61"
+        },
+        {
+          "path": "compatibility/rc/material-public-source-members/2ee894e12f9c4bedfea46aff56f317bb3d4f874e76a95b6b98e304b89866d6f6.gz",
+          "sha256": "db39de18f16713e9aced1f14961c75700e4a709b83ec4af5d9b413bd1b1c66e6"
+        },
+        {
+          "path": "compatibility/rc/material-public-source-members/39fc38921aa1f28533becd5027dbcec5192b642121452b8352d94aee9813d9f2.gz",
+          "sha256": "b66fff08478b2f66ff8f803d200e7c39d0d4ecf823b84f75eb980bab0a46cfea"
+        },
+        {
+          "path": "compatibility/rc/material-public-source-members/a383d3ac54007522b06834df39d822a35c09c8ce167a0a75165e96f56ed50f01.gz",
+          "sha256": "471547f73a86faefe8cee9b8c1956974dd606c4679dee8f17b0287fc50fb59ce"
+        }
+      ]
+    }
+  },
+  "prior_source_review": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-main-media-matcher-inherited-decision.json",
+    "sha256": "d7c84c927c65681ffd61afd403e48ad7e517a84408d5aaf9f970e5834668f447"
+  },
+  "native_admission": {
+    "kind": "browser-required-individual-media-matcher",
+    "required": true,
+    "runtimes": [
+      "zoneful",
+      "zoneless"
+    ],
+    "case_ids": [
+      "browser-diagnostic/media-matcher/native-brace-filter"
+    ],
+    "actual_native_or_packed_executed": false,
+    "qualified_by_this_document": false,
+    "g11_claim": "not-passed"
+  },
+  "media_matcher_admission_source_context": {
+    "prior": {
+      "path": "compatibility/rc/media-matcher-admission-context-prior.json.gz",
+      "sha256": "c9d1e3e188a920d9a75efa7867c1a649aa1843454976082afa882fcdf542d72d"
+    },
+    "prior_entry_sha": "231f94f5557bb58afc0070585688b3014d541eb2",
+    "source_only_verdict_preserved": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "native_date_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/native-date-context-inputs.json",
+      "sha256": "454c1b7b78cf9fa0444e206c7ab45638ef118922270a2a34619e29992f5df521"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "f6f9557a2fdd14811d67b951755db19985b94b7b",
+      "entry_sha256": "6207629225b69526f5509f9469c8558c684a30964fd58c7aa5721176bc4bd8a8"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-source-review.json",
+      "sha256": "ae3210f85f4514c4ec78deb0e063a0dedfe2fe56dff658d0c85de8121132df2b"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "before_sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2",
+        "after_sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
+      }
+    ],
+    "original_verdict_and_runtime_requirements_unchanged": true,
+    "new_fixture_dependencies_bound": false,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "recorded_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/chip-audit-source-requalification-inputs.json",
+      "sha256": "cd8f1f0cafa2d46ae9a438f66703ed064f7454c607441f025fdc690d49b104d9"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "430206ae5a23a430b3e6736fa641b09d57ea1bda",
+      "entry_sha256": "b377edfb0dc8806cb5f483546de4c9d4fd1103e2664ef16b47c517099721a867"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-recorded-source-context-231f94f5557bb58afc0070585688b3014d541eb2.json",
+      "sha256": "3bca5673b406733fac014750ec4477d5df0f63e32154899cd92f85830f53a042"
+    },
+    "source_scope_only": true,
+    "actual_native_packed_or_floor_qualified": false,
+    "note": "Exact current source bindings after classic first-enabled-focus restoration,4 appended historical regressions and3 mandatory historical scopes. Preserve the full prior decision and all runtime/floor obligations; this document records source qualification only."
+  }
+}
