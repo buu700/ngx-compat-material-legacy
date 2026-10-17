@@ -1,0 +1,619 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "1735032610eec0cb4d9695b2fd621a71346495c7",
+  "subject": "fix(material-experimental/theming): Update M3 palettes (#28109)",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material-experimental/theming/_definition.scss",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "4119c5b1593a0b7e5da53b6b3ee2d5c18aa7f620",
+      "after_blob": "9d3e2a251e0c534b79a43658e56525a4f9012a9a"
+    },
+    {
+      "path": "src/material-experimental/theming/_m3-palettes.scss",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "bcd3e96061a1cf35fd33bed3c24fe0ba66867c69",
+      "after_blob": "5064e49f7a25cbf6231a251d6043620565660a2b"
+    },
+    {
+      "path": "src/material-experimental/theming/_m3-tokens.scss",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "1dd47ddf9403bdd04e4efcd140d69145b6ca0467",
+      "after_blob": "e3566f7f9ab0e954629c7ff3bc9bf280d178d630"
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-definition-api.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "e2e56a235f0fec7412f4461f891fa8dc82e89e6e",
+      "after_blob": "93ee46da3afdc1672a809afdd8b9f7a89cf00def"
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "74c72bf5aa175294a94d69aa643e22d5b1843602",
+      "after_blob": "d64000977a33da50d3af5295e9716751aa07cb07"
+    }
+  ],
+  "original_files": 5,
+  "original_hunks": 11,
+  "raw_commit_sha256": "52e890d2a684078364937a53b3dd1a17ae69037fada65d50b29a2c797caef5b0",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-theming-source-subjects.json.gz",
+    "sha256": "17e6f17d8c46916487c2afc1b6a94bd0b1390c951dd91d4421319575751b78f0"
+  },
+  "patch_file": "compatibility/rc/mixed-theming-source-1735032610eec0cb4d9695b2fd621a71346495c7.original.patch",
+  "diff_sha256": "8613535af4b53100fc67f461966dff2c55f80de9c6f9c7260270fd34352ed0b9",
+  "hunk_reviews": [
+    {
+      "path": "src/material-experimental/theming/_definition.scss",
+      "header": "@@ -38,7 +38,7 @@ $theme-version: 1;",
+      "sha256": "ee6efe382a1ad7d1bc79c33a39ceb9b22f0cb6c5004f273e392afeb774514006",
+      "judgment": "Complete theme definition: review primary/tertiary defaults, neutral/secondary metadata extraction and stripping, error source and exact generator arguments. Experimental M3 definition/config behavior does not replace the owned M2 model."
+    },
+    {
+      "path": "src/material-experimental/theming/_definition.scss",
+      "header": "@@ -47,15 +47,15 @@ $theme-version: 1;",
+      "sha256": "4a4ecc25353b932247eb8b36f473a685c0f04c9dd557202e862574dbef38a9d0",
+      "judgment": "Complete theme definition: review primary/tertiary defaults, neutral/secondary metadata extraction and stripping, error source and exact generator arguments. Experimental M3 definition/config behavior does not replace the owned M2 model."
+    },
+    {
+      "path": "src/material-experimental/theming/_m3-palettes.scss",
+      "header": "@@ -1,105 +1,123 @@",
+      "sha256": "76a59ce7430ee5027b84be3893953ad47ba872f07de8f37cd8beab88f0bd0183",
+      "judgment": "Complete original palette declaration bodies and all hex values/nested-role keys are recorded. Review variable additions/removals, hue-set and metadata shape in this SHA; preserve the independently owned historical M2 palettes. No color, map, output-CSS or runtime equivalence claimed."
+    },
+    {
+      "path": "src/material-experimental/theming/_m3-palettes.scss",
+      "header": "@@ -107,13 +125,16 @@ $green-palette: (",
+      "sha256": "33a51a26402fce88a1295f17d4f03df118ad929ee2210d0326b1fc6cbb0fbfb7",
+      "judgment": "Complete original palette declaration bodies and all hex values/nested-role keys are recorded. Review variable additions/removals, hue-set and metadata shape in this SHA; preserve the independently owned historical M2 palettes. No color, map, output-CSS or runtime equivalence claimed."
+    },
+    {
+      "path": "src/material-experimental/theming/_m3-palettes.scss",
+      "header": "@@ -121,131 +142,306 @@ $green-palette: (",
+      "sha256": "363570f8fbd4444a6850259ea6f254c6775f368a757590c4af043b27f47f74e4",
+      "judgment": "Complete original palette declaration bodies and all hex values/nested-role keys are recorded. Review variable additions/removals, hue-set and metadata shape in this SHA; preserve the independently owned historical M2 palettes. No color, map, output-CSS or runtime equivalence claimed."
+    },
+    {
+      "path": "src/material-experimental/theming/_m3-tokens.scss",
+      "header": "@@ -65,7 +65,7 @@",
+      "sha256": "12450e98aeea761ccddc518fbb37ee4b84598d1db93dbc86076803015f114097",
+      "judgment": "Complete token source: compare every function span, with the individually enumerated changed generator/filter signatures, map lookups and caller arity. Keep all other complete function bodies and raw source bound; no private upstream helper is imported into the add-on."
+    },
+    {
+      "path": "src/material-experimental/theming/_m3-tokens.scss",
+      "header": "@@ -78,16 +78,15 @@",
+      "sha256": "56ccfaf2055fbfe5f371c94147a3bedd90dcce5bbb1eea1ce9d9a111de1cd7dd",
+      "judgment": "Complete token source: compare every function span, with the individually enumerated changed generator/filter signatures, map lookups and caller arity. Keep all other complete function bodies and raw source bound; no private upstream helper is imported into the add-on."
+    },
+    {
+      "path": "src/material-experimental/theming/_m3-tokens.scss",
+      "header": "@@ -329,12 +328,11 @@",
+      "sha256": "b67ddd01cb7cb1bc59036fd0dd6d1c1a89281bfa2d13f6bcc19b06a9090f7c5c",
+      "judgment": "Complete token source: compare every function span, with the individually enumerated changed generator/filter signatures, map lookups and caller arity. Keep all other complete function bodies and raw source bound; no private upstream helper is imported into the add-on."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-definition-api.spec.ts",
+      "header": "@@ -129,12 +129,12 @@ describe('theming definition api', () => {",
+      "sha256": "0f7127dec281d8006a9ae74d029d2195fc1143020adbcf85f9b91405c4857d3c",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -273,7 +273,7 @@ describe('theming inspection api', () => {",
+      "sha256": "208a901049dbc4f9cd2014e7ea4101259a14b7c089831fd020b8558e9178a64a",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -295,7 +295,7 @@ describe('theming inspection api', () => {",
+      "sha256": "08cb77d4ad0c66b2b03a0f0d6ab61dd333caf52613eb173eacb5a67673256ff3",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "src/material-experimental/theming/_definition.scss",
+      "review": "Complete theme definition: review primary/tertiary defaults, neutral/secondary metadata extraction and stripping, error source and exact generator arguments. Experimental M3 definition/config behavior does not replace the owned M2 model."
+    },
+    {
+      "path": "src/material-experimental/theming/_m3-palettes.scss",
+      "review": "Complete original palette declaration bodies and all hex values/nested-role keys are recorded. Review variable additions/removals, hue-set and metadata shape in this SHA; preserve the independently owned historical M2 palettes. No color, map, output-CSS or runtime equivalence claimed."
+    },
+    {
+      "path": "src/material-experimental/theming/_m3-tokens.scss",
+      "review": "Complete token source: compare every function span, with the individually enumerated changed generator/filter signatures, map lookups and caller arity. Keep all other complete function bodies and raw source bound; no private upstream helper is imported into the add-on."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-definition-api.spec.ts",
+      "review": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "review": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-theming-source-review.json.gz",
+    "sha256": "aa465caaef023ba6dbca41510a05a8cdafde6f755c6e215de38193e93a714f2e"
+  },
+  "source_semantics": {
+    "sha": "1735032610eec0cb4d9695b2fd621a71346495c7",
+    "data": {
+      "before_palette_variables": [
+        {
+          "name": "red-palette",
+          "sha256": "c6b727e8ee61338cf706bf89502aa32240b8cf8ecc9e5ecc358d94bbdbf42c5a",
+          "top_level_roles": [
+            "neutral-variant"
+          ],
+          "hex_values": 26
+        },
+        {
+          "name": "orange-palette",
+          "sha256": "408c6957377a741c4fdfdb1ac9f04ca24a4d33a8683cb4f048dd79d53d6a3e68",
+          "top_level_roles": [
+            "neutral-variant"
+          ],
+          "hex_values": 26
+        },
+        {
+          "name": "yellow-palette",
+          "sha256": "4915241ddac5cdabe69215e895f8159a8915e671c12b8e70cfc8d57581a196da",
+          "top_level_roles": [
+            "neutral-variant"
+          ],
+          "hex_values": 26
+        },
+        {
+          "name": "green-palette",
+          "sha256": "36baed1550fb47217451af6c25ee8cca86231cad33194aac01ff6c7376f3f27e",
+          "top_level_roles": [
+            "neutral-variant"
+          ],
+          "hex_values": 26
+        },
+        {
+          "name": "blue-palette",
+          "sha256": "918866a6ac653cdd1678a3315bfedc8381447c0164ee57ea5004529c582b8236",
+          "top_level_roles": [
+            "neutral-variant"
+          ],
+          "hex_values": 26
+        },
+        {
+          "name": "indigo-palette",
+          "sha256": "1eac68f8ce29fad18644ca241b59a6b2202941513f317ff954fdb926d8779ef5",
+          "top_level_roles": [
+            "neutral-variant"
+          ],
+          "hex_values": 26
+        },
+        {
+          "name": "violet-palette",
+          "sha256": "0b2bf51b60196156ef494fe02bf84e06816bdb57833f499385d2520cca691f50",
+          "top_level_roles": [
+            "neutral-variant"
+          ],
+          "hex_values": 26
+        },
+        {
+          "name": "neutral-palette",
+          "sha256": "9374298927ca0157c7e70c75f6e185337ab6ffc3d7f38bad9bacbdc4ffda4b29",
+          "top_level_roles": [],
+          "hex_values": 24
+        }
+      ],
+      "after_palette_variables": [
+        {
+          "name": "blue-palette",
+          "sha256": "5120d970d593a60b6ec9974f1fc2b21421e677b50243d1956916cd158ac9ff1b",
+          "top_level_roles": [
+            "neutral",
+            "neutral-variant"
+          ],
+          "hex_values": 48
+        },
+        {
+          "name": "cyan-palette",
+          "sha256": "cd3386c03cf2f8c304a43ffc10a6716cf974bedf025419dbf35b509fbcebe0a9",
+          "top_level_roles": [
+            "neutral",
+            "neutral-variant"
+          ],
+          "hex_values": 48
+        },
+        {
+          "name": "green-palette",
+          "sha256": "09efc56f17f842f399a07b5a3b7d27070e48caa9334e1d1e6e88cc04b090f1ce",
+          "top_level_roles": [
+            "neutral",
+            "neutral-variant"
+          ],
+          "hex_values": 48
+        },
+        {
+          "name": "magenta-palette",
+          "sha256": "be72238402439b73fc21e9be9828c67911284cd3d7f7ae2d5e3f5a7c3fa94d47",
+          "top_level_roles": [
+            "neutral",
+            "neutral-variant"
+          ],
+          "hex_values": 48
+        },
+        {
+          "name": "orange-palette",
+          "sha256": "061c166dde189aeef1b8841a4d98b99918fa7f5fa9831ce23149168b5f831114",
+          "top_level_roles": [
+            "neutral",
+            "neutral-variant"
+          ],
+          "hex_values": 48
+        },
+        {
+          "name": "purple-palette",
+          "sha256": "b193268185c0c4436f9666f954ccf871ab945bda1f193d4e0529e705f34b4a26",
+          "top_level_roles": [
+            "neutral",
+            "neutral-variant"
+          ],
+          "hex_values": 48
+        },
+        {
+          "name": "red-palette",
+          "sha256": "29111181342a8850322a3656b232d3b55c18e1b4547c3eeac810387c88da7948",
+          "top_level_roles": [
+            "neutral",
+            "neutral-variant"
+          ],
+          "hex_values": 48
+        },
+        {
+          "name": "yellow-palette",
+          "sha256": "9da783570a824d3d5e90ec1bcdd2eacff4a803df86f83e4b5ffb5efe37ffbeb2",
+          "top_level_roles": [
+            "neutral",
+            "neutral-variant"
+          ],
+          "hex_values": 48
+        }
+      ],
+      "changed_token_functions": [
+        "_generate-palette-tokens",
+        "_generate-ref-palette-tokens",
+        "generate-color-tokens"
+      ],
+      "unchanged_palette_helpers": [],
+      "palette_data_or_token_behavior_equivalence_proved": false
+    },
+    "cases_before": 44,
+    "cases_after": 44,
+    "unchanged_complete_callbacks": 41,
+    "source_conclusion_only": true,
+    "actual_Sass_Angular_native_artifact_browser_SSR_or_floor_qualified": false,
+    "review": "Individually review all five complete files and eleven hunks of the first experimental M3 palette change. Eight complete palette declarations replace the prior set: generated tonal values and hue keys change, neutral maps move inside each color palette, and several palette names change. The definition default changes indigo to purple, primary/secondary/tertiary strip neutral metadata, neutral comes from primary, and error strips neutral metadata. Exactly three token functions change: palette-token filtering removes both neutral roles, reference-token generation takes neutral from primary, and the explicit neutral argument disappears from the generator/caller. Whole declaration bodies, all tonal entries/nested role keys and full token-function spans are retained; no numeric/color or map equivalence is claimed. All44 source cases retain identity,41 complete callbacks are unchanged and three update exact M3 expected colors. These are experimental M3 data/definition/token contracts; the add-on imports no experimental Material Sass and keeps its independently owned M2 palettes/theme/typography and historical oracle unchanged. Do not update a legacy palette, consumer map, golden or expected CSS to these new values. This source decision is not inheritance or executed M2/M3 coexistence; native legacy M3 theming remains outside the first-stable requirement."
+  },
+  "decision": "Individually review all five complete files and eleven hunks of the first experimental M3 palette change. Eight complete palette declarations replace the prior set: generated tonal values and hue keys change, neutral maps move inside each color palette, and several palette names change. The definition default changes indigo to purple, primary/secondary/tertiary strip neutral metadata, neutral comes from primary, and error strips neutral metadata. Exactly three token functions change: palette-token filtering removes both neutral roles, reference-token generation takes neutral from primary, and the explicit neutral argument disappears from the generator/caller. Whole declaration bodies, all tonal entries/nested role keys and full token-function spans are retained; no numeric/color or map equivalence is claimed. All44 source cases retain identity,41 complete callbacks are unchanged and three update exact M3 expected colors. These are experimental M3 data/definition/token contracts; the add-on imports no experimental Material Sass and keeps its independently owned M2 palettes/theme/typography and historical oracle unchanged. Do not update a legacy palette, consumer map, golden or expected CSS to these new values. This source decision is not inheritance or executed M2/M3 coexistence; native legacy M3 theming remains outside the first-stable requirement. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "owned_context": {
+    "source_members": 1028,
+    "members_sha256": "4eea094fdf39828468fc9dfd4d4ae09009e78c4c6d26ce619d9d8a4b3b4dcbd3",
+    "owned_context": [
+      {
+        "path": "projects/ngx-material-legacy/_index.scss",
+        "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/theming/_theming.scss",
+        "sha256": "54d065537ee74a0def763b52f37cdabd792b4a29820b02d135d7daf4b05c06e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/theming/_palette.scss",
+        "sha256": "86fcb97f4fe3c1c005edc4840c48ebe7a677d35fa558988db62fb268b0aef300"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/tokens/m2/_index.scss",
+        "sha256": "a28e7498f3e8ee4c7f6644c2bcb3dce3f99710d11764e12a53a98b7a776f41d4"
+      },
+      {
+        "path": "compatibility/rc/oracles/material-16.2.14-sass-api.json",
+        "sha256": "76908825fdbb55fc188f0add372d371f473cd7874cbf575894247231ab854e2d"
+      },
+      {
+        "path": "compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json",
+        "sha256": "8613cc1432b2ae351e655a59b3e39b2c48d80da12c875b5233f4fac2192d657a"
+      },
+      {
+        "path": "toolchain-lock.json",
+        "sha256": "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b"
+      },
+      {
+        "path": ".node-version",
+        "sha256": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f"
+      },
+      {
+        "path": ".npm-version",
+        "sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2"
+      },
+      {
+        "path": "package.json",
+        "sha256": "a3a268beffc3620d3fdeeadc1269c9e9676adbf3e40f55d45cd9683c85e4a060"
+      }
+    ],
+    "historical_oracle_counts": {
+      "variables": 47,
+      "functions": 25,
+      "mixins": 286
+    },
+    "historical_oracle_members": 358,
+    "modern_inspection_names_added": 0,
+    "allowed_current_companion_style_routes": [
+      "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+      "projects/ngx-material-legacy/styles/datepicker/_datepicker-theme.scss",
+      "projects/ngx-material-legacy/styles/progress-bar/_progress-bar-theme.scss"
+    ],
+    "current_private_tools": {
+      "node": "24.21.0",
+      "pnpm": "12.4.2"
+    },
+    "current_private_npm": "11.19.0",
+    "published_node_engine": "^20.19.0 || ^22.12.0 || ^24.0.0",
+    "peer_dependencies": {
+      "@angular/core": "^21.2.23",
+      "@angular/common": "^21.2.23",
+      "@angular/forms": "^21.2.23",
+      "@angular/platform-browser": "^21.2.23",
+      "@angular/cdk": "^21.2.14",
+      "@angular/material": "^21.2.14",
+      "rxjs": "^6.5.3 || ^7.5.5"
+    },
+    "consumer_engine_narrowed_or_required_HTML_CSS_SCSS_changes": false,
+    "actual_compiler_floor_or_Sass_executed": false
+  },
+  "prior_entry": {
+    "sha": "1735032610eec0cb4d9695b2fd621a71346495c7",
+    "bucket": "test-only-batch-candidate",
+    "subject": "fix(material-experimental/theming): Update M3 palettes (#28109)",
+    "files": [
+      "src/material/core/theming/tests/theming-definition-api.spec.ts",
+      "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-theming-source-prior.json.gz",
+    "sha256": "1e8480afb3d77e659da5a141a385a7851145e3621351a29b2d003e217b8c3c7a"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-theming-source-applicability",
+    "diff_sha256": "8613535af4b53100fc67f461966dff2c55f80de9c6f9c7260270fd34352ed0b9",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Individually review all five complete files and eleven hunks of the first experimental M3 palette change. Eight complete palette declarations replace the prior set: generated tonal values and hue keys change, neutral maps move inside each color palette, and several palette names change. The definition default changes indigo to purple, primary/secondary/tertiary strip neutral metadata, neutral comes from primary, and error strips neutral metadata. Exactly three token functions change: palette-token filtering removes both neutral roles, reference-token generation takes neutral from primary, and the explicit neutral argument disappears from the generator/caller. Whole declaration bodies, all tonal entries/nested role keys and full token-function spans are retained; no numeric/color or map equivalence is claimed. All44 source cases retain identity,41 complete callbacks are unchanged and three update exact M3 expected colors. These are experimental M3 data/definition/token contracts; the add-on imports no experimental Material Sass and keeps its independently owned M2 palettes/theme/typography and historical oracle unchanged. Do not update a legacy palette, consumer map, golden or expected CSS to these new values. This source decision is not inheritance or executed M2/M3 coexistence; native legacy M3 theming remains outside the first-stable requirement. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-theming-source-review.mjs",
+        "sha256": "f1efd83c60e40aa79461c1bd1e5b42d2f50278933356540cd832364d87c91de5"
+      },
+      {
+        "path": "tests/mixed_theming_source_probe.mjs",
+        "sha256": "a9653a6aa5a373ad0c10a666dc4b88d5dcea78101ba8833615e52299663bdabb"
+      },
+      {
+        "path": "tests/test_mixed_theming_source.py",
+        "sha256": "e611cd82f417fee29386ca154088c6b729c7666e5625237e74abcdde4518969f"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-qualification-record.py",
+        "sha256": "d4aab473c58987bb990d4a6d1d436267436e0e8ac0681da0ba04cc6db055faba"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-theming-originals.py",
+        "sha256": "b819d3634db1e641a58443d32207cfb8ebb661a32d9b3a81f75423d217660308"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-authenticator.mjs",
+        "sha256": "3798a7ce48a278bb9e62f4bdcb224ae40a1e5908b24ac98f547ab9fe42038989"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-subjects.json.gz",
+        "sha256": "17e6f17d8c46916487c2afc1b6a94bd0b1390c951dd91d4421319575751b78f0"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-acquisition.json.gz",
+        "sha256": "854a80d5c80fd7d66a61352b99407e861dc52ed7f8b75aa8bf87b7cbbff3e464"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-authentication.json.gz",
+        "sha256": "af60fa55365c4b9185c5d3a6af93ff76040e582e281f8f94dad166f8c922be6e"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-eof-control-results.json",
+        "sha256": "13130448b150e0b6f4d516101bbc1a89df305a75ded6bccf39c065245e7a90d4"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-eof-controls.mjs",
+        "sha256": "668fda17abccf4e1bb66a7500fd5c445ddf131f477306e58acffb532ea2fe525"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-acquisition-checkpoint.json",
+        "sha256": "b70cccb6ff1c48c617296bdf765ea101d7cf2d74b3f08b3ed1b841a1cc122353"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-intake.json",
+        "sha256": "d3de22fa6a47f8b4ce416408b2df3b2dd279c12ff0454890782583aacd05eb63"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-observation-pins.json.gz",
+        "sha256": "df334c7929358b366ca55fb32345a2458b286e7bf6ebe35c7e2afd9ea6e693d2"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-prior.json.gz",
+        "sha256": "1e8480afb3d77e659da5a141a385a7851145e3621351a29b2d003e217b8c3c7a"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-review.json.gz",
+        "sha256": "aa465caaef023ba6dbca41510a05a8cdafde6f755c6e215de38193e93a714f2e"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-controls.json",
+        "sha256": "f056fe46cf68dddf7f7f0891f755b7cb25fd14aac9d00570986a990ec1e5105d"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-python.log.gz",
+        "sha256": "63d15260ca2de25529f606fad85b08551ac8c0fe8fb3e8a08402e7ccd771011d"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-cyph-sanity.json",
+        "sha256": "35bb51ea8839bfd1f8b183ac49a8e2e722136b32e84eab5eeb35c72f0b3c2e30"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-theming-source-review.mjs",
+      "sha256": "f1efd83c60e40aa79461c1bd1e5b42d2f50278933356540cd832364d87c91de5"
+    },
+    {
+      "path": "tests/mixed_theming_source_probe.mjs",
+      "sha256": "a9653a6aa5a373ad0c10a666dc4b88d5dcea78101ba8833615e52299663bdabb"
+    },
+    {
+      "path": "tests/test_mixed_theming_source.py",
+      "sha256": "e611cd82f417fee29386ca154088c6b729c7666e5625237e74abcdde4518969f"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-qualification-record.py",
+      "sha256": "d4aab473c58987bb990d4a6d1d436267436e0e8ac0681da0ba04cc6db055faba"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-theming-originals.py",
+      "sha256": "b819d3634db1e641a58443d32207cfb8ebb661a32d9b3a81f75423d217660308"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-authenticator.mjs",
+      "sha256": "3798a7ce48a278bb9e62f4bdcb224ae40a1e5908b24ac98f547ab9fe42038989"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-subjects.json.gz",
+      "sha256": "17e6f17d8c46916487c2afc1b6a94bd0b1390c951dd91d4421319575751b78f0"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-acquisition.json.gz",
+      "sha256": "854a80d5c80fd7d66a61352b99407e861dc52ed7f8b75aa8bf87b7cbbff3e464"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-authentication.json.gz",
+      "sha256": "af60fa55365c4b9185c5d3a6af93ff76040e582e281f8f94dad166f8c922be6e"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-eof-control-results.json",
+      "sha256": "13130448b150e0b6f4d516101bbc1a89df305a75ded6bccf39c065245e7a90d4"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-eof-controls.mjs",
+      "sha256": "668fda17abccf4e1bb66a7500fd5c445ddf131f477306e58acffb532ea2fe525"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-acquisition-checkpoint.json",
+      "sha256": "b70cccb6ff1c48c617296bdf765ea101d7cf2d74b3f08b3ed1b841a1cc122353"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-intake.json",
+      "sha256": "d3de22fa6a47f8b4ce416408b2df3b2dd279c12ff0454890782583aacd05eb63"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-observation-pins.json.gz",
+      "sha256": "df334c7929358b366ca55fb32345a2458b286e7bf6ebe35c7e2afd9ea6e693d2"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-prior.json.gz",
+      "sha256": "1e8480afb3d77e659da5a141a385a7851145e3621351a29b2d003e217b8c3c7a"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-review.json.gz",
+      "sha256": "aa465caaef023ba6dbca41510a05a8cdafde6f755c6e215de38193e93a714f2e"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-controls.json",
+      "sha256": "f056fe46cf68dddf7f7f0891f755b7cb25fd14aac9d00570986a990ec1e5105d"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-python.log.gz",
+      "sha256": "63d15260ca2de25529f606fad85b08551ac8c0fe8fb3e8a08402e7ccd771011d"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-cyph-sanity.json",
+      "sha256": "35bb51ea8839bfd1f8b183ac49a8e2e722136b32e84eab5eeb35c72f0b3c2e30"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
