@@ -16242,7 +16242,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-chips-keyboard-source-review.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-current-chip-keyboard-46bcc21cbc19ff8ec946485febf70a85146f1026.json",
       "prior_dispositions": [
         {
           "sha": "46bcc21cbc19ff8ec946485febf70a85146f1026",
@@ -16311,30 +16311,108 @@
         "diff_sha256": "83a4860a58a3fb63c5f26224735f2c0dbe7834d50889693f0468ba27796ee036",
         "review_depth": "individual-compatibility",
         "affected_branches": [
-          "main",
           "21.x"
         ],
-        "decision": "The complete hunks change modern MDC MatChip/MatChipInput/MatChipGrid behavior and tests. The original legacy input owns a keyup-driven focus guard, exposes _keyup and AfterContentInit behavior, and emits repeated separator/removal requests. Previously transplanting the modern repeat predicate into owned legacy sources removed that historical state machine and replaced a genuine original test. Restore original16; installed modern peer remains separate. No residual risk or historical-contract deviation is accepted. Branch-native Actions now confirm both exact repair commits pass all67 packed consumer cases, including actual release/repress focus and repeated separator/removal probes, and2152 historical tests. Decline the modern behavior changes for the owned legacy controls; retain the distinct historical state machine and assertions. This decision does not clear unrelated API, audit, dependency or release failures.",
-        "proof_kind": "original-contract-and-executed-packed-behavior",
-        "execution": {
-          "main": {
-            "source_commit": "e155084685004f19ed010a468754d690f438642b",
-            "run": 37533826194,
-            "job": 112509599897,
-            "library_sha256": "fd0269c00b547c848fb049836357b9e4f1735b1ad27093cc9a6cbf8f36d9af90"
-          },
-          "21.x": {
-            "source_commit": "ed4180c98c307c38e87c47eb93ad1c43b53d87c2",
-            "run": 37533828978,
-            "job": 112509608870,
-            "library_sha256": "386aa373fcf7e0384a86d641c82e19e30c87a4044c17952b36f5c015e9acf589"
-          }
-        },
+        "decision": "The complete hunks change modern MDC MatChip/MatChipInput/MatChipGrid behavior and tests. The original legacy input owns a keyup-driven focus guard, exposes _keyup and AfterContentInit behavior, and emits repeated separator/removal requests. Previously transplanting the modern repeat predicate into owned legacy sources removed that historical state machine and replaced a genuine original test. Restore original16; installed modern peer remains separate. No residual risk or historical-contract deviation is accepted. Branch-native Actions now confirm both exact repair commits pass all67 packed consumer cases, including actual release/repress focus and repeated separator/removal probes, and2152 historical tests. Decline the modern behavior changes for the owned legacy controls; retain the distinct historical state machine and assertions. This decision does not clear unrelated API, audit, dependency or release failures. The retained execution receipts apply to their recorded historical subjects. Current qualification additionally requires the complete current clean same-library packed106 run, both real DOM keyboard results and the exact tagged historical source contract; this source review alone qualifies no current execution.",
+        "proof_kind": "artifact-required-individual-behavior",
         "executed_cases": [
           "packed-consumer/harness/chip-input-backspace-release",
           "packed-consumer/harness/chip-repeated-removal-and-separator"
         ],
-        "original_provenance": "reference/material-16.2.14/chips-keyboard-sources/provenance.json"
+        "original_provenance": "reference/material-16.2.14/chips-keyboard-sources/provenance.json",
+        "artifact_behavior": {
+          "kind": "original-chip-keyup-backspace-state",
+          "case_ids": [
+            "packed-consumer/harness/chip-input-backspace-release",
+            "packed-consumer/harness/chip-repeated-removal-and-separator"
+          ],
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-input.ts",
+              "sha256": "33570050813994128c0ba997912c66de993ea75fd9f27d03b85842ee509cbe27"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+              "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+              "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+            },
+            {
+              "path": "reference/material-16.2.14/chips-keyboard-sources/chip-input.ts",
+              "sha256": "8970d734fc5404e9e54341a21bea9753311ed3447f415006ac41234ca9890680"
+            },
+            {
+              "path": "reference/material-16.2.14/chips-keyboard-sources/chip.ts",
+              "sha256": "a3809031dbb69a835b3766f2af6052073939bab62a70161fe57e39260377fe5a"
+            },
+            {
+              "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+              "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+            },
+            {
+              "path": "reference/material-16.2.14/chips-keyboard-sources/provenance.json",
+              "sha256": "483dc418fc76a3962383287202f4d8b0b0277ad38fdaae49f234a4b560367582"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "9b46c01fd5c9a83ca33deb75ab006f5e200e381bb81138b58483170b4790e5fc"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/packed-consumer-aot-smoke.mjs",
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
+            },
+            {
+              "path": "scripts/packed-consumer-evidence.mjs",
+              "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+            },
+            {
+              "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+              "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+            },
+            {
+              "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+              "sha256": "815acad5ae822d885db27db66f486e0c762b30796ea93b6bb4fd0c77302ad8a3"
+            },
+            {
+              "path": "scripts/bidi-isolated-packed-contract.mjs",
+              "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+            },
+            {
+              "path": "scripts/bidi-isolated-packed-fixture.mjs",
+              "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+            },
+            {
+              "path": "scripts/selection-comparator-packed-contract.mjs",
+              "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+            },
+            {
+              "path": "scripts/selection-comparator-packed-fixture.mjs",
+              "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
+            },
+            {
+              "path": "compatibility/rc/matrices/library-exports.json",
+              "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "2c734a849ddf2098841baeb25695cdf8f8e72093b3fb1ec98b0c9c46e2cf9404"
+            }
+          ]
+        }
       }
     },
     {
@@ -26918,7 +26996,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-chips-keyboard-source-review.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-current-chip-keyboard-5153a5cd4bdd69649f07ba6596cad56bfd9eb2b1.json",
       "prior_dispositions": [
         {
           "sha": "5153a5cd4bdd69649f07ba6596cad56bfd9eb2b1",
@@ -26982,30 +27060,108 @@
         "diff_sha256": "7be37f5426716aafd2a70dcaed7730abf6af48a625da0120252c819c7627e67e",
         "review_depth": "individual-compatibility",
         "affected_branches": [
-          "main",
           "21.x"
         ],
-        "decision": "The complete hunks change modern MDC MatChip/MatChipInput/MatChipGrid behavior and tests. The original legacy input owns a keyup-driven focus guard, exposes _keyup and AfterContentInit behavior, and emits repeated separator/removal requests. Previously transplanting the modern repeat predicate into owned legacy sources removed that historical state machine and replaced a genuine original test. Restore original16; installed modern peer remains separate. No residual risk or historical-contract deviation is accepted. Branch-native Actions now confirm both exact repair commits pass all67 packed consumer cases, including actual release/repress focus and repeated separator/removal probes, and2152 historical tests. Decline the modern behavior changes for the owned legacy controls; retain the distinct historical state machine and assertions. This decision does not clear unrelated API, audit, dependency or release failures.",
-        "proof_kind": "original-contract-and-executed-packed-behavior",
-        "execution": {
-          "main": {
-            "source_commit": "e155084685004f19ed010a468754d690f438642b",
-            "run": 37533826194,
-            "job": 112509599897,
-            "library_sha256": "fd0269c00b547c848fb049836357b9e4f1735b1ad27093cc9a6cbf8f36d9af90"
-          },
-          "21.x": {
-            "source_commit": "ed4180c98c307c38e87c47eb93ad1c43b53d87c2",
-            "run": 37533828978,
-            "job": 112509608870,
-            "library_sha256": "386aa373fcf7e0384a86d641c82e19e30c87a4044c17952b36f5c015e9acf589"
-          }
-        },
+        "decision": "The complete hunks change modern MDC MatChip/MatChipInput/MatChipGrid behavior and tests. The original legacy input owns a keyup-driven focus guard, exposes _keyup and AfterContentInit behavior, and emits repeated separator/removal requests. Previously transplanting the modern repeat predicate into owned legacy sources removed that historical state machine and replaced a genuine original test. Restore original16; installed modern peer remains separate. No residual risk or historical-contract deviation is accepted. Branch-native Actions now confirm both exact repair commits pass all67 packed consumer cases, including actual release/repress focus and repeated separator/removal probes, and2152 historical tests. Decline the modern behavior changes for the owned legacy controls; retain the distinct historical state machine and assertions. This decision does not clear unrelated API, audit, dependency or release failures. The retained execution receipts apply to their recorded historical subjects. Current qualification additionally requires the complete current clean same-library packed106 run, both real DOM keyboard results and the exact tagged historical source contract; this source review alone qualifies no current execution.",
+        "proof_kind": "artifact-required-individual-behavior",
         "executed_cases": [
           "packed-consumer/harness/chip-input-backspace-release",
           "packed-consumer/harness/chip-repeated-removal-and-separator"
         ],
-        "original_provenance": "reference/material-16.2.14/chips-keyboard-sources/provenance.json"
+        "original_provenance": "reference/material-16.2.14/chips-keyboard-sources/provenance.json",
+        "artifact_behavior": {
+          "kind": "original-chip-repeated-separator-events",
+          "case_ids": [
+            "packed-consumer/harness/chip-input-backspace-release",
+            "packed-consumer/harness/chip-repeated-removal-and-separator"
+          ],
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-input.ts",
+              "sha256": "33570050813994128c0ba997912c66de993ea75fd9f27d03b85842ee509cbe27"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+              "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+              "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+            },
+            {
+              "path": "reference/material-16.2.14/chips-keyboard-sources/chip-input.ts",
+              "sha256": "8970d734fc5404e9e54341a21bea9753311ed3447f415006ac41234ca9890680"
+            },
+            {
+              "path": "reference/material-16.2.14/chips-keyboard-sources/chip.ts",
+              "sha256": "a3809031dbb69a835b3766f2af6052073939bab62a70161fe57e39260377fe5a"
+            },
+            {
+              "path": "reference/material-16.2.14/chips-keyboard-sources/chip-list.spec.ts",
+              "sha256": "a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053"
+            },
+            {
+              "path": "reference/material-16.2.14/chips-keyboard-sources/provenance.json",
+              "sha256": "483dc418fc76a3962383287202f4d8b0b0277ad38fdaae49f234a4b560367582"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "9b46c01fd5c9a83ca33deb75ab006f5e200e381bb81138b58483170b4790e5fc"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/packed-consumer-aot-smoke.mjs",
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
+            },
+            {
+              "path": "scripts/packed-consumer-evidence.mjs",
+              "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+            },
+            {
+              "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+              "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+            },
+            {
+              "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+              "sha256": "815acad5ae822d885db27db66f486e0c762b30796ea93b6bb4fd0c77302ad8a3"
+            },
+            {
+              "path": "scripts/bidi-isolated-packed-contract.mjs",
+              "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+            },
+            {
+              "path": "scripts/bidi-isolated-packed-fixture.mjs",
+              "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+            },
+            {
+              "path": "scripts/selection-comparator-packed-contract.mjs",
+              "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+            },
+            {
+              "path": "scripts/selection-comparator-packed-fixture.mjs",
+              "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
+            },
+            {
+              "path": "compatibility/rc/matrices/library-exports.json",
+              "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "2c734a849ddf2098841baeb25695cdf8f8e72093b3fb1ec98b0c9c46e2cf9404"
+            }
+          ]
+        }
       }
     },
     {
@@ -29053,7 +29209,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-snack-bar-style-decision.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-current-owned-style-d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a.json",
       "prior_dispositions": [
         {
           "sha": "d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a",
@@ -29081,12 +29237,148 @@
         "affected_branches": [
           "21.x"
         ],
-        "decision": "The entire one-file hunk scopes the modern mat-mdc snack action button-color token to mat-unthemed, preventing that structural modern rule from overriding explicitly themed current buttons. It does not edit a legacy theme mixin. Keep the original16 legacy action/primary/accent/warn behavior; do not transplant this modern structural selector into the owned legacy Sass. Both exact peer npm floors already contain the modern structural selector; their component internals are not copied. The retained historical ordinary snack-bar-theme emits theme token values and does not embed this structural container rule. The actual original16-versus-packed style probes pass default and custom snack-container, action, and explicit primary action properties. This is a do-not-adopt decision for the add-on, not a claim to have executed or certified every current modern snack-bar interaction.",
-        "proof_kind": "whole-hunk-peer-structure-and-original-rendered-style",
-        "execution": {
-          "source_commit": "81d7887c91995979a2ff1866eeaceadf68cbce88",
-          "run": 37556909448,
-          "job": 112585134550
+        "decision": "The entire one-file hunk scopes the modern mat-mdc snack action button-color token to mat-unthemed, preventing that structural modern rule from overriding explicitly themed current buttons. It does not edit a legacy theme mixin. Keep the original16 legacy action/primary/accent/warn behavior; do not transplant this modern structural selector into the owned legacy Sass. Both exact peer npm floors already contain the modern structural selector; their component internals are not copied. The retained historical ordinary snack-bar-theme emits theme token values and does not embed this structural container rule. The actual original16-versus-packed style probes pass default and custom snack-container, action, and explicit primary action properties. This is a do-not-adopt decision for the add-on, not a claim to have executed or certified every current modern snack-bar interaction. The retained execution receipts apply to their recorded historical subjects. Current qualification additionally requires the complete current clean same-library packed106 and Sass invocations, exact minimum peer identities and the required owned default/custom light/dark style assertions with effective custom-theme and wrong-style controls; this source review alone qualifies no current execution.",
+        "proof_kind": "sass-required-individual-owned-style",
+        "owned_style_behavior": {
+          "kind": "original-snack-action-and-body-overlay-styles",
+          "case_ids": [
+            "owned-style/light/snack-container",
+            "owned-style/light/snack-action",
+            "owned-style/light/snack-primary-action",
+            "owned-style/theme-light/snack-container",
+            "owned-style/theme-light/snack-action",
+            "owned-style/theme-light/snack-primary-action",
+            "owned-style/theme-dark/snack-container",
+            "owned-style/theme-dark/snack-action",
+            "owned-style/theme-dark/snack-primary-action",
+            "owned-style/typography/snack-action"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/upstream-owned-style-evidence.mjs",
+              "sha256": "89a2de2716e3bb1b7d17cb13980acb3e6bbbb0b8487b6a29757cfef1eac42c1f"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "9b46c01fd5c9a83ca33deb75ab006f5e200e381bb81138b58483170b4790e5fc"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "ee60da89c664c447bf768e9115a4103a911c8eee6c34bd343b66e9f2d42c9c7d"
+            },
+            {
+              "path": "scripts/owned-style-contract.mjs",
+              "sha256": "4914eb6a58c5de1df2a86ba104385d88fa5587996003b7336c6711568a277bd0"
+            },
+            {
+              "path": "scripts/sass-owned-rendered.mjs",
+              "sha256": "329f36cbd8deea5911d5b95a7433b03f00873ca3c14f5f2efcf9158539dd2cc0"
+            },
+            {
+              "path": "scripts/sass-seal.mjs",
+              "sha256": "da6ddb51bf5bfe9dd8500991b003a452e2eb2b0c2b90f32052ea45215f711ce2"
+            },
+            {
+              "path": "scripts/owned_rendered_admission.py",
+              "sha256": "1e9f5931fa9723e9efdbc6c57a3b424c99d366f21b51db3c03a6303dc2b1677f"
+            },
+            {
+              "path": "scripts/sass_mixin_argument_admission.py",
+              "sha256": "73822ff9804d6dd0bbf8cd5d77e52022aef6f8ffb793446befda005d223a5145"
+            },
+            {
+              "path": "scripts/sass-mixin-arguments.mjs",
+              "sha256": "d332eb8803298d79a52ef15383e7808454194128cab3e0081029f85d8e791665"
+            },
+            {
+              "path": "package.json",
+              "sha256": "a3a268beffc3620d3fdeeadc1269c9e9676adbf3e40f55d45cd9683c85e4a060"
+            },
+            {
+              "path": "projects/ngx-material-legacy/package.json",
+              "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/_index.scss",
+              "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+            },
+            {
+              "path": "fixtures/sass/mixin-argument-contracts.json",
+              "sha256": "c1d1151a8c1fa02cea0c6fac5618bbefe11dd018bbfff1d30f5c3f35f8fc8770"
+            },
+            {
+              "path": "fixtures/sass/function-contracts.json",
+              "sha256": "3d49e0e5db749e4c902d33ff7501d67bde7853243c854a5996c04eaaab3845c4"
+            },
+            {
+              "path": "reference/material-16.2.14/PROVENANCE.json",
+              "sha256": "d13d466669cbf96d386ceabfe3de0241b91bcbd3dce98ac70c31093609100f34"
+            },
+            {
+              "path": "reference/material-16.2.14/environment-package-lock.json",
+              "sha256": "ad2f9d62bf04758f87650cae408f805e667236f992cd6d8e481c5577c939d130"
+            },
+            {
+              "path": "fixtures/sass/owned-legacy-select.scss",
+              "sha256": "0b9852837d00a78979c9ae1476c7747c80a747d0803d07887d783149225752ee"
+            },
+            {
+              "path": "reference/material-16.2.14/sass-css/owned-legacy-select.css",
+              "sha256": "20d53fa0e73f1251b90734f579abdc759597031854db446ab61a88e8fce4369e"
+            },
+            {
+              "path": "fixtures/sass/owned-legacy-snack-bar.scss",
+              "sha256": "5cc824d0c7a1495aa52c7539c9541ebe694d909463dad843a80d2e06ba921729"
+            },
+            {
+              "path": "reference/material-16.2.14/sass-css/owned-legacy-snack-bar.css",
+              "sha256": "1b7345b93a674021009c8804e9762cd72569bd4e6b3a952ee06d9ceddd78f548"
+            },
+            {
+              "path": "fixtures/sass/owned-legacy-button.scss",
+              "sha256": "bd06ccaa570a0ae1127369b645e63082737a6e6aa2ba68e0d565ac961077d222"
+            },
+            {
+              "path": "reference/material-16.2.14/sass-css/owned-legacy-button.css",
+              "sha256": "d68091356fca93c590be566ae50ce221d35cdf2327b16f590ee0658797acc311"
+            },
+            {
+              "path": "fixtures/sass/05-custom-map-nested.scss",
+              "sha256": "3b84ac535804b859763e75e520472659fb85905ba95c190057c45a2532abc03f"
+            },
+            {
+              "path": "reference/material-16.2.14/sass-css/05-custom-map-nested.css",
+              "sha256": "e82b4ca28cb36a74fdd7d9c25c25288e4ca2587b06f86fe525e43a68daedc130"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "2c734a849ddf2098841baeb25695cdf8f8e72093b3fb1ec98b0c9c46e2cf9404"
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/legacy-snack-bar/_snack-bar-theme.scss",
+              "sha256": "b9a6613433a84b02035c6252dd226d31cc74eb71c5dcb68ce76e012579a848bf"
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss",
+              "sha256": "29ca545098f2b8eb81fbf7f311b5dac5fda4986f641d39ac23ca01eb7a547906"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.scss",
+              "sha256": "f87776ff2d2a32075eb2794b68cc2a8eb018ec7cedbe494dcdf4c0c586504dfc"
+            },
+            {
+              "path": "compatibility/f10/disposition-ledger/evidence/closeout-snack-bar-style-decision.json",
+              "sha256": "abe4a59e4880a97c3686d6ec48e135cbafee9818031a4a825c5f76cdacf6fbf6"
+            },
+            {
+              "path": "compatibility/f10/disposition-ledger/evidence/patches/d0cf8bfe8bc476145984e0f8f3ab7d18eea36f1a.patch",
+              "sha256": "54a23a310fdb6c13ccca73846eb6c7e0e7798324bd308678e018e6a0152d02ba"
+            }
+          ]
         }
       }
     },
@@ -30762,7 +31054,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-select-style-decision.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-current-owned-style-306e437d213f3ace7b3ee294ef1dd82f5e8e2fab.json",
       "prior_dispositions": [
         {
           "sha": "306e437d213f3ace7b3ee294ef1dd82f5e8e2fab",
@@ -30790,12 +31082,151 @@
         "affected_branches": [
           "21.x"
         ],
-        "decision": "The entire one-file hunk assigns the modern disabled placeholder the existing disabled-trigger-text-color token inside mat-mdc-select-disabled. It does not edit the original legacy .mat-select color contract or the exported theme constructors. Keep the original16 legacy disabled placeholder/value/arrow and custom-map behavior; do not transplant the modern token-slot selector into the owned legacy Sass. Both exact peer npm floors already contain the modern disabled-placeholder structural rule, while the retained historical ordinary select-theme emits color tokens rather than that structural rule. Actual original16-versus-packed default/custom disabled placeholder, disabled value and invalid-arrow style probes pass. Modern select is outside the thirteen bridged companions; no current-component fork or claim that its full interaction/style contract was exercised is made.",
-        "proof_kind": "whole-hunk-peer-structure-and-original-rendered-style",
-        "execution": {
-          "source_commit": "81d7887c91995979a2ff1866eeaceadf68cbce88",
-          "run": 37556909448,
-          "job": 112585134550
+        "decision": "The entire one-file hunk assigns the modern disabled placeholder the existing disabled-trigger-text-color token inside mat-mdc-select-disabled. It does not edit the original legacy .mat-select color contract or the exported theme constructors. Keep the original16 legacy disabled placeholder/value/arrow and custom-map behavior; do not transplant the modern token-slot selector into the owned legacy Sass. Both exact peer npm floors already contain the modern disabled-placeholder structural rule, while the retained historical ordinary select-theme emits color tokens rather than that structural rule. Actual original16-versus-packed default/custom disabled placeholder, disabled value and invalid-arrow style probes pass. Modern select is outside the thirteen bridged companions; no current-component fork or claim that its full interaction/style contract was exercised is made. The retained execution receipts apply to their recorded historical subjects. Current qualification additionally requires the complete current clean same-library packed106 and Sass invocations, exact minimum peer identities and the required owned default/custom light/dark style assertions with effective custom-theme and wrong-style controls; this source review alone qualifies no current execution.",
+        "proof_kind": "sass-required-individual-owned-style",
+        "owned_style_behavior": {
+          "kind": "original-disabled-select-and-custom-map-styles",
+          "case_ids": [
+            "owned-style/light/disabled-placeholder",
+            "owned-style/light/disabled-value",
+            "owned-style/light/invalid-arrow",
+            "owned-style/theme-light/disabled-placeholder",
+            "owned-style/theme-light/disabled-value",
+            "owned-style/theme-light/invalid-arrow",
+            "owned-style/theme-dark/disabled-placeholder",
+            "owned-style/theme-dark/disabled-value",
+            "owned-style/theme-dark/invalid-arrow",
+            "owned-style/custom/disabled-placeholder",
+            "owned-style/custom/disabled-value",
+            "owned-style/custom/invalid-arrow",
+            "owned-style/typography/select-value"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/upstream-owned-style-evidence.mjs",
+              "sha256": "89a2de2716e3bb1b7d17cb13980acb3e6bbbb0b8487b6a29757cfef1eac42c1f"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "9b46c01fd5c9a83ca33deb75ab006f5e200e381bb81138b58483170b4790e5fc"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "ee60da89c664c447bf768e9115a4103a911c8eee6c34bd343b66e9f2d42c9c7d"
+            },
+            {
+              "path": "scripts/owned-style-contract.mjs",
+              "sha256": "4914eb6a58c5de1df2a86ba104385d88fa5587996003b7336c6711568a277bd0"
+            },
+            {
+              "path": "scripts/sass-owned-rendered.mjs",
+              "sha256": "329f36cbd8deea5911d5b95a7433b03f00873ca3c14f5f2efcf9158539dd2cc0"
+            },
+            {
+              "path": "scripts/sass-seal.mjs",
+              "sha256": "da6ddb51bf5bfe9dd8500991b003a452e2eb2b0c2b90f32052ea45215f711ce2"
+            },
+            {
+              "path": "scripts/owned_rendered_admission.py",
+              "sha256": "1e9f5931fa9723e9efdbc6c57a3b424c99d366f21b51db3c03a6303dc2b1677f"
+            },
+            {
+              "path": "scripts/sass_mixin_argument_admission.py",
+              "sha256": "73822ff9804d6dd0bbf8cd5d77e52022aef6f8ffb793446befda005d223a5145"
+            },
+            {
+              "path": "scripts/sass-mixin-arguments.mjs",
+              "sha256": "d332eb8803298d79a52ef15383e7808454194128cab3e0081029f85d8e791665"
+            },
+            {
+              "path": "package.json",
+              "sha256": "a3a268beffc3620d3fdeeadc1269c9e9676adbf3e40f55d45cd9683c85e4a060"
+            },
+            {
+              "path": "projects/ngx-material-legacy/package.json",
+              "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/_index.scss",
+              "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+            },
+            {
+              "path": "fixtures/sass/mixin-argument-contracts.json",
+              "sha256": "c1d1151a8c1fa02cea0c6fac5618bbefe11dd018bbfff1d30f5c3f35f8fc8770"
+            },
+            {
+              "path": "fixtures/sass/function-contracts.json",
+              "sha256": "3d49e0e5db749e4c902d33ff7501d67bde7853243c854a5996c04eaaab3845c4"
+            },
+            {
+              "path": "reference/material-16.2.14/PROVENANCE.json",
+              "sha256": "d13d466669cbf96d386ceabfe3de0241b91bcbd3dce98ac70c31093609100f34"
+            },
+            {
+              "path": "reference/material-16.2.14/environment-package-lock.json",
+              "sha256": "ad2f9d62bf04758f87650cae408f805e667236f992cd6d8e481c5577c939d130"
+            },
+            {
+              "path": "fixtures/sass/owned-legacy-select.scss",
+              "sha256": "0b9852837d00a78979c9ae1476c7747c80a747d0803d07887d783149225752ee"
+            },
+            {
+              "path": "reference/material-16.2.14/sass-css/owned-legacy-select.css",
+              "sha256": "20d53fa0e73f1251b90734f579abdc759597031854db446ab61a88e8fce4369e"
+            },
+            {
+              "path": "fixtures/sass/owned-legacy-snack-bar.scss",
+              "sha256": "5cc824d0c7a1495aa52c7539c9541ebe694d909463dad843a80d2e06ba921729"
+            },
+            {
+              "path": "reference/material-16.2.14/sass-css/owned-legacy-snack-bar.css",
+              "sha256": "1b7345b93a674021009c8804e9762cd72569bd4e6b3a952ee06d9ceddd78f548"
+            },
+            {
+              "path": "fixtures/sass/owned-legacy-button.scss",
+              "sha256": "bd06ccaa570a0ae1127369b645e63082737a6e6aa2ba68e0d565ac961077d222"
+            },
+            {
+              "path": "reference/material-16.2.14/sass-css/owned-legacy-button.css",
+              "sha256": "d68091356fca93c590be566ae50ce221d35cdf2327b16f590ee0658797acc311"
+            },
+            {
+              "path": "fixtures/sass/05-custom-map-nested.scss",
+              "sha256": "3b84ac535804b859763e75e520472659fb85905ba95c190057c45a2532abc03f"
+            },
+            {
+              "path": "reference/material-16.2.14/sass-css/05-custom-map-nested.css",
+              "sha256": "e82b4ca28cb36a74fdd7d9c25c25288e4ca2587b06f86fe525e43a68daedc130"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "2c734a849ddf2098841baeb25695cdf8f8e72093b3fb1ec98b0c9c46e2cf9404"
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/legacy-select/_select-theme.scss",
+              "sha256": "42f5d0d0aa21b2034cee66aa1b022ffd7b6d7f17ad7f636bc2490cd4ccbdccc8"
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/select/_select-theme.scss",
+              "sha256": "37438dfdc7e738a041c3c24ec0f552846c97d2e2d3ceb28eebd34f0f9f612214"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/select.scss",
+              "sha256": "7f8269121e0d449b08966ea8fcb2544e0866243851317f429cea745caa96a45f"
+            },
+            {
+              "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-style-decision.json",
+              "sha256": "e83af5123c972844440846f3511d9986b5190ed710ee9d8de93347f0dc846bf2"
+            },
+            {
+              "path": "compatibility/f10/disposition-ledger/evidence/patches/306e437d213f3ace7b3ee294ef1dd82f5e8e2fab.patch",
+              "sha256": "57d55f6c66ece9e528f32fc87e09c23fdce736da221d50c27647323f6a93a82f"
+            }
+          ]
         }
       }
     },

@@ -70,7 +70,8 @@ export function createFixture(sourceRoot, individualReview = null) {
   const note = 'Synthetic validator fixture only. No real source API, runtime, package, advisory or approval is qualified by this fixture.\n';
   for (const file of new Set(frozen.symbol_uses.map(row => row.file))) repoPut('projects/ngx-material-legacy/' + file, '// ' + note);
   const requiredMembers = new Set([...SELECT_FOCUS_MEMBERS,
-    ...(individualReview?.entry.individual_proof.artifact_behavior.source_members ?? []).map(row => row.path)]);
+    ...(individualReview?.entry.individual_proof.artifact_behavior.source_members ?? []).map(row => row.path),
+    ...(individualReview?.extraMembers ?? [])]);
   for (const path of requiredMembers) repoPut(path, read(path));
   repoPut('compatibility/rc/artifact-validator-note.txt', note);
   const noteRef = {path: 'compatibility/rc/artifact-validator-note.txt', sha256: hash(note)};
