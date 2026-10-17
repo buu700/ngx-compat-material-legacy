@@ -9,6 +9,7 @@ import {createHash} from 'node:crypto';
 import {isDeepStrictEqual} from 'node:util';
 import {readEvidenceMember, validatePackedConsumerRun} from './upstream-packed-run-evidence.mjs';
 import {CHIP_LIST_SOURCE,CHIP_LIST_REFERENCE,CHIP_LIST_ORIGINALS,inspectChipListFocusContract} from './chip-list-focus-contract.mjs';
+import {chipLifecycleHistoricalScopes,inspectChipLifecycleCurrentContract,validateChipLifecycleBrowserRun} from './upstream-chip-lifecycle-admission.mjs';
 
 export const HISTORICAL_BEHAVIOR_KIND = 'historical-required-individual-behavior';
 const checkId = 'historical-legacy-artifact';
@@ -51,6 +52,7 @@ export function historicalRegressionRequirements() {
 // Names are checked in addition to indexed ids: an inserted test cannot silently
 // turn the same numeric id into an unrelated behavior assertion.
 const scopes = new Map([
+  ...chipLifecycleHistoricalScopes(commonMembers,nativeCase),
   ['e69b2b09efaf577cd5fe92b70808479f975913af', {
     patch: '896c8735f0eb1e9afa6c49c70c84050af0d62d91c0085522eab07e7a6a90ec4b',
     kind: 'classic-first-chip-refocus',
@@ -179,6 +181,10 @@ export function validateHistoricalBehavior({root, entry, proof, request}) {
       demand(entry.final_disposition === registered.required_disposition, 'wrong classic chip-list disposition');
       inspectChipListFocusContract({root,readSource:relative=>readEvidenceMember(root,relative).toString('utf8')});
     }
+    if (registered.source_contract === 'owned-chip-lifecycle-current') {
+      demand(entry.final_disposition === registered.required_disposition, 'wrong owned chip lifecycle disposition');
+      inspectChipLifecycleCurrentContract({root,read:relative=>readEvidenceMember(root,relative),line:proof.affected_branches?.[0]});
+    }
     const scope = proof.historical_behavior;
     demand(object(scope) && scope.kind === registered.kind
       && sameIds(scope.case_ids, registered.cases.map(row => row.case_id)), 'wrong historical behavior scope');
@@ -237,7 +243,12 @@ export function validateHistoricalBehavior({root, entry, proof, request}) {
       demand(Object.entries(required).every(([key, value]) => selected[key] === value)
         && selected.executed_full_name === required.full_name, 'wrong required historical test identity');
     }
-    return {ok: true, detail: 'Required named tests passed in the complete same-run historical artifact invocation; final sealing remains separate.',
+    let chipLifecycleBrowser;
+    if (registered.source_contract === 'owned-chip-lifecycle-current') {
+      chipLifecycleBrowser = validateChipLifecycleBrowserRun({root,request});
+      demand(chipLifecycleBrowser.ok,chipLifecycleBrowser.detail);
+    }
+    return {ok: true, ...(chipLifecycleBrowser ? {chip_lifecycle_browser:chipLifecycleBrowser} : {}), detail: 'Required named tests passed in the complete same-run historical artifact invocation; final sealing remains separate.',
       invocation_id: execution.invocation_id, output, library: packed.library,
       packed_consumer: {invocation_id: packed.invocation_id, output: packed.output},
       required_cases: registered.cases.map(row => row.case_id),

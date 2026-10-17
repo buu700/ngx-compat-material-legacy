@@ -11,6 +11,7 @@ from pathlib import Path
 import subprocess
 import unittest
 
+from tests.chip_lifecycle_admission_context import admission_before_member
 from tests.chip_focus_repair_context import (
     INPUT, focus_before_member, focus_historical_product_diff, focus_repair_context,
 )
@@ -46,7 +47,7 @@ class ChipFocusRepair(unittest.TestCase):
             )
             self.assertEqual(original, source['text'].encode())
             self.assertEqual(sha(original), source['sha256'])
-        self.assertEqual(sha((ROOT/prior['ledger_path']).read_bytes()), prior['ledger_sha256'])
+        self.assertEqual(sha(admission_before_member(ROOT,prior['ledger_path'])), prior['ledger_sha256'])
         for member in prior['product_members']:
             if member['path'] not in data['product_scope_changed_paths']:
                 self.assertEqual(sha((ROOT/member['path']).read_bytes()), member['sha256'], member['path'])

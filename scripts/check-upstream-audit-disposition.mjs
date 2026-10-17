@@ -35,7 +35,8 @@ import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
 import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';
-import {requiresHistoricalBehavior,validateHistoricalBehavior} from './upstream-historical-behavior-evidence.mjs';
+import {requiresHistoricalBehavior,validateHistoricalBehavior,historicalBehaviorRequirements} from './upstream-historical-behavior-evidence.mjs';
+import {CHIP_LIFECYCLE_SCOPE_ROLE,requiresChipLifecycleScope,chipLifecycleScopeEvidenceOk} from './upstream-chip-lifecycle-admission.mjs';
 import {requiresProgressCsp,validateProgressCsp} from './upstream-progress-csp-evidence.mjs';
 import {requiresGeneratedIdentity,validateGeneratedIdentity} from './upstream-generated-identity-evidence.mjs';
 import {requiresNativeDate,validateNativeDate} from './upstream-native-date-evidence.mjs';
@@ -168,6 +169,7 @@ function evidenceClass(entry) {
   if (requiresModernChipScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-modern-chip-source-scope';
   if (requiresChipEditScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-edit-source-scope';
   if (requiresChipInputApiScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-input-api-source-scope';
+  if (requiresChipLifecycleScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-lifecycle-source-scope';
   if (requiresChipModernizationScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-modernization-source-scope';
   if (TEST_IMPORT_SHAS.includes(entry.sha) && !rel.endsWith('.json')) return 'invalid-test-import-cleanup-scope';
   if (SLIDER_INPUT_SHAS.includes(entry.sha) && !rel.endsWith('.json')) return 'invalid-slider-input-scope';
@@ -185,6 +187,10 @@ function evidenceClass(entry) {
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
     if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';
+    if (requiresChipLifecycleScope(entry,entry.individual_proof) || body.role === CHIP_LIFECYCLE_SCOPE_ROLE) {
+      const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};
+      if (!chipLifecycleScopeEvidenceOk(body,entry,readMember,root,line || body.line,historicalBehaviorRequirements)) return 'invalid-chip-lifecycle-source-scope';
+    }
     if (requiresChipModernizationScope(entry,entry.individual_proof) || body.role === CHIP_MODERNIZATION_SCOPE_ROLE) {
       const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};
       if (!chipModernizationScopeEvidenceOk(body,entry,readMember,candidateProductSourcePaths(root).sort(),line || body.line)) return 'invalid-chip-modernization-source-scope';
@@ -270,7 +276,7 @@ function individualPatchBound(entry, proof) {
     ? body.reviews.find(item => item?.sha === entry.sha) : body;
   if (!review || review.sha !== entry.sha || review.diff_sha256 !== proof.diff_sha256) return false;
   if(!individualReviewScopeOk({entry,proof,body,review,
-    requiresIndividual:Boolean(sensitiveClass(entry))||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),
+    requiresIndividual:Boolean(sensitiveClass(entry))||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),
     claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)}))return false;
   let bytes;
   if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {
@@ -415,7 +421,7 @@ for (const entry of ledgerBySha.values()) {
     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});
   }
   const sensitive = sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)
-    || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof) || requiresChipEditScope(entry, entry.individual_proof) || requiresChipInputApiScope(entry, entry.individual_proof) || requiresChipModernizationScope(entry, entry.individual_proof);
+    || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof) || requiresChipEditScope(entry, entry.individual_proof) || requiresChipInputApiScope(entry, entry.individual_proof) || requiresChipModernizationScope(entry, entry.individual_proof) || requiresChipLifecycleScope(entry, entry.individual_proof);
   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);
   if (needsIndividual && !individualProofOk(entry)) {
     if (sensitive) insufficientSensitive.push(entry.sha);
