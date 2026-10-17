@@ -7,6 +7,7 @@
  */
 /** Re-evaluate current source guards and all native no-run refusals; never emulate runtime success. */
 import assert from 'node:assert/strict';
+import {recordedStageSubject} from '../scripts/chip-history-union.mjs';
 import {readFileSync,writeFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync,spawnSync} from 'node:child_process';
@@ -21,7 +22,7 @@ const root=process.cwd(),read=p=>readFileSync(p),hash=b=>createHash('sha256').up
 const before=chipAuditSourcePrior(),w=JSON.parse(read('compatibility/rc/chip-audit-source-requalification-worksheet.json')),inputs=JSON.parse(read('compatibility/rc/chip-audit-source-requalification-inputs.json')),out=JSON.parse(read('compatibility/rc/chip-audit-source-requalification-outputs.json')),line=before.line;
 const git=(...args)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{maxBuffer:32*1024*1024});
 assert.equal(inputs.source_parent,before.source_parent);assert.equal(hash(read(out.inputs.path)),out.inputs.sha256);assert.equal(hash(read(before.ledger_path)),out.expected_ledger_sha256);
-for(const member of inputs.source_subjects)assert.equal(hash(read(member.path)),member.sha256);
+for(const member of inputs.source_subjects){const bytes=['tests/audit_test_context.py','tests/test_audit_test_context.py'].includes(member.path)?recordedStageSubject('chip-source-requalification',member.path,read):read(member.path);assert.equal(hash(bytes),member.sha256);}
 for(const member of [...before.reviews,...before.authored_reviews]){assert.equal(hash(read(member.path)),member.sha256);assert.equal(git('show',before.source_parent+':'+member.path).toString(),member.text);}
 for(const member of before.sources.filter(m=>m.path.startsWith('projects/')))assert.equal(hash(read(member.path)),member.sha256,'source qualification changed product bytes');
 const roles=inspectChipAuditSourceRoles();assert.deepEqual(roles,JSON.parse(read(inputs.role_proof.path)));assert.equal(hash(read(inputs.role_proof.path)),inputs.role_proof.sha256);assert.equal(roles.roles.length,27);assert.equal(roles.unchanged_upstream_bindings,26);assert.equal(roles.owned_replacement_roles,1);

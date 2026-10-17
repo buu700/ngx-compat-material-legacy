@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.chip_history_union import historical_product_diff
 from tests.native_date_source_context import project_native_date_context
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -101,7 +102,7 @@ def project_media_matcher_context(root,read_member=None):
     assert recovered==original and len(entries)==1697
     for p in ['compatibility/f10/authored-dependency-dispositions.json','compatibility/f10/authored-dependency-current-dispositions.json','compatibility/rc/matrices/full-verify.json']:
         assert read(p)==git('show',parent+':'+p)
-    assert git('diff',parent,'--name-only','--','projects','testing','reference','fixtures')==b''
+    assert historical_product_diff(root,parent,read,name_only=True)==b''
     def projected(p):
         if p in sources:return sources[p]['text'].encode()
         if p=='compatibility/f10/disposition-ledger/ledger.json':return original_bytes

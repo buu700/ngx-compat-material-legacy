@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.chip_history_union import historical_product_diff
 
 ROOT = Path(__file__).resolve().parents[1]
 EDITS_SHA = 'b22cb92914d8ef31822f299f28e3eea408d00e2d92aa994792d4c91e832eb9de'
@@ -139,7 +140,7 @@ def project_observer_admission_context(root, read_member=None):
                    'compatibility/f10/authored-dependency-current-dispositions.json',
                    'compatibility/rc/matrices/full-verify.json']:
         assert read(member) == git('show', parent + ':' + member)
-    assert git('diff', parent, '--name-only', '--', 'projects', 'testing', 'reference', 'fixtures') == b''
+    assert historical_product_diff(root,parent,read,name_only=True) == b''
     def projected_read(p):
         if p in sources:
             return sources[p]['text'].encode()

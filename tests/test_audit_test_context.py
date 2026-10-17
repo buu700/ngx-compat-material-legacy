@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.chip_history_union import historical_product_diff
 from tests.native_date_source_context import project_native_date_context
 from tests.recorded_execution_source_context import recorded_source_context
 from unittest.mock import patch
@@ -50,7 +51,7 @@ class AuditTestContext(unittest.TestCase):
         self.assertEqual(names(current),rules['current_methods'])
         for member in [LEDGER,'compatibility/f10/authored-dependency-dispositions.json','compatibility/f10/authored-dependency-current-dispositions.json']:
             self.assertEqual(read(member),subprocess.check_output(['git','show',task['source_parent']+':'+member],cwd=ROOT))
-        self.assertEqual(subprocess.check_output(['git','diff',task['source_parent'],'--name-only','--','projects','testing','reference','fixtures'],cwd=ROOT),b'')
+        self.assertEqual(historical_product_diff(ROOT,task['source_parent'],read,name_only=True),b'')
         # This exact earlier test transition is checked at its sealed source commit.
         # The current complete31/30 guard census is checked independently below.
         historical_head=recorded_source_context(ROOT,lambda p:(ROOT/p).read_bytes())[0]['baseline']

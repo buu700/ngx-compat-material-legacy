@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.chip_history_union import historical_product_diff
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -48,4 +49,4 @@ class InheritedHelperExecution(unittest.TestCase):
                        'compatibility/f10/authored-dependency-dispositions.json',
                        'compatibility/f10/authored-dependency-current-dispositions.json']:
             self.assertEqual(read(member), git('show', parent + ':' + member), member)
-        self.assertEqual(git('diff', parent, '--name-only', '--', 'projects', 'testing', 'reference', 'fixtures'), b'')
+        self.assertEqual(historical_product_diff(ROOT,parent,read,name_only=True), b'')

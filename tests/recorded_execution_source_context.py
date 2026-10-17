@@ -8,6 +8,7 @@ import gzip
 import hashlib
 import json
 from weakref import WeakKeyDictionary
+from tests.chip_history_union import chip_history_read,mark_chip_history_view,validate_chip_history_current
 
 INPUT='compatibility/rc/recorded-source-context-inputs.json'
 OUTPUT='compatibility/rc/recorded-source-context-outputs.json'
@@ -19,6 +20,7 @@ _sha=lambda b:hashlib.sha256(b).hexdigest()
 
 def recorded_source_context(root,read):
     if read in _VIEWS:return _VIEWS[read]
+    read=chip_history_read(root,read)
     raw=read(INPUT);data=json.loads(raw);line=data['line'];assert _sha(raw)==INPUT_PINS[line]
     final=read(OUTPUT);output=json.loads(final);assert _sha(final)==OUTPUT_PINS[line]
     assert output['line']==line and output['inputs']==dict(path=INPUT,sha256=_sha(raw))
@@ -39,6 +41,8 @@ def recorded_source_context(root,read):
 
 def validate_recorded_subjects(root,read):
     """Strict current/history identities before the older eager Python checks."""
+    validate_chip_history_current(root,read)
+    read=chip_history_read(root,read)
     data,before,after,_=recorded_source_context(root,read)
     previous={m['path']:m['sha256'] for m in before['sources']}
     previous.update({m['path']:m['sha256'] for m in before['authored_stores']})
@@ -53,18 +57,20 @@ def recorded_historical_read(root,read):
     if read in _VIEWS:return read
     if read in _READERS:return _READERS[read]
     ctx=recorded_source_context(root,read);data,before,after,_=ctx
+    successor=chip_history_read(root,read)
     sources={m['path']:m for m in before['sources']};changes={m['path']:m for m in data['changes']}
     previous={before['ledger_path']:dict(text=before['ledger_text'],sha256=before['ledger_sha256']),**{m['path']:m for m in before['authored_stores']}}
     current={m['path']:m for m in after['members']}
     def projected(path):
-        raw=read(path);fingerprint=_sha(raw)
+        raw=successor(path);fingerprint=_sha(raw)
         if path in sources and fingerprint==changes[path]['current_sha256']:return sources[path]['text'].encode()
         if path in previous and path in current and fingerprint==current[path]['sha256']:return previous[path]['text'].encode()
         return raw
+    mark_chip_history_view(root,projected,read)
     _VIEWS[projected]=ctx;_READERS[read]=projected;return projected
 
 def recorded_implementation_subject(root,path,read=None):
-    read=read or (lambda p:(root/p).read_bytes());_,before,after,_=recorded_source_context(root,read)
+    read=chip_history_read(root,read or (lambda p:(root/p).read_bytes()));_,before,after,_=recorded_source_context(root,read)
     assert path==before['ledger_path']
     current=next(m for m in after['members'] if m['path']==path)
     assert _sha(read(path)) in (current['sha256'],before['implementation_ledger_sha256'])

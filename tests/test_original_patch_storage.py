@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.chip_history_union import historical_product_diff
 from tests.native_date_source_context import project_native_date_context
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -51,7 +52,7 @@ class OriginalPatchStorage(unittest.TestCase):
                        'scripts/check-upstream-audit-disposition.mjs','scripts/upstream-individual-evidence-scope.mjs','scripts/spec-date-tooltip-slider-source-review.mjs','scripts/authenticated-single-spec-review.mjs',
                        'compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz','compatibility/rc/spec-date-tooltip-slider-source-acquisition.json.gz']:
             self.assertEqual(read(member),subprocess.check_output(['git','show',parent+':'+member],cwd=ROOT))
-        self.assertEqual(subprocess.check_output(['git','diff',parent,'--name-only','--','projects','testing','reference','fixtures'],cwd=ROOT),b'')
+        self.assertEqual(historical_product_diff(ROOT,parent,read,name_only=True),b'')
 
     def test_actual_checker_binding_positives_and_mutations_remain_incomplete_overall(self):
         child=subprocess.run(['node','tests/original_patch_storage_probe.mjs'],cwd=ROOT,text=True,capture_output=True,timeout=60)

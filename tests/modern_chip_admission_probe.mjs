@@ -15,7 +15,8 @@ import {MODERN_CHIP_SHAS,modernChipScopeEvidenceOk,modernChipSourceProof,readMod
 import {candidateProductSourcePaths} from '../scripts/upstream-candidate-source-evidence.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex'),json=v=>JSON.stringify(v,null,2)+'\n',read=p=>readFileSync(p),paths=candidateProductSourcePaths(process.cwd()).sort();
 const task=JSON.parse(read('compatibility/rc/modern-chip-admission-worksheet.json')),line=task.line,prior=readModernChipPrior(read,line),migration=JSON.parse(read('compatibility/rc/modern-chip-admission-entry-migration.json'));
-const bodyPath=migration.current_review.path,body=JSON.parse(read(bodyPath)),ledger=JSON.parse(read('compatibility/f10/disposition-ledger/ledger.json')),entries=MODERN_CHIP_SHAS.map(sha=>ledger.entries.find(r=>r.sha===sha));
+const ledger=JSON.parse(read('compatibility/f10/disposition-ledger/ledger.json')),entries=MODERN_CHIP_SHAS.map(sha=>ledger.entries.find(r=>r.sha===sha));
+const bodyPath=entries[0].evidence_report,body=JSON.parse(read(bodyPath));
 for(const entry of entries)assert.equal(modernChipScopeEvidenceOk(body,entry,read,paths,line),true,entry.sha);
 const controls=[];
 const variants=[
