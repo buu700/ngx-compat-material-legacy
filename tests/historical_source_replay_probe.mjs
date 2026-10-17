@@ -130,7 +130,7 @@ for(const wrapper of data.wrapper_edits.slice(21,22)){
  assert.deepEqual(inspect(name=>name===wrapper.path?Buffer.from(after):cached(name)),guard);cases.push({id:'native-date-frame-exact-invocation-wrapper-'+wrapper.path,result:'pass'});
 }
 assert.equal(cases.length,94);
-assert.deepEqual(cases,JSON.parse(gunzipSync(read('compatibility/rc/recorded-source-context-replay-controls.json.gz'))).cases,'prior94 controls changed');
+assert.deepEqual(cases,JSON.parse(gunzipSync(read('compatibility/rc/recorded-source-context-replay-controls.json.gz'))).current_guard_controls.cases,'prior94 controls changed');
 assert.equal(data.entries.slice(25).length,1);assert.equal(data.wrapper_edits.slice(22).length,1);
 for(const path of [...data.entries.slice(25).map(row=>row.probe),...data.wrapper_edits.slice(22).map(row=>row.path)]){
  const changed=Buffer.concat([cached(path),Buffer.from('\n// unreviewed recorded-context historical subject\n')]);
