@@ -7,6 +7,7 @@
  */
 /** Combined live source decisions; all native execution obligations stay open. */
 import assert from 'node:assert/strict';
+import {batchRecordedStageSubject} from '../scripts/chip-batch-history.mjs';
 import {readFileSync,writeFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
@@ -17,8 +18,9 @@ import {candidateProductSourcePaths} from '../scripts/upstream-candidate-source-
 const read=p=>readFileSync(p),hash=b=>createHash('sha256').update(b).digest('hex'),json=v=>JSON.stringify(v,null,2)+'\n';
 const prior=chipSourceBatchPrior(),inputs=JSON.parse(read('compatibility/rc/chip-source-batch-inputs.json')),out=JSON.parse(read('compatibility/rc/chip-source-batch-outputs.json')),line=prior.line;
 assert.equal(hash(read(out.inputs.path)),out.inputs.sha256);assert.equal(hash(read(prior.ledger_path)),out.expected_ledger_sha256);
-for(const member of inputs.source_subjects)assert.equal(hash(read(member.path)),member.sha256);
-for(const member of [...prior.reviews,...prior.sources,...prior.authored_stores,...prior.authored_reviews])assert.equal(hash(read(member.path)),member.sha256);
+for(const member of inputs.source_subjects)assert.equal(hash(batchRecordedStageSubject('chip-source-batch-requalification',member.path,read)),member.sha256);
+for(const member of [...prior.reviews,...prior.authored_stores,...prior.authored_reviews])assert.equal(hash(read(member.path)),member.sha256);
+for(const member of prior.sources)assert.equal(hash(batchRecordedStageSubject('chip-source-batch-requalification',member.path,read)),member.sha256);
 const current=await inspectChipSourceBatch({requireNoCoordinator:true});assert.equal(current.stale_native_bindings.length,0);
 assert.deepEqual(current.native_definitions.map(({no_run,...d})=>d),inputs.native_definitions);
 assert.deepEqual(current.source_subjects,inputs.modern_source_subjects);assert.deepEqual(current.chip_list_roles,inputs.chip_list_roles);assert.deepEqual(current.existing_role_evidence,inputs.existing_role_evidence);

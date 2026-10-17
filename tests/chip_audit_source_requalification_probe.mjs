@@ -7,6 +7,7 @@
  */
 /** Re-evaluate current source guards and all native no-run refusals; never emulate runtime success. */
 import assert from 'node:assert/strict';
+import {batchHistoryRead} from '../scripts/chip-batch-history.mjs';
 import {recordedStageSubject} from '../scripts/chip-history-union.mjs';
 import {readFileSync,writeFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -18,7 +19,7 @@ import {modernChipScopeEvidenceOk} from '../scripts/upstream-modern-chip-scope.m
 import {candidateProductSourcePaths} from '../scripts/upstream-candidate-source-evidence.mjs';
 import {authoredUseReviewEvidence} from '../scripts/authored-use-inventory.mjs';
 import {scanCurrentAuthoredUses,currentAuthoredUseAdmission} from '../scripts/authored-current-use-inventory.mjs';
-const root=process.cwd(),read=p=>readFileSync(p),hash=b=>createHash('sha256').update(b).digest('hex'),json=x=>JSON.stringify(x,null,2)+'\n';
+const root=process.cwd(),read=batchHistoryRead(p=>readFileSync(p)),hash=b=>createHash('sha256').update(b).digest('hex'),json=x=>JSON.stringify(x,null,2)+'\n';
 const before=chipAuditSourcePrior(),w=JSON.parse(read('compatibility/rc/chip-audit-source-requalification-worksheet.json')),inputs=JSON.parse(read('compatibility/rc/chip-audit-source-requalification-inputs.json')),out=JSON.parse(read('compatibility/rc/chip-audit-source-requalification-outputs.json')),line=before.line;
 const git=(...args)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{maxBuffer:32*1024*1024});
 assert.equal(inputs.source_parent,before.source_parent);assert.equal(hash(read(out.inputs.path)),out.inputs.sha256);assert.equal(hash(read(before.ledger_path)),out.expected_ledger_sha256);

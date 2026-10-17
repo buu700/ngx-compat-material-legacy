@@ -9,6 +9,7 @@ import hashlib
 import json
 import subprocess
 from weakref import WeakKeyDictionary
+from tests.chip_batch_history import batch_history_read,batch_recorded_stage_subject,BATCH_HISTORY_STAGES,validate_batch_history_current
 
 INPUT='compatibility/rc/chip-history-union-inputs.json'
 PINS={'main': '8eaac78f9ed1d217035fe69ff8776578e612ed04ebad979e93a6c5ca550c7925', '21.x': '8b9e6784e47ea448cfe6ce50dbf03670e9178e82e74560d813281f4577c0f5c1'}
@@ -19,6 +20,7 @@ _sha=lambda b:hashlib.sha256(b).hexdigest()
 
 def chip_history_union_context(root,read):
     if read in _VIEWS:return _VIEWS[read]
+    read=batch_history_read(root,read)
     raw=read(INPUT);data=json.loads(raw);assert _sha(raw)==PINS[data['line']]
     stored=read(data['prior']['path']);assert _sha(stored)==data['prior']['sha256']
     extra=read(data['supplement']['path']);assert _sha(extra)==data['supplement']['sha256']
@@ -40,6 +42,8 @@ def chip_history_union_context(root,read):
 
 
 def validate_chip_history_current(root,read,required=False):
+    validate_batch_history_current(root,read)
+    read=batch_history_read(root,read)
     data,before=chip_history_union_context(root,read);current=_sha(read(data['ledger_path']))==data['ledger_sha256']
     assert current or not required
     if current:
@@ -58,6 +62,7 @@ def mark_chip_history_view(root,view,read):
 
 def chip_history_read(root,read):
     if read in _VIEWS:return read
+    read=batch_history_read(root,read)
     data,before=chip_history_union_context(root,read)
     if read in _READERS:return _READERS[read]
     current={m['path']:m['sha256'] for m in data['current_subjects']};previous={m['path']:m for m in before['members']}
@@ -70,7 +75,9 @@ def chip_history_read(root,read):
 
 
 def recorded_stage_subject(root,stage,path,read=None):
-    read=read or (lambda p:(root/p).read_bytes());data,before=chip_history_union_context(root,read)
+    read=read or (lambda p:(root/p).read_bytes())
+    if stage in BATCH_HISTORY_STAGES:return batch_recorded_stage_subject(root,stage,path,read)
+    read=batch_history_read(root,read);data,before=chip_history_union_context(root,read)
     selected=[m for s in before['stages'] if s['name']==stage for m in s['members'] if m['path']==path]
     assert len(selected)==1,'unregistered chip history stage/member';current=next(m for m in data['current_subjects'] if m['path']==path)
     assert _sha(read(path)) in (current['sha256'],selected[0]['sha256']),'unreviewed chip history stage subject'

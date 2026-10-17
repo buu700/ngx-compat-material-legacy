@@ -14,6 +14,7 @@ import subprocess
 import unittest
 from unittest.mock import patch
 import tests.audit_test_context as context
+from tests.chip_batch_history import batch_recorded_stage_subject
 
 ROOT=Path(__file__).resolve().parents[1]
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -44,7 +45,7 @@ class ChipAuditSourceRequalification(unittest.TestCase):
 
     def test_finite_source_transition_preserves_all_unrelated_entry_bytes(self):
         task=json.loads((ROOT/'compatibility/rc/chip-audit-source-requalification-worksheet.json').read_bytes());stored=(ROOT/task['prior']['path']).read_bytes();self.assertEqual(sha(stored),task['prior']['sha256']);raw=gzip.decompress(stored);self.assertEqual(sha(raw),task['prior']['raw_sha256']);before=json.loads(raw)
-        outputs=json.loads((ROOT/'compatibility/rc/chip-audit-source-requalification-outputs.json').read_bytes());old=raw_rows(before['ledger_text']);new=raw_rows((ROOT/before['ledger_path']).read_text());self.assertEqual(len(new),1697)
+        outputs=json.loads((ROOT/'compatibility/rc/chip-audit-source-requalification-outputs.json').read_bytes());old=raw_rows(before['ledger_text']);new=raw_rows(batch_recorded_stage_subject(ROOT,'chip-audit-source-requalification',before['ledger_path']).decode());self.assertEqual(len(new),1697)
         self.assertEqual(subprocess.check_output(['git','--no-replace-objects','show',task['source_parent']+':'+before['ledger_path']],cwd=ROOT),before['ledger_text'].encode())
         updated={r['sha'] for r in outputs['refreshed_native_profiles']}|set(task['modern_source_scopes']);self.assertEqual(updated,set(outputs['updated_entry_shas']));self.assertEqual(len(updated),31 if task['line']=='main' else 30);same=[]
         for (previous,oldtext),(actual,newtext) in zip(old,new):

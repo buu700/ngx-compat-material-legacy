@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from tests.chip_batch_history import batch_recorded_stage_subject
 
 ROOT=Path(__file__).resolve().parents[1]
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -43,7 +44,7 @@ class ChipEditAdmission(unittest.TestCase):
         for commit in [task['source_parent'],prior['source_parent']]:
             before=subprocess.check_output(['git','--no-replace-objects','show',commit+':'+prior['ledger_path']],cwd=ROOT)
             self.assertEqual(before,prior['ledger_text'].encode())
-        current=(ROOT/prior['ledger_path']).read_bytes();migration=json.loads((ROOT/'compatibility/rc/chip-edit-admission-entry-migration.json').read_bytes())
+        current=batch_recorded_stage_subject(ROOT,'chip-edit-admission',prior['ledger_path']);migration=json.loads((ROOT/'compatibility/rc/chip-edit-admission-entry-migration.json').read_bytes())
         self.assertEqual(sha(current),migration['expected_ledger_sha256']);self.assertEqual(migration['prior'],ref)
         self.assertEqual(migration['foundation_parent'],task['source_parent'])
         old=raw_rows(before.decode());new=raw_rows(current.decode());self.assertEqual(len(new),1697);self.assertEqual([r['sha'] for r,_ in old],[r['sha'] for r,_ in new])
