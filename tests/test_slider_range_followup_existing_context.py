@@ -24,9 +24,13 @@ const ledger=json('compatibility/f10/disposition-ledger/ledger.json');
 const pooled='compatibility/f10/disposition-ledger/evidence/closeout-slider-range-followup-native-context.json';
 const group=json(pooled);assert.equal(group.reviews.length,15);
 for(const old of group.reviews){
- const entry=ledger.entries.find(row=>row.sha===old.sha), current=json(entry.evidence_report);
+ const entry=ledger.entries.find(row=>row.sha===old.sha);let current=json(entry.evidence_report);
  assert.notEqual(entry.evidence_report,pooled);assert.equal(current.sha,entry.sha);
  assert.deepEqual(current.individual_proof,entry.individual_proof);
+ if(current.inherited_execution_admission_source_context){
+  const ref=current.inherited_execution_admission_source_context.prior_review;
+  assert.equal(hash(read(ref.path)),ref.sha256);current=json(ref.path);
+ }
  const link=current.slider_range_followup_native_context_materialization;
  assert.deepEqual(link,{group:{path:pooled,sha256:hash(read(pooled))},individual_document_interface_preserved:true});
  delete current.slider_range_followup_native_context_materialization;assert.deepEqual(current,old);

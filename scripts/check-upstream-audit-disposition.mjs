@@ -34,6 +34,7 @@ import {SLIDER_RANGE_SHAS,SLIDER_RANGE_ROLE,sliderRangeEvidenceOk} from './upstr
 import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
+import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';
 import {requiresHistoricalBehavior,validateHistoricalBehavior} from './upstream-historical-behavior-evidence.mjs';
 import {requiresProgressCsp,validateProgressCsp} from './upstream-progress-csp-evidence.mjs';
 import {requiresGeneratedIdentity,validateGeneratedIdentity} from './upstream-generated-identity-evidence.mjs';
@@ -129,6 +130,7 @@ function sensitiveClass(entry) {
 
 const evidenceCache = new Map();
 const artifactBehaviorResults = new Map();
+const inheritedExecutionResults = new Map();
 const testConsolidationCache = new Map();
 const testImportCache = new Map();
 let buildScopeProductPaths;
@@ -318,12 +320,9 @@ function individualProofOk(entry) {
     if (!result.ok) return false;
   }
   if (INHERITED.has(entry.final_disposition)) {
-    const installed = proof.installed_member;
-    const behavior = proof.reachable_behavior;
-    if (!installed || typeof installed !== 'object' || !HEX64.test(installed.sha256 || '')) return false;
-    if (!behavior || behavior.kind !== 'executed-delegation' || typeof behavior.id !== 'string' || !behavior.id.trim()) {
-      return false;
-    }
+    const result = validateInheritedExecution({root, entry, proof, request, line});
+    inheritedExecutionResults.set(entry.sha, result);
+    if (!result.ok) return false;
   }
   return true;
 }
@@ -454,6 +453,7 @@ const report = {
   check_id: 'upstream-audit-disposition',
   evidence_failures: evidenceFailures,
   artifact_behavior_evidence: [...artifactBehaviorResults].map(([sha, result]) => ({sha, ...result})),
+  inherited_execution_evidence: [...inheritedExecutionResults].map(([sha, result]) => ({sha, ...result})),
   insufficient_review_sha_ids: {
     sensitive: insufficientSensitive,
     inherited: insufficientInherited,
@@ -583,6 +583,7 @@ function writeAcceptance(request) {
     binding: request.binding,
     current_advisories: advisory,
     artifact_behavior_evidence: report.artifact_behavior_evidence,
+    inherited_execution_evidence: report.inherited_execution_evidence,
     note: 'Structural row equality is recorded separately from security clearance. Failed cases are the admission gap.',
     cases,
   };
