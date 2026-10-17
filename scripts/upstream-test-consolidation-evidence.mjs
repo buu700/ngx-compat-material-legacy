@@ -10,6 +10,7 @@ import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {analyzeSharedTestMove,bazelProductionCalls} from './upstream-test-consolidation-analysis.mjs';
 import {buildScopeEvidenceOk} from './upstream-build-scope-evidence.mjs';
+import {qualifiedCurrentConsolidationSources} from './harness-animation-preparation-evidence.mjs';
 import {HISTORICAL_CONSOLIDATION_CAPSULE, retainedConsolidationSources,
   individualConsolidationScope} from './upstream-test-consolidation-historical.mjs';
 export const TEST_CONSOLIDATION_ROLE='C04 finite original32 shared harness consolidation source review';
@@ -131,7 +132,9 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     assert.equal(inventory.denominator,57);assert.equal(inventory.historical_tag,'16.2.14');
     assert.equal(body.subject_capsule.path,TEST_CONSOLIDATION_CAPSULE);assert.equal(body.subject_capsule.sha256,TEST_CONSOLIDATION_CAPSULE_SHA256);
     const actual=analyzeConsolidationSubjects(readRepo(TEST_CONSOLIDATION_CAPSULE),readRepo);
-    const retained=retainedConsolidationSources(readRepo(HISTORICAL_CONSOLIDATION_CAPSULE),readRepo);
+    const retained=body.current_harness_preparation
+      ? qualifiedCurrentConsolidationSources(readRepo,body.current_harness_preparation)
+      : retainedConsolidationSources(readRepo(HISTORICAL_CONSOLIDATION_CAPSULE),readRepo);
     for(const result of actual){
       const row=body.reviews.find(r=>r.sha===result.sha);assert.ok(row);
       assert.deepEqual(row.source_analysis,result);
