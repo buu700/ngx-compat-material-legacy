@@ -52,6 +52,8 @@ import {bidiIsolatedPackedFixture} from './bidi-isolated-packed-fixture.mjs';
 import {packedLegacyBidiScopeCase} from './bidi-isolated-packed-contract.mjs';
 import {selectionComparatorPackedFixture} from './selection-comparator-packed-fixture.mjs';
 import {packedSelectionComparatorCase} from './selection-comparator-packed-contract.mjs';
+import {nativeDatePackedFixture} from './native-date-packed-fixture.mjs';
+import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from './native-date-packed-contract.mjs';
 import {assertEngineFreeConsumer, assertEngineFreeHarnessInputs} from './consumer-animation-engine.mjs';
 import {
   allConsumerCaseIds,
@@ -492,6 +494,8 @@ function collectAcceptanceCases(result, keys, consumerReal, rootReal) {
     packedChipDisabledCase(parsed.chipDisabledObservation),packedMenuLazyCase(parsed.menuLazyObservation),
     packedTooltipContainerCase(parsed.tooltipContainerObservation),packedLegacyBidiScopeCase(parsed.isolatedLegacyBidi),
     packedSelectionComparatorCase(parsed.selectionComparatorObservation),
+    packedNativeDateConstructorCase(parsed.nativeDateConstructorObservation),
+    packedNativeDateProviderCase(parsed.nativeDateProviderObservation),
   ].map(row => [row.case_id,row]));
   const harnessMap = {
     'packed-consumer/harness/legacy-button': parsed.buttonText === 'Go',
@@ -931,6 +935,8 @@ platformBrowserDynamic().bootstrapModule(AotSmokeModule).catch(err => console.er
     writeFileSync(join(consumer, 'src/bidi-isolated-contract.mjs'), readFileSync(join(root, 'scripts/bidi-isolated-packed-contract.mjs')));
     writeFileSync(join(consumer, 'src/selection-comparator-probe.ts'), selectionComparatorPackedFixture());
     writeFileSync(join(consumer, 'src/selection-comparator-contract.mjs'), readFileSync(join(root, 'scripts/selection-comparator-packed-contract.mjs')));
+    writeFileSync(join(consumer, 'src/native-date-probe.ts'), nativeDatePackedFixture());
+    writeFileSync(join(consumer, 'src/native-date-contract.mjs'), readFileSync(join(root, 'scripts/native-date-packed-contract.mjs')));
     writeFileSync(
       join(consumer, 'src/harness-runtime.ts'),
       `import {JSDOM} from 'jsdom';
@@ -987,6 +993,8 @@ import {PackedLegacyBidiScope,observePackedLegacyBidiScope} from './bidi-isolate
 import {packedLegacyBidiScopeCase} from './bidi-isolated-contract.mjs';
 import {observePackedSelectionComparator} from './selection-comparator-probe';
 import {packedSelectionComparatorCase} from './selection-comparator-contract.mjs';
+import {observePackedNativeDateManual,observePackedNativeDateProviders} from './native-date-probe';
+import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from './native-date-contract.mjs';
 import {MatStepperModule, MatStepper} from '@angular/material/stepper';
 import {MatTabContent,MatTabLabel} from '@angular/material/tabs';
 import {_LegacyViewport} from '@ngx-compat/material-legacy/legacy-core';
@@ -1270,6 +1278,8 @@ let observingPublicEmitterBaseline=false;
 const CHECKBOX_EMITTER_BASELINE=new InjectionToken<EventEmitter<unknown>[]>('closeout-public-emitter-baseline');
 
 async function main() {
+  const nativeDateManual=observePackedNativeDateManual();
+  const nativeDateConstructorObservation=nativeDateManual.observed;
   // These constructors run outside an injection context, as in the untouched v16 API.
   class ConsumerDateAdapter extends LegacyNativeDateAdapter {
     constructor(locale: string) { super(locale); }
@@ -1283,6 +1293,7 @@ async function main() {
     direct.getMonth(direct.addCalendarMonths(direct.createDate(2023, 0, 31), 1)) === 1 &&
     direct.getDate(direct.addCalendarMonths(direct.createDate(2023, 0, 31), 1)) === 28 &&
     direct.isValid(direct.invalid()) === false && direct.deserialize('2024-02-29')?.getFullYear() === 2024;
+  const nativeDateProviderObservation=observePackedNativeDateProviders(nativeDateManual.direct);
   // A public node provider executes the untouched artifact factory inside a
   // real node context. No Angular private context helper or token is imported.
   TestBed.overrideComponent(MatLegacyCheckbox,{add:{providers:[{
@@ -2069,11 +2080,13 @@ async function main() {
   const tableOnPush=await observePackedTableOnPush();
   const detailedPackedBehaviorsOkay=[packedChipDisabledCase(chipDisabledObservation),
     packedMenuLazyCase(menuLazyObservation),packedTooltipContainerCase(tooltipContainerObservation),
-    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed),packedSelectionComparatorCase(selectionComparator.observed)]
+    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed),packedSelectionComparatorCase(selectionComparator.observed),
+    packedNativeDateConstructorCase(nativeDateConstructorObservation),packedNativeDateProviderCase(nativeDateProviderObservation)]
     .every(row=>row.result==='pass');
   const out = {
     chipDisabledObservation,menuLazyObservation,tooltipContainerObservation,isolatedLegacyBidi:isolatedLegacyBidi.observed,
     selectionComparatorObservation:selectionComparator.observed,
+    nativeDateConstructorObservation,nativeDateProviderObservation,
     valueAccessorRegistration:valueAccessors.rows,
     tableOnPushRendering:tableOnPush.observed,
     radioIdentity:radioIdentity.observed,

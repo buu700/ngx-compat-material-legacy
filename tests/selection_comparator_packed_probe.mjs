@@ -14,6 +14,7 @@ import {tmpdir} from 'node:os';
 import {join, resolve, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {SELECTION_COMPARATOR_CASE_ID, packedSelectionComparatorCase} from '../scripts/selection-comparator-packed-contract.mjs';
+import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';
 import {selectionComparatorPackedFixture} from '../scripts/selection-comparator-packed-fixture.mjs';
 import {selectionComparatorPackedSample} from './selection_comparator_packed_sample.mjs';
 import {packedValueAccessorCases} from '../scripts/value-accessor-packed-contract.mjs';
@@ -35,10 +36,10 @@ const declaration = source.statements.find(node => ts.isFunctionDeclaration(node
 const collectorText = declaration.getText(source);
 const load = text => new Function('declarationObservations', 'declarationKeys', 'packagedSpec', 'harnessCaseIds', 'packedValueAccessorCases',
   'packedTableOnPushCase', 'packedRadioIdentityCase', 'packedGeneratedIdentityCase', 'packedSelectDetachCase', 'packedMenuItemTokenCase',
-  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',
+  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',
   text + ';return collectAcceptanceCases;')(declarationObservations, declarationKeys, librarySpec, harnessCaseIds, packedValueAccessorCases,
   packedTableOnPushCase, packedRadioIdentityCase, packedGeneratedIdentityCase, packedSelectDetachCase, packedMenuItemTokenCase,
-  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase);
+  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);
 const keys = loadExportKeys(), expected = allConsumerCaseIds(keys), collector = load(collectorText), sample = selectionComparatorPackedSample();
 assert.equal(expected.length, 106); assert.equal(expected.filter(id => id === SELECTION_COMPARATOR_CASE_ID).length, 1);
 const observed = (value, original = true, fn = collector) => {

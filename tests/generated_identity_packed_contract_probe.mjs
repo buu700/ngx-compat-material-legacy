@@ -7,6 +7,7 @@
  */
 import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';
 import {packedSelectionComparatorCase} from '../scripts/selection-comparator-packed-contract.mjs';
+import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';
 /** Synthetic admission controls. Real extracted-artifact component execution is separate. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -86,8 +87,8 @@ const producerPath = 'scripts/packed-consumer-aot-smoke.mjs', raw = read(produce
 const sf = ts.createSourceFile(producerPath, raw, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 assert.equal(sf.parseDiagnostics.length,0);
 const source = sf.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases').getText(sf);
-const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(
-  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);
+const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(
+  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);
 const keys = loadExportKeys(), expected = allConsumerCaseIds(keys);
 assert.equal(expected.length,106); assert.equal(new Set(expected).size,106);
 const observe = (value, fn=load(source)) => {

@@ -129,6 +129,6 @@ const report={schema_version:1,line:JSON.parse(read('projects/ngx-material-legac
   predicate_corruption_controls:mutations,generated_observer_protocol_defects_detected:protocolDefects,observer_status_mutants_rejected:sourceMutants,
   existing_case_ids_unchanged:106,owned_source_sha256:hash(adapterSource),owned_module_sha256:hash(moduleSource),
   fixture_sha256:hash(fixture),protocol_uses_owned_algorithm_and_module_source:true,public_base_and_injector_are_test_protocols:true,
-  packed_collector_integrated:false,actual_Angular_DI_or_artifact_factory_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};
+  packed_collector_exercised:false,actual_Angular_DI_or_artifact_factory_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});
 console.log(JSON.stringify(report));

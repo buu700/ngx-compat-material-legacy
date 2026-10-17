@@ -1,0 +1,355 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "f6f9557a2fdd14811d67b951755db19985b94b7b",
+  "prior": {
+    "path": "compatibility/rc/native-date-packed-integration-prior.json.gz",
+    "sha256": "09d1ea5d136f9d5f2bea8b955b8ff59f09bb71cc8973bf240074984dec377ca1",
+    "raw_sha256": "ca95de938e29481bd8d389abf4c4eee2211cb76de14bdd6173ca226e950337b1"
+  },
+  "producer_edits": [
+    [
+      "import {packedSelectionComparatorCase} from './selection-comparator-packed-contract.mjs';",
+      "import {packedSelectionComparatorCase} from './selection-comparator-packed-contract.mjs';\nimport {nativeDatePackedFixture} from './native-date-packed-fixture.mjs';\nimport {packedNativeDateConstructorCase,packedNativeDateProviderCase} from './native-date-packed-contract.mjs';"
+    ],
+    [
+      "    packedSelectionComparatorCase(parsed.selectionComparatorObservation),",
+      "    packedSelectionComparatorCase(parsed.selectionComparatorObservation),\n    packedNativeDateConstructorCase(parsed.nativeDateConstructorObservation),\n    packedNativeDateProviderCase(parsed.nativeDateProviderObservation),"
+    ],
+    [
+      "    writeFileSync(join(consumer, 'src/selection-comparator-contract.mjs'), readFileSync(join(root, 'scripts/selection-comparator-packed-contract.mjs')));",
+      "    writeFileSync(join(consumer, 'src/selection-comparator-contract.mjs'), readFileSync(join(root, 'scripts/selection-comparator-packed-contract.mjs')));\n    writeFileSync(join(consumer, 'src/native-date-probe.ts'), nativeDatePackedFixture());\n    writeFileSync(join(consumer, 'src/native-date-contract.mjs'), readFileSync(join(root, 'scripts/native-date-packed-contract.mjs')));"
+    ],
+    [
+      "import {packedSelectionComparatorCase} from './selection-comparator-contract.mjs';",
+      "import {packedSelectionComparatorCase} from './selection-comparator-contract.mjs';\nimport {observePackedNativeDateManual,observePackedNativeDateProviders} from './native-date-probe';\nimport {packedNativeDateConstructorCase,packedNativeDateProviderCase} from './native-date-contract.mjs';"
+    ],
+    [
+      "async function main() {\n  // These constructors",
+      "async function main() {\n  const nativeDateManual=observePackedNativeDateManual();\n  const nativeDateConstructorObservation=nativeDateManual.observed;\n  // These constructors"
+    ],
+    [
+      "    direct.isValid(direct.invalid()) === false && direct.deserialize('2024-02-29')?.getFullYear() === 2024;",
+      "    direct.isValid(direct.invalid()) === false && direct.deserialize('2024-02-29')?.getFullYear() === 2024;\n  const nativeDateProviderObservation=observePackedNativeDateProviders(nativeDateManual.direct);"
+    ],
+    [
+      "    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed),packedSelectionComparatorCase(selectionComparator.observed)]",
+      "    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed),packedSelectionComparatorCase(selectionComparator.observed),\n    packedNativeDateConstructorCase(nativeDateConstructorObservation),packedNativeDateProviderCase(nativeDateProviderObservation)]"
+    ],
+    [
+      "    selectionComparatorObservation:selectionComparator.observed,",
+      "    selectionComparatorObservation:selectionComparator.observed,\n    nativeDateConstructorObservation,nativeDateProviderObservation,"
+    ]
+  ],
+  "changes": [
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "before_sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591",
+      "current_sha256": "b2f618b78c2df350d3e3dc235626b772f7440877a37627dd0329097b3ebfee91",
+      "edits": [
+        {
+          "start": 2802,
+          "end": 2988,
+          "before": "",
+          "after": "import {nativeDatePackedFixture} from './native-date-packed-fixture.mjs';\nimport {packedNativeDateConstructorCase,packedNativeDateProviderCase} from './native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 19813,
+          "end": 19963,
+          "before": "",
+          "after": "    packedNativeDateConstructorCase(parsed.nativeDateConstructorObservation),\n    packedNativeDateProviderCase(parsed.nativeDateProviderObservation),\n"
+        },
+        {
+          "start": 42865,
+          "end": 43091,
+          "before": "",
+          "after": "    writeFileSync(join(consumer, 'src/native-date-probe.ts'), nativeDatePackedFixture());\n    writeFileSync(join(consumer, 'src/native-date-contract.mjs'), readFileSync(join(root, 'scripts/native-date-packed-contract.mjs')));\n"
+        },
+        {
+          "start": 46167,
+          "end": 46372,
+          "before": "",
+          "after": "import {observePackedNativeDateManual,observePackedNativeDateProviders} from './native-date-probe';\nimport {packedNativeDateConstructorCase,packedNativeDateProviderCase} from './native-date-contract.mjs';\n"
+        },
+        {
+          "start": 64086,
+          "end": 64212,
+          "before": "",
+          "after": "  const nativeDateManual=observePackedNativeDateManual();\n  const nativeDateConstructorObservation=nativeDateManual.observed;\n"
+        },
+        {
+          "start": 65118,
+          "end": 65215,
+          "before": "",
+          "after": "  const nativeDateProviderObservation=observePackedNativeDateProviders(nativeDateManual.direct);\n"
+        },
+        {
+          "start": 121467,
+          "end": 121718,
+          "before": "    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed),packedSelectionComparatorCase(selectionComparator.observed)]\n",
+          "after": "    packedLegacyBidiScopeCase(isolatedLegacyBidi.observed),packedSelectionComparatorCase(selectionComparator.observed),\n    packedNativeDateConstructorCase(nativeDateConstructorObservation),packedNativeDateProviderCase(nativeDateProviderObservation)]\n"
+        },
+        {
+          "start": 121961,
+          "end": 122029,
+          "before": "",
+          "after": "    nativeDateConstructorObservation,nativeDateProviderObservation,\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/bidi_isolated_packed_probe.mjs",
+      "before_sha256": "6b5a1ff2b2cffea149930970dac2e8b9ac5e0d48a4115b28ca71bf1af8e01f77",
+      "current_sha256": "b8127d07d05bc4b06555e578899cd90e6125534102f577d59f2f39dc4830d2f4",
+      "edits": [
+        {
+          "start": 899,
+          "end": 1020,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 4061,
+          "end": 4300,
+          "before": "  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',\n",
+          "after": "  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',\n"
+        },
+        {
+          "start": 4569,
+          "end": 4791,
+          "before": "  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/chip_menu_tooltip_packed_contract_probe.mjs",
+      "before_sha256": "918a0e6b1e78b31a8902897bad010f7aafe3ce2693578df949ece11a00a75e62",
+      "current_sha256": "4cd422bfb98a194eb143dfd45a129be48632d1437407e918f4c2ad6433f6e09d",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 2990,
+          "end": 3179,
+          "before": " packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase,packedSelectionComparatorCase};\n",
+          "after": " packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase,packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase};\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/generated_identity_packed_contract_probe.mjs",
+      "before_sha256": "cd9866ffb0e3bfb99c983cb5c6bc00f03db5cda350117b3e7bc97604f645eec1",
+      "current_sha256": "cb72f1fa75f8e9213f992df2316eb60fcd892a31456d7b535221be980fa0d482",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 8779,
+          "end": 9751,
+          "before": "const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(\n  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load = text => new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(\n  declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/menu_item_token_packed_contract_probe.mjs",
+      "before_sha256": "5f61c1cf172915d2f8caceb9554e3b916318a1f0fb69ca6600491eafaab66c79",
+      "current_sha256": "ca54096b0f7d2a3e8bbb245f726904eaeea210de590a726c28e24647185f2f81",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5530,
+          "end": 6497,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/packed_required_contract_admission.mjs",
+      "before_sha256": "85cd54b0f9b2b17702dfbbf4cb982994b9729dfaa42ebdcb3e8a24ebc296c0dd",
+      "current_sha256": "39aed491735b270aba97224432dbc13e92a4f51aa2993536906e912dbae85187",
+      "edits": [
+        {
+          "start": 587,
+          "end": 708,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 3305,
+          "end": 4271,
+          "before": " const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": " const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/radio_identity_packed_contract_probe.mjs",
+      "before_sha256": "28ae025e716312b854405c79ba51eb07c5cc329b5f702e14bdcf74ceef2e04a2",
+      "current_sha256": "ba983f89f61d416ac3d24287bd8e451f9e0dffadcb022dc89821600f2de412af",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5801,
+          "end": 6766,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/select_detach_packed_contract_probe.mjs",
+      "before_sha256": "84e0ada3beab48575759a74aacb264bfd7f35e553a5c3b493f58811b4fd8be67",
+      "current_sha256": "ba952835e6e4eb4df966a76831d7abdf2e495ccece0ce281ca7b4a9715f4e10c",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5322,
+          "end": 6289,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/select_focus_click_packed_contract_probe.mjs",
+      "before_sha256": "4dff316d3fedd6218011a429434245e8312084325e63c2416f66ea1260b64c49",
+      "current_sha256": "528f8edba50e80f8c6333816e4ed1e59d58b85e67268ba5af8a0ee59043ec17a",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5056,
+          "end": 6023,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(\n declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/selection_comparator_packed_probe.mjs",
+      "before_sha256": "7014d4257c7381a7dfe8acd7299b37a3c98433c7c0a79f6ab9070ac4ac6eafb4",
+      "current_sha256": "4c4da7f96d71a1d10a2087be38f288dcc966f2ebd996af5a65e577afc19797d9",
+      "edits": [
+        {
+          "start": 773,
+          "end": 894,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 3168,
+          "end": 3407,
+          "before": "  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',\n",
+          "after": "  'packedSelectFocusClickCase', 'packedChipDisabledCase', 'packedMenuLazyCase', 'packedTooltipContainerCase', 'packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',\n"
+        },
+        {
+          "start": 3676,
+          "end": 3898,
+          "before": "  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "  packedSelectFocusClickCase, packedChipDisabledCase, packedMenuLazyCase, packedTooltipContainerCase, packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/table_onpush_packed_contract_probe.mjs",
+      "before_sha256": "1b44c359ed3c283fb0695e93a5077ad6437584733a3ab245682c69031283ffb8",
+      "current_sha256": "ac39627b30e36680213d99ffb94471fab223275c73b8b16222573d012750a5b4",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 5179,
+          "end": 6147,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')\n  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')\n  (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/value_accessor_packed_contract_probe.mjs",
+      "before_sha256": "e28ea11bbf9a7af45c66cd3fc9c0e7ab18b76c8672b5a688ca3c203fa5ac3cef",
+      "current_sha256": "6d61796e2dd50b453fbf7782bbdf220f1935dbed8b77ebca8b270e3131bd167d",
+      "edits": [
+        {
+          "start": 421,
+          "end": 542,
+          "before": "",
+          "after": "import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';\n"
+        },
+        {
+          "start": 3884,
+          "end": 4851,
+          "before": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')\n (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);\n",
+          "after": "const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')\n (declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/native_date_packed_probe.mjs",
+      "before_sha256": "e3a22b803eace3645eb6f1ec7bc93ba8ff704414b5506e88f3be6b4bd9e06c4e",
+      "current_sha256": "39e43263760e4929da63c964f1b65a69d5ac622109f4e032eaf95a838a551930",
+      "edits": [
+        {
+          "start": 11072,
+          "end": 11231,
+          "before": "  packed_collector_integrated:false,actual_Angular_DI_or_artifact_factory_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};\n",
+          "after": "  packed_collector_exercised:false,actual_Angular_DI_or_artifact_factory_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};\n"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_native_date_packed.py",
+      "before_sha256": "84eac5caefabb2d8b0b032fbe9358506f04ff23530803b7c8971cc1791d39701",
+      "current_sha256": "a8f7cf591b5139ec4941014fc0ae004f31bc26b91cbf2bcf2d71d4e4498ab142",
+      "edits": [
+        {
+          "start": 221,
+          "end": 308,
+          "before": "\"\"\"Native date observation foundation; actual packed collector integration is pending.\"\"\"\n",
+          "after": "\"\"\"Native date observation foundation; collector integration has separate controls.\"\"\"\n"
+        },
+        {
+          "start": 1391,
+          "end": 1462,
+          "before": "                self.assertFalse(report['packed_collector_integrated'])\n",
+          "after": "                self.assertFalse(report['packed_collector_exercised'])\n"
+        }
+      ]
+    }
+  ],
+  "qualification": "pending; exact source transitions captured before modifying files; not a current runtime or audit pass"
+}
