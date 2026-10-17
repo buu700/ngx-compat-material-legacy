@@ -9,6 +9,7 @@ import gzip
 import hashlib
 import json
 import subprocess
+from tests.chip_history_union import historical_product_diff
 from tests.recorded_execution_source_context import recorded_historical_read,validate_recorded_subjects
 
 INPUT='compatibility/rc/native-date-context-inputs.json'
@@ -64,7 +65,7 @@ def project_native_date_context(root,read_member=None):
         assert digest(read(member['path'])) in allowed,member['path']
     for member in [*before['reviews'],*before['authored_reviews']]:assert digest(read(member['path']))==member['sha256'],member['path']
     for member in [*data['new_dependencies'],data['new_runtime_source']]:assert digest(read(member['path']))==member['sha256']
-    assert subprocess.check_output(['git','diff',data['baseline'],'--','projects','testing','reference','fixtures'],cwd=root)==b''
+    assert historical_product_diff(root,data['baseline'],raw_read)==b''
     def projected(path):
         if path in sources:return sources[path]['text'].encode()
         if path in previous:return previous[path]['text'].encode()

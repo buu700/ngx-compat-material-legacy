@@ -7,6 +7,7 @@
  */
 /** Finite exact historical projection. Never a current runtime admission reader. */
 import assert from 'node:assert/strict';
+import {chipHistoryUnionContext} from './chip-history-union.mjs';
 import {recordedHistoricalRead,reverseRecordedSource} from './recorded-execution-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
@@ -24,6 +25,7 @@ export function nativeDateSourceContext(readMember=defaultRead){
  // An explicit history view retains the immutable context authenticated at creation.
  // Ordinary readers below still rehash all live input/archive identities.
  if(historicalContextViews.has(readMember))return historicalContextViews.get(readMember);
+ chipHistoryUnionContext(readMember);
  readMember=recordedHistoricalRead(readMember);
  const raw=readMember(NATIVE_DATE_CONTEXT_INPUT),rawHash=hash(raw);
  const previous=[...cache.values()].find(value=>value.output.inputs.sha256===rawHash);

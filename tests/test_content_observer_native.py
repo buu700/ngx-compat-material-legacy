@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.chip_history_union import historical_product_diff
 
 ROOT = Path(__file__).resolve().parents[1]
 EDIT_HASH = '604125db25a73e20b51ae195a9d6eefb9decbc5512d56eb32723c06d6dbb1547'
@@ -90,7 +91,7 @@ def project_content_observer_native_context(root, read_member=None):
     for member in ['compatibility/rc/matrices/full-verify.json', 'compatibility/f10/authored-dependency-dispositions.json',
                    'compatibility/f10/authored-dependency-current-dispositions.json']:
         assert read(member) == git('show', parent + ':' + member)
-    assert git('diff', parent, '--name-only', '--', 'projects', 'testing', 'reference', 'fixtures') == b''
+    assert historical_product_diff(root,parent,read,name_only=True) == b''
     ledger_path = 'compatibility/f10/disposition-ledger/ledger.json'
     original_ledger_bytes = git('show', parent + ':' + ledger_path)
     return recovered, lambda p: (before['text'].encode() if p == before['path'] else

@@ -7,6 +7,7 @@
  */
 /** Finite historical views only. Actual runtime admission always reads live files. */
 import assert from 'node:assert/strict';
+import {chipHistoryRead,reverseChipHistorySource,markChipHistoryView} from './chip-history-union.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
@@ -20,6 +21,7 @@ const hash=bytes=>createHash('sha256').update(bytes).digest('hex'),cache=new Map
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
 export function recordedSourceContext(readMember=defaultRead){
  if(views.has(readMember))return views.get(readMember);
+ readMember=chipHistoryRead(readMember);
  const raw=readMember(RECORDED_CONTEXT_INPUT),fingerprint=hash(raw),cached=[...cache.values()].find(ctx=>ctx.input_sha256===fingerprint),data=cached?.data||JSON.parse(raw),line=data.line;
  assert.equal(fingerprint,inputPins[line],'recorded source inputs changed');
  const outputRaw=readMember(RECORDED_CONTEXT_OUTPUT);assert.equal(hash(outputRaw),outputPins[line],'recorded source outputs changed');
@@ -44,10 +46,12 @@ function projectedBytes(path,bytes,ctx,implementation=false){
 export function recordedHistoricalRead(readMember=defaultRead){
  if(views.has(readMember))return readMember;
  if(readers.has(readMember))return readers.get(readMember);
- const ctx=recordedSourceContext(readMember),projected=path=>projectedBytes(path,readMember(path),ctx);
+ const ctx=recordedSourceContext(readMember),successor=chipHistoryRead(readMember),projected=path=>projectedBytes(path,successor(path),ctx);
+ markChipHistoryView(projected,readMember);
  views.set(projected,ctx);readers.set(readMember,projected);return projected;
 }
 export function reverseRecordedSource(path,text,{readMember=defaultRead,strict=false}={}){
+ text=reverseChipHistorySource(path,text,{readMember});
  const ctx=recordedSourceContext(readMember),before=ctx.before.sources.find(row=>row.path===path);if(!before)return text;
  const change=ctx.data.changes.find(row=>row.path===path);assert.ok(change);
  if(hash(text)===before.sha256)return text;
@@ -56,6 +60,7 @@ export function reverseRecordedSource(path,text,{readMember=defaultRead,strict=f
  assert.equal(text,before.text,'complete recorded predecessor not recovered');return text;
 }
 export function recordedImplementationSubject(path,readMember=defaultRead){
+ readMember=chipHistoryRead(readMember);
  const ctx=recordedSourceContext(readMember);assert.equal(path,ctx.before.ledger_path,'unregistered implementation subject');
  const bytes=readMember(path),current=ctx.after.members.find(row=>row.path===path);assert.ok(current);
  assert.ok([current.sha256,ctx.before.implementation_ledger_sha256].includes(hash(bytes)),'unreviewed implementation subject');

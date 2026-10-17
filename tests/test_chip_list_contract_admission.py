@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from tests.chip_history_union import recorded_stage_subject
 
 ROOT=Path(__file__).resolve().parents[1]
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -40,7 +41,7 @@ class ChipListContractAdmission(unittest.TestCase):
         task=json.loads((ROOT/'compatibility/rc/chip-list-contract-worksheet.json').read_bytes());migration=json.loads((ROOT/'compatibility/rc/chip-list-contract-entry-migration.json').read_bytes())
         stored=(ROOT/task['prior']['path']).read_bytes();self.assertEqual(sha(stored),task['prior']['sha256']);prior=json.loads(gzip.decompress(stored))
         original=subprocess.check_output(['git','--no-replace-objects','show',task['source_parent']+':'+prior['ledger_path']],cwd=ROOT);self.assertEqual(original,prior['ledger_text'].encode())
-        current=(ROOT/prior['ledger_path']).read_bytes();self.assertEqual(sha(current),migration['expected_ledger_sha256']);old=raw_rows(prior['ledger_text']);new=raw_rows(current.decode());self.assertEqual(len(new),1697)
+        current=recorded_stage_subject(ROOT,'classic-chip-list-contract',prior['ledger_path']);self.assertEqual(sha(current),migration['expected_ledger_sha256']);old=raw_rows(prior['ledger_text']);new=raw_rows(current.decode());self.assertEqual(len(new),1697)
         self.assertEqual([r['sha'] for r,_ in old],[r['sha'] for r,_ in new]);selected=set(task['subjects']);unchanged=[]
         body=json.loads((ROOT/task['current_review']['path']).read_bytes());self.assertEqual(sha((ROOT/task['current_review']['path']).read_bytes()),task['current_review']['sha256'])
         for (previous,oldtext),(actual,newtext) in zip(old,new):

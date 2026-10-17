@@ -12,6 +12,8 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from tests.chip_history_union import recorded_stage_subject
+from tests.chip_history_union import historical_product_diff
 
 ROOT=Path(__file__).resolve().parents[1]
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -43,7 +45,7 @@ class ModernChipAdmission(unittest.TestCase):
         self.assertEqual(sha(stored),ref['sha256']);raw=gzip.decompress(stored);self.assertEqual(sha(raw),ref['raw_sha256']);prior=json.loads(raw)
         before=subprocess.check_output(['git','--no-replace-objects','show',task['source_parent']+':'+prior['ledger_path']],cwd=ROOT)
         self.assertEqual(before,prior['ledger_text'].encode());self.assertEqual(sha(before),prior['ledger_sha256'])
-        current=(ROOT/prior['ledger_path']).read_bytes();migration=json.loads((ROOT/'compatibility/rc/modern-chip-admission-entry-migration.json').read_bytes())
+        current=recorded_stage_subject(ROOT,'modern-chip-admission',prior['ledger_path']);migration=json.loads((ROOT/'compatibility/rc/modern-chip-admission-entry-migration.json').read_bytes())
         self.assertEqual(sha(current),migration['expected_ledger_sha256']);self.assertEqual(migration['prior'],ref)
         old=raw_rows(before.decode());new=raw_rows(current.decode());self.assertEqual(len(new),1697);self.assertEqual([r['sha'] for r,_ in old],[r['sha'] for r,_ in new])
         selected=set(task['subjects']);unrelated=[];oldlabels=[];newlabels=[]
@@ -61,4 +63,4 @@ class ModernChipAdmission(unittest.TestCase):
         if task['line']=='main':self.assertEqual(oldlabels,newlabels)
         else:self.assertEqual(oldlabels,['needs-individual-review']*3);self.assertEqual(newlabels,['irrelevant','not-applicable','not-applicable'])
         for oldreview in prior['reviews']:self.assertEqual((ROOT/oldreview['path']).read_bytes(),oldreview['text'].encode())
-        self.assertEqual(subprocess.check_output(['git','diff',task['source_parent'],'--','projects','testing','reference','fixtures'],cwd=ROOT),b'')
+        self.assertEqual(historical_product_diff(ROOT,task['source_parent']),b'')

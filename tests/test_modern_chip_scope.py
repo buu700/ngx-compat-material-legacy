@@ -12,6 +12,7 @@ from pathlib import Path
 import subprocess
 from tempfile import TemporaryDirectory
 import unittest
+from tests.chip_history_union import historical_product_diff
 
 ROOT=Path(__file__).resolve().parents[1]
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -56,4 +57,4 @@ class ModernChipScope(unittest.TestCase):
         current=subprocess.check_output(['git','--no-replace-objects','show',admission['source_parent']+':compatibility/f10/disposition-ledger/ledger.json'],cwd=ROOT)
         before=subprocess.check_output(['git','--no-replace-objects','show',task['source_parent']+':compatibility/f10/disposition-ledger/ledger.json'],cwd=ROOT)
         self.assertEqual(current,before)
-        self.assertEqual(subprocess.check_output(['git','diff',task['source_parent'],'--','projects','testing','reference','fixtures'],cwd=ROOT),b'')
+        self.assertEqual(historical_product_diff(ROOT,task['source_parent']),b'')
