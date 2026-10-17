@@ -7654,16 +7654,42 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/chips): focus lingering on previous chip (#27559)",
       "final_disposition": "irrelevant",
-      "reason": "The patch makes MatChipOption._handlePrimaryActionInteraction call focus() before toggleSelected, to clear a Safari focus leftover. The owned chips have no MatChipOption and no _handlePrimaryActionInteraction, and that method was not added.",
+      "reason": "The only hunk changes MatChipOption._handlePrimaryActionInteraction: a non-disabled primary-action interaction now calls focus before conditionally toggling selection. It addresses the modern option action focus unit, including selectable:false; no other source or test file changes. MatLegacyChip is an owned directive extending the local _MatChipMixinBase, with classic mat-chip/mat-basic-chip hosts and separate host click/focus handlers. It defines no _handlePrimaryActionInteraction. The whole589-file authored AST population has no current Material chips import/export/type/dynamic route, modern chip class/base or modern chip selector. The local base and each local mixin implementation are checked through the actual barrel. This is an individually verified source ownership exclusion, not a claim that the upstream Safari regression was executed or fixed in the legacy control.",
       "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-modern-chip-source-scope.json",
       "files": [
         "src/material/chips/chip-option.ts"
       ],
       "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
       "recorded_at_utc": "2026-10-01T16:46:41Z",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "affected_branches": [
+        "main"
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-modern-chip-source-exclusion",
+        "diff_sha256": "b7d1803957b72bf8ac0f4d02df76fb39c83b3b3f50ef27a5a83e88179b3cf323",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The only hunk changes MatChipOption._handlePrimaryActionInteraction: a non-disabled primary-action interaction now calls focus before conditionally toggling selection. It addresses the modern option action focus unit, including selectable:false; no other source or test file changes. MatLegacyChip is an owned directive extending the local _MatChipMixinBase, with classic mat-chip/mat-basic-chip hosts and separate host click/focus handlers. It defines no _handlePrimaryActionInteraction. The whole589-file authored AST population has no current Material chips import/export/type/dynamic route, modern chip class/base or modern chip selector. The local base and each local mixin implementation are checked through the actual barrel. This is an individually verified source ownership exclusion, not a claim that the upstream Safari regression was executed or fixed in the legacy control.",
+        "modern_chip_source_scope": {
+          "kind": "three-reviewed-modern-option-grid-source-exclusions",
+          "case_id": "source/modern-chip/49f6859246bde08ff50c9a19de936227dccd0626",
+          "original_subjects_sha256": "2ea89af65439e6b4093108e449ee248d417914f1ab47772b66759cc270c1c79b",
+          "source_context_sha256": "6f08356f62f27f298ff226cd04a149fffca8805685fe8b9578ea3689a775ed24",
+          "original_hunks": 1,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      },
+      "source_check": {
+        "proof_kind": "individual-modern-chip-source-exclusion",
+        "evidence_report_sha256": "074dc0aa8d1e1a6257f7e5abd07a8df83762af832d388c4236976ac6c1de4b5f",
+        "review_membership": "49f6859246bde08ff50c9a19de936227dccd0626"
+      }
     },
     {
       "sha": "776e530f7d9dbec0208f5f6302ad46db66a4da16",
@@ -22088,18 +22114,44 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/chips): navigate between rows on up/down arrow (#29364)",
       "final_disposition": "not-applicable",
-      "reason": "Upstream chip-grid navigates primary/trailing actions between rows. Legacy chip-list is a listbox with FocusKeyManager vertical orientation already; it has no row/action grid.",
+      "reason": "All13 hunks include the UP/DOWN imports, four new primary/trailing action row-navigation assertions, six retained fixture-formatting hunks, and the complete MatChipGrid keydown change. The new branch filters _chipActions by the active action _isPrimary and skip predicate, prevents default, and moves within that action column; TAB and fallback handling are also reviewed. The owned MatLegacyChipList manages MatLegacyChip focus units with FocusKeyManager configured for wrapping, vertical, horizontal and Home/End navigation. Its host _keydown delegates only chip-host targets to that manager. Neither owned class has the modern _chipActions/primary-action grid model, and no current chips class, selector, import or export is in the authored source graph. This upstream row/action navigation contract does not authorize changing the classic HTML/focus structure or styles. The separate existing keyboard/runtime gates remain required; source classification does not claim those tests were executed here.",
       "read_note_disposition": "owned-retained",
       "files": [
+        "src/material/chips/chip-grid.spec.ts",
         "src/material/chips/chip-grid.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "legacy-chips/chip-list.ts withVerticalOrientation",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-modern-chip-source-scope.json",
+      "source_check": {
+        "proof_kind": "individual-modern-chip-source-exclusion",
+        "evidence_report_sha256": "074dc0aa8d1e1a6257f7e5abd07a8df83762af832d388c4236976ac6c1de4b5f",
+        "review_membership": "051917432ad18aadd1747c5b6e8d5af0e861cc52"
+      },
       "batch_id": "product-adapt-residual-2026-10-01-l",
       "recorded_at_utc": "2026-10-01T18:30:00Z",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "category": "chips-grid-rows-na"
+      "category": "chips-grid-rows-na",
+      "affected_branches": [
+        "main"
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-modern-chip-source-exclusion",
+        "diff_sha256": "4c58f5f7db1f3bda71ff05d2616cf143bb09be29cbdd369366959e6202994643",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "All13 hunks include the UP/DOWN imports, four new primary/trailing action row-navigation assertions, six retained fixture-formatting hunks, and the complete MatChipGrid keydown change. The new branch filters _chipActions by the active action _isPrimary and skip predicate, prevents default, and moves within that action column; TAB and fallback handling are also reviewed. The owned MatLegacyChipList manages MatLegacyChip focus units with FocusKeyManager configured for wrapping, vertical, horizontal and Home/End navigation. Its host _keydown delegates only chip-host targets to that manager. Neither owned class has the modern _chipActions/primary-action grid model, and no current chips class, selector, import or export is in the authored source graph. This upstream row/action navigation contract does not authorize changing the classic HTML/focus structure or styles. The separate existing keyboard/runtime gates remain required; source classification does not claim those tests were executed here.",
+        "modern_chip_source_scope": {
+          "kind": "three-reviewed-modern-option-grid-source-exclusions",
+          "case_id": "source/modern-chip/051917432ad18aadd1747c5b6e8d5af0e861cc52",
+          "original_subjects_sha256": "2ea89af65439e6b4093108e449ee248d417914f1ab47772b66759cc270c1c79b",
+          "source_context_sha256": "6f08356f62f27f298ff226cd04a149fffca8805685fe8b9578ea3689a775ed24",
+          "original_hunks": 13,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      }
     },
     {
       "sha": "10da6c63757200b5848c00e560eabe8642435fe8",
@@ -49571,10 +49623,40 @@
       "bucket": "needs-triage",
       "subject": "refactor(material/chips): remove TypeScript mixin usages",
       "final_disposition": "not-applicable",
-      "reason": "Inspected upstream patch content (sha256=de3481d3e2b8a7b454fbe7c4e53fc0bb611b7cbfcfc2214b6661c815ac02a080, bytes=7892). Changed paths: src/material/chips/chip-grid.ts, tools/public_api_guard/material/chips.md. Current Material class/metadata structural cleanup. Historical legacy facade retains its ported shape; not auto-absorbed without owned adaptation evidence. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "reason": "All13 hunks cover removal of MatChipGridBase and _MatChipGridMixinBase, direct MatChipSet inheritance, introduction of the private upstream _ErrorStateTracker, changed constructor/NgControl visibility, error-state accessors/stateChanges/updateErrorState, and the matching public declaration changes. The API-guard file is a contract hunk and is retained as part of the whole review. The exported MatLegacyChipList retains the anonymous local mixinErrorState base and classic form-field/CVA contract. Its mixin resolves through its owned common-behaviors barrel to the owned function returning a class over its caller-supplied base. The original minimum public ErrorStateMatcher dependency remains; no private upstream _ErrorStateTracker is imported. No authored current MatChipGrid/MatChipSet dependency or subtype exists. Applying the current grid constructor/private-helper rewrite would create a different public implementation contract without serving this source owner; no such TypeScript or resource change is made.",
       "batch_id": "needs-triage-surface-m3-nonshipped-cdk-2026-10-01",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/6ef5959afc2a452885e25afba4d311c896693f85.json"
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-modern-chip-source-scope.json",
+      "files": [
+        "src/material/chips/chip-grid.ts",
+        "tools/public_api_guard/material/chips.md"
+      ],
+      "affected_branches": [
+        "main"
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-modern-chip-source-exclusion",
+        "diff_sha256": "9c1a4d372f31cac23dcd30f37c4afb8cc1d087a86592ebdd749238580134ce8c",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "All13 hunks cover removal of MatChipGridBase and _MatChipGridMixinBase, direct MatChipSet inheritance, introduction of the private upstream _ErrorStateTracker, changed constructor/NgControl visibility, error-state accessors/stateChanges/updateErrorState, and the matching public declaration changes. The API-guard file is a contract hunk and is retained as part of the whole review. The exported MatLegacyChipList retains the anonymous local mixinErrorState base and classic form-field/CVA contract. Its mixin resolves through its owned common-behaviors barrel to the owned function returning a class over its caller-supplied base. The original minimum public ErrorStateMatcher dependency remains; no private upstream _ErrorStateTracker is imported. No authored current MatChipGrid/MatChipSet dependency or subtype exists. Applying the current grid constructor/private-helper rewrite would create a different public implementation contract without serving this source owner; no such TypeScript or resource change is made.",
+        "modern_chip_source_scope": {
+          "kind": "three-reviewed-modern-option-grid-source-exclusions",
+          "case_id": "source/modern-chip/6ef5959afc2a452885e25afba4d311c896693f85",
+          "original_subjects_sha256": "2ea89af65439e6b4093108e449ee248d417914f1ab47772b66759cc270c1c79b",
+          "source_context_sha256": "6f08356f62f27f298ff226cd04a149fffca8805685fe8b9578ea3689a775ed24",
+          "original_hunks": 13,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      },
+      "source_check": {
+        "proof_kind": "individual-modern-chip-source-exclusion",
+        "evidence_report_sha256": "074dc0aa8d1e1a6257f7e5abd07a8df83762af832d388c4236976ac6c1de4b5f",
+        "review_membership": "6ef5959afc2a452885e25afba4d311c896693f85"
+      }
     },
     {
       "sha": "087cf15c571d1d9c299e44f0a2f12aa9cdbbd9fd",

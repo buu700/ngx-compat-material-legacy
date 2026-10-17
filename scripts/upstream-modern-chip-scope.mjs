@@ -129,3 +129,55 @@ export function modernChipSourceContext(readMember,productPaths){
   owned_selectors:['mat-basic-chip, [mat-basic-chip], mat-chip, [mat-chip]','mat-chip-list'],local_base_classes:['MatChipBase','anonymous-class-in-_MatChipListBase'],owned_mixin_implementations:ownedMixins.map(([name,relative])=>({name,path:common+relative+'.ts'})),
   source_scope_only:true,actual_native_packed_or_floor_qualified:false};
 }
+
+export const MODERN_CHIP_PROOF_KIND='individual-modern-chip-source-exclusion';
+const priorPins={"main":{"path":"compatibility/rc/modern-chip-admission-prior.json.gz","sha256":"14f24b49930b45bb641078853e175748214f59363686d4d70e49cf048140326a","raw_sha256":"fdfdb7d5208f0f517b089633a67a309d7bbe76cfe145df8a05074f562883f9a4","source_parent":"4e9a4438ef8f77513a6cd5384c7e18b71455eaac"},"21.x":{"path":"compatibility/rc/modern-chip-admission-prior.json.gz","sha256":"d77e5b7e012acadfbc00e8af833870006df76f0d20dbfc8d04f45fcee1a295d6","raw_sha256":"2b25405e616171e3a63a4b67ccc1e5a5f0a8a6582096fd2b6edcfff87f54ba98","source_parent":"2c347d2b3ee5500da4b9b304641b4c9f21a515ac"}};
+const priorCache=new Map();
+const same=(a,b)=>assert.deepEqual(a,b);
+const json=value=>JSON.stringify(value,null,2)+'\n';
+function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
+export function readModernChipPrior(readMember,line){
+ const pin=priorPins[line];assert.ok(pin,'foreign modern chip source line');const bytes=readMember(pin.path);assert.equal(hash(bytes),pin.sha256,'changed modern chip prior archive');
+ if(priorCache.has(line))return priorCache.get(line);
+ const raw=gunzipSync(bytes);assert.equal(hash(raw),pin.raw_sha256);const prior=JSON.parse(raw);assert.equal(prior.line,line);assert.equal(prior.source_parent,pin.source_parent);
+ assert.equal(hash(prior.ledger_text),prior.ledger_sha256);assert.equal(prior.ledger_path,'compatibility/f10/disposition-ledger/ledger.json');
+ same(prior.entries.map(r=>r.sha),MODERN_CHIP_SHAS);const rows=JSON.parse(prior.ledger_text).entries;assert.equal(rows.length,1697);
+ for(const entry of prior.entries)same(rows.find(r=>r.sha===entry.sha),entry);
+ for(const member of prior.reviews)assert.equal(hash(member.text),member.sha256);
+ const value=freeze(prior);priorCache.set(line,value);return value;
+}
+export function requiresModernChipScope(entry,proof){return MODERN_CHIP_SHAS.includes(entry?.sha)||proof?.proof_kind===MODERN_CHIP_PROOF_KIND||proof?.modern_chip_source_scope!==undefined;}
+export function modernChipSourceProof(subject,context,decision){
+ assert.ok(MODERN_CHIP_SHAS.includes(subject?.sha));assert.ok(['main','21.x'].includes(context?.line));
+ return {proof_kind:MODERN_CHIP_PROOF_KIND,diff_sha256:subject.diff_sha256,review_depth:'individual-compatibility',affected_branches:[context.line],decision,
+  modern_chip_source_scope:{kind:'three-reviewed-modern-option-grid-source-exclusions',case_id:'source/modern-chip/'+subject.sha,original_subjects_sha256:subjectHash,source_context_sha256:hash(JSON.stringify(context)),original_hunks:subject.hunks,actual_native_packed_or_floor_qualified:false}};
+}
+/** Mandatory finite source admission. An old label, missing proof, incomplete
+ * original patch or different current source graph cannot replace this check. */
+export function modernChipScopeEvidenceOk(body,entry,readMember,productPaths,line){
+ try{
+  assert.ok(MODERN_CHIP_SHAS.includes(entry.sha));assert.ok(['main','21.x'].includes(line));
+  assert.equal(body.role,MODERN_CHIP_SCOPE_ROLE);assert.equal(body.line,line);assert.equal(body.status,'reviewed');assert.equal(body.g11_claim,'not-passed');
+  assert.equal(body.source_scope_only,true);assert.equal(body.actual_native_packed_or_floor_qualified,false);
+  same(body.scope_sha_ids,MODERN_CHIP_SHAS);assert.equal(body.reviews.length,3);same(body.reviews.map(r=>r.sha),MODERN_CHIP_SHAS);
+  const actual=analyzeModernChipSubjects(readMember),context=modernChipSourceContext(readMember,productPaths);assert.equal(context.line,line);same(body.candidate_context,context);
+  const prior=readModernChipPrior(readMember,line);same(body.prior,pinsRef(line));
+  for(const member of prior.reviews)assert.equal(hash(readMember(member.path)),member.sha256,'changed retained prior review');
+  const stored=readMember(MODERN_CHIP_SUBJECTS);assert.equal(hash(stored),subjectHash);const originals=JSON.parse(gunzipSync(stored)).subjects;
+  for(const [index,row]of body.reviews.entries()){
+   const original=originals[index],summary=actual[index],old=prior.entries[index];
+   same(row.original_analysis,summary);assert.equal(row.diff,original.diff);assert.equal(row.diff_sha256,summary.diff_sha256);same(row.patch_paths,summary.paths);
+   assert.equal(row.review_depth,'individual-compatibility');same(row.affected_branches,[line]);assert.equal(row.status,'reviewed');assert.equal(row.actual_native_packed_or_floor_qualified,false);
+   assert.equal(row.final_disposition,index===0?'irrelevant':'not-applicable');assert.equal(typeof row.decision,'string');assert.ok(row.decision.trim().length>=80);
+   for(const field of ['hunk_review','candidate_review'])assert.equal(typeof row[field],'string');
+   same(row.prior_entry,{ledger_path:prior.ledger_path,ledger_commit:prior.source_parent,entry_sha256:hash(json(old))});
+  }
+  const row=body.reviews.find(r=>r.sha===entry.sha);assert.ok(row);
+  assert.equal(entry.final_disposition,row.final_disposition);assert.equal(entry.reason,row.decision);same(entry.files,row.patch_paths);
+  assert.equal(entry.review_depth,row.review_depth);same(entry.affected_branches,[line]);same(entry.individual_proof,modernChipSourceProof(row.original_analysis,context,row.decision));
+  assert.equal(hash(readMember(entry.evidence_report)),entry.source_check.evidence_report_sha256);
+  assert.equal(entry.source_check.review_membership,entry.sha);assert.equal(entry.source_check.proof_kind,MODERN_CHIP_PROOF_KIND);
+  return true;
+ }catch{return false;}
+}
+function pinsRef(line){return {...priorPins[line]};}

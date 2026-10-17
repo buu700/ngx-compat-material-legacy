@@ -49,8 +49,11 @@ class ModernChipScope(unittest.TestCase):
                     result=subprocess.run(['git','--no-replace-objects','apply','--whitespace=nowarn',*flags,'-'],cwd=directory,input=subject['diff'].encode(),capture_output=True)
                     self.assertEqual(result.returncode,0,result.stderr.decode())
                 for member in subject['members']:self.assertEqual((Path(directory)/member['path']).read_text(),member['after']['text'])
-        # This foundation must not silently close any current disposition.
-        current=(ROOT/'compatibility/f10/disposition-ledger/ledger.json').read_bytes()
+        # Preserve the no-ledger-write assertion at the exact sealed foundation
+        # subject. The subsequent migration tests independently check all current
+        # rows and reject every unrelated byte change.
+        admission=json.loads((ROOT/'compatibility/rc/modern-chip-admission-worksheet.json').read_bytes())
+        current=subprocess.check_output(['git','--no-replace-objects','show',admission['source_parent']+':compatibility/f10/disposition-ledger/ledger.json'],cwd=ROOT)
         before=subprocess.check_output(['git','--no-replace-objects','show',task['source_parent']+':compatibility/f10/disposition-ledger/ledger.json'],cwd=ROOT)
         self.assertEqual(current,before)
         self.assertEqual(subprocess.check_output(['git','diff',task['source_parent'],'--','projects','testing','reference','fixtures'],cwd=ROOT),b'')
