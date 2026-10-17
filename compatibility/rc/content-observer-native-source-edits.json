@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "path": "scripts/browser-surface-families.mjs",
+  "edits": [
+    {
+      "before": "import {formFieldStateTokensOkay} from './form-field-state-style-observation.mjs';",
+      "after": "import {formFieldStateTokensOkay} from './form-field-state-style-observation.mjs';\nimport {contentObserverNativeFixture, installContentObserverNativeTrace, contentObserverNativeOkay} from './content-observer-native-contract.mjs';",
+      "occurrences": 1
+    },
+    {
+      "before": "    <button mat-button id=\"peer-icon-button\">",
+      "after": "    <closeout-content-observer></closeout-content-observer>\n    <button mat-button id=\"peer-icon-button\">",
+      "occurrences": 1
+    },
+    {
+      "before": "\n@NgModule({\n  imports: [\n    BrowserModule,",
+      "after": "\n${contentObserverNativeFixture()}\n@NgModule({\n  imports: [\n    BrowserModule,\n    ObserverLegacyTabsModule,",
+      "occurrences": 1
+    },
+    {
+      "before": "  declarations: [LabRoot],",
+      "after": "  declarations: [LabRoot, ContentObserverNativeProbe],",
+      "occurrences": 1
+    },
+    {
+      "before": "let rippleColorBinding = null;",
+      "after": "let rippleColorBinding = null;\nlet contentObserver = null;",
+      "occurrences": 1
+    },
+    {
+      "before": "    source: 'window.__errors=[];",
+      "after": "    source: `(${installContentObserverNativeTrace.toString()})();` + 'window.__errors=[];",
+      "occurrences": 1
+    },
+    {
+      "before": "  rippleColorBinding.compiled_theme_css_sha256=createHash('sha256').update(progressCss).digest('hex');",
+      "after": "  rippleColorBinding.compiled_theme_css_sha256=createHash('sha256').update(progressCss).digest('hex');\n\n  if (!await waitFor('!!window.__closeoutContentObserver')) throw new Error('owned observer fixture not initialized');\n  const observerResult = await send('Runtime.evaluate', {\n    expression: 'window.__closeoutContentObserver.exercise()', returnByValue: true, awaitPromise: true,\n  });\n  if (observerResult.exceptionDetails) throw new Error('native content observer execution failed');\n  contentObserver = observerResult.result?.value ?? null;",
+      "occurrences": 1
+    },
+    {
+      "before": "  && rippleColorBindingOkay(rippleColorBinding)",
+      "after": "  && rippleColorBindingOkay(rippleColorBinding)\n  && contentObserverNativeOkay(contentObserver, zoneless)",
+      "occurrences": 1
+    },
+    {
+      "before": "  ripple_color_binding: rippleColorBinding,",
+      "after": "  ripple_color_binding: rippleColorBinding,\n  content_observer: contentObserver,",
+      "occurrences": 2
+    },
+    {
+      "before": "    'Does not claim G10.',",
+      "after": "    'Content observer diagnostic uses native records, the public peer and actual owned legacy header notification/text guard plus subscription/destroy/reobserve teardown in this Chromium runtime. It earns no new matrix cells or whole native/AT/motion/floor equivalence.',\n    'Does not claim G10.',",
+      "occurrences": 1
+    }
+  ]
+}

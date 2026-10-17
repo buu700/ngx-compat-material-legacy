@@ -36,6 +36,9 @@ class InheritedExecutionAdmission(unittest.TestCase):
         prior = json.loads(gzip.decompress(raw))
         self.assertEqual(digest(prior['checker']['text'].encode()), prior['checker']['sha256'])
         ledger = load('compatibility/f10/disposition-ledger/ledger.json')
+        if (ROOT / 'compatibility/rc/content-observer-native-worksheet.json').exists():
+            from tests.test_content_observer_native import project_content_observer_native_context
+            ledger, read = project_content_observer_native_context(ROOT)
         entries = {row['sha']: row for row in ledger['entries']}
         worksheet = load('compatibility/rc/inherited-execution-admission-worksheet.json')
         parent = worksheet['source_parent']
