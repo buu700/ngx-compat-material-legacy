@@ -11,9 +11,9 @@ from weakref import WeakKeyDictionary
 
 INPUT='compatibility/rc/recorded-source-context-inputs.json'
 OUTPUT='compatibility/rc/recorded-source-context-outputs.json'
-INPUT_PINS={'main': 'dc4a2446283ea1faaba8ae11821ec5a6d5d72f7310af126472da36407157a139', '21.x': 'ea4d3e34614fcb29559f1c5ff58c41fd82b773cf3bf18036d0a437db2dfef057'}
-OUTPUT_PINS={'main': '440372733e6c21f5e7fcbc16d8b58dbeddf93a224409529f1d9f25ce1815264b', '21.x': 'b82e61caa3f19fc16316b46660d3314e9f30e476b42129b4a7b697f04b129ee2'}
-JS_PIN='c70c734ae0ae6e3e6f236ac61b1c0c0c126eafc720001cba8facff31a784c5ab'
+INPUT_PINS={'main': 'e1ac134a7018bd36d49d2e8f6f000cc0d714b82be318cb880d51380900c8acb5', '21.x': '941bf45036d3f1a3ecab1680d7a75fcf50db96c5956c151937b4bc211bdbf996'}
+OUTPUT_PINS={'main': 'a05dcd9ca107f66882b1ae4b8169178a4bb54a2c9059424e3da43f4a3be1db2d', '21.x': '85d1724a5c9cce63a6c1cda5e05c87ad3931c61c8b082c55f05cd57c6aa8f5dc'}
+JS_PIN='9ab4bb50af0cb9fd7c5343cfae25bf5bb774f37c33c671726c60c583cfd5d695'
 _CACHE={};_VIEWS=WeakKeyDictionary();_READERS=WeakKeyDictionary()
 _sha=lambda b:hashlib.sha256(b).hexdigest()
 

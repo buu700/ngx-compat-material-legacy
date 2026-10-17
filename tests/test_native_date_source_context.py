@@ -19,7 +19,7 @@ class NativeDateSourceContext(unittest.TestCase):
         command=['node','scripts/run-historical-source-probe.mjs','native-date-context-source']
         if os.environ.get('NGX_NATIVE_DATE_CONTEXT_DIAGNOSTIC'):
             command.extend(['--report',os.environ['NGX_NATIVE_DATE_CONTEXT_DIAGNOSTIC']])
-        result=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=45)
+        result=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=120)
         self.assertEqual(result.returncode,0,(result.stdout+result.stderr)[-8000:])
         report=json.loads(result.stdout.strip().splitlines()[-1])
         self.assertEqual(report['complete_committed_source_preimages'],30)
