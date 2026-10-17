@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "current_contract": {
+    "schema_version": 1,
+    "line": "main",
+    "source": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+    "source_sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae",
+    "prior_source_sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15",
+    "prior_source_parent": "e0e8331a0316fe1da2f3a1b9b25c42c0c2599f96",
+    "sole_production_member_changed": "MatLegacyChip.focus",
+    "public_signature": "focus(): void",
+    "constructor_imports_other_members_and_metadata_unchanged": true,
+    "pending_blur_captured_before_cancel": true,
+    "focus_state_published_before_native_focus": true,
+    "notification_after_native_focus": true,
+    "all_other_product_reference_fixture_members_preserved": 1621,
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed"
+  },
+  "current_native_spec_contract": {
+    "schema_version": 1,
+    "line": "main",
+    "old_case_identities_and_names_preserved": 2227,
+    "old_chip_case_callbacks_preserved": 34,
+    "old_chip_list_callbacks_preserved": 92,
+    "old_cases_with_truthful_adaptation_metadata_updated": 34,
+    "strengthened_case_indices": [
+      27,
+      28
+    ],
+    "additional_DOM_or_microtask_assertion_statements": 8,
+    "appended_cases": [
+      {
+        "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#34",
+        "historical_path": "src/material/legacy-chips/chip.spec.ts",
+        "candidate": "projects/ngx-material-legacy/legacy-chips/chip.spec.ts",
+        "adaptation": "adapted",
+        "shared": null,
+        "full_name": "MatChip > owned blur lifecycle > should restore DOM focus while an earlier blur is pending",
+        "index": 34,
+        "kind": "direct"
+      },
+      {
+        "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#35",
+        "historical_path": "src/material/legacy-chips/chip.spec.ts",
+        "candidate": "projects/ngx-material-legacy/legacy-chips/chip.spec.ts",
+        "adaptation": "adapted",
+        "shared": null,
+        "full_name": "MatChip > owned blur lifecycle > should emit one blur for repeated requests and racing stability",
+        "index": 35,
+        "kind": "direct"
+      },
+      {
+        "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#36",
+        "historical_path": "src/material/legacy-chips/chip.spec.ts",
+        "candidate": "projects/ngx-material-legacy/legacy-chips/chip.spec.ts",
+        "adaptation": "adapted",
+        "shared": null,
+        "full_name": "MatChip > owned blur lifecycle > should cancel pending blur and notify destruction before ripple cleanup",
+        "index": 36,
+        "kind": "direct"
+      },
+      {
+        "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#37",
+        "historical_path": "src/material/legacy-chips/chip.spec.ts",
+        "candidate": "projects/ngx-material-legacy/legacy-chips/chip.spec.ts",
+        "adaptation": "adapted",
+        "shared": null,
+        "full_name": "MatChip > owned blur lifecycle > should notify programmatic focus once during synchronous host reentry",
+        "index": 37,
+        "kind": "direct"
+      }
+    ],
+    "positive_case_count": 2231,
+    "discovery_negative_case_count": 5,
+    "full_historical_case_count": 2236,
+    "inventory_rows_updated": 2,
+    "existing_native_scope_definitions_unchanged": true,
+    "new_cases_retained_by_full_native_validator": true,
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed"
+  },
+  "current_focus_protocol_cases": 9,
+  "observations": [
+    {
+      "id": "initial-focus-synchronous-host-and-repeat",
+      "native_focus_calls_before_direct_repeat": 1,
+      "focus_notifications": 1
+    },
+    {
+      "id": "pending-blur-refocus",
+      "stable": false,
+      "active": "chip",
+      "stale_blurs": 0,
+      "native_focus_calls": 1
+    },
+    {
+      "id": "pending-blur-refocus",
+      "stable": true,
+      "active": "chip",
+      "stale_blurs": 0,
+      "native_focus_calls": 1
+    },
+    {
+      "id": "repeated-blur-one-delivery-and-closed-request-refocus",
+      "race": "microtask-first",
+      "blur_notifications": 1
+    },
+    {
+      "id": "repeated-blur-one-delivery-and-closed-request-refocus",
+      "race": "stability-first",
+      "blur_notifications": 1
+    },
+    {
+      "id": "destroy-cancels-and-notifies-before-cleanup",
+      "stable": false,
+      "destroy_notifications": 1
+    },
+    {
+      "id": "destroy-cancels-and-notifies-before-cleanup",
+      "stable": true,
+      "destroy_notifications": 1
+    },
+    {
+      "id": "focus-subscriber-reentry",
+      "focus_notifications": 1
+    },
+    {
+      "id": "destroyed-never-focused-chip-rejects-new-requests",
+      "native_focus_calls": 0
+    }
+  ],
+  "before_source_counterexamples": [
+    {
+      "id": "synchronous-host-focus-reentry",
+      "native_focus_calls": 2,
+      "focus_notifications": 2
+    },
+    {
+      "id": "pending-blur-refocus",
+      "active": "outside",
+      "cached_hasFocus": true,
+      "native_focus_calls": 0
+    }
+  ],
+  "before_counterexamples_reproduced": 2,
+  "current_counterexamples_remaining_in_protocols": 0,
+  "semantic_behavior_mutants": 9,
+  "controls": [
+    {
+      "id": "drop-pending-refocus",
+      "valid_TypeScript": true,
+      "behavior_rejected": true,
+      "current_contract_rejected": true
+    },
+    {
+      "id": "capture-pending-after-cancel",
+      "valid_TypeScript": true,
+      "behavior_rejected": true,
+      "current_contract_rejected": true
+    },
+    {
+      "id": "state-latched-after-native-focus",
+      "valid_TypeScript": true,
+      "behavior_rejected": true,
+      "current_contract_rejected": true
+    },
+    {
+      "id": "notify-before-DOM-focus",
+      "valid_TypeScript": true,
+      "behavior_rejected": true,
+      "current_contract_rejected": true
+    },
+    {
+      "id": "stale-blur-not-cancelled",
+      "valid_TypeScript": true,
+      "behavior_rejected": true,
+      "current_contract_rejected": true
+    },
+    {
+      "id": "closed-request-treated-as-pending",
+      "valid_TypeScript": true,
+      "behavior_rejected": true,
+      "current_contract_rejected": true
+    },
+    {
+      "id": "destroyed-focus-not-guarded",
+      "valid_TypeScript": true,
+      "behavior_rejected": true,
+      "current_contract_rejected": true
+    },
+    {
+      "id": "duplicate-focus-notification",
+      "valid_TypeScript": true,
+      "behavior_rejected": true,
+      "current_contract_rejected": true
+    },
+    {
+      "id": "missing-focus-notification",
+      "valid_TypeScript": true,
+      "behavior_rejected": true,
+      "current_contract_rejected": true
+    },
+    {
+      "id": "unrelated-production-member",
+      "result": "rejected"
+    },
+    {
+      "id": "historical-golden-change",
+      "result": "rejected"
+    },
+    {
+      "id": "stylesheet-change",
+      "result": "rejected"
+    },
+    {
+      "id": "field-only-DOM-escape",
+      "result": "rejected"
+    },
+    {
+      "id": "new-focus-test-removed",
+      "result": "rejected"
+    },
+    {
+      "id": "old-callback-changed",
+      "result": "rejected"
+    },
+    {
+      "id": "old-native-count",
+      "result": "rejected"
+    },
+    {
+      "id": "native-case-omitted",
+      "result": "rejected"
+    },
+    {
+      "id": "inventory-misclassified",
+      "result": "rejected"
+    },
+    {
+      "id": "unknown-historical-subject-projects/ngx-material-legacy/legacy-chips/chip.ts",
+      "result": "passed-through-to-strict-original-check"
+    },
+    {
+      "id": "unknown-historical-subject-projects/ngx-material-legacy/legacy-chips/chip.spec.ts",
+      "result": "passed-through-to-strict-original-check"
+    },
+    {
+      "id": "unknown-historical-subject-projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "result": "passed-through-to-strict-original-check"
+    },
+    {
+      "id": "unknown-historical-subject-testing/legacy-runner/historical-inventory.json",
+      "result": "passed-through-to-strict-original-check"
+    },
+    {
+      "id": "unknown-historical-subject-compatibility/rc/matrices/full-verify.json",
+      "result": "passed-through-to-strict-original-check"
+    },
+    {
+      "id": "unknown-historical-subject-scripts/upstream-historical-behavior-evidence.mjs",
+      "result": "passed-through-to-strict-original-check"
+    },
+    {
+      "id": "late-capsule-corruption-compatibility/rc/chip-focus-repair-inputs.json",
+      "result": "direct-recheck-rejects;captured-view-retained"
+    },
+    {
+      "id": "late-capsule-corruption-compatibility/rc/chip-focus-repair-prior.json.gz",
+      "result": "direct-recheck-rejects;captured-view-retained"
+    },
+    {
+      "id": "immutable-prior",
+      "result": "rejected"
+    }
+  ],
+  "prior_sources_and_reports_preserved": true,
+  "old_foundation_subjects_replayed_only_through_explicit_view": true,
+  "current_product_and_native_inspectors_read_raw_files": true,
+  "installed_RxJS": "7.8.2",
+  "node": "v22.23.3",
+  "scope": "Selected complete current focus/blur/destroy method bodies with genuine host RxJS and explicit synchronous DOM-event/zone/ripple collaborators. Angular historical specs and the full artifact-bound matrix are authored/inspected,not executed here. No current native/browser/packed/floor/full-suite credit.",
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

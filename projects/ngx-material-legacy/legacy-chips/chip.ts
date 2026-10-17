@@ -395,12 +395,16 @@ export class MatLegacyChip
   /** Allows for programmatic focusing of the chip. */
   focus(): void {
     if (this._isDestroyed) return;
+    const wasBlurPending = !!this._blurSubscription && !this._blurSubscription.closed;
     this._blurSubscription?.unsubscribe();
-    if (!this._hasFocus) {
+
+    if (!this._hasFocus || wasBlurPending) {
+      // Native focus dispatches the host focus handler synchronously. Publish the
+      // state first so reentry cannot focus or notify a second time.
+      this._hasFocus = true;
       this._elementRef.nativeElement.focus();
       this._onFocus.next({chip: this});
     }
-    this._hasFocus = true;
   }
 
   /**

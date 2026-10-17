@@ -7,12 +7,13 @@
  */
 /** Extracted authored protocols only; no Angular fixture or browser is run. */
 import assert from 'node:assert/strict';
+import {chipFocusBeforeRead} from '../scripts/chip-focus-repair.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {analyzeChipLifecycleOriginals,readChipLifecycleOriginals,chipLifecycleOriginalHunks,chipLifecycleSourceContext,replayChipLifecycle,CHIP_LIFECYCLE_ORIGINALS} from '../scripts/upstream-chip-lifecycle-scope.mjs';
 import {candidateProductSourcePaths} from '../scripts/upstream-candidate-source-evidence.mjs';
-const read=p=>readFileSync(p),hash=b=>createHash('sha256').update(b).digest('hex'),require=createRequire(import.meta.url),ts=require('typescript'),paths=candidateProductSourcePaths(process.cwd()).sort();
+const read=chipFocusBeforeRead(p=>readFileSync(p)),hash=b=>createHash('sha256').update(b).digest('hex'),require=createRequire(import.meta.url),ts=require('typescript'),paths=candidateProductSourcePaths(process.cwd()).sort();
 const {Subject,Subscription,merge}=require('rxjs'),{take,startWith,takeUntil}=require('rxjs/operators');
 const chipPath='projects/ngx-material-legacy/legacy-chips/chip.ts',listPath='projects/ngx-material-legacy/legacy-chips/chip-list.ts',chip=read(chipPath).toString(),list=read(listPath).toString();
 const analysis=analyzeChipLifecycleOriginals(read),context=chipLifecycleSourceContext(read,paths),controls=[];assert.equal(analysis.length,7);assert.equal(analysis.reduce((n,r)=>n+r.hunks,0),30);assert.equal(analysis.reduce((n,r)=>n+r.paths.length,0),16);
@@ -98,5 +99,5 @@ const focusCounterexamples=[];
  assert.ok(chip.includes("'(focus)': 'focus()'"));o.focus();assert.equal(active,'chip');assert.equal(trace.filter(s=>s.startsWith('focus:')).length,2);assert.equal(nativeCalls,2);
  focusCounterexamples.push({id:'synchronous-host-focus-reentry',native_focus_calls:nativeCalls,focus_notifications:2,expected_focus_notifications:1,status:'source-counterexample;native-regression-and-repair-required'});
 }
-const report={schema_version:1,line:context.line,focus_counterexamples:focusCounterexamples,complete_original_subjects:7,whole_original_hunks:30,complete_changed_path_occurrences:16,authenticated_blob_occurrences:32,original_analysis:analysis,source_context:context,protocols:{blur_cases:blurCases,macro_task_DOM_escape_cases:escapeCases,query_selection_timing_cases:selectionCases,destroy_event_and_focus_cases:destroyedFocusCases,actual_selected_authored_method_bodies:true,collaborators:'Genuine installed RxJS Subject/Subscription/merge/operators; explicit NgZone,focus-node,key-manager,timer and value-observer protocols. Angular fixtures,renderer,layout,SSR/hydration and native floors are not executed.',installed_rxjs:require('rxjs/package.json').version},controls,actual_native_packed_or_floor_qualified:false,native_DOM_test_and_per_SHA_admission_pending:true,g11_claim:'not-passed'};
+const report={schema_version:1,line:context.line,source_view:'authenticated pre-repair lifecycle foundation;current raw repair checked separately',focus_counterexamples:focusCounterexamples,complete_original_subjects:7,whole_original_hunks:30,complete_changed_path_occurrences:16,authenticated_blob_occurrences:32,original_analysis:analysis,source_context:context,protocols:{blur_cases:blurCases,macro_task_DOM_escape_cases:escapeCases,query_selection_timing_cases:selectionCases,destroy_event_and_focus_cases:destroyedFocusCases,actual_selected_authored_method_bodies:true,collaborators:'Genuine installed RxJS Subject/Subscription/merge/operators; explicit NgZone,focus-node,key-manager,timer and value-observer protocols. Angular fixtures,renderer,layout,SSR/hydration and native floors are not executed.',installed_rxjs:require('rxjs/package.json').version},controls,actual_native_packed_or_floor_qualified:false,native_DOM_test_and_per_SHA_admission_pending:true,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:context.line,subjects:7,hunks:30,protocol_cases:blurCases+escapeCases+selectionCases+destroyedFocusCases,protocols:report.protocols,controls:controls.length,focus_counterexamples:focusCounterexamples.length,actual_native_packed_or_floor_qualified:false}));

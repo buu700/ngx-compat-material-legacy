@@ -32,7 +32,7 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {
   FormBuilder,
   FormControl,
@@ -500,11 +500,16 @@ describe('MatChipList', () => {
             .withContext('Expected tabIndex to be set to -1 temporarily.')
             .toBe(-1);
 
+          expect(chipListNativeElement.tabIndex).toBe(-1);
+          flushMicrotasks();
+          expect(chipListNativeElement.tabIndex).toBe(-1);
+
           tick();
 
           expect(chipListInstance._tabIndex)
             .withContext('Expected tabIndex to be reset back to 0')
             .toBe(0);
+          expect(chipListNativeElement.tabIndex).toBe(0);
         }));
 
         it(`should use user defined tabIndex`, fakeAsync(() => {
@@ -522,11 +527,16 @@ describe('MatChipList', () => {
             .withContext('Expected tabIndex to be set to -1 temporarily.')
             .toBe(-1);
 
+          expect(chipListNativeElement.tabIndex).toBe(-1);
+          flushMicrotasks();
+          expect(chipListNativeElement.tabIndex).toBe(-1);
+
           tick();
 
           expect(chipListInstance._tabIndex)
             .withContext('Expected tabIndex to be reset back to 4')
             .toBe(4);
+          expect(chipListNativeElement.tabIndex).toBe(4);
         }));
       });
 
