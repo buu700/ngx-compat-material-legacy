@@ -1,0 +1,75 @@
+diff --git a/src/material/slider/slider-input.ts b/src/material/slider/slider-input.ts
+index e88cd54e07fbbea4b4c3816fee95df4be6a66b9e..87fb21986edb80a5021797327e631901c5d962df 100644
+--- a/src/material/slider/slider-input.ts
++++ b/src/material/slider/slider-input.ts
+@@ -476,6 +476,9 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+   _onPointerUp(): void {
+     if (this._isActive) {
+       this._isActive = false;
++      if (this._platform.SAFARI) {
++        this._setIsFocused(false);
++      }
+       this.dragEnd.emit({source: this, parent: this._slider, value: this.value});
+ 
+       // This setTimeout is to prevent the pointerup from triggering a value
+diff --git a/src/material/slider/slider-thumb.ts b/src/material/slider/slider-thumb.ts
+index cfd25eea2ec5e7c07080e4e53d7ef28d321efe9d..5988970896a2664a6643ab54a715d0d91b46780b 100644
+--- a/src/material/slider/slider-thumb.ts
++++ b/src/material/slider/slider-thumb.ts
+@@ -18,6 +18,7 @@ import {
+   OnDestroy,
+   ViewChild,
+   ViewEncapsulation,
++  inject,
+ } from '@angular/core';
+ import {MatRipple, RippleAnimationConfig, RippleRef, RippleState} from '@angular/material/core';
+ import {
+@@ -28,6 +29,7 @@ import {
+   MAT_SLIDER,
+   MAT_SLIDER_VISUAL_THUMB,
+ } from './slider-interface';
++import {Platform} from '@angular/cdk/platform';
+ 
+ /**
+  * The visual slider thumb.
+@@ -96,6 +98,8 @@ export class MatSliderVisualThumb implements _MatSliderVisualThumb, AfterViewIni
+   /** The host native HTML input element. */
+   _hostElement: HTMLElement;
+ 
++  private _platform = inject(Platform);
++
+   constructor(
+     readonly _cdr: ChangeDetectorRef,
+     private readonly _ngZone: NgZone,
+@@ -189,6 +193,12 @@ export class MatSliderVisualThumb implements _MatSliderVisualThumb, AfterViewIni
+     if (!this._sliderInput._isFocused) {
+       this._hideRipple(this._focusRippleRef);
+     }
++
++    // On Safari we need to immediately re-show the hover ripple because
++    // sliders do not retain focus from pointer events on that platform.
++    if (this._platform.SAFARI) {
++      this._showHoverRipple();
++    }
+   };
+ 
+   /** Handles displaying the hover ripple. */
+diff --git a/src/material/slider/slider.spec.ts b/src/material/slider/slider.spec.ts
+index b2c559b0440002b78f6fef89d29aad97d680ef35..c77cf846686c9fb1359ad934d3f4608ae3c893c8 100644
+--- a/src/material/slider/slider.spec.ts
++++ b/src/material/slider/slider.spec.ts
+@@ -627,7 +627,13 @@ describe('MDC-based MatSlider', () => {
+       pointerdown();
+       pointerup();
+       flush();
+-      expect(isRippleVisible('focus')).toBeTrue();
++
++      // The slider immediately loses focus on pointerup for Safari.
++      if (platform.SAFARI) {
++        expect(isRippleVisible('hover')).toBeTrue();
++      } else {
++        expect(isRippleVisible('focus')).toBeTrue();
++      }
+     }));
+ 
+     it('should hide the focus ripple on blur', fakeAsync(() => {

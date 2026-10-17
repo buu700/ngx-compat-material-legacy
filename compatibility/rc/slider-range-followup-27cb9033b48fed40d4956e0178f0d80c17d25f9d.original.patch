@@ -1,0 +1,27 @@
+diff --git a/src/material/slider/slider-input.ts b/src/material/slider/slider-input.ts
+index a735dd9ed169b623d0d452d8a343ea99d98f0384..18480d7a707081533e371197b4840e627d789e09 100644
+--- a/src/material/slider/slider-input.ts
++++ b/src/material/slider/slider-input.ts
+@@ -340,6 +340,8 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+   }
+ 
+   _onFocus(): void {
++    this._slider._setTransition(false);
++    this._slider._updateTrackUI(this);
+     this._setIsFocused(true);
+   }
+ 
+diff --git a/src/material/slider/slider-interface.ts b/src/material/slider/slider-interface.ts
+index a26bd5329a867f7ad3792b3626f0a18f93c470aa..de7c3feb1afd4e5d3bbe721c5c0edfa2d671b35d 100644
+--- a/src/material/slider/slider-interface.ts
++++ b/src/material/slider/slider-interface.ts
+@@ -142,6 +142,9 @@ export interface _MatSlider {
+   /** Updates the stored slider dimensions using the current bounding client rect. */
+   _updateDimensions: () => void;
+ 
++  /** Updates the scale on the active portion of the track. */
++  _updateTrackUI: (source: _MatSliderThumb) => void;
++
+   /** Used to set the transition duration for thumb and track animations. */
+   _setTransition: (withAnimation: boolean) => void;
+ 

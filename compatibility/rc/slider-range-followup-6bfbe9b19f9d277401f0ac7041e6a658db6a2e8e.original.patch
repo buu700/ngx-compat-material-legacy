@@ -1,0 +1,96 @@
+diff --git a/src/material/slider/slider-input.ts b/src/material/slider/slider-input.ts
+index d37f7da643f911d837b107ff555519edc1d11357..e88cd54e07fbbea4b4c3816fee95df4be6a66b9e 100644
+--- a/src/material/slider/slider-input.ts
++++ b/src/material/slider/slider-input.ts
+@@ -98,12 +98,21 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+     if (this._isActive) {
+       return;
+     }
+-    this._hostElement.value = stringValue;
++    this._setValue(stringValue);
++  }
++
++  /**
++   * Handles programmatic value setting. This has been split out to
++   * allow the range thumb to override it and add additional necessary logic.
++   */
++  protected _setValue(value: string) {
++    this._hostElement.value = value;
+     this._updateThumbUIByValue();
+     this._slider._onValueChange(this);
+     this._cdr.detectChanges();
+     this._slider._cdr.markForCheck();
+   }
++
+   /** Event emitted when the `value` is changed. */
+   @Output() readonly valueChange: EventEmitter<number> = new EventEmitter<number>();
+ 
+@@ -793,4 +802,10 @@ export class MatSliderRangeThumb extends MatSliderThumb implements _MatSliderRan
+       this._updateSibling();
+     }
+   }
++
++  override _setValue(value: string) {
++    super._setValue(value);
++    this._updateWidthInactive();
++    this._updateSibling();
++  }
+ }
+diff --git a/src/material/slider/slider.spec.ts b/src/material/slider/slider.spec.ts
+index b7f2886d2242e0a0915535453bf7e997390702e1..b2c559b0440002b78f6fef89d29aad97d680ef35 100644
+--- a/src/material/slider/slider.spec.ts
++++ b/src/material/slider/slider.spec.ts
+@@ -1022,6 +1022,32 @@ describe('MDC-based MatSlider', () => {
+       fixture.detectChanges();
+       expect(endInput.value).toBe(70);
+     });
++
++    it('should update the input width when the start value changes', () => {
++      const startInputEl = startInput._elementRef.nativeElement;
++      const endInputEl = endInput._elementRef.nativeElement;
++      const startInputWidthBefore = startInputEl.getBoundingClientRect().width;
++      const endInputWidthBefore = endInputEl.getBoundingClientRect().width;
++      fixture.componentInstance.startValue = 10;
++      fixture.detectChanges();
++      const startInputWidthAfter = startInputEl.getBoundingClientRect().width;
++      const endInputWidthAfter = endInputEl.getBoundingClientRect().width;
++      expect(startInputWidthBefore).not.toBe(startInputWidthAfter);
++      expect(endInputWidthBefore).not.toBe(endInputWidthAfter);
++    });
++
++    it('should update the input width when the end value changes', () => {
++      const startInputEl = startInput._elementRef.nativeElement;
++      const endInputEl = endInput._elementRef.nativeElement;
++      const startInputWidthBefore = startInputEl.getBoundingClientRect().width;
++      const endInputWidthBefore = endInputEl.getBoundingClientRect().width;
++      fixture.componentInstance.endValue = 90;
++      fixture.detectChanges();
++      const startInputWidthAfter = startInputEl.getBoundingClientRect().width;
++      const endInputWidthAfter = endInputEl.getBoundingClientRect().width;
++      expect(startInputWidthBefore).not.toBe(startInputWidthAfter);
++      expect(endInputWidthBefore).not.toBe(endInputWidthAfter);
++    });
+   });
+ 
+   describe('slider with direction', () => {
+diff --git a/tools/public_api_guard/material/slider.md b/tools/public_api_guard/material/slider.md
+index 351cf2113d15da583ce3b6ba4b05780f5df0454f..59577d88f0631bb9542464a91076e0a94d67611f 100644
+--- a/tools/public_api_guard/material/slider.md
++++ b/tools/public_api_guard/material/slider.md
+@@ -180,6 +180,8 @@ export class MatSliderRangeThumb extends MatSliderThumb implements _MatSliderRan
+     // (undocumented)
+     _setIsLeftThumb(): void;
+     // (undocumented)
++    _setValue(value: string): void;
++    // (undocumented)
+     _updateMinMax(): void;
+     // (undocumented)
+     _updateStaticStyles(): void;
+@@ -261,6 +263,7 @@ export class MatSliderThumb implements _MatSliderThumb, OnDestroy, ControlValueA
+     registerOnChange(fn: any): void;
+     registerOnTouched(fn: any): void;
+     setDisabledState(isDisabled: boolean): void;
++    protected _setValue(value: string): void;
+     _skipUIUpdate: boolean;
+     // (undocumented)
+     protected _slider: _MatSlider;
