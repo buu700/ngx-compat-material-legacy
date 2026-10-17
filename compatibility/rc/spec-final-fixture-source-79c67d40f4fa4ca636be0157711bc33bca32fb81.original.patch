@@ -1,0 +1,2013 @@
+diff --git a/src/material-experimental/column-resize/column-resize.spec.ts b/src/material-experimental/column-resize/column-resize.spec.ts
+index 47ff9f13aa71328740fdf83f086327e1c9ad04f9..3ab5a3f70b121a9af943456cf32dfef007ca158f 100644
+--- a/src/material-experimental/column-resize/column-resize.spec.ts
++++ b/src/material-experimental/column-resize/column-resize.spec.ts
+@@ -274,7 +274,10 @@ abstract class BaseTestComponentRtl extends BaseTestComponent {
+   }
+ }
+ 
+-@Component({template: getTableTemplate(false), standalone: false})
++@Component({
++  template: getTableTemplate(false),
++  imports: [BidiModule, MatTableModule, MatColumnResizeModule],
++})
+ class MatResizeTest extends BaseTestComponent {
+   @ViewChild(MatColumnResize) columnResize: AbstractMatColumnResize;
+ }
+@@ -282,32 +285,47 @@ class MatResizeTest extends BaseTestComponent {
+ @Component({
+   template: getTableTemplate(false),
+   changeDetection: ChangeDetectionStrategy.OnPush,
+-  standalone: false,
++  imports: [BidiModule, MatTableModule, MatColumnResizeModule],
+ })
+ class MatResizeOnPushTest extends MatResizeTest {}
+ 
+-@Component({template: getTableTemplate(true), standalone: false})
++@Component({
++  template: getTableTemplate(true),
++  imports: [BidiModule, MatTableModule, MatDefaultEnabledColumnResizeModule],
++})
+ class MatResizeDefaultTest extends BaseTestComponent {
+   @ViewChild(MatDefaultEnabledColumnResize) columnResize: AbstractMatColumnResize;
+ }
+ 
+-@Component({template: getTableTemplate(true), standalone: false})
++@Component({
++  template: getTableTemplate(true),
++  imports: [BidiModule, MatTableModule, MatDefaultEnabledColumnResizeModule],
++})
+ class MatResizeDefaultRtlTest extends BaseTestComponentRtl {
+   @ViewChild(MatDefaultEnabledColumnResize) columnResize: AbstractMatColumnResize;
+ }
+ 
+-@Component({template: getFlexTemplate(false), standalone: false})
++@Component({
++  template: getFlexTemplate(false),
++  imports: [BidiModule, MatTableModule, MatColumnResizeModule],
++})
+ class MatResizeFlexTest extends BaseTestComponent {
+   @ViewChild(MatColumnResizeFlex) columnResize: AbstractMatColumnResize;
+ }
+ 
+-@Component({template: getFlexTemplate(true), standalone: false})
++@Component({
++  template: getFlexTemplate(true),
++  imports: [BidiModule, MatTableModule, MatDefaultEnabledColumnResizeModule],
++})
+ class MatResizeDefaultFlexTest extends BaseTestComponent {
+   @ViewChild(MatDefaultEnabledColumnResizeFlex)
+   columnResize: AbstractMatColumnResize;
+ }
+ 
+-@Component({template: getFlexTemplate(true), standalone: false})
++@Component({
++  template: getFlexTemplate(true),
++  imports: [BidiModule, MatTableModule, MatDefaultEnabledColumnResizeModule],
++})
+ class MatResizeDefaultFlexRtlTest extends BaseTestComponentRtl {
+   @ViewChild(MatDefaultEnabledColumnResizeFlex)
+   columnResize: AbstractMatColumnResize;
+@@ -357,44 +375,23 @@ declare global {
+ }
+ 
+ const testCases = [
+-  [MatColumnResizeModule, MatResizeTest, 'opt-in table-based mat-table'],
+-  [MatColumnResizeModule, MatResizeOnPushTest, 'inside OnPush component'],
+-  [MatColumnResizeModule, MatResizeFlexTest, 'opt-in flex-based mat-table'],
+-  [
+-    MatDefaultEnabledColumnResizeModule,
+-    MatResizeDefaultTest,
+-    'default enabled table-based mat-table',
+-  ],
+-  [
+-    MatDefaultEnabledColumnResizeModule,
+-    MatResizeDefaultRtlTest,
+-    'default enabled rtl table-based mat-table',
+-  ],
+-  [
+-    MatDefaultEnabledColumnResizeModule,
+-    MatResizeDefaultFlexTest,
+-    'default enabled flex-based mat-table',
+-  ],
+-  [
+-    MatDefaultEnabledColumnResizeModule,
+-    MatResizeDefaultFlexRtlTest,
+-    'default enabled rtl flex-based mat-table',
+-  ],
++  [MatResizeTest, 'opt-in table-based mat-table'],
++  [MatResizeOnPushTest, 'inside OnPush component'],
++  [MatResizeFlexTest, 'opt-in flex-based mat-table'],
++  [MatResizeDefaultTest, 'default enabled table-based mat-table'],
++  [MatResizeDefaultRtlTest, 'default enabled rtl table-based mat-table'],
++  [MatResizeDefaultFlexTest, 'default enabled flex-based mat-table'],
++  [MatResizeDefaultFlexRtlTest, 'default enabled rtl flex-based mat-table'],
+ ] as const;
+ 
+ describe('Material Popover Edit', () => {
+-  for (const [resizeModule, componentClass, label] of testCases) {
++  for (const [componentClass, label] of testCases) {
+     describe(label, () => {
+       let component: BaseTestComponent;
+       let fixture: ComponentFixture<BaseTestComponent>;
+ 
+       beforeEach(fakeAsync(() => {
+         jasmine.addMatchers(approximateMatcher);
+-
+-        TestBed.configureTestingModule({
+-          imports: [BidiModule, MatTableModule, resizeModule],
+-          declarations: [componentClass],
+-        });
+         fixture = TestBed.createComponent(componentClass);
+         component = fixture.componentInstance;
+         fixture.detectChanges();
+@@ -645,12 +642,10 @@ describe('Material Popover Edit', () => {
+       jasmine.addMatchers(approximateMatcher);
+ 
+       TestBed.configureTestingModule({
+-        imports: [BidiModule, MatTableModule, MatColumnResizeModule],
+         providers: [
+           FakeColumnSizeStore,
+           {provide: ColumnSizeStore, useExisting: FakeColumnSizeStore},
+         ],
+-        declarations: [MatResizeOnPushTest],
+       });
+       fixture = TestBed.createComponent(MatResizeOnPushTest);
+       component = fixture.componentInstance;
+diff --git a/src/material-experimental/popover-edit/popover-edit.spec.ts b/src/material-experimental/popover-edit/popover-edit.spec.ts
+index 52ee1c7cf75b86021e711ff1c318526faea050e5..6775393c0746c43a388ea8cfc7145263a3d589c7 100644
+--- a/src/material-experimental/popover-edit/popover-edit.spec.ts
++++ b/src/material-experimental/popover-edit/popover-edit.spec.ts
+@@ -229,7 +229,7 @@ class ElementDataSource extends DataSource<PeriodicElement> {
+       margin: 16px;
+     }
+   `,
+-  standalone: false,
++  imports: [MatTableModule, MatPopoverEditModule, FormsModule],
+ })
+ class MatFlexTableInCell extends BaseTestComponent {
+   displayedColumns = ['before', 'name', 'weight'];
+@@ -281,7 +281,7 @@ class MatFlexTableInCell extends BaseTestComponent {
+       margin: 16px;
+     }
+   `,
+-  standalone: false,
++  imports: [MatTableModule, MatPopoverEditModule, FormsModule],
+ })
+ class MatTableInCell extends BaseTestComponent {
+   displayedColumns = ['before', 'name', 'weight'];
+@@ -300,10 +300,6 @@ describe('Material Popover Edit', () => {
+       let fixture: ComponentFixture<BaseTestComponent>;
+ 
+       beforeEach(fakeAsync(() => {
+-        TestBed.configureTestingModule({
+-          imports: [MatTableModule, MatPopoverEditModule, FormsModule],
+-          declarations: [componentClass],
+-        });
+         fixture = TestBed.createComponent(componentClass);
+         component = fixture.componentInstance;
+         fixture.detectChanges();
+diff --git a/src/material/chips/chip-grid.spec.ts b/src/material/chips/chip-grid.spec.ts
+index 92659883278a499e7a20391f8450d9a58e225deb..b3ca890d877de95de917e5fd17b65f3a882efbfe 100644
+--- a/src/material/chips/chip-grid.spec.ts
++++ b/src/material/chips/chip-grid.spec.ts
+@@ -39,9 +39,15 @@ import {FormControl, FormsModule, NgForm, ReactiveFormsModule, Validators} from
+ import {By} from '@angular/platform-browser';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MATERIAL_ANIMATIONS} from '../core';
+-import {MatFormFieldModule} from '../form-field';
+-import {MatInputModule} from '../input';
+-import {MatChipEvent, MatChipGrid, MatChipInputEvent, MatChipRow, MatChipsModule} from './index';
++import {MatError, MatFormField, MatHint, MatLabel} from '../form-field';
++import {
++  MatChipEvent,
++  MatChipGrid,
++  MatChipInput,
++  MatChipInputEvent,
++  MatChipRemove,
++  MatChipRow,
++} from './index';
+ 
+ describe('MatChipGrid', () => {
+   let chipGridDebugElement: DebugElement;
+@@ -1028,19 +1034,11 @@ describe('MatChipGrid', () => {
+     directionality = signal(direction);
+ 
+     TestBed.configureTestingModule({
+-      imports: [
+-        FormsModule,
+-        ReactiveFormsModule,
+-        MatChipsModule,
+-        MatFormFieldModule,
+-        MatInputModule,
+-        ...additionalImports,
+-      ],
++      imports: additionalImports,
+       providers: [
+         provideFakeDirectionality(directionality),
+         {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+-      declarations: [component],
+     });
+ 
+     const fixture = TestBed.createComponent<T>(component);
+@@ -1067,7 +1065,7 @@ describe('MatChipGrid', () => {
+       }
+     </mat-chip-grid>
+     <input name="test" [matChipInputFor]="chipGrid"/>`,
+-  standalone: false,
++  imports: [MatChipGrid, MatChipRow, MatChipInput],
+ })
+ class StandardChipGrid {
+   name: string = 'Test';
+@@ -1089,7 +1087,7 @@ class StandardChipGrid {
+       <input name="test" [matChipInputFor]="chipGrid"/>
+     </mat-form-field>
+   `,
+-  standalone: false,
++  imports: [MatChipGrid, MatChipRow, MatChipInput, MatFormField, MatLabel],
+ })
+ class FormFieldChipGrid {
+   chips = ['Chip 0', 'Chip 1', 'Chip 2'];
+@@ -1121,7 +1119,7 @@ class FormFieldChipGrid {
+           (matChipInputTokenEnd)="add($event)"/>
+     </mat-form-field>
+   `,
+-  standalone: false,
++  imports: [MatChipGrid, MatChipRow, MatChipInput, MatFormField, MatLabel, ReactiveFormsModule],
+ })
+ class InputChipGrid {
+   foods: any[] = [
+@@ -1168,20 +1166,30 @@ class InputChipGrid {
+ 
+ @Component({
+   template: `
+-<form #form="ngForm" novalidate>
+-  <mat-form-field>
+-    <mat-chip-grid #chipGrid [formControl]="formControl">
+-      @for (food of foods; track food) {
+-        <mat-chip-row [value]="food.value">{{food.viewValue}}</mat-chip-row>
+-      }
+-    </mat-chip-grid>
+-    <input name="test" [matChipInputFor]="chipGrid"/>
+-    <mat-hint>Please select a chip, or type to add a new chip</mat-hint>
+-    <mat-error>Should have value</mat-error>
+-  </mat-form-field>
+-</form>
++    <form #form="ngForm" novalidate>
++      <mat-form-field>
++        <mat-chip-grid #chipGrid [formControl]="formControl">
++          @for (food of foods; track food) {
++            <mat-chip-row [value]="food.value">{{food.viewValue}}</mat-chip-row>
++          }
++        </mat-chip-grid>
++        <input name="test" [matChipInputFor]="chipGrid"/>
++        <mat-hint>Please select a chip, or type to add a new chip</mat-hint>
++        <mat-error>Should have value</mat-error>
++      </mat-form-field>
++    </form>
+   `,
+-  standalone: false,
++  imports: [
++    MatChipGrid,
++    MatChipRow,
++    MatChipInput,
++    MatFormField,
++    MatHint,
++    MatError,
++    MatLabel,
++    ReactiveFormsModule,
++    FormsModule,
++  ],
+ })
+ class ChipGridWithFormErrorMessages {
+   foods: any[] = [
+@@ -1217,7 +1225,7 @@ class ChipGridWithFormErrorMessages {
+       <input name="test" [matChipInputFor]="chipGrid"/>
+     </mat-form-field>
+   `,
+-  standalone: false,
++  imports: [MatChipGrid, MatChipRow, MatChipInput, MatFormField, MatChipRemove],
+ })
+ class ChipGridWithRemove {
+   chips = [0, 1, 2, 3, 4];
+diff --git a/src/material/chips/chip-input.spec.ts b/src/material/chips/chip-input.spec.ts
+index 99bedfec25391abc4ab35bdaa1eca3e5892b9f37..7bc043c2e321c2a986a919a6f1925f253bbc0cd3 100644
+--- a/src/material/chips/chip-input.spec.ts
++++ b/src/material/chips/chip-input.spec.ts
+@@ -1,5 +1,4 @@
+ import {COMMA, ENTER, TAB} from '@angular/cdk/keycodes';
+-import {PlatformModule} from '@angular/cdk/platform';
+ import {
+   createKeyboardEvent,
+   dispatchEvent,
+@@ -10,14 +9,14 @@ import {Component, DebugElement, ViewChild} from '@angular/core';
+ import {ComponentFixture, fakeAsync, flush, TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {MATERIAL_ANIMATIONS} from '../core';
+-import {MatFormFieldModule} from '../form-field';
++import {MatFormField} from '../form-field';
+ import {
+   MAT_CHIPS_DEFAULT_OPTIONS,
+   MatChipGrid,
+   MatChipInput,
+   MatChipInputEvent,
++  MatChipRow,
+   MatChipsDefaultOptions,
+-  MatChipsModule,
+ } from './index';
+ 
+ describe('MatChipInput', () => {
+@@ -29,12 +28,10 @@ describe('MatChipInput', () => {
+ 
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [PlatformModule, MatChipsModule, MatFormFieldModule],
+       providers: [
+         provideFakeDirectionality('ltr'),
+         {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+-      declarations: [TestChipInput],
+     });
+   }));
+ 
+@@ -239,8 +236,6 @@ describe('MatChipInput', () => {
+       fixture.destroy();
+ 
+       TestBed.resetTestingModule().configureTestingModule({
+-        imports: [MatChipsModule, MatFormFieldModule, PlatformModule],
+-        declarations: [TestChipInput],
+         providers: [
+           {
+             provide: MAT_CHIPS_DEFAULT_OPTIONS,
+@@ -325,7 +320,7 @@ describe('MatChipInput', () => {
+       </mat-chip-grid>
+     </mat-form-field>
+   `,
+-  standalone: false,
++  imports: [MatFormField, MatChipGrid, MatChipRow, MatChipInput],
+ })
+ class TestChipInput {
+   @ViewChild(MatChipGrid) chipGridInstance: MatChipGrid;
+diff --git a/src/material/chips/chip-listbox.spec.ts b/src/material/chips/chip-listbox.spec.ts
+index 9fe8faf05c002c3cb3609bf2f5e079836fa8783d..89b7d9172198158b456a0942ac7fcce3ff306b22 100644
+--- a/src/material/chips/chip-listbox.spec.ts
++++ b/src/material/chips/chip-listbox.spec.ts
+@@ -16,12 +16,13 @@ import {
+   ViewChildren,
+   WritableSignal,
+ } from '@angular/core';
++import {AsyncPipe} from '@angular/common';
+ import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
+ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+ import {asyncScheduler, BehaviorSubject, Observable} from 'rxjs';
+ import {observeOn} from 'rxjs/operators';
+-import {MatChipListbox, MatChipOption, MatChipsModule} from './index';
++import {MatChipListbox, MatChipOption} from './index';
+ 
+ describe('MatChipListbox', () => {
+   let fixture: ComponentFixture<any>;
+@@ -930,9 +931,7 @@ describe('MatChipListbox', () => {
+     directionality = signal(direction);
+ 
+     TestBed.configureTestingModule({
+-      imports: [FormsModule, ReactiveFormsModule, MatChipsModule],
+       providers: [provideFakeDirectionality(directionality)],
+-      declarations: [component],
+     });
+ 
+     fixture = TestBed.createComponent<T>(component);
+@@ -961,7 +960,7 @@ describe('MatChipListbox', () => {
+         </mat-chip-option>
+       }
+     </mat-chip-listbox>`,
+-  standalone: false,
++  imports: [MatChipListbox, MatChipOption],
+ })
+ class StandardChipListbox {
+   name: string = 'Test';
+@@ -975,16 +974,16 @@ class StandardChipListbox {
+ 
+ @Component({
+   template: `
+-      <mat-chip-listbox [formControl]="control" [required]="isRequired"
+-        [tabIndex]="tabIndexOverride" [selectable]="selectable">
+-        @for (food of foods; track food) {
+-          <mat-chip-option [value]="food.value" [disabled]="food.disabled">
+-            {{ food.viewValue }}
+-          </mat-chip-option>
+-        }
+-      </mat-chip-listbox>
++    <mat-chip-listbox [formControl]="control" [required]="isRequired"
++      [tabIndex]="tabIndexOverride" [selectable]="selectable">
++      @for (food of foods; track food) {
++        <mat-chip-option [value]="food.value" [disabled]="food.disabled">
++          {{ food.viewValue }}
++        </mat-chip-option>
++      }
++    </mat-chip-listbox>
+   `,
+-  standalone: false,
++  imports: [MatChipListbox, MatChipOption, ReactiveFormsModule],
+ })
+ class BasicChipListbox {
+   foods: any[] = [
+@@ -1008,17 +1007,17 @@ class BasicChipListbox {
+ 
+ @Component({
+   template: `
+-      <mat-chip-listbox [multiple]="true" [formControl]="control"
+-        [required]="isRequired"
+-        [tabIndex]="tabIndexOverride" [selectable]="selectable">
+-        @for (food of foods; track food) {
+-          <mat-chip-option [value]="food.value" [disabled]="food.disabled">
+-            {{ food.viewValue }}
+-          </mat-chip-option>
+-        }
+-      </mat-chip-listbox>
++    <mat-chip-listbox [multiple]="true" [formControl]="control"
++      [required]="isRequired"
++      [tabIndex]="tabIndexOverride" [selectable]="selectable">
++      @for (food of foods; track food) {
++        <mat-chip-option [value]="food.value" [disabled]="food.disabled">
++          {{ food.viewValue }}
++        </mat-chip-option>
++      }
++    </mat-chip-listbox>
+   `,
+-  standalone: false,
++  imports: [MatChipListbox, MatChipOption, ReactiveFormsModule],
+ })
+ class MultiSelectionChipListbox {
+   foods: any[] = [
+@@ -1042,13 +1041,13 @@ class MultiSelectionChipListbox {
+ 
+ @Component({
+   template: `
+-      <mat-chip-listbox [multiple]="true" [formControl]="control">
+-        <mat-chip-option *ngFor="let chip of chips$ | async" [value]="chip">
+-          {{ chip }}
+-        </mat-chip-option>
+-      </mat-chip-listbox>
++    <mat-chip-listbox [multiple]="true" [formControl]="control">
++      @for (chip of chips$ | async; track $index) {
++        <mat-chip-option [value]="chip">{{ chip }}</mat-chip-option>
++      }
++    </mat-chip-listbox>
+   `,
+-  standalone: false,
++  imports: [MatChipListbox, MatChipOption, AsyncPipe, ReactiveFormsModule],
+ })
+ class AsyncMultiSelectionChipListbox {
+   private _chipsSubject = new BehaviorSubject(['tutorial-1', 'tutorial-2', 'tutorial-3']);
+@@ -1064,13 +1063,13 @@ class AsyncMultiSelectionChipListbox {
+ 
+ @Component({
+   template: `
+-      <mat-chip-listbox [formControl]="control">
+-        @for (food of foods; track food) {
+-          <mat-chip-option [value]="food.value">{{ food.viewValue }}</mat-chip-option>
+-        }
+-      </mat-chip-listbox>
++    <mat-chip-listbox [formControl]="control">
++      @for (food of foods; track food) {
++        <mat-chip-option [value]="food.value">{{ food.viewValue }}</mat-chip-option>
++      }
++    </mat-chip-listbox>
+   `,
+-  standalone: false,
++  imports: [MatChipListbox, MatChipOption, ReactiveFormsModule],
+ })
+ class FalsyValueChipListbox {
+   foods: any[] = [
+@@ -1091,7 +1090,7 @@ class FalsyValueChipListbox {
+       }
+     </mat-chip-listbox>
+   `,
+-  standalone: false,
++  imports: [MatChipListbox, MatChipOption],
+ })
+ class SelectedChipListbox {
+   foods: any[] = [
+@@ -1104,16 +1103,16 @@ class SelectedChipListbox {
+ 
+ @Component({
+   template: `
+-      <mat-chip-listbox [formControl]="control" [required]="isRequired"
+-        [tabIndex]="tabIndexOverride" [selectable]="selectable">
+-        @for (food of foods; track food) {
+-          <mat-chip-option [value]="food.value" [disabled]="food.disabled">
+-            {{ food.viewValue }}
+-          </mat-chip-option>
+-        }
+-      </mat-chip-listbox>
++    <mat-chip-listbox [formControl]="control" [required]="isRequired"
++      [tabIndex]="tabIndexOverride" [selectable]="selectable">
++      @for (food of foods; track food) {
++        <mat-chip-option [value]="food.value" [disabled]="food.disabled">
++          {{ food.viewValue }}
++        </mat-chip-option>
++      }
++    </mat-chip-listbox>
+   `,
+-  standalone: false,
++  imports: [MatChipListbox, MatChipOption, ReactiveFormsModule],
+ })
+ class FalsyBasicChipListbox {
+   foods: any[] = [
+@@ -1144,7 +1143,7 @@ class FalsyBasicChipListbox {
+       </mat-chip-listbox>
+     </form>
+   `,
+-  standalone: false,
++  imports: [MatChipListbox, MatChipOption, FormsModule],
+ })
+ class IndividuallyDisabledChipInsideForm {
+   @ViewChild(MatChipOption) chip: MatChipOption;
+diff --git a/src/material/chips/chip-option.spec.ts b/src/material/chips/chip-option.spec.ts
+index f8dfb891ef57ae834c47fc47f7bf836cd8ff54ac..70338f81d2155251fda7ba3f099dd8102b3c731f 100644
+--- a/src/material/chips/chip-option.spec.ts
++++ b/src/material/chips/chip-option.spec.ts
+@@ -10,12 +10,12 @@ import {By} from '@angular/platform-browser';
+ import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions} from '../core';
+ import {
+   MAT_CHIPS_DEFAULT_OPTIONS,
++  MatChipAvatar,
+   MatChipEvent,
+   MatChipListbox,
+   MatChipOption,
+   MatChipSelectionChange,
+   MatChipsDefaultOptions,
+-  MatChipsModule,
+ } from './index';
+ 
+ describe('Option Chips', () => {
+@@ -36,13 +36,11 @@ describe('Option Chips', () => {
+     };
+ 
+     TestBed.configureTestingModule({
+-      imports: [MatChipsModule],
+       providers: [
+         {provide: MAT_RIPPLE_GLOBAL_OPTIONS, useFactory: () => globalRippleOptions},
+         provideFakeDirectionality('ltr'),
+         {provide: MAT_CHIPS_DEFAULT_OPTIONS, useFactory: () => defaultOptions},
+       ],
+-      declarations: [SingleChip],
+     });
+   }));
+ 
+@@ -419,7 +417,7 @@ describe('Option Chips', () => {
+         </div>
+       }
+     </mat-chip-listbox>`,
+-  standalone: false,
++  imports: [MatChipListbox, MatChipOption, MatChipAvatar],
+ })
+ class SingleChip {
+   @ViewChild(MatChipListbox) chipList: MatChipListbox;
+diff --git a/src/material/datepicker/calendar.spec.ts b/src/material/datepicker/calendar.spec.ts
+index b3ae64ce8d3b03d47e0a3f662796b477083466ee..76149d06b2c21e618f3c5833916863a338a53395 100644
+--- a/src/material/datepicker/calendar.spec.ts
++++ b/src/material/datepicker/calendar.spec.ts
+@@ -8,11 +8,10 @@ import {
+ import {Component} from '@angular/core';
+ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {DateAdapter, MatNativeDateModule} from '../core';
++import {DateAdapter, provideNativeDateAdapter} from '../core';
+ import {DEC, FEB, JAN, JUL, NOV} from '../testing';
+ import {MatCalendar} from './calendar';
+ import {MatDatepickerIntl} from './datepicker-intl';
+-import {MatDatepickerModule} from './datepicker-module';
+ 
+ describe('MatCalendar', () => {
+   let adapter: DateAdapter<Date>;
+@@ -20,15 +19,7 @@ describe('MatCalendar', () => {
+ 
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatNativeDateModule, MatDatepickerModule],
+-      providers: [MatDatepickerIntl, provideFakeDirectionality('ltr')],
+-      declarations: [
+-        // Test components.
+-        StandardCalendar,
+-        CalendarWithMinMax,
+-        CalendarWithDateFilter,
+-        CalendarWithSelectableMinDate,
+-      ],
++      providers: [MatDatepickerIntl, provideFakeDirectionality('ltr'), provideNativeDateAdapter()],
+     });
+ 
+     adapter = TestBed.inject(DateAdapter);
+@@ -650,7 +641,7 @@ describe('MatCalendar', () => {
+         (yearSelected)="selectedYear=$event"
+         (monthSelected)="selectedMonth=$event">
+     </mat-calendar>`,
+-  standalone: false,
++  imports: [MatCalendar],
+ })
+ class StandardCalendar {
+   selected: Date;
+@@ -663,7 +654,7 @@ class StandardCalendar {
+   template: `
+     <mat-calendar [startAt]="startAt" [minDate]="minDate" [maxDate]="maxDate"></mat-calendar>
+   `,
+-  standalone: false,
++  imports: [MatCalendar],
+ })
+ class CalendarWithMinMax {
+   startAt: Date;
+@@ -676,7 +667,7 @@ class CalendarWithMinMax {
+     <mat-calendar [startAt]="startDate" [(selected)]="selected" [dateFilter]="dateFilter">
+     </mat-calendar>
+   `,
+-  standalone: false,
++  imports: [MatCalendar],
+ })
+ class CalendarWithDateFilter {
+   selected: Date;
+@@ -696,7 +687,7 @@ class CalendarWithDateFilter {
+       [minDate]="selected">
+     </mat-calendar>
+   `,
+-  standalone: false,
++  imports: [MatCalendar],
+ })
+ class CalendarWithSelectableMinDate {
+   startAt = new Date(2018, JUL, 0);
+diff --git a/src/material/datepicker/datepicker-actions.spec.ts b/src/material/datepicker/datepicker-actions.spec.ts
+index a513b7440efa875e22ff8572fcc6ab9e5ac7950b..88e5fa4be4c27b7527059a91f9b6870c4d91286b 100644
+--- a/src/material/datepicker/datepicker-actions.spec.ts
++++ b/src/material/datepicker/datepicker-actions.spec.ts
+@@ -1,25 +1,19 @@
+ import {Component, ElementRef, Type, ViewChild} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+-import {MATERIAL_ANIMATIONS, MatNativeDateModule} from '../core';
+-import {MatFormFieldModule} from '../form-field';
++import {FormControl, ReactiveFormsModule} from '@angular/forms';
++import {MATERIAL_ANIMATIONS, provideNativeDateAdapter} from '../core';
+ import {MatInputModule} from '../input';
+ import {MatDatepicker} from './datepicker';
+ import {MatDatepickerModule} from './datepicker-module';
++import {MatButtonModule} from '../button';
+ 
+ describe('MatDatepickerActions', () => {
+   function createComponent<T>(component: Type<T>): ComponentFixture<T> {
+     TestBed.configureTestingModule({
+-      declarations: [component],
+-      imports: [
+-        FormsModule,
+-        MatDatepickerModule,
+-        MatFormFieldModule,
+-        MatInputModule,
+-        ReactiveFormsModule,
+-        MatNativeDateModule,
++      providers: [
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++        provideNativeDateAdapter(),
+       ],
+-      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
+     });
+ 
+     return TestBed.createComponent(component);
+@@ -303,7 +297,7 @@ describe('MatDatepickerActions', () => {
+       </mat-datepicker>
+     </mat-form-field>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerModule, MatInputModule, MatButtonModule, ReactiveFormsModule],
+ })
+ class DatepickerWithActions {
+   @ViewChild(MatDatepicker) datepicker: MatDatepicker<Date>;
+diff --git a/src/material/datepicker/datepicker.spec.ts b/src/material/datepicker/datepicker.spec.ts
+index 9f3896b1de56c90fcf5046b5226a58b2e91f3181..e2fefcad062f426b68943171595ba508c5e0fceb 100644
+--- a/src/material/datepicker/datepicker.spec.ts
++++ b/src/material/datepicker/datepicker.spec.ts
+@@ -43,18 +43,18 @@ import {
+ import {By} from '@angular/platform-browser';
+ import {Subject} from 'rxjs';
+ import {MATERIAL_ANIMATIONS, MAT_DATE_LOCALE, MatNativeDateModule, NativeDateModule} from '../core';
+-import {MatFormField, MatFormFieldModule} from '../form-field';
++import {MatFormField} from '../form-field';
+ import {MatInputModule} from '../input';
+ import {DEC, JAN, JUL, JUN, SEP} from '../testing';
+ import {MatDatepicker} from './datepicker';
+ import {DatepickerDropdownPositionX, DatepickerDropdownPositionY} from './datepicker-base';
+ import {MatDatepickerInput} from './datepicker-input';
+-import {MatDatepickerToggle} from './datepicker-toggle';
++import {MatDatepickerToggle, MatDatepickerToggleIcon} from './datepicker-toggle';
+ import {
+   MAT_DATEPICKER_SCROLL_STRATEGY,
++  MatCalendarHeader,
+   MatDateSelectionModel,
+   MatDatepickerIntl,
+-  MatDatepickerModule,
+ } from './index';
+ 
+ describe('MatDatepicker', () => {
+@@ -65,22 +65,13 @@ describe('MatDatepicker', () => {
+     component: Type<T>,
+     imports: Type<any>[] = [],
+     providers: Provider[] = [],
+-    declarations: Type<any>[] = [],
+   ): ComponentFixture<T> {
+     TestBed.configureTestingModule({
+-      imports: [
+-        FormsModule,
+-        MatDatepickerModule,
+-        MatFormFieldModule,
+-        MatInputModule,
+-        ReactiveFormsModule,
+-        ...imports,
+-      ],
++      imports,
+       providers: [
+         ...providers,
+         {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+-      declarations: [component, ...declarations],
+     });
+ 
+     return TestBed.createComponent(component);
+@@ -2360,12 +2351,7 @@ describe('MatDatepicker', () => {
+     let testComponent: DatepickerWithCustomHeader;
+ 
+     beforeEach(fakeAsync(() => {
+-      fixture = createComponent(
+-        DatepickerWithCustomHeader,
+-        [MatNativeDateModule],
+-        [],
+-        [CustomHeaderForDatepicker],
+-      );
++      fixture = createComponent(DatepickerWithCustomHeader, [MatNativeDateModule]);
+       fixture.detectChanges();
+       testComponent = fixture.componentInstance;
+     }));
+@@ -2396,12 +2382,7 @@ describe('MatDatepicker', () => {
+   });
+ 
+   it('should not trigger validators if new date object for same date is set for `min`', () => {
+-    const fixture = createComponent(
+-      DatepickerInputWithCustomValidator,
+-      [MatNativeDateModule],
+-      undefined,
+-      [CustomValidator],
+-    );
++    const fixture = createComponent(DatepickerInputWithCustomValidator, [MatNativeDateModule]);
+     fixture.detectChanges();
+     const minDate = new Date(2019, 0, 1);
+     const validator = fixture.componentInstance.validator;
+@@ -2420,12 +2401,7 @@ describe('MatDatepicker', () => {
+   });
+ 
+   it('should not trigger validators if new date object for same date is set for `max`', () => {
+-    const fixture = createComponent(
+-      DatepickerInputWithCustomValidator,
+-      [MatNativeDateModule],
+-      undefined,
+-      [CustomValidator],
+-    );
++    const fixture = createComponent(DatepickerInputWithCustomValidator, [MatNativeDateModule]);
+     fixture.detectChanges();
+     const maxDate = new Date(2120, 0, 1);
+     const validator = fixture.componentInstance.validator;
+@@ -2560,7 +2536,7 @@ const inputFixedWidthStyles = `
+       [yPosition]="yPosition"></mat-datepicker>
+   `,
+   styles: inputFixedWidthStyles,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker],
+ })
+ class StandardDatepicker {
+   opened = false;
+@@ -2579,13 +2555,13 @@ class StandardDatepicker {
+   template: `
+     <input [matDatepicker]="d"><input [matDatepicker]="d"><mat-datepicker #d></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker],
+ })
+ class MultiInputDatepicker {}
+ 
+ @Component({
+   template: `<mat-datepicker #d></mat-datepicker>`,
+-  standalone: false,
++  imports: [MatDatepicker],
+ })
+ class NoInputDatepicker {
+   @ViewChild('d') datepicker: MatDatepicker<Date>;
+@@ -2596,7 +2572,7 @@ class NoInputDatepicker {
+     <input [matDatepicker]="d" [value]="date">
+     <mat-datepicker #d [startAt]="startDate"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker],
+ })
+ class DatepickerWithStartAt {
+   date = new Date(2020, JAN, 1);
+@@ -2609,7 +2585,7 @@ class DatepickerWithStartAt {
+     <input [matDatepicker]="d" [value]="date">
+     <mat-datepicker #d startView="year" (monthSelected)="onYearSelection()"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker],
+ })
+ class DatepickerWithStartViewYear {
+   date = new Date(2020, JAN, 1);
+@@ -2624,7 +2600,7 @@ class DatepickerWithStartViewYear {
+     <mat-datepicker #d startView="multi-year"
+         (yearSelected)="onMultiYearSelection()"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker],
+ })
+ class DatepickerWithStartViewMultiYear {
+   date = new Date(2020, JAN, 1);
+@@ -2638,7 +2614,7 @@ class DatepickerWithStartViewMultiYear {
+     <input [(ngModel)]="selected" [matDatepicker]="d">
+     <mat-datepicker #d></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, FormsModule],
+ })
+ class DatepickerWithNgModel {
+   selected: Date | null = null;
+@@ -2652,7 +2628,7 @@ class DatepickerWithNgModel {
+     <mat-datepicker-toggle [for]="d"></mat-datepicker-toggle>
+     <mat-datepicker #d></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, MatDatepickerToggle, ReactiveFormsModule],
+ })
+ class DatepickerWithFormControl {
+   formControl = new FormControl<Date | null>(null);
+@@ -2667,7 +2643,7 @@ class DatepickerWithFormControl {
+     <mat-datepicker-toggle [for]="d" [aria-label]="ariaLabel"></mat-datepicker-toggle>
+     <mat-datepicker #d [touchUi]="touchUI" [restoreFocus]="restoreFocus"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, MatDatepickerToggle],
+ })
+ class DatepickerWithToggle {
+   @ViewChild('d') datepicker: MatDatepicker<Date>;
+@@ -2684,7 +2660,7 @@ class DatepickerWithToggle {
+     <mat-datepicker-toggle [for]="d" [aria-label]="ariaLabel"></mat-datepicker-toggle>
+     <mat-datepicker #d [touchUi]="touchUI" [restoreFocus]="restoreFocus"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, MatDatepickerToggle],
+ })
+ class DatepickerWithToggleInShadowDom extends DatepickerWithToggle {}
+ 
+@@ -2696,19 +2672,19 @@ class DatepickerWithToggleInShadowDom extends DatepickerWithToggle {}
+     </mat-datepicker-toggle>
+     <mat-datepicker #d></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, MatDatepickerToggle],
+ })
+ class DatepickerWithCustomIcon {}
+ 
+ @Component({
+   template: `
+-      <mat-form-field>
+-        <mat-label>Pick a date</mat-label>
+-        <input matInput [matDatepicker]="d">
+-        <mat-datepicker #d></mat-datepicker>
+-      </mat-form-field>
++    <mat-form-field>
++      <mat-label>Pick a date</mat-label>
++      <input matInput [matDatepicker]="d">
++      <mat-datepicker #d></mat-datepicker>
++    </mat-form-field>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, MatInputModule],
+ })
+ class FormFieldDatepicker {
+   @ViewChild('d') datepicker: MatDatepicker<Date>;
+@@ -2722,7 +2698,7 @@ class FormFieldDatepicker {
+     <mat-datepicker-toggle [for]="d"></mat-datepicker-toggle>
+     <mat-datepicker #d></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, MatDatepickerToggle, FormsModule],
+ })
+ class DatepickerWithMinAndMaxValidation {
+   @ViewChild('d') datepicker: MatDatepicker<Date>;
+@@ -2738,7 +2714,7 @@ class DatepickerWithMinAndMaxValidation {
+     <mat-datepicker-toggle [for]="d"></mat-datepicker-toggle>
+     <mat-datepicker #d [touchUi]="true"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, MatDatepickerToggle, FormsModule],
+ })
+ class DatepickerWithFilterAndValidation {
+   @ViewChild('d') datepicker: MatDatepicker<Date>;
+@@ -2753,17 +2729,14 @@ class DatepickerWithFilterAndValidation {
+            (dateChange)="onDateChange()" (dateInput)="onDateInput()">
+     <mat-datepicker #d [touchUi]="true"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker],
+ })
+ class DatepickerWithChangeAndInputEvents {
+   @ViewChild('d') datepicker: MatDatepicker<Date>;
+ 
+   onChange() {}
+-
+   onInput() {}
+-
+   onDateChange() {}
+-
+   onDateInput() {}
+ }
+ 
+@@ -2772,7 +2745,7 @@ class DatepickerWithChangeAndInputEvents {
+     <input [matDatepicker]="d" [(ngModel)]="date">
+     <mat-datepicker #d></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, FormsModule],
+ })
+ class DatepickerWithi18n {
+   date: Date | null = new Date(2010, JAN, 1);
+@@ -2785,7 +2758,7 @@ class DatepickerWithi18n {
+     <input [matDatepicker]="d" [(ngModel)]="value" [min]="min" [max]="max">
+     <mat-datepicker #d [startAt]="startAt"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, FormsModule],
+ })
+ class DatepickerWithISOStrings {
+   value = new Date(2017, JUN, 1).toISOString();
+@@ -2801,7 +2774,7 @@ class DatepickerWithISOStrings {
+     <input [(ngModel)]="selected" [matDatepicker]="d">
+     <mat-datepicker (opened)="openedSpy()" (closed)="closedSpy()" #d></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, FormsModule],
+ })
+ class DatepickerWithEvents {
+   selected: Date | null = null;
+@@ -2815,7 +2788,7 @@ class DatepickerWithEvents {
+     <input (focus)="d.open()" [matDatepicker]="d">
+     <mat-datepicker #d="matDatepicker"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker],
+ })
+ class DatepickerOpeningOnFocus {
+   @ViewChild(MatDatepicker) datepicker: MatDatepicker<Date>;
+@@ -2826,7 +2799,7 @@ class DatepickerOpeningOnFocus {
+     <input [matDatepicker]="ch">
+     <mat-datepicker #ch [calendarHeaderComponent]="customHeaderForDatePicker"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker],
+ })
+ class DatepickerWithCustomHeader {
+   @ViewChild('ch') datepicker: MatDatepicker<Date>;
+@@ -2838,7 +2811,7 @@ class DatepickerWithCustomHeader {
+     <div class="custom-element">Custom element</div>
+     <mat-calendar-header></mat-calendar-header>
+   `,
+-  standalone: false,
++  imports: [MatCalendarHeader],
+ })
+ class CustomHeaderForDatepicker {}
+ 
+@@ -2847,7 +2820,7 @@ class CustomHeaderForDatepicker {}
+     <input [matDatepicker]="assignedDatepicker" [value]="date">
+     <mat-datepicker #d [touchUi]="touch"></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker],
+ })
+ class DelayedDatepicker {
+   @ViewChild('d') datepicker: MatDatepicker<Date>;
+@@ -2864,25 +2837,21 @@ class DelayedDatepicker {
+     </mat-datepicker-toggle>
+     <mat-datepicker #d></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, MatDatepickerToggle, MatDatepickerToggleIcon],
+ })
+ class DatepickerWithTabindexOnToggle {
+   disabled = false;
+ }
+ 
+ @Component({
+-  template: `
+-    <mat-datepicker-toggle></mat-datepicker-toggle>
+-  `,
+-  standalone: false,
++  template: `<mat-datepicker-toggle/>`,
++  imports: [MatDatepickerToggle],
+ })
+ class DatepickerToggleWithNoDatepicker {}
+ 
+ @Component({
+-  template: `
+-    <input [matDatepicker]="d">
+-  `,
+-  standalone: false,
++  template: `<input [matDatepicker]="d">`,
++  imports: [MatDatepickerInput],
+ })
+ class DatepickerInputWithNoDatepicker {}
+ 
+@@ -2895,7 +2864,6 @@ class DatepickerInputWithNoDatepicker {}
+       multi: true,
+     },
+   ],
+-  standalone: false,
+ })
+ class CustomValidator implements Validator {
+   validate = jasmine.createSpy('validate spy').and.returnValue(null);
+@@ -2906,7 +2874,7 @@ class CustomValidator implements Validator {
+     <input [matDatepicker]="d" [(ngModel)]="value" [min]="min" [max]="max" customValidator>
+     <mat-datepicker #d></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker, CustomValidator, FormsModule],
+ })
+ class DatepickerInputWithCustomValidator {
+   @ViewChild(CustomValidator) validator: CustomValidator;
+@@ -2920,10 +2888,10 @@ class DatepickerInputWithCustomValidator {
+   <input [matDatepicker]="d" [value]="date">
+   <mat-datepicker [panelClass]="panelClass" touchUi #d></mat-datepicker>
+   `,
+-  standalone: false,
++  imports: [MatDatepickerInput, MatDatepicker],
+ })
+ class PanelClassDatepicker {
+   date = new Date(0);
+-  panelClass: any;
++  panelClass: string | string[] | undefined;
+   @ViewChild('d') datepicker: MatDatepicker<Date>;
+ }
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index 96bbb691f6c5a63aafcabc8a3a94eaada2f204d0..d7cec2f244320222d7a798435c679a8e112ed777 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -2287,7 +2287,6 @@ class DirectiveWithViewContainer {
+ @Component({
+   changeDetection: ChangeDetectionStrategy.OnPush,
+   template: 'hello',
+-  standalone: false,
+ })
+ class ComponentWithOnPushViewContainer {
+   viewContainerRef = inject(ViewContainerRef);
+@@ -2429,7 +2428,6 @@ class DialogWithoutFocusableElements {}
+ @Component({
+   template: `<button>I'm a button</button>`,
+   encapsulation: ViewEncapsulation.ShadowDom,
+-  standalone: false,
+ })
+ class ShadowDomComponent {}
+ 
+diff --git a/src/material/icon/icon.spec.ts b/src/material/icon/icon.spec.ts
+index a0f9aa45ca1630b5bac49a318ebe67acf176b0d1..9f2ac51ea8e8b72c3cf294d39d321aed2799dbff 100644
+--- a/src/material/icon/icon.spec.ts
++++ b/src/material/icon/icon.spec.ts
+@@ -1364,18 +1364,13 @@ describe('MatIcon without HttpClientModule', () => {
+ 
+   @Component({
+     template: `<mat-icon [svgIcon]="iconName"></mat-icon>`,
+-    standalone: false,
++    imports: [MatIcon],
+   })
+   class IconFromSvgName {
+     iconName: string | undefined = '';
+   }
+ 
+   beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatIconModule],
+-      declarations: [IconFromSvgName],
+-    });
+-
+     iconRegistry = TestBed.inject(MatIconRegistry);
+     sanitizer = TestBed.inject(DomSanitizer);
+   }));
+diff --git a/src/material/paginator/paginator.spec.ts b/src/material/paginator/paginator.spec.ts
+index 9f141ef2b04aee4f2b4be65ec684348473887b56..e9d63c7afcb4c7423fbfbee80ff6448ece9de75c 100644
+--- a/src/material/paginator/paginator.spec.ts
++++ b/src/material/paginator/paginator.spec.ts
+@@ -3,20 +3,13 @@ import {ComponentFixture, TestBed, fakeAsync, tick} from '@angular/core/testing'
+ import {ThemePalette} from '../core';
+ import {MatSelect} from '../select';
+ import {By} from '@angular/platform-browser';
+-import {
+-  MatPaginator,
+-  MatPaginatorIntl,
+-  MatPaginatorModule,
+-  MatPaginatorSelectConfig,
+-} from './index';
++import {MatPaginator, MatPaginatorIntl, MatPaginatorSelectConfig} from './index';
+ import {MAT_PAGINATOR_DEFAULT_OPTIONS, MatPaginatorDefaultOptions} from './paginator';
+ 
+ describe('MatPaginator', () => {
+   function createComponent<T>(type: Type<T>, providers: Provider[] = []): ComponentFixture<T> {
+     TestBed.configureTestingModule({
+-      imports: [MatPaginatorModule],
+       providers: [MatPaginatorIntl, ...providers],
+-      declarations: [type],
+     });
+ 
+     const fixture = TestBed.createComponent(type);
+@@ -652,7 +645,7 @@ function getLastButton(fixture: ComponentFixture<any>): HTMLButtonElement {
+                    (page)="pageEvent($event)">
+     </mat-paginator>
+   `,
+-  standalone: false,
++  imports: [MatPaginator],
+ })
+ class MatPaginatorApp {
+   pageIndex = 0;
+@@ -677,30 +670,24 @@ class MatPaginatorApp {
+ }
+ 
+ @Component({
+-  template: `
+-    <mat-paginator></mat-paginator>
+-  `,
+-  standalone: false,
++  template: `<mat-paginator/>`,
++  imports: [MatPaginator],
+ })
+ class MatPaginatorWithoutInputsApp {
+   @ViewChild(MatPaginator) paginator: MatPaginator;
+ }
+ 
+ @Component({
+-  template: `
+-    <mat-paginator [pageSizeOptions]="[10, 20, 30]"></mat-paginator>
+-  `,
+-  standalone: false,
++  template: `<mat-paginator [pageSizeOptions]="[10, 20, 30]"/>`,
++  imports: [MatPaginator],
+ })
+ class MatPaginatorWithoutPageSizeApp {
+   @ViewChild(MatPaginator) paginator: MatPaginator;
+ }
+ 
+ @Component({
+-  template: `
+-    <mat-paginator [pageSize]="10"></mat-paginator>
+-  `,
+-  standalone: false,
++  template: `<mat-paginator [pageSize]="10"/>`,
++  imports: [MatPaginator],
+ })
+ class MatPaginatorWithoutOptionsApp {
+   @ViewChild(MatPaginator) paginator: MatPaginator;
+@@ -714,18 +701,15 @@ class MatPaginatorWithoutOptionsApp {
+                    length="100">
+     </mat-paginator>
+   `,
+-  standalone: false,
++  imports: [MatPaginator],
+ })
+ class MatPaginatorWithStringValues {
+   @ViewChild(MatPaginator) paginator: MatPaginator;
+ }
+ 
+ @Component({
+-  template: `
+-    <mat-paginator [pageSizeOptions]="pageSizeOptions">
+-    </mat-paginator>
+-  `,
+-  standalone: false,
++  template: `<mat-paginator [pageSizeOptions]="pageSizeOptions"/>`,
++  imports: [MatPaginator],
+ })
+ class MatPaginatorWithReadonlyOptions {
+   @ViewChild(MatPaginator) paginator: MatPaginator;
+diff --git a/src/material/stepper/stepper.spec.ts b/src/material/stepper/stepper.spec.ts
+index b66beebe99f40b30c4c494262df90de3475bfd4e..ad62b508bb8e4ab752efefc4736e66049ad4e56e 100644
+--- a/src/material/stepper/stepper.spec.ts
++++ b/src/material/stepper/stepper.spec.ts
+@@ -50,7 +50,6 @@ import {By} from '@angular/platform-browser';
+ import {Observable, Subject, merge} from 'rxjs';
+ import {map, take} from 'rxjs/operators';
+ import {MATERIAL_ANIMATIONS, MatRipple, ThemePalette} from '../core';
+-import {MatFormFieldModule} from '../form-field';
+ import {MatInputModule} from '../input';
+ import {MatStepHeader, MatStepperModule} from './index';
+ import {MatStep, MatStepper} from './stepper';
+@@ -265,7 +264,7 @@ describe('MatStepper', () => {
+ 
+       fixture.destroy();
+       TestBed.resetTestingModule();
+-      fixture = createComponent(SimpleMatVerticalStepperApp, [], [], ViewEncapsulation.ShadowDom);
++      fixture = createComponent(SimpleMatVerticalStepperApp, [], ViewEncapsulation.ShadowDom);
+       fixture.detectChanges();
+ 
+       const stepper = fixture.componentInstance.stepper;
+@@ -591,7 +590,7 @@ describe('MatStepper', () => {
+     let stepper: MatStepper;
+ 
+     beforeEach(() => {
+-      fixture = createComponent(LinearMatVerticalStepperApp, [], [], undefined, []);
++      fixture = createComponent(LinearMatVerticalStepperApp);
+       fixture.detectChanges();
+ 
+       testComponent = fixture.componentInstance;
+@@ -1307,16 +1306,12 @@ describe('MatStepper', () => {
+     let stepper: MatStepper;
+ 
+     function createFixture(showErrorByDefault: boolean | undefined) {
+-      fixture = createComponent(
+-        MatHorizontalStepperWithErrorsApp,
+-        [
+-          {
+-            provide: STEPPER_GLOBAL_OPTIONS,
+-            useValue: {showError: showErrorByDefault},
+-          },
+-        ],
+-        [MatFormFieldModule, MatInputModule],
+-      );
++      fixture = createComponent(MatHorizontalStepperWithErrorsApp, [
++        {
++          provide: STEPPER_GLOBAL_OPTIONS,
++          useValue: {showError: showErrorByDefault},
++        },
++      ]);
+       fixture.detectChanges();
+       stepper = fixture.debugElement.query(By.css('mat-stepper'))!.componentInstance;
+     }
+@@ -1370,16 +1365,12 @@ describe('MatStepper', () => {
+     let stepper: MatStepper;
+ 
+     beforeEach(() => {
+-      fixture = createComponent(
+-        MatHorizontalStepperWithErrorsApp,
+-        [
+-          {
+-            provide: STEPPER_GLOBAL_OPTIONS,
+-            useValue: {displayDefaultIndicatorType: false},
+-          },
+-        ],
+-        [MatFormFieldModule, MatInputModule],
+-      );
++      fixture = createComponent(MatHorizontalStepperWithErrorsApp, [
++        {
++          provide: STEPPER_GLOBAL_OPTIONS,
++          useValue: {displayDefaultIndicatorType: false},
++        },
++      ]);
+       fixture.detectChanges();
+       stepper = fixture.debugElement.query(By.css('mat-stepper'))!.componentInstance;
+     });
+@@ -1765,18 +1756,14 @@ function asyncValidator(minLength: number, validationTrigger: Subject<void>): As
+ function createComponent<T>(
+   component: Type<T>,
+   providers: Provider[] = [],
+-  imports: any[] = [],
+   encapsulation?: ViewEncapsulation,
+-  declarations = [component],
+ ): ComponentFixture<T> {
+   TestBed.configureTestingModule({
+-    imports: [MatStepperModule, ReactiveFormsModule, ...imports],
+     providers: [
+       provideFakeDirectionality(dir),
+       {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ...providers,
+     ],
+-    declarations,
+   });
+ 
+   if (encapsulation != null) {
+@@ -1801,22 +1788,22 @@ function createComponent<T>(
+           <mat-error>This field is required</mat-error>
+         </mat-form-field>
+         <div>
+-          <button matButton matStepperPrevious>Back</button>
+-          <button matButton matStepperNext>Next</button>
++          <button matStepperPrevious>Back</button>
++          <button matStepperNext>Next</button>
+         </div>
+       </mat-step>
+       <mat-step>
+         <ng-template matStepLabel>Step 2</ng-template>
+         Content 2
+         <div>
+-          <button matButton matStepperPrevious>Back</button>
+-          <button matButton matStepperNext>Next</button>
++          <button matStepperPrevious>Back</button>
++          <button matStepperNext>Next</button>
+         </div>
+       </mat-step>
+     </mat-stepper>
+   </form>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule, MatInputModule, ReactiveFormsModule],
+ })
+ class MatHorizontalStepperWithErrorsApp {
+   private readonly _formBuilder = inject(FormBuilder);
+@@ -1837,28 +1824,28 @@ class MatHorizontalStepperWithErrorsApp {
+         <ng-template matStepLabel>Step 1</ng-template>
+         Content 1
+         <div>
+-          <button matButton matStepperPrevious>Back</button>
+-          <button matButton matStepperNext>Next</button>
++          <button matStepperPrevious>Back</button>
++          <button matStepperNext>Next</button>
+         </div>
+       </mat-step>
+       <mat-step [color]="secondStepTheme()">
+         <ng-template matStepLabel>Step 2</ng-template>
+         Content 2
+         <div>
+-          <button matButton matStepperPrevious>Back</button>
+-          <button matButton matStepperNext>Next</button>
++          <button matStepperPrevious>Back</button>
++          <button matStepperNext>Next</button>
+         </div>
+       </mat-step>
+       <mat-step [label]="inputLabel" optional>
+         Content 3
+         <div>
+-          <button matButton matStepperPrevious>Back</button>
+-          <button matButton matStepperNext>Next</button>
++          <button matStepperPrevious>Back</button>
++          <button matStepperNext>Next</button>
+         </div>
+       </mat-step>
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class SimpleMatHorizontalStepperApp {
+   @ViewChild(MatStepper) stepper: MatStepper;
+@@ -1876,8 +1863,8 @@ class SimpleMatHorizontalStepperApp {
+         <ng-template matStepLabel>Step 1</ng-template>
+         Content 1
+         <div>
+-          <button matButton matStepperPrevious>Back</button>
+-          <button matButton matStepperNext>Next</button>
++          <button matStepperPrevious>Back</button>
++          <button matStepperNext>Next</button>
+         </div>
+       </mat-step>
+       @if (showStepTwo()) {
+@@ -1885,21 +1872,21 @@ class SimpleMatHorizontalStepperApp {
+           <ng-template matStepLabel>Step 2</ng-template>
+           Content 2
+           <div>
+-            <button matButton matStepperPrevious>Back</button>
+-            <button matButton matStepperNext>Next</button>
++            <button matStepperPrevious>Back</button>
++            <button matStepperNext>Next</button>
+           </div>
+         </mat-step>
+       }
+       <mat-step [label]="inputLabel()">
+         Content 3
+         <div>
+-          <button matButton matStepperPrevious>Back</button>
+-          <button matButton matStepperNext>Next</button>
++          <button matStepperPrevious>Back</button>
++          <button matStepperNext>Next</button>
+         </div>
+       </mat-step>
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class SimpleMatVerticalStepperApp {
+   @ViewChild(MatStepper) stepper: MatStepper;
+@@ -1971,7 +1958,7 @@ class LinearMatVerticalStepperApp {
+       <mat-step label="Three"></mat-step>
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class SimplePreselectedMatHorizontalStepperApp {
+   @ViewChild(MatStepper) stepper: MatStepper;
+@@ -2017,7 +2004,6 @@ class SimplePreselectedMatHorizontalStepperApp {
+     </mat-stepper>
+   `,
+   imports: [ReactiveFormsModule, MatStepperModule],
+-  standalone: false,
+ })
+ class LinearMatVerticalStepperAppForAlreadyFilledForm {
+   @ViewChild(MatStepper) stepper: MatStepper;
+@@ -2042,7 +2028,7 @@ class LinearMatVerticalStepperAppForAlreadyFilledForm {
+       }
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class SimpleStepperWithoutStepControl {
+   @ViewChild(MatStepper) stepper: MatStepper;
+@@ -2064,7 +2050,7 @@ class SimpleStepperWithoutStepControl {
+       }
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class SimpleStepperWithStepControlAndCompletedBinding {
+   @ViewChild(MatStepper) stepper: MatStepper;
+@@ -2090,7 +2076,7 @@ class SimpleStepperWithStepControlAndCompletedBinding {
+       <mat-step>Content 3</mat-step>
+     </mat-stepper>
+ `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class IconOverridesStepper {
+   @ViewChild(MatStepper) stepper: MatStepper;
+@@ -2128,7 +2114,7 @@ class IconOverridesStepper {
+       <mat-step>Content 3</mat-step>
+     </mat-stepper>
+ `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class IndirectDescendantIconOverridesStepper extends IconOverridesStepper {}
+ 
+@@ -2140,7 +2126,7 @@ class IndirectDescendantIconOverridesStepper extends IconOverridesStepper {}
+       <mat-step label="Step 3" [stepControl]="controls[2]"></mat-step>
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class LinearStepperWithValidOptionalStep {
+   controls = [0, 0, 0].map(() => new FormControl(''));
+@@ -2153,7 +2139,7 @@ class LinearStepperWithValidOptionalStep {
+       <mat-step [aria-label]="ariaLabel()" [aria-labelledby]="ariaLabelledby()" label="One"></mat-step>
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class StepperWithAriaInputs {
+   ariaLabel = signal('');
+@@ -2170,7 +2156,7 @@ class StepperWithAriaInputs {
+       }
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class StepperWithIndirectDescendantSteps {
+   @ViewChild(MatStepper) stepper: MatStepper;
+@@ -2190,7 +2176,7 @@ class StepperWithIndirectDescendantSteps {
+       }
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class StepperWithNgIf {
+   showStep2 = signal(false);
+@@ -2209,7 +2195,7 @@ class StepperWithNgIf {
+       </mat-step>
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class NestedSteppers {
+   @ViewChildren(MatStepper) steppers: QueryList<MatStepper>;
+@@ -2223,7 +2209,7 @@ class NestedSteppers {
+       <mat-step label="Step 3">Content 3</mat-step>
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class StepperWithStaticOutOfBoundsIndex {
+   @ViewChild(MatStepper) stepper: MatStepper;
+@@ -2246,7 +2232,7 @@ class StepperWithStaticOutOfBoundsIndex {
+       </mat-step>
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class StepperWithLazyContent {
+   selectedIndex = signal(0);
+@@ -2262,7 +2248,7 @@ class StepperWithLazyContent {
+       <mat-step label="Step 3">Content 3</mat-step>
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class HorizontalStepperWithDelayedStep {
+   @ViewChild(MatStepper) stepper: MatStepper;
+@@ -2277,7 +2263,7 @@ class HorizontalStepperWithDelayedStep {
+       <mat-step label="Three"></mat-step>
+     </mat-stepper>
+   `,
+-  standalone: false,
++  imports: [MatStepperModule],
+ })
+ class StepperWithTwoWayBindingOnSelectedIndex {
+   index: number = 0;
+diff --git a/src/material/tree/tree-using-legacy-key-manager.spec.ts b/src/material/tree/tree-using-legacy-key-manager.spec.ts
+index 674cccd852a1449caeeea6202cae9faebc518dfa..1d41b33141cf5e9c2490da23d1bce15cc2df214d 100644
+--- a/src/material/tree/tree-using-legacy-key-manager.spec.ts
++++ b/src/material/tree/tree-using-legacy-key-manager.spec.ts
+@@ -10,12 +10,7 @@ describe('MatTree when provided LegacyTreeKeyManager', () => {
+   let fixture: ComponentFixture<SimpleMatTreeApp>;
+ 
+   beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      imports: [MatTreeModule],
+-      declarations: [SimpleMatTreeApp],
+-      providers: [NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER],
+-    });
+-
++    TestBed.configureTestingModule({providers: [NOOP_TREE_KEY_MANAGER_FACTORY_PROVIDER]});
+     fixture = TestBed.createComponent(SimpleMatTreeApp);
+     fixture.detectChanges();
+   });
+@@ -98,7 +93,7 @@ class MinimalTestData {
+       </mat-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class SimpleMatTreeApp {
+   isExpandable = (node: MinimalTestData) => node.children.length > 0;
+diff --git a/src/material/tree/tree-using-tree-control.spec.ts b/src/material/tree/tree-using-tree-control.spec.ts
+index 2bb9875a4b7303c1471fce6bcc566b5a7c98385d..cdff071e2daf08f460907bf14a53318c0dc43d5f 100644
+--- a/src/material/tree/tree-using-tree-control.spec.ts
++++ b/src/material/tree/tree-using-tree-control.spec.ts
+@@ -6,7 +6,8 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ import {FlatTreeControl, NestedTreeControl, TreeControl} from '@angular/cdk/tree';
+-import {Component, ViewChild, Type} from '@angular/core';
++import {Component, ViewChild} from '@angular/core';
++import {AsyncPipe} from '@angular/common';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {BehaviorSubject, Observable} from 'rxjs';
+ import {map} from 'rxjs/operators';
+@@ -21,30 +22,19 @@ import {
+ describe('MatTree', () => {
+   /** Represents an indent for expectNestedTreeToMatch */
+   const _ = {};
+-
+   let treeElement: HTMLElement;
+   let underlyingDataSource: FakeDataSource;
+ 
+-  function configureMatTreeTestingModule(declarations: Type<any>[]) {
+-    TestBed.configureTestingModule({
+-      imports: [MatTreeModule],
+-      declarations: declarations,
+-    });
+-  }
+-
+   describe('flat tree', () => {
+     describe('should initialize', () => {
+       let fixture: ComponentFixture<SimpleMatTreeApp>;
+       let component: SimpleMatTreeApp;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([SimpleMatTreeApp]);
+         fixture = TestBed.createComponent(SimpleMatTreeApp);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.underlyingDataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -120,13 +110,10 @@ describe('MatTree', () => {
+       let component: MatTreeAppWithToggle;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([MatTreeAppWithToggle]);
+         fixture = TestBed.createComponent(MatTreeAppWithToggle);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.underlyingDataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -252,13 +239,10 @@ describe('MatTree', () => {
+       let component: WhenNodeMatTreeApp;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([WhenNodeMatTreeApp]);
+         fixture = TestBed.createComponent(WhenNodeMatTreeApp);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.underlyingDataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -280,10 +264,8 @@ describe('MatTree', () => {
+       let fixture: ComponentFixture<MatTreeWithNullOrUndefinedChild>;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([MatTreeWithNullOrUndefinedChild]);
+         fixture = TestBed.createComponent(MatTreeWithNullOrUndefinedChild);
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -301,10 +283,8 @@ describe('MatTree', () => {
+       let fixture: ComponentFixture<MatNestedTreeWithNullOrUndefinedChild>;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([MatNestedTreeWithNullOrUndefinedChild]);
+         fixture = TestBed.createComponent(MatNestedTreeWithNullOrUndefinedChild);
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -322,13 +302,10 @@ describe('MatTree', () => {
+       let component: NestedMatTreeApp;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([NestedMatTreeApp]);
+         fixture = TestBed.createComponent(NestedMatTreeApp);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.underlyingDataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -428,13 +405,10 @@ describe('MatTree', () => {
+       let component: WhenNodeNestedMatTreeApp;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([WhenNodeNestedMatTreeApp]);
+         fixture = TestBed.createComponent(WhenNodeNestedMatTreeApp);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.underlyingDataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -454,13 +428,10 @@ describe('MatTree', () => {
+       let component: NestedMatTreeAppWithToggle;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([NestedMatTreeAppWithToggle]);
+         fixture = TestBed.createComponent(NestedMatTreeAppWithToggle);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.underlyingDataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -579,10 +550,8 @@ describe('MatTree', () => {
+     let tree: MatTree<TestData>;
+ 
+     beforeEach(() => {
+-      configureMatTreeTestingModule([NestedMatTreeApp]);
+       fixture = TestBed.createComponent(NestedMatTreeApp);
+       fixture.detectChanges();
+-
+       component = fixture.componentInstance;
+       underlyingDataSource = component.underlyingDataSource as FakeDataSource;
+       const data = underlyingDataSource.data;
+@@ -590,7 +559,6 @@ describe('MatTree', () => {
+       underlyingDataSource.addChild(child, false);
+       underlyingDataSource.addChild(child, false);
+       fixture.detectChanges();
+-
+       tree = component.tree;
+       treeElement = fixture.nativeElement.querySelector('mat-tree');
+       nodes = getNodes(treeElement);
+@@ -884,7 +852,7 @@ function expectNestedTreeToMatch(treeElement: Element, ...expectedTree: any[]) {
+       </mat-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class SimpleMatTreeApp {
+   getLevel = (node: TestData) => node.level;
+@@ -962,7 +930,7 @@ const TREE_DATA: FoodNode[] = [
+       </mat-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class MatTreeWithNullOrUndefinedChild {
+   private _transformer = (node: FoodNode, level: number) => {
+@@ -999,7 +967,7 @@ class MatTreeWithNullOrUndefinedChild {
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class MatNestedTreeWithNullOrUndefinedChild {
+   treeControl: NestedTreeControl<FoodNode>;
+@@ -1025,7 +993,7 @@ class MatNestedTreeWithNullOrUndefinedChild {
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule, AsyncPipe],
+ })
+ class NestedMatTreeApp {
+   getChildren = (node: TestData) => node.observableChildren;
+@@ -1056,13 +1024,13 @@ class NestedMatTreeApp {
+        <mat-nested-tree-node *matTreeNodeDef="let node; when: isSpecial"
+                              matTreeNodeToggle>
+                      >>> {{node.pizzaTopping}} - {{node.pizzaCheese}} + {{node.pizzaBase}}
+-         <div *ngIf="treeControl.isExpanded(node)">
+-            <ng-template matTreeNodeOutlet></ng-template>
+-         </div>
++        @if (treeControl.isExpanded(node)) {
++          <ng-template matTreeNodeOutlet></ng-template>
++        }
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class WhenNodeNestedMatTreeApp {
+   isSpecial = (_: number, node: TestData) => node.isSpecial;
+@@ -1095,7 +1063,7 @@ class WhenNodeNestedMatTreeApp {
+       </mat-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class MatTreeAppWithToggle {
+   toggleRecursively: boolean = true;
+@@ -1137,13 +1105,14 @@ class MatTreeAppWithToggle {
+                             matTreeNodeToggle
+                             [matTreeNodeToggleRecursive]="toggleRecursively">
+                      {{node.pizzaTopping}} - {{node.pizzaCheese}} + {{node.pizzaBase}}
+-        <div *ngIf="treeControl.isExpanded(node)">
++
++        @if (treeControl.isExpanded(node)) {
+           <ng-template matTreeNodeOutlet></ng-template>
+-        </div>
++        }
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule, AsyncPipe],
+ })
+ class NestedMatTreeAppWithToggle {
+   toggleRecursively: boolean = true;
+@@ -1180,7 +1149,7 @@ class NestedMatTreeAppWithToggle {
+       </mat-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class WhenNodeMatTreeApp {
+   isSpecial = (_: number, node: TestData) => node.isSpecial;
+diff --git a/src/material/tree/tree.spec.ts b/src/material/tree/tree.spec.ts
+index 1a62d6b1505b4a8f492a0b18385332c0d4643958..9fe78c00b2114432c4faec3e136da1222e6abedf 100644
+--- a/src/material/tree/tree.spec.ts
++++ b/src/material/tree/tree.spec.ts
+@@ -5,8 +5,9 @@
+  * Use of this source code is governed by an MIT-style license that can be
+  * found in the LICENSE file at https://angular.dev/license
+  */
+-import {Component, ViewChild, Type} from '@angular/core';
++import {Component, ViewChild} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {AsyncPipe} from '@angular/common';
+ import {BehaviorSubject, Observable} from 'rxjs';
+ import {map} from 'rxjs/operators';
+ import {MatTree, MatTreeModule, MatTreeNestedDataSource} from './index';
+@@ -14,30 +15,19 @@ import {MatTree, MatTreeModule, MatTreeNestedDataSource} from './index';
+ describe('MatTree', () => {
+   /** Represents an indent for expectNestedTreeToMatch */
+   const _ = {};
+-
+   let treeElement: HTMLElement;
+   let underlyingDataSource: FakeDataSource;
+ 
+-  function configureMatTreeTestingModule(declarations: Type<any>[]) {
+-    TestBed.configureTestingModule({
+-      imports: [MatTreeModule],
+-      declarations: declarations,
+-    });
+-  }
+-
+   describe('flat tree', () => {
+     describe('should initialize', () => {
+       let fixture: ComponentFixture<SimpleMatTreeApp>;
+       let component: SimpleMatTreeApp;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([SimpleMatTreeApp]);
+         fixture = TestBed.createComponent(SimpleMatTreeApp);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.dataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -113,13 +103,10 @@ describe('MatTree', () => {
+       let component: MatTreeAppWithToggle;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([MatTreeAppWithToggle]);
+         fixture = TestBed.createComponent(MatTreeAppWithToggle);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.dataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -241,13 +228,10 @@ describe('MatTree', () => {
+       let component: WhenNodeMatTreeApp;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([WhenNodeMatTreeApp]);
+         fixture = TestBed.createComponent(WhenNodeMatTreeApp);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.dataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -269,10 +253,8 @@ describe('MatTree', () => {
+       let fixture: ComponentFixture<MatTreeWithNullOrUndefinedChild>;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([MatTreeWithNullOrUndefinedChild]);
+         fixture = TestBed.createComponent(MatTreeWithNullOrUndefinedChild);
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -290,10 +272,8 @@ describe('MatTree', () => {
+       let fixture: ComponentFixture<MatNestedTreeWithNullOrUndefinedChild>;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([MatNestedTreeWithNullOrUndefinedChild]);
+         fixture = TestBed.createComponent(MatNestedTreeWithNullOrUndefinedChild);
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -311,7 +291,6 @@ describe('MatTree', () => {
+       let component: NestedMatTreeApp;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([NestedMatTreeApp]);
+         fixture = TestBed.createComponent(NestedMatTreeApp);
+ 
+         component = fixture.componentInstance;
+@@ -417,13 +396,10 @@ describe('MatTree', () => {
+       let component: WhenNodeNestedMatTreeApp;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([WhenNodeNestedMatTreeApp]);
+         fixture = TestBed.createComponent(WhenNodeNestedMatTreeApp);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.underlyingDataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -443,13 +419,10 @@ describe('MatTree', () => {
+       let component: NestedMatTreeAppWithToggle;
+ 
+       beforeEach(() => {
+-        configureMatTreeTestingModule([NestedMatTreeAppWithToggle]);
+         fixture = TestBed.createComponent(NestedMatTreeAppWithToggle);
+-
+         component = fixture.componentInstance;
+         underlyingDataSource = component.dataSource;
+         treeElement = fixture.nativeElement.querySelector('mat-tree');
+-
+         fixture.detectChanges();
+       });
+ 
+@@ -574,7 +547,6 @@ describe('MatTree', () => {
+     let tree: MatTree<TestData>;
+ 
+     beforeEach(() => {
+-      configureMatTreeTestingModule([NestedMatTreeApp]);
+       fixture = TestBed.createComponent(NestedMatTreeApp);
+       fixture.detectChanges();
+ 
+@@ -585,7 +557,6 @@ describe('MatTree', () => {
+       underlyingDataSource.addChild(child, false);
+       underlyingDataSource.addChild(child, false);
+       fixture.detectChanges();
+-
+       tree = component.tree;
+       treeElement = fixture.nativeElement.querySelector('mat-tree');
+       nodes = getNodes(treeElement);
+@@ -884,7 +855,7 @@ function expectNestedTreeToMatch(treeElement: Element, ...expectedTree: any[]) {
+       </mat-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class SimpleMatTreeApp {
+   getLevel = (node: TestData) => node.level;
+@@ -934,7 +905,7 @@ const TREE_DATA: FoodNode[] = [
+       </mat-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class MatTreeWithNullOrUndefinedChild {
+   childrenAccessor = (node: FoodNode): FoodNode[] => node.children || [];
+@@ -955,7 +926,7 @@ class MatTreeWithNullOrUndefinedChild {
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class MatNestedTreeWithNullOrUndefinedChild {
+   childrenAccessor = (node: FoodNode): FoodNode[] => node.children || [];
+@@ -978,7 +949,7 @@ class MatNestedTreeWithNullOrUndefinedChild {
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule, AsyncPipe],
+ })
+ class NestedMatTreeApp {
+   childrenAccessor = (node: TestData) => node.observableChildren;
+@@ -1015,7 +986,7 @@ class NestedMatTreeApp {
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class WhenNodeNestedMatTreeApp {
+   isSpecial = (_: number, node: TestData) => node.isSpecial;
+@@ -1050,7 +1021,7 @@ class WhenNodeNestedMatTreeApp {
+       </mat-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class MatTreeAppWithToggle {
+   toggleRecursively: boolean = true;
+@@ -1079,7 +1050,7 @@ class MatTreeAppWithToggle {
+       </mat-nested-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule, AsyncPipe],
+ })
+ class NestedMatTreeAppWithToggle {
+   toggleRecursively: boolean = true;
+@@ -1112,7 +1083,7 @@ class NestedMatTreeAppWithToggle {
+       </mat-tree-node>
+     </mat-tree>
+   `,
+-  standalone: false,
++  imports: [MatTreeModule],
+ })
+ class WhenNodeMatTreeApp {
+   isSpecial = (_: number, node: TestData) => node.isSpecial;

@@ -1,0 +1,3490 @@
+diff --git a/src/cdk-experimental/selection/selection.spec.ts b/src/cdk-experimental/selection/selection.spec.ts
+index 821e57e784eeaac38aca1479fa3ab56753e689da..8fe14dc688cc3d8460c33d3fe9499f3339b3656a 100644
+--- a/src/cdk-experimental/selection/selection.spec.ts
++++ b/src/cdk-experimental/selection/selection.spec.ts
+@@ -308,11 +308,12 @@ describe('cdkSelectionColumn', () => {
+     });
+   }));
+ 
+-  beforeEach(() => {
++  beforeEach(fakeAsync(() => {
+     fixture = TestBed.createComponent(MultiSelectTableWithSelectionColumn);
+     component = fixture.componentInstance;
+     fixture.detectChanges();
+-  });
++    flush();
++  }));
+ 
+   it('should show check boxes', () => {
+     const checkboxes =
+@@ -585,6 +586,7 @@ class MultiSelectTableWithSelectionColumn {
+     this.getSelectAll().click();
+     flush();
+     this._cdr.detectChanges();
++    flush();
+   }
+ 
+   clickSelectionToggle(index: number) {
+@@ -596,6 +598,7 @@ class MultiSelectTableWithSelectionColumn {
+     toggle.click();
+     flush();
+     this._cdr.detectChanges();
++    flush();
+   }
+ 
+   constructor(
+@@ -648,6 +651,7 @@ class SingleSelectTableWithSelectionColumn {
+     toggle.click();
+     flush();
+     this._cdr.detectChanges();
++    flush();
+   }
+ 
+   constructor(
+diff --git a/src/cdk/bidi/directionality.spec.ts b/src/cdk/bidi/directionality.spec.ts
+index 41330a27b49513de577727d1105b78d73d1d0737..03a64b6845477dc9a06290533c09eabdaf14965a 100644
+--- a/src/cdk/bidi/directionality.spec.ts
++++ b/src/cdk/bidi/directionality.spec.ts
+@@ -1,4 +1,4 @@
+-import {waitForAsync, fakeAsync, TestBed} from '@angular/core/testing';
++import {waitForAsync, fakeAsync, TestBed, flush} from '@angular/core/testing';
+ import {Component, ViewChild, signal} from '@angular/core';
+ import {By} from '@angular/platform-browser';
+ import {BidiModule, Directionality, Dir, Direction, DIR_DOCUMENT} from './index';
+@@ -121,6 +121,7 @@ describe('Directionality', () => {
+       fixture.destroy();
+       expect(spy).toHaveBeenCalled();
+       subscription.unsubscribe();
++      flush();
+     }));
+ 
+     it('should default to ltr if an invalid value is passed in', () => {
+diff --git a/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts b/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
+index 1d68d78068032ee4614e9b14c899f32d0ebc5647..b738ab16194e44413d8dda2e8c92abcb999781fe 100644
+--- a/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
++++ b/src/cdk/overlay/dispatchers/overlay-outside-click-dispatcher.spec.ts
+@@ -1,4 +1,4 @@
+-import {TestBed, inject, fakeAsync} from '@angular/core/testing';
++import {TestBed, inject} from '@angular/core/testing';
+ import {ApplicationRef, Component, afterRender} from '@angular/core';
+ import {dispatchFakeEvent, dispatchMouseEvent} from '../../testing/private';
+ import {OverlayModule, Overlay} from '../index';
+@@ -305,39 +305,35 @@ describe('OverlayOutsideClickDispatcher', () => {
+     overlayRef.dispose();
+   });
+ 
+-  it(
+-    'should not throw an error when closing out related components via the ' +
+-      'outsidePointerEvents emitter on background click',
+-    fakeAsync(() => {
+-      const firstOverlayRef = overlay.create();
+-      firstOverlayRef.attach(new ComponentPortal(TestComponent));
+-      const secondOverlayRef = overlay.create();
+-      secondOverlayRef.attach(new ComponentPortal(TestComponent));
+-      const thirdOverlayRef = overlay.create();
+-      thirdOverlayRef.attach(new ComponentPortal(TestComponent));
+-
+-      const spy = jasmine.createSpy('background click handler spy').and.callFake(() => {
+-        // we close out both overlays from a single outside click event
+-        firstOverlayRef.detach();
+-        thirdOverlayRef.detach();
+-      });
+-      firstOverlayRef.outsidePointerEvents().subscribe(spy);
+-      secondOverlayRef.outsidePointerEvents().subscribe(spy);
+-      thirdOverlayRef.outsidePointerEvents().subscribe(spy);
++  it('should not throw an error when closing out related components via the outsidePointerEvents emitter on background click', () => {
++    const firstOverlayRef = overlay.create();
++    firstOverlayRef.attach(new ComponentPortal(TestComponent));
++    const secondOverlayRef = overlay.create();
++    secondOverlayRef.attach(new ComponentPortal(TestComponent));
++    const thirdOverlayRef = overlay.create();
++    thirdOverlayRef.attach(new ComponentPortal(TestComponent));
++
++    const spy = jasmine.createSpy('background click handler spy').and.callFake(() => {
++      // we close out both overlays from a single outside click event
++      firstOverlayRef.detach();
++      thirdOverlayRef.detach();
++    });
++    firstOverlayRef.outsidePointerEvents().subscribe(spy);
++    secondOverlayRef.outsidePointerEvents().subscribe(spy);
++    thirdOverlayRef.outsidePointerEvents().subscribe(spy);
+ 
+-      const backgroundElement = document.createElement('div');
+-      document.body.appendChild(backgroundElement);
++    const backgroundElement = document.createElement('div');
++    document.body.appendChild(backgroundElement);
+ 
+-      expect(() => backgroundElement.click()).not.toThrowError();
++    expect(() => backgroundElement.click()).not.toThrowError();
+ 
+-      expect(spy).toHaveBeenCalled();
++    expect(spy).toHaveBeenCalled();
+ 
+-      backgroundElement.remove();
+-      firstOverlayRef.dispose();
+-      secondOverlayRef.dispose();
+-      thirdOverlayRef.dispose();
+-    }),
+-  );
++    backgroundElement.remove();
++    firstOverlayRef.dispose();
++    secondOverlayRef.dispose();
++    thirdOverlayRef.dispose();
++  });
+ 
+   describe('change detection behavior', () => {
+     it('should not run change detection if there is no portal attached to the overlay', () => {
+diff --git a/src/cdk/overlay/overlay.spec.ts b/src/cdk/overlay/overlay.spec.ts
+index 77048fdc5dc041089a44e6501a578fb73611ba61..8acf58d68314dfde86cbc10dae2381f4cc0f719c 100644
+--- a/src/cdk/overlay/overlay.spec.ts
++++ b/src/cdk/overlay/overlay.spec.ts
+@@ -528,6 +528,7 @@ describe('Overlay', () => {
+       tick();
+ 
+       overlayRef.attach(componentPortal);
++      tick();
+ 
+       expect(overlayPresentInDom)
+         .withContext('Expected host element to be attached to the DOM.')
+diff --git a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
+index c3233c3eafef46b9136fd6ebb5a1a6fdf1b95c45..de6e7072ac02b2fe6b74d72c3c82b0e337c3aeac 100644
+--- a/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
++++ b/src/cdk/scrolling/virtual-scroll-viewport.spec.ts
+@@ -83,6 +83,7 @@ describe('CdkVirtualScrollViewport', () => {
+       flush();
+       viewport.checkViewportSize();
+       expect(viewport.getViewportSize()).toBe(500);
++      flush();
+     }));
+ 
+     it('should update the viewport size when the page viewport changes', fakeAsync(() => {
+@@ -112,12 +113,14 @@ describe('CdkVirtualScrollViewport', () => {
+       fixture.componentInstance.items = [0, 1];
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
++      flush();
+ 
+       expect(viewport.getRenderedRange()).toEqual({start: 0, end: 2});
+ 
+       fixture.componentInstance.items = [];
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
++      flush();
+ 
+       expect(viewport.getRenderedRange()).toEqual({start: 0, end: 0});
+     }));
+diff --git a/src/material-experimental/column-resize/column-resize.spec.ts b/src/material-experimental/column-resize/column-resize.spec.ts
+index 2ea243f4ee9331c93d7388410285b7fb56329939..b109a924e0d0336ff5beeb27da440f8160859054 100644
+--- a/src/material-experimental/column-resize/column-resize.spec.ts
++++ b/src/material-experimental/column-resize/column-resize.spec.ts
+@@ -2,7 +2,7 @@ import {BidiModule} from '@angular/cdk/bidi';
+ import {DataSource} from '@angular/cdk/collections';
+ import {ESCAPE} from '@angular/cdk/keycodes';
+ import {ChangeDetectionStrategy, Component, Directive, ElementRef, ViewChild} from '@angular/core';
+-import {ComponentFixture, TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, flush} from '@angular/core/testing';
+ import {MatTableModule} from '@angular/material/table';
+ import {BehaviorSubject} from 'rxjs';
+ import {dispatchKeyboardEvent} from '../../cdk/testing/private';
+@@ -379,7 +379,7 @@ describe('Material Popover Edit', () => {
+         fixture = TestBed.createComponent(componentClass);
+         component = fixture.componentInstance;
+         fixture.detectChanges();
+-        flushMicrotasks();
++        flush();
+       }));
+ 
+       it('shows resize handle overlays on header row hover and while a resize handle is in use', fakeAsync(() => {
+@@ -427,7 +427,7 @@ describe('Material Popover Edit', () => {
+         component.completeResizeWithMouseInProgress(0);
+         component.endHoverState();
+         fixture.detectChanges();
+-        flushMicrotasks();
++        flush();
+ 
+         expect(component.getOverlayThumbElement(0)).toBeUndefined();
+       }));
+@@ -445,7 +445,7 @@ describe('Material Popover Edit', () => {
+         const initialThumbPosition = component.getOverlayThumbPosition(1);
+         component.updateResizeWithMouseInProgress(5);
+         fixture.detectChanges();
+-        flushMicrotasks();
++        flush();
+ 
+         let thumbPositionDelta = component.getOverlayThumbPosition(1) - initialThumbPosition;
+         let columnPositionDelta = component.getColumnOriginPosition(1) - initialColumnPosition;
+@@ -463,7 +463,7 @@ describe('Material Popover Edit', () => {
+ 
+         component.updateResizeWithMouseInProgress(1);
+         fixture.detectChanges();
+-        flushMicrotasks();
++        flush();
+ 
+         thumbPositionDelta = component.getOverlayThumbPosition(1) - initialThumbPosition;
+         columnPositionDelta = component.getColumnOriginPosition(1) - initialColumnPosition;
+@@ -473,7 +473,7 @@ describe('Material Popover Edit', () => {
+         (expect(component.getColumnWidth(1)) as any).isApproximately(initialColumnWidth + 1);
+ 
+         component.completeResizeWithMouseInProgress(1);
+-        flushMicrotasks();
++        flush();
+ 
+         (expect(component.getColumnWidth(1)) as any).isApproximately(initialColumnWidth + 1);
+ 
+@@ -509,7 +509,7 @@ describe('Material Popover Edit', () => {
+ 
+         component.updateResizeWithMouseInProgress(5);
+         fixture.detectChanges();
+-        flushMicrotasks();
++        flush();
+ 
+         let thumbPositionDelta = component.getOverlayThumbPosition(1) - initialThumbPosition;
+         let columnPositionDelta = component.getColumnOriginPosition(1) - initialColumnPosition;
+@@ -521,7 +521,7 @@ describe('Material Popover Edit', () => {
+         // (expect(component.getTableWidth()) as any).isApproximately(initialTableWidth + 5);
+ 
+         dispatchKeyboardEvent(document, 'keyup', ESCAPE);
+-        flushMicrotasks();
++        flush();
+ 
+         (expect(component.getColumnWidth(1)) as any).isApproximately(initialColumnWidth);
+         (expect(component.getTableWidth()) as any).isApproximately(initialTableWidth);
+@@ -545,7 +545,7 @@ describe('Material Popover Edit', () => {
+ 
+         component.resizeColumnWithMouse(1, 5);
+         fixture.detectChanges();
+-        flushMicrotasks();
++        flush();
+ 
+         expect(resize).toEqual({columnId: 'name', size: initialColumnWidth + 5} as any);
+ 
+@@ -564,10 +564,10 @@ describe('Material Popover Edit', () => {
+         component.beginColumnResizeWithMouse(0);
+ 
+         component.updateResizeWithMouseInProgress(5);
+-        flushMicrotasks();
++        flush();
+ 
+         dispatchKeyboardEvent(document, 'keyup', ESCAPE);
+-        flushMicrotasks();
++        flush();
+ 
+         component.endHoverState();
+         fixture.detectChanges();
+@@ -580,7 +580,7 @@ describe('Material Popover Edit', () => {
+         (expect(component.getColumnWidth(1)) as any).not.isApproximately(173);
+ 
+         component.columnResize.columnResizeNotifier.resize('name', 173);
+-        flushMicrotasks();
++        flush();
+ 
+         (expect(component.getColumnWidth(1)) as any).isApproximately(173);
+       }));
+diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts
+index edb70b151dee6dcb80c5f7e3d96e583505126965..975c4e7eecfff7a9c724f766b9fe575b798047bd 100644
+--- a/src/material/autocomplete/autocomplete.spec.ts
++++ b/src/material/autocomplete/autocomplete.spec.ts
+@@ -356,6 +356,7 @@ describe('MatAutocomplete', () => {
+       ) as NodeListOf<HTMLElement>;
+       options[1].click();
+       fixture.detectChanges();
++      flush();
+ 
+       expect(fixture.componentInstance.formField.floatLabel)
+         .withContext('Expected label to stay in static state after close.')
+@@ -379,6 +380,7 @@ describe('MatAutocomplete', () => {
+       ) as NodeListOf<HTMLElement>;
+       options[1].click();
+       fixture.detectChanges();
++      flush();
+ 
+       expect(fixture.componentInstance.formField.floatLabel)
+         .withContext('Expected label to stay elevated after close.')
+@@ -1182,6 +1184,7 @@ describe('MatAutocomplete', () => {
+ 
+       fixture.componentInstance.trigger._handleKeydown(ENTER_EVENT);
+       fixture.detectChanges();
++      flush();
+       expect(input.value)
+         .withContext(`Expected text field to fill with selected value on ENTER.`)
+         .toContain('Alabama');
+@@ -1192,6 +1195,7 @@ describe('MatAutocomplete', () => {
+       flush();
+ 
+       fixture.componentInstance.trigger._handleKeydown(ENTER_EVENT);
++      flush();
+ 
+       expect(ENTER_EVENT.defaultPrevented)
+         .withContext('Expected the default action to have been prevented.')
+@@ -1257,6 +1261,7 @@ describe('MatAutocomplete', () => {
+       flush();
+       fixture.componentInstance.trigger._handleKeydown(ENTER_EVENT);
+       fixture.detectChanges();
++      flush();
+ 
+       expect(fixture.componentInstance.stateCtrl.dirty)
+         .withContext(`Expected control to become dirty when option was selected by ENTER.`)
+@@ -1444,6 +1449,7 @@ describe('MatAutocomplete', () => {
+ 
+       dispatchKeyboardEvent(document.body, 'keydown', ESCAPE);
+       fixture.detectChanges();
++      flush();
+ 
+       expect(document.activeElement)
+         .withContext('Expected input to continue to be focused.')
+@@ -1451,12 +1457,12 @@ describe('MatAutocomplete', () => {
+       expect(trigger.panelOpen).withContext('Expected panel to be closed.').toBe(false);
+     }));
+ 
+-    it('should prevent the default action when pressing escape', fakeAsync(() => {
++    it('should prevent the default action when pressing escape', () => {
+       const escapeEvent = dispatchKeyboardEvent(input, 'keydown', ESCAPE);
+       fixture.detectChanges();
+ 
+       expect(escapeEvent.defaultPrevented).toBe(true);
+-    }));
++    });
+ 
+     it('should not close the panel when pressing escape with a modifier', fakeAsync(() => {
+       const trigger = fixture.componentInstance.trigger;
+@@ -1494,6 +1500,7 @@ describe('MatAutocomplete', () => {
+ 
+       dispatchEvent(document.body, upArrowEvent);
+       fixture.detectChanges();
++      flush();
+ 
+       expect(document.activeElement)
+         .withContext('Expected input to continue to be focused.')
+@@ -2976,7 +2983,7 @@ describe('MatAutocomplete', () => {
+   });
+ 
+   describe('with panel classes in the default options', () => {
+-    it('should apply them if provided as string', fakeAsync(() => {
++    it('should apply them if provided as string', () => {
+       const fixture = createComponent(SimpleAutocomplete, [
+         {provide: MAT_AUTOCOMPLETE_DEFAULT_OPTIONS, useValue: {overlayPanelClass: 'default1'}},
+       ]);
+@@ -2987,9 +2994,9 @@ describe('MatAutocomplete', () => {
+ 
+       const panelClassList = overlayContainerElement.querySelector('.cdk-overlay-pane')!.classList;
+       expect(panelClassList).toContain('default1');
+-    }));
++    });
+ 
+-    it('should apply them if provided as array', fakeAsync(() => {
++    it('should apply them if provided as array', () => {
+       const fixture = createComponent(SimpleAutocomplete, [
+         {
+           provide: MAT_AUTOCOMPLETE_DEFAULT_OPTIONS,
+@@ -3004,7 +3011,7 @@ describe('MatAutocomplete', () => {
+       const panelClassList = overlayContainerElement.querySelector('.cdk-overlay-pane')!.classList;
+       expect(panelClassList).toContain('default1');
+       expect(panelClassList).toContain('default2');
+-    }));
++    });
+   });
+ 
+   describe('misc', () => {
+@@ -3170,7 +3177,7 @@ describe('MatAutocomplete', () => {
+       expect(trigger.panelOpen).withContext('Expected panel to be closed.').toBe(false);
+     }));
+ 
+-    it('should handle autocomplete being attached to number inputs', fakeAsync(() => {
++    it('should handle autocomplete being attached to number inputs', () => {
+       const fixture = createComponent(AutocompleteWithNumberInputAndNgModel);
+       fixture.detectChanges();
+       const input = fixture.debugElement.query(By.css('input'))!.nativeElement;
+@@ -3179,9 +3186,9 @@ describe('MatAutocomplete', () => {
+       fixture.detectChanges();
+ 
+       expect(fixture.componentInstance.selectedValue).toBe(1337);
+-    }));
++    });
+ 
+-    it('should not focus the option when DOWN key is pressed', fakeAsync(() => {
++    it('should not focus the option when DOWN key is pressed', () => {
+       const fixture = createComponent(SimpleAutocomplete);
+       const input = fixture.debugElement.query(By.css('input'))!.nativeElement;
+       fixture.detectChanges();
+@@ -3194,7 +3201,7 @@ describe('MatAutocomplete', () => {
+       // Note: for some reason the error here gets logged using console.error, rather than being
+       // thrown, hence why we use a spy to assert against it, rather than `.not.toThrow`.
+       expect(spy).not.toHaveBeenCalled();
+-    }));
++    });
+   });
+ 
+   describe('automatically selecting the active option', () => {
+@@ -3584,32 +3591,27 @@ describe('MatAutocomplete', () => {
+     expect(Math.ceil(parseFloat(overlayPane.style.width as string))).toBe(400);
+   });
+ 
+-  it(
+-    'should show the panel when the options are initialized later within a component with ' +
+-      'OnPush change detection',
+-    fakeAsync(() => {
+-      let fixture = createComponent(AutocompleteWithOnPushDelay);
+-
+-      fixture.detectChanges();
+-      dispatchFakeEvent(fixture.debugElement.query(By.css('input'))!.nativeElement, 'focusin');
+-      tick(1000);
++  it('should show the panel when the options are initialized later within a component with OnPush change detection', fakeAsync(() => {
++    let fixture = createComponent(AutocompleteWithOnPushDelay);
++    fixture.detectChanges();
++    flush();
++    dispatchFakeEvent(fixture.debugElement.query(By.css('input'))!.nativeElement, 'focusin');
++    tick(1000);
+ 
+-      fixture.detectChanges();
+-      tick();
++    fixture.detectChanges();
++    tick();
+ 
+-      Promise.resolve().then(() => {
+-        let panel = overlayContainerElement.querySelector(
+-          '.mat-mdc-autocomplete-panel',
+-        ) as HTMLElement;
+-        let visibleClass = 'mat-mdc-autocomplete-visible';
++    Promise.resolve().then(() => {
++      let panel = overlayContainerElement.querySelector(
++        '.mat-mdc-autocomplete-panel',
++      ) as HTMLElement;
++      let visibleClass = 'mat-mdc-autocomplete-visible';
+ 
+-        fixture.detectChanges();
+-        expect(panel.classList)
+-          .withContext(`Expected panel to be visible.`)
+-          .toContain(visibleClass);
+-      });
+-    }),
+-  );
++      fixture.changeDetectorRef.markForCheck();
++      fixture.detectChanges();
++      expect(panel.classList).withContext(`Expected panel to be visible.`).toContain(visibleClass);
++    });
++  }));
+ 
+   it('should emit an event when an option is selected', waitForAsync(async () => {
+     let fixture = createComponent(AutocompleteWithSelectEvent);
+@@ -3883,12 +3885,12 @@ describe('MatAutocomplete', () => {
+   describe('when used inside a modal', () => {
+     let fixture: ComponentFixture<AutocompleteInsideAModal>;
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = createComponent(AutocompleteInsideAModal);
+       fixture.detectChanges();
+-    }));
++    });
+ 
+-    it('should add the id of the autocomplete panel to the aria-owns of the modal', fakeAsync(() => {
++    it('should add the id of the autocomplete panel to the aria-owns of the modal', () => {
+       fixture.componentInstance.trigger.openPanel();
+       fixture.detectChanges();
+ 
+@@ -3898,9 +3900,9 @@ describe('MatAutocomplete', () => {
+       expect(modalElement.getAttribute('aria-owns')?.split(' '))
+         .withContext('expecting modal to own the autocommplete panel')
+         .toContain(panelId);
+-    }));
++    });
+ 
+-    it('should remove the aria-owns attribute of the modal when the autocomplete panel closes', fakeAsync(() => {
++    it('should remove the aria-owns attribute of the modal when the autocomplete panel closes', () => {
+       fixture.componentInstance.trigger.openPanel();
+       fixture.componentInstance.trigger.closePanel();
+       fixture.detectChanges();
+@@ -3908,9 +3910,9 @@ describe('MatAutocomplete', () => {
+       const modalElement = fixture.componentInstance.modal.nativeElement;
+ 
+       expect(modalElement.getAttribute('aria-owns')).toBeFalsy();
+-    }));
++    });
+ 
+-    it('should readd the aria-owns attribute of the modal when the autocomplete panel opens again', fakeAsync(() => {
++    it('should readd the aria-owns attribute of the modal when the autocomplete panel opens again', () => {
+       fixture.componentInstance.trigger.openPanel();
+       fixture.componentInstance.trigger.closePanel();
+       fixture.componentInstance.trigger.openPanel();
+@@ -3922,7 +3924,7 @@ describe('MatAutocomplete', () => {
+       expect(modalElement.getAttribute('aria-owns')?.split(' '))
+         .withContext('expecting modal to own the autocommplete panel')
+         .toContain(panelId);
+-    }));
++    });
+   });
+ });
+ 
+diff --git a/src/material/bottom-sheet/bottom-sheet.spec.ts b/src/material/bottom-sheet/bottom-sheet.spec.ts
+index 6ff758e2fa96568f728c3737a0bbb3506b61021d..3eb25e436bea77a0eaa1fbea5c9f7487dddc4e9d 100644
+--- a/src/material/bottom-sheet/bottom-sheet.spec.ts
++++ b/src/material/bottom-sheet/bottom-sheet.spec.ts
+@@ -133,7 +133,7 @@ describe('MatBottomSheet', () => {
+     // callback should not be called before animation is complete
+     expect(spy).not.toHaveBeenCalled();
+ 
+-    flushMicrotasks();
++    flush();
+     expect(spy).toHaveBeenCalled();
+   }));
+ 
+@@ -242,6 +242,7 @@ describe('MatBottomSheet', () => {
+ 
+     bottomSheetRef.keydownEvents().subscribe(spy);
+     viewContainerFixture.detectChanges();
++    flush();
+ 
+     const backdrop = overlayContainerElement.querySelector('.cdk-overlay-backdrop') as HTMLElement;
+     const container = overlayContainerElement.querySelector(
+@@ -459,7 +460,7 @@ describe('MatBottomSheet', () => {
+     expect(overlayContainerElement.querySelector('mat-bottom-sheet-container')).toBeTruthy();
+   }));
+ 
+-  it('should be able to attach a custom scroll strategy', fakeAsync(() => {
++  it('should be able to attach a custom scroll strategy', () => {
+     const scrollStrategy: ScrollStrategy = {
+       attach: () => {},
+       enable: jasmine.createSpy('scroll strategy enable spy'),
+@@ -468,7 +469,7 @@ describe('MatBottomSheet', () => {
+ 
+     bottomSheet.open(PizzaMsg, {scrollStrategy});
+     expect(scrollStrategy.enable).toHaveBeenCalled();
+-  }));
++  });
+ 
+   describe('passing in data', () => {
+     it('should be able to pass in data', () => {
+@@ -624,7 +625,7 @@ describe('MatBottomSheet', () => {
+       });
+ 
+       viewContainerFixture.detectChanges();
+-      flushMicrotasks();
++      flush();
+ 
+       const focusTrapAnchors = overlayContainerElement.querySelectorAll('.cdk-focus-trap-anchor');
+ 
+diff --git a/src/material/button-toggle/button-toggle.spec.ts b/src/material/button-toggle/button-toggle.spec.ts
+index e30088d97a6adc7106294b08fadef0303c095636..bb9e65895be7c987ecb078a16e7b78a92fefe529 100644
+--- a/src/material/button-toggle/button-toggle.spec.ts
++++ b/src/material/button-toggle/button-toggle.spec.ts
+@@ -84,7 +84,7 @@ describe('MatButtonToggle with forms', () => {
+     let groupNgModel: NgModel;
+     let innerButtons: HTMLElement[];
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = TestBed.createComponent(ButtonToggleGroupWithNgModel);
+       fixture.detectChanges();
+       testComponent = fixture.debugElement.componentInstance;
+@@ -100,7 +100,7 @@ describe('MatButtonToggle with forms', () => {
+       );
+ 
+       fixture.detectChanges();
+-    }));
++    });
+ 
+     it('should update the model before firing change event', fakeAsync(() => {
+       expect(testComponent.modelValue).toBeUndefined();
+@@ -134,6 +134,7 @@ describe('MatButtonToggle with forms', () => {
+         .toBe(true);
+ 
+       fixture.componentInstance.groupName = 'changed-name';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(groupInstance.name).toBe('changed-name');
+@@ -147,6 +148,7 @@ describe('MatButtonToggle with forms', () => {
+       expect(firstButton.getAttribute('name')).toBe(fixture.componentInstance.groupName);
+ 
+       fixture.componentInstance.options[0].name = 'changed-name';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expect(firstButton.getAttribute('name')).toBe(fixture.componentInstance.groupName);
+     });
+@@ -213,6 +215,7 @@ describe('MatButtonToggle with forms', () => {
+       const groupElement = groupDebugElement.nativeElement;
+ 
+       testComponent.disableRipple = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(groupElement.querySelectorAll('.mat-ripple-element').length).toBe(0);
+diff --git a/src/material/checkbox/checkbox.spec.ts b/src/material/checkbox/checkbox.spec.ts
+index 8e0db10bb9968022e950b2cf5286bb01acf3c92c..9c029d2bc8e221a13cccad09291525fae06c13d6 100644
+--- a/src/material/checkbox/checkbox.spec.ts
++++ b/src/material/checkbox/checkbox.spec.ts
+@@ -264,14 +264,14 @@ describe('MatCheckbox', () => {
+       expect(inputElement.disabled).toBe(false);
+     }));
+ 
+-    it('should not toggle `checked` state upon interation while disabled', fakeAsync(() => {
++    it('should not toggle `checked` state upon interation while disabled', () => {
+       testComponent.isDisabled = true;
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       checkboxNativeElement.click();
+       expect(checkboxInstance.checked).toBe(false);
+-    }));
++    });
+ 
+     it('should overwrite indeterminate state when clicked', fakeAsync(() => {
+       testComponent.isIndeterminate = true;
+@@ -926,7 +926,7 @@ describe('MatCheckbox', () => {
+       // also turn touched.
+       dispatchFakeEvent(inputElement, 'blur');
+       fixture.detectChanges();
+-      flushMicrotasks();
++      flush();
+ 
+       expect(ngModel.pristine).toBe(false);
+       expect(ngModel.touched).toBe(true);
+@@ -968,7 +968,7 @@ describe('MatCheckbox', () => {
+         fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+-        flushMicrotasks();
++        flush();
+       }).not.toThrow();
+     }));
+ 
+diff --git a/src/material/datepicker/datepicker.spec.ts b/src/material/datepicker/datepicker.spec.ts
+index fef4abbe808136d720fd90b2760fc5171e5305ff..749f944e990f0a4e812d85aab6d20906ccdada6f 100644
+--- a/src/material/datepicker/datepicker.spec.ts
++++ b/src/material/datepicker/datepicker.spec.ts
+@@ -1366,6 +1366,7 @@ describe('MatDatepicker', () => {
+ 
+         fixture.componentInstance.datepicker.close();
+         fixture.detectChanges();
++        flush();
+ 
+         expect(document.activeElement)
+           .not.withContext('Expected focus not to be restored to toggle.')
+@@ -1582,6 +1583,7 @@ describe('MatDatepicker', () => {
+       beforeEach(fakeAsync(() => {
+         fixture = createComponent(DatepickerWithMinAndMaxValidation, [MatNativeDateModule]);
+         fixture.detectChanges();
++        flush();
+ 
+         testComponent = fixture.componentInstance;
+       }));
+@@ -1744,12 +1746,12 @@ describe('MatDatepicker', () => {
+       let fixture: ComponentFixture<DatepickerWithFilterAndValidation>;
+       let testComponent: DatepickerWithFilterAndValidation;
+ 
+-      beforeEach(fakeAsync(() => {
++      beforeEach(() => {
+         fixture = createComponent(DatepickerWithFilterAndValidation, [MatNativeDateModule]);
+         fixture.detectChanges();
+ 
+         testComponent = fixture.componentInstance;
+-      }));
++      });
+ 
+       afterEach(fakeAsync(() => {
+         testComponent.datepicker.close();
+@@ -1966,6 +1968,7 @@ describe('MatDatepicker', () => {
+ 
+       beforeEach(fakeAsync(() => {
+         fixture = createComponent(DatepickerWithISOStrings, [MatNativeDateModule]);
++        flush();
+         testComponent = fixture.componentInstance;
+       }));
+ 
+@@ -1993,6 +1996,7 @@ describe('MatDatepicker', () => {
+       beforeEach(fakeAsync(() => {
+         fixture = createComponent(DatepickerWithEvents, [MatNativeDateModule]);
+         fixture.detectChanges();
++        flush();
+         testComponent = fixture.componentInstance;
+       }));
+ 
+@@ -2318,7 +2322,7 @@ describe('MatDatepicker', () => {
+     let testComponent: DatepickerWithi18n;
+     let input: HTMLInputElement;
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = createComponent(
+         DatepickerWithi18n,
+         [MatNativeDateModule, NativeDateModule],
+@@ -2327,7 +2331,7 @@ describe('MatDatepicker', () => {
+       fixture.detectChanges();
+       testComponent = fixture.componentInstance;
+       input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+-    }));
++    });
+ 
+     it('should have the correct input value even when inverted date format', fakeAsync(() => {
+       if (typeof Intl === 'undefined') {
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index 953fa5927701899133480c7856aca4a5a699c045..1e64f000548684403d7b54ddd4671c20c4f539d1 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -1243,7 +1243,7 @@ describe('MatDialog', () => {
+       });
+ 
+       viewContainerFixture.detectChanges();
+-      flushMicrotasks();
++      flush();
+ 
+       expect(
+         overlayContainerElement.querySelectorAll('.cdk-focus-trap-anchor').length,
+diff --git a/src/material/divider/divider.spec.ts b/src/material/divider/divider.spec.ts
+index c5e7b0057551464e54bcbe07291786745940e464..3bb8c08c8aeeff74ddb558165404a5f4e2fe846d 100644
+--- a/src/material/divider/divider.spec.ts
++++ b/src/material/divider/divider.spec.ts
+@@ -1,4 +1,4 @@
+-import {fakeAsync, ComponentFixture, TestBed} from '@angular/core/testing';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {Component} from '@angular/core';
+ import {By} from '@angular/platform-browser';
+ import {MatDividerModule} from './divider-module';
+@@ -6,13 +6,13 @@ import {MatDividerModule} from './divider-module';
+ describe('MatDivider', () => {
+   let fixture: ComponentFixture<MatDividerTestComponent>;
+ 
+-  beforeEach(fakeAsync(() => {
++  beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [MatDividerModule, MatDividerTestComponent],
+     });
+ 
+     fixture = TestBed.createComponent(MatDividerTestComponent);
+-  }));
++  });
+ 
+   it('should apply vertical class to vertical divider', () => {
+     fixture.componentInstance.vertical = true;
+diff --git a/src/material/expansion/expansion.spec.ts b/src/material/expansion/expansion.spec.ts
+index 157507f935f95097afc148f43b2139bdcd087666..4196816877fe7544bcd77a912c04c23f36ef4a86 100644
+--- a/src/material/expansion/expansion.spec.ts
++++ b/src/material/expansion/expansion.spec.ts
+@@ -55,16 +55,16 @@ describe('MatExpansionPanel', () => {
+     expect(headerEl.classList).toContain('mat-expanded');
+   }));
+ 
+-  it('should add strong focus indication', fakeAsync(() => {
++  it('should add strong focus indication', () => {
+     const fixture = TestBed.createComponent(PanelWithContent);
+     fixture.detectChanges();
+ 
+     expect(fixture.nativeElement.querySelector('.mat-expansion-panel-header').classList).toContain(
+       'mat-focus-indicator',
+     );
+-  }));
++  });
+ 
+-  it('should be able to render panel content lazily', fakeAsync(() => {
++  it('should be able to render panel content lazily', () => {
+     const fixture = TestBed.createComponent(LazyPanelWithContent);
+     const content = fixture.debugElement.query(
+       By.css('.mat-expansion-panel-content'),
+@@ -82,9 +82,9 @@ describe('MatExpansionPanel', () => {
+     expect(content.textContent.trim())
+       .withContext('Expected content to be rendered.')
+       .toContain('Some content');
+-  }));
++  });
+ 
+-  it('should render the content for a lazy-loaded panel that is opened on init', fakeAsync(() => {
++  it('should render the content for a lazy-loaded panel that is opened on init', () => {
+     const fixture = TestBed.createComponent(LazyPanelOpenOnLoad);
+     const content = fixture.debugElement.query(
+       By.css('.mat-expansion-panel-content'),
+@@ -94,9 +94,9 @@ describe('MatExpansionPanel', () => {
+     expect(content.textContent.trim())
+       .withContext('Expected content to be rendered.')
+       .toContain('Some content');
+-  }));
++  });
+ 
+-  it('should not render lazy content from a child panel inside the parent', fakeAsync(() => {
++  it('should not render lazy content from a child panel inside the parent', () => {
+     const fixture = TestBed.createComponent(NestedLazyPanelWithContent);
+     fixture.componentInstance.parentExpanded = true;
+     fixture.changeDetectorRef.markForCheck();
+@@ -126,7 +126,7 @@ describe('MatExpansionPanel', () => {
+       'Child content',
+       'Expected child content element to be rendered.',
+     );
+-  }));
++  });
+ 
+   it('emit correct events for change in panel expanded state', () => {
+     const fixture = TestBed.createComponent(PanelWithContent);
+@@ -449,13 +449,13 @@ describe('MatExpansionPanel', () => {
+     expect(header.nativeElement.style.height).toBe('10px');
+   });
+ 
+-  it('should be able to set a custom tabindex on the header', fakeAsync(() => {
++  it('should be able to set a custom tabindex on the header', () => {
+     const fixture = TestBed.createComponent(PanelWithHeaderTabindex);
+     const headerEl = fixture.nativeElement.querySelector('.mat-expansion-panel-header');
+     fixture.detectChanges();
+ 
+     expect(headerEl.getAttribute('tabindex')).toBe('7');
+-  }));
++  });
+ 
+   describe('disabled state', () => {
+     let fixture: ComponentFixture<PanelWithContent>;
+diff --git a/src/material/input/input.spec.ts b/src/material/input/input.spec.ts
+index b39f6eeb74f136eb46efba584f46ec3837fcac23..13c2b1d4f45c70508455e1ab4af9d20d3131f56c 100644
+--- a/src/material/input/input.spec.ts
++++ b/src/material/input/input.spec.ts
+@@ -1099,6 +1099,7 @@ describe('MatMdcInput with forms', () => {
+ 
+       dispatchFakeEvent(inputEl, 'focus');
+       dispatchFakeEvent(inputEl, 'blur');
++      flush();
+       expect(wrapperEl.classList).toContain('mdc-text-field--invalid');
+     }));
+ 
+@@ -1369,7 +1370,7 @@ describe('MatMdcInput with forms', () => {
+     }));
+   });
+ 
+-  it('should update the value when using FormControl.setValue', fakeAsync(() => {
++  it('should update the value when using FormControl.setValue', () => {
+     let fixture = createComponent(MatInputWithFormControl);
+     fixture.detectChanges();
+ 
+@@ -1382,7 +1383,7 @@ describe('MatMdcInput with forms', () => {
+     fixture.componentInstance.formControl.setValue('something');
+ 
+     expect(input.value).toBe('something');
+-  }));
++  });
+ 
+   it('should display disabled styles when using FormControl.disable()', fakeAsync(() => {
+     const fixture = createComponent(MatInputWithFormControl);
+diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts
+index 8de903786e8d1bd5cb60cdb6298c812e8a2c97ae..0ac3065cdaa00638429897408f2827892775e8e8 100644
+--- a/src/material/menu/menu.spec.ts
++++ b/src/material/menu/menu.spec.ts
+@@ -501,7 +501,7 @@ describe('MatMenu', () => {
+     expect(event.defaultPrevented).toBe(false);
+   }));
+ 
+-  it('should open a custom menu', fakeAsync(() => {
++  it('should open a custom menu', () => {
+     const fixture = createComponent(CustomMenu, [], [CustomMenuPanel]);
+     fixture.detectChanges();
+     expect(overlayContainerElement.textContent).toBe('');
+@@ -512,7 +512,7 @@ describe('MatMenu', () => {
+       expect(overlayContainerElement.textContent).toContain('Custom Menu header');
+       expect(overlayContainerElement.textContent).toContain('Custom Content');
+     }).not.toThrowError();
+-  }));
++  });
+ 
+   it('should set the panel direction based on the trigger direction', fakeAsync(() => {
+     const fixture = createComponent(
+@@ -609,6 +609,7 @@ describe('MatMenu', () => {
+     expect(panel.classList).toContain('mat-elevation-z2');
+ 
+     fixture.componentInstance.panelClass = 'custom-two';
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(panel.classList).not.toContain('custom-one');
+@@ -719,16 +720,16 @@ describe('MatMenu', () => {
+     expect(secondMenuItemDebugEl.nativeElement.classList).toContain('cdk-mouse-focused');
+   }));
+ 
+-  it('should not throw an error on destroy', fakeAsync(() => {
++  it('should not throw an error on destroy', () => {
+     const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
+     expect(fixture.destroy.bind(fixture)).not.toThrow();
+-  }));
++  });
+ 
+-  it('should be able to extract the menu item text', fakeAsync(() => {
++  it('should be able to extract the menu item text', () => {
+     const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
+     fixture.detectChanges();
+     expect(fixture.componentInstance.items.first.getLabel()).toBe('Item');
+-  }));
++  });
+ 
+   it('should filter out icon nodes when figuring out the label', fakeAsync(() => {
+     const fixture = createComponent(SimpleMenu, [], [FakeIcon]);
+@@ -1047,39 +1048,34 @@ describe('MatMenu', () => {
+     flush();
+   }));
+ 
+-  it(
+-    'should respect the DOM order, rather than insertion order, when moving focus using ' +
+-      'the arrow keys',
+-    fakeAsync(() => {
+-      let fixture = createComponent(SimpleMenuWithRepeater);
++  it('should respect the DOM order, rather than insertion order, when moving focus using the arrow keys', fakeAsync(() => {
++    let fixture = createComponent(SimpleMenuWithRepeater);
+ 
+-      fixture.detectChanges();
+-      fixture.componentInstance.trigger.openMenu();
+-      fixture.detectChanges();
+-      tick(500);
++    fixture.detectChanges();
++    fixture.componentInstance.trigger.openMenu();
++    fixture.detectChanges();
++    tick(500);
+ 
+-      let menuPanel = document.querySelector('.mat-mdc-menu-panel')!;
+-      let items = menuPanel.querySelectorAll('.mat-mdc-menu-panel [mat-menu-item]');
++    let menuPanel = document.querySelector('.mat-mdc-menu-panel')!;
++    let items = menuPanel.querySelectorAll('.mat-mdc-menu-panel [mat-menu-item]');
+ 
+-      expect(document.activeElement)
+-        .withContext('Expected first item to be focused on open')
+-        .toBe(items[0]);
++    expect(document.activeElement)
++      .withContext('Expected first item to be focused on open')
++      .toBe(items[0]);
+ 
+-      // Add a new item after the first one.
+-      fixture.componentInstance.items.splice(1, 0, {label: 'Calzone', disabled: false});
+-      fixture.detectChanges();
++    // Add a new item after the first one.
++    fixture.componentInstance.items.splice(1, 0, {label: 'Calzone', disabled: false});
++    fixture.changeDetectorRef.markForCheck();
++    fixture.detectChanges();
+ 
+-      items = menuPanel.querySelectorAll('.mat-mdc-menu-panel [mat-menu-item]');
+-      dispatchKeyboardEvent(menuPanel, 'keydown', DOWN_ARROW);
+-      fixture.detectChanges();
+-      tick();
++    items = menuPanel.querySelectorAll('.mat-mdc-menu-panel [mat-menu-item]');
++    dispatchKeyboardEvent(menuPanel, 'keydown', DOWN_ARROW);
++    fixture.detectChanges();
++    tick();
+ 
+-      expect(document.activeElement)
+-        .withContext('Expected second item to be focused')
+-        .toBe(items[1]);
+-      flush();
+-    }),
+-  );
++    expect(document.activeElement).withContext('Expected second item to be focused').toBe(items[1]);
++    flush();
++  }));
+ 
+   it('should sync the focus order when an item is focused programmatically', fakeAsync(() => {
+     const fixture = createComponent(SimpleMenuWithRepeater);
+@@ -1362,6 +1358,7 @@ describe('MatMenu', () => {
+       expect(panel.classList).not.toContain('mat-menu-after');
+ 
+       fixture.componentInstance.xPosition = 'after';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(panel.classList).toContain('mat-menu-after');
+@@ -1379,6 +1376,7 @@ describe('MatMenu', () => {
+       expect(panel.classList).not.toContain('mat-menu-below');
+ 
+       fixture.componentInstance.yPosition = 'below';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(panel.classList).toContain('mat-menu-below');
+@@ -1444,9 +1442,9 @@ describe('MatMenu', () => {
+         .toBe(Math.floor(trigger.getBoundingClientRect().bottom));
+     }));
+ 
+-    it('should not throw if a menu reposition is requested while the menu is closed', fakeAsync(() => {
++    it('should not throw if a menu reposition is requested while the menu is closed', () => {
+       expect(() => fixture.componentInstance.trigger.updatePosition()).not.toThrow();
+-    }));
++    });
+   });
+ 
+   describe('fallback positions', () => {
+@@ -1954,6 +1952,7 @@ describe('MatMenu', () => {
+         .toBe(2);
+ 
+       items[1].componentInstance.disabled = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       // Invoke the handler directly since the fake events are flaky on disabled elements.
+@@ -1979,6 +1978,7 @@ describe('MatMenu', () => {
+       const item = fixture.debugElement.query(By.directive(MatMenuItem))!;
+ 
+       item.componentInstance.disabled = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       // Invoke the handler directly since the fake events are flaky on disabled elements.
+@@ -2498,6 +2498,7 @@ describe('MatMenu', () => {
+         .toBe(1);
+ 
+       instance.showLazy = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       const lazyTrigger = overlay.querySelector('#lazy-trigger')!;
+diff --git a/src/material/select/select.spec.ts b/src/material/select/select.spec.ts
+index 14374e689edb29c6a24e52ead458c1ac4926a47c..c0a5dc64cec7167286181c485db7488138db10ae 100644
+--- a/src/material/select/select.spec.ts
++++ b/src/material/select/select.spec.ts
+@@ -135,17 +135,17 @@ describe('MatSelect', () => {
+         let fixture: ComponentFixture<BasicSelect>;
+         let select: HTMLElement;
+ 
+-        beforeEach(fakeAsync(() => {
++        beforeEach(() => {
+           fixture = TestBed.createComponent(BasicSelect);
+           fixture.detectChanges();
+           select = fixture.debugElement.query(By.css('mat-select'))!.nativeElement;
+-        }));
++        });
+ 
+-        it('should set the role of the select to combobox', fakeAsync(() => {
++        it('should set the role of the select to combobox', () => {
+           expect(select.getAttribute('role')).toEqual('combobox');
+           expect(select.getAttribute('aria-autocomplete')).toBe('none');
+           expect(select.getAttribute('aria-haspopup')).toBe('listbox');
+-        }));
++        });
+ 
+         it('should point the aria-controls attribute to the listbox', fakeAsync(() => {
+           expect(select.hasAttribute('aria-controls')).toBe(false);
+@@ -169,16 +169,16 @@ describe('MatSelect', () => {
+           expect(select.getAttribute('aria-expanded')).toBe('true');
+         }));
+ 
+-        it('should support setting a custom aria-label', fakeAsync(() => {
++        it('should support setting a custom aria-label', () => {
+           fixture.componentInstance.ariaLabel = 'Custom Label';
+           fixture.changeDetectorRef.markForCheck();
+           fixture.detectChanges();
+ 
+           expect(select.getAttribute('aria-label')).toEqual('Custom Label');
+           expect(select.hasAttribute('aria-labelledby')).toBeFalsy();
+-        }));
++        });
+ 
+-        it('should be able to add an extra aria-labelledby on top of the default', fakeAsync(() => {
++        it('should be able to add an extra aria-labelledby on top of the default', () => {
+           fixture.componentInstance.ariaLabelledby = 'myLabelId';
+           fixture.changeDetectorRef.markForCheck();
+           fixture.detectChanges();
+@@ -187,15 +187,15 @@ describe('MatSelect', () => {
+           const valueId = fixture.nativeElement.querySelector('.mat-mdc-select-value').id;
+ 
+           expect(select.getAttribute('aria-labelledby')).toBe(`${labelId} ${valueId} myLabelId`);
+-        }));
++        });
+ 
+-        it('should set aria-labelledby to the value and label IDs', fakeAsync(() => {
++        it('should set aria-labelledby to the value and label IDs', () => {
+           fixture.detectChanges();
+ 
+           const labelId = fixture.nativeElement.querySelector('label').id;
+           const valueId = fixture.nativeElement.querySelector('.mat-mdc-select-value').id;
+           expect(select.getAttribute('aria-labelledby')).toBe(`${labelId} ${valueId}`);
+-        }));
++        });
+ 
+         it('should trim the trigger aria-labelledby when there is no label', fakeAsync(() => {
+           fixture.componentInstance.hasLabel = false;
+@@ -209,11 +209,11 @@ describe('MatSelect', () => {
+           expect(select.getAttribute('aria-labelledby')).toBe(`${valueId}`);
+         }));
+ 
+-        it('should set the tabindex of the select to 0 by default', fakeAsync(() => {
++        it('should set the tabindex of the select to 0 by default', () => {
+           expect(select.getAttribute('tabindex')).toEqual('0');
+-        }));
++        });
+ 
+-        it('should set `aria-describedby` to the id of the mat-hint', fakeAsync(() => {
++        it('should set `aria-describedby` to the id of the mat-hint', () => {
+           expect(select.getAttribute('aria-describedby')).toBeNull();
+ 
+           fixture.componentInstance.hint = 'test';
+@@ -222,24 +222,24 @@ describe('MatSelect', () => {
+           const hint = fixture.debugElement.query(By.css('mat-hint')).nativeElement;
+           expect(select.getAttribute('aria-describedby')).toBe(hint.getAttribute('id'));
+           expect(select.getAttribute('aria-describedby')).toMatch(/^mat-mdc-hint-\d+$/);
+-        }));
++        });
+ 
+-        it('should support user binding to `aria-describedby`', fakeAsync(() => {
++        it('should support user binding to `aria-describedby`', () => {
+           fixture.componentInstance.ariaDescribedBy = 'test';
+           fixture.changeDetectorRef.markForCheck();
+           fixture.detectChanges();
+           expect(select.getAttribute('aria-describedby')).toBe('test');
+-        }));
++        });
+ 
+-        it('should be able to override the tabindex', fakeAsync(() => {
++        it('should be able to override the tabindex', () => {
+           fixture.componentInstance.tabIndexOverride = 3;
+           fixture.changeDetectorRef.markForCheck();
+           fixture.detectChanges();
+ 
+           expect(select.getAttribute('tabindex')).toBe('3');
+-        }));
++        });
+ 
+-        it('should set aria-required for required selects', fakeAsync(() => {
++        it('should set aria-required for required selects', () => {
+           expect(select.getAttribute('aria-required'))
+             .withContext(`Expected aria-required attr to be false for normal selects.`)
+             .toEqual('false');
+@@ -251,9 +251,9 @@ describe('MatSelect', () => {
+           expect(select.getAttribute('aria-required'))
+             .withContext(`Expected aria-required attr to be true for required selects.`)
+             .toEqual('true');
+-        }));
++        });
+ 
+-        it('should set the mat-select-required class for required selects', fakeAsync(() => {
++        it('should set the mat-select-required class for required selects', () => {
+           expect(select.classList).not.toContain(
+             'mat-mdc-select-required',
+             `Expected the mat-mdc-select-required class not to be set.`,
+@@ -266,9 +266,9 @@ describe('MatSelect', () => {
+           expect(select.classList)
+             .withContext(`Expected the mat-mdc-select-required class to be set.`)
+             .toContain('mat-mdc-select-required');
+-        }));
++        });
+ 
+-        it('should set aria-invalid for selects that are invalid and touched', fakeAsync(() => {
++        it('should set aria-invalid for selects that are invalid and touched', () => {
+           expect(select.getAttribute('aria-invalid'))
+             .withContext(`Expected aria-invalid attr to be false for valid selects.`)
+             .toEqual('false');
+@@ -282,18 +282,18 @@ describe('MatSelect', () => {
+           expect(select.getAttribute('aria-invalid'))
+             .withContext(`Expected aria-invalid attr to be true for invalid selects.`)
+             .toEqual('true');
+-        }));
++        });
+ 
+-        it('should set aria-disabled for disabled selects', fakeAsync(() => {
++        it('should set aria-disabled for disabled selects', () => {
+           expect(select.getAttribute('aria-disabled')).toEqual('false');
+ 
+           fixture.componentInstance.control.disable();
+           fixture.detectChanges();
+ 
+           expect(select.getAttribute('aria-disabled')).toEqual('true');
+-        }));
++        });
+ 
+-        it('should set the tabindex of the select to -1 if disabled', fakeAsync(() => {
++        it('should set the tabindex of the select to -1 if disabled', () => {
+           fixture.componentInstance.control.disable();
+           fixture.detectChanges();
+           expect(select.getAttribute('tabindex')).toEqual('-1');
+@@ -301,7 +301,7 @@ describe('MatSelect', () => {
+           fixture.componentInstance.control.enable();
+           fixture.detectChanges();
+           expect(select.getAttribute('tabindex')).toEqual('0');
+-        }));
++        });
+ 
+         it('should set `aria-labelledby` to the value ID if there is no form field', () => {
+           fixture.destroy();
+@@ -353,44 +353,40 @@ describe('MatSelect', () => {
+           flush();
+         }));
+ 
+-        it(
+-          'should go back to first option if value is reset after interacting using the' +
+-            'arrow keys on a closed select',
+-          fakeAsync(() => {
+-            const formControl = fixture.componentInstance.control;
+-            const options = fixture.componentInstance.options.toArray();
++        it('should go back to first option if value is reset after interacting using the arrow keys on a closed select', fakeAsync(() => {
++          const formControl = fixture.componentInstance.control;
++          const options = fixture.componentInstance.options.toArray();
+ 
+-            expect(formControl.value).withContext('Expected no initial value.').toBeFalsy();
++          expect(formControl.value).withContext('Expected no initial value.').toBeFalsy();
+ 
+-            dispatchKeyboardEvent(select, 'keydown', DOWN_ARROW);
+-            flush();
++          dispatchKeyboardEvent(select, 'keydown', DOWN_ARROW);
++          flush();
+ 
+-            expect(options[0].selected)
+-              .withContext('Expected first option to be selected.')
+-              .toBe(true);
+-            expect(formControl.value)
+-              .withContext('Expected value from first option to have been set on the model.')
+-              .toBe(options[0].value);
++          expect(options[0].selected)
++            .withContext('Expected first option to be selected.')
++            .toBe(true);
++          expect(formControl.value)
++            .withContext('Expected value from first option to have been set on the model.')
++            .toBe(options[0].value);
+ 
+-            formControl.reset();
+-            fixture.detectChanges();
++          formControl.reset();
++          fixture.detectChanges();
+ 
+-            expect(options[0].selected)
+-              .withContext('Expected first option to be deselected.')
+-              .toBe(false);
+-            expect(formControl.value).withContext('Expected value to be reset.').toBeFalsy();
++          expect(options[0].selected)
++            .withContext('Expected first option to be deselected.')
++            .toBe(false);
++          expect(formControl.value).withContext('Expected value to be reset.').toBeFalsy();
+ 
+-            dispatchKeyboardEvent(select, 'keydown', DOWN_ARROW);
+-            flush();
+-
+-            expect(options[0].selected)
+-              .withContext('Expected first option to be selected again.')
+-              .toBe(true);
+-            expect(formControl.value)
+-              .withContext('Expected value from first option to have been set on the model again.')
+-              .toBe(options[0].value);
+-          }),
+-        );
++          dispatchKeyboardEvent(select, 'keydown', DOWN_ARROW);
++          flush();
++
++          expect(options[0].selected)
++            .withContext('Expected first option to be selected again.')
++            .toBe(true);
++          expect(formControl.value)
++            .withContext('Expected value from first option to have been set on the model again.')
++            .toBe(options[0].value);
++        }));
+ 
+         it('should select first/last options via the HOME/END keys on a closed select', fakeAsync(() => {
+           const formControl = fixture.componentInstance.control;
+@@ -544,7 +540,7 @@ describe('MatSelect', () => {
+           flush();
+         }));
+ 
+-        it('should open a single-selection select using ALT + DOWN_ARROW', fakeAsync(() => {
++        it('should open a single-selection select using ALT + DOWN_ARROW', () => {
+           const {control: formControl, select: selectInstance} = fixture.componentInstance;
+ 
+           expect(selectInstance.panelOpen).withContext('Expected select to be closed.').toBe(false);
+@@ -556,9 +552,9 @@ describe('MatSelect', () => {
+ 
+           expect(selectInstance.panelOpen).withContext('Expected select to be open.').toBe(true);
+           expect(formControl.value).withContext('Expected value not to have changed.').toBeFalsy();
+-        }));
++        });
+ 
+-        it('should open a single-selection select using ALT + UP_ARROW', fakeAsync(() => {
++        it('should open a single-selection select using ALT + UP_ARROW', () => {
+           const {control: formControl, select: selectInstance} = fixture.componentInstance;
+ 
+           expect(selectInstance.panelOpen).withContext('Expected select to be closed.').toBe(false);
+@@ -570,9 +566,9 @@ describe('MatSelect', () => {
+ 
+           expect(selectInstance.panelOpen).withContext('Expected select to be open.').toBe(true);
+           expect(formControl.value).withContext('Expected value not to have changed.').toBeFalsy();
+-        }));
++        });
+ 
+-        it('should close when pressing ALT + DOWN_ARROW', fakeAsync(() => {
++        it('should close when pressing ALT + DOWN_ARROW', () => {
+           const {select: selectInstance} = fixture.componentInstance;
+ 
+           selectInstance.open();
+@@ -588,9 +584,9 @@ describe('MatSelect', () => {
+           expect(event.defaultPrevented)
+             .withContext('Expected default action to be prevented.')
+             .toBe(true);
+-        }));
++        });
+ 
+-        it('should close when pressing ALT + UP_ARROW', fakeAsync(() => {
++        it('should close when pressing ALT + UP_ARROW', () => {
+           const {select: selectInstance} = fixture.componentInstance;
+ 
+           selectInstance.open();
+@@ -606,7 +602,7 @@ describe('MatSelect', () => {
+           expect(event.defaultPrevented)
+             .withContext('Expected default action to be prevented.')
+             .toBe(true);
+-        }));
++        });
+ 
+         it('should be able to select options by typing on a closed select', fakeAsync(() => {
+           const formControl = fixture.componentInstance.control;
+@@ -708,7 +704,7 @@ describe('MatSelect', () => {
+           expect(formControl.value).withContext('Expected no value to be assigned.').toBeFalsy();
+         }));
+ 
+-        it('should open the panel when pressing a vertical arrow key on a closed multiple select', fakeAsync(() => {
++        it('should open the panel when pressing a vertical arrow key on a closed multiple select', () => {
+           fixture.destroy();
+ 
+           const multiFixture = TestBed.createComponent(MultiSelect);
+@@ -730,9 +726,9 @@ describe('MatSelect', () => {
+           expect(event.defaultPrevented)
+             .withContext('Expected default to be prevented.')
+             .toBe(true);
+-        }));
++        });
+ 
+-        it('should open the panel when pressing a horizontal arrow key on closed multiple select', fakeAsync(() => {
++        it('should open the panel when pressing a horizontal arrow key on closed multiple select', () => {
+           fixture.destroy();
+ 
+           const multiFixture = TestBed.createComponent(MultiSelect);
+@@ -754,9 +750,9 @@ describe('MatSelect', () => {
+           expect(event.defaultPrevented)
+             .withContext('Expected default to be prevented.')
+             .toBe(true);
+-        }));
++        });
+ 
+-        it('should do nothing when typing on a closed multi-select', fakeAsync(() => {
++        it('should do nothing when typing on a closed multi-select', () => {
+           fixture.destroy();
+ 
+           const multiFixture = TestBed.createComponent(MultiSelect);
+@@ -777,9 +773,9 @@ describe('MatSelect', () => {
+           expect(instance.control.value)
+             .withContext('Expected value to stay the same.')
+             .toBe(initialValue);
+-        }));
++        });
+ 
+-        it('should do nothing if the key manager did not change the active item', fakeAsync(() => {
++        it('should do nothing if the key manager did not change the active item', () => {
+           const formControl = fixture.componentInstance.control;
+ 
+           expect(formControl.value)
+@@ -795,7 +791,7 @@ describe('MatSelect', () => {
+           expect(formControl.pristine)
+             .withContext('Expected form control to stay clean.')
+             .toBe(true);
+-        }));
++        });
+ 
+         it('should continue from the selected option when the value is set programmatically', fakeAsync(() => {
+           const formControl = fixture.componentInstance.control;
+@@ -810,48 +806,44 @@ describe('MatSelect', () => {
+           flush();
+         }));
+ 
+-        it(
+-          'should not shift focus when the selected options are updated programmatically ' +
+-            'in a multi select',
+-          fakeAsync(() => {
+-            fixture.destroy();
++        it('should not shift focus when the selected options are updated programmatically in a multi select', () => {
++          fixture.destroy();
+ 
+-            const multiFixture = TestBed.createComponent(MultiSelect);
++          const multiFixture = TestBed.createComponent(MultiSelect);
+ 
+-            multiFixture.detectChanges();
+-            select = multiFixture.debugElement.query(By.css('mat-select'))!.nativeElement;
+-            multiFixture.componentInstance.select.open();
+-            multiFixture.detectChanges();
++          multiFixture.detectChanges();
++          select = multiFixture.debugElement.query(By.css('mat-select'))!.nativeElement;
++          multiFixture.componentInstance.select.open();
++          multiFixture.detectChanges();
+ 
+-            const options = overlayContainerElement.querySelectorAll(
+-              'mat-option',
+-            ) as NodeListOf<HTMLElement>;
++          const options = overlayContainerElement.querySelectorAll(
++            'mat-option',
++          ) as NodeListOf<HTMLElement>;
+ 
+-            select.focus();
+-            multiFixture.detectChanges();
+-            multiFixture.componentInstance.select._keyManager.setActiveItem(3);
+-            multiFixture.detectChanges();
++          select.focus();
++          multiFixture.detectChanges();
++          multiFixture.componentInstance.select._keyManager.setActiveItem(3);
++          multiFixture.detectChanges();
+ 
+-            expect(document.activeElement)
+-              .withContext('Expected select to have DOM focus.')
+-              .toBe(select);
+-            expect(select.getAttribute('aria-activedescendant'))
+-              .withContext('Expected fourth option to be activated.')
+-              .toBe(options[3].id);
++          expect(document.activeElement)
++            .withContext('Expected select to have DOM focus.')
++            .toBe(select);
++          expect(select.getAttribute('aria-activedescendant'))
++            .withContext('Expected fourth option to be activated.')
++            .toBe(options[3].id);
+ 
+-            multiFixture.componentInstance.control.setValue(['steak-0', 'sushi-7']);
+-            multiFixture.detectChanges();
++          multiFixture.componentInstance.control.setValue(['steak-0', 'sushi-7']);
++          multiFixture.detectChanges();
+ 
+-            expect(document.activeElement)
+-              .withContext('Expected select to have DOM focus.')
+-              .toBe(select);
+-            expect(select.getAttribute('aria-activedescendant'))
+-              .withContext('Expected fourth optino to remain activated.')
+-              .toBe(options[3].id);
+-          }),
+-        );
++          expect(document.activeElement)
++            .withContext('Expected select to have DOM focus.')
++            .toBe(select);
++          expect(select.getAttribute('aria-activedescendant'))
++            .withContext('Expected fourth optino to remain activated.')
++            .toBe(options[3].id);
++        });
+ 
+-        it('should not cycle through the options if the control is disabled', fakeAsync(() => {
++        it('should not cycle through the options if the control is disabled', () => {
+           const formControl = fixture.componentInstance.control;
+ 
+           formControl.setValue('eggs-5');
+@@ -862,9 +854,9 @@ describe('MatSelect', () => {
+           expect(formControl.value)
+             .withContext('Expected value to remain unchaged.')
+             .toBe('eggs-5');
+-        }));
++        });
+ 
+-        it('should not wrap selection after reaching the end of the options', fakeAsync(() => {
++        it('should not wrap selection after reaching the end of the options', () => {
+           const lastOption = fixture.componentInstance.options.last;
+ 
+           fixture.componentInstance.options.forEach(() => {
+@@ -880,11 +872,9 @@ describe('MatSelect', () => {
+           expect(lastOption.selected)
+             .withContext('Expected last option to stay selected.')
+             .toBe(true);
++        });
+ 
+-          flush();
+-        }));
+-
+-        it('should not open a multiple select when tabbing through', fakeAsync(() => {
++        it('should not open a multiple select when tabbing through', () => {
+           fixture.destroy();
+ 
+           const multiFixture = TestBed.createComponent(MultiSelect);
+@@ -901,7 +891,7 @@ describe('MatSelect', () => {
+           expect(multiFixture.componentInstance.select.panelOpen)
+             .withContext('Expected panel to stay closed.')
+             .toBe(false);
+-        }));
++        });
+ 
+         it('should toggle the next option when pressing shift + DOWN_ARROW on a multi-select', fakeAsync(() => {
+           fixture.destroy();
+@@ -961,22 +951,22 @@ describe('MatSelect', () => {
+           expect(multiFixture.componentInstance.select.value).toEqual(['sandwich-3', 'chips-4']);
+         }));
+ 
+-        it('should prevent the default action when pressing space', fakeAsync(() => {
++        it('should prevent the default action when pressing space', () => {
+           const event = dispatchKeyboardEvent(select, 'keydown', SPACE);
+           expect(event.defaultPrevented).toBe(true);
+-        }));
++        });
+ 
+-        it('should prevent the default action when pressing enter', fakeAsync(() => {
++        it('should prevent the default action when pressing enter', () => {
+           const event = dispatchKeyboardEvent(select, 'keydown', ENTER);
+           expect(event.defaultPrevented).toBe(true);
+-        }));
++        });
+ 
+-        it('should not prevent the default actions on selection keys when pressing a modifier', fakeAsync(() => {
++        it('should not prevent the default actions on selection keys when pressing a modifier', () => {
+           [ENTER, SPACE].forEach(key => {
+             const event = createKeyboardEvent('keydown', key, undefined, {shift: true});
+             expect(event.defaultPrevented).toBe(false);
+           });
+-        }));
++        });
+ 
+         it('should consider the selection a result of a user action when closed', fakeAsync(() => {
+           const option = fixture.componentInstance.options.first;
+@@ -992,7 +982,7 @@ describe('MatSelect', () => {
+           flush();
+         }));
+ 
+-        it('should be able to focus the select trigger', fakeAsync(() => {
++        it('should be able to focus the select trigger', () => {
+           document.body.focus(); // ensure that focus isn't on the trigger already
+ 
+           fixture.componentInstance.select.focus();
+@@ -1000,7 +990,7 @@ describe('MatSelect', () => {
+           expect(document.activeElement)
+             .withContext('Expected select element to be focused.')
+             .toBe(select);
+-        }));
++        });
+ 
+         it('should set `aria-multiselectable` to true on the listbox inside multi select', fakeAsync(() => {
+           fixture.destroy();
+@@ -1097,7 +1087,7 @@ describe('MatSelect', () => {
+           expect(host.getAttribute('aria-activedescendant')).toBe(options[0].id);
+         }));
+ 
+-        it('should restore focus to the trigger after selecting an option in multi-select mode', fakeAsync(() => {
++        it('should restore focus to the trigger after selecting an option in multi-select mode', () => {
+           fixture.destroy();
+ 
+           const multiFixture = TestBed.createComponent(MultiSelect);
+@@ -1119,7 +1109,7 @@ describe('MatSelect', () => {
+           expect(document.activeElement)
+             .withContext('Expected trigger to be focused.')
+             .toBe(select);
+-        }));
++        });
+ 
+         it('should set a role of listbox on the select panel', fakeAsync(() => {
+           fixture.componentInstance.select.open();
+@@ -1181,12 +1171,12 @@ describe('MatSelect', () => {
+       describe('for select inside a modal', () => {
+         let fixture: ComponentFixture<SelectInsideAModal>;
+ 
+-        beforeEach(fakeAsync(() => {
++        beforeEach(() => {
+           fixture = TestBed.createComponent(SelectInsideAModal);
+           fixture.detectChanges();
+-        }));
++        });
+ 
+-        it('should add the id of the select panel to the aria-owns of the modal', fakeAsync(() => {
++        it('should add the id of the select panel to the aria-owns of the modal', () => {
+           fixture.componentInstance.select.open();
+           fixture.detectChanges();
+ 
+@@ -1196,7 +1186,7 @@ describe('MatSelect', () => {
+           expect(modalElement.getAttribute('aria-owns')?.split(' '))
+             .withContext('expecting modal to own the select panel')
+             .toContain(panelId);
+-        }));
++        });
+       });
+ 
+       describe('for options', () => {
+@@ -1204,7 +1194,7 @@ describe('MatSelect', () => {
+         let trigger: HTMLElement;
+         let options: HTMLElement[];
+ 
+-        beforeEach(fakeAsync(() => {
++        beforeEach(() => {
+           fixture = TestBed.createComponent(BasicSelect);
+           fixture.detectChanges();
+           trigger = fixture.debugElement.query(By.css('.mat-mdc-select-trigger'))!.nativeElement;
+@@ -1212,7 +1202,7 @@ describe('MatSelect', () => {
+           fixture.detectChanges();
+ 
+           options = Array.from(overlayContainerElement.querySelectorAll('mat-option'));
+-        }));
++        });
+ 
+         it('should set the role of mat-option to option', fakeAsync(() => {
+           expect(options[0].getAttribute('role')).toEqual('option');
+@@ -1348,6 +1338,7 @@ describe('MatSelect', () => {
+ 
+           fixture.componentInstance.select.open();
+           fixture.detectChanges();
++          flush();
+ 
+           activeOptions = options.filter(option => {
+             return option.classList.contains('mat-mdc-option-active');
+@@ -1416,7 +1407,7 @@ describe('MatSelect', () => {
+         let trigger: HTMLElement;
+         let groups: NodeListOf<HTMLElement>;
+ 
+-        beforeEach(fakeAsync(() => {
++        beforeEach(() => {
+           fixture = TestBed.createComponent(SelectWithGroups);
+           fixture.detectChanges();
+           trigger = fixture.debugElement.query(By.css('.mat-mdc-select-trigger'))!.nativeElement;
+@@ -1425,7 +1416,7 @@ describe('MatSelect', () => {
+           groups = overlayContainerElement.querySelectorAll(
+             'mat-optgroup',
+           ) as NodeListOf<HTMLElement>;
+-        }));
++        });
+ 
+         it('should set the appropriate role', fakeAsync(() => {
+           expect(groups[0].getAttribute('role')).toBe('group');
+@@ -1454,12 +1445,12 @@ describe('MatSelect', () => {
+       let formField: HTMLElement;
+       let trigger: HTMLElement;
+ 
+-      beforeEach(fakeAsync(() => {
++      beforeEach(() => {
+         fixture = TestBed.createComponent(BasicSelect);
+         fixture.detectChanges();
+         formField = fixture.debugElement.query(By.css('.mat-mdc-form-field'))!.nativeElement;
+         trigger = formField.querySelector('.mat-mdc-select-trigger') as HTMLElement;
+-      }));
++      });
+ 
+       it('should not throw when attempting to open too early', () => {
+         // Create component and then immediately open without running change detection
+@@ -1580,7 +1571,7 @@ describe('MatSelect', () => {
+         expect(pane.style.width).toBeFalsy();
+       }));
+ 
+-      it('should not attempt to open a select that does not have any options', fakeAsync(() => {
++      it('should not attempt to open a select that does not have any options', () => {
+         fixture.componentInstance.foods = [];
+         fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+@@ -1589,7 +1580,7 @@ describe('MatSelect', () => {
+         fixture.detectChanges();
+ 
+         expect(fixture.componentInstance.select.panelOpen).toBe(false);
+-      }));
++      });
+ 
+       it('should close the panel when tabbing out', fakeAsync(() => {
+         trigger.click();
+@@ -1700,7 +1691,7 @@ describe('MatSelect', () => {
+         expect(event.defaultPrevented).toBe(true);
+       }));
+ 
+-      it('should be able to set extra classes on the panel', fakeAsync(() => {
++      it('should be able to set extra classes on the panel', () => {
+         trigger.click();
+         fixture.detectChanges();
+ 
+@@ -1708,9 +1699,9 @@ describe('MatSelect', () => {
+ 
+         expect(panel.classList).toContain('custom-one');
+         expect(panel.classList).toContain('custom-two');
+-      }));
++      });
+ 
+-      it('should update disableRipple properly on each option', fakeAsync(() => {
++      it('should update disableRipple properly on each option', () => {
+         const options = fixture.componentInstance.options.toArray();
+ 
+         expect(options.every(option => option.disableRipple === false))
+@@ -1724,7 +1715,7 @@ describe('MatSelect', () => {
+         expect(options.every(option => option.disableRipple === true))
+           .withContext('Expected all options to have disableRipple set to true.')
+           .toBeTruthy();
+-      }));
++      });
+ 
+       it('should not show ripples if they were disabled', fakeAsync(() => {
+         fixture.componentInstance.disableRipple = true;
+@@ -1743,7 +1734,7 @@ describe('MatSelect', () => {
+         expect(option.querySelectorAll('.mat-ripple-element').length).toBe(0);
+       }));
+ 
+-      it('should be able to render options inside groups with an ng-container', fakeAsync(() => {
++      it('should be able to render options inside groups with an ng-container', () => {
+         fixture.destroy();
+ 
+         const groupFixture = TestBed.createComponent(SelectWithGroupsAndNgContainer);
+@@ -1755,31 +1746,27 @@ describe('MatSelect', () => {
+         expect(document.querySelectorAll('.cdk-overlay-container mat-option').length)
+           .withContext('Expected at least one option to be rendered.')
+           .toBeGreaterThan(0);
+-      }));
++      });
+ 
+-      it(
+-        'should not consider itself as blurred if the trigger loses focus while the ' +
+-          'panel is still open',
+-        fakeAsync(() => {
+-          const selectElement = fixture.nativeElement.querySelector('.mat-mdc-select');
+-          const selectInstance = fixture.componentInstance.select;
++      it('should not consider itself as blurred if the trigger loses focus while the panel is still open', fakeAsync(() => {
++        const selectElement = fixture.nativeElement.querySelector('.mat-mdc-select');
++        const selectInstance = fixture.componentInstance.select;
+ 
+-          dispatchFakeEvent(selectElement, 'focus');
+-          fixture.detectChanges();
++        dispatchFakeEvent(selectElement, 'focus');
++        fixture.detectChanges();
+ 
+-          expect(selectInstance.focused).withContext('Expected select to be focused.').toBe(true);
++        expect(selectInstance.focused).withContext('Expected select to be focused.').toBe(true);
+ 
+-          selectInstance.open();
+-          fixture.detectChanges();
+-          flush();
+-          dispatchFakeEvent(selectElement, 'blur');
+-          fixture.detectChanges();
++        selectInstance.open();
++        fixture.detectChanges();
++        flush();
++        dispatchFakeEvent(selectElement, 'blur');
++        fixture.detectChanges();
+ 
+-          expect(selectInstance.focused)
+-            .withContext('Expected select element to remain focused.')
+-            .toBe(true);
+-        }),
+-      );
++        expect(selectInstance.focused)
++          .withContext('Expected select element to remain focused.')
++          .toBe(true);
++      }));
+     });
+ 
+     describe('selection logic', () => {
+@@ -1788,19 +1775,19 @@ describe('MatSelect', () => {
+       let formField: HTMLElement;
+       let label: HTMLLabelElement;
+ 
+-      beforeEach(fakeAsync(() => {
++      beforeEach(() => {
+         fixture = TestBed.createComponent(BasicSelect);
+         fixture.detectChanges();
+         trigger = fixture.debugElement.query(By.css('.mat-mdc-select-trigger'))!.nativeElement;
+         formField = fixture.debugElement.query(By.css('.mat-mdc-form-field'))!.nativeElement;
+         label = formField.querySelector('label')!;
+-      }));
++      });
+ 
+-      it('should not float label if no option is selected', fakeAsync(() => {
++      it('should not float label if no option is selected', () => {
+         expect(label.classList.contains('mat-form-field-should-float'))
+           .withContext('Label should not be floating')
+           .toBe(false);
+-      }));
++      });
+ 
+       it('should focus the first option if no option is selected', fakeAsync(() => {
+         trigger.click();
+@@ -2025,7 +2012,7 @@ describe('MatSelect', () => {
+         expect(trigger.textContent!.trim()).toBe('PIZZA');
+       }));
+ 
+-      it('should not select disabled options', fakeAsync(() => {
++      it('should not select disabled options', () => {
+         trigger.click();
+         fixture.detectChanges();
+ 
+@@ -2038,9 +2025,9 @@ describe('MatSelect', () => {
+         expect(fixture.componentInstance.select.panelOpen).toBe(true);
+         expect(options[2].classList).not.toContain('mdc-list-item--selected');
+         expect(fixture.componentInstance.select.selected).toBeUndefined();
+-      }));
++      });
+ 
+-      it('should not select options inside a disabled group', fakeAsync(() => {
++      it('should not select options inside a disabled group', () => {
+         fixture.destroy();
+ 
+         const groupFixture = TestBed.createComponent(SelectWithGroups);
+@@ -2057,7 +2044,7 @@ describe('MatSelect', () => {
+         expect(groupFixture.componentInstance.select.panelOpen).toBe(true);
+         expect(options[0].classList).not.toContain('mdc-list-item--selected');
+         expect(groupFixture.componentInstance.select.selected).toBeUndefined();
+-      }));
++      });
+ 
+       it('should not throw if triggerValue accessed with no selected value', fakeAsync(() => {
+         expect(() => fixture.componentInstance.select.triggerValue).not.toThrow();
+@@ -2159,11 +2146,11 @@ describe('MatSelect', () => {
+       let fixture: ComponentFixture<BasicSelect>;
+       let trigger: HTMLElement;
+ 
+-      beforeEach(fakeAsync(() => {
++      beforeEach(() => {
+         fixture = TestBed.createComponent(BasicSelect);
+         fixture.detectChanges();
+         trigger = fixture.debugElement.query(By.css('.mat-mdc-select-trigger'))!.nativeElement;
+-      }));
++      });
+ 
+       it('should take an initial view value with reactive forms', fakeAsync(() => {
+         fixture.componentInstance.control = new FormControl('pizza-1');
+@@ -2339,7 +2326,7 @@ describe('MatSelect', () => {
+           .toBe(true);
+       }));
+ 
+-      it('should not set touched when a disabled select is touched', fakeAsync(() => {
++      it('should not set touched when a disabled select is touched', () => {
+         expect(fixture.componentInstance.control.touched)
+           .withContext('Expected the control to start off as untouched.')
+           .toBe(false);
+@@ -2350,7 +2337,7 @@ describe('MatSelect', () => {
+         expect(fixture.componentInstance.control.touched)
+           .withContext('Expected the control to stay untouched.')
+           .toBe(false);
+-      }));
++      });
+ 
+       it('should set the control to dirty when the select value changes in DOM', fakeAsync(() => {
+         expect(fixture.componentInstance.control.dirty)
+@@ -2371,7 +2358,7 @@ describe('MatSelect', () => {
+           .toEqual(true);
+       }));
+ 
+-      it('should not set the control to dirty when the value changes programmatically', fakeAsync(() => {
++      it('should not set the control to dirty when the value changes programmatically', () => {
+         expect(fixture.componentInstance.control.dirty)
+           .withContext(`Expected control to start out pristine.`)
+           .toEqual(false);
+@@ -2381,7 +2368,7 @@ describe('MatSelect', () => {
+         expect(fixture.componentInstance.control.dirty)
+           .withContext(`Expected control to stay pristine after programmatic change.`)
+           .toEqual(false);
+-      }));
++      });
+ 
+       it('should set an asterisk after the label if control is required', fakeAsync(() => {
+         const label = fixture.nativeElement.querySelector('.mat-mdc-form-field label');
+@@ -2426,6 +2413,7 @@ describe('MatSelect', () => {
+ 
+         trigger.click();
+         fixture.detectChanges();
++        flush();
+ 
+         expect(overlayContainerElement.textContent)
+           .withContext(`Expected select panel to stay closed.`)
+@@ -2442,6 +2430,7 @@ describe('MatSelect', () => {
+ 
+         trigger.click();
+         fixture.detectChanges();
++        flush();
+ 
+         expect(overlayContainerElement.textContent)
+           .withContext(`Expected select panel to open normally on re-enabled control`)
+@@ -2451,22 +2440,18 @@ describe('MatSelect', () => {
+           .toBe(true);
+       }));
+ 
+-      it(
+-        'should keep the disabled state in sync if the form group is swapped and ' +
+-          'disabled at the same time',
+-        fakeAsync(() => {
+-          const fixture = TestBed.createComponent(SelectInsideDynamicFormGroup);
+-          fixture.detectChanges();
+-          const instance = fixture.componentInstance;
++      it('should keep the disabled state in sync if the form group is swapped and disabled at the same time', () => {
++        const fixture = TestBed.createComponent(SelectInsideDynamicFormGroup);
++        fixture.detectChanges();
++        const instance = fixture.componentInstance;
+ 
+-          expect(instance.select.disabled).toBe(false);
++        expect(instance.select.disabled).toBe(false);
+ 
+-          instance.assignGroup(true);
+-          fixture.detectChanges();
++        instance.assignGroup(true);
++        fixture.detectChanges();
+ 
+-          expect(instance.select.disabled).toBe(true);
+-        }),
+-      );
++        expect(instance.select.disabled).toBe(true);
++      });
+     });
+ 
+     describe('keyboard scrolling', () => {
+@@ -2494,7 +2479,7 @@ describe('MatSelect', () => {
+         panel = overlayContainerElement.querySelector('.mat-mdc-select-panel')! as HTMLElement;
+       }));
+ 
+-      it('should not scroll to options that are completely in the view', fakeAsync(() => {
++      it('should not scroll to options that are completely in the view', () => {
+         const initialScrollPosition = panel.scrollTop;
+ 
+         [1, 2, 3].forEach(() => {
+@@ -2504,18 +2489,18 @@ describe('MatSelect', () => {
+         expect(panel.scrollTop)
+           .withContext('Expected scroll position not to change')
+           .toBe(initialScrollPosition);
+-      }));
++      });
+ 
+-      it('should scroll down to the active option', fakeAsync(() => {
++      it('should scroll down to the active option', () => {
+         for (let i = 0; i < 15; i++) {
+           dispatchKeyboardEvent(host, 'keydown', DOWN_ARROW);
+         }
+ 
+         // <top padding> + <option index * height> - <panel height> = 8 + 16 * 48 - 275 = 501
+         expect(panel.scrollTop).withContext('Expected scroll to be at the 16th option.').toBe(501);
+-      }));
++      });
+ 
+-      it('should scroll up to the active option', fakeAsync(() => {
++      it('should scroll up to the active option', () => {
+         // Scroll to the bottom.
+         for (let i = 0; i < fixture.componentInstance.foods.length; i++) {
+           dispatchKeyboardEvent(host, 'keydown', DOWN_ARROW);
+@@ -2527,7 +2512,7 @@ describe('MatSelect', () => {
+ 
+         // <top padding> + <option index * height> = 8 + 9 * 48 = 440
+         expect(panel.scrollTop).withContext('Expected scroll to be at the 9th option.').toBe(440);
+-      }));
++      });
+ 
+       it('should skip option group labels', fakeAsync(() => {
+         fixture.destroy();
+@@ -2544,6 +2529,7 @@ describe('MatSelect', () => {
+ 
+         for (let i = 0; i < 8; i++) {
+           dispatchKeyboardEvent(host, 'keydown', DOWN_ARROW);
++          flush();
+         }
+ 
+         // <top padding> + <(option index + group labels) * height> - <panel height> =
+@@ -2551,7 +2537,7 @@ describe('MatSelect', () => {
+         expect(panel.scrollTop).withContext('Expected scroll to be at the 9th option.').toBe(309);
+       }));
+ 
+-      it('should scroll to the top when pressing HOME', fakeAsync(() => {
++      it('should scroll to the top when pressing HOME', () => {
+         for (let i = 0; i < 20; i++) {
+           dispatchKeyboardEvent(host, 'keydown', DOWN_ARROW);
+           fixture.detectChanges();
+@@ -2566,9 +2552,9 @@ describe('MatSelect', () => {
+ 
+         // 8px is the top padding of the panel.
+         expect(panel.scrollTop).withContext('Expected panel to be scrolled to the top').toBe(8);
+-      }));
++      });
+ 
+-      it('should scroll to the bottom of the panel when pressing END', fakeAsync(() => {
++      it('should scroll to the bottom of the panel when pressing END', () => {
+         dispatchKeyboardEvent(host, 'keydown', END);
+         fixture.detectChanges();
+ 
+@@ -2577,9 +2563,9 @@ describe('MatSelect', () => {
+         expect(panel.scrollTop)
+           .withContext('Expected panel to be scrolled to the bottom')
+           .toBe(1173);
+-      }));
++      });
+ 
+-      it('should scroll 10 to the top or to first element when pressing PAGE_UP', fakeAsync(() => {
++      it('should scroll 10 to the top or to first element when pressing PAGE_UP', () => {
+         for (let i = 0; i < 18; i++) {
+           dispatchKeyboardEvent(host, 'keydown', DOWN_ARROW);
+           fixture.detectChanges();
+@@ -2605,9 +2591,9 @@ describe('MatSelect', () => {
+         // 8px is the top padding of the panel.
+         expect(panel.scrollTop).withContext('Expected panel to be scrolled to the top').toBe(8);
+         expect(fixture.componentInstance.select._keyManager.activeItemIndex).toBe(0);
+-      }));
++      });
+ 
+-      it('should scroll 10 to the bottom of the panel when pressing PAGE_DOWN', fakeAsync(() => {
++      it('should scroll 10 to the bottom of the panel when pressing PAGE_DOWN', () => {
+         dispatchKeyboardEvent(host, 'keydown', PAGE_DOWN);
+         fixture.detectChanges();
+ 
+@@ -2637,7 +2623,7 @@ describe('MatSelect', () => {
+           .withContext('Expected panel to be scrolled 10 to the bottom')
+           .toBe(1173);
+         expect(fixture.componentInstance.select._keyManager.activeItemIndex).toBe(29);
+-      }));
++      });
+ 
+       it('should scroll to the active option when typing', fakeAsync(() => {
+         for (let i = 0; i < 15; i++) {
+@@ -2671,6 +2657,7 @@ describe('MatSelect', () => {
+ 
+         for (let i = 0; i < 5; i++) {
+           dispatchKeyboardEvent(host, 'keydown', UP_ARROW);
++          flush();
+         }
+ 
+         expect(panel.scrollTop).toBe(0);
+@@ -2692,6 +2679,7 @@ describe('MatSelect', () => {
+       expect(instance.select.selected).toBeFalsy();
+ 
+       instance.addOptions();
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+ 
+@@ -2706,23 +2694,23 @@ describe('MatSelect', () => {
+     let fixture: ComponentFixture<SelectWithChangeEvent>;
+     let trigger: HTMLElement;
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = TestBed.createComponent(SelectWithChangeEvent);
+       fixture.detectChanges();
+ 
+       trigger = fixture.debugElement.query(By.css('.mat-mdc-select-trigger'))!.nativeElement;
+-    }));
++    });
+ 
+-    it('should emit an event when the selected option has changed', fakeAsync(() => {
++    it('should emit an event when the selected option has changed', () => {
+       trigger.click();
+       fixture.detectChanges();
+ 
+       (overlayContainerElement.querySelector('mat-option') as HTMLElement).click();
+ 
+       expect(fixture.componentInstance.changeListener).toHaveBeenCalled();
+-    }));
++    });
+ 
+-    it('should not emit multiple change events for the same option', fakeAsync(() => {
++    it('should not emit multiple change events for the same option', () => {
+       trigger.click();
+       fixture.detectChanges();
+ 
+@@ -2732,7 +2720,7 @@ describe('MatSelect', () => {
+       option.click();
+ 
+       expect(fixture.componentInstance.changeListener).toHaveBeenCalledTimes(1);
+-    }));
++    });
+ 
+     it('should only emit one event when pressing arrow keys on closed select', fakeAsync(() => {
+       const select = fixture.debugElement.query(By.css('mat-select'))!.nativeElement;
+@@ -2764,6 +2752,7 @@ describe('MatSelect', () => {
+ 
+       trigger.click();
+       fixture.detectChanges();
++      flush();
+ 
+       expect(overlayContainerElement.textContent)
+         .withContext(`Expected select panel to stay closed.`)
+@@ -2784,6 +2773,7 @@ describe('MatSelect', () => {
+ 
+       trigger.click();
+       fixture.detectChanges();
++      flush();
+ 
+       expect(overlayContainerElement.textContent)
+         .withContext(`Expected select panel to open normally on re-enabled control`)
+@@ -2878,7 +2868,7 @@ describe('MatSelect', () => {
+   describe('with floatLabel', () => {
+     beforeEach(waitForAsync(() => configureMatSelectTestingModule([FloatLabelSelect])));
+ 
+-    it('should be able to always float the label', fakeAsync(() => {
++    it('should be able to always float the label', () => {
+       const fixture = TestBed.createComponent(FloatLabelSelect);
+       fixture.detectChanges();
+       const label = fixture.nativeElement.querySelector('.mat-mdc-form-field label');
+@@ -2892,9 +2882,9 @@ describe('MatSelect', () => {
+       expect(label.classList.contains('mdc-floating-label--float-above'))
+         .withContext('Label should be floating')
+         .toBe(true);
+-    }));
++    });
+ 
+-    it('should default to global floating label type', fakeAsync(() => {
++    it('should default to global floating label type', () => {
+       TestBed.resetTestingModule();
+       TestBed.configureTestingModule({
+         imports: [
+@@ -2917,9 +2907,9 @@ describe('MatSelect', () => {
+       expect(label.classList.contains('mdc-floating-label--float-above'))
+         .withContext('Label should be floating')
+         .toBe(true);
+-    }));
++    });
+ 
+-    it('should float the label on focus if it has a placeholder', fakeAsync(() => {
++    it('should float the label on focus if it has a placeholder', () => {
+       const fixture = TestBed.createComponent(FloatLabelSelect);
+       fixture.detectChanges();
+       expect(fixture.componentInstance.placeholder).toBeTruthy();
+@@ -2935,32 +2925,32 @@ describe('MatSelect', () => {
+       expect(label.classList.contains('mdc-floating-label--float-above'))
+         .withContext('Label should be floating')
+         .toBe(true);
+-    }));
++    });
+   });
+ 
+   describe('with a sibling component that throws an error', () => {
+     beforeEach(waitForAsync(() =>
+       configureMatSelectTestingModule([SelectWithErrorSibling, ThrowsErrorOnInit])));
+ 
+-    it('should not crash the browser when a sibling throws an error on init', fakeAsync(() => {
++    it('should not crash the browser when a sibling throws an error on init', () => {
+       // Note that this test can be considered successful if the error being thrown didn't
+       // end up crashing the testing setup altogether.
+       expect(() => {
+         TestBed.createComponent(SelectWithErrorSibling).detectChanges();
+       }).toThrowError(new RegExp('Oh no!', 'g'));
+-    }));
++    });
+   });
+ 
+   describe('with tabindex', () => {
+     beforeEach(waitForAsync(() => configureMatSelectTestingModule([SelectWithPlainTabindex])));
+ 
+-    it('should be able to set the tabindex via the native attribute', fakeAsync(() => {
++    it('should be able to set the tabindex via the native attribute', () => {
+       const fixture = TestBed.createComponent(SelectWithPlainTabindex);
+       fixture.detectChanges();
+ 
+       const select = fixture.debugElement.query(By.css('mat-select'))!.nativeElement;
+       expect(select.getAttribute('tabindex')).toBe('5');
+-    }));
++    });
+   });
+ 
+   describe('change events', () => {
+@@ -3028,12 +3018,12 @@ describe('MatSelect', () => {
+ 
+     let fixture: ComponentFixture<BasicSelectWithTheming>;
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = TestBed.createComponent(BasicSelectWithTheming);
+       fixture.detectChanges();
+-    }));
++    });
+ 
+-    it('should transfer the theme to the select panel', fakeAsync(() => {
++    it('should transfer the theme to the select panel', () => {
+       fixture.componentInstance.theme = 'warn';
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+@@ -3043,13 +3033,13 @@ describe('MatSelect', () => {
+ 
+       const panel = overlayContainerElement.querySelector('.mat-mdc-select-panel')! as HTMLElement;
+       expect(panel.classList).toContain('mat-warn');
+-    }));
++    });
+   });
+ 
+   describe('when invalid inside a form', () => {
+     beforeEach(waitForAsync(() => configureMatSelectTestingModule([InvalidSelectInForm])));
+ 
+-    it('should not throw SelectionModel errors in addition to ngModel errors', fakeAsync(() => {
++    it('should not throw SelectionModel errors in addition to ngModel errors', () => {
+       const fixture = TestBed.createComponent(InvalidSelectInForm);
+ 
+       // The first change detection run will throw the "ngModel is missing a name" error.
+@@ -3058,7 +3048,7 @@ describe('MatSelect', () => {
+ 
+       // The second run shouldn't throw selection-model related errors.
+       expect(() => fixture.detectChanges()).not.toThrow();
+-    }));
++    });
+   });
+ 
+   describe('with ngModel using compareWith', () => {
+@@ -3070,7 +3060,9 @@ describe('MatSelect', () => {
+     beforeEach(fakeAsync(() => {
+       fixture = TestBed.createComponent(NgModelCompareWithSelect);
+       instance = fixture.componentInstance;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
++      flush();
+     }));
+ 
+     describe('comparing by value', () => {
+@@ -3094,17 +3086,19 @@ describe('MatSelect', () => {
+       beforeEach(fakeAsync(() => {
+         spyOn(instance, 'compareByReference').and.callThrough();
+         instance.useCompareByReference();
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
++        flush();
+       }));
+ 
+-      it('should use the comparator', fakeAsync(() => {
++      it('should use the comparator', () => {
+         expect(instance.compareByReference).toHaveBeenCalled();
+-      }));
++      });
+ 
+-      it('should initialize with no selection despite having a value', fakeAsync(() => {
++      it('should initialize with no selection despite having a value', () => {
+         expect(instance.selectedFood.value).toBe('pizza-1');
+         expect(instance.select.selected).toBeUndefined();
+-      }));
++      });
+ 
+       it('should not update the selection if value is copied on change', fakeAsync(() => {
+         instance.options.first._selectViaInteraction();
+@@ -3115,26 +3109,27 @@ describe('MatSelect', () => {
+         expect(instance.select.selected).toBeUndefined();
+       }));
+ 
+-      it('should throw an error when using a non-function comparator', fakeAsync(() => {
++      it('should throw an error when using a non-function comparator', () => {
+         instance.useNullComparator();
+ 
+         expect(() => {
++          fixture.changeDetectorRef.markForCheck();
+           fixture.detectChanges();
+         }).toThrowError(wrappedErrorMessage(getMatSelectNonFunctionValueError()));
+-      }));
++      });
+     });
+   });
+ 
+   describe(`when the select's value is accessed on initialization`, () => {
+     beforeEach(waitForAsync(() => configureMatSelectTestingModule([SelectEarlyAccessSibling])));
+ 
+-    it('should not throw when trying to access the selected value on init in the view', fakeAsync(() => {
++    it('should not throw when trying to access the selected value on init in the view', () => {
+       expect(() => {
+         TestBed.createComponent(SelectEarlyAccessSibling).detectChanges();
+       }).not.toThrow();
+-    }));
++    });
+ 
+-    it('should not throw when reading selected value programmatically in single selection mode', fakeAsync(() => {
++    it('should not throw when reading selected value programmatically in single selection mode', () => {
+       expect(() => {
+         const fixture = TestBed.createComponent(SelectEarlyAccessSibling);
+         const select = fixture.debugElement.query(By.directive(MatSelect)).componentInstance;
+@@ -3142,9 +3137,9 @@ describe('MatSelect', () => {
+         select.multiple = false;
+         return select.selected;
+       }).not.toThrow();
+-    }));
++    });
+ 
+-    it('should not throw when reading selected value programmatically in multi selection mode', fakeAsync(() => {
++    it('should not throw when reading selected value programmatically in multi selection mode', () => {
+       expect(() => {
+         const fixture = TestBed.createComponent(SelectEarlyAccessSibling);
+         const select = fixture.debugElement.query(By.directive(MatSelect)).componentInstance;
+@@ -3152,18 +3147,18 @@ describe('MatSelect', () => {
+         select.multiple = true;
+         return select.selected;
+       }).not.toThrow();
+-    }));
++    });
+   });
+ 
+   describe('with ngIf and mat-label', () => {
+     beforeEach(waitForAsync(() => configureMatSelectTestingModule([SelectWithNgIfAndLabel])));
+ 
+-    it('should not throw when using ngIf on a select with an associated label', fakeAsync(() => {
++    it('should not throw when using ngIf on a select with an associated label', () => {
+       expect(() => {
+         const fixture = TestBed.createComponent(SelectWithNgIfAndLabel);
+         fixture.detectChanges();
+       }).not.toThrow();
+-    }));
++    });
+   });
+ 
+   describe('inside of a form group', () => {
+@@ -3173,12 +3168,12 @@ describe('MatSelect', () => {
+     let testComponent: SelectInsideFormGroup;
+     let select: HTMLElement;
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = TestBed.createComponent(SelectInsideFormGroup);
+       fixture.detectChanges();
+       testComponent = fixture.componentInstance;
+       select = fixture.debugElement.query(By.css('mat-select'))!.nativeElement;
+-    }));
++    });
+ 
+     it('should not set the invalid class on a clean select', fakeAsync(() => {
+       expect(testComponent.formGroup.untouched)
+@@ -3274,7 +3269,7 @@ describe('MatSelect', () => {
+         .toBe(1);
+     }));
+ 
+-    it('should override error matching behavior via injection token', fakeAsync(() => {
++    it('should override error matching behavior via injection token', () => {
+       const errorStateMatcher: ErrorStateMatcher = {
+         isErrorState: jasmine.createSpy('error state matcher').and.returnValue(true),
+       };
+@@ -3294,7 +3289,7 @@ describe('MatSelect', () => {
+ 
+       expect(component.select.errorState).toBe(true);
+       expect(errorStateMatcher.isErrorState).toHaveBeenCalled();
+-    }));
++    });
+ 
+     it('should notify that the state changed when the options have changed', fakeAsync(() => {
+       testComponent.formControl.setValue('pizza-1');
+@@ -3321,7 +3316,7 @@ describe('MatSelect', () => {
+   describe('with custom error behavior', () => {
+     beforeEach(waitForAsync(() => configureMatSelectTestingModule([CustomErrorBehaviorSelect])));
+ 
+-    it('should be able to override the error matching behavior via an @Input', fakeAsync(() => {
++    it('should be able to override the error matching behavior via an @Input', () => {
+       const fixture = TestBed.createComponent(CustomErrorBehaviorSelect);
+       const component = fixture.componentInstance;
+       const matcher = jasmine.createSpy('error state matcher').and.returnValue(true);
+@@ -3337,7 +3332,7 @@ describe('MatSelect', () => {
+ 
+       expect(component.select.errorState).toBe(true);
+       expect(matcher).toHaveBeenCalled();
+-    }));
++    });
+   });
+ 
+   describe('with preselected array values', () => {
+@@ -3361,7 +3356,7 @@ describe('MatSelect', () => {
+     beforeEach(waitForAsync(() =>
+       configureMatSelectTestingModule([CompWithCustomSelect, CustomSelectAccessor])));
+ 
+-    it('should support use inside a custom value accessor', fakeAsync(() => {
++    it('should support use inside a custom value accessor', () => {
+       const fixture = TestBed.createComponent(CompWithCustomSelect);
+       spyOn(fixture.componentInstance.customAccessor, 'writeValue');
+       fixture.detectChanges();
+@@ -3370,7 +3365,7 @@ describe('MatSelect', () => {
+         .withContext('Expected mat-select NOT to inherit control from parent value accessor.')
+         .toBeFalsy();
+       expect(fixture.componentInstance.customAccessor.writeValue).toHaveBeenCalled();
+-    }));
++    });
+   });
+ 
+   describe('with a falsy value', () => {
+@@ -3411,7 +3406,7 @@ describe('MatSelect', () => {
+       expect(trigger.textContent).toContain('Pizza');
+     }));
+ 
+-    it('should update the trigger based on the value', fakeAsync(() => {
++    it('should update the trigger based on the value', () => {
+       const fixture = TestBed.createComponent(BasicSelectOnPush);
+       fixture.detectChanges();
+       const trigger = fixture.debugElement.query(By.css('.mat-mdc-select-trigger'))!.nativeElement;
+@@ -3425,7 +3420,7 @@ describe('MatSelect', () => {
+       fixture.detectChanges();
+ 
+       expect(trigger.textContent).not.toContain('Pizza');
+-    }));
++    });
+ 
+     it('should sync up the form control value with the component value', fakeAsync(() => {
+       const fixture = TestBed.createComponent(BasicSelectOnPushPreselected);
+@@ -3440,7 +3435,7 @@ describe('MatSelect', () => {
+   describe('with custom trigger', () => {
+     beforeEach(waitForAsync(() => configureMatSelectTestingModule([SelectWithCustomTrigger])));
+ 
+-    it('should allow the user to customize the label', fakeAsync(() => {
++    it('should allow the user to customize the label', () => {
+       const fixture = TestBed.createComponent(SelectWithCustomTrigger);
+       fixture.detectChanges();
+ 
+@@ -3452,7 +3447,7 @@ describe('MatSelect', () => {
+       expect(label.textContent)
+         .withContext('Expected the displayed text to be "Pizza" in reverse.')
+         .toContain('azziP');
+-    }));
++    });
+   });
+ 
+   describe('when reseting the value by setting null or undefined', () => {
+@@ -3537,7 +3532,7 @@ describe('MatSelect', () => {
+       expect(trigger.textContent).toContain('Falsy');
+     }));
+ 
+-    it('should not consider the reset values as selected when resetting the form control', fakeAsync(() => {
++    it('should not consider the reset values as selected when resetting the form control', () => {
+       expect(label.classList).toContain('mdc-floating-label--float-above');
+ 
+       fixture.componentInstance.control.reset();
+@@ -3548,7 +3543,7 @@ describe('MatSelect', () => {
+       expect(label.classList).not.toContain('mdc-floating-label--float-above');
+       expect(trigger.textContent).not.toContain('Null');
+       expect(trigger.textContent).not.toContain('Undefined');
+-    }));
++    });
+   });
+ 
+   describe('with reset option and a form control', () => {
+@@ -3556,7 +3551,7 @@ describe('MatSelect', () => {
+     let options: HTMLElement[];
+     let trigger: HTMLElement;
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       configureMatSelectTestingModule([SelectWithResetOptionAndFormControl]);
+       fixture = TestBed.createComponent(SelectWithResetOptionAndFormControl);
+       fixture.detectChanges();
+@@ -3564,7 +3559,7 @@ describe('MatSelect', () => {
+       trigger.click();
+       fixture.detectChanges();
+       options = Array.from(overlayContainerElement.querySelectorAll('mat-option'));
+-    }));
++    });
+ 
+     it('should set the select value', fakeAsync(() => {
+       fixture.componentInstance.control.setValue('a');
+@@ -3600,6 +3595,7 @@ describe('MatSelect', () => {
+       fixture.componentInstance.control.setValue('c');
+       fixture.detectChanges();
+       trigger.click();
++      flush();
+       fixture.detectChanges();
+ 
+       expect(options[0].classList).not.toContain('mat-mdc-option-active');
+@@ -3661,6 +3657,7 @@ describe('MatSelect', () => {
+ 
+       trigger.click();
+       fixture.detectChanges();
++      flush();
+ 
+       const option = overlayContainerElement.querySelectorAll('mat-option')[2];
+ 
+@@ -3708,6 +3705,7 @@ describe('MatSelect', () => {
+ 
+       trigger.click();
+       fixture.detectChanges();
++      flush();
+ 
+       const option = overlayContainerElement.querySelectorAll('mat-option')[1];
+ 
+@@ -3725,6 +3723,7 @@ describe('MatSelect', () => {
+ 
+       trigger.click();
+       fixture.detectChanges();
++      flush();
+ 
+       const options = overlayContainerElement.querySelectorAll(
+         'mat-option',
+@@ -3963,11 +3962,13 @@ describe('MatSelect', () => {
+     beforeEach(fakeAsync(() => {
+       fixture = TestBed.createComponent(SelectWithoutOptionCentering);
+       fixture.detectChanges();
++      flush();
+       trigger = fixture.debugElement.query(By.css('.mat-mdc-select-trigger'))!.nativeElement;
+     }));
+ 
+     it('should not align the active option with the trigger if centering is disabled', fakeAsync(() => {
+       trigger.click();
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+ 
+@@ -3996,6 +3997,7 @@ describe('MatSelect', () => {
+     beforeEach(fakeAsync(() => {
+       fixture = TestBed.createComponent(BasicSelect);
+       fixture.detectChanges();
++      flush();
+       formField = fixture.nativeElement.querySelector('.mat-mdc-form-field');
+       formFieldWrapper = formField.querySelector('.mat-mdc-text-field-wrapper') as HTMLElement;
+       trigger = formFieldWrapper.querySelector('.mat-mdc-select-trigger') as HTMLElement;
+@@ -4006,6 +4008,7 @@ describe('MatSelect', () => {
+       formField.style.left = formField.style.top = '10%';
+       trigger.click();
+       fixture.detectChanges();
++      flush();
+ 
+       const panel = overlayContainerElement.querySelector('.cdk-overlay-pane')!;
+       const paneRect = panel.getBoundingClientRect();
+@@ -4023,6 +4026,7 @@ describe('MatSelect', () => {
+       formField.style.bottom = '0';
+       trigger.click();
+       fixture.detectChanges();
++      flush();
+ 
+       const panel = overlayContainerElement.querySelector('.cdk-overlay-pane')!;
+       const paneRect = panel.getBoundingClientRect();
+@@ -4043,14 +4047,14 @@ describe('MatSelect', () => {
+     let testInstance: MultiSelect;
+     let trigger: HTMLElement;
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = TestBed.createComponent(MultiSelect);
+       testInstance = fixture.componentInstance;
+       fixture.detectChanges();
+       trigger = fixture.debugElement.query(By.css('.mat-mdc-select-trigger'))!.nativeElement;
+-    }));
++    });
+ 
+-    it('should be able to select multiple values', fakeAsync(() => {
++    it('should be able to select multiple values', () => {
+       trigger.click();
+       fixture.detectChanges();
+ 
+@@ -4064,9 +4068,9 @@ describe('MatSelect', () => {
+       fixture.detectChanges();
+ 
+       expect(testInstance.control.value).toEqual(['steak-0', 'tacos-2', 'eggs-5']);
+-    }));
++    });
+ 
+-    it('should be able to toggle an option on and off', fakeAsync(() => {
++    it('should be able to toggle an option on and off', () => {
+       trigger.click();
+       fixture.detectChanges();
+ 
+@@ -4081,7 +4085,7 @@ describe('MatSelect', () => {
+       fixture.detectChanges();
+ 
+       expect(testInstance.control.value).toEqual([]);
+-    }));
++    });
+ 
+     it('should update the label', fakeAsync(() => {
+       trigger.click();
+@@ -4105,7 +4109,7 @@ describe('MatSelect', () => {
+       expect(trigger.textContent).toContain('Steak, Eggs');
+     }));
+ 
+-    it('should be able to set the selected value by taking an array', fakeAsync(() => {
++    it('should be able to set the selected value by taking an array', () => {
+       trigger.click();
+       testInstance.control.setValue(['steak-0', 'eggs-5']);
+       fixture.detectChanges();
+@@ -4121,9 +4125,9 @@ describe('MatSelect', () => {
+ 
+       expect(optionInstances[0].selected).toBe(true);
+       expect(optionInstances[5].selected).toBe(true);
+-    }));
++    });
+ 
+-    it('should override the previously-selected value when setting an array', fakeAsync(() => {
++    it('should override the previously-selected value when setting an array', () => {
+       trigger.click();
+       fixture.detectChanges();
+ 
+@@ -4141,9 +4145,9 @@ describe('MatSelect', () => {
+ 
+       expect(options[0].classList).not.toContain('mdc-list-item--selected');
+       expect(options[5].classList).toContain('mdc-list-item--selected');
+-    }));
++    });
+ 
+-    it('should not close the panel when clicking on options', fakeAsync(() => {
++    it('should not close the panel when clicking on options', () => {
+       trigger.click();
+       fixture.detectChanges();
+ 
+@@ -4158,7 +4162,7 @@ describe('MatSelect', () => {
+       fixture.detectChanges();
+ 
+       expect(testInstance.select.panelOpen).toBe(true);
+-    }));
++    });
+ 
+     it('should sort the selected options based on their order in the panel', fakeAsync(() => {
+       trigger.click();
+@@ -4222,7 +4226,7 @@ describe('MatSelect', () => {
+       expect(fixture.componentInstance.control.value).toEqual(['tacos-2', 'pizza-1', 'steak-0']);
+     }));
+ 
+-    it('should sort the values that get set via the model based on the panel order', fakeAsync(() => {
++    it('should sort the values that get set via the model based on the panel order', () => {
+       trigger.click();
+       fixture.detectChanges();
+ 
+@@ -4230,9 +4234,9 @@ describe('MatSelect', () => {
+       fixture.detectChanges();
+ 
+       expect(trigger.textContent).toContain('Steak, Pizza, Tacos');
+-    }));
++    });
+ 
+-    it('should reverse sort the values, that get set via the model in rtl', fakeAsync(() => {
++    it('should reverse sort the values, that get set via the model in rtl', () => {
+       dir.value = 'rtl';
+       trigger.click();
+       fixture.detectChanges();
+@@ -4241,19 +4245,19 @@ describe('MatSelect', () => {
+       fixture.detectChanges();
+ 
+       expect(trigger.textContent).toContain('Tacos, Pizza, Steak');
+-    }));
++    });
+ 
+-    it('should throw an exception when trying to set a non-array value', fakeAsync(() => {
++    it('should throw an exception when trying to set a non-array value', () => {
+       expect(() => {
+         testInstance.control.setValue('not-an-array' as any);
+       }).toThrowError(wrappedErrorMessage(getMatSelectNonArrayValueError()));
+-    }));
++    });
+ 
+-    it('should throw an exception when trying to change multiple mode after init', fakeAsync(() => {
++    it('should throw an exception when trying to change multiple mode after init', () => {
+       expect(() => {
+         testInstance.select.multiple = false;
+       }).toThrowError(wrappedErrorMessage(getMatSelectDynamicMultipleError()));
+-    }));
++    });
+ 
+     it('should pass the `multiple` value to all of the option instances', fakeAsync(() => {
+       trigger.click();
+@@ -4265,7 +4269,9 @@ describe('MatSelect', () => {
+         .toBe(true);
+ 
+       testInstance.foods.push({value: 'cake-8', viewValue: 'Cake'});
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
++      flush();
+ 
+       expect(testInstance.options.toArray().every(option => !!option.multiple))
+         .withContext('Expected `multiple` to have been set on dynamically-added option.')
+@@ -4289,7 +4295,7 @@ describe('MatSelect', () => {
+       expect(fixture.componentInstance.select._keyManager.activeItemIndex).toBe(2);
+     }));
+ 
+-    it('should be to select an option with a `null` value', fakeAsync(() => {
++    it('should be to select an option with a `null` value', () => {
+       fixture.componentInstance.foods = [
+         {value: null, viewValue: 'Steak'},
+         {value: 'pizza-1', viewValue: 'Pizza'},
+@@ -4311,7 +4317,7 @@ describe('MatSelect', () => {
+       fixture.detectChanges();
+ 
+       expect(testInstance.control.value).toEqual([null!, 'pizza-1', null!]);
+-    }));
++    });
+ 
+     it('should select all options when pressing ctrl + a', () => {
+       const selectElement = fixture.nativeElement.querySelector('mat-select');
+@@ -4438,7 +4444,7 @@ describe('MatSelect', () => {
+       }).not.toThrow();
+     }));
+ 
+-    it('should be able to programmatically set an array with duplicate values', fakeAsync(() => {
++    it('should be able to programmatically set an array with duplicate values', () => {
+       testInstance.foods = [
+         {value: 'steak-0', viewValue: 'Steak'},
+         {value: 'pizza-1', viewValue: 'Pizza'},
+@@ -4447,6 +4453,7 @@ describe('MatSelect', () => {
+         {value: 'pizza-1', viewValue: 'Pizza'},
+         {value: 'pizza-1', viewValue: 'Pizza'},
+       ];
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       testInstance.control.setValue(['steak-0', 'pizza-1', 'pizza-1', 'pizza-1']);
+       fixture.detectChanges();
+@@ -4474,9 +4481,9 @@ describe('MatSelect', () => {
+         false,
+         false,
+       ]);
+-    }));
++    });
+ 
+-    it('should update the option selected state if the same array is mutated and passed back in', fakeAsync(() => {
++    it('should update the option selected state if the same array is mutated and passed back in', () => {
+       const value: string[] = [];
+       trigger.click();
+       testInstance.control.setValue(value);
+@@ -4500,7 +4507,7 @@ describe('MatSelect', () => {
+ 
+       expect(optionNodes[5].classList).toContain('mdc-list-item--selected');
+       expect(optionInstances[5].selected).toBe(true);
+-    }));
++    });
+   });
+ 
+   it('should be able to provide default values through an injection token', fakeAsync(() => {
+@@ -4565,11 +4572,11 @@ describe('MatSelect', () => {
+       .toBe(0);
+   });
+ 
+-  it('should not not throw if the select is inside an ng-container with ngIf', fakeAsync(() => {
++  it('should not not throw if the select is inside an ng-container with ngIf', () => {
+     configureMatSelectTestingModule([SelectInNgContainer]);
+     const fixture = TestBed.createComponent(SelectInNgContainer);
+     expect(() => fixture.detectChanges()).not.toThrow();
+-  }));
++  });
+ 
+   describe('page up/down with disabled options', () => {
+     let fixture: ComponentFixture<BasicSelectWithFirstAndLastOptionDisabled>;
+@@ -4595,11 +4602,13 @@ describe('MatSelect', () => {
+ 
+       dispatchKeyboardEvent(host, 'keydown', PAGE_UP);
+       fixture.detectChanges();
++      flush();
+ 
+       expect(fixture.componentInstance.select._keyManager.activeItemIndex).toBe(0);
+ 
+       dispatchKeyboardEvent(host, 'keydown', PAGE_UP);
+       fixture.detectChanges();
++      flush();
+ 
+       expect(fixture.componentInstance.select._keyManager.activeItemIndex).toBe(0);
+     }));
+@@ -4607,11 +4616,13 @@ describe('MatSelect', () => {
+     it('should be able to scroll to disabled option when pressing PAGE_DOWN', fakeAsync(() => {
+       dispatchKeyboardEvent(host, 'keydown', PAGE_DOWN);
+       fixture.detectChanges();
++      flush();
+ 
+       expect(fixture.componentInstance.select._keyManager.activeItemIndex).toBe(7);
+ 
+       dispatchKeyboardEvent(host, 'keydown', PAGE_DOWN);
+       fixture.detectChanges();
++      flush();
+ 
+       expect(fixture.componentInstance.select._keyManager.activeItemIndex).toBe(7);
+     }));
+diff --git a/src/material/sidenav/drawer.spec.ts b/src/material/sidenav/drawer.spec.ts
+index 7d3e2c781624ff59c2dfb2143ae930ef90ef1884..cd37f913a0f7df13a296a30d9aa3919c7d54ec2a 100644
+--- a/src/material/sidenav/drawer.spec.ts
++++ b/src/material/sidenav/drawer.spec.ts
+@@ -1090,7 +1090,7 @@ describe('MatDrawerContainer', () => {
+     discardPeriodicTasks();
+   }));
+ 
+-  it('should be able to toggle whether the container has a backdrop', fakeAsync(() => {
++  it('should be able to toggle whether the container has a backdrop', () => {
+     const fixture = TestBed.createComponent(BasicTestApp);
+     fixture.detectChanges();
+ 
+@@ -1101,7 +1101,7 @@ describe('MatDrawerContainer', () => {
+     fixture.detectChanges();
+ 
+     expect(fixture.nativeElement.querySelector('.mat-drawer-backdrop')).toBeFalsy();
+-  }));
++  });
+ 
+   it('should be able to explicitly enable the backdrop in `side` mode', fakeAsync(() => {
+     const fixture = TestBed.createComponent(BasicTestApp);
+@@ -1135,7 +1135,7 @@ describe('MatDrawerContainer', () => {
+     expect(fixture.componentInstance.drawer.opened).toBe(false);
+   }));
+ 
+-  it('should expose a scrollable when the consumer has not specified drawer content', fakeAsync(() => {
++  it('should expose a scrollable when the consumer has not specified drawer content', () => {
+     const fixture = TestBed.createComponent(DrawerContainerTwoDrawerTestApp);
+ 
+     fixture.detectChanges();
+@@ -1143,9 +1143,9 @@ describe('MatDrawerContainer', () => {
+     expect(fixture.componentInstance.drawerContainer.scrollable instanceof CdkScrollable).toBe(
+       true,
+     );
+-  }));
++  });
+ 
+-  it('should expose a scrollable when the consumer has specified drawer content', fakeAsync(() => {
++  it('should expose a scrollable when the consumer has specified drawer content', () => {
+     const fixture = TestBed.createComponent(DrawerContainerWithContent);
+ 
+     fixture.detectChanges();
+@@ -1153,9 +1153,9 @@ describe('MatDrawerContainer', () => {
+     expect(fixture.componentInstance.drawerContainer.scrollable instanceof CdkScrollable).toBe(
+       true,
+     );
+-  }));
++  });
+ 
+-  it('should clean up the drawers stream on destroy', fakeAsync(() => {
++  it('should clean up the drawers stream on destroy', () => {
+     const fixture = TestBed.createComponent(DrawerContainerTwoDrawerTestApp);
+     fixture.detectChanges();
+ 
+@@ -1168,9 +1168,9 @@ describe('MatDrawerContainer', () => {
+ 
+     expect(spy).toHaveBeenCalled();
+     subscription.unsubscribe();
+-  }));
++  });
+ 
+-  it('should position the drawers before/after the content in the DOM based on their position', fakeAsync(() => {
++  it('should position the drawers before/after the content in the DOM based on their position', () => {
+     const fixture = TestBed.createComponent(DrawerContainerTwoDrawerTestApp);
+     fixture.detectChanges();
+ 
+@@ -1203,7 +1203,7 @@ describe('MatDrawerContainer', () => {
+     expect(endIndex)
+       .withContext('Expected end drawer to be after content')
+       .toBeGreaterThan(contentIndex);
+-  }));
++  });
+ });
+ 
+ /** Test component that contains an MatDrawerContainer but no MatDrawer. */
+diff --git a/src/material/slide-toggle/slide-toggle.spec.ts b/src/material/slide-toggle/slide-toggle.spec.ts
+index a9238eb50cc6e04f9b3bc71b986dde1893142519..1433026fadc4fea70c8b2081aa0488ad57e472f3 100644
+--- a/src/material/slide-toggle/slide-toggle.spec.ts
++++ b/src/material/slide-toggle/slide-toggle.spec.ts
+@@ -17,7 +17,7 @@ import {MatSlideToggle, MatSlideToggleChange, MatSlideToggleModule} from './inde
+ import {MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS} from './slide-toggle-config';
+ 
+ describe('MatSlideToggle without forms', () => {
+-  beforeEach(fakeAsync(() => {
++  beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [
+         MatSlideToggleModule,
+@@ -31,7 +31,7 @@ describe('MatSlideToggle without forms', () => {
+         SlideToggleWithStaticAriaAttributes,
+       ],
+     });
+-  }));
++  });
+ 
+   describe('basic behavior', () => {
+     let fixture: ComponentFixture<any>;
+@@ -42,7 +42,7 @@ describe('MatSlideToggle without forms', () => {
+     let labelElement: HTMLLabelElement;
+     let buttonElement: HTMLButtonElement;
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = TestBed.createComponent(SlideToggleBasic);
+ 
+       // Enable jasmine spies on event functions, which may trigger at initialization
+@@ -60,9 +60,9 @@ describe('MatSlideToggle without forms', () => {
+       slideToggleElement = slideToggleDebug.nativeElement;
+       buttonElement = fixture.debugElement.query(By.css('button'))!.nativeElement;
+       labelElement = fixture.debugElement.query(By.css('label'))!.nativeElement;
+-    }));
++    });
+ 
+-    it('should apply class based on color attribute', fakeAsync(() => {
++    it('should apply class based on color attribute', () => {
+       testComponent.slideColor = 'primary';
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+@@ -74,9 +74,9 @@ describe('MatSlideToggle without forms', () => {
+       fixture.detectChanges();
+ 
+       expect(slideToggleElement.classList).toContain('mat-accent');
+-    }));
++    });
+ 
+-    it('should correctly update the disabled property', fakeAsync(() => {
++    it('should correctly update the disabled property', () => {
+       expect(buttonElement.disabled).toBeFalsy();
+ 
+       testComponent.isDisabled = true;
+@@ -84,9 +84,9 @@ describe('MatSlideToggle without forms', () => {
+       fixture.detectChanges();
+ 
+       expect(buttonElement.disabled).toBeTruthy();
+-    }));
++    });
+ 
+-    it('should correctly update the checked property', fakeAsync(() => {
++    it('should correctly update the checked property', () => {
+       expect(slideToggle.checked).toBeFalsy();
+       expect(buttonElement.getAttribute('aria-checked')).toBe('false');
+ 
+@@ -95,7 +95,7 @@ describe('MatSlideToggle without forms', () => {
+       fixture.detectChanges();
+ 
+       expect(buttonElement.getAttribute('aria-checked')).toBe('true');
+-    }));
++    });
+ 
+     it('should set the toggle to checked on click', fakeAsync(() => {
+       expect(slideToggle.checked).toBe(false);
+@@ -153,7 +153,7 @@ describe('MatSlideToggle without forms', () => {
+       expect(testComponent.onSlideChange).not.toHaveBeenCalled();
+     }));
+ 
+-    it('should add a suffix to the element id', fakeAsync(() => {
++    it('should add a suffix to the element id', () => {
+       testComponent.slideId = 'myId';
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+@@ -174,9 +174,9 @@ describe('MatSlideToggle without forms', () => {
+ 
+       // Once the id binding is set to null, the id property should auto-generate a unique id.
+       expect(buttonElement.id).toMatch(/mat-mdc-slide-toggle-\d+-button/);
+-    }));
++    });
+ 
+-    it('should forward the tabIndex to the underlying element', fakeAsync(() => {
++    it('should forward the tabIndex to the underlying element', () => {
+       fixture.detectChanges();
+ 
+       expect(buttonElement.tabIndex).toBe(0);
+@@ -186,9 +186,9 @@ describe('MatSlideToggle without forms', () => {
+       fixture.detectChanges();
+ 
+       expect(buttonElement.tabIndex).toBe(4);
+-    }));
++    });
+ 
+-    it('should forward the specified name to the element', fakeAsync(() => {
++    it('should forward the specified name to the element', () => {
+       testComponent.slideName = 'myName';
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+@@ -206,9 +206,9 @@ describe('MatSlideToggle without forms', () => {
+       fixture.detectChanges();
+ 
+       expect(buttonElement.name).toBe('');
+-    }));
++    });
+ 
+-    it('should forward the aria-label attribute to the element', fakeAsync(() => {
++    it('should forward the aria-label attribute to the element', () => {
+       testComponent.slideLabel = 'ariaLabel';
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+@@ -220,9 +220,9 @@ describe('MatSlideToggle without forms', () => {
+       fixture.detectChanges();
+ 
+       expect(buttonElement.hasAttribute('aria-label')).toBeFalsy();
+-    }));
++    });
+ 
+-    it('should forward the aria-labelledby attribute to the element', fakeAsync(() => {
++    it('should forward the aria-labelledby attribute to the element', () => {
+       testComponent.slideLabelledBy = 'ariaLabelledBy';
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+@@ -237,9 +237,9 @@ describe('MatSlideToggle without forms', () => {
+       expect(buttonElement.getAttribute('aria-labelledby')).toMatch(
+         /mat-mdc-slide-toggle-\d+-label/,
+       );
+-    }));
++    });
+ 
+-    it('should forward the aria-describedby attribute to the element', fakeAsync(() => {
++    it('should forward the aria-describedby attribute to the element', () => {
+       testComponent.slideAriaDescribedBy = 'some-element';
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+@@ -251,13 +251,13 @@ describe('MatSlideToggle without forms', () => {
+       fixture.detectChanges();
+ 
+       expect(buttonElement.hasAttribute('aria-describedby')).toBe(false);
+-    }));
++    });
+ 
+-    it('should set the `for` attribute to the id of the element', fakeAsync(() => {
++    it('should set the `for` attribute to the id of the element', () => {
+       expect(labelElement.getAttribute('for')).toBeTruthy();
+       expect(buttonElement.getAttribute('id')).toBeTruthy();
+       expect(labelElement.getAttribute('for')).toBe(buttonElement.getAttribute('id'));
+-    }));
++    });
+ 
+     it('should emit the new values properly', fakeAsync(() => {
+       labelElement.click();
+@@ -519,7 +519,7 @@ describe('MatSlideToggle without forms', () => {
+     }),
+   );
+ 
+-  it('should be able to change the default color', fakeAsync(() => {
++  it('should be able to change the default color', () => {
+     TestBed.resetTestingModule().configureTestingModule({
+       imports: [MatSlideToggleModule, SlideToggleWithForm],
+       providers: [{provide: MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS, useValue: {color: 'warn'}}],
+@@ -528,20 +528,20 @@ describe('MatSlideToggle without forms', () => {
+     fixture.detectChanges();
+     const slideToggle = fixture.nativeElement.querySelector('.mat-mdc-slide-toggle');
+     expect(slideToggle.classList).toContain('mat-warn');
+-  }));
++  });
+ 
+-  it('should clear static aria attributes from the host node', fakeAsync(() => {
++  it('should clear static aria attributes from the host node', () => {
+     const fixture = TestBed.createComponent(SlideToggleWithStaticAriaAttributes);
+     fixture.detectChanges();
+ 
+     const host: HTMLElement = fixture.nativeElement.querySelector('mat-slide-toggle');
+     expect(host.hasAttribute('aria-label')).toBe(false);
+     expect(host.hasAttribute('aria-labelledby')).toBe(false);
+-  }));
++  });
+ });
+ 
+ describe('MatSlideToggle with forms', () => {
+-  beforeEach(fakeAsync(() => {
++  beforeEach(() => {
+     TestBed.configureTestingModule({
+       imports: [
+         MatSlideToggleModule,
+@@ -553,7 +553,7 @@ describe('MatSlideToggle with forms', () => {
+         SlideToggleWithModelAndChangeEvent,
+       ],
+     });
+-  }));
++  });
+ 
+   describe('using ngModel', () => {
+     let fixture: ComponentFixture<SlideToggleWithModel>;
+@@ -566,7 +566,7 @@ describe('MatSlideToggle with forms', () => {
+     let labelElement: HTMLLabelElement;
+ 
+     // This initialization is async() because it needs to wait for ngModel to set the initial value.
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = TestBed.createComponent(SlideToggleWithModel);
+       fixture.detectChanges();
+ 
+@@ -578,12 +578,12 @@ describe('MatSlideToggle with forms', () => {
+       slideToggleModel = slideToggleDebug.injector.get<NgModel>(NgModel);
+       buttonElement = fixture.debugElement.query(By.css('button'))!.nativeElement;
+       labelElement = fixture.debugElement.query(By.css('label'))!.nativeElement;
+-    }));
++    });
+ 
+-    it('should be initially set to ng-pristine', fakeAsync(() => {
++    it('should be initially set to ng-pristine', () => {
+       expect(slideToggleElement.classList).toContain('ng-pristine');
+       expect(slideToggleElement.classList).not.toContain('ng-dirty');
+-    }));
++    });
+ 
+     it('should update the model programmatically', fakeAsync(() => {
+       expect(slideToggleElement.classList).not.toContain('mat-mdc-slide-toggle-checked');
+@@ -621,7 +621,7 @@ describe('MatSlideToggle with forms', () => {
+       // also turn touched.
+       dispatchFakeEvent(buttonElement, 'blur');
+       fixture.detectChanges();
+-      flushMicrotasks();
++      flush();
+ 
+       expect(slideToggleModel.valid).toBe(true);
+       expect(slideToggleModel.pristine).toBe(false);
+@@ -639,7 +639,7 @@ describe('MatSlideToggle with forms', () => {
+         fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+-        flushMicrotasks();
++        flush();
+       }).not.toThrow();
+     }));
+ 
+@@ -658,7 +658,7 @@ describe('MatSlideToggle with forms', () => {
+       // also turn touched.
+       dispatchFakeEvent(buttonElement, 'blur');
+       fixture.detectChanges();
+-      flushMicrotasks();
++      flush();
+ 
+       expect(slideToggleModel.touched).toBe(true);
+       expect(slideToggleElement.classList).toContain('mat-mdc-slide-toggle-checked');
+@@ -719,6 +719,7 @@ describe('MatSlideToggle with forms', () => {
+       fixture.componentInstance.modelValue = true;
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
++      flush();
+ 
+       const debugElement = fixture.debugElement.query(By.directive(MatSlideToggle))!;
+       const modelInstance = debugElement.injector.get<NgModel>(NgModel);
+@@ -748,16 +749,16 @@ describe('MatSlideToggle with forms', () => {
+     let slideToggle: MatSlideToggle;
+     let buttonElement: HTMLButtonElement;
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = TestBed.createComponent(SlideToggleWithFormControl);
+       fixture.detectChanges();
+ 
+       testComponent = fixture.debugElement.componentInstance;
+       slideToggle = fixture.debugElement.query(By.directive(MatSlideToggle))!.componentInstance;
+       buttonElement = fixture.debugElement.query(By.css('button'))!.nativeElement;
+-    }));
++    });
+ 
+-    it('should toggle the disabled state', fakeAsync(() => {
++    it('should toggle the disabled state', () => {
+       expect(slideToggle.disabled).toBe(false);
+       expect(buttonElement.disabled).toBe(false);
+ 
+@@ -772,7 +773,7 @@ describe('MatSlideToggle with forms', () => {
+ 
+       expect(slideToggle.disabled).toBe(false);
+       expect(buttonElement.disabled).toBe(false);
+-    }));
++    });
+   });
+ 
+   describe('with form element', () => {
+@@ -784,6 +785,7 @@ describe('MatSlideToggle with forms', () => {
+     beforeEach(fakeAsync(() => {
+       fixture = TestBed.createComponent(SlideToggleWithForm);
+       fixture.detectChanges();
++      flush();
+ 
+       testComponent = fixture.debugElement.componentInstance;
+       buttonElement = fixture.debugElement.query(By.css('button'))!.nativeElement;
+@@ -803,6 +805,7 @@ describe('MatSlideToggle with forms', () => {
+       testComponent.isRequired = true;
+       fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
++      flushMicrotasks();
+ 
+       const slideToggleEl = fixture.nativeElement.querySelector('.mat-mdc-slide-toggle');
+ 
+diff --git a/src/material/slider/slider.spec.ts b/src/material/slider/slider.spec.ts
+index 572c7a595f1fc2599b57aa05c545c702c759d39f..c7fd968bc31a5eaf0f0354d03668887f90671191 100644
+--- a/src/material/slider/slider.spec.ts
++++ b/src/material/slider/slider.spec.ts
+@@ -1319,11 +1319,11 @@ describe('MatSlider', () => {
+       checkInput(input, {min: 0, max: 100, value: 7, translateX: 21});
+     });
+ 
+-    it('should update the disabled state when control is disabled', fakeAsync(() => {
++    it('should update the disabled state when control is disabled', () => {
+       expect(slider.disabled).toBe(false);
+       fixture.componentInstance.control.disable();
+       expect(slider.disabled).toBe(true);
+-    }));
++    });
+ 
+     it('should update the disabled state when the control is enabled', () => {
+       slider.disabled = true;
+diff --git a/src/material/table/table.spec.ts b/src/material/table/table.spec.ts
+index 35b66b80e9d53be15e9111cae2e479fb422c4996..fee8085f6fa842bc1fe4cc29cdf64cdb2754ab43 100644
+--- a/src/material/table/table.spec.ts
++++ b/src/material/table/table.spec.ts
+@@ -240,14 +240,14 @@ describe('MatTable', () => {
+     let dataSource: MatTableDataSource<TestData>;
+     let component: ArrayDataSourceMatTableApp;
+ 
+-    beforeEach(fakeAsync(() => {
++    beforeEach(() => {
+       fixture = TestBed.createComponent(ArrayDataSourceMatTableApp);
+       fixture.detectChanges();
+ 
+       tableElement = fixture.nativeElement.querySelector('table');
+       component = fixture.componentInstance;
+       dataSource = fixture.componentInstance.dataSource;
+-    }));
++    });
+ 
+     it('should create table and display data source contents', () => {
+       expectTableToMatchContent(tableElement, [
+@@ -262,6 +262,7 @@ describe('MatTable', () => {
+     it('changing data should update the table contents', () => {
+       // Add data
+       component.underlyingDataSource.addData();
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+@@ -276,6 +277,7 @@ describe('MatTable', () => {
+       const modifiedData = dataSource.data.slice();
+       modifiedData.shift();
+       dataSource.data = modifiedData;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+@@ -315,6 +317,7 @@ describe('MatTable', () => {
+     it('should be able to filter the table contents', fakeAsync(() => {
+       // Change filter to a_1, should match one row
+       dataSource.filter = 'a_1';
++      flushMicrotasks(); // Resolve promise that updates paginator's length
+       fixture.detectChanges();
+       expect(dataSource.filteredData.length).toBe(1);
+       expect(dataSource.filteredData[0]).toBe(dataSource.data[0]);
+@@ -324,11 +327,11 @@ describe('MatTable', () => {
+         ['Footer A', 'Footer B', 'Footer C'],
+       ]);
+ 
+-      flushMicrotasks(); // Resolve promise that updates paginator's length
+       expect(dataSource.paginator!.length).toBe(1);
+ 
+       // Change filter to '  A_2  ', should match one row (ignores case and whitespace)
+       dataSource.filter = '  A_2  ';
++      flushMicrotasks();
+       fixture.detectChanges();
+       expect(dataSource.filteredData.length).toBe(1);
+       expect(dataSource.filteredData[0]).toBe(dataSource.data[1]);
+@@ -340,6 +343,7 @@ describe('MatTable', () => {
+ 
+       // Change filter to empty string, should match all rows
+       dataSource.filter = '';
++      flushMicrotasks();
+       fixture.detectChanges();
+       expect(dataSource.filteredData.length).toBe(3);
+       expect(dataSource.filteredData[0]).toBe(dataSource.data[0]);
+@@ -373,6 +377,7 @@ describe('MatTable', () => {
+         return dataStr.indexOf(filter) != -1;
+       };
+       dataSource.filter = 'zebra';
++      flushMicrotasks();
+       fixture.detectChanges();
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+@@ -382,6 +387,7 @@ describe('MatTable', () => {
+ 
+       // Change the filter to a falsy value that might come in from the view.
+       dataSource.filter = 0 as any;
++      flushMicrotasks();
+       fixture.detectChanges();
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+@@ -393,6 +399,7 @@ describe('MatTable', () => {
+       // Set the value to the last character of the first
+       // column plus the first character of the second column.
+       dataSource.filter = '1b';
++      flushMicrotasks();
+       fixture.detectChanges();
+       expect(dataSource.filteredData.length).toBe(0);
+       expectTableToMatchContent(tableElement, [
+@@ -606,6 +613,7 @@ describe('MatTable', () => {
+       ]);
+ 
+       dataSource.data = null!;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+@@ -613,6 +621,7 @@ describe('MatTable', () => {
+       ]);
+ 
+       component.underlyingDataSource.addData();
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+@@ -625,6 +634,7 @@ describe('MatTable', () => {
+       ]);
+ 
+       dataSource.data = {} as any;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expectTableToMatchContent(tableElement, [
+         ['Column A', 'Column B', 'Column C'],
+diff --git a/src/material/tabs/tab-group.spec.ts b/src/material/tabs/tab-group.spec.ts
+index f8797c63d91cb4c7d3c6de5f011273d4c6dca2f2..564720e5f5aa4b4f09fb5ef1a655867217969953 100644
+--- a/src/material/tabs/tab-group.spec.ts
++++ b/src/material/tabs/tab-group.spec.ts
+@@ -585,6 +585,7 @@ describe('MatTabGroup', () => {
+       tick();
+ 
+       fixture.componentInstance.tabs.push({label: 'New tab', content: 'to left of index'});
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       tick();
+ 
+@@ -605,6 +606,7 @@ describe('MatTabGroup', () => {
+ 
+       // Remove last tab while last tab is selected, expect next tab over to be selected
+       fixture.componentInstance.tabs.pop();
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       tick();
+ 
+@@ -761,6 +763,7 @@ describe('MatTabGroup', () => {
+       expect(getSelectedContent(fixture).textContent).toMatch('Pizza, fries');
+ 
+       tabGroup.selectedIndex = 2;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       tick();
+ 
+@@ -785,6 +788,7 @@ describe('MatTabGroup', () => {
+       expect(fixture.nativeElement.textContent).not.toContain('Peanuts');
+ 
+       tabGroup.selectedIndex = 3;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       tick();
+ 
+@@ -798,6 +802,7 @@ describe('MatTabGroup', () => {
+       expect(tabGroupNode.classList).not.toContain('mat-mdc-tab-group-inverted-header');
+ 
+       tabGroup.headerPosition = 'below';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(tabGroupNode.classList).toContain('mat-mdc-tab-group-inverted-header');
+@@ -833,6 +838,7 @@ describe('MatTabGroup', () => {
+       ]);
+ 
+       tabGroup.selectedIndex = 2;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       tick();
+ 
+@@ -844,6 +850,7 @@ describe('MatTabGroup', () => {
+       ]);
+ 
+       tabGroup.selectedIndex = 1;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       tick();
+ 
+diff --git a/src/material/tabs/tab-header.spec.ts b/src/material/tabs/tab-header.spec.ts
+index 26679454ee702ba65d57061776076b4f083be85d..d9c4f5cd16830963cea0ec44a4be5691ef04700e 100644
+--- a/src/material/tabs/tab-header.spec.ts
++++ b/src/material/tabs/tab-header.spec.ts
+@@ -18,6 +18,7 @@ import {
+   TestBed,
+   discardPeriodicTasks,
+   fakeAsync,
++  flush,
+   flushMicrotasks,
+   tick,
+   waitForAsync,
+@@ -570,6 +571,7 @@ describe('MatTabHeader', () => {
+           .toBeGreaterThan(previousDistance);
+ 
+         dispatchFakeEvent(nextButton, endEventName);
++        flush();
+       }
+ 
+       /**
+@@ -608,6 +610,7 @@ describe('MatTabHeader', () => {
+           .toBeLessThan(currentScroll);
+ 
+         dispatchFakeEvent(nextButton, endEventName);
++        flush();
+       }
+     });
+ 
+diff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts
+index 3c211004b4a3bd0626a4cc70b844548d7d38ee4e..8ff54ed42d1399e01f87d91f5df03760030177b1 100644
+--- a/src/material/tooltip/tooltip.spec.ts
++++ b/src/material/tooltip/tooltip.spec.ts
+@@ -131,6 +131,7 @@ describe('MatTooltip', () => {
+       // On animation complete, should expect that the tooltip has been detached.
+       finishCurrentTooltipAnimation(overlayContainerElement, false);
+       assertTooltipInstance(tooltipDirective, false);
++      flush();
+     }));
+ 
+     it('should be able to re-open a tooltip if it was closed by detaching the overlay', fakeAsync(() => {
+@@ -150,6 +151,7 @@ describe('MatTooltip', () => {
+       tick(0);
+       finishCurrentTooltipAnimation(overlayContainerElement, true);
+       expect(tooltipDirective._isTooltipVisible()).toBe(true);
++      flush();
+     }));
+ 
+     it('should show with delay', fakeAsync(() => {
+@@ -199,6 +201,7 @@ describe('MatTooltip', () => {
+       expect(tooltipDirective._isTooltipVisible()).toBe(true);
+       tick(7331);
+       expect(tooltipDirective._isTooltipVisible()).toBe(false);
++      flush();
+     }));
+ 
+     it('should be able to override the default position', fakeAsync(() => {
+@@ -432,6 +435,7 @@ describe('MatTooltip', () => {
+       expect(tooltipDirective._isTooltipVisible()).toBe(true);
+ 
+       fixture.componentInstance.message = '';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       tick(0);
+       expect(tooltipDirective._isTooltipVisible()).toBe(false);
+@@ -501,8 +505,8 @@ describe('MatTooltip', () => {
+ 
+       assertTooltipInstance(tooltipDirective, true);
+ 
+-      tooltipDirective.position = 'above';
+       spyOn(tooltipDirective._overlayRef!, 'updatePosition').and.callThrough();
++      tooltipDirective.position = 'above';
+       fixture.detectChanges();
+       tick();
+ 
+@@ -599,6 +603,7 @@ describe('MatTooltip', () => {
+       fixture.destroy();
+       expect(overlayContainerElement.childNodes.length).toBe(0);
+       expect(overlayContainerElement.textContent).toBe('');
++      flush();
+     }));
+ 
+     it('should have an aria-describedby element with the tooltip message', fakeAsync(() => {
+@@ -652,6 +657,7 @@ describe('MatTooltip', () => {
+       tick(tooltipDelay); // Change the tooltip state to hidden and trigger animation start
+ 
+       fixture.componentInstance.showButton = false;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+     }));
+ 
+@@ -770,6 +776,7 @@ describe('MatTooltip', () => {
+       expect(tooltipWrapper.getAttribute('dir'))
+         .withContext('Expected tooltip to be in LTR.')
+         .toBe('ltr');
++      flush();
+     }));
+ 
+     it('should be able to set the tooltip message as a number', fakeAsync(() => {
+@@ -829,6 +836,7 @@ describe('MatTooltip', () => {
+       finishCurrentTooltipAnimation(overlayContainerElement, true);
+ 
+       expect(overlayContainerElement.textContent).toContain(initialTooltipMessage);
++      flush();
+     }));
+ 
+     it('should hide when pressing escape', fakeAsync(() => {
+@@ -849,6 +857,7 @@ describe('MatTooltip', () => {
+ 
+       expect(tooltipDirective._isTooltipVisible()).toBe(false);
+       expect(overlayContainerElement.textContent).toBe('');
++      flush();
+     }));
+ 
+     it('should not throw when pressing ESCAPE', fakeAsync(() => {
+@@ -940,6 +949,7 @@ describe('MatTooltip', () => {
+       finishCurrentTooltipAnimation(overlayContainerElement, true);
+ 
+       expect(overlayRef.detach).not.toHaveBeenCalled();
++      flush();
+     }));
+ 
+     it('should set a class on the overlay panel that reflects the position', fakeAsync(() => {
+@@ -1028,6 +1038,7 @@ describe('MatTooltip', () => {
+       // Note that we aren't asserting anything, but `fakeAsync` will
+       // throw if we have any timers by the end of the test.
+       fixture.destroy();
++      flush();
+     }));
+ 
+     it('should clear the hide timeout on destroy', fakeAsync(() => {
+@@ -1044,6 +1055,7 @@ describe('MatTooltip', () => {
+       // Note that we aren't asserting anything, but `fakeAsync` will
+       // throw if we have any timers by the end of the test.
+       fixture.destroy();
++      flush();
+     }));
+ 
+     it('should set the multiline class on tooltips with messages that overflow', fakeAsync(() => {
+@@ -1287,6 +1299,7 @@ describe('MatTooltip', () => {
+       // On animation complete, should expect that the tooltip has been detached.
+       finishCurrentTooltipAnimation(overlayContainerElement, false);
+       assertTooltipInstance(tooltipDirective, false);
++      flush();
+     }));
+ 
+     it('should have rendered the tooltip text on init', fakeAsync(() => {
+@@ -1327,6 +1340,7 @@ describe('MatTooltip', () => {
+       finishCurrentTooltipAnimation(overlayContainerElement, true); // Finish the animation.
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, true);
++      flush();
+     }));
+ 
+     it('should be able to disable opening on touch', fakeAsync(() => {
+@@ -1376,6 +1390,7 @@ describe('MatTooltip', () => {
+       finishCurrentTooltipAnimation(overlayContainerElement, false); // Finish the exit animation.
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, false);
++      flush();
+     }));
+ 
+     it('should close on touchcancel with a delay', fakeAsync(() => {
+@@ -1400,6 +1415,7 @@ describe('MatTooltip', () => {
+       finishCurrentTooltipAnimation(overlayContainerElement, false); // Finish the exit animation.
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, false);
++      flush();
+     }));
+ 
+     it('should disable native touch interactions', () => {
+@@ -1537,6 +1553,7 @@ describe('MatTooltip', () => {
+       finishCurrentTooltipAnimation(overlayContainerElement, false);
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, false);
++      flush();
+     }));
+ 
+     it('should not close if the cursor is over the trigger after a wheel event', fakeAsync(() => {
+@@ -1571,6 +1588,7 @@ describe('MatTooltip', () => {
+       finishCurrentTooltipAnimation(overlayContainerElement, false);
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, true);
++      flush();
+     }));
+   });
+ });
