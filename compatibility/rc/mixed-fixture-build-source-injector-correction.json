@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "a0eb8b06917b6fc83e13578a8a7358e008844c6f",
+  "correction": "Four owned injector contexts accept and forward notFoundValue: three bounded borrowed-dependency contexts use public Injector.NULL; the table viewport context forwards to its parent with InjectOptions while intentionally hiding CDK_VIRTUAL_SCROLL_VIEWPORT during construction. These are distinct routes. This corrects the overbroad earlier statement that all four forward through Injector.NULL. The complete original source observations, applicability decision and runtime/floor obligations are unchanged.",
+  "routes": [
+    {
+      "path": "projects/ngx-material-legacy/internal/public-constructor-context.ts",
+      "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "exact_operation": "return Injector.NULL.get(token, notFoundValue);",
+      "fallback_route": "Injector.NULL",
+      "viewport_token_intentionally_hidden": false
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+      "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "exact_operation": "return Injector.NULL.get(token, notFoundValue);",
+      "fallback_route": "Injector.NULL",
+      "viewport_token_intentionally_hidden": false
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/internal/public-constructor-context.ts",
+      "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef",
+      "exact_operation": "return Injector.NULL.get(token, notFoundValue);",
+      "fallback_route": "Injector.NULL",
+      "viewport_token_intentionally_hidden": false
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts",
+      "sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771",
+      "exact_operation": "return token === CDK_VIRTUAL_SCROLL_VIEWPORT ? null : this.parent.get(token, notFoundValue, options);",
+      "fallback_route": "parent injector with InjectOptions",
+      "viewport_token_intentionally_hidden": true
+    }
+  ],
+  "producer": {
+    "path": "compatibility/rc/mixed-fixture-build-source-injector-correction.py",
+    "sha256": "860c88acf27b2916c5132e5d8655f0a484d2ebdccf7d9817da1770d53a84e22d"
+  },
+  "original_source_observations_changed": false,
+  "product_changed": false,
+  "actual_native_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
