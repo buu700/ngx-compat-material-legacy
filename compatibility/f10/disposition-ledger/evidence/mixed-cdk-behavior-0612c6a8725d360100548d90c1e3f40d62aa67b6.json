@@ -1,0 +1,660 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "0612c6a8725d360100548d90c1e3f40d62aa67b6",
+  "subject": "fix(cdk/accordion): resolve changed after checked error",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "goldens/cdk/accordion/index.api.md",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "8e6254e6293fa264e5c18cddb655846b2d312ff2",
+      "after_blob": "bcb6931f8f805f17d9b3ec4084428fbc7871a929"
+    },
+    {
+      "path": "src/cdk/accordion/accordion-item.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "97a9cdd07d5b7e17a7d8dd1f626d5ba0bac864ab",
+      "after_blob": "bd32f3f10d8c063c5aad58e15f6f7b21320a2730"
+    },
+    {
+      "path": "src/material/expansion/accordion.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "10445635c270c0ce51c2cd1fe249e97404dac9fe",
+      "after_blob": "b1ce7dac589c3267f9df86f66c9b95df32eb9436"
+    }
+  ],
+  "original_files": 3,
+  "original_hunks": 5,
+  "raw_commit_sha256": "229e29b8c4822636f2c88b9ae0935b6b9161847e0a4a7b7afbb59526064fca44",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-cdk-behavior-source-subjects.json.gz",
+    "sha256": "d8456f6c28ff9618863bbdd24f026a1a0b5f5d4854f5692e2283695395e869d7"
+  },
+  "patch_file": "compatibility/rc/mixed-cdk-behavior-source-0612c6a8725d360100548d90c1e3f40d62aa67b6.original.patch",
+  "diff_sha256": "32108654f469f947dc27be279bfe3ca5b3eeaac2bf38c6be6e1a4a1c5662afc2",
+  "hunk_reviews": [
+    {
+      "path": "goldens/cdk/accordion/index.api.md",
+      "header": "@@ -44,7 +44,8 @@ export class CdkAccordionItem implements OnInit, OnDestroy {",
+      "sha256": "3566520d0dbff2bd8bacc4ad01efff75bb682d47022618ecb86b97cff9b39263",
+      "judgment": "The untouched upstream API golden changes only disabled:boolean to get/set disabled declarations. This is source evidence; no owned golden is updated."
+    },
+    {
+      "path": "src/cdk/accordion/accordion-item.ts",
+      "header": "@@ -16,6 +16,7 @@ import {",
+      "sha256": "fea5f1e63af7adcb77a1350a61bcf82e54b60a2565c046a7e41d26cb3afa4c48",
+      "judgment": "The field is replaced with a boolean-transform Input accessor pair and false signal. Complete remaining runtime operations match, and published minimum source metadata/accessor bodies are checked individually."
+    },
+    {
+      "path": "src/cdk/accordion/accordion-item.ts",
+      "header": "@@ -90,7 +91,14 @@ export class CdkAccordionItem implements OnInit, OnDestroy {",
+      "sha256": "8264b2210f72ea5a42c58668bd2a237acbf824ba8a6ddd4980b4b8c3989ebdf3",
+      "judgment": "The field is replaced with a boolean-transform Input accessor pair and false signal. Complete remaining runtime operations match, and published minimum source metadata/accessor bodies are checked individually."
+    },
+    {
+      "path": "src/material/expansion/accordion.spec.ts",
+      "header": "@@ -5,13 +5,7 @@ import {",
+      "sha256": "877fbb572d184e7882b394b790152b149e65e91e8e3f066aa7995cfe5f6bf959",
+      "judgment": "All15 callbacks remain unchanged. The removed provideCheckNoChangesConfig(exhaustive:false) hook configuration and fixture imports are fixture-preparation changes; do not infer compiler/error timing or replace historical module setup."
+    },
+    {
+      "path": "src/material/expansion/accordion.spec.ts",
+      "header": "@@ -25,18 +19,6 @@ describe('MatAccordion', () => {",
+      "sha256": "5e9587b27858e5070e7266c8ebea89bc844a35a72918dd45f0700686b5c4bf08",
+      "judgment": "All15 callbacks remain unchanged. The removed provideCheckNoChangesConfig(exhaustive:false) hook configuration and fixture imports are fixture-preparation changes; do not infer compiler/error timing or replace historical module setup."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "goldens/cdk/accordion/index.api.md",
+      "review": "The untouched upstream API golden changes only disabled:boolean to get/set disabled declarations. This is source evidence; no owned golden is updated."
+    },
+    {
+      "path": "src/cdk/accordion/accordion-item.ts",
+      "review": "The field is replaced with a boolean-transform Input accessor pair and false signal. Complete remaining runtime operations match, and published minimum source metadata/accessor bodies are checked individually."
+    },
+    {
+      "path": "src/material/expansion/accordion.spec.ts",
+      "review": "All15 callbacks remain unchanged. The removed provideCheckNoChangesConfig(exhaustive:false) hook configuration and fixture imports are fixture-preparation changes; do not infer compiler/error timing or replace historical module setup."
+    }
+  ],
+  "source_semantics": {
+    "sha": "0612c6a8725d360100548d90c1e3f40d62aa67b6",
+    "runtime_path": "src/cdk/accordion/accordion-item.ts",
+    "golden": [
+      {
+        "path": "goldens/cdk/accordion/index.api.md",
+        "before": "## API Report File for \"@angular/cdk_accordion\"\n\n> Do not edit this file. It is a report generated by [API Extractor](https://api-extractor.com/).\n\n```ts\n\nimport { EventEmitter } from '@angular/core';\nimport * as i0 from '@angular/core';\nimport { InjectionToken } from '@angular/core';\nimport { OnChanges } from '@angular/core';\nimport { OnDestroy } from '@angular/core';\nimport { OnInit } from '@angular/core';\nimport { SimpleChanges } from '@angular/core';\nimport { Subject } from 'rxjs';\n\n// @public\nexport const CDK_ACCORDION: InjectionToken<CdkAccordion>;\n\n// @public\nexport class CdkAccordion implements OnDestroy, OnChanges {\n    closeAll(): void;\n    readonly id: string;\n    multi: boolean;\n    // (undocumented)\n    static ngAcceptInputType_multi: unknown;\n    // (undocumented)\n    ngOnChanges(changes: SimpleChanges): void;\n    // (undocumented)\n    ngOnDestroy(): void;\n    openAll(): void;\n    readonly _openCloseAllActions: Subject<boolean>;\n    readonly _stateChanges: Subject<SimpleChanges>;\n    // (undocumented)\n    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<CdkAccordion, \"cdk-accordion, [cdkAccordion]\", [\"cdkAccordion\"], { \"multi\": { \"alias\": \"multi\"; \"required\": false; }; }, {}, never, never, true, never>;\n    // (undocumented)\n    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<CdkAccordion, never>;\n}\n\n// @public\nexport class CdkAccordionItem implements OnInit, OnDestroy {\n    constructor(...args: unknown[]);\n    // (undocumented)\n    accordion: CdkAccordion;\n    close(): void;\n    readonly closed: EventEmitter<void>;\n    readonly destroyed: EventEmitter<void>;\n    disabled: boolean;\n    get expanded(): boolean;\n    set expanded(expanded: boolean);\n    readonly expandedChange: EventEmitter<boolean>;\n    // (undocumented)\n    protected _expansionDispatcher: UniqueSelectionDispatcher;\n    readonly id: string;\n    // (undocumented)\n    static ngAcceptInputType_disabled: unknown;\n    // (undocumented)\n    static ngAcceptInputType_expanded: unknown;\n    ngOnDestroy(): void;\n    // (undocumented)\n    ngOnInit(): void;\n    open(): void;\n    readonly opened: EventEmitter<void>;\n    toggle(): void;\n    // (undocumented)\n    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<CdkAccordionItem, \"cdk-accordion-item, [cdkAccordionItem]\", [\"cdkAccordionItem\"], { \"expanded\": { \"alias\": \"expanded\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; }, { \"closed\": \"closed\"; \"opened\": \"opened\"; \"destroyed\": \"destroyed\"; \"expandedChange\": \"expandedChange\"; }, never, never, true, never>;\n    // (undocumented)\n    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<CdkAccordionItem, never>;\n}\n\n// @public (undocumented)\nexport class CdkAccordionModule {\n    // (undocumented)\n    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<CdkAccordionModule, never>;\n    // (undocumented)\n    static \u0275inj: i0.\u0275\u0275InjectorDeclaration<CdkAccordionModule>;\n    // (undocumented)\n    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<CdkAccordionModule, never, [typeof CdkAccordion, typeof CdkAccordionItem], [typeof CdkAccordion, typeof CdkAccordionItem]>;\n}\n\n// (No @packageDocumentation comment for this package)\n\n```\n",
+        "after": "## API Report File for \"@angular/cdk_accordion\"\n\n> Do not edit this file. It is a report generated by [API Extractor](https://api-extractor.com/).\n\n```ts\n\nimport { EventEmitter } from '@angular/core';\nimport * as i0 from '@angular/core';\nimport { InjectionToken } from '@angular/core';\nimport { OnChanges } from '@angular/core';\nimport { OnDestroy } from '@angular/core';\nimport { OnInit } from '@angular/core';\nimport { SimpleChanges } from '@angular/core';\nimport { Subject } from 'rxjs';\n\n// @public\nexport const CDK_ACCORDION: InjectionToken<CdkAccordion>;\n\n// @public\nexport class CdkAccordion implements OnDestroy, OnChanges {\n    closeAll(): void;\n    readonly id: string;\n    multi: boolean;\n    // (undocumented)\n    static ngAcceptInputType_multi: unknown;\n    // (undocumented)\n    ngOnChanges(changes: SimpleChanges): void;\n    // (undocumented)\n    ngOnDestroy(): void;\n    openAll(): void;\n    readonly _openCloseAllActions: Subject<boolean>;\n    readonly _stateChanges: Subject<SimpleChanges>;\n    // (undocumented)\n    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<CdkAccordion, \"cdk-accordion, [cdkAccordion]\", [\"cdkAccordion\"], { \"multi\": { \"alias\": \"multi\"; \"required\": false; }; }, {}, never, never, true, never>;\n    // (undocumented)\n    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<CdkAccordion, never>;\n}\n\n// @public\nexport class CdkAccordionItem implements OnInit, OnDestroy {\n    constructor(...args: unknown[]);\n    // (undocumented)\n    accordion: CdkAccordion;\n    close(): void;\n    readonly closed: EventEmitter<void>;\n    readonly destroyed: EventEmitter<void>;\n    get disabled(): boolean;\n    set disabled(value: boolean);\n    get expanded(): boolean;\n    set expanded(expanded: boolean);\n    readonly expandedChange: EventEmitter<boolean>;\n    // (undocumented)\n    protected _expansionDispatcher: UniqueSelectionDispatcher;\n    readonly id: string;\n    // (undocumented)\n    static ngAcceptInputType_disabled: unknown;\n    // (undocumented)\n    static ngAcceptInputType_expanded: unknown;\n    ngOnDestroy(): void;\n    // (undocumented)\n    ngOnInit(): void;\n    open(): void;\n    readonly opened: EventEmitter<void>;\n    toggle(): void;\n    // (undocumented)\n    static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<CdkAccordionItem, \"cdk-accordion-item, [cdkAccordionItem]\", [\"cdkAccordionItem\"], { \"expanded\": { \"alias\": \"expanded\"; \"required\": false; }; \"disabled\": { \"alias\": \"disabled\"; \"required\": false; }; }, { \"closed\": \"closed\"; \"opened\": \"opened\"; \"destroyed\": \"destroyed\"; \"expandedChange\": \"expandedChange\"; }, never, never, true, never>;\n    // (undocumented)\n    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<CdkAccordionItem, never>;\n}\n\n// @public (undocumented)\nexport class CdkAccordionModule {\n    // (undocumented)\n    static \u0275fac: i0.\u0275\u0275FactoryDeclaration<CdkAccordionModule, never>;\n    // (undocumented)\n    static \u0275inj: i0.\u0275\u0275InjectorDeclaration<CdkAccordionModule>;\n    // (undocumented)\n    static \u0275mod: i0.\u0275\u0275NgModuleDeclaration<CdkAccordionModule, never, [typeof CdkAccordion, typeof CdkAccordionItem], [typeof CdkAccordion, typeof CdkAccordionItem]>;\n}\n\n// (No @packageDocumentation comment for this package)\n\n```\n"
+      }
+    ],
+    "cases_before": 15,
+    "cases_after": 15,
+    "unchanged_complete_retained_callbacks": 15,
+    "complete_original_files": 3,
+    "complete_original_hunks": 5,
+    "review": "Individually review all3 complete originals, including the API golden, and all5 hunks of the accordion disabled-state fix. The ordinary field becomes a boolean-transform Input getter/setter backed by signal(false), and the API golden changes exactly to get/set accessors. Remaining runtime operations are identical after that exact delta. Both minimum source maps preserve the complete Input/coercion source metadata and accessors, while shipped JS preserves their bodies and false signal initialization with exact compiler debugName metadata. All15 old case callbacks retain semantics; one setup drops an exhaustive-check opt-out and module scope, which is not initialization/error equivalence. The add-on owns/imports no accordion or expansion implementation. Cyph uses the public expansion module and markup independently, so no legacy component/API/DOM/style fork or required consumer edit follows. Preserve actual public-peer, compiler/error/lifecycle and floor obligations outside this source-only applicability decision.",
+    "source_conclusion_only": true,
+    "actual_runtime_or_floor_qualified": false
+  },
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-cdk-behavior-source-review.json.gz",
+    "sha256": "e610f44d5375505ed1aa1e8f9b1c60d3ac9dcc269d417121fe51572289cd49b4"
+  },
+  "decision": "Individually review all3 complete originals, including the API golden, and all5 hunks of the accordion disabled-state fix. The ordinary field becomes a boolean-transform Input getter/setter backed by signal(false), and the API golden changes exactly to get/set accessors. Remaining runtime operations are identical after that exact delta. Both minimum source maps preserve the complete Input/coercion source metadata and accessors, while shipped JS preserves their bodies and false signal initialization with exact compiler debugName metadata. All15 old case callbacks retain semantics; one setup drops an exhaustive-check opt-out and module scope, which is not initialization/error equivalence. The add-on owns/imports no accordion or expansion implementation. Cyph uses the public expansion module and markup independently, so no legacy component/API/DOM/style fork or required consumer edit follows. Preserve actual public-peer, compiler/error/lifecycle and floor obligations outside this source-only applicability decision. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates and independent audit remain separate. No publication.",
+  "current_minimum_source_comparisons": [
+    {
+      "line": "main",
+      "version": "22.1.7",
+      "entries": [
+        {
+          "public_entry": "@angular/cdk/observers",
+          "mapped_source_sha256": "2637f832f0bc1d08de48da0a5b56f59f9476a7489592da364b70a5a7366a158a",
+          "public_runtime_sha256": "8991cf56e1d55d6e784280fb658546b15999a4ea803e599a6a6c905fc7c47746",
+          "checks": {
+            "comment_filter": {
+              "kind": "FunctionDeclaration",
+              "start": 974,
+              "end": 1614,
+              "raw": "function shouldIgnoreRecord(record: MutationRecord) {\n  // Ignore changes to comment text.\n  if (record.type === 'characterData' && record.target instanceof Comment) {\n    return true;\n  }\n  // Ignore addition / removal of comments.\n  if (record.type === 'childList') {\n    for (let i = 0; i < record.addedNodes.length; i++) {\n      if (!(record.addedNodes[i] instanceof Comment)) {\n        return false;\n      }\n    }\n    for (let i = 0; i < record.removedNodes.length; i++) {\n      if (!(record.removedNodes[i] instanceof Comment)) {\n        return false;\n      }\n    }\n    return true;\n  }\n  // Observe everything else.\n  return false;\n}",
+              "sha256": "4bb022bd854282cb810d8361865b15e1353d74735270a86c8828270a9855f891",
+              "semantic_sha256": "2323bb5678f5f5a81fcc7155aeb95a514309ed87366c1102d0e9fd2d7920143e"
+            },
+            "subscription": {
+              "kind": "CallExpression",
+              "start": 3232,
+              "end": 3519,
+              "raw": "stream\n        .pipe(\n          map(records => records.filter(record => !shouldIgnoreRecord(record))),\n          filter(records => !!records.length),\n        )\n        .subscribe(records => {\n          this._ngZone.run(() => {\n            observer.next(records);\n          });\n        })",
+              "sha256": "107b194442420d543a2a684d43c9c9b6eb3460b624b3abf19f5f2ddefd9adb7c",
+              "semantic_sha256": "fa2e4ecc6aec78f0f4b907e2160c701f859049fd2e757b06d5877bb73bee1b87"
+            },
+            "current_delivery_inside_NgZone_differs_from_original_direct_subscriber": true
+          },
+          "actual_runtime_or_floor_executed": false
+        },
+        {
+          "public_entry": "@angular/cdk/stepper",
+          "mapped_source_sha256": "dbbc1c55d5835a125e6f9908bede1a2c2706f0bc85925e796b8ea8165505fc71",
+          "public_runtime_sha256": "aeb13ff5e4ef4e5f8bf8c176908edd3a76cc28af74cabee8354c508e09b3d77d",
+          "checks": {
+            "linear_initialization": {
+              "kind": "IfStatement",
+              "start": 16658,
+              "end": 16873,
+              "raw": "if (this.linear && this.selectedIndex > 0) {\n      const visitedSteps = this.steps.toArray().slice(0, this._selectedIndex());\n\n      for (const step of visitedSteps) {\n        step._markAsInteracted();\n      }\n    }",
+              "sha256": "eafcb72460610bbca33e0d252d0346f78ea0d2fb1e84689bdb081e3a64a9edcc",
+              "semantic_sha256": "92eea677c276ca132cdb9f127dc29a977bc69ba78a663f512e6f6704e1e4531e"
+            },
+            "selection_setter": {
+              "kind": "SetAccessor",
+              "start": 11256,
+              "end": 11932,
+              "raw": "set selectedIndex(index: number) {\n    if (this._steps) {\n      // Ensure that the index can't be out of bounds.\n      if (!this._isValidIndex(index) && (typeof ngDevMode === 'undefined' || ngDevMode)) {\n        throw Error('cdkStepper: Cannot assign out-of-bounds value to `selectedIndex`.');\n      }\n\n      if (this.selectedIndex !== index) {\n        this.selected?._markAsInteracted();\n\n        if (\n          !this._anyControlsInvalidOrPending(index) &&\n          (index >= this.selectedIndex || this.steps.toArray()[index].editable)\n        ) {\n          this._updateSelectedItemIndex(index);\n        }\n      }\n    } else {\n      this._selectedIndex.set(index);\n    }\n  }",
+              "sha256": "256d7a7402350ac990f8c631a65f1cec89df690622d43ec0c3c197f514c7d7b7",
+              "semantic_sha256": "ad17305e917d26739289eac405563c641d803237e77070987a2f3751484262e7"
+            },
+            "signal_read_write_normalization_only": true,
+            "shipped_signal_initializer": {
+              "initializer": {
+                "kind": "CallExpression",
+                "start": 10775,
+                "end": 10847,
+                "raw": "signal(0, ...(ngDevMode ? [{\n    debugName: \"_selectedIndex\"\n  }] : []))",
+                "sha256": "38f4c19adde0835637e835e5ea3565491bcc187b9ad776759e3445613c59da65",
+                "semantic_sha256": "c1b1083ec045a68db34268aff00d65d8089dd4d6aadaf02d7eefef899848128f"
+              },
+              "initial_value": "0",
+              "exact_compiler_debug_name_only": true
+            }
+          },
+          "actual_runtime_or_floor_executed": false
+        },
+        {
+          "public_entry": "@angular/cdk/accordion",
+          "mapped_source_sha256": "4c937bbe9a1acf3584532e1f905a0e22e31741da2e69e7b0c245dc68ba8b9c0c",
+          "public_runtime_sha256": "7caf32b2870b94ddd671bb41369bbd6d6b39d27bb7777ee1269564d1f90b5066",
+          "checks": {
+            "disabled_getter": {
+              "kind": "GetAccessor",
+              "start": 3267,
+              "end": 3356,
+              "raw": "@Input({transform: booleanAttribute})\n  get disabled() {\n    return this._disabled();\n  }",
+              "sha256": "0513563756e2505cdd601b74e17c6fc0ad07153479b7778eeb193bda689b6f8e",
+              "semantic_sha256": "43cb68a31d8e5bd3d1c146b30868dcad197936da7407f265228c6095ed78e711"
+            },
+            "disabled_setter": {
+              "kind": "SetAccessor",
+              "start": 3359,
+              "end": 3424,
+              "raw": "set disabled(value: boolean) {\n    this._disabled.set(value);\n  }",
+              "sha256": "2968340eb6c4fc2e8787e576c90953e875c63853f168bbf9d51df13977095b6b",
+              "semantic_sha256": "895587cec08825d69f05a383f4a74a899776d49adb92b878911f32d5dce4ff03"
+            },
+            "disabled_signal": {
+              "kind": "PropertyDeclaration",
+              "start": 3427,
+              "end": 3461,
+              "raw": "private _disabled = signal(false);",
+              "sha256": "82a96162c556a6c1d9d37ef00130f8e73d4c0a596ce650dcf905deb6da16b2e9",
+              "semantic_sha256": "e3e0f3c65e8ae53bd17bfb90812c9af902ac5787ab3328b9e1e18ee8cbce4da8"
+            },
+            "shipped_signal_initializer": {
+              "initializer": {
+                "kind": "CallExpression",
+                "start": 3114,
+                "end": 3185,
+                "raw": "signal(false, ...(ngDevMode ? [{\n    debugName: \"_disabled\"\n  }] : []))",
+                "sha256": "f93922599c30be8108222d1cb199688a0887165fd559781ce3619a1a0a40b895",
+                "semantic_sha256": "a8c937ef47d989a99a2e1d94b44d57a5d072abeef34a7e1900cadb34b0f5b128"
+              },
+              "initial_value": "false",
+              "exact_compiler_debug_name_only": true
+            }
+          },
+          "actual_runtime_or_floor_executed": false
+        }
+      ],
+      "source_comparison_only": true,
+      "actual_runtime_or_floor_qualified": false
+    },
+    {
+      "line": "21.x",
+      "version": "21.2.14",
+      "entries": [
+        {
+          "public_entry": "@angular/cdk/observers",
+          "mapped_source_sha256": "6125fe083d7c1bf0f6c9f3552c8a7b8a7b164bf25b57adc1377b8ad2a8a0e7ce",
+          "public_runtime_sha256": "f709af3e7a617ec0ffa95ed916683c50c777ba14f77ed4bee2e27afe75f88329",
+          "checks": {
+            "comment_filter": {
+              "kind": "FunctionDeclaration",
+              "start": 977,
+              "end": 1617,
+              "raw": "function shouldIgnoreRecord(record: MutationRecord) {\n  // Ignore changes to comment text.\n  if (record.type === 'characterData' && record.target instanceof Comment) {\n    return true;\n  }\n  // Ignore addition / removal of comments.\n  if (record.type === 'childList') {\n    for (let i = 0; i < record.addedNodes.length; i++) {\n      if (!(record.addedNodes[i] instanceof Comment)) {\n        return false;\n      }\n    }\n    for (let i = 0; i < record.removedNodes.length; i++) {\n      if (!(record.removedNodes[i] instanceof Comment)) {\n        return false;\n      }\n    }\n    return true;\n  }\n  // Observe everything else.\n  return false;\n}",
+              "sha256": "4bb022bd854282cb810d8361865b15e1353d74735270a86c8828270a9855f891",
+              "semantic_sha256": "2323bb5678f5f5a81fcc7155aeb95a514309ed87366c1102d0e9fd2d7920143e"
+            },
+            "subscription": {
+              "kind": "CallExpression",
+              "start": 3336,
+              "end": 3623,
+              "raw": "stream\n        .pipe(\n          map(records => records.filter(record => !shouldIgnoreRecord(record))),\n          filter(records => !!records.length),\n        )\n        .subscribe(records => {\n          this._ngZone.run(() => {\n            observer.next(records);\n          });\n        })",
+              "sha256": "107b194442420d543a2a684d43c9c9b6eb3460b624b3abf19f5f2ddefd9adb7c",
+              "semantic_sha256": "fa2e4ecc6aec78f0f4b907e2160c701f859049fd2e757b06d5877bb73bee1b87"
+            },
+            "current_delivery_inside_NgZone_differs_from_original_direct_subscriber": true
+          },
+          "actual_runtime_or_floor_executed": false
+        },
+        {
+          "public_entry": "@angular/cdk/stepper",
+          "mapped_source_sha256": "a328c9e9c1dbf3372d1892d9065af6c2b20f2669b6b379eda5292916d9414dd2",
+          "public_runtime_sha256": "a46ab0d237318c714a917fa60663c29711a6980366cd4ea3ae3d47a37d91308c",
+          "checks": {
+            "linear_initialization": {
+              "kind": "IfStatement",
+              "start": 16638,
+              "end": 16853,
+              "raw": "if (this.linear && this.selectedIndex > 0) {\n      const visitedSteps = this.steps.toArray().slice(0, this._selectedIndex());\n\n      for (const step of visitedSteps) {\n        step._markAsInteracted();\n      }\n    }",
+              "sha256": "eafcb72460610bbca33e0d252d0346f78ea0d2fb1e84689bdb081e3a64a9edcc",
+              "semantic_sha256": "92eea677c276ca132cdb9f127dc29a977bc69ba78a663f512e6f6704e1e4531e"
+            },
+            "selection_setter": {
+              "kind": "SetAccessor",
+              "start": 11181,
+              "end": 11857,
+              "raw": "set selectedIndex(index: number) {\n    if (this._steps) {\n      // Ensure that the index can't be out of bounds.\n      if (!this._isValidIndex(index) && (typeof ngDevMode === 'undefined' || ngDevMode)) {\n        throw Error('cdkStepper: Cannot assign out-of-bounds value to `selectedIndex`.');\n      }\n\n      if (this.selectedIndex !== index) {\n        this.selected?._markAsInteracted();\n\n        if (\n          !this._anyControlsInvalidOrPending(index) &&\n          (index >= this.selectedIndex || this.steps.toArray()[index].editable)\n        ) {\n          this._updateSelectedItemIndex(index);\n        }\n      }\n    } else {\n      this._selectedIndex.set(index);\n    }\n  }",
+              "sha256": "256d7a7402350ac990f8c631a65f1cec89df690622d43ec0c3c197f514c7d7b7",
+              "semantic_sha256": "ad17305e917d26739289eac405563c641d803237e77070987a2f3751484262e7"
+            },
+            "signal_read_write_normalization_only": true,
+            "shipped_signal_initializer": {
+              "initializer": {
+                "kind": "CallExpression",
+                "start": 10990,
+                "end": 11062,
+                "raw": "signal(0, ...(ngDevMode ? [{\n    debugName: \"_selectedIndex\"\n  }] : []))",
+                "sha256": "38f4c19adde0835637e835e5ea3565491bcc187b9ad776759e3445613c59da65",
+                "semantic_sha256": "c1b1083ec045a68db34268aff00d65d8089dd4d6aadaf02d7eefef899848128f"
+              },
+              "initial_value": "0",
+              "exact_compiler_debug_name_only": true
+            }
+          },
+          "actual_runtime_or_floor_executed": false
+        },
+        {
+          "public_entry": "@angular/cdk/accordion",
+          "mapped_source_sha256": "2898ee511a64bb94c4e3d0e7502b2c83bc3195a87f7bf3ef921ca5b49b4d461e",
+          "public_runtime_sha256": "7fb5cb3bc795a413c4cc32e5f5c379c678ccf39f9714761bea6fb6040ca562ec",
+          "checks": {
+            "disabled_getter": {
+              "kind": "GetAccessor",
+              "start": 3267,
+              "end": 3356,
+              "raw": "@Input({transform: booleanAttribute})\n  get disabled() {\n    return this._disabled();\n  }",
+              "sha256": "0513563756e2505cdd601b74e17c6fc0ad07153479b7778eeb193bda689b6f8e",
+              "semantic_sha256": "43cb68a31d8e5bd3d1c146b30868dcad197936da7407f265228c6095ed78e711"
+            },
+            "disabled_setter": {
+              "kind": "SetAccessor",
+              "start": 3359,
+              "end": 3424,
+              "raw": "set disabled(value: boolean) {\n    this._disabled.set(value);\n  }",
+              "sha256": "2968340eb6c4fc2e8787e576c90953e875c63853f168bbf9d51df13977095b6b",
+              "semantic_sha256": "895587cec08825d69f05a383f4a74a899776d49adb92b878911f32d5dce4ff03"
+            },
+            "disabled_signal": {
+              "kind": "PropertyDeclaration",
+              "start": 3427,
+              "end": 3461,
+              "raw": "private _disabled = signal(false);",
+              "sha256": "82a96162c556a6c1d9d37ef00130f8e73d4c0a596ce650dcf905deb6da16b2e9",
+              "semantic_sha256": "e3e0f3c65e8ae53bd17bfb90812c9af902ac5787ab3328b9e1e18ee8cbce4da8"
+            },
+            "shipped_signal_initializer": {
+              "initializer": {
+                "kind": "CallExpression",
+                "start": 3117,
+                "end": 3188,
+                "raw": "signal(false, ...(ngDevMode ? [{\n    debugName: \"_disabled\"\n  }] : []))",
+                "sha256": "f93922599c30be8108222d1cb199688a0887165fd559781ce3619a1a0a40b895",
+                "semantic_sha256": "a8c937ef47d989a99a2e1d94b44d57a5d072abeef34a7e1900cadb34b0f5b128"
+              },
+              "initial_value": "false",
+              "exact_compiler_debug_name_only": true
+            }
+          },
+          "actual_runtime_or_floor_executed": false
+        }
+      ],
+      "source_comparison_only": true,
+      "actual_runtime_or_floor_qualified": false
+    }
+  ],
+  "owned_scope": {
+    "source_members": 1028,
+    "source_extensions": [
+      ".ts",
+      ".scss",
+      ".css",
+      ".html"
+    ],
+    "members_sha256": "4eea094fdf39828468fc9dfd4d4ae09009e78c4c6d26ce619d9d8a4b3b4dcbd3",
+    "owned_stepper_or_accordion_dependencies": 0,
+    "ordinary_CDK_forks": 0,
+    "public_observer_module_routes": [
+      "legacy-tabs/tabs-module.ts",
+      "legacy-form-field/form-field-module.ts",
+      "legacy-checkbox/checkbox-module.ts",
+      "legacy-slide-toggle/slide-toggle-module.ts"
+    ],
+    "source_scope_only": true,
+    "actual_public_peer_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "0612c6a8725d360100548d90c1e3f40d62aa67b6",
+    "bucket": "test-only-batch-candidate",
+    "subject": "fix(cdk/accordion): resolve changed after checked error",
+    "files": [
+      "src/material/expansion/accordion.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-cdk-behavior-source-prior.json.gz",
+    "sha256": "aafceb40d1da3c5a4b60b56de0b321ba348ea2524d982acc692692e17670616f"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-mixed-cdk-source-applicability",
+    "diff_sha256": "32108654f469f947dc27be279bfe3ca5b3eeaac2bf38c6be6e1a4a1c5662afc2",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Individually review all3 complete originals, including the API golden, and all5 hunks of the accordion disabled-state fix. The ordinary field becomes a boolean-transform Input getter/setter backed by signal(false), and the API golden changes exactly to get/set accessors. Remaining runtime operations are identical after that exact delta. Both minimum source maps preserve the complete Input/coercion source metadata and accessors, while shipped JS preserves their bodies and false signal initialization with exact compiler debugName metadata. All15 old case callbacks retain semantics; one setup drops an exhaustive-check opt-out and module scope, which is not initialization/error equivalence. The add-on owns/imports no accordion or expansion implementation. Cyph uses the public expansion module and markup independently, so no legacy component/API/DOM/style fork or required consumer edit follows. Preserve actual public-peer, compiler/error/lifecycle and floor obligations outside this source-only applicability decision. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-cdk-behavior-source-review.mjs",
+        "sha256": "68f0c085e20a674da1a6963d673c4192b8642909f891fb1f3ef1c836672fb6d1"
+      },
+      {
+        "path": "tests/mixed_cdk_behavior_source_probe.mjs",
+        "sha256": "558b4183d0dff055951fa3ee9c5dbb81eeeac938a688042abc5ae6e4adb53ff8"
+      },
+      {
+        "path": "tests/test_mixed_cdk_behavior_source.py",
+        "sha256": "752b1c8be41d68b0eff516128d779a90ad8596d39195ea076a389b01b297eed8"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-qualification-inspector.py",
+        "sha256": "3e6e5a3e6510dc77acb8d32b5b5deaabdffc10846ae650def3a5b45674bcf549"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/acquire-mixed-cdk-originals.py",
+        "sha256": "2fc03920a1e970741b11c2630a2aafd7a768969f1230f3e7ad37107843a21219"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-authenticator.mjs",
+        "sha256": "8193955ec17a2ea2273d3456f64b309224f81798eb23236167d7bf7a666ed195"
+      },
+      {
+        "path": "compatibility/rc/material-public-subjects.json",
+        "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-subjects.json.gz",
+        "sha256": "d8456f6c28ff9618863bbdd24f026a1a0b5f5d4854f5692e2283695395e869d7"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-acquisition.json.gz",
+        "sha256": "d9a50d55c68fbd2fb3c83f4c3d6411a3ba2a824322069bca156aa6d74cd63de8"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-authentication.json.gz",
+        "sha256": "b42bcb0382a49ffe0244b3c5982bb6fd7de3623e141ebc6da2c40b45e70c0871"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-acquisition-checkpoint.json",
+        "sha256": "f7d8974da631d168722ce20c4d87bff90cfe8016bbbe7b76c923f20e45d871b8"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-published-peer-floors.json.gz",
+        "sha256": "e8d524ba28dfe3f4dd1112e14524cfd2c0ab0f2a4ba46ccddd49a46fbc17098a"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-observation-pins.json.gz",
+        "sha256": "4a2c595c74cd17de848a57ac7ddc45f5b3ec37b82f274d8c9b1891c3cc94a50c"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-prior.json.gz",
+        "sha256": "aafceb40d1da3c5a4b60b56de0b321ba348ea2524d982acc692692e17670616f"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-review.json.gz",
+        "sha256": "e610f44d5375505ed1aa1e8f9b1c60d3ac9dcc269d417121fe51572289cd49b4"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-controls.json",
+        "sha256": "beabe31ba86ec9bd6b77b7102a29c216c78ffc638f3e0dc6f5d22396cfebab6e"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-python.log.gz",
+        "sha256": "45e3e6a7e4c82564162c676d6f05b1c713528f987e4a0a08231072c9bb780f8e"
+      },
+      {
+        "path": "compatibility/rc/mixed-cdk-behavior-source-cyph-sanity.json",
+        "sha256": "6a21b17df9eeed065fa508eef6461dbcb72b1a32dd535e9dc344bbdbd7c54a57"
+      },
+      {
+        "path": "testing/legacy-runner/mutation-observer.ts",
+        "sha256": "dd022b4cb90670f08b9a92d9dc3bfc264a973a7a1e45f7260f88e170ce14c706"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+        "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+        "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.spec.ts",
+        "sha256": "8d4e12acb4e0a65ea96ec687dfa78c703af3b6790c400649b4d5358aa08cc5d7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tabs-module.ts",
+        "sha256": "2f3043630da700af5933e64e481d1d0b88803d847d2c1451d5e8508ccab45673"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.html",
+        "sha256": "abbaad86d831c8ae251568f492214b50452f25da32f6a06a9350ff84bccf85cc"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.html",
+        "sha256": "b1b76d778dfebc650343150afa0b82c200097c7b61a8d1a0059e4ac51b5d20c8"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+        "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+        "sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.html",
+        "sha256": "aa441ced1917ab6b29a83948533f85c8ceb62c373866460d56e59cfca5a2fabd"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-cdk-behavior-source-review.mjs",
+      "sha256": "68f0c085e20a674da1a6963d673c4192b8642909f891fb1f3ef1c836672fb6d1"
+    },
+    {
+      "path": "tests/mixed_cdk_behavior_source_probe.mjs",
+      "sha256": "558b4183d0dff055951fa3ee9c5dbb81eeeac938a688042abc5ae6e4adb53ff8"
+    },
+    {
+      "path": "tests/test_mixed_cdk_behavior_source.py",
+      "sha256": "752b1c8be41d68b0eff516128d779a90ad8596d39195ea076a389b01b297eed8"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-qualification-inspector.py",
+      "sha256": "3e6e5a3e6510dc77acb8d32b5b5deaabdffc10846ae650def3a5b45674bcf549"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/acquire-mixed-cdk-originals.py",
+      "sha256": "2fc03920a1e970741b11c2630a2aafd7a768969f1230f3e7ad37107843a21219"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-authenticator.mjs",
+      "sha256": "8193955ec17a2ea2273d3456f64b309224f81798eb23236167d7bf7a666ed195"
+    },
+    {
+      "path": "compatibility/rc/material-public-subjects.json",
+      "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-subjects.json.gz",
+      "sha256": "d8456f6c28ff9618863bbdd24f026a1a0b5f5d4854f5692e2283695395e869d7"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-acquisition.json.gz",
+      "sha256": "d9a50d55c68fbd2fb3c83f4c3d6411a3ba2a824322069bca156aa6d74cd63de8"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-authentication.json.gz",
+      "sha256": "b42bcb0382a49ffe0244b3c5982bb6fd7de3623e141ebc6da2c40b45e70c0871"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-acquisition-checkpoint.json",
+      "sha256": "f7d8974da631d168722ce20c4d87bff90cfe8016bbbe7b76c923f20e45d871b8"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-published-peer-floors.json.gz",
+      "sha256": "e8d524ba28dfe3f4dd1112e14524cfd2c0ab0f2a4ba46ccddd49a46fbc17098a"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-observation-pins.json.gz",
+      "sha256": "4a2c595c74cd17de848a57ac7ddc45f5b3ec37b82f274d8c9b1891c3cc94a50c"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-prior.json.gz",
+      "sha256": "aafceb40d1da3c5a4b60b56de0b321ba348ea2524d982acc692692e17670616f"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-review.json.gz",
+      "sha256": "e610f44d5375505ed1aa1e8f9b1c60d3ac9dcc269d417121fe51572289cd49b4"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-controls.json",
+      "sha256": "beabe31ba86ec9bd6b77b7102a29c216c78ffc638f3e0dc6f5d22396cfebab6e"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-python.log.gz",
+      "sha256": "45e3e6a7e4c82564162c676d6f05b1c713528f987e4a0a08231072c9bb780f8e"
+    },
+    {
+      "path": "compatibility/rc/mixed-cdk-behavior-source-cyph-sanity.json",
+      "sha256": "6a21b17df9eeed065fa508eef6461dbcb72b1a32dd535e9dc344bbdbd7c54a57"
+    },
+    {
+      "path": "testing/legacy-runner/mutation-observer.ts",
+      "sha256": "dd022b4cb90670f08b9a92d9dc3bfc264a973a7a1e45f7260f88e170ce14c706"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+      "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.spec.ts",
+      "sha256": "c6c9f1bed9f75472644efa00d2e51a18f3bf85c461286b335ba35abe8bece7b7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.spec.ts",
+      "sha256": "8d4e12acb4e0a65ea96ec687dfa78c703af3b6790c400649b4d5358aa08cc5d7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tabs-module.ts",
+      "sha256": "2f3043630da700af5933e64e481d1d0b88803d847d2c1451d5e8508ccab45673"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.html",
+      "sha256": "abbaad86d831c8ae251568f492214b50452f25da32f6a06a9350ff84bccf85cc"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-nav-bar/tab-nav-bar.html",
+      "sha256": "b1b76d778dfebc650343150afa0b82c200097c7b61a8d1a0059e4ac51b5d20c8"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+      "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.html",
+      "sha256": "f630375b769dac8ba62c05c74d8f6abbb640bb9d6a9539ce01f220220f7b93b5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.html",
+      "sha256": "aa441ced1917ab6b29a83948533f85c8ceb62c373866460d56e59cfca5a2fabd"
+    }
+  ],
+  "inherited_observer_runtime_delegation_required": false,
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
