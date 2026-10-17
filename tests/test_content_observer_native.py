@@ -23,6 +23,9 @@ def project_content_observer_native_context(root, read_member=None):
     native run, changes an original expectation or admits an unrelated delta.
     """
     read = read_member or (lambda p: (root / p).read_bytes())
+    if (root / 'compatibility/rc/content-observer-admission-worksheet.json').exists():
+        from tests.test_content_observer_admission import project_observer_admission_context
+        _, read = project_observer_admission_context(root, read)
     load = lambda p: json.loads(read(p))
     digest = lambda raw: hashlib.sha256(raw).hexdigest()
     task = load('compatibility/rc/content-observer-native-worksheet.json')

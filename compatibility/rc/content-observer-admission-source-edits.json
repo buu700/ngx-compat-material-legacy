@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "edits": [
+        {
+          "before": "import {requiresRippleReplay,validateRippleReplay} from './upstream-ripple-replay-evidence.mjs';",
+          "after": "import {requiresRippleReplay,validateRippleReplay} from './upstream-ripple-replay-evidence.mjs';\nimport {requiresContentObserver,validateContentObserver} from './upstream-content-observer-evidence.mjs';",
+          "occurrences": 1
+        },
+        {
+          "before": "  if (INHERITED.has(entry.final_disposition)) {\n    const result = validateInheritedExecution({root, entry, proof, request, line});",
+          "after": "  if (requiresContentObserver(entry, proof)) {\n    const result = validateContentObserver({root, entry, proof, request});\n    artifactBehaviorResults.set(entry.sha, result);\n    inheritedExecutionResults.set(entry.sha, result);\n    // This finite guard has verified the installed identity and complete\n    // per-SHA execution; generic inherited labels cannot substitute for it.\n    return result.ok;\n  }\n  if (INHERITED.has(entry.final_disposition)) {\n    const result = validateInheritedExecution({root, entry, proof, request, line});",
+          "occurrences": 1
+        },
+        {
+          "before": "|| requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof);",
+          "after": "|| requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof);",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "path": "scripts/browser-surface-families.mjs",
+      "edits": [
+        {
+          "before": "// Compile the exported ordinary and legacy progress-bar themes from the packed",
+          "after": "// Record the actual installed public peer export identities alongside native observations.\nconst observerPeerRoot = join(consumer, 'node_modules/@angular/cdk');\nconst observerPeerPackage = JSON.parse(readFileSync(join(observerPeerRoot, 'package.json'), 'utf8'));\nconst observerPeerExports = observerPeerPackage.exports['./observers'];\nconst observerPublicMember = member => {\n  if (typeof member !== 'string' || !member.startsWith('./') || member.split('/').includes('..')) throw Error('invalid public observer export path');\n  return readFileSync(join(observerPeerRoot, member));\n};\nconst contentObserverPeer = {\n  package: observerPeerPackage.name, version: observerPeerPackage.version,\n  runtime_member: observerPeerExports.default.replace(/^\\.\\//, ''),\n  runtime_sha256: createHash('sha256').update(observerPublicMember(observerPeerExports.default)).digest('hex'),\n  types_member: observerPeerExports.types.replace(/^\\.\\//, ''),\n  types_sha256: createHash('sha256').update(observerPublicMember(observerPeerExports.types)).digest('hex'),\n};\n\n// Compile the exported ordinary and legacy progress-bar themes from the packed",
+          "occurrences": 1
+        },
+        {
+          "before": "  content_observer: contentObserver,",
+          "after": "  content_observer: contentObserver,\n  content_observer_peer: contentObserverPeer,",
+          "occurrences": 2
+        }
+      ]
+    },
+    {
+      "path": "scripts/content-observer-native-contract.mjs",
+      "edits": [
+        {
+          "before": "  const trace=(window as any).__closeoutNativeObserverTrace,header=(group as any)._tabHeader;\n  const element=host.querySelector('.mat-tab-list') as HTMLElement;\n  const headerElement=host.querySelector('mat-tab-header') as HTMLElement;\n  const label=host.querySelector('.mat-tab-label-content') as HTMLElement;",
+          "after": "  const trace=(window as any).__closeoutNativeObserverTrace;",
+          "occurrences": 1
+        },
+        {
+          "before": "  return {exercise:async()=>{\n    const result:any=",
+          "after": "  return {exercise:async()=>{\n    await settle();\n    const header=(group as any)._tabHeader;\n    const element=host.querySelector('.mat-tab-list') as HTMLElement;\n    const headerElement=host.querySelector('mat-tab-header') as HTMLElement;\n    const label=host.querySelector('.mat-tab-label-content') as HTMLElement;\n    const result:any=",
+          "occurrences": 1
+        }
+      ]
+    }
+  ],
+  "sample_extraction": {
+    "path": "tests/content_observer_native_probe.mjs",
+    "sample_path": "tests/content_observer_native_sample.mjs",
+    "before": "const record=(type,target_type,added_types=[],removed_types=[])=>({native:true,type,target_type,added_types,removed_types});\nexport function contentObserverNativeSample(zoneless){\n  const stages=CONTENT_OBSERVER_STAGES.map(id=>{\n    const comment=id.startsWith('comment-'),destroyed=['destroyed-owner','reobserve-detached','final-unsubscribe'].includes(id);\n    let raw=[record('childList',1,[comment?8:3])];\n    if(id==='comment-edit')raw=[record('characterData',8)];\n    if(id==='comment-remove')raw=[record('childList',1,[],[8])];\n    if(['text-edit','text-same','reobserve-detached','final-unsubscribe'].includes(id))raw=[record('characterData',3)];\n    if(id==='text-remove')raw=[record('childList',1,[],[3])];\n    if(id==='mixed-add')raw=[record('childList',1,[8,3])];\n    if(id==='mixed-remove')raw=[record('childList',1,[],[8]),record('childList',1,[],[3])];\n    const events=comment||['shared-after-unsubscribe','destroyed-owner','final-unsubscribe'].includes(id)?0:1,owned=comment||destroyed?0:1;\n    return {id,raw_records:raw,delivered_records:events?(id==='mixed-remove'?[raw[1]]:structuredClone(raw)):[],public_events:events,\n      public_zones:Array(events).fill(!zoneless),owned_callbacks:owned,owned_zones:Array(owned).fill(!zoneless),\n      pagination_calls:owned&&id!=='text-same'?1:0,text_changed:!comment&&id!=='text-same',cache_matches_text:!destroyed,\n      owner_destroyed:destroyed,owner_connected:!destroyed};\n  });\n  return {execution:'packed-native-content-observer-legacy-header',error:null,zoneless,mutations_outside_angular:true,\n    identity:{public_content_observer:true,owned_legacy_header:true,legacy_structure:true,shared_native_observer:true},\n    calibration:{text_add_notified:true,text_remove_notified:true},initial_native_generations:1,stages,\n    native_generations:[{id:1,observes:1,disconnects:1,active:false},{id:3,observes:1,disconnects:1,active:false}],\n    cleanup:{owned_header_destroyed:true,direct_subscription_closed:true,fresh_subscription_closed:true,control_disconnected:true,trace_restored:true}};\n}\n",
+    "after": "import {contentObserverNativeSample,contentObserverNativeRecord as record} from './content_observer_native_sample.mjs';\nexport {contentObserverNativeSample};\n",
+    "sample_prefix": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n/** Synthetic observation only; never native execution evidence. */\nimport {CONTENT_OBSERVER_STAGES} from '../scripts/content-observer-native-contract.mjs';\n",
+    "sample_suffix": "export {record as contentObserverNativeRecord};\n"
+  }
+}

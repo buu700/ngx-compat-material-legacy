@@ -43,6 +43,7 @@ import {requiresSelectionBehavior,validateSelectionBehavior} from './upstream-se
 import {requiresFormFieldHover,validateFormFieldHover} from './upstream-form-field-hover-evidence.mjs';
 import {requiresTabCompletion,validateTabCompletion} from './upstream-tab-completion-evidence.mjs';
 import {requiresRippleReplay,validateRippleReplay} from './upstream-ripple-replay-evidence.mjs';
+import {requiresContentObserver,validateContentObserver} from './upstream-content-observer-evidence.mjs';
 import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
 import {SLIDER_THUMB_DESTROY_SHA, SLIDER_THUMB_DESTROY_ROLE, sliderThumbDestroyEvidenceOk} from './upstream-slider-thumb-destroy-scope.mjs';
 import {BAZEL_BUILD_SHAS, BAZEL_BUILD_ROLE, bazelBuildEvidenceOk} from './upstream-bazel-build-scope.mjs';
@@ -319,6 +320,14 @@ function individualProofOk(entry) {
     artifactBehaviorResults.set(entry.sha, result);
     if (!result.ok) return false;
   }
+  if (requiresContentObserver(entry, proof)) {
+    const result = validateContentObserver({root, entry, proof, request});
+    artifactBehaviorResults.set(entry.sha, result);
+    inheritedExecutionResults.set(entry.sha, result);
+    // This finite guard has verified the installed identity and complete
+    // per-SHA execution; generic inherited labels cannot substitute for it.
+    return result.ok;
+  }
   if (INHERITED.has(entry.final_disposition)) {
     const result = validateInheritedExecution({root, entry, proof, request, line});
     inheritedExecutionResults.set(entry.sha, result);
@@ -363,7 +372,7 @@ for (const entry of ledgerBySha.values()) {
     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});
   }
   const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)
-    || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof);
+    || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof);
   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);
   if (needsIndividual && !individualProofOk(entry)) {
     if (sensitive) insufficientSensitive.push(entry.sha);

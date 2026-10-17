@@ -124,6 +124,22 @@ if (install.status !== 0) fail(1, (install.stderr || install.stdout || 'npm inst
 const installed = realpathSync(join(consumer, 'node_modules/@ngx-compat/material-legacy'));
 if (relative(realpathSync(consumer), installed).startsWith('..')) fail(1, `Library resolved outside the consumer: ${installed}`);
 
+// Record the actual installed public peer export identities alongside native observations.
+const observerPeerRoot = join(consumer, 'node_modules/@angular/cdk');
+const observerPeerPackage = JSON.parse(readFileSync(join(observerPeerRoot, 'package.json'), 'utf8'));
+const observerPeerExports = observerPeerPackage.exports['./observers'];
+const observerPublicMember = member => {
+  if (typeof member !== 'string' || !member.startsWith('./') || member.split('/').includes('..')) throw Error('invalid public observer export path');
+  return readFileSync(join(observerPeerRoot, member));
+};
+const contentObserverPeer = {
+  package: observerPeerPackage.name, version: observerPeerPackage.version,
+  runtime_member: observerPeerExports.default.replace(/^\.\//, ''),
+  runtime_sha256: createHash('sha256').update(observerPublicMember(observerPeerExports.default)).digest('hex'),
+  types_member: observerPeerExports.types.replace(/^\.\//, ''),
+  types_sha256: createHash('sha256').update(observerPublicMember(observerPeerExports.types)).digest('hex'),
+};
+
 // Compile the exported ordinary and legacy progress-bar themes from the packed
 // consumer. The historical IE-only data URI stays intact; the guard requires modern dots and CSP enforcement.
 const progressSass = createRequire(join(root, 'package.json'))('sass');
@@ -727,6 +743,7 @@ const report = {
   core_high_contrast: coreHighContrast,
   ripple_color_binding: rippleColorBinding,
   content_observer: contentObserver,
+  content_observer_peer: contentObserverPeer,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
   error,
@@ -768,6 +785,7 @@ console.log(JSON.stringify({
   core_high_contrast: coreHighContrast,
   ripple_color_binding: rippleColorBinding,
   content_observer: contentObserver,
+  content_observer_peer: contentObserverPeer,
   error,
   credited_cell_ids: report.credited_cell_ids,
 }, null, 2));
