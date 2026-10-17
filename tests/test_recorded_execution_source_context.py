@@ -18,9 +18,9 @@ ROOT=Path(__file__).resolve().parents[1]
 
 class RecordedExecutionSourceContext(unittest.TestCase):
     def test_actual_current_definitions_and_preserved_source_subjects(self):
-        command=['node','tests/recorded_execution_source_context_probe.mjs']
-        if os.environ.get('NGX_RECORDED_SOURCE_CONTEXT_DIAGNOSTIC'):command.append(os.environ['NGX_RECORDED_SOURCE_CONTEXT_DIAGNOSTIC'])
-        result=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=60)
+        command=['node','scripts/run-historical-source-probe.mjs','recorded-execution-source-context']
+        if os.environ.get('NGX_RECORDED_SOURCE_CONTEXT_DIAGNOSTIC'):command.extend(['--report',os.environ['NGX_RECORDED_SOURCE_CONTEXT_DIAGNOSTIC']])
+        result=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=120)
         self.assertEqual(result.returncode,0,(result.stdout+result.stderr)[-10000:])
         report=json.loads(result.stdout.strip().splitlines()[-1])
         main=report['line']=='main'

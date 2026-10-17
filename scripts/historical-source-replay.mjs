@@ -16,12 +16,12 @@ import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export const HISTORICAL_REPLAY_INPUTS='compatibility/rc/historical-source-replay-inputs.json';
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'f12067a98c3d2b9912a3ce7e4ca9776cd1beb2c844c70eea0468b461821f0952','21.x':'576b847f713d33e064a5bf4e649432ccdafb90b5f7dd00f2a259e1f62c6224fa'};
+const pins={main:'3d8d3595f3f51f00ea3c3c0c3722b5801a58771dd130e1ea8a1a41732aa585d7','21.x':'600ea9c6e02bf4991c021c42ddc3574fd6869840adce7057a0ec6591f1c09579'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
  'native-individual-source','native-individual-admission','spec-fixture-context',
  'small-spec-source','followup-spec-source','peer-spec-source','control-case-context',
  'control-test-source','render-setup-source','theme-date-source','test-environment-zone-source','standalone-environment-source',
- 'stability-chip-method','stability-chip-context','wide-fixture-adapter-context','historical-native-admission','test-consolidation-source','deferred-control-upstream-source','native-date-context-source'];
+ 'stability-chip-method','stability-chip-context','wide-fixture-adapter-context','historical-native-admission','test-consolidation-source','deferred-control-upstream-source','native-date-context-source','recorded-execution-source-context'];
 // These six versioned replay-tool members are checked against the caller HEAD,
 // separately from the qualified product/review context. Comparing the registry
 // and its own verifier to that older context would require self-referential hashes.
@@ -42,12 +42,12 @@ function relativePath(path){assert.equal(typeof path,'string');assert.ok(!path.i
 export function historicalReplayInputs({root=rootDefault,readMember}={}){
  const read=readMember||((path)=>readFileSync(resolve(root,path))),bytes=read(HISTORICAL_REPLAY_INPUTS),data=JSON.parse(bytes);
  assert.ok(Object.hasOwn(pins,data.line),'unregistered historical line');assert.equal(hash(bytes),pins[data.line],'historical replay input changed');
- assert.equal(data.schema_version,10);assert.deepEqual(data.entries.map(row=>row.id),ids);assert.equal(new Set(data.entries.map(row=>row.probe)).size,25);
+ assert.equal(data.schema_version,11);assert.deepEqual(data.entries.map(row=>row.id),ids);assert.equal(new Set(data.entries.map(row=>row.probe)).size,26);
  assert.deepEqual(data.mutable_progress_paths,['compatibility/rc/remaining-native-admission-worksheet.json','compatibility/rc/session-handoff.json']);
  assert.deepEqual(data.current_head_tooling_paths,toolingPaths);
  for(const entry of data.entries)assert.equal(entry.report_option,['tab-lifecycle-source','native-individual-source','native-individual-admission','spec-fixture-context','small-spec-source','followup-spec-source','peer-spec-source','control-case-context','control-test-source','render-setup-source','theme-date-source','test-environment-zone-source','standalone-environment-source','stability-chip-method','stability-chip-context'].includes(entry.id)?'--out':undefined,'historical report invocation changed');
  for(const entry of data.entries)assert.equal(entry.report_source,entry.id==='wide-fixture-adapter-context'?'stdout-json':undefined,'historical report channel changed');
- assert.equal(data.wrapper_edits.length,22);assert.equal(new Set(data.wrapper_edits.map(row=>row.path)).size,22);
+ assert.equal(data.wrapper_edits.length,23);assert.equal(new Set(data.wrapper_edits.map(row=>row.path)).size,23);
  assert.match(data.wrapper_reference_commit,/^[0-9a-f]{40}$/);for(const wrapper of data.wrapper_edits)if(wrapper.reference_commit!==undefined)assert.match(wrapper.reference_commit,/^[0-9a-f]{40}$/);
  assert.equal(data.original_js_programs_and_assertions_unchanged,true);assert.equal(data.new_sha_or_authored_use_closures,0);
  return data;

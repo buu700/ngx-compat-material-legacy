@@ -119,18 +119,30 @@ for(const wrapper of data.wrapper_edits.slice(20,21)){
 }
 assert.equal(cases.length,91);
 assert.deepEqual(cases,JSON.parse(gunzipSync(read('compatibility/rc/native-date-context-replay-controls.json.gz'))).cases,'prior91 controls changed');
-assert.equal(data.entries.slice(24).length,1);assert.equal(data.wrapper_edits.slice(21).length,1);
-for(const path of [...data.entries.slice(24).map(row=>row.probe),...data.wrapper_edits.slice(21).map(row=>row.path)]){
+assert.equal(data.entries.slice(24,25).length,1);assert.equal(data.wrapper_edits.slice(21,22).length,1);
+for(const path of [...data.entries.slice(24,25).map(row=>row.probe),...data.wrapper_edits.slice(21,22).map(row=>row.path)]){
  const changed=Buffer.concat([cached(path),Buffer.from('\n// unreviewed NativeDate historical subject\n')]);
  assert.throws(()=>inspect(name=>name===path?changed:cached(name)),/changed/,path);cases.push({id:'native-date-frame-changed-subject-'+path,result:'rejected'});
 }
-for(const wrapper of data.wrapper_edits.slice(21)){
+for(const wrapper of data.wrapper_edits.slice(21,22)){
  const before=git(['show',wrapper.reference_commit+':'+wrapper.path]);assert.deepEqual(inspect(name=>name===wrapper.path?before:cached(name)),guard);
  let after=before.toString();for(const edit of wrapper.edits)after=after.replace(edit.before,edit.after);
  assert.deepEqual(inspect(name=>name===wrapper.path?Buffer.from(after):cached(name)),guard);cases.push({id:'native-date-frame-exact-invocation-wrapper-'+wrapper.path,result:'pass'});
 }
 assert.equal(cases.length,94);
+assert.deepEqual(cases,JSON.parse(gunzipSync(read('compatibility/rc/recorded-source-context-replay-controls.json.gz'))).cases,'prior94 controls changed');
+assert.equal(data.entries.slice(25).length,1);assert.equal(data.wrapper_edits.slice(22).length,1);
+for(const path of [...data.entries.slice(25).map(row=>row.probe),...data.wrapper_edits.slice(22).map(row=>row.path)]){
+ const changed=Buffer.concat([cached(path),Buffer.from('\n// unreviewed recorded-context historical subject\n')]);
+ assert.throws(()=>inspect(name=>name===path?changed:cached(name)),/changed/,path);cases.push({id:'recorded-context-frame-changed-subject-'+path,result:'rejected'});
+}
+for(const wrapper of data.wrapper_edits.slice(22)){
+ const before=git(['show',wrapper.reference_commit+':'+wrapper.path]);assert.deepEqual(inspect(name=>name===wrapper.path?before:cached(name)),guard);
+ let after=before.toString();for(const edit of wrapper.edits)after=after.replace(edit.before,edit.after);
+ assert.deepEqual(inspect(name=>name===wrapper.path?Buffer.from(after):cached(name)),guard);cases.push({id:'recorded-context-frame-exact-invocation-wrapper-'+wrapper.path,result:'pass'});
+}
+assert.equal(cases.length,97);
 
-const report={schema_version:10,line:data.line,scope:'Actual current coherence guard and exact wrapper/reference checks with cached original bytes. No historical program, build, installer, peer, browser or runtime qualification in these controls.',current_guard:guard,registered_original_programs:25,controls:cases.length,cases,inputs_sha256:hash(read(HISTORICAL_REPLAY_INPUTS)),helper_sha256:hash(read('scripts/historical-source-replay.mjs')),cli_sha256:hash(read('scripts/run-historical-source-probe.mjs')),producer_sha256:hash(read('tests/historical_source_replay_probe.mjs')),actual_current_source_or_native_or_packed_qualified:false,g11_claim:'not-passed'};
+const report={schema_version:11,line:data.line,scope:'Actual current coherence guard and exact wrapper/reference checks with cached original bytes. No historical program, build, installer, peer, browser or runtime qualification in these controls.',current_guard:guard,registered_original_programs:26,controls:cases.length,cases,inputs_sha256:hash(read(HISTORICAL_REPLAY_INPUTS)),helper_sha256:hash(read('scripts/historical-source-replay.mjs')),cli_sha256:hash(read('scripts/run-historical-source-probe.mjs')),producer_sha256:hash(read('tests/historical_source_replay_probe.mjs')),actual_current_source_or_native_or_packed_qualified:false,g11_claim:'not-passed'};
 const out=process.argv.indexOf('--out');if(out>=0)writeFileSync(process.argv[out+1],JSON.stringify(report,null,2)+'\n',{flag:'wx'});
 console.log(JSON.stringify({line:data.line,controls:cases.length,current_members:guard.guarded_current_members,current_product_members:guard.current_product_members,historical_probes_executed:0,actual_current_native_or_packed_qualified:false}));

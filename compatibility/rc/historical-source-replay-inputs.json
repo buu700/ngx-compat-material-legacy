@@ -1,5 +1,5 @@
 {
-  "schema_version": 10,
+  "schema_version": 11,
   "line": "main",
   "scope": "Finite original historical source probes only. Current-source coherence is mandatory; historical execution never admits current source, runtime, compiler, peer floors or G11. Two additional unchanged source programs use the exact pre-harness-preparation frame; current preparation requires its separate current qualification.",
   "current_frame": {
@@ -328,6 +328,18 @@
         "members": 8889
       },
       "timeout_ms": 45000
+    },
+    {
+      "id": "recorded-execution-source-context",
+      "probe": "tests/recorded_execution_source_context_probe.mjs",
+      "probe_sha256": "9d3ea00281814e27e36bdb5df0dd75ce650d1dc7d98233bccc096b5dafd4b6f3",
+      "frame": {
+        "commit": "4a8a12e601e69299831bbb3487bd087cf94d626c",
+        "tree": "e2a47a523a72c4f30a6fa8952e27adcbd67d7662",
+        "tree_listing_sha256": "7458864e4eb825e56c73a1c0a0f91d2f50cee5d92987ba00652ab3c60736dac1",
+        "members": 8944
+      },
+      "timeout_ms": 60000
     }
   ],
   "wrapper_edits": [
@@ -613,6 +625,26 @@
           "after": "text=True,timeout=120)"
         }
       ]
+    },
+    {
+      "path": "tests/test_recorded_execution_source_context.py",
+      "reference_commit": "585330cd37e4952ea37b533dcdc238afd8d4e5a1",
+      "before_sha256": "91f170f2dd67e9b8625027a294c6783aaa3271327af2668da72deca65ab77829",
+      "after_sha256": "3721cfec92e9e74eb6c7955b86e3696ebc15c32dd1c16fee4b2b2a68be17882c",
+      "edits": [
+        {
+          "before": "command=['node','tests/recorded_execution_source_context_probe.mjs']",
+          "after": "command=['node','scripts/run-historical-source-probe.mjs','recorded-execution-source-context']"
+        },
+        {
+          "before": "command.append(os.environ['NGX_RECORDED_SOURCE_CONTEXT_DIAGNOSTIC'])",
+          "after": "command.extend(['--report',os.environ['NGX_RECORDED_SOURCE_CONTEXT_DIAGNOSTIC']])"
+        },
+        {
+          "before": "text=True,timeout=60)",
+          "after": "text=True,timeout=120)"
+        }
+      ]
     }
   ],
   "source_phase_reports": {
@@ -639,7 +671,9 @@
     "standalone_environment_source": "compatibility/rc/spec-test-environment-source-standalone-checkpoint.json",
     "chip_method_source": "compatibility/rc/spec-stability-source-chip-repair-checkpoint.json",
     "chip_context_source": "compatibility/rc/spec-stability-context-checkpoint.json",
-    "current_harness_preparation": "compatibility/rc/harness-animation-preparation-qualification-checkpoint.json"
+    "current_harness_preparation": "compatibility/rc/harness-animation-preparation-qualification-checkpoint.json",
+    "current_chip_source_and_roles": "compatibility/rc/chip-audit-source-requalification-checkpoint.json",
+    "recorded_source_replay": "compatibility/rc/recorded-source-replay-checkpoint.json"
   },
   "no_install_build_publish_or_remote_operations": true,
   "original_js_programs_and_assertions_unchanged": true,
