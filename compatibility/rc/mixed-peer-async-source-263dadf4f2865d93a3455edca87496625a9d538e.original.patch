@@ -1,0 +1,633 @@
+diff --git a/src/cdk-experimental/combobox/combobox.spec.ts b/src/cdk-experimental/combobox/combobox.spec.ts
+index 06f86c15fbc8fd3490a5bce8a99a1371f20c441a..f7b6f9f7aed5eb27fb1fd5a006f9a4d0eeb7a0f3 100644
+--- a/src/cdk-experimental/combobox/combobox.spec.ts
++++ b/src/cdk-experimental/combobox/combobox.spec.ts
+@@ -1,3 +1,6 @@
++import {CdkComboboxPopup} from '@angular/cdk-experimental/combobox/combobox-popup';
++import {DOWN_ARROW, ESCAPE} from '@angular/cdk/keycodes';
++import {dispatchKeyboardEvent, dispatchMouseEvent} from '@angular/cdk/testing/private';
+ import {
+   Component,
+   DebugElement,
+@@ -8,11 +11,8 @@ import {
+ } from '@angular/core';
+ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {CdkComboboxModule} from './combobox-module';
+ import {CdkCombobox} from './combobox';
+-import {dispatchKeyboardEvent, dispatchMouseEvent} from '@angular/cdk/testing/private';
+-import {DOWN_ARROW, ESCAPE} from '@angular/cdk/keycodes';
+-import {CdkComboboxPopup} from '@angular/cdk-experimental/combobox/combobox-popup';
++import {CdkComboboxModule} from './combobox-module';
+ 
+ describe('Combobox', () => {
+   describe('with a basic toggle trigger', () => {
+@@ -249,10 +249,10 @@ describe('Combobox', () => {
+     });
+ 
+     it('should throw error when given invalid open action', () => {
+-      const errorSpy = spyOn(console, 'error');
+-      testComponent.actions.set('invalidAction');
+-      fixture.detectChanges();
+-      expect(errorSpy).toHaveBeenCalled();
++      expect(() => {
++        testComponent.actions.set('invalidAction');
++        fixture.detectChanges();
++      }).toThrowError('invalidAction is not a support open action for CdkCombobox');
+     });
+   });
+ 
+diff --git a/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
+index c836a54b9b033aefe170d96525ee764679af810f..c362e8003c79eb1478ebbb897151df1cb2bbd3d8 100644
+--- a/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
++++ b/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
+@@ -1,6 +1,6 @@
+ import {CdkVirtualScrollViewport, ScrollingModule} from '@angular/cdk/scrolling';
+ import {Component, Input, ViewChild, ViewEncapsulation} from '@angular/core';
+-import {waitForAsync, ComponentFixture, fakeAsync, flush, TestBed} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, flush, waitForAsync} from '@angular/core/testing';
+ import {ScrollingModule as ExperimentalScrollingModule} from './scrolling-module';
+ 
+ describe('CdkVirtualScrollViewport', () => {
+@@ -47,11 +47,13 @@ describe('CdkVirtualScrollViewport', () => {
+     }));
+ 
+     it('should throw if maxBufferPx is less than minBufferPx', fakeAsync(() => {
+-      testComponent.minBufferPx = 100;
+-      testComponent.maxBufferPx = 99;
+-      const errorSpy = spyOn(console, 'error');
+-      finishInit(fixture);
+-      expect(errorSpy).toHaveBeenCalled();
++      expect(() => {
++        testComponent.minBufferPx = 100;
++        testComponent.maxBufferPx = 99;
++        finishInit(fixture);
++      }).toThrowError(
++        'CDK virtual scroll: maxBufferPx must be greater than or equal to minBufferPx',
++      );
+     }));
+ 
+     // TODO(mmalerba): Add test that it corrects the initial render if it didn't render enough,
+diff --git a/src/cdk/listbox/listbox.spec.ts b/src/cdk/listbox/listbox.spec.ts
+index cdc273fb96e7d52d9a177df6a9ab645cb2eff5d6..4448e872fb62c3a445fb6428fb533a710141c5db 100644
+--- a/src/cdk/listbox/listbox.spec.ts
++++ b/src/cdk/listbox/listbox.spec.ts
+@@ -1058,11 +1058,9 @@ describe('CdkOption and CdkListbox', () => {
+     });
+ 
+     it('should throw on init if the preselected value is invalid', () => {
+-      const errorSpy = spyOn(console, 'error');
+-      setupComponent(ListboxWithInvalidPreselectedFormControl, [ReactiveFormsModule]);
+-      expect(errorSpy.calls.first().args[1]).toMatch(
+-        /Listbox has selected values that do not match any of its options./,
+-      );
++      expect(() => {
++        setupComponent(ListboxWithInvalidPreselectedFormControl, [ReactiveFormsModule]);
++      }).toThrowError('Listbox has selected values that do not match any of its options.');
+     });
+   });
+ });
+diff --git a/src/cdk/menu/menu-trigger.spec.ts b/src/cdk/menu/menu-trigger.spec.ts
+index a55df9b19d55b943e313a621ba2394e6fdcf1991..00f0a902171af685bd9b9e7629585d3d15286e9b 100644
+--- a/src/cdk/menu/menu-trigger.spec.ts
++++ b/src/cdk/menu/menu-trigger.spec.ts
+@@ -1,13 +1,21 @@
+-import {Component, ViewChildren, QueryList, ElementRef, ViewChild, Type} from '@angular/core';
++import {ENTER, SPACE, TAB} from '@angular/cdk/keycodes';
++import {
++  Component,
++  ElementRef,
++  QueryList,
++  Type,
++  ViewChild,
++  ViewChildren,
++  provideZoneChangeDetection,
++} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {dispatchKeyboardEvent} from '../../cdk/testing/private';
+-import {TAB, SPACE, ENTER} from '@angular/cdk/keycodes';
+-import {CdkMenuModule} from './menu-module';
+-import {CdkMenuItem} from './menu-item';
+ import {CdkMenu} from './menu';
+-import {CdkMenuTrigger} from './menu-trigger';
+ import {Menu} from './menu-interface';
++import {CdkMenuItem} from './menu-item';
++import {CdkMenuModule} from './menu-module';
++import {CdkMenuTrigger} from './menu-trigger';
+ 
+ describe('MenuTrigger', () => {
+   describe('on CdkMenuItem', () => {
+@@ -114,6 +122,7 @@ describe('MenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [MenuBarWithNestedSubMenus],
++        providers: [provideZoneChangeDetection()],
+       }).compileComponents();
+     }));
+ 
+diff --git a/src/cdk/menu/menu.spec.ts b/src/cdk/menu/menu.spec.ts
+index 11421f3b5693288ae5bfa7e5345c1541fe251172..122d8bef7795b4b957dc98bb0180162945024e55 100644
+--- a/src/cdk/menu/menu.spec.ts
++++ b/src/cdk/menu/menu.spec.ts
+@@ -1,24 +1,31 @@
++import {TAB} from '@angular/cdk/keycodes';
++import {
++  Component,
++  ElementRef,
++  QueryList,
++  ViewChild,
++  ViewChildren,
++  provideZoneChangeDetection,
++} from '@angular/core';
+ import {
+   ComponentFixture,
++  TestBed,
+   fakeAsync,
+   flush,
+-  TestBed,
+   tick,
+   waitForAsync,
+ } from '@angular/core/testing';
+-import {Component, ElementRef, QueryList, ViewChild, ViewChildren} from '@angular/core';
+-import {TAB} from '@angular/cdk/keycodes';
++import {By} from '@angular/platform-browser';
+ import {
+   createMouseEvent,
+   dispatchEvent,
+   dispatchKeyboardEvent,
+   dispatchMouseEvent,
+ } from '../../cdk/testing/private';
+-import {By} from '@angular/platform-browser';
+ import {CdkMenu} from './menu';
+-import {CdkMenuModule} from './menu-module';
+-import {CdkMenuItemCheckbox} from './menu-item-checkbox';
+ import {CdkMenuItem} from './menu-item';
++import {CdkMenuItemCheckbox} from './menu-item-checkbox';
++import {CdkMenuModule} from './menu-module';
+ 
+ describe('Menu', () => {
+   describe('as checkbox group', () => {
+@@ -138,6 +145,7 @@ describe('Menu', () => {
+       beforeEach(waitForAsync(() => {
+         TestBed.configureTestingModule({
+           imports: [CdkMenuModule, WithComplexNestedMenus],
++          providers: [provideZoneChangeDetection()],
+         }).compileComponents();
+       }));
+ 
+@@ -329,6 +337,7 @@ describe('Menu', () => {
+       beforeEach(waitForAsync(() => {
+         TestBed.configureTestingModule({
+           imports: [CdkMenuModule, WithComplexNestedMenusOnBottom],
++          providers: [provideZoneChangeDetection()],
+         }).compileComponents();
+       }));
+ 
+diff --git a/src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.spec.ts b/src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.spec.ts
+index 2102e69625841c7775078dd0c88fd31dd89de4fb..2c45f1e8b5da66724fa7cc78d381e6f74d9aca1d 100644
+--- a/src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.spec.ts
++++ b/src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.spec.ts
+@@ -1,7 +1,8 @@
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
++import {provideZoneChangeDetection} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {MatCheckboxHarness} from '@angular/material/checkbox/testing';
+-import {HarnessLoader} from '@angular/cdk/testing';
+ import {CheckboxHarnessExample} from './checkbox-harness-example';
+ 
+ describe('CheckboxHarnessExample', () => {
+@@ -9,6 +10,10 @@ describe('CheckboxHarnessExample', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
++    TestBed.configureTestingModule({
++      providers: [provideZoneChangeDetection()],
++    });
++
+     fixture = TestBed.createComponent(CheckboxHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/components-examples/material/slide-toggle/slide-toggle-harness/slide-toggle-harness-example.spec.ts b/src/components-examples/material/slide-toggle/slide-toggle-harness/slide-toggle-harness-example.spec.ts
+index 0bfe1d677562d583438c29e5abd61887496c5616..15c488cb25c6b9ff7548d28ccc57a144eba2251d 100644
+--- a/src/components-examples/material/slide-toggle/slide-toggle-harness/slide-toggle-harness-example.spec.ts
++++ b/src/components-examples/material/slide-toggle/slide-toggle-harness/slide-toggle-harness-example.spec.ts
+@@ -1,7 +1,8 @@
+-import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {HarnessLoader} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
++import {provideZoneChangeDetection} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {MatSlideToggleHarness} from '@angular/material/slide-toggle/testing';
+-import {HarnessLoader} from '@angular/cdk/testing';
+ import {SlideToggleHarnessExample} from './slide-toggle-harness-example';
+ 
+ describe('SlideToggleHarnessExample', () => {
+@@ -9,6 +10,10 @@ describe('SlideToggleHarnessExample', () => {
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
++    TestBed.configureTestingModule({
++      providers: [provideZoneChangeDetection()],
++    });
++
+     fixture = TestBed.createComponent(SlideToggleHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts
+index 5be00074bd6f7937dccb01343aa1717550f1fc8e..8c2ae19924ffe50649170ac4607ccd2f58086deb 100644
+--- a/src/material/autocomplete/autocomplete.spec.ts
++++ b/src/material/autocomplete/autocomplete.spec.ts
+@@ -28,13 +28,13 @@ import {
+   provideZoneChangeDetection,
+ } from '@angular/core';
+ import {
+-  waitForAsync,
+   ComponentFixture,
++  TestBed,
+   fakeAsync,
+   flush,
+   inject,
+-  TestBed,
+   tick,
++  waitForAsync,
+ } from '@angular/core/testing';
+ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+ import {MatOption, MatOptionSelectionChange} from '@angular/material/core';
+@@ -45,15 +45,15 @@ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {EMPTY, Observable, Subject, Subscription} from 'rxjs';
+ import {map, startWith} from 'rxjs/operators';
+ import {
+-  getMatAutocompleteMissingPanelError,
++  MAT_AUTOCOMPLETE_DEFAULT_OPTIONS,
++  MAT_AUTOCOMPLETE_SCROLL_STRATEGY,
+   MatAutocomplete,
+   MatAutocompleteDefaultOptions,
+   MatAutocompleteModule,
+   MatAutocompleteOrigin,
+   MatAutocompleteSelectedEvent,
+   MatAutocompleteTrigger,
+-  MAT_AUTOCOMPLETE_DEFAULT_OPTIONS,
+-  MAT_AUTOCOMPLETE_SCROLL_STRATEGY,
++  getMatAutocompleteMissingPanelError,
+ } from './index';
+ 
+ describe('MDC-based MatAutocomplete', () => {
+@@ -1025,6 +1025,9 @@ describe('MDC-based MatAutocomplete', () => {
+     it('should disable the input when used with a value accessor and without `matInput`', () => {
+       fixture.destroy();
+       TestBed.resetTestingModule();
++      TestBed.configureTestingModule({
++        providers: [provideZoneChangeDetection()],
++      });
+ 
+       const plainFixture = createComponent(PlainAutocompleteInputWithFormControl);
+       plainFixture.detectChanges();
+diff --git a/src/material/bottom-sheet/bottom-sheet.spec.ts b/src/material/bottom-sheet/bottom-sheet.spec.ts
+index ecf8bbbd4a88887b5356d6d9aa4fb8b125001bae..3826b3e0de1ebb94e0c2077f162239ba191c0c22 100644
+--- a/src/material/bottom-sheet/bottom-sheet.spec.ts
++++ b/src/material/bottom-sheet/bottom-sheet.spec.ts
+@@ -20,6 +20,7 @@ import {
+   ViewChild,
+   ViewContainerRef,
+   ViewEncapsulation,
++  provideZoneChangeDetection,
+ } from '@angular/core';
+ import {
+   ComponentFixture,
+@@ -61,7 +62,7 @@ describe('MatBottomSheet', () => {
+         BottomSheetWithInjectedData,
+         ShadowDomComponent,
+       ],
+-      providers: [{provide: Location, useClass: SpyLocation}],
++      providers: [provideZoneChangeDetection(), {provide: Location, useClass: SpyLocation}],
+     }).compileComponents();
+   }));
+ 
+@@ -639,6 +640,7 @@ describe('MatBottomSheet', () => {
+           autoFocus: 'first-tabbable',
+         });
+ 
++        viewContainerFixture.detectChanges();
+         await viewContainerFixture.whenStable();
+ 
+         expect(document.activeElement!.tagName)
+diff --git a/src/material/datepicker/datepicker.spec.ts b/src/material/datepicker/datepicker.spec.ts
+index 02f623a05c9b4f6e07b6e400deefd60a572de503..3de72d5c064085b123d6467ace30f85dc1933c87 100644
+--- a/src/material/datepicker/datepicker.spec.ts
++++ b/src/material/datepicker/datepicker.spec.ts
+@@ -10,6 +10,7 @@ import {
+   UP_ARROW,
+ } from '@angular/cdk/keycodes';
+ import {Overlay} from '@angular/cdk/overlay';
++import {_supportsShadowDom} from '@angular/cdk/platform';
+ import {ScrollDispatcher} from '@angular/cdk/scrolling';
+ import {
+   createKeyboardEvent,
+@@ -21,40 +22,39 @@ import {
+ } from '@angular/cdk/testing/private';
+ import {
+   Component,
++  Directive,
++  Provider,
+   Type,
+   ViewChild,
+-  Provider,
+-  Directive,
+   ViewEncapsulation,
+   provideZoneChangeDetection,
+ } from '@angular/core';
+-import {ComponentFixture, fakeAsync, flush, inject, TestBed, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, flush, inject, tick} from '@angular/core/testing';
+ import {
+   FormControl,
+   FormsModule,
++  NG_VALIDATORS,
+   NgModel,
+   ReactiveFormsModule,
+   Validator,
+-  NG_VALIDATORS,
+ } from '@angular/forms';
+ import {MAT_DATE_LOCALE, MatNativeDateModule, NativeDateModule} from '@angular/material/core';
+ import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
+-import {DEC, JAN, JUL, JUN, SEP} from '../testing';
++import {MatInputModule} from '@angular/material/input';
+ import {By} from '@angular/platform-browser';
+-import {_supportsShadowDom} from '@angular/cdk/platform';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
+-import {MatInputModule} from '@angular/material/input';
++import {DEC, JAN, JUL, JUN, SEP} from '../testing';
+ import {MatDatepicker} from './datepicker';
++import {DatepickerDropdownPositionX, DatepickerDropdownPositionY} from './datepicker-base';
+ import {MatDatepickerInput} from './datepicker-input';
+ import {MatDatepickerToggle} from './datepicker-toggle';
+ import {
+   MAT_DATEPICKER_SCROLL_STRATEGY,
++  MatDateSelectionModel,
+   MatDatepickerIntl,
+   MatDatepickerModule,
+-  MatDateSelectionModel,
+ } from './index';
+-import {DatepickerDropdownPositionX, DatepickerDropdownPositionY} from './datepicker-base';
+ 
+ describe('MatDatepicker', () => {
+   const SUPPORTS_INTL = typeof Intl != 'undefined';
+@@ -511,6 +511,9 @@ describe('MatDatepicker', () => {
+ 
+       it('should reset the datepicker when it is closed externally', fakeAsync(() => {
+         TestBed.resetTestingModule();
++        TestBed.configureTestingModule({
++          providers: [provideZoneChangeDetection()],
++        });
+ 
+         const scrolledSubject = new Subject();
+ 
+@@ -1312,6 +1315,9 @@ describe('MatDatepicker', () => {
+ 
+         fixture.destroy();
+         TestBed.resetTestingModule();
++        TestBed.configureTestingModule({
++          providers: [provideZoneChangeDetection()],
++        });
+         fixture = createComponent(DatepickerWithToggleInShadowDom, [MatNativeDateModule]);
+         fixture.detectChanges();
+         testComponent = fixture.componentInstance;
+diff --git a/src/material/dialog/testing/dialog-opener.spec.ts b/src/material/dialog/testing/dialog-opener.spec.ts
+index d6c6e1f3a0969642d0bfc17d83d19b826ca8a135..a53aa54804bcae8250ccbae2b91daa21e8b5fdb9 100644
+--- a/src/material/dialog/testing/dialog-opener.spec.ts
++++ b/src/material/dialog/testing/dialog-opener.spec.ts
+@@ -1,7 +1,7 @@
+ import {Component, Inject} from '@angular/core';
+-import {fakeAsync, TestBed, flush} from '@angular/core/testing';
+-import {MatTestDialogOpenerModule, MatTestDialogOpener} from '@angular/material/dialog/testing';
++import {TestBed, fakeAsync, flush} from '@angular/core/testing';
+ import {MAT_DIALOG_DATA, MatDialogRef, MatDialogState} from '@angular/material/dialog';
++import {MatTestDialogOpener, MatTestDialogOpenerModule} from '@angular/material/dialog/testing';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ 
+ describe('MDC-based MatTestDialogOpener', () => {
+@@ -26,12 +26,13 @@ describe('MDC-based MatTestDialogOpener', () => {
+     );
+   });
+ 
+-  it('should pass data to the component', () => {
++  it('should pass data to the component', async () => {
+     const config = {data: 'test'};
+     const fixture = TestBed.createComponent(
+       MatTestDialogOpener.withComponent(ExampleComponent, config),
+     );
+     fixture.detectChanges();
++    await fixture.whenStable();
+     const dialogContainer = document.querySelector('mat-dialog-container');
+     expect(dialogContainer!.innerHTML).toContain('Data: test');
+   });
+diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts
+index 50ce8f1bfdcbf8780cd95c285d28eaf661cbf369..7e538385988d9a3882c4a357833cc7f2faeabd76 100644
+--- a/src/material/menu/menu.spec.ts
++++ b/src/material/menu/menu.spec.ts
+@@ -25,8 +25,9 @@ import {
+   Type,
+   ViewChild,
+   ViewChildren,
++  provideZoneChangeDetection,
+ } from '@angular/core';
+-import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+ import {MatRipple} from '@angular/material/core';
+ import {By} from '@angular/platform-browser';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+@@ -63,7 +64,7 @@ describe('MDC-based MatMenu', () => {
+     declarations: any[] = [],
+   ): ComponentFixture<T> {
+     TestBed.configureTestingModule({
+-      providers,
++      providers: [provideZoneChangeDetection(), ...providers],
+       imports: [MatMenuModule, NoopAnimationsModule],
+       declarations: [component, ...declarations],
+     }).compileComponents();
+@@ -907,11 +908,11 @@ describe('MDC-based MatMenu', () => {
+   }));
+ 
+   it('should throw if assigning a menu that contains the trigger', fakeAsync(() => {
+-    const errorSpy = spyOn(console, 'error');
+-    const fixture = createComponent(InvalidRecursiveMenu, [], [FakeIcon]);
+-    fixture.detectChanges();
+-    tick(500);
+-    expect(errorSpy.calls.first().args[1]).toMatch(/menu cannot contain its own trigger/);
++    expect(() => {
++      const fixture = createComponent(InvalidRecursiveMenu, [], [FakeIcon]);
++      fixture.detectChanges();
++      tick(500);
++    }).toThrowError(/menu cannot contain its own trigger/);
+   }));
+ 
+   it('should be able to swap out a menu after the first time it is opened', fakeAsync(() => {
+diff --git a/src/material/stepper/stepper.spec.ts b/src/material/stepper/stepper.spec.ts
+index 000e30b50dd1f6d5f6910c3e5e3bbb0d3a661ba2..b4269ff719525487edfea11cc9a51a8026e19ce4 100644
+--- a/src/material/stepper/stepper.spec.ts
++++ b/src/material/stepper/stepper.spec.ts
+@@ -9,52 +9,53 @@ import {
+   SPACE,
+   UP_ARROW,
+ } from '@angular/cdk/keycodes';
++import {_supportsShadowDom} from '@angular/cdk/platform';
+ import {
+-  StepperOrientation,
++  CdkStep,
+   STEPPER_GLOBAL_OPTIONS,
+   STEP_STATE,
+-  CdkStep,
++  StepperOrientation,
+ } from '@angular/cdk/stepper';
+ import {
+-  dispatchKeyboardEvent,
+   createKeyboardEvent,
+   dispatchEvent,
++  dispatchKeyboardEvent,
+ } from '@angular/cdk/testing/private';
+ import {
+   Component,
+   DebugElement,
+   EventEmitter,
+-  Type,
+   Provider,
+-  ViewChildren,
+   QueryList,
++  Type,
+   ViewChild,
++  ViewChildren,
+   ViewEncapsulation,
++  provideZoneChangeDetection,
+   signal,
+ } from '@angular/core';
+-import {ComponentFixture, fakeAsync, flush, inject, TestBed} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, flush, inject} from '@angular/core/testing';
+ import {
+   AbstractControl,
+   AsyncValidatorFn,
++  FormBuilder,
+   FormControl,
+   FormGroup,
+   ReactiveFormsModule,
+   ValidationErrors,
+   Validators,
+-  FormBuilder,
+ } from '@angular/forms';
+ import {MatRipple, ThemePalette} from '@angular/material/core';
++import {MatFormFieldModule} from '@angular/material/form-field';
++import {MatInputModule} from '@angular/material/input';
+ import {By} from '@angular/platform-browser';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+-import {_supportsShadowDom} from '@angular/cdk/platform';
+-import {merge, Observable, Subject} from 'rxjs';
++import {Observable, Subject, merge} from 'rxjs';
+ import {map, take} from 'rxjs/operators';
+ import {MatStepHeader, MatStepperModule} from './index';
+ import {MatStep, MatStepper} from './stepper';
+ import {MatStepperNext, MatStepperPrevious} from './stepper-button';
+ import {MatStepperIntl} from './stepper-intl';
+-import {MatFormFieldModule} from '@angular/material/form-field';
+-import {MatInputModule} from '@angular/material/input';
+ 
+ const VALID_REGEX = /valid/;
+ let dir: {value: Direction; readonly change: EventEmitter<Direction>};
+@@ -1794,7 +1795,11 @@ function createComponent<T>(
+ ): ComponentFixture<T> {
+   TestBed.configureTestingModule({
+     imports: [MatStepperModule, NoopAnimationsModule, ReactiveFormsModule, ...imports],
+-    providers: [{provide: Directionality, useFactory: () => dir}, ...providers],
++    providers: [
++      provideZoneChangeDetection(),
++      {provide: Directionality, useFactory: () => dir},
++      ...providers,
++    ],
+     declarations: [component],
+   });
+ 
+diff --git a/src/material/toolbar/toolbar.spec.ts b/src/material/toolbar/toolbar.spec.ts
+index 589542d7894dc4706274a65bca0ee82a78d62ee0..b8cbb95de67e3b261a04eaca06e5a12faa6a68c3 100644
+--- a/src/material/toolbar/toolbar.spec.ts
++++ b/src/material/toolbar/toolbar.spec.ts
+@@ -1,7 +1,7 @@
++import {CommonModule} from '@angular/common';
+ import {Component, signal} from '@angular/core';
+-import {TestBed, waitForAsync, ComponentFixture} from '@angular/core/testing';
++import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+-import {CommonModule} from '@angular/common';
+ import {MatToolbarModule} from './index';
+ 
+ describe('MatToolbar', () => {
+@@ -70,22 +70,26 @@ describe('MatToolbar', () => {
+     });
+ 
+     it('should throw an error if different toolbar modes are mixed', () => {
+-      const errorSpy = spyOn(console, 'error');
+-      const fixture = TestBed.createComponent(ToolbarMixedRowModes);
+-      fixture.detectChanges();
+-      expect(errorSpy.calls.first().args[1]).toMatch(/attempting to combine different/i);
++      expect(() => {
++        const fixture = TestBed.createComponent(ToolbarMixedRowModes);
++        fixture.detectChanges();
++      }).toThrowError(/attempting to combine different/i);
+     });
+ 
+     it('should throw an error if a toolbar-row is added later', async () => {
+       const fixture = TestBed.createComponent(ToolbarMixedRowModes);
+ 
+-      const errorSpy = spyOn(console, 'error');
+-      fixture.componentInstance.showToolbarRow.set(false);
+-      await fixture.whenStable();
+-
+-      fixture.componentInstance.showToolbarRow.set(true);
+-      await fixture.whenStable();
+-      expect(errorSpy.calls.first().args[1]).toMatch(/attempting to combine different/i);
++      await expectAsync(
++        (async () => {
++          fixture.componentInstance.showToolbarRow.set(false);
++          fixture.detectChanges();
++          await fixture.whenStable();
++
++          fixture.componentInstance.showToolbarRow.set(true);
++          fixture.detectChanges();
++          await fixture.whenStable();
++        })(),
++      ).toBeRejectedWithError(/attempting to combine different/i);
+     });
+ 
+     it('should pick up indirect descendant rows', () => {
+diff --git a/test/angular-test-init-spec.ts b/test/angular-test-init-spec.ts
+index da351e741c0e784283c3dfab5c2ffd170884c0ce..77d8c9e56bbfab81da496d586fe7761007e6b06a 100644
+--- a/test/angular-test-init-spec.ts
++++ b/test/angular-test-init-spec.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {NgModule, provideExperimentalZonelessChangeDetection} from '@angular/core';
++import {ErrorHandler, NgModule, provideExperimentalZonelessChangeDetection} from '@angular/core';
+ import {TestBed} from '@angular/core/testing';
+ import {
+   BrowserDynamicTestingModule,
+@@ -14,7 +14,17 @@ import {
+ } from '@angular/platform-browser-dynamic/testing';
+ 
+ @NgModule({
+-  providers: [provideExperimentalZonelessChangeDetection()],
++  providers: [
++    provideExperimentalZonelessChangeDetection(),
++    {
++      provide: ErrorHandler,
++      useValue: {
++        handleError: (e: any) => {
++          throw e;
++        },
++      },
++    },
++  ],
+ })
+ export class TestModule {}
+ 

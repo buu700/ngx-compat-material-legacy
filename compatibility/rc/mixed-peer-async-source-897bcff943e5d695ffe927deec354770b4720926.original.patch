@@ -1,0 +1,407 @@
+diff --git a/src/cdk-experimental/column-resize/resizable.ts b/src/cdk-experimental/column-resize/resizable.ts
+index 8e2726a6f9f1c1b5b6a8e50e067c4ecd765589b0..d713035213a262a3629c88b28989af1a684d6e4e 100644
+--- a/src/cdk-experimental/column-resize/resizable.ts
++++ b/src/cdk-experimental/column-resize/resizable.ts
+@@ -23,7 +23,12 @@ import {
+ } from '@angular/core';
+ import {Directionality} from '@angular/cdk/bidi';
+ import {ComponentPortal} from '@angular/cdk/portal';
+-import {Overlay, OverlayRef} from '@angular/cdk/overlay';
++import {
++  createFlexibleConnectedPositionStrategy,
++  createOverlayRef,
++  createRepositionScrollStrategy,
++  OverlayRef,
++} from '@angular/cdk/overlay';
+ import {CdkColumnDef, _CoalescedStyleScheduler} from '@angular/cdk/table';
+ import {merge, Subject} from 'rxjs';
+ import {distinctUntilChanged, filter, take, takeUntil} from 'rxjs/operators';
+@@ -64,7 +69,6 @@ export abstract class Resizable<HandleComponent extends ResizeOverlayHandle>
+   protected abstract readonly eventDispatcher: HeaderRowEventDispatcher;
+   protected abstract readonly injector: Injector;
+   protected abstract readonly ngZone: NgZone;
+-  protected abstract readonly overlay: Overlay;
+   protected abstract readonly resizeNotifier: ColumnResizeNotifierSource;
+   protected abstract readonly resizeStrategy: ResizeStrategy;
+   protected abstract readonly styleScheduler: _CoalescedStyleScheduler;
+@@ -72,6 +76,7 @@ export abstract class Resizable<HandleComponent extends ResizeOverlayHandle>
+   protected abstract readonly changeDetectorRef: ChangeDetectorRef;
+ 
+   protected readonly columnSizeStore = inject(ColumnSizeStore, {optional: true});
++  private _injector = inject(Injector);
+ 
+   private _viewInitialized = false;
+   private _isDestroyed = false;
+@@ -146,9 +151,10 @@ export abstract class Resizable<HandleComponent extends ResizeOverlayHandle>
+     // over both cells and extending it down the table as needed.
+ 
+     const isRtl = this.directionality.value === 'rtl';
+-    const positionStrategy = this.overlay
+-      .position()
+-      .flexibleConnectedTo(this.elementRef.nativeElement!)
++    const positionStrategy = createFlexibleConnectedPositionStrategy(
++      this._injector,
++      this.elementRef.nativeElement!,
++    )
+       .withFlexibleDimensions(false)
+       .withGrowAfterOpen(false)
+       .withPush(false)
+@@ -162,12 +168,12 @@ export abstract class Resizable<HandleComponent extends ResizeOverlayHandle>
+         },
+       ]);
+ 
+-    return this.overlay.create({
++    return createOverlayRef(this._injector, {
+       // Always position the overlay based on left-indexed coordinates.
+       direction: 'ltr',
+       disposeOnNavigation: true,
+       positionStrategy,
+-      scrollStrategy: this.overlay.scrollStrategies.reposition(),
++      scrollStrategy: createRepositionScrollStrategy(this._injector),
+       width: '16px',
+     });
+   }
+diff --git a/src/cdk-experimental/combobox/combobox.ts b/src/cdk-experimental/combobox/combobox.ts
+index e934a0521c47da8ae39630a77f17f1c62eb34762..5044d08c802af067e1f5bc20827076ce19a4117e 100644
+--- a/src/cdk-experimental/combobox/combobox.ts
++++ b/src/cdk-experimental/combobox/combobox.ts
+@@ -10,8 +10,10 @@ import {BooleanInput, coerceArray, coerceBooleanProperty} from '@angular/cdk/coe
+ import {DOWN_ARROW, ENTER, ESCAPE, TAB} from '@angular/cdk/keycodes';
+ import {
+   ConnectedPosition,
++  createBlockScrollStrategy,
++  createFlexibleConnectedPositionStrategy,
++  createOverlayRef,
+   FlexibleConnectedPositionStrategy,
+-  Overlay,
+   OverlayConfig,
+   OverlayRef,
+ } from '@angular/cdk/overlay';
+@@ -64,7 +66,6 @@ export const CDK_COMBOBOX = new InjectionToken<CdkCombobox>('CDK_COMBOBOX');
+ export class CdkCombobox<T = unknown> implements OnDestroy {
+   private readonly _tagName = inject(HOST_TAG_NAME);
+   private readonly _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+-  private readonly _overlay = inject(Overlay);
+   protected readonly _viewContainerRef = inject(ViewContainerRef);
+   private readonly _injector = inject(Injector);
+   private readonly _doc = inject(DOCUMENT);
+@@ -191,7 +192,8 @@ export class CdkCombobox<T = unknown> implements OnDestroy {
+   open() {
+     if (!this.isOpen() && !this.disabled) {
+       this.opened.next();
+-      this._overlayRef = this._overlayRef || this._overlay.create(this._getOverlayConfig());
++      this._overlayRef =
++        this._overlayRef || createOverlayRef(this._injector, this._getOverlayConfig());
+       this._overlayRef.attach(this._getPanelContent());
+       this._changeDetectorRef.markForCheck();
+       if (!this._isTextTrigger()) {
+@@ -255,16 +257,15 @@ export class CdkCombobox<T = unknown> implements OnDestroy {
+   private _getOverlayConfig() {
+     return new OverlayConfig({
+       positionStrategy: this._getOverlayPositionStrategy(),
+-      scrollStrategy: this._overlay.scrollStrategies.block(),
++      scrollStrategy: createBlockScrollStrategy(this._injector),
+       direction: this._directionality || undefined,
+     });
+   }
+ 
+   private _getOverlayPositionStrategy(): FlexibleConnectedPositionStrategy {
+-    return this._overlay
+-      .position()
+-      .flexibleConnectedTo(this._elementRef)
+-      .withPositions(this._getOverlayPositions());
++    return createFlexibleConnectedPositionStrategy(this._injector, this._elementRef).withPositions(
++      this._getOverlayPositions(),
++    );
+   }
+ 
+   private _getOverlayPositions(): ConnectedPosition[] {
+diff --git a/src/cdk-experimental/popover-edit/edit-services.ts b/src/cdk-experimental/popover-edit/edit-services.ts
+index 1be53cdf0efaaca0172e95981ee57c63df6e404a..74454a4a0f561e50af4a663eb0a2c4d1c1683c5e 100644
+--- a/src/cdk-experimental/popover-edit/edit-services.ts
++++ b/src/cdk-experimental/popover-edit/edit-services.ts
+@@ -9,7 +9,6 @@
+ import {Injectable, NgZone, inject} from '@angular/core';
+ import {FocusTrapFactory} from '@angular/cdk/a11y';
+ import {Directionality} from '@angular/cdk/bidi';
+-import {Overlay} from '@angular/cdk/overlay';
+ import {ScrollDispatcher, ViewportRuler} from '@angular/cdk/scrolling';
+ 
+ import {EditEventDispatcher} from './edit-event-dispatcher';
+@@ -29,7 +28,6 @@ export class EditServices {
+   readonly focusDispatcher = inject(FocusDispatcher);
+   readonly focusTrapFactory = inject(FocusTrapFactory);
+   readonly ngZone = inject(NgZone);
+-  readonly overlay = inject(Overlay);
+   readonly scrollDispatcher = inject(ScrollDispatcher);
+   readonly viewportRuler = inject(ViewportRuler);
+ }
+diff --git a/src/cdk-experimental/popover-edit/table-directives.ts b/src/cdk-experimental/popover-edit/table-directives.ts
+index 34130fa89c656b7d8d9a9183d9871f0cbe48e325..427fac7c2889f1118952df38bb1eb3d5d15bfa35 100644
+--- a/src/cdk-experimental/popover-edit/table-directives.ts
++++ b/src/cdk-experimental/popover-edit/table-directives.ts
+@@ -6,7 +6,14 @@
+  * found in the LICENSE file at https://angular.dev/license
+  */
+ import {FocusTrap} from '@angular/cdk/a11y';
+-import {OverlayRef, OverlaySizeConfig, PositionStrategy} from '@angular/cdk/overlay';
++import {
++  createFlexibleConnectedPositionStrategy,
++  createOverlayRef,
++  createRepositionScrollStrategy,
++  OverlayRef,
++  OverlaySizeConfig,
++  PositionStrategy,
++} from '@angular/cdk/overlay';
+ import {TemplatePortal} from '@angular/cdk/portal';
+ import {
+   afterNextRender,
+@@ -15,6 +22,7 @@ import {
+   ElementRef,
+   EmbeddedViewRef,
+   inject,
++  Injector,
+   ListenerOptions,
+   NgZone,
+   OnDestroy,
+@@ -240,6 +248,7 @@ export class CdkPopoverEdit<C> implements AfterViewInit, OnDestroy {
+   protected readonly services = inject(EditServices);
+   protected readonly elementRef = inject(ElementRef);
+   protected readonly viewContainerRef = inject(ViewContainerRef);
++  private _injector = inject(Injector);
+ 
+   /** The edit lens template shown over the cell on edit. */
+   template: TemplateRef<any> | null = null;
+@@ -344,11 +353,11 @@ export class CdkPopoverEdit<C> implements AfterViewInit, OnDestroy {
+   }
+ 
+   private _createEditOverlay(): void {
+-    this.overlayRef = this.services.overlay.create({
++    this.overlayRef = createOverlayRef(this._injector, {
+       disposeOnNavigation: true,
+       panelClass: this.panelClass(),
+       positionStrategy: this._getPositionStrategy(),
+-      scrollStrategy: this.services.overlay.scrollStrategies.reposition(),
++      scrollStrategy: createRepositionScrollStrategy(this._injector),
+       direction: this.services.directionality,
+     });
+ 
+@@ -402,9 +411,7 @@ export class CdkPopoverEdit<C> implements AfterViewInit, OnDestroy {
+ 
+   private _getPositionStrategy(): PositionStrategy {
+     const cells = this._getOverlayCells();
+-    return this.services.overlay
+-      .position()
+-      .flexibleConnectedTo(cells[0])
++    return createFlexibleConnectedPositionStrategy(this._injector, cells[0])
+       .withGrowAfterOpen()
+       .withPush()
+       .withViewportMargin(16)
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.spec.ts b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+index c92882f3a570bfdfbb14cb234289f6e72478527c..7c9195fbd6a7f47f532c474ec59d52e45853c9d7 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.spec.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+@@ -1,7 +1,6 @@
+ import {MutationObserverFactory} from '../../observers';
+-import {Overlay} from '../../overlay';
+ import {ComponentPortal} from '../../portal';
+-import {Component, inject} from '@angular/core';
++import {Component, inject, Injector} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {A11yModule} from '../index';
+@@ -11,10 +10,10 @@ import {
+   LIVE_ANNOUNCER_ELEMENT_TOKEN,
+   LiveAnnouncerDefaultOptions,
+ } from './live-announcer-tokens';
++import {createOverlayRef} from '@angular/cdk/overlay';
+ 
+ describe('LiveAnnouncer', () => {
+   let announcer: LiveAnnouncer;
+-  let overlay: Overlay;
+   let ariaLiveElement: Element;
+   let fixture: ComponentFixture<TestApp>;
+ 
+@@ -26,7 +25,6 @@ describe('LiveAnnouncer', () => {
+     );
+ 
+     beforeEach(fakeAsync(() => {
+-      overlay = TestBed.inject(Overlay);
+       announcer = TestBed.inject(LiveAnnouncer);
+       ariaLiveElement = getLiveElement();
+       fixture = TestBed.createComponent(TestApp);
+@@ -172,7 +170,7 @@ describe('LiveAnnouncer', () => {
+ 
+     it('should add aria-owns to open aria-modal elements', fakeAsync(() => {
+       const portal = new ComponentPortal(TestModal);
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(TestBed.inject(Injector));
+       const componentRef = overlayRef.attach(portal);
+       const modal = componentRef.location.nativeElement;
+       fixture.detectChanges();
+@@ -192,7 +190,7 @@ describe('LiveAnnouncer', () => {
+ 
+     it('should expand aria-owns of open aria-modal elements', fakeAsync(() => {
+       const portal = new ComponentPortal(TestModal);
+-      const overlayRef = overlay.create();
++      const overlayRef = createOverlayRef(TestBed.inject(Injector));
+       const componentRef = overlayRef.attach(portal);
+       const modal = componentRef.location.nativeElement;
+       fixture.detectChanges();
+diff --git a/src/components-examples/cdk/drag-drop/cdk-drag-drop-root-element/cdk-drag-drop-root-element-example.ts b/src/components-examples/cdk/drag-drop/cdk-drag-drop-root-element/cdk-drag-drop-root-element-example.ts
+index 9758542d8068534a95b365b2a90b9dc21d9cbea2..44857bd39fe6cdbd4ff00fb3d06b9522d46c9714 100644
+--- a/src/components-examples/cdk/drag-drop/cdk-drag-drop-root-element/cdk-drag-drop-root-element-example.ts
++++ b/src/components-examples/cdk/drag-drop/cdk-drag-drop-root-element/cdk-drag-drop-root-element-example.ts
+@@ -6,8 +6,9 @@ import {
+   ViewContainerRef,
+   OnDestroy,
+   inject,
++  Injector,
+ } from '@angular/core';
+-import {Overlay, OverlayRef} from '@angular/cdk/overlay';
++import {createGlobalPositionStrategy, createOverlayRef, OverlayRef} from '@angular/cdk/overlay';
+ import {TemplatePortal} from '@angular/cdk/portal';
+ import {CdkDrag} from '@angular/cdk/drag-drop';
+ 
+@@ -21,7 +22,7 @@ import {CdkDrag} from '@angular/cdk/drag-drop';
+   imports: [CdkDrag],
+ })
+ export class CdkDragDropRootElementExample implements AfterViewInit, OnDestroy {
+-  private _overlay = inject(Overlay);
++  private _injector = inject(Injector);
+   private _viewContainerRef = inject(ViewContainerRef);
+ 
+   @ViewChild(TemplateRef) _dialogTemplate: TemplateRef<any>;
+@@ -30,8 +31,10 @@ export class CdkDragDropRootElementExample implements AfterViewInit, OnDestroy {
+ 
+   ngAfterViewInit() {
+     this._portal = new TemplatePortal(this._dialogTemplate, this._viewContainerRef);
+-    this._overlayRef = this._overlay.create({
+-      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),
++    this._overlayRef = createOverlayRef(this._injector, {
++      positionStrategy: createGlobalPositionStrategy(this._injector)
++        .centerHorizontally()
++        .centerVertically(),
+       hasBackdrop: true,
+     });
+     this._overlayRef.backdropClick().subscribe(() => this._overlayRef.detach());
+diff --git a/src/dev-app/connected-overlay/connected-overlay-demo.ts b/src/dev-app/connected-overlay/connected-overlay-demo.ts
+index b7ff9f5af0111705f85f027c160f701d06f3a669..c9107f32562030afbfdc6b23f34a4a0c2721ed80 100644
+--- a/src/dev-app/connected-overlay/connected-overlay-demo.ts
++++ b/src/dev-app/connected-overlay/connected-overlay-demo.ts
+@@ -9,8 +9,10 @@
+ import {Directionality} from '@angular/cdk/bidi';
+ import {
+   CdkOverlayOrigin,
++  createFlexibleConnectedPositionStrategy,
++  createOverlayRef,
++  createRepositionScrollStrategy,
+   HorizontalConnectionPos,
+-  Overlay,
+   OverlayModule,
+   OverlayRef,
+   VerticalConnectionPos,
+@@ -20,6 +22,7 @@ import {CdkOverlayBasicExample} from '@angular/components-examples/cdk/overlay';
+ import {
+   ChangeDetectionStrategy,
+   Component,
++  Injector,
+   TemplateRef,
+   ViewChild,
+   ViewContainerRef,
+@@ -47,7 +50,7 @@ import {MatRadioModule} from '@angular/material/radio';
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })
+ export class ConnectedOverlayDemo {
+-  overlay = inject(Overlay);
++  private _injector = inject(Injector);
+   viewContainerRef = inject(ViewContainerRef);
+   dir = inject(Directionality);
+ 
+@@ -69,9 +72,10 @@ export class ConnectedOverlayDemo {
+   overlayRef: OverlayRef | null;
+ 
+   openWithConfig() {
+-    const positionStrategy = this.overlay
+-      .position()
+-      .flexibleConnectedTo(this._overlayOrigin.elementRef)
++    const positionStrategy = createFlexibleConnectedPositionStrategy(
++      this._injector,
++      this._overlayOrigin.elementRef,
++    )
+       .withFlexibleDimensions(this.isFlexible)
+       .withPush(this.canPush)
+       .withViewportMargin(10)
+@@ -99,9 +103,9 @@ export class ConnectedOverlayDemo {
+         },
+       ]);
+ 
+-    this.overlayRef = this.overlay.create({
++    this.overlayRef = createOverlayRef(this._injector, {
+       positionStrategy,
+-      scrollStrategy: this.overlay.scrollStrategies.reposition(),
++      scrollStrategy: createRepositionScrollStrategy(this._injector),
+       direction: this.dir.value,
+       minWidth: 200,
+       minHeight: 50,
+diff --git a/src/e2e-app/components/block-scroll-strategy/block-scroll-strategy-e2e.ts b/src/e2e-app/components/block-scroll-strategy/block-scroll-strategy-e2e.ts
+index 8e515a71e941c74124346607d152f9d69abc41fb..8f96070568e322110aa1a73911914cbd3e1b8f02 100644
+--- a/src/e2e-app/components/block-scroll-strategy/block-scroll-strategy-e2e.ts
++++ b/src/e2e-app/components/block-scroll-strategy/block-scroll-strategy-e2e.ts
+@@ -1,5 +1,5 @@
+-import {Component, inject} from '@angular/core';
+-import {Overlay, OverlayContainer} from '@angular/cdk/overlay';
++import {Component, inject, Injector} from '@angular/core';
++import {createBlockScrollStrategy, OverlayContainer} from '@angular/cdk/overlay';
+ import {ScrollingModule} from '@angular/cdk/scrolling';
+ 
+ @Component({
+@@ -9,7 +9,7 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
+   imports: [ScrollingModule],
+ })
+ export class BlockScrollStrategyE2E {
+-  scrollStrategy = inject(Overlay).scrollStrategies.block();
++  scrollStrategy = createBlockScrollStrategy(inject(Injector));
+ 
+   constructor() {
+     // This loads the structural styles for the test.
+diff --git a/src/material-experimental/column-resize/resizable-directives/default-enabled-resizable.ts b/src/material-experimental/column-resize/resizable-directives/default-enabled-resizable.ts
+index 56eb32bb10f2b320d6c4d7d5613cfe21fe9ea8cf..3a6eca40635011eda89b3845c64609e7e3d9fd92 100644
+--- a/src/material-experimental/column-resize/resizable-directives/default-enabled-resizable.ts
++++ b/src/material-experimental/column-resize/resizable-directives/default-enabled-resizable.ts
+@@ -18,7 +18,6 @@ import {
+ } from '@angular/core';
+ 
+ import {Directionality} from '@angular/cdk/bidi';
+-import {Overlay} from '@angular/cdk/overlay';
+ import {
+   CdkColumnDef,
+   _CoalescedStyleScheduler,
+@@ -50,7 +49,6 @@ export class MatDefaultResizable extends AbstractMatResizable {
+   protected readonly eventDispatcher = inject(HeaderRowEventDispatcher);
+   protected readonly injector = inject(Injector);
+   protected readonly ngZone = inject(NgZone);
+-  protected readonly overlay = inject(Overlay);
+   protected readonly resizeNotifier = inject(ColumnResizeNotifierSource);
+   protected readonly resizeStrategy = inject(ResizeStrategy);
+   protected readonly styleScheduler = inject<_CoalescedStyleScheduler>(_COALESCED_STYLE_SCHEDULER);
+diff --git a/src/material-experimental/column-resize/resizable-directives/resizable.ts b/src/material-experimental/column-resize/resizable-directives/resizable.ts
+index 5047197a1bf2fc41b6998475d651347e52de57ea..11a0faa19851752359dfe7142871de5ad7182b8c 100644
+--- a/src/material-experimental/column-resize/resizable-directives/resizable.ts
++++ b/src/material-experimental/column-resize/resizable-directives/resizable.ts
+@@ -18,7 +18,6 @@ import {
+ } from '@angular/core';
+ 
+ import {Directionality} from '@angular/cdk/bidi';
+-import {Overlay} from '@angular/cdk/overlay';
+ import {
+   CdkColumnDef,
+   _CoalescedStyleScheduler,
+@@ -49,7 +48,6 @@ export class MatResizable extends AbstractMatResizable {
+   protected readonly eventDispatcher = inject(HeaderRowEventDispatcher);
+   protected readonly injector = inject(Injector);
+   protected readonly ngZone = inject(NgZone);
+-  protected readonly overlay = inject(Overlay);
+   protected readonly resizeNotifier = inject(ColumnResizeNotifierSource);
+   protected readonly resizeStrategy = inject(ResizeStrategy);
+   protected readonly styleScheduler = inject<_CoalescedStyleScheduler>(_COALESCED_STYLE_SCHEDULER);
