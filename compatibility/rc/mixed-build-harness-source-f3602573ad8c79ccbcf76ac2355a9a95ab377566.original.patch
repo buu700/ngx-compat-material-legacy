@@ -1,0 +1,654 @@
+diff --git a/integration/mdc-migration/verify-golden.ts b/integration/mdc-migration/verify-golden.ts
+index e0cb0d1a1496677047b70a38cd60dea0d9cc37af..330a8af26fe0a0b866b6f74afbe35f7be8ee29c5 100644
+--- a/integration/mdc-migration/verify-golden.ts
++++ b/integration/mdc-migration/verify-golden.ts
+@@ -17,7 +17,7 @@ const TEST_DIRECTORY = CURRENT_WORKING_DIRECTORY;
+ const GOLDEN_DIRECTORY = path.join(CURRENT_WORKING_DIRECTORY, process.argv[3]);
+ const IGNORED_FILES = new Set(process.argv.slice(5));
+ 
+-if (SHOULD_APPROVE && !process.env.BUILD_WORKSPACE_DIRECTORY) {
++if (SHOULD_APPROVE && !process.env['BUILD_WORKSPACE_DIRECTORY']) {
+   console.error('Approval command must be run with `bazel run`.');
+   process.exit(1);
+ }
+@@ -197,7 +197,7 @@ async function deleteFiles(file: string, ignoredFiles: Set<string>) {
+     if (diffs.length) {
+       if (SHOULD_APPROVE) {
+         const APPROVED_GOLDEN_DIRECTORY = path.join(
+-          process.env.BUILD_WORKSPACE_DIRECTORY!,
++          process.env['BUILD_WORKSPACE_DIRECTORY']!,
+           process.argv[4],
+         );
+         await deleteFiles(
+diff --git a/integration/size-test/check-size.ts b/integration/size-test/check-size.ts
+index ee4b4eaa3f2fd7ba989f733e4615a8c51223f93d..0ad6615f10aadf07c890f87bae60dadc1c219785 100644
+--- a/integration/size-test/check-size.ts
++++ b/integration/size-test/check-size.ts
+@@ -77,7 +77,7 @@ if (deviatedByPercentage) {
+ /** Prints the command for approving the current test. */
+ function printApproveCommand() {
+   console.info(chalk.yellow('You can approve the golden by running the following command:'));
+-  console.info(chalk.yellow(`  bazel run ${process.env.BAZEL_TARGET}.approve`));
++  console.info(chalk.yellow(`  bazel run ${process.env['BAZEL_TARGET']}.approve`));
+ }
+ 
+ /** Gets the lexicographically sorted size-test golden. */
+diff --git a/scripts/build-docs-content.mts b/scripts/build-docs-content.mts
+index eb5aaef16196a42b2818bd58d01a2a5d51642c0c..d2015e98b09bb68b8be9c8b3b3f03bc7661b4f72 100644
+--- a/scripts/build-docs-content.mts
++++ b/scripts/build-docs-content.mts
+@@ -21,7 +21,7 @@ const distDir = join(projectDir, 'dist/');
+ const outputDir = join(distDir, 'docs-content-pkg');
+ 
+ /** Command that runs Bazel. */
+-const bazelCmd = process.env.BAZEL || `yarn -s bazel`;
++const bazelCmd = process.env['BAZEL'] || `yarn -s bazel`;
+ 
+ /**
+  * Builds the docs content NPM package in snapshot mode.
+diff --git a/scripts/build-packages-dist.mts b/scripts/build-packages-dist.mts
+index ccc96b6d950fa2f110a9c8c127b1edc315433ee4..0bd2212f7afaffe3170eafa33aa9c031e03f83a3 100755
+--- a/scripts/build-packages-dist.mts
++++ b/scripts/build-packages-dist.mts
+@@ -20,7 +20,7 @@ const releaseTargetTag = 'release-package';
+ const projectDir = join(dirname(fileURLToPath(import.meta.url)), '../');
+ 
+ /** Command that runs Bazel. */
+-const bazelCmd = process.env.BAZEL || `yarn -s bazel`;
++const bazelCmd = process.env['BAZEL'] || `yarn -s bazel`;
+ 
+ /** Command that queries Bazel for all release package targets. */
+ const queryPackagesCmd =
+diff --git a/scripts/caretaking/resync-caretaker-app-prs.ts b/scripts/caretaking/resync-caretaker-app-prs.ts
+index 162015cdc9c8634d39a2bf2a1859e16882bee4f4..6cfe1f683167f3d09cdce9bb6d1e42a2f0215689 100644
+--- a/scripts/caretaking/resync-caretaker-app-prs.ts
++++ b/scripts/caretaking/resync-caretaker-app-prs.ts
+@@ -2,7 +2,7 @@ import {Octokit} from '@octokit/rest';
+ import * as fetch from 'node-fetch';
+ 
+ const apiBaseUrl = 'https://test-jperrott.firebaseio.com/pulls';
+-const github = new Octokit({auth: process.env.TOKEN});
++const github = new Octokit({auth: process.env['TOKEN']});
+ 
+ async function resync() {
+   const pulls: any[] = [];
+diff --git a/scripts/circleci/notify-slack-job-failure.mts b/scripts/circleci/notify-slack-job-failure.mts
+index fe39dabd4b0743d4bee2a8983c766205646e9ca2..8f15ec03c16e36aade2d3603775dac19e7ef0937 100644
+--- a/scripts/circleci/notify-slack-job-failure.mts
++++ b/scripts/circleci/notify-slack-job-failure.mts
+@@ -8,15 +8,15 @@
+ import sh from 'shelljs';
+ import {isVersionBranch, getConfig, assertValidGithubConfig} from '@angular/ng-dev';
+ 
+-if (process.env.CIRCLE_PR_NUMBER !== undefined) {
++if (process.env['CIRCLE_PR_NUMBER'] !== undefined) {
+   console.info('Skipping notifications for pull requests.');
+   process.exit(0);
+ }
+ 
+-const jobName = process.env.CIRCLE_JOB!;
+-const branchName = process.env.CIRCLE_BRANCH!;
+-const jobUrl = process.env.CIRCLE_BUILD_URL!;
+-const webhookUrl = process.env.SLACK_COMPONENTS_CI_FAILURES_WEBHOOK_URL!;
++const jobName = process.env['CIRCLE_JOB']!;
++const branchName = process.env['CIRCLE_BRANCH']!;
++const jobUrl = process.env['CIRCLE_BUILD_URL']!;
++const webhookUrl = process.env['SLACK_COMPONENTS_CI_FAILURES_WEBHOOK_URL']!;
+ 
+ const {github} = await getConfig([assertValidGithubConfig]);
+ const isPublishBranch = isVersionBranch(branchName) || branchName === github.mainBranchName;
+diff --git a/scripts/docs-deploy/deploy-ci-push.mts b/scripts/docs-deploy/deploy-ci-push.mts
+index a3029961180040905c1f7788e232b7377bb0731c..5f9c65f8b9472f8ddb480a31eb197bf8eb96a21d 100644
+--- a/scripts/docs-deploy/deploy-ci-push.mts
++++ b/scripts/docs-deploy/deploy-ci-push.mts
+@@ -13,19 +13,19 @@ import {getReleaseRepoWithApi} from './github-versioning.mjs';
+ import {updateVersionsFile} from './update-versions-file.mjs';
+ 
+ async function main() {
+-  if (process.env.CIRCLE_PR_NUMBER !== undefined) {
++  if (process.env['CIRCLE_PR_NUMBER'] !== undefined) {
+     console.log('Skipping deployment for pull request build.');
+     return;
+   }
+ 
+-  const branchName = process.env.CIRCLE_BRANCH;
++  const branchName = process.env['CIRCLE_BRANCH'];
+   if (branchName === undefined) {
+     throw new Error('Deployment script is unable to determine CI branch.');
+   }
+ 
+   const repo = await getReleaseRepoWithApi();
+   const active = await ActiveReleaseTrains.fetch(repo);
+-  const description = `${branchName} - ${process.env.CIRCLE_SHA1!}`;
++  const description = `${branchName} - ${process.env['CIRCLE_SHA1']!}`;
+   const {projectId, serviceKey} = firebaseConfig;
+ 
+   if (branchName === active.next.branchName) {
+diff --git a/scripts/docs-deploy/deploy-to-site.mts b/scripts/docs-deploy/deploy-to-site.mts
+index 8c860b5dfe22b004ec755bd50eb90961a2ad7946..2b2f70b2040d951665430b4312e9e026ac4a2b99 100644
+--- a/scripts/docs-deploy/deploy-to-site.mts
++++ b/scripts/docs-deploy/deploy-to-site.mts
+@@ -45,7 +45,7 @@ export async function deployToSite(
+   // Setup GCP service key for the docs-app deployment.
+   // https://firebase.google.com/docs/admin/setup.
+   await fs.promises.writeFile(gcpServiceKeyTmpFile, firebaseServiceKey);
+-  process.env.GOOGLE_APPLICATION_CREDENTIALS = gcpServiceKeyTmpFile;
++  process.env['GOOGLE_APPLICATION_CREDENTIALS'] = gcpServiceKeyTmpFile;
+ 
+   await firebase('use', info.projectId);
+   await firebase('target:clear', 'hosting', 'mat-aio');
+diff --git a/scripts/docs-deploy/utils.mts b/scripts/docs-deploy/utils.mts
+index 82218d6021543ca052820f47bb7393013f4079f1..c68483460878185eb3516e8f1c406024e3ec5fa1 100644
+--- a/scripts/docs-deploy/utils.mts
++++ b/scripts/docs-deploy/utils.mts
+@@ -11,7 +11,10 @@ export const projectDir = path.join(path.dirname(fileURLToPath(import.meta.url))
+ 
+ /** Interface describing a site target for the docs-app. */
+ export class SiteTarget {
+-  constructor(public firebaseSiteId: string, public remoteUrl: string) {}
++  constructor(
++    public firebaseSiteId: string,
++    public remoteUrl: string,
++  ) {}
+ }
+ 
+ /** Object capturing all site targets for the docs-app. */
+@@ -25,12 +28,12 @@ export const sites = {
+ };
+ 
+ /** Optional Github access token. Can be used for querying the active release trains. */
+-export const githubAccessToken: string | undefined = process.env.DOCS_DEPLOY_GITHUB_TOKEN;
++export const githubAccessToken: string | undefined = process.env['DOCS_DEPLOY_GITHUB_TOKEN'];
+ 
+ /** Configuration describing the Firebase project that we deploy to. */
+ export const firebaseConfig = {
+   projectId: 'material-angular-io',
+-  serviceKey: process.env.DOCS_SITE_GCP_SERVICE_KEY!,
++  serviceKey: process.env['DOCS_SITE_GCP_SERVICE_KEY']!,
+ };
+ 
+ /** Finds and parsed the `package.json` of the specified project directory. */
+diff --git a/scripts/tsconfig.json b/scripts/tsconfig.json
+index 1cf5aeaebcf9a53e74a29416be77b3d16f4ecc87..8c6293f4a3032af12616619f00d21469a1f30b5e 100644
+--- a/scripts/tsconfig.json
++++ b/scripts/tsconfig.json
+@@ -7,6 +7,7 @@
+     "types": ["node"],
+     "strict": true,
+     "noEmit": true,
++    "noPropertyAccessFromIndexSignature": true,
+     "skipLibCheck": true,
+     "downlevelIteration": true,
+     "esModuleInterop": true
+diff --git a/src/bazel-tsconfig-build.json b/src/bazel-tsconfig-build.json
+index f04c1c955269e8211532b6a7944e87e0d7364ec0..ea425fb5bc38f7916c1f26e2c79e6e2f20423836 100644
+--- a/src/bazel-tsconfig-build.json
++++ b/src/bazel-tsconfig-build.json
+@@ -10,6 +10,7 @@
+     "noUnusedParameters": false,
+     "noUnusedLocals": false,
+     "strictNullChecks": true,
++    "noPropertyAccessFromIndexSignature": true,
+     "noImplicitReturns": true,
+     "strictFunctionTypes": true,
+     "noImplicitOverride": true,
+diff --git a/src/cdk/schematics/tsconfig.json b/src/cdk/schematics/tsconfig.json
+index 0f9346a17cfed606034cf04c85db4d673f9133fb..0733e83f56920743528bc61d6509d8240f6a8248 100644
+--- a/src/cdk/schematics/tsconfig.json
++++ b/src/cdk/schematics/tsconfig.json
+@@ -7,6 +7,7 @@
+     "outDir": "../../../dist/packages/cdk/schematics",
+     "noEmitOnError": false,
+     "strictNullChecks": true,
++    "noPropertyAccessFromIndexSignature": true,
+     "useUnknownInCatchVariables": true,
+     "noImplicitOverride": true,
+     "noImplicitReturns": true,
+diff --git a/src/cdk/schematics/utils/build-component.ts b/src/cdk/schematics/utils/build-component.ts
+index a2aba22b2b7a7592f3483827ccdc8702484f8e20..69bf8941e425c9a7ac1fbebe9f22cb52e1708203 100644
+--- a/src/cdk/schematics/utils/build-component.ts
++++ b/src/cdk/schematics/utils/build-component.ts
+@@ -43,7 +43,8 @@ import {getDefaultComponentOptions, isStandaloneSchematic} from './schematic-opt
+ function buildDefaultPath(project: workspaces.ProjectDefinition): string {
+   const root = project.sourceRoot ? `/${project.sourceRoot}/` : `/${project.root}/src/`;
+ 
+-  const projectDirName = project.extensions.projectType === ProjectType.Application ? 'app' : 'lib';
++  const projectDirName =
++    project.extensions['projectType'] === ProjectType.Application ? 'app' : 'lib';
+ 
+   return `${root}${projectDirName}`;
+ }
+diff --git a/src/cdk/schematics/utils/html-manipulation.ts b/src/cdk/schematics/utils/html-manipulation.ts
+index 57498612a13cb78dfdf960af268b06cb6ef376d6..94083880bbec5365750ea01c8b6479078bd65fc8 100644
+--- a/src/cdk/schematics/utils/html-manipulation.ts
++++ b/src/cdk/schematics/utils/html-manipulation.ts
+@@ -72,7 +72,7 @@ export function addBodyClass(host: Tree, htmlFilePath: string, className: string
+     if (!hasClass) {
+       // We have source code location info enabled, and we pre-checked that the element
+       // has attributes, specifically the `class` attribute.
+-      const classAttributeLocation = body.sourceCodeLocation!.attrs!.class;
++      const classAttributeLocation = body.sourceCodeLocation!.attrs!['class'];
+       const recordedChange = host
+         .beginUpdate(htmlFilePath)
+         .insertRight(classAttributeLocation.endOffset - 1, ` ${className}`);
+diff --git a/src/cdk/schematics/utils/project-index-file.ts b/src/cdk/schematics/utils/project-index-file.ts
+index d7c2876751680e08c61cad1ef6663b5355664afe..061908e6e31d2f1175a32098458808c934e1e4ab 100644
+--- a/src/cdk/schematics/utils/project-index-file.ts
++++ b/src/cdk/schematics/utils/project-index-file.ts
+@@ -12,8 +12,8 @@ import {defaultTargetBuilders, getTargetsByBuilderName} from './project-targets'
+ /** Gets the path of the index file in the given project. */
+ export function getProjectIndexFiles(project: workspaces.ProjectDefinition): Path[] {
+   const paths = getTargetsByBuilderName(project, defaultTargetBuilders.build)
+-    .filter(t => t.options?.index)
+-    .map(t => t.options!.index as Path);
++    .filter(t => t.options?.['index'])
++    .map(t => t.options!['index'] as Path);
+ 
+   // Use a set to remove duplicate index files referenced in multiple build targets of a project.
+   return Array.from(new Set(paths));
+diff --git a/src/cdk/schematics/utils/project-main-file.ts b/src/cdk/schematics/utils/project-main-file.ts
+index 71f5c4e2cd40f87022ac733d57f545df3c9fac1b..6562146fd5eda06ae98a0003f02eec1e84ce54eb 100644
+--- a/src/cdk/schematics/utils/project-main-file.ts
++++ b/src/cdk/schematics/utils/project-main-file.ts
+@@ -13,7 +13,7 @@ import {getProjectTargetOptions} from './project-targets';
+ /** Looks for the main TypeScript file in the given project and returns its path. */
+ export function getProjectMainFile(project: workspaces.ProjectDefinition): Path {
+   const buildOptions = getProjectTargetOptions(project, 'build');
+-  const mainPath = buildOptions.browser as Path | undefined;
++  const mainPath = buildOptions['browser'] as Path | undefined;
+ 
+   if (!mainPath) {
+     throw new SchematicsException(
+diff --git a/src/cdk/schematics/utils/project-style-file.ts b/src/cdk/schematics/utils/project-style-file.ts
+index 8962d84f34878c3f03ac6b5ac619c17e91f38e7d..7416c977f21f64ea666a4a10f56949bf05f839bf 100644
+--- a/src/cdk/schematics/utils/project-style-file.ts
++++ b/src/cdk/schematics/utils/project-style-file.ts
+@@ -24,10 +24,10 @@ export function getProjectStyleFile(
+   extension?: string,
+ ): string | null {
+   const buildOptions = getProjectTargetOptions(project, 'build');
+-  if (buildOptions.styles && isJsonArray(buildOptions.styles) && buildOptions.styles.length) {
+-    const styles = buildOptions.styles.map(s =>
+-      typeof s === 'string' ? s : (s as {input: string}).input,
+-    );
++  const buildStyles = buildOptions['styles'];
++
++  if (buildStyles && isJsonArray(buildStyles) && buildStyles.length) {
++    const styles = buildStyles.map(s => (typeof s === 'string' ? s : (s as {input: string}).input));
+ 
+     // Look for the default style file that is generated for new projects by the Angular CLI. This
+     // default style file is usually called `styles.ext` unless it has been changed explicitly.
+diff --git a/src/cdk/schematics/utils/project-tsconfig-paths.ts b/src/cdk/schematics/utils/project-tsconfig-paths.ts
+index 6138fa258c825de2fc1ead4f1fc0143299297097..6bb95a0e523024724ca0edf667bcdb8d4938a4ea 100644
+--- a/src/cdk/schematics/utils/project-tsconfig-paths.ts
++++ b/src/cdk/schematics/utils/project-tsconfig-paths.ts
+@@ -19,7 +19,7 @@ export function getTargetTsconfigPath(
+   project: workspaces.ProjectDefinition,
+   targetName: string,
+ ): WorkspacePath | null {
+-  const tsconfig = project.targets?.get(targetName)?.options?.tsConfig;
++  const tsconfig = project.targets?.get(targetName)?.options?.['tsConfig'];
+   return tsconfig ? normalize(tsconfig as string) : null;
+ }
+ 
+diff --git a/src/cdk/schematics/utils/schematic-options.ts b/src/cdk/schematics/utils/schematic-options.ts
+index 4de7e3ab17c6d102492f5496210617c9fbedfe17..bd7a996ed91bdf493b6ad99f6984d280c00aa161 100644
+--- a/src/cdk/schematics/utils/schematic-options.ts
++++ b/src/cdk/schematics/utils/schematic-options.ts
+@@ -71,8 +71,8 @@ function getDefaultComponentOption<T>(
+   optionNames: string[],
+   fallbackValue: T,
+ ): T {
+-  const schematicOptions = isJsonObject(project.extensions.schematics || null)
+-    ? (project.extensions.schematics as JsonObject)
++  const schematicOptions = isJsonObject(project.extensions['schematics'] || null)
++    ? (project.extensions['schematics'] as JsonObject)
+     : null;
+   const defaultSchematic = schematicOptions
+     ? (schematicOptions['@schematics/angular:component'] as JsonObject | null)
+diff --git a/src/cdk/testing/tests/webdriver.e2e.spec.ts b/src/cdk/testing/tests/webdriver.e2e.spec.ts
+index 6dc0449b97b08af2a9bb15af5b3ff6e15cdbf5a1..3809fc1e951dee973a4826693778874f17cc08e2 100644
+--- a/src/cdk/testing/tests/webdriver.e2e.spec.ts
++++ b/src/cdk/testing/tests/webdriver.e2e.spec.ts
+@@ -57,7 +57,7 @@ describe('WebDriverHarnessEnvironment', () => {
+ 
+   beforeAll(async () => {
+     wd = await new webdriver.Builder()
+-      .usingServer(process.env.WEB_TEST_WEBDRIVER_SERVER!)
++      .usingServer(process.env['WEB_TEST_WEBDRIVER_SERVER']!)
+       .withCapabilities(webTestMetadata.capabilities)
+       .build();
+   });
+diff --git a/src/material/datepicker/date-range-input.spec.ts b/src/material/datepicker/date-range-input.spec.ts
+index 154485c0fd960b5562a6a79ba7d6fc02bb27edb5..40c9ba565cc28dfc9a3fc791f805ada2b529254c 100644
+--- a/src/material/datepicker/date-range-input.spec.ts
++++ b/src/material/datepicker/date-range-input.spec.ts
+@@ -263,23 +263,23 @@ describe('MatDateRangeInput', () => {
+     // Set it manually here so we can assert `rangeInput.errorState` correctly.
+     fixture.componentInstance.range.markAllAsTouched();
+     expect(fixture.componentInstance.rangeInput.errorState).toBe(false);
+-    expect(start.errors?.matStartDateInvalid).toBeFalsy();
+-    expect(end.errors?.matEndDateInvalid).toBeFalsy();
++    expect(start.errors?.['matStartDateInvalid']).toBeFalsy();
++    expect(end.errors?.['matEndDateInvalid']).toBeFalsy();
+ 
+     start.setValue(new Date(2020, 2, 2));
+     end.setValue(new Date(2020, 1, 2));
+     fixture.detectChanges();
+ 
+     expect(fixture.componentInstance.rangeInput.errorState).toBe(true);
+-    expect(start.errors?.matStartDateInvalid).toBeTruthy();
+-    expect(end.errors?.matEndDateInvalid).toBeTruthy();
++    expect(start.errors?.['matStartDateInvalid']).toBeTruthy();
++    expect(end.errors?.['matEndDateInvalid']).toBeTruthy();
+ 
+     end.setValue(new Date(2020, 3, 2));
+     fixture.detectChanges();
+ 
+     expect(fixture.componentInstance.rangeInput.errorState).toBe(false);
+-    expect(start.errors?.matStartDateInvalid).toBeFalsy();
+-    expect(end.errors?.matEndDateInvalid).toBeFalsy();
++    expect(start.errors?.['matStartDateInvalid']).toBeFalsy();
++    expect(end.errors?.['matEndDateInvalid']).toBeFalsy();
+   }));
+ 
+   it('should pass the minimum date from the range input to the inner inputs', () => {
+@@ -288,16 +288,16 @@ describe('MatDateRangeInput', () => {
+     fixture.detectChanges();
+     const {start, end} = fixture.componentInstance.range.controls;
+ 
+-    expect(start.errors?.matDatepickerMin).toBeFalsy();
+-    expect(end.errors?.matDatepickerMin).toBeFalsy();
++    expect(start.errors?.['matDatepickerMin']).toBeFalsy();
++    expect(end.errors?.['matDatepickerMin']).toBeFalsy();
+ 
+     const date = new Date(2020, 2, 2);
+     start.setValue(date);
+     end.setValue(date);
+     fixture.detectChanges();
+ 
+-    expect(start.errors?.matDatepickerMin).toBeTruthy();
+-    expect(end.errors?.matDatepickerMin).toBeTruthy();
++    expect(start.errors?.['matDatepickerMin']).toBeTruthy();
++    expect(end.errors?.['matDatepickerMin']).toBeTruthy();
+   });
+ 
+   it('should pass the maximum date from the range input to the inner inputs', () => {
+@@ -306,16 +306,16 @@ describe('MatDateRangeInput', () => {
+     fixture.detectChanges();
+     const {start, end} = fixture.componentInstance.range.controls;
+ 
+-    expect(start.errors?.matDatepickerMax).toBeFalsy();
+-    expect(end.errors?.matDatepickerMax).toBeFalsy();
++    expect(start.errors?.['matDatepickerMax']).toBeFalsy();
++    expect(end.errors?.['matDatepickerMax']).toBeFalsy();
+ 
+     const date = new Date(2020, 2, 2);
+     start.setValue(date);
+     end.setValue(date);
+     fixture.detectChanges();
+ 
+-    expect(start.errors?.matDatepickerMax).toBeTruthy();
+-    expect(end.errors?.matDatepickerMax).toBeTruthy();
++    expect(start.errors?.['matDatepickerMax']).toBeTruthy();
++    expect(end.errors?.['matDatepickerMax']).toBeTruthy();
+   });
+ 
+   it('should pass the date filter function from the range input to the inner inputs', () => {
+@@ -324,16 +324,16 @@ describe('MatDateRangeInput', () => {
+     fixture.detectChanges();
+     const {start, end} = fixture.componentInstance.range.controls;
+ 
+-    expect(start.errors?.matDatepickerFilter).toBeFalsy();
+-    expect(end.errors?.matDatepickerFilter).toBeFalsy();
++    expect(start.errors?.['matDatepickerFilter']).toBeFalsy();
++    expect(end.errors?.['matDatepickerFilter']).toBeFalsy();
+ 
+     const date = new Date(2020, 2, 2);
+     start.setValue(date);
+     end.setValue(date);
+     fixture.detectChanges();
+ 
+-    expect(start.errors?.matDatepickerFilter).toBeTruthy();
+-    expect(end.errors?.matDatepickerFilter).toBeTruthy();
++    expect(start.errors?.['matDatepickerFilter']).toBeTruthy();
++    expect(end.errors?.['matDatepickerFilter']).toBeTruthy();
+   });
+ 
+   it('should should revalidate when a new date filter function is assigned', () => {
+@@ -448,14 +448,14 @@ describe('MatDateRangeInput', () => {
+     end.setValue(date);
+     fixture.detectChanges();
+ 
+-    expect(start.errors?.matDatepickerMin).toBeTruthy();
+-    expect(end.errors?.matDatepickerMin).toBeTruthy();
++    expect(start.errors?.['matDatepickerMin']).toBeTruthy();
++    expect(end.errors?.['matDatepickerMin']).toBeTruthy();
+ 
+     fixture.componentInstance.minDate = new Date(2019, 3, 2);
+     fixture.detectChanges();
+ 
+-    expect(start.errors?.matDatepickerMin).toBeFalsy();
+-    expect(end.errors?.matDatepickerMin).toBeFalsy();
++    expect(start.errors?.['matDatepickerMin']).toBeFalsy();
++    expect(end.errors?.['matDatepickerMin']).toBeFalsy();
+   });
+ 
+   it('should set the formatted date value as the input value', () => {
+diff --git a/src/material/schematics/ng-add/index.spec.ts b/src/material/schematics/ng-add/index.spec.ts
+index 429005d757ea0edaa0dc282f01febaf22e9dce98..e69c41d289db31eddd0c12801b2616b31bb03dda 100644
+--- a/src/material/schematics/ng-add/index.spec.ts
++++ b/src/material/schematics/ng-add/index.spec.ts
+@@ -41,7 +41,7 @@ describe('ng-add schematic', () => {
+ 
+   /** Expects the given file to be in the styles of the specified workspace project. */
+   function expectProjectStyleFile(project: workspaces.ProjectDefinition, filePath: string) {
+-    expect(getProjectTargetOptions(project, 'build').styles)
++    expect(getProjectTargetOptions(project, 'build')['styles'])
+       .withContext(`Expected "${filePath}" to be added to the project styles in the workspace.`)
+       .toContain(filePath);
+   }
+@@ -436,7 +436,7 @@ describe('ng-add schematic', () => {
+       const tree = await runner.runSchematic('ng-add-setup-project', baseOptions, appTree);
+       const workspace = await getWorkspace(tree);
+       const project = getProjectFromWorkspace(workspace, baseOptions.project);
+-      const styles = getProjectTargetOptions(project, 'build').styles;
++      const styles = getProjectTargetOptions(project, 'build')['styles'];
+ 
+       expect(styles)
+         .not.withContext('Expected the existing prebuilt theme file to be removed.')
+@@ -452,7 +452,7 @@ describe('ng-add schematic', () => {
+       const tree = await runner.runSchematic('ng-add-setup-project', baseOptions, appTree);
+       const workspace = await getWorkspace(tree);
+       const project = getProjectFromWorkspace(workspace, baseOptions.project);
+-      const styles = getProjectTargetOptions(project, 'build').styles;
++      const styles = getProjectTargetOptions(project, 'build')['styles'];
+ 
+       expect(styles)
+         .not.withContext('Expected the default prebuilt theme to be not configured.')
+@@ -467,7 +467,7 @@ describe('ng-add schematic', () => {
+       const tree = await runner.runSchematic('ng-add-setup-project', baseOptions, appTree);
+       const workspace = await getWorkspace(tree);
+       const project = getProjectFromWorkspace(workspace, baseOptions.project);
+-      const styles = getProjectTargetOptions(project, 'build').styles;
++      const styles = getProjectTargetOptions(project, 'build')['styles'];
+ 
+       expect(styles)
+         .withContext(
+diff --git a/src/material/schematics/ng-add/setup-project.ts b/src/material/schematics/ng-add/setup-project.ts
+index 9ddeb999f4dca5a13b6a801fea4031a213cf261c..ea59b97b7fc75c5b8b7d6b0a0ffd50e7859ddf30 100644
+--- a/src/material/schematics/ng-add/setup-project.ts
++++ b/src/material/schematics/ng-add/setup-project.ts
+@@ -38,7 +38,7 @@ export default function (options: Schema): Rule {
+     const workspace = await getWorkspace(host);
+     const project = getProjectFromWorkspace(workspace, options.project);
+ 
+-    if (project.extensions.projectType === ProjectType.Application) {
++    if (project.extensions['projectType'] === ProjectType.Application) {
+       return chain([
+         addAnimationsModule(options),
+         addThemeToAppStyles(options),
+diff --git a/src/material/schematics/ng-add/theming/theming.ts b/src/material/schematics/ng-add/theming/theming.ts
+index 85b783e217665f5bf3993c76e8c0ce52c1edaa61..bee0e43245880605d553252eea74ad509e3340db 100644
+--- a/src/material/schematics/ng-add/theming/theming.ts
++++ b/src/material/schematics/ng-add/theming/theming.ts
+@@ -132,10 +132,10 @@ function addThemeStyleToTarget(
+     }
+ 
+     const targetOptions = getProjectTargetOptions(project, targetName);
+-    const styles = targetOptions.styles as (string | {input: string})[];
++    const styles = targetOptions['styles'] as (string | {input: string})[];
+ 
+     if (!styles) {
+-      targetOptions.styles = [assetPath];
++      targetOptions['styles'] = [assetPath];
+     } else {
+       const existingStyles = styles.map(s => (typeof s === 'string' ? s : s.input));
+ 
+diff --git a/src/material/schematics/tsconfig.json b/src/material/schematics/tsconfig.json
+index c82bc7202f2f2ad46a3abd1bf0ab952b7bda4e04..227597b4f5cb8e7eb94ef8f6f7f26c52dcaa0443 100644
+--- a/src/material/schematics/tsconfig.json
++++ b/src/material/schematics/tsconfig.json
+@@ -6,6 +6,7 @@
+     "outDir": "../../../dist/packages/material/schematics",
+     "noEmitOnError": false,
+     "strictNullChecks": true,
++    "noPropertyAccessFromIndexSignature": true,
+     "useUnknownInCatchVariables": true,
+     "noImplicitOverride": true,
+     "noImplicitAny": true,
+diff --git a/src/universal-app/prerender.ts b/src/universal-app/prerender.ts
+index f65e1840fd5c0e75b04f034f1c0e8143fad7a108..22e970236c67cad62c2fff4dafbdc187640ab401 100644
+--- a/src/universal-app/prerender.ts
++++ b/src/universal-app/prerender.ts
+@@ -18,7 +18,7 @@ const themeCssPath = runfiles.resolvePackageRelative('./theme.css');
+ const result = renderModule(KitchenSinkRootServerModule, {
+   document: readFileSync(indexHtmlPath, 'utf-8'),
+ });
+-const outDir = process.env.TEST_UNDECLARED_OUTPUTS_DIR as string;
++const outDir = process.env['TEST_UNDECLARED_OUTPUTS_DIR'] as string;
+ 
+ result
+   .then(content => {
+diff --git a/tools/dgeni/tsconfig.json b/tools/dgeni/tsconfig.json
+index 90a80bf846ddaee2b5f824c1b5cd6180b66dac67..4edbcdca5bebb8c9ab9457ff34edc46837ee8c4b 100644
+--- a/tools/dgeni/tsconfig.json
++++ b/tools/dgeni/tsconfig.json
+@@ -6,6 +6,7 @@
+     "moduleResolution": "node",
+     "esModuleInterop": true,
+     "strictNullChecks": true,
++    "noPropertyAccessFromIndexSignature": true,
+     "useUnknownInCatchVariables": true,
+     "noImplicitReturns": true,
+     "strictFunctionTypes": true,
+diff --git a/tools/tslint-rules/ngOnChangesPropertyAccessRule.ts b/tools/tslint-rules/ngOnChangesPropertyAccessRule.ts
+deleted file mode 100644
+index aec9aed19787bc11fe41c5784c8cd25e4b6a0f49..0000000000000000000000000000000000000000
+--- a/tools/tslint-rules/ngOnChangesPropertyAccessRule.ts
++++ /dev/null
+@@ -1,80 +0,0 @@
+-import ts from 'typescript';
+-import * as Lint from 'tslint';
+-
+-/**
+- * Rule that catches cases where a property of a `SimpleChanges` object is accessed directly,
+- * rather than through a literal. Accessing properties of `SimpleChanges` directly can break
+- * when using Closure's property renaming.
+- */
+-export class Rule extends Lint.Rules.TypedRule {
+-  applyWithProgram(sourceFile: ts.SourceFile, program: ts.Program): Lint.RuleFailure[] {
+-    return this.applyWithWalker(new Walker(sourceFile, this.getOptions(), program));
+-  }
+-}
+-
+-class Walker extends Lint.ProgramAwareRuleWalker {
+-  override visitMethodDeclaration(method: ts.MethodDeclaration) {
+-    // Walk through all of the `ngOnChanges` methods that have at least one parameter.
+-    if (method.name.getText() !== 'ngOnChanges' || !method.parameters.length || !method.body) {
+-      return;
+-    }
+-
+-    const walkChildren = (node: ts.Node) => {
+-      // Walk through all the nodes and look for property access expressions
+-      // (e.g. `changes.something`). Note that this is different from element access
+-      // expressions which look like `changes['something']`.
+-      if (ts.isPropertyAccessExpression(node) && this._isSimpleChangesAccess(method, node)) {
+-        const expressionName = node.expression.getText();
+-        const propName = node.name.getText();
+-
+-        this.addFailureAtNode(
+-          node,
+-          'Accessing properties of SimpleChanges objects directly ' +
+-            'is not allowed. Use index access instead (e.g. ' +
+-            `${expressionName}.${propName} should be ` +
+-            `${expressionName}['${propName}']).`,
+-        );
+-      }
+-
+-      // Don't walk calls to `hasOwnProperty` since they can be used for null checking.
+-      if (
+-        !ts.isCallExpression(node) ||
+-        !ts.isPropertyAccessExpression(node.expression) ||
+-        !ts.isIdentifier(node.expression.name) ||
+-        node.expression.name.text !== 'hasOwnProperty'
+-      ) {
+-        node.forEachChild(walkChildren);
+-      }
+-    };
+-
+-    method.body.forEachChild(walkChildren);
+-    super.visitMethodDeclaration(method);
+-  }
+-
+-  /** Checks whether a property access is operating on a `SimpleChanges` object. */
+-  private _isSimpleChangesAccess(method: ts.MethodDeclaration, node: ts.PropertyAccessExpression) {
+-    const changesParam = method.parameters[0];
+-    const changesName =
+-      changesParam && ts.isParameter(changesParam) && ts.isIdentifier(changesParam.name)
+-        ? changesParam.name.text
+-        : null;
+-    const receiverName = ts.isIdentifier(node.expression) ? node.expression.text : null;
+-
+-    // Try to resolve based on the name. This should be quicker and more robust since it doesn't
+-    // require the type checker to be present and to have been configured correctly. Note that
+-    // we filter out property accesses inside of other property accesses since we only want to
+-    // look at top-level ones so that we don't flag something like `foo.bar.changes`.
+-    if (
+-      changesName &&
+-      receiverName &&
+-      changesName === receiverName &&
+-      !ts.isPropertyAccessExpression(node.parent)
+-    ) {
+-      return true;
+-    }
+-
+-    // Fall back to trying to resolve using the type checker.
+-    const symbol = this.getTypeChecker().getTypeAtLocation(node.expression).symbol;
+-    return symbol != null && symbol.name === 'SimpleChanges';
+-  }
+-}
+diff --git a/tsconfig.json b/tsconfig.json
+index f7e71faf7fd883566213301cc2a4b5e51cd69ecf..c2effe38fa6f8857b9d0ba01f0ab7a8972586100 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -11,6 +11,7 @@
+     "noFallthroughCasesInSwitch": true,
+     "noUnusedLocals": false,
+     "strictNullChecks": true,
++    "noPropertyAccessFromIndexSignature": true,
+     "useUnknownInCatchVariables": true,
+     "noImplicitOverride": true,
+     "noImplicitReturns": true,
+diff --git a/tslint.json b/tslint.json
+index 1551e38b68bb092a03731c2a00f1d16c82a60d14..a4231a4d61f5f64f79936c971780d6cc16c0acd1 100644
+--- a/tslint.json
++++ b/tslint.json
+@@ -65,7 +65,6 @@
+     "no-undecorated-base-class-di": true,
+     "no-undecorated-class-with-angular-features": true,
+     "setters-after-getters": true,
+-    "ng-on-changes-property-access": true,
+     "lifecycle-hook-interface": true,
+     "require-breaking-change-version": true,
+     "no-nested-ternary": true,
