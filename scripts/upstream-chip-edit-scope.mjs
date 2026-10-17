@@ -7,6 +7,7 @@
  */
 /** Finite modern editing applicability; no native, inherited fix, CSS render or floor credit. */
 import assert from 'node:assert/strict';
+import {qualifyChipFocusSourceEpoch} from './chip-focus-source-epoch.mjs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
@@ -98,7 +99,7 @@ export function chipEditSourceContext(read,productPaths){
  }
  // Pin the reviewed ownership surface conservatively. These are source epochs,
  // not behavioral expectations synthesized from candidate output.
- for(const m of prior.owned_sources)assert.equal(hash(read(m.path)),m.sha256,'unreviewed owned chip source '+m.path);
+ const reviewed=qualifyChipFocusSourceEpoch(prior.owned_sources,read);
  const chipPath='projects/ngx-material-legacy/legacy-chips/chip.ts',owned=parse(chipPath,read(chipPath).toString()),reference=parse(taggedChip,read(taggedChip).toString());
  for(const [name,methods]of [['MatLegacyChip',['_handleClick','remove']],['MatLegacyChipRemove',['_handleClick']]]){
   const a=cls(owned,name),b=cls(reference,name);for(const method of methods)assert.equal(print(member(a,method),owned),print(member(b,method),reference),'classic interaction differs from tag');
@@ -106,7 +107,7 @@ export function chipEditSourceContext(read,productPaths){
  assert.deepEqual(base(cls(owned,'MatLegacyChipRemove')),[],'legacy remove inherited modern action');
  const source='projects/ngx-material-legacy/legacy-chips/chips.scss',own=normalizedClassicChipStyles(read(source).toString()),old=normalizedClassicChipStyles(read(taggedStyles).toString());assert.equal(own.normalized,old.normalized,'classic structural Sass differs beyond module sources');assert.deepEqual(own.bindings.map(b=>b.namespace),old.bindings.map(b=>b.namespace),'Sass namespaces changed');
  const moduleFile=parse('chips-module.ts',read('projects/ngx-material-legacy/legacy-chips/chips-module.ts').toString()),declarations=moduleFile.statements.filter(ts.isVariableStatement).flatMap(s=>[...s.declarationList.declarations]).filter(d=>d.name.getText(moduleFile)==='CHIP_DECLARATIONS');assert.equal(declarations.length,1);assert.ok(ts.isArrayLiteralExpression(declarations[0].initializer));assert.deepEqual(declarations[0].initializer.elements.map(e=>e.getText(moduleFile)),['MatLegacyChipList','MatLegacyChip','MatLegacyChipInput','MatLegacyChipRemove','MatLegacyChipAvatar','MatLegacyChipTrailingIcon']);
- return {line:current.line,modern_type_boundary:current,authored_TS_and_resource_members:facts,reviewed_owned_sources:prior.owned_sources.map(({path,sha256})=>({path,sha256})),legacy_click_and_remove_methods_match_tag:true,tagged_chip:{path:taggedChip,sha256:taggedChipPin},tagged_structural_styles:{path:taggedStyles,sha256:taggedStylesPin},classic_structural_Sass_equal_after_module_source_normalization:true,preserved_Sass_namespace_bindings:own.bindings.map(b=>b.namespace),candidate_Sass_modules:own.bindings,legacy_module_declarations:6,authored_row_or_editing_surfaces:0,historical_Material16_MDC_style_members:historicalMdcStyleMembers,source_scope_only:true,actual_native_packed_or_floor_qualified:false};
+ return {line:current.line,modern_type_boundary:current,authored_TS_and_resource_members:facts,reviewed_owned_sources:reviewed.members,...(reviewed.approved_focus_source_epoch?{approved_focus_source_epoch:reviewed.approved_focus_source_epoch}:{}),legacy_click_and_remove_methods_match_tag:true,tagged_chip:{path:taggedChip,sha256:taggedChipPin},tagged_structural_styles:{path:taggedStyles,sha256:taggedStylesPin},classic_structural_Sass_equal_after_module_source_normalization:true,preserved_Sass_namespace_bindings:own.bindings.map(b=>b.namespace),candidate_Sass_modules:own.bindings,legacy_module_declarations:6,authored_row_or_editing_surfaces:0,historical_Material16_MDC_style_members:historicalMdcStyleMembers,source_scope_only:true,actual_native_packed_or_floor_qualified:false};
 }
 
 export const CHIP_EDIT_SCOPE_ROLE='C04 individual complete modern chip editing and edit-only padding source exclusions';

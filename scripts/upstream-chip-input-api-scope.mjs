@@ -7,6 +7,7 @@
  */
 /** Whole input/grid API source applicability only; no native or floor credit. */
 import assert from 'node:assert/strict';
+import {qualifyChipFocusSourceEpoch} from './chip-focus-source-epoch.mjs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
@@ -61,7 +62,7 @@ export function analyzeChipInputApiOriginals(read){
 export function chipInputApiSourceContext(read,productPaths){
  const boundary=chipEditSourceContext(read,productPaths),prior=readChipInputApiPrior(read,boundary.line);
  assert.equal(hash(read(taggedInput)),inputPin,'changed original tagged chip input');assert.equal(hash(read(taggedList)),listPin,'changed original tagged chip list');
- for(const m of prior.owned_sources)assert.equal(hash(read(m.path)),m.sha256,'unreviewed owned input API source '+m.path);
+ const reviewed=qualifyChipFocusSourceEpoch(prior.owned_sources,read);
  const inputPath='projects/ngx-material-legacy/legacy-chips/chip-input.ts',listPath='projects/ngx-material-legacy/legacy-chips/chip-list.ts',file=parse(inputPath,read(inputPath).toString()),original=parse(taggedInput,read(taggedInput).toString()),input=cls(file,'MatLegacyChipInput'),old=cls(original,'MatLegacyChipInput');
  assert.deepEqual(input.members.map(n=>canonical(n,file)),old.members.map(n=>canonical(n,original)),'legacy input class members differ from tagged16');assert.ok(!input.heritageClauses?.some(c=>c.token===ts.SyntaxKind.ExtendsKeyword));
  const listFile=parse(listPath,read(listPath).toString()),listOriginal=parse(taggedList,read(taggedList).toString()),list=cls(listFile,'MatLegacyChipList'),oldList=cls(listOriginal,'MatLegacyChipList');
@@ -70,7 +71,7 @@ export function chipInputApiSourceContext(read,productPaths){
  const defaultsPath='projects/ngx-material-legacy/legacy-chips/chip-default-options.ts',defaults=parse(defaultsPath,read(defaultsPath).toString()),options=defaults.statements.find(n=>ts.isInterfaceDeclaration(n)&&n.name.text==='MatLegacyChipsDefaultOptions');assert.deepEqual(options.members.map(n=>n.name.getText()),['separatorKeyCodes']);assert.equal(options.members[0].type.getText(),'readonly number[] | ReadonlySet<number>');
  const forbidden=/^(?:(?:Mat)?Legacy)?SeparatorKey$|^chipGrid$|^_chipGrid$|^chipRemovedChanges$/;
  for(const path of productPaths.filter(p=>p.startsWith('projects/ngx-material-legacy/legacy-chips/')&&p.endsWith('.ts'))){const source=parse(path,read(path).toString());const visit=node=>{if(ts.isIdentifier(node))assert.ok(!forbidden.test(node.text),'modern input API '+path);ts.forEachChild(node,visit);};visit(source);}
- return {line:boundary.line,current_legacy_owner_boundary:boundary,reviewed_owned_sources:prior.owned_sources.map(({path,sha256})=>({path,sha256})),tagged_references:[{path:taggedInput,sha256:inputPin},{path:taggedList,sha256:listPin}],all_legacy_input_class_members_match_tagged16:true,input_class_members:input.members.length,owned_separator_type:'readonly number[] | ReadonlySet<number>',owned_default_options_separator_type:'readonly number[] | ReadonlySet<number>',legacy_list_members_matching_tag:selected.map(([name,kind])=>({name,kind:ts.SyntaxKind[kind]})),legacy_stream:'chipRemoveChanges merges chip.destroyed',modern_requested_stream:'chipRemovedChanges would merge chip.removed',classic_input_association:'setter chipList -> _chipList; no getter or chipGrid alias',modern_input_API_surfaces:0,source_scope_only:true,actual_native_packed_or_floor_qualified:false};
+ return {line:boundary.line,current_legacy_owner_boundary:boundary,reviewed_owned_sources:reviewed.members,...(reviewed.approved_focus_source_epoch?{approved_focus_source_epoch:reviewed.approved_focus_source_epoch}:{}),tagged_references:[{path:taggedInput,sha256:inputPin},{path:taggedList,sha256:listPin}],all_legacy_input_class_members_match_tagged16:true,input_class_members:input.members.length,owned_separator_type:'readonly number[] | ReadonlySet<number>',owned_default_options_separator_type:'readonly number[] | ReadonlySet<number>',legacy_list_members_matching_tag:selected.map(([name,kind])=>({name,kind:ts.SyntaxKind[kind]})),legacy_stream:'chipRemoveChanges merges chip.destroyed',modern_requested_stream:'chipRemovedChanges would merge chip.removed',classic_input_association:'setter chipList -> _chipList; no getter or chipGrid alias',modern_input_API_surfaces:0,source_scope_only:true,actual_native_packed_or_floor_qualified:false};
 }
 /** Method-level test extraction only. DI, resources and Angular lifecycle do not run. */
 export function replayChipInputSeparator(source,{modern=false}={}){
