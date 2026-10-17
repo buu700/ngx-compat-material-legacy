@@ -1,0 +1,193 @@
+diff --git a/integration/harness-e2e-cli/src/styles.scss b/integration/harness-e2e-cli/src/styles.scss
+index 3294246f8703d99cc6f0afcbe1670241b96df1c0..6e10e28ca557de9f43bd9986ee5278914caea0d9 100644
+--- a/integration/harness-e2e-cli/src/styles.scss
++++ b/integration/harness-e2e-cli/src/styles.scss
+@@ -1 +1 @@
+-@import '@angular/material/prebuilt-themes/indigo-pink.css';
+\ No newline at end of file
++@import '@angular/material/prebuilt-themes/azure-blue.css';
+diff --git a/integration/yarn-pnp-compat/angular.json b/integration/yarn-pnp-compat/angular.json
+index 8a38d051aa91ed54cbaa20ca9378ebdf66201abb..f4a5bf47554185d861e7bed0588f8d09f155c1e4 100644
+--- a/integration/yarn-pnp-compat/angular.json
++++ b/integration/yarn-pnp-compat/angular.json
+@@ -27,7 +27,7 @@
+             "tsConfig": "tsconfig.app.json",
+             "inlineStyleLanguage": "scss",
+             "assets": ["src/favicon.ico", "src/assets"],
+-            "styles": ["@angular/material/prebuilt-themes/indigo-pink.css", "src/styles.scss"],
++            "styles": ["@angular/material/prebuilt-themes/azure-blue.css", "src/styles.scss"],
+             "scripts": []
+           },
+           "configurations": {
+@@ -90,7 +90,7 @@
+             "karmaConfig": "karma.conf.js",
+             "inlineStyleLanguage": "scss",
+             "assets": ["src/favicon.ico", "src/assets"],
+-            "styles": ["@angular/material/prebuilt-themes/indigo-pink.css", "src/styles.scss"],
++            "styles": ["@angular/material/prebuilt-themes/azure-blue.css", "src/styles.scss"],
+             "scripts": []
+           }
+         }
+diff --git a/src/e2e-app/BUILD.bazel b/src/e2e-app/BUILD.bazel
+index 7b965a2fd69996d4768a3fe462548410648c6c93..0139fd7dcbb578fedc9cf77e141bc8c14b031e2e 100644
+--- a/src/e2e-app/BUILD.bazel
++++ b/src/e2e-app/BUILD.bazel
+@@ -8,7 +8,7 @@ package(default_visibility = ["//visibility:public"])
+ devserverIndexHtmlDependencies = [
+     "@npm//zone.js",
+     "@npm//kagekiri",
+-    "//src/material/prebuilt-themes:indigo-pink",
++    "//src/material/prebuilt-themes:azure-blue",
+     ":index.html",
+     ":theme",
+ ]
+diff --git a/src/e2e-app/index.html b/src/e2e-app/index.html
+index 86ee49b6e3cb5dce60d4673b7aa4d6cc41e6bdd4..32b525b4f1c0240c8c151ab55221d2a67de3cb3a 100644
+--- a/src/e2e-app/index.html
++++ b/src/e2e-app/index.html
+@@ -11,7 +11,7 @@
+   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+   <link href="theme.css" rel="stylesheet">
+ </head>
+-<body>
++<body class="mat-typography">
+   <e2e-app>Loading...</e2e-app>
+   <span class="sibling">I am a sibling!</span>
+ 
+diff --git a/src/e2e-app/theme.scss b/src/e2e-app/theme.scss
+index 8671b8fce3640a9d7e2c7cea945c7dc1aa89ece0..ae8533a75c1f897f307f23c126d44c9203db18ac 100644
+--- a/src/e2e-app/theme.scss
++++ b/src/e2e-app/theme.scss
+@@ -1,23 +1,21 @@
+ @use '@angular/material' as mat;
++@use '@angular/material-experimental' as matx;
+ 
+-// Plus imports for other components in your app.
+-
+-// Disable legacy API compatibility, since e2e-app is fully migrated to theme inspection API.
+-mat.$theme-legacy-inspection-api-compatibility: false;
+-
+-// Include the common styles for Angular Material. We include this here so that you only
+-// have to load a single css file for Angular Material in your app.
+-// **Be sure that you only ever include this mixin once!**
+ @include mat.core();
+ 
+-// Define the default theme (same as the example above).
+-$candy-app-primary: mat.define-palette(mat.$indigo-palette);
+-$candy-app-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+-$candy-app-theme: mat.define-light-theme((
+-    color: (primary: $candy-app-primary, accent: $candy-app-accent),
+-    typography: mat.define-typography-config(),
+-    density: 0
++$theme: matx.define-theme((
++  color: (
++    theme-type: light,
++    primary: matx.$m3-azure-palette,
++    tertiary: matx.$m3-blue-palette,
++  ),
++  density: (
++    scale: 0,
++  )
+ ));
+ 
+-// Include the default theme styles.
+-@include mat.all-component-themes($candy-app-theme);
++html {
++  @include mat.all-component-themes($theme);
++}
++
++@include mat.typography-hierarchy($theme);
+diff --git a/src/material/sidenav/drawer.spec.ts b/src/material/sidenav/drawer.spec.ts
+index ceed2baa24e30f9c0c33f134267dfffd3110f170..9a365534bd4dff4645aabca3b03da6e8edc792d5 100644
+--- a/src/material/sidenav/drawer.spec.ts
++++ b/src/material/sidenav/drawer.spec.ts
+@@ -985,8 +985,10 @@ describe('MatDrawerContainer', () => {
+ 
+   it('should recalculate the margin if a drawer changes size while open in autosize mode', fakeAsync(() => {
+     const fixture = TestBed.createComponent(AutosizeDrawer);
+-
+     fixture.detectChanges();
++
++    // In M3 the drawer has a fixed default width.
++    fixture.nativeElement.querySelector('.mat-drawer').style.width = 'auto';
+     fixture.componentInstance.drawer.open();
+     fixture.detectChanges();
+     tick();
+diff --git a/src/universal-app/styles.scss b/src/universal-app/styles.scss
+index 9bab6949a03d3264692cafc1660aa7e494d3a624..5e48b27aebb7291d1ae5459a0aef8c61665902c3 100644
+--- a/src/universal-app/styles.scss
++++ b/src/universal-app/styles.scss
+@@ -1,27 +1,24 @@
+ @use '@angular/material' as mat;
++@use '@angular/material-experimental' as matx;
+ 
+-// Plus imports for other components in your app.
+-
+-// Disable legacy API compatibility, since universal-app is fully migrated to theme inspection API.
+-mat.$theme-legacy-inspection-api-compatibility: false;
+-
+-// Include the common styles for Angular Material. We include this here so that you only
+-// have to load a single css file for Angular Material in your app.
+-// **Be sure that you only ever include this mixin once!**
+ @include mat.core();
+ 
+-// Define the default theme (same as the example above).
+-$candy-app-primary: mat.define-palette(mat.$indigo-palette);
+-$candy-app-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+-$candy-app-theme: mat.define-light-theme((
+-  color: (primary: $candy-app-primary, accent: $candy-app-accent),
+-  typography: mat.define-typography-config(),
+-  density: 0
++$theme: matx.define-theme((
++  color: (
++    theme-type: light,
++    primary: matx.$m3-azure-palette,
++    tertiary: matx.$m3-blue-palette,
++  ),
++  density: (
++    scale: 0,
++  )
+ ));
+ 
+-// Include the default theme styles.
+-@include mat.all-component-themes($candy-app-theme);
+-@include mat.typography-hierarchy($candy-app-theme);
++html {
++  @include mat.all-component-themes($theme);
++}
++
++@include mat.typography-hierarchy($theme);
+ 
+ body.test-automated {
+   // Make sure bottom sheet doesn't obscure components.
+@@ -38,4 +35,3 @@ body.test-automated {
+     background: lime;
+   }
+ }
+-
+diff --git a/test/karma.conf.js b/test/karma.conf.js
+index e8ab5bc421f1c0a6d435bc022dafff813c1b9826..8f0f6d4ed4206f845927b1f2ed0ff123cd0e21f4 100644
+--- a/test/karma.conf.js
++++ b/test/karma.conf.js
+@@ -60,7 +60,7 @@ module.exports = config => {
+       // Include a Material theme in the test suite. Also include the MDC theme as
+       // karma runs tests for the MDC prototype components as well.
+       {
+-        pattern: 'src/material/core/theming/prebuilt/indigo-pink.css',
++        pattern: 'src/material/core/theming/prebuilt/azure-blue.css',
+         included: true,
+         watched: true,
+       },
+diff --git a/tools/defaults.bzl b/tools/defaults.bzl
+index 03cd381ae2692eb0dc1f66c9ee5507964d38d0e2..73d722b7dac728e1c8d8b030479607ca8ded7895 100644
+--- a/tools/defaults.bzl
++++ b/tools/defaults.bzl
+@@ -378,7 +378,7 @@ def ng_web_test_suite(deps = [], static_css = [], exclude_init_script = False, *
+     # reduces the amount of setup that is needed to create a test suite Bazel target. Note that the
+     # prebuilt theme will be also added to CDK test suites but shouldn't affect anything.
+     static_css = static_css + [
+-        "//src/material/prebuilt-themes:indigo-pink",
++        "//src/material/prebuilt-themes:azure-blue",
+     ]
+ 
+     # Workaround for https://github.com/bazelbuild/rules_typescript/issues/301
