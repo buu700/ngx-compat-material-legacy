@@ -45,6 +45,7 @@ import {SLIDER_INPUT_ROLE, SLIDER_INPUT_SHAS, sliderInputScopeEvidenceOk} from '
 import {SLIDER_THUMB_DESTROY_SHA, SLIDER_THUMB_DESTROY_ROLE, sliderThumbDestroyEvidenceOk} from './upstream-slider-thumb-destroy-scope.mjs';
 import {BAZEL_BUILD_SHAS, BAZEL_BUILD_ROLE, bazelBuildEvidenceOk} from './upstream-bazel-build-scope.mjs';
 import {TEST_IMPORT_ROLE, TEST_IMPORT_SHAS, testImportBatchOk, testImportEntryOk} from './upstream-test-import-cleanup-evidence.mjs';
+import {requiresBootstrapPreparation, bootstrapPreparationEntryOk} from './bootstrap-stability-evidence.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -251,6 +252,10 @@ function individualPatchBound(entry, proof) {
 function individualProofOk(entry) {
   const proof = entry.individual_proof;
   if (!proof || typeof proof !== 'object' || Array.isArray(proof)) return false;
+  if ((requiresBootstrapPreparation(entry) || proof.current_bootstrap_preparation !== undefined) && !bootstrapPreparationEntryOk(entry, proof, rel => {
+    const member = regularRepoMember(rel);
+    return member ? readFileSync(member) : null;
+  })) return false;
   if (!HEX64.test(proof.diff_sha256 || '') || !individualPatchBound(entry, proof)) return false;
   if (!candidateSourceEvidenceOk(proof, rel => {
     const member = regularRepoMember(rel);
