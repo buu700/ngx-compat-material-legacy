@@ -9691,17 +9691,48 @@
       "sha": "4eb06acbd9c30b3f5e8146b949739fe95cfcf6d3",
       "bucket": "behavior-semantic",
       "subject": "fix(material/chips): Async chips with a delay are not highlighted (#27399)",
-      "final_disposition": "irrelevant",
-      "reason": "The patch reapplies a chip listbox value when chips arrive after the value was set. This package does not define MatChipListbox. Owned chip list already selects from the control value when the chip query changes (legacy-chips/chip-list.ts). That listbox path was not copied.",
-      "read_note_disposition": "not-owned",
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+      "final_disposition": "not-applicable",
+      "reason": "Modern listbox pending-initial-value/value/writeValue logic is absent. Owned legacy QueryList initialization remains exactly tagged16 and already re-reads the current control/value after each chips change. Retain distinct legacy null and setter behavior; source timing observations confer no Angular async-selection credit.",
+      "read_note_disposition": "individual-whole-original-source-review",
+      "evidence_report": "compatibility/rc/chip-lifecycle-admission-source-review.json",
       "files": [
+        "src/material/chips/chip-listbox.spec.ts",
         "src/material/chips/chip-listbox.ts"
       ],
-      "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
-      "recorded_at_utc": "2026-10-01T16:46:41Z",
+      "batch_id": "closeout-chip-lifecycle-individual-source-and-native-admission",
+      "recorded_at_utc": "2026-10-17T18:39:47.857254+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "diff_sha256": "8f2beadc89fc8aa619216fb56c28c51eca5d9faf550f9840661da2cd04e684e1",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "diff_sha256": "8f2beadc89fc8aa619216fb56c28c51eca5d9faf550f9840661da2cd04e684e1",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Modern listbox pending-initial-value/value/writeValue logic is absent. Owned legacy QueryList initialization remains exactly tagged16 and already re-reads the current control/value after each chips change. Retain distinct legacy null and setter behavior; source timing observations confer no Angular async-selection credit.",
+        "chip_lifecycle_source_scope": {
+          "kind": "seven-complete-chip-lifecycle-source-decisions",
+          "case_id": "source/chip-lifecycle/4eb06acbd9c30b3f5e8146b949739fe95cfcf6d3",
+          "foundation_review_sha256": "d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc",
+          "source_context_sha256": "28a6c60ad1445b3755bc1d6524f031a01e6e456ddb497252323208af60a0f251",
+          "original_hunks": 7,
+          "source_scope_only": true,
+          "native_admission_required": false,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      },
+      "source_check": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "review_membership": "4eb06acbd9c30b3f5e8146b949739fe95cfcf6d3",
+        "evidence_report_sha256": "2fdf3582b7548e22670d2e9fd5ddc28b6cf707e06ee6a3aca1d16564490a8631"
+      },
+      "status": "reviewed"
     },
     {
       "sha": "20083416967308916d2b3f81bf95606b45dbdb0b",
@@ -13675,17 +13706,47 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/chips): enable hydration (#28260)",
       "final_disposition": "not-applicable",
-      "reason": "The patch removes ngSkipHydration from mat-chip-listbox. The owned chip list is mat-chip-list and still sets ngSkipHydration. That host binding was not removed. Upstream change is not applicable: owned legacy surface intentionally retains the pre-change contract (historical NgModule/legacy tree), verified against current owned sources.",
-      "read_note_disposition": "owned-retained",
+      "reason": "The complete change belongs to modern MatChipListbox hydration metadata and an upstream universal demo. Owned legacy mat-chip-list metadata/structure is retained. No legacy SSR/hydration success is inferred.",
+      "read_note_disposition": "individual-whole-original-source-review",
       "files": [
-        "src/material/chips/chip-listbox.ts"
+        "src/material/chips/chip-listbox.ts",
+        "src/universal-app/kitchen-sink/kitchen-sink.html"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "Owned chips/tabs/table/autocomplete/menu/select still set ngSkipHydration host bindings.",
-      "batch_id": "owned-retain-not-applied-2026-10-01-e",
-      "recorded_at_utc": "2026-10-01T16:53:08Z",
+      "evidence_report": "compatibility/rc/chip-lifecycle-admission-source-review.json",
+      "source_check": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "review_membership": "597b822e25693734faf4ffc2fb6a0194abac32f0",
+        "evidence_report_sha256": "2fdf3582b7548e22670d2e9fd5ddc28b6cf707e06ee6a3aca1d16564490a8631"
+      },
+      "batch_id": "closeout-chip-lifecycle-individual-source-and-native-admission",
+      "recorded_at_utc": "2026-10-17T18:39:47.857891+00:00",
       "g11_claim": "not-passed",
-      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "diff_sha256": "9a0e706acd71a7ed6183e7b5789e41248de8b1cfe163ae24c3751a7c5f0fc2cc",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "diff_sha256": "9a0e706acd71a7ed6183e7b5789e41248de8b1cfe163ae24c3751a7c5f0fc2cc",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete change belongs to modern MatChipListbox hydration metadata and an upstream universal demo. Owned legacy mat-chip-list metadata/structure is retained. No legacy SSR/hydration success is inferred.",
+        "chip_lifecycle_source_scope": {
+          "kind": "seven-complete-chip-lifecycle-source-decisions",
+          "case_id": "source/chip-lifecycle/597b822e25693734faf4ffc2fb6a0194abac32f0",
+          "foundation_review_sha256": "d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc",
+          "source_context_sha256": "28a6c60ad1445b3755bc1d6524f031a01e6e456ddb497252323208af60a0f251",
+          "original_hunks": 2,
+          "source_scope_only": true,
+          "native_admission_required": false,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      },
+      "status": "reviewed"
     },
     {
       "sha": "771f1df50e38f634a0845c756b809029849a2291",
@@ -20396,18 +20457,222 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/chips): focus escape not working consistently",
       "final_disposition": "already-adapted",
-      "reason": "_allowFocusEscape sets nativeElement.tabIndex immediately (and syncs _tabIndex) so tab-away is not gated on CD timing.",
-      "read_note_disposition": "owned-retained",
+      "reason": "Owned legacy _allowFocusEscape already writes the native tabIndex immediately and restores it on a macrotask while keeping the bound field and user-index contract. The original modern MatChipSet restoration rule is not mirrored. Add DOM assertions to the two existing historical cases and require actual per-SHA artifact-bound native admission before any runtime claim.",
+      "read_note_disposition": "individual-whole-original-source-review",
       "files": [
+        "src/material/chips/chip-grid.spec.ts",
+        "src/material/chips/chip-listbox.spec.ts",
         "src/material/chips/chip-set.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "legacy-chips/chip-list.ts _allowFocusEscape DOM tabindex",
-      "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
-      "recorded_at_utc": "2026-10-01T17:10:57Z",
+      "evidence_report": "compatibility/rc/chip-lifecycle-admission-source-review.json",
+      "source_check": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "review_membership": "8e1711216f7d07324e311e0f6ada3d2426c7891e",
+        "evidence_report_sha256": "2fdf3582b7548e22670d2e9fd5ddc28b6cf707e06ee6a3aca1d16564490a8631"
+      },
+      "batch_id": "closeout-chip-lifecycle-individual-source-and-native-admission",
+      "recorded_at_utc": "2026-10-17T18:39:47.858874+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "product_adaptation": true
+      "product_adaptation": true,
+      "diff_sha256": "26fda79c340cae54a00569f1e9e44f5acfa829190dda45c56c1c56635006f108",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "historical-required-individual-behavior",
+        "diff_sha256": "26fda79c340cae54a00569f1e9e44f5acfa829190dda45c56c1c56635006f108",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Owned legacy _allowFocusEscape already writes the native tabIndex immediately and restores it on a macrotask while keeping the bound field and user-index contract. The original modern MatChipSet restoration rule is not mirrored. Add DOM assertions to the two existing historical cases and require actual per-SHA artifact-bound native admission before any runtime claim.",
+        "chip_lifecycle_source_scope": {
+          "kind": "seven-complete-chip-lifecycle-source-decisions",
+          "case_id": "source/chip-lifecycle/8e1711216f7d07324e311e0f6ada3d2426c7891e",
+          "foundation_review_sha256": "d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc",
+          "source_context_sha256": "28a6c60ad1445b3755bc1d6524f031a01e6e456ddb497252323208af60a0f251",
+          "original_hunks": 5,
+          "source_scope_only": true,
+          "native_admission_required": true,
+          "actual_native_packed_or_floor_qualified": false
+        },
+        "historical_behavior": {
+          "kind": "owned-chip-direct-DOM-macrotask-focus-escape",
+          "case_ids": [
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#27",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#28"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/rc-test-legacy-family.mjs",
+              "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+            },
+            {
+              "path": "scripts/historical-case-roster.mjs",
+              "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+            },
+            {
+              "path": "scripts/resolve-run-library.mjs",
+              "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "1434d36fae6f72ec2f5460eb5fdeb158f5b14da9d722f4a5313573f49edb1ff0"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "db1ad9e6d7a069eaeae9ce026912bd520d3a13630678f76e37f965fc25960377"
+            },
+            {
+              "path": "scripts/upstream-historical-behavior-evidence.mjs",
+              "sha256": "7e04af26527d8520bdf3ae4b5ce7bfc861b642877c714708193bc87a8c7948f0"
+            },
+            {
+              "path": "testing/legacy-runner/build.mjs",
+              "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+            },
+            {
+              "path": "testing/legacy-runner/adapt-spec.mjs",
+              "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+            },
+            {
+              "path": "testing/legacy-runner/entry.ts",
+              "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+            },
+            {
+              "path": "testing/legacy-runner/init-test-env.ts",
+              "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+            },
+            {
+              "path": "testing/legacy-runner/karma.conf.cjs",
+              "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+            },
+            {
+              "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+              "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "89e7770f51357cd8544c7df10a3ba9c538bcc66f3040e3d45434634308616832"
+            },
+            {
+              "path": "testing/legacy-runner/historical-specs.json",
+              "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+              "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+              "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "8064929cb9db7067b33c03d58b0dfb498a80ab9307a9b34ac8c013400073697b"
+            },
+            {
+              "path": "scripts/upstream-chip-lifecycle-admission.mjs",
+              "sha256": "0c825c6d22cc3f56726b6a1a00b559f268d388225d7450a651f0c5ca05915139"
+            },
+            {
+              "path": "scripts/upstream-chip-lifecycle-scope.mjs",
+              "sha256": "6cd6d27bed5544289fe4bffbccf965b3fcbf54d0db20f9c96fe4f31eaa544a26"
+            },
+            {
+              "path": "scripts/chip-focus-contract.mjs",
+              "sha256": "1b62df50e50430e7340e11478f2487930d801c993b8e0fcd1104daddc160b23b"
+            },
+            {
+              "path": "scripts/chip-focus-repair.mjs",
+              "sha256": "39e3a622e89f34f3366ec8ff3f2b8175da9ca97313107da3194cfdb2516c1bc9"
+            },
+            {
+              "path": "scripts/chip-list-focus-contract.mjs",
+              "sha256": "152c89e70c6b61f6f87240cd5564f96972bf2d0c3c4e58572aea6439a8daf313"
+            },
+            {
+              "path": "scripts/upstream-browser-run-evidence.mjs",
+              "sha256": "a60c4e7bb1c61de9c5672861a04ee57df229ff695d44298b85e3a6a6a7c4a886"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/browser-matrix-acceptance.mjs",
+              "sha256": "89825af639a7d8dfae33cfec9849035b913adecd165d5cfe94ac300350178142"
+            },
+            {
+              "path": "scripts/browser-matrix-roster.mjs",
+              "sha256": "370350b69325c8b9a54c6c5cffa2c62c7e4b616096598d78a5c87345116b0c8c"
+            },
+            {
+              "path": "scripts/browser-required-cells.mjs",
+              "sha256": "01818e24608876f624118a94a67ddca6c0537661740f5d8d885e67d3ed6f2e2e"
+            },
+            {
+              "path": "scripts/browser-required-probe.js",
+              "sha256": "ec42695be171ad558fa7e1c4459e18351fd74c6f08705fdc88622a4ba2546384"
+            },
+            {
+              "path": "scripts/browser-form-families.mjs",
+              "sha256": "51a2ec8be6da0fa2e9080fb19ec7fc5522dc7a3e52fd29ac42aaa38ef3569af4"
+            },
+            {
+              "path": "scripts/chip-focus-lifecycle-fixture.mjs",
+              "sha256": "fdfd1bdc8b6803b616aad112a8a07a440e3e7cf59af6580ae80fbab02f8dd641"
+            },
+            {
+              "path": "scripts/chip-focus-lifecycle-native-contract.mjs",
+              "sha256": "49c0e25c8235e60534a4c5e278100a47f629772d46401b2a7b7eccf682b27d1d"
+            },
+            {
+              "path": "scripts/legacy-chip-blur-native-contract.mjs",
+              "sha256": "8bb3e4c34f57f5d24103cad5d2e8202af7b383d4eddd4fc9d77f7b6d9c6846f6"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+              "sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.spec.ts",
+              "sha256": "54a0155a6498645f599e40fe1d4ba787647de68e888141eb9e69e923a99523ac"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+              "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+              "sha256": "26263b1efa46119fc7a8ea1b8693af78401cb2b78a3a4a6fb1dc7b0c78618750"
+            },
+            {
+              "path": "compatibility/rc/chip-focus-repair-inputs.json",
+              "sha256": "40ef578cc1983d119effd4a99a0dfd2c877489c957be56ae081a961ccfb4dfe4"
+            },
+            {
+              "path": "compatibility/rc/chip-focus-repair-prior.json.gz",
+              "sha256": "d2a4a33b3ec94c325039a08662912451dc74bab2fb85af1cf0b94fbdb9b48ae5"
+            },
+            {
+              "path": "compatibility/rc/chip-lifecycle-scope-originals.json.gz",
+              "sha256": "0995e6b1f103e6a31557bee91d4c2c9898c59e6b44ef7b8bd9fed1e393056f4b"
+            },
+            {
+              "path": "compatibility/rc/chip-lifecycle-scope-source-review.json",
+              "sha256": "d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc"
+            },
+            {
+              "path": "compatibility/rc/tab-header-public-key-manager-subjects.json",
+              "sha256": "f9ddb7e762ebdc52dbdac079d3b66c2b3c99f7d60cd13066f8b126d25847a0d6"
+            }
+          ]
+        }
+      },
+      "status": "reviewed"
     },
     {
       "sha": "216ae0cca12d1a9139f0faf0a85fceb157fc2490",
@@ -23182,20 +23447,223 @@
       "sha": "7c9c898faac8daac1bbb20a0807168a74360760d",
       "bucket": "behavior-semantic",
       "subject": "fix(material/chips): fix chip blur timing (#30347)",
-      "final_disposition": "already-adapted",
-      "reason": "Owned chip already defers blur via NgZone.onStable, which is the legacy-compatible equivalent of the upstream setTimeout deferral for the animation focus race. Switching to setTimeout breaks MockNgZone historical specs (artifact-bound CI).",
-      "read_note_disposition": "owned-retained",
+      "final_disposition": "do-not-adopt",
+      "reason": "The current owned legacy chip does not implement this modern markForCheck/setTimeout patch. It retains tagged focus-flag deferral plus cancelable onStable/take(1) and a zoneless isStable microtask fallback. Correct the unsupported prior already-adapted source judgment only through real guarded admission; native lifecycle qualification remains required.",
+      "read_note_disposition": "individual-whole-original-source-review",
       "files": [
         "src/material/chips/chip.ts"
       ],
-      "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
-      "source_check": "legacy-chips/chip.ts _blur onStable deferral",
-      "batch_id": "product-adapt-residual-2026-10-01-l-followup",
-      "recorded_at_utc": "2026-10-01T18:10:42Z",
+      "evidence_report": "compatibility/rc/chip-lifecycle-admission-source-review.json",
+      "source_check": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "review_membership": "7c9c898faac8daac1bbb20a0807168a74360760d",
+        "evidence_report_sha256": "2fdf3582b7548e22670d2e9fd5ddc28b6cf707e06ee6a3aca1d16564490a8631"
+      },
+      "batch_id": "closeout-chip-lifecycle-individual-source-and-native-admission",
+      "recorded_at_utc": "2026-10-17T18:39:47.859325+00:00",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
       "category": "chips-blur-onStable",
-      "product_adaptation": true
+      "diff_sha256": "806269f7974701a727ac4ff6a13c51f80c6d26832928aed4cf4d563d728e768a",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "historical-required-individual-behavior",
+        "diff_sha256": "806269f7974701a727ac4ff6a13c51f80c6d26832928aed4cf4d563d728e768a",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The current owned legacy chip does not implement this modern markForCheck/setTimeout patch. It retains tagged focus-flag deferral plus cancelable onStable/take(1) and a zoneless isStable microtask fallback. Correct the unsupported prior already-adapted source judgment only through real guarded admission; native lifecycle qualification remains required.",
+        "chip_lifecycle_source_scope": {
+          "kind": "seven-complete-chip-lifecycle-source-decisions",
+          "case_id": "source/chip-lifecycle/7c9c898faac8daac1bbb20a0807168a74360760d",
+          "foundation_review_sha256": "d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc",
+          "source_context_sha256": "28a6c60ad1445b3755bc1d6524f031a01e6e456ddb497252323208af60a0f251",
+          "original_hunks": 3,
+          "source_scope_only": true,
+          "native_admission_required": true,
+          "actual_native_packed_or_floor_qualified": false
+        },
+        "historical_behavior": {
+          "kind": "owned-chip-blur-and-refocus-timing",
+          "case_ids": [
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#34",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#35",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#36",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#37"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/rc-test-legacy-family.mjs",
+              "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+            },
+            {
+              "path": "scripts/historical-case-roster.mjs",
+              "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+            },
+            {
+              "path": "scripts/resolve-run-library.mjs",
+              "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "1434d36fae6f72ec2f5460eb5fdeb158f5b14da9d722f4a5313573f49edb1ff0"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "db1ad9e6d7a069eaeae9ce026912bd520d3a13630678f76e37f965fc25960377"
+            },
+            {
+              "path": "scripts/upstream-historical-behavior-evidence.mjs",
+              "sha256": "7e04af26527d8520bdf3ae4b5ce7bfc861b642877c714708193bc87a8c7948f0"
+            },
+            {
+              "path": "testing/legacy-runner/build.mjs",
+              "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+            },
+            {
+              "path": "testing/legacy-runner/adapt-spec.mjs",
+              "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+            },
+            {
+              "path": "testing/legacy-runner/entry.ts",
+              "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+            },
+            {
+              "path": "testing/legacy-runner/init-test-env.ts",
+              "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+            },
+            {
+              "path": "testing/legacy-runner/karma.conf.cjs",
+              "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+            },
+            {
+              "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+              "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "89e7770f51357cd8544c7df10a3ba9c538bcc66f3040e3d45434634308616832"
+            },
+            {
+              "path": "testing/legacy-runner/historical-specs.json",
+              "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+              "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+              "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "8064929cb9db7067b33c03d58b0dfb498a80ab9307a9b34ac8c013400073697b"
+            },
+            {
+              "path": "scripts/upstream-chip-lifecycle-admission.mjs",
+              "sha256": "0c825c6d22cc3f56726b6a1a00b559f268d388225d7450a651f0c5ca05915139"
+            },
+            {
+              "path": "scripts/upstream-chip-lifecycle-scope.mjs",
+              "sha256": "6cd6d27bed5544289fe4bffbccf965b3fcbf54d0db20f9c96fe4f31eaa544a26"
+            },
+            {
+              "path": "scripts/chip-focus-contract.mjs",
+              "sha256": "1b62df50e50430e7340e11478f2487930d801c993b8e0fcd1104daddc160b23b"
+            },
+            {
+              "path": "scripts/chip-focus-repair.mjs",
+              "sha256": "39e3a622e89f34f3366ec8ff3f2b8175da9ca97313107da3194cfdb2516c1bc9"
+            },
+            {
+              "path": "scripts/chip-list-focus-contract.mjs",
+              "sha256": "152c89e70c6b61f6f87240cd5564f96972bf2d0c3c4e58572aea6439a8daf313"
+            },
+            {
+              "path": "scripts/upstream-browser-run-evidence.mjs",
+              "sha256": "a60c4e7bb1c61de9c5672861a04ee57df229ff695d44298b85e3a6a6a7c4a886"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/browser-matrix-acceptance.mjs",
+              "sha256": "89825af639a7d8dfae33cfec9849035b913adecd165d5cfe94ac300350178142"
+            },
+            {
+              "path": "scripts/browser-matrix-roster.mjs",
+              "sha256": "370350b69325c8b9a54c6c5cffa2c62c7e4b616096598d78a5c87345116b0c8c"
+            },
+            {
+              "path": "scripts/browser-required-cells.mjs",
+              "sha256": "01818e24608876f624118a94a67ddca6c0537661740f5d8d885e67d3ed6f2e2e"
+            },
+            {
+              "path": "scripts/browser-required-probe.js",
+              "sha256": "ec42695be171ad558fa7e1c4459e18351fd74c6f08705fdc88622a4ba2546384"
+            },
+            {
+              "path": "scripts/browser-form-families.mjs",
+              "sha256": "51a2ec8be6da0fa2e9080fb19ec7fc5522dc7a3e52fd29ac42aaa38ef3569af4"
+            },
+            {
+              "path": "scripts/chip-focus-lifecycle-fixture.mjs",
+              "sha256": "fdfd1bdc8b6803b616aad112a8a07a440e3e7cf59af6580ae80fbab02f8dd641"
+            },
+            {
+              "path": "scripts/chip-focus-lifecycle-native-contract.mjs",
+              "sha256": "49c0e25c8235e60534a4c5e278100a47f629772d46401b2a7b7eccf682b27d1d"
+            },
+            {
+              "path": "scripts/legacy-chip-blur-native-contract.mjs",
+              "sha256": "8bb3e4c34f57f5d24103cad5d2e8202af7b383d4eddd4fc9d77f7b6d9c6846f6"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+              "sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.spec.ts",
+              "sha256": "54a0155a6498645f599e40fe1d4ba787647de68e888141eb9e69e923a99523ac"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+              "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+              "sha256": "26263b1efa46119fc7a8ea1b8693af78401cb2b78a3a4a6fb1dc7b0c78618750"
+            },
+            {
+              "path": "compatibility/rc/chip-focus-repair-inputs.json",
+              "sha256": "40ef578cc1983d119effd4a99a0dfd2c877489c957be56ae081a961ccfb4dfe4"
+            },
+            {
+              "path": "compatibility/rc/chip-focus-repair-prior.json.gz",
+              "sha256": "d2a4a33b3ec94c325039a08662912451dc74bab2fb85af1cf0b94fbdb9b48ae5"
+            },
+            {
+              "path": "compatibility/rc/chip-lifecycle-scope-originals.json.gz",
+              "sha256": "0995e6b1f103e6a31557bee91d4c2c9898c59e6b44ef7b8bd9fed1e393056f4b"
+            },
+            {
+              "path": "compatibility/rc/chip-lifecycle-scope-source-review.json",
+              "sha256": "d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc"
+            },
+            {
+              "path": "compatibility/rc/tab-header-public-key-manager-subjects.json",
+              "sha256": "f9ddb7e762ebdc52dbdac079d3b66c2b3c99f7d60cd13066f8b126d25847a0d6"
+            }
+          ]
+        }
+      },
+      "status": "reviewed"
     },
     {
       "sha": "11f02eecc18939a1c8a2ac4c4cc9b74b2f5ca07a",
@@ -51587,14 +52055,218 @@
       "files": [
         "src/material/chips/chip.ts"
       ],
-      "diff_sha256": "0fafc00e9b0c2da6670bf2523a6c47dfe7d9ff9d167f26b575de9235eb2db8d0",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/20bf71c40f565c59101b63b5a878d2ddb7fe251d.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
-      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "diff_sha256": "577907fa7d9aab38742778bac3fcf1aadec1fbf46fc0da7ae6d2bf1d36fce4df",
+      "evidence_report": "compatibility/rc/chip-lifecycle-admission-source-review.json",
+      "batch_id": "closeout-chip-lifecycle-individual-source-and-native-admission",
+      "recorded_at_utc": "2026-10-17T18:39:47.862830+00:00",
       "g11_claim": "not-passed",
-      "final_disposition": "not-applicable",
-      "read_note_disposition": "not-owned",
-      "reason": "The diff in src/material/chips/chip.ts changes `afterNextRender,`. The changed paths are absent from projects/ngx-material-legacy, and no legacy source imports that entry point. Docs, examples, dev-app, goldens, and tooling-only hunks do not change the shipped legacy contract."
+      "final_disposition": "do-not-adopt",
+      "read_note_disposition": "individual-whole-original-source-review",
+      "reason": "Retain the owned legacy cancelable stability/microtask blur protocol. The original replaces modern FocusMonitor notification scheduling with afterNextRender and adds Injector state; copying it would change historical timing/construction. Native tests and per-SHA runtime admission remain required for the retained contract.",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "historical-required-individual-behavior",
+        "diff_sha256": "577907fa7d9aab38742778bac3fcf1aadec1fbf46fc0da7ae6d2bf1d36fce4df",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Retain the owned legacy cancelable stability/microtask blur protocol. The original replaces modern FocusMonitor notification scheduling with afterNextRender and adds Injector state; copying it would change historical timing/construction. Native tests and per-SHA runtime admission remain required for the retained contract.",
+        "chip_lifecycle_source_scope": {
+          "kind": "seven-complete-chip-lifecycle-source-decisions",
+          "case_id": "source/chip-lifecycle/20bf71c40f565c59101b63b5a878d2ddb7fe251d",
+          "foundation_review_sha256": "d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc",
+          "source_context_sha256": "28a6c60ad1445b3755bc1d6524f031a01e6e456ddb497252323208af60a0f251",
+          "original_hunks": 4,
+          "source_scope_only": true,
+          "native_admission_required": true,
+          "actual_native_packed_or_floor_qualified": false
+        },
+        "historical_behavior": {
+          "kind": "owned-chip-stability-blur-cancellation",
+          "case_ids": [
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#34",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#35",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#36",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip.spec.ts#37"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/rc-test-legacy-family.mjs",
+              "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+            },
+            {
+              "path": "scripts/historical-case-roster.mjs",
+              "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+            },
+            {
+              "path": "scripts/resolve-run-library.mjs",
+              "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "1434d36fae6f72ec2f5460eb5fdeb158f5b14da9d722f4a5313573f49edb1ff0"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "db1ad9e6d7a069eaeae9ce026912bd520d3a13630678f76e37f965fc25960377"
+            },
+            {
+              "path": "scripts/upstream-historical-behavior-evidence.mjs",
+              "sha256": "7e04af26527d8520bdf3ae4b5ce7bfc861b642877c714708193bc87a8c7948f0"
+            },
+            {
+              "path": "testing/legacy-runner/build.mjs",
+              "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+            },
+            {
+              "path": "testing/legacy-runner/adapt-spec.mjs",
+              "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+            },
+            {
+              "path": "testing/legacy-runner/entry.ts",
+              "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+            },
+            {
+              "path": "testing/legacy-runner/init-test-env.ts",
+              "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+            },
+            {
+              "path": "testing/legacy-runner/karma.conf.cjs",
+              "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+            },
+            {
+              "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+              "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "89e7770f51357cd8544c7df10a3ba9c538bcc66f3040e3d45434634308616832"
+            },
+            {
+              "path": "testing/legacy-runner/historical-specs.json",
+              "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+              "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+              "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "8064929cb9db7067b33c03d58b0dfb498a80ab9307a9b34ac8c013400073697b"
+            },
+            {
+              "path": "scripts/upstream-chip-lifecycle-admission.mjs",
+              "sha256": "0c825c6d22cc3f56726b6a1a00b559f268d388225d7450a651f0c5ca05915139"
+            },
+            {
+              "path": "scripts/upstream-chip-lifecycle-scope.mjs",
+              "sha256": "6cd6d27bed5544289fe4bffbccf965b3fcbf54d0db20f9c96fe4f31eaa544a26"
+            },
+            {
+              "path": "scripts/chip-focus-contract.mjs",
+              "sha256": "1b62df50e50430e7340e11478f2487930d801c993b8e0fcd1104daddc160b23b"
+            },
+            {
+              "path": "scripts/chip-focus-repair.mjs",
+              "sha256": "39e3a622e89f34f3366ec8ff3f2b8175da9ca97313107da3194cfdb2516c1bc9"
+            },
+            {
+              "path": "scripts/chip-list-focus-contract.mjs",
+              "sha256": "152c89e70c6b61f6f87240cd5564f96972bf2d0c3c4e58572aea6439a8daf313"
+            },
+            {
+              "path": "scripts/upstream-browser-run-evidence.mjs",
+              "sha256": "a60c4e7bb1c61de9c5672861a04ee57df229ff695d44298b85e3a6a6a7c4a886"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/browser-matrix-acceptance.mjs",
+              "sha256": "89825af639a7d8dfae33cfec9849035b913adecd165d5cfe94ac300350178142"
+            },
+            {
+              "path": "scripts/browser-matrix-roster.mjs",
+              "sha256": "370350b69325c8b9a54c6c5cffa2c62c7e4b616096598d78a5c87345116b0c8c"
+            },
+            {
+              "path": "scripts/browser-required-cells.mjs",
+              "sha256": "01818e24608876f624118a94a67ddca6c0537661740f5d8d885e67d3ed6f2e2e"
+            },
+            {
+              "path": "scripts/browser-required-probe.js",
+              "sha256": "ec42695be171ad558fa7e1c4459e18351fd74c6f08705fdc88622a4ba2546384"
+            },
+            {
+              "path": "scripts/browser-form-families.mjs",
+              "sha256": "51a2ec8be6da0fa2e9080fb19ec7fc5522dc7a3e52fd29ac42aaa38ef3569af4"
+            },
+            {
+              "path": "scripts/chip-focus-lifecycle-fixture.mjs",
+              "sha256": "fdfd1bdc8b6803b616aad112a8a07a440e3e7cf59af6580ae80fbab02f8dd641"
+            },
+            {
+              "path": "scripts/chip-focus-lifecycle-native-contract.mjs",
+              "sha256": "49c0e25c8235e60534a4c5e278100a47f629772d46401b2a7b7eccf682b27d1d"
+            },
+            {
+              "path": "scripts/legacy-chip-blur-native-contract.mjs",
+              "sha256": "8bb3e4c34f57f5d24103cad5d2e8202af7b383d4eddd4fc9d77f7b6d9c6846f6"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+              "sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.spec.ts",
+              "sha256": "54a0155a6498645f599e40fe1d4ba787647de68e888141eb9e69e923a99523ac"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+              "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+              "sha256": "26263b1efa46119fc7a8ea1b8693af78401cb2b78a3a4a6fb1dc7b0c78618750"
+            },
+            {
+              "path": "compatibility/rc/chip-focus-repair-inputs.json",
+              "sha256": "40ef578cc1983d119effd4a99a0dfd2c877489c957be56ae081a961ccfb4dfe4"
+            },
+            {
+              "path": "compatibility/rc/chip-focus-repair-prior.json.gz",
+              "sha256": "d2a4a33b3ec94c325039a08662912451dc74bab2fb85af1cf0b94fbdb9b48ae5"
+            },
+            {
+              "path": "compatibility/rc/chip-lifecycle-scope-originals.json.gz",
+              "sha256": "0995e6b1f103e6a31557bee91d4c2c9898c59e6b44ef7b8bd9fed1e393056f4b"
+            },
+            {
+              "path": "compatibility/rc/chip-lifecycle-scope-source-review.json",
+              "sha256": "d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc"
+            },
+            {
+              "path": "compatibility/rc/tab-header-public-key-manager-subjects.json",
+              "sha256": "f9ddb7e762ebdc52dbdac079d3b66c2b3c99f7d60cd13066f8b126d25847a0d6"
+            }
+          ]
+        }
+      },
+      "source_check": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "review_membership": "20bf71c40f565c59101b63b5a878d2ddb7fe251d",
+        "evidence_report_sha256": "2fdf3582b7548e22670d2e9fd5ddc28b6cf707e06ee6a3aca1d16564490a8631"
+      },
+      "status": "reviewed"
     },
     {
       "sha": "249db698b9d80823e83d3e15dd67f138e24cd9d1",
@@ -57032,14 +57704,43 @@
         "src/material/chips/chip-set.ts",
         "src/material/chips/chip.ts"
       ],
-      "diff_sha256": "bd9732b03b81ae323815648d0b291c225d9f3bd4fcb07b46e7f7f70b1ae2f78b",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/4bf8ebf5f3b874ae2f512dc684506f017f022f69.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
-      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "diff_sha256": "9b314ac52d8cf8c0691b1348a1e09579bf84fb0f4bc3b0923d70d5f03195c6eb",
+      "evidence_report": "compatibility/rc/chip-lifecycle-admission-source-review.json",
+      "batch_id": "closeout-chip-lifecycle-individual-source-and-native-admission",
+      "recorded_at_utc": "2026-10-17T18:39:47.863586+00:00",
       "g11_claim": "not-passed",
       "final_disposition": "not-applicable",
-      "read_note_disposition": "not-owned",
-      "reason": "The diff in src/material/chips/chip-set.ts changes `const chipArray = this._chips.toArray();`. The changed paths are absent from projects/ngx-material-legacy, and no legacy source imports that entry point. Docs, examples, dev-app, goldens, and tooling-only hunks do not change the shipped legacy contract."
+      "read_note_disposition": "individual-whole-original-source-review",
+      "reason": "The original modern remove-time snapshot and active-action fallback do not exist in the owned legacy chip/list architecture. Legacy destroyed-event and cached boolean handling remain individually reviewed, with native lifetime/destruction qualification still open under the full suite.",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "diff_sha256": "9b314ac52d8cf8c0691b1348a1e09579bf84fb0f4bc3b0923d70d5f03195c6eb",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The original modern remove-time snapshot and active-action fallback do not exist in the owned legacy chip/list architecture. Legacy destroyed-event and cached boolean handling remain individually reviewed, with native lifetime/destruction qualification still open under the full suite.",
+        "chip_lifecycle_source_scope": {
+          "kind": "seven-complete-chip-lifecycle-source-decisions",
+          "case_id": "source/chip-lifecycle/4bf8ebf5f3b874ae2f512dc684506f017f022f69",
+          "foundation_review_sha256": "d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc",
+          "source_context_sha256": "28a6c60ad1445b3755bc1d6524f031a01e6e456ddb497252323208af60a0f251",
+          "original_hunks": 4,
+          "source_scope_only": true,
+          "native_admission_required": false,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      },
+      "source_check": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "review_membership": "4bf8ebf5f3b874ae2f512dc684506f017f022f69",
+        "evidence_report_sha256": "2fdf3582b7548e22670d2e9fd5ddc28b6cf707e06ee6a3aca1d16564490a8631"
+      },
+      "status": "reviewed"
     },
     {
       "sha": "11ad09ff3e67d1825e2c6ce3d211d5192cf8e354",
@@ -63992,14 +64693,43 @@
         "src/material/chips/chip-set.ts",
         "src/material/chips/chip.ts"
       ],
-      "diff_sha256": "343f3ef91851da60fc1c5f4538bd437ad8f64384e56d944fcad452dc6fcbb298",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/e49f1273c8f7de2deda7ab1d2162b5594d9b04fa.json",
-      "batch_id": "unread-seed-content-review-2026-10-02",
-      "recorded_at_utc": "2026-10-02T18:49:16Z",
+      "diff_sha256": "4fa8d2113e06343a232869d8d1e2585de5fbe86282f854316653a53706139aeb",
+      "evidence_report": "compatibility/rc/chip-lifecycle-admission-source-review.json",
+      "batch_id": "closeout-chip-lifecycle-individual-source-and-native-admission",
+      "recorded_at_utc": "2026-10-17T18:39:47.864490+00:00",
       "g11_claim": "not-passed",
       "final_disposition": "do-not-adopt",
-      "read_note_disposition": "retained-legacy-differs",
-      "reason": "The diff in src/material/chips/chip-grid.spec.ts changes `it('should clear the active item in key manager when the last focused chip is destroyed', fakeAsync(() => {`. The owned legacy file still contains the previous line because this package keeps the Material 16 legacy contract (zone scheduling, factory providers, explicit change detection, or the pre-signal API). The current-component rewrite is not copied into the legacy sources. The commit is an ancestor of v22.1.7, so @angular/material@22.1.7 and @angular/cdk@22.1.7 already contain it for peer callers."
+      "read_note_disposition": "individual-whole-original-source-review",
+      "reason": "Retain the classic owned neighbor/list focus contract and explicit empty active-item clearing. The modern private-to-protected grid override calls super before its conditional clear, and its new test only establishes the final empty active index. Do not import its action/subclass pipeline or claim layout/focus equivalence from the comment.",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "diff_sha256": "4fa8d2113e06343a232869d8d1e2585de5fbe86282f854316653a53706139aeb",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Retain the classic owned neighbor/list focus contract and explicit empty active-item clearing. The modern private-to-protected grid override calls super before its conditional clear, and its new test only establishes the final empty active index. Do not import its action/subclass pipeline or claim layout/focus equivalence from the comment.",
+        "chip_lifecycle_source_scope": {
+          "kind": "seven-complete-chip-lifecycle-source-decisions",
+          "case_id": "source/chip-lifecycle/e49f1273c8f7de2deda7ab1d2162b5594d9b04fa",
+          "foundation_review_sha256": "d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc",
+          "source_context_sha256": "28a6c60ad1445b3755bc1d6524f031a01e6e456ddb497252323208af60a0f251",
+          "original_hunks": 5,
+          "source_scope_only": true,
+          "native_admission_required": false,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      },
+      "source_check": {
+        "proof_kind": "individual-chip-lifecycle-source-decision",
+        "review_membership": "e49f1273c8f7de2deda7ab1d2162b5594d9b04fa",
+        "evidence_report_sha256": "2fdf3582b7548e22670d2e9fd5ddc28b6cf707e06ee6a3aca1d16564490a8631"
+      },
+      "status": "reviewed"
     },
     {
       "sha": "e31d3fd2477348bf9c47b39f05650735e6c4e536",

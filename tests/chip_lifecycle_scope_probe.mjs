@@ -7,13 +7,14 @@
  */
 /** Extracted authored protocols only; no Angular fixture or browser is run. */
 import assert from 'node:assert/strict';
+import {chipLifecycleAdmissionBeforeRead} from './chip_lifecycle_admission_context.mjs';
 import {chipFocusBeforeRead} from '../scripts/chip-focus-repair.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {analyzeChipLifecycleOriginals,readChipLifecycleOriginals,chipLifecycleOriginalHunks,chipLifecycleSourceContext,replayChipLifecycle,CHIP_LIFECYCLE_ORIGINALS} from '../scripts/upstream-chip-lifecycle-scope.mjs';
 import {candidateProductSourcePaths} from '../scripts/upstream-candidate-source-evidence.mjs';
-const read=chipFocusBeforeRead(p=>readFileSync(p)),hash=b=>createHash('sha256').update(b).digest('hex'),require=createRequire(import.meta.url),ts=require('typescript'),paths=candidateProductSourcePaths(process.cwd()).sort();
+const read=chipFocusBeforeRead(chipLifecycleAdmissionBeforeRead(p=>readFileSync(p))),hash=b=>createHash('sha256').update(b).digest('hex'),require=createRequire(import.meta.url),ts=require('typescript'),paths=candidateProductSourcePaths(process.cwd()).sort();
 const {Subject,Subscription,merge}=require('rxjs'),{take,startWith,takeUntil}=require('rxjs/operators');
 const chipPath='projects/ngx-material-legacy/legacy-chips/chip.ts',listPath='projects/ngx-material-legacy/legacy-chips/chip-list.ts',chip=read(chipPath).toString(),list=read(listPath).toString();
 const analysis=analyzeChipLifecycleOriginals(read),context=chipLifecycleSourceContext(read,paths),controls=[];assert.equal(analysis.length,7);assert.equal(analysis.reduce((n,r)=>n+r.hunks,0),30);assert.equal(analysis.reduce((n,r)=>n+r.paths.length,0),16);
