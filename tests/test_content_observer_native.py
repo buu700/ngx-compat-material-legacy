@@ -88,7 +88,10 @@ def project_content_observer_native_context(root, read_member=None):
                    'compatibility/f10/authored-dependency-current-dispositions.json']:
         assert read(member) == git('show', parent + ':' + member)
     assert git('diff', parent, '--name-only', '--', 'projects', 'testing', 'reference', 'fixtures') == b''
-    return recovered, lambda p: before['text'].encode() if p == before['path'] else read(p)
+    ledger_path = 'compatibility/f10/disposition-ledger/ledger.json'
+    original_ledger_bytes = git('show', parent + ':' + ledger_path)
+    return recovered, lambda p: (before['text'].encode() if p == before['path'] else
+                                 original_ledger_bytes if p == ledger_path else read(p))
 
 
 class ContentObserverNative(unittest.TestCase):
