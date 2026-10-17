@@ -50254,14 +50254,44 @@
         "src/material/chips/chip-set.ts",
         "tools/public_api_guard/material/chips.md"
       ],
-      "diff_sha256": "402c92fce52b700b03ed3dd5cb2290f74880bf46d85623d3da0cc9cbc7e9bcda",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/67191681921550b7e4e0c587880e4db25686c589.json",
+      "diff_sha256": "b1c239fe70577ad3e5852e5ccd9b8552a2228ee30e1358c666446e5646f846a6",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-chip-input-api-source-scope.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
       "final_disposition": "not-applicable",
       "read_note_disposition": "not-owned",
-      "reason": "The diff in src/material/chips/chip-input.ts changes `_chipGrid: MatChipGrid;`. The changed paths are absent from projects/ngx-material-legacy, and no legacy source imports that entry point. Docs, examples, dev-app, goldens, and tooling-only hunks do not change the shipped legacy contract."
+      "reason": "The whole patch adds the modern chipGrid getter/private _chipGrid backing field and a new chipRemovedChanges removal-request stream, including both public API hunks. The owned legacy input retains its original setter-only chipList/_chipList members, with all29 class members identical to the untouched tagged16 class. Its legacy chipRemoveChanges is a distinct destruction-event stream merging chip.destroyed, not chip.removed despite its comment/name. Both old and candidate source protocols observe only destroy-a/destroy-b after interleaved removal requests/destruction; changing that existing stream would break the historical destruction-driven contract. No current MatChipInput/Grid/Set ownership route exists. Neither a renamed accessor nor a new modern public stream is required to preserve the historical contract; no API is mirrored and no native runtime pass is claimed.",
+      "affected_branches": [
+        "main"
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-modern-chip-input-api-source-decision",
+        "diff_sha256": "b1c239fe70577ad3e5852e5ccd9b8552a2228ee30e1358c666446e5646f846a6",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The whole patch adds the modern chipGrid getter/private _chipGrid backing field and a new chipRemovedChanges removal-request stream, including both public API hunks. The owned legacy input retains its original setter-only chipList/_chipList members, with all29 class members identical to the untouched tagged16 class. Its legacy chipRemoveChanges is a distinct destruction-event stream merging chip.destroyed, not chip.removed despite its comment/name. Both old and candidate source protocols observe only destroy-a/destroy-b after interleaved removal requests/destruction; changing that existing stream would break the historical destruction-driven contract. No current MatChipInput/Grid/Set ownership route exists. Neither a renamed accessor nor a new modern public stream is required to preserve the historical contract; no API is mirrored and no native runtime pass is claimed.",
+        "chip_input_api_source_scope": {
+          "kind": "three-complete-modern-input-grid-api-source-decisions",
+          "case_id": "source/chip-input-api/67191681921550b7e4e0c587880e4db25686c589",
+          "originals_sha256": "8cef1a52320f37eb95f76a649e8f5ca00bc0657268ab1488078bea75f4a19495",
+          "foundation_review_sha256": "63a1d9312e9148bdc914ef74b737f778149c0dfa2e3c958e3db25d5cf44ada17",
+          "source_context_sha256": "d9755b164a3121b7838ae017126a2d2cdefc4bc433f5e69a75fcadc9c5ef54b6",
+          "original_hunks": 4,
+          "changed_path_occurrences": 3,
+          "existing_blob_occurrences": 6,
+          "source_scope_only": true,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      },
+      "source_check": {
+        "proof_kind": "individual-modern-chip-input-api-source-decision",
+        "review_membership": "67191681921550b7e4e0c587880e4db25686c589",
+        "evidence_report_sha256": "a029de41dec3e09d4eeaeeee5b9be3969069da16d8bc4f6f976c499ab073005a"
+      }
     },
     {
       "sha": "8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc",
@@ -57255,14 +57285,44 @@
         "src/material/chips/chip-grid.ts",
         "src/material/chips/chips.md"
       ],
-      "diff_sha256": "10db35e4a77d0eceee89ce766ad3585e8e77485b1b5b12e88886d4a1d1749e36",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/29f0bb238a2a327ac6ed69071f6aa555693ab2d4.json",
+      "diff_sha256": "8944c4842fc479392f13939e3cf85a6e6e621758a55034b7b4422fa7cf053d06",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-chip-input-api-source-scope.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
       "final_disposition": "not-applicable",
       "read_note_disposition": "not-owned",
-      "reason": "The diff in src/material/chips/chip-grid.spec.ts changes `describe('ChipGrid without input', () => {`. The changed paths are absent from projects/ngx-material-legacy, and no legacy source imports that entry point. Docs, examples, dev-app, goldens, and tooling-only hunks do not change the shipped legacy contract."
+      "reason": "The original patch relaxes the modern MatChipGrid input requirement and changes id/focus/description forwarding, private _IdGenerator injection, grid after-view lifecycle and action navigation, plus all five source/API/doc/demo paths. Legacy MatLegacyChipList already supports absent input through its historical id/placeholder/focused/empty/focus fallbacks. Eleven relevant list members, including focus, _focusInput, registration, host described-by setter and own uid/input fields, match the untouched tagged16 source. Six receiver-state and two stream/registration protocols preserve empty input placeholder values, host aria-describedby and data-mat-chip-input without modern forwarding or private id machinery. This is a modern grid implementation change with an existing distinct classic capability; it does not authorize altering classic host structure or treating protocol tests as Angular/browser/packed qualification.",
+      "affected_branches": [
+        "main"
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-modern-chip-input-api-source-decision",
+        "diff_sha256": "8944c4842fc479392f13939e3cf85a6e6e621758a55034b7b4422fa7cf053d06",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The original patch relaxes the modern MatChipGrid input requirement and changes id/focus/description forwarding, private _IdGenerator injection, grid after-view lifecycle and action navigation, plus all five source/API/doc/demo paths. Legacy MatLegacyChipList already supports absent input through its historical id/placeholder/focused/empty/focus fallbacks. Eleven relevant list members, including focus, _focusInput, registration, host described-by setter and own uid/input fields, match the untouched tagged16 source. Six receiver-state and two stream/registration protocols preserve empty input placeholder values, host aria-describedby and data-mat-chip-input without modern forwarding or private id machinery. This is a modern grid implementation change with an existing distinct classic capability; it does not authorize altering classic host structure or treating protocol tests as Angular/browser/packed qualification.",
+        "chip_input_api_source_scope": {
+          "kind": "three-complete-modern-input-grid-api-source-decisions",
+          "case_id": "source/chip-input-api/29f0bb238a2a327ac6ed69071f6aa555693ab2d4",
+          "originals_sha256": "8cef1a52320f37eb95f76a649e8f5ca00bc0657268ab1488078bea75f4a19495",
+          "foundation_review_sha256": "63a1d9312e9148bdc914ef74b737f778149c0dfa2e3c958e3db25d5cf44ada17",
+          "source_context_sha256": "d9755b164a3121b7838ae017126a2d2cdefc4bc433f5e69a75fcadc9c5ef54b6",
+          "original_hunks": 18,
+          "changed_path_occurrences": 5,
+          "existing_blob_occurrences": 10,
+          "source_scope_only": true,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      },
+      "source_check": {
+        "proof_kind": "individual-modern-chip-input-api-source-decision",
+        "review_membership": "29f0bb238a2a327ac6ed69071f6aa555693ab2d4",
+        "evidence_report_sha256": "a029de41dec3e09d4eeaeeee5b9be3969069da16d8bc4f6f976c499ab073005a"
+      }
     },
     {
       "sha": "13a9c48a093b1bfeab8f0328030dae60aca7519f",
@@ -58565,14 +58625,44 @@
         "src/material/chips/chip-input.ts",
         "src/material/chips/tokens.ts"
       ],
-      "diff_sha256": "1c9d1ba11883a5db125861fe59ebd81a907ba9d16aabbcce297a7b045689ccaa",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/ef70029820423ff7ba6a5a1a372c24a0583a03f2.json",
+      "diff_sha256": "5661c8857e93dd231fc89cb4d684110b1dd29dbc91fe2a2783770f964f28cf61",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-chip-input-api-source-scope.json",
       "batch_id": "unread-seed-content-review-2026-10-02",
       "recorded_at_utc": "2026-10-02T18:49:16Z",
       "g11_claim": "not-passed",
       "final_disposition": "do-not-adopt",
       "read_note_disposition": "retained-legacy-differs",
-      "reason": "The diff in src/material/chips/chip-input.spec.ts changes `it('should ignore modifier keys when `SeparatorKey.modifiers` is empty', () => {`. The owned legacy file still contains the previous line because this package keeps the Material 16 legacy contract (zone scheduling, factory providers, explicit change detection, or the pre-signal API). The current-component rewrite is not copied into the legacy sources. The commit is an ancestor of v22.1.7, so @angular/material@22.1.7 and @angular/cdk@22.1.7 already contain it for peer callers."
+      "reason": "The complete optional feature adds the public SeparatorKey interface and widens both input/default option types and matching semantics across four full changed paths, including API goldens. The legacy input and owned default-options declarations retain readonly number[] | ReadonlySet<number>; every input class member matches untouched tagged16. Across288 array/set/key/modifier traces per genuine original16.2.14 and advertised-minimum21.2.14/22.1.7 public helper, the candidate matches tagged numeric-only modifier rejection and getter order. The original modern feature separately accepts ctrl plus shift when ctrl is requested because the helper uses a disjunction; no exact-only modifier set is inferred from the test name. This additive modern feature is outside preserving Material16 behavior and would create a modern API mirror; retain the historical contract rather than adding an unrequired type/option surface. No resource or consumer changes, native execution or minimum-floor credit follow from these source protocols.",
+      "affected_branches": [
+        "main"
+      ],
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "individual-modern-chip-input-api-source-decision",
+        "diff_sha256": "5661c8857e93dd231fc89cb4d684110b1dd29dbc91fe2a2783770f964f28cf61",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete optional feature adds the public SeparatorKey interface and widens both input/default option types and matching semantics across four full changed paths, including API goldens. The legacy input and owned default-options declarations retain readonly number[] | ReadonlySet<number>; every input class member matches untouched tagged16. Across288 array/set/key/modifier traces per genuine original16.2.14 and advertised-minimum21.2.14/22.1.7 public helper, the candidate matches tagged numeric-only modifier rejection and getter order. The original modern feature separately accepts ctrl plus shift when ctrl is requested because the helper uses a disjunction; no exact-only modifier set is inferred from the test name. This additive modern feature is outside preserving Material16 behavior and would create a modern API mirror; retain the historical contract rather than adding an unrequired type/option surface. No resource or consumer changes, native execution or minimum-floor credit follow from these source protocols.",
+        "chip_input_api_source_scope": {
+          "kind": "three-complete-modern-input-grid-api-source-decisions",
+          "case_id": "source/chip-input-api/ef70029820423ff7ba6a5a1a372c24a0583a03f2",
+          "originals_sha256": "8cef1a52320f37eb95f76a649e8f5ca00bc0657268ab1488078bea75f4a19495",
+          "foundation_review_sha256": "63a1d9312e9148bdc914ef74b737f778149c0dfa2e3c958e3db25d5cf44ada17",
+          "source_context_sha256": "d9755b164a3121b7838ae017126a2d2cdefc4bc433f5e69a75fcadc9c5ef54b6",
+          "original_hunks": 10,
+          "changed_path_occurrences": 4,
+          "existing_blob_occurrences": 8,
+          "source_scope_only": true,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      },
+      "source_check": {
+        "proof_kind": "individual-modern-chip-input-api-source-decision",
+        "review_membership": "ef70029820423ff7ba6a5a1a372c24a0583a03f2",
+        "evidence_report_sha256": "a029de41dec3e09d4eeaeeee5b9be3969069da16d8bc4f6f976c499ab073005a"
+      }
     },
     {
       "sha": "667a007d0d4017d14eadb2db4b5c0665efa1c2b9",

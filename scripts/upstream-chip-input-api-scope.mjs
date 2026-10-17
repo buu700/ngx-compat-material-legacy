@@ -81,3 +81,39 @@ export function replayChipInputList(source,merge){
  const file=parse('chip-list.ts',source),owner=cls(file,'MatLegacyChipList'),names=[['chipRemoveChanges',ts.SyntaxKind.GetAccessor],['id',ts.SyntaxKind.GetAccessor],['placeholder',ts.SyntaxKind.GetAccessor],['focused',ts.SyntaxKind.GetAccessor],['empty',ts.SyntaxKind.GetAccessor],['registerInput',ts.SyntaxKind.MethodDeclaration],['setDescribedByIds',ts.SyntaxKind.MethodDeclaration]];
  const result=ts.transpileModule('class Replay {\n'+names.map(([name,kind])=>canonical(member(owner,name,kind),file).replace(/^@[^\n]+\n/gm,'')).join('\n')+'\n}\nreturn Replay;',{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext},reportDiagnostics:true});assert.equal(result.diagnostics?.length??0,0);return new Function('merge',result.outputText)(merge);
 }
+
+export const CHIP_INPUT_API_SCOPE_ROLE='C04 individual complete modern chip input and grid API source decisions';
+export const CHIP_INPUT_API_PROOF_KIND='individual-modern-chip-input-api-source-decision';
+const foundationPath='compatibility/rc/chip-input-api-scope-source-review.json';
+const foundationPins={"main":"63a1d9312e9148bdc914ef74b737f778149c0dfa2e3c958e3db25d5cf44ada17","21.x":"268dcb61714ed0b66bc69cfedd6b89e9a5e005804d99eb12871a88750f0335b4"};
+const json=value=>JSON.stringify(value,null,2)+'\n';
+export function requiresChipInputApiScope(entry,proof){return CHIP_INPUT_API_SHAS.includes(entry?.sha)||proof?.proof_kind===CHIP_INPUT_API_PROOF_KIND||proof?.chip_input_api_source_scope!==undefined;}
+/** Exact source identities and individually retained reviews, never runtime goldens. */
+export function chipInputApiSourceBody(read,productPaths,line){
+ assert.ok(['main','21.x'].includes(line));
+ const bytes=read(foundationPath);assert.equal(hash(bytes),foundationPins[line],'changed chip input API foundation');const foundation=JSON.parse(bytes);
+ assert.equal(foundation.line,line);assert.deepEqual(foundation.reviews.map(r=>r.sha),CHIP_INPUT_API_SHAS);
+ const prior=readChipInputApiPrior(read,line),originals=readChipInputApiOriginals(read).subjects,analysis=analyzeChipInputApiOriginals(read),context=chipInputApiSourceContext(read,productPaths);assert.equal(context.line,line);
+ for(const old of prior.reviews)assert.equal(hash(read(old.path)),old.sha256,'changed retained chip input API review');
+ return {schema_version:1,role:CHIP_INPUT_API_SCOPE_ROLE,line,status:'reviewed',scope_sha_ids:[...CHIP_INPUT_API_SHAS],source_scope_only:true,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed',
+  prior:{path:'compatibility/rc/chip-input-api-scope-prior.json.gz',sha256:priorPins[line],source_parent:prior.source_parent},foundation_review:{path:foundationPath,sha256:foundationPins[line]},candidate_context:context,
+  reviews:analysis.map((subject,i)=>{
+   const source=foundation.reviews[i];assert.deepEqual(source.original_analysis,subject);assert.equal(source.proposed_disposition,i===2?'do-not-adopt':'not-applicable');assert.equal(source.whole_original_hunk_reviews.length,subject.hunks);
+   return {sha:subject.sha,status:'reviewed',final_disposition:source.proposed_disposition,review_depth:'individual-compatibility',affected_branches:[line],decision:source.candidate_review,whole_original_hunk_reviews:source.whole_original_hunk_reviews,original_analysis:subject,patch_paths:subject.paths,diff_sha256:subject.diff_sha256,diff:originals[i].diff,original_sources:{path:CHIP_INPUT_API_ORIGINALS,sha256:originalPin},prior_entry:{ledger_path:prior.ledger_path,ledger_commit:prior.source_parent,entry_sha256:hash(json(prior.entries[i]))},actual_native_packed_or_floor_qualified:false};
+  })};
+}
+export function chipInputApiSourceProof(subject,context,decision){
+ assert.ok(CHIP_INPUT_API_SHAS.includes(subject?.sha));assert.ok(['main','21.x'].includes(context?.line));
+ return {proof_kind:CHIP_INPUT_API_PROOF_KIND,diff_sha256:subject.diff_sha256,review_depth:'individual-compatibility',affected_branches:[context.line],decision,
+  chip_input_api_source_scope:{kind:'three-complete-modern-input-grid-api-source-decisions',case_id:'source/chip-input-api/'+subject.sha,originals_sha256:originalPin,foundation_review_sha256:foundationPins[context.line],source_context_sha256:hash(JSON.stringify(context)),original_hunks:subject.hunks,changed_path_occurrences:subject.paths.length,existing_blob_occurrences:subject.existing_blob_occurrences,source_scope_only:true,actual_native_packed_or_floor_qualified:false}};
+}
+/** Mandatory by SHA even when proof, kind, label or evidence suffix is removed. */
+export function chipInputApiScopeEvidenceOk(body,entry,read,productPaths,line){
+ try{
+  assert.ok(CHIP_INPUT_API_SHAS.includes(entry.sha));const expected=chipInputApiSourceBody(read,productPaths,line);assert.deepEqual(body,expected);
+  const row=expected.reviews.find(r=>r.sha===entry.sha);assert.equal(entry.final_disposition,row.final_disposition);assert.equal(entry.reason,row.decision);assert.equal(entry.diff_sha256,row.diff_sha256);assert.deepEqual(entry.files,row.patch_paths);assert.equal(entry.review_depth,row.review_depth);assert.deepEqual(entry.affected_branches,[line]);assert.equal(entry.g11_claim,'not-passed');
+  assert.deepEqual(entry.individual_proof,chipInputApiSourceProof(row.original_analysis,expected.candidate_context,row.decision));
+  const bytes=read(entry.evidence_report);assert.equal(bytes.toString(),json(body),'evidence bytes differ from selected source body');assert.deepEqual(entry.source_check,{proof_kind:CHIP_INPUT_API_PROOF_KIND,review_membership:entry.sha,evidence_report_sha256:hash(bytes)});
+  return true;
+ }catch{return false;}
+}
