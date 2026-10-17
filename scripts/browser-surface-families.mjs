@@ -19,6 +19,7 @@ import {observeRippleColorBinding,rippleColorBindingOkay} from './ripple-color-b
 import {PEER_ICON_TT_CSP, peerIconTtOkay} from './peer-icon-tt-admission.mjs';
 import {progressCspStyleOkay} from './progress-csp-style-contract.mjs';
 import {formFieldStateTokensOkay} from './form-field-state-style-observation.mjs';
+import {contentObserverNativeFixture, installContentObserverNativeTrace, contentObserverNativeOkay} from './content-observer-native-contract.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
   // Local Node 20 shells need the experimental flag; CI/Chainman Node 22+ has WebSocket.
@@ -193,6 +194,7 @@ export class PeerProgressCspModule {}
   standalone: false,
   selector: 'lab-root',
   template: \`
+    <closeout-content-observer></closeout-content-observer>
     <button mat-button id="peer-icon-button"><mat-icon svgIcon="closeout-native-tt"></mat-icon>Icon</button>
     <button id="button-default" mat-button type="button">Default</button>
     <button id="button-disabled" mat-button type="button" disabled>Disabled</button>
@@ -279,9 +281,11 @@ export class LabRoot {
   }
 }
 
+${contentObserverNativeFixture()}
 @NgModule({
   imports: [
     BrowserModule,
+    ObserverLegacyTabsModule,
     MatIconModule,
     MatLegacyRippleModule,
     PeerProgressCspModule,
@@ -290,7 +294,7 @@ export class LabRoot {
     MatLegacyProgressBarModule,
     MatLegacyProgressSpinnerModule,
   ],
-  declarations: [LabRoot],
+  declarations: [LabRoot, ContentObserverNativeProbe],
   bootstrap: [LabRoot],
   providers: [${zoneless ? 'provideZonelessChangeDetection(), ' : ''}{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
 })
@@ -472,12 +476,13 @@ let progressCsp = null;
 let peerFormHover = null;
 let coreHighContrast = null;
 let rippleColorBinding = null;
+let contentObserver = null;
 
 try {
   await send('Runtime.enable');
   await send('Page.enable');
   await send('Page.addScriptToEvaluateOnNewDocument', {
-    source: 'window.__errors=[];window.__ttViolations=[];window.__cspDetails=[];window.addEventListener("error",e=>window.__errors.push(String(e.message)));window.addEventListener("securitypolicyviolation",e=>{window.__ttViolations.push(e.violatedDirective);window.__cspDetails.push({directive:e.violatedDirective,blocked:e.blockedURI});});',
+    source: `(${installContentObserverNativeTrace.toString()})();` + 'window.__errors=[];window.__ttViolations=[];window.__cspDetails=[];window.addEventListener("error",e=>window.__errors.push(String(e.message)));window.addEventListener("securitypolicyviolation",e=>{window.__ttViolations.push(e.violatedDirective);window.__cspDetails.push({directive:e.violatedDirective,blocked:e.blockedURI});});',
   });
   await send('Page.reload', {ignoreCache: true});
   await waitFor('!!document.getElementById("button-default") || !!document.getElementById("bootstrap-error")');
@@ -627,6 +632,13 @@ try {
   rippleColorBinding=await observeRippleColorBinding({evaluate});
   rippleColorBinding.compiled_theme_css_sha256=createHash('sha256').update(progressCss).digest('hex');
 
+  if (!await waitFor('!!window.__closeoutContentObserver')) throw new Error('owned observer fixture not initialized');
+  const observerResult = await send('Runtime.evaluate', {
+    expression: 'window.__closeoutContentObserver.exercise()', returnByValue: true, awaitPromise: true,
+  });
+  if (observerResult.exceptionDetails) throw new Error('native content observer execution failed');
+  contentObserver = observerResult.result?.value ?? null;
+
   // Button default + disabled + focused state cells.
   families.button.present = await waitFor('!!document.querySelector("button#button-default.mat-button, button#button-default[mat-button]")');
   families.button.disabled_class = await waitFor(
@@ -690,6 +702,7 @@ const ok =
   && formFieldStateTokensOkay(peerFormHover?.state_token_scenarios)
   && legacyCoreHighContrastOkay(coreHighContrast)
   && rippleColorBindingOkay(rippleColorBinding)
+  && contentObserverNativeOkay(contentObserver, zoneless)
   && families.button.present && families.button.disabled_class && families.button.focused
   && families.card.present
   && families['progress-bar'].present && families['progress-bar'].value_reflected
@@ -713,6 +726,7 @@ const report = {
   peer_form_hover: peerFormHover,
   core_high_contrast: coreHighContrast,
   ripple_color_binding: rippleColorBinding,
+  content_observer: contentObserver,
   credited_cell_ids: ok ? cells : [],
   matrix_updated: false,
   error,
@@ -733,6 +747,7 @@ const report = {
     'Fixed indigo M2 progress guard requires dots only in current buffer mode, the expected radial gradient and color, retained legacy inline SVG and IE-only data URI, zero positive image violations and an enforced blocked-data-image negative. No additional matrix cells or complete CSP/motion qualification are credited.',
     'Current form-field state check requires light/dark baseline, wrapper/hint hover, focus, token consumption negative and restoration with packed exported Sass. Historical selectors are retained; no additional matrix cells, full Sass or general style qualification are credited.',
     'Ripple color guard consumes packed root/scoped/light/dark/custom/CSS-variable Sass through shared public MatRipple, challenges late public styles and token consumption, and preserves explicit colors and a separate modern color scope. This earns no full Sass/peer-floor/motion/matrix credit.',
+    'Content observer diagnostic uses native records, the public peer and actual owned legacy header notification/text guard plus subscription/destroy/reobserve teardown in this Chromium runtime. It earns no new matrix cells or whole native/AT/motion/floor equivalence.',
     'Does not claim G10.',
   ],
 };
@@ -752,6 +767,7 @@ console.log(JSON.stringify({
   peer_form_hover: peerFormHover,
   core_high_contrast: coreHighContrast,
   ripple_color_binding: rippleColorBinding,
+  content_observer: contentObserver,
   error,
   credited_cell_ids: report.credited_cell_ids,
 }, null, 2));
