@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.native_date_source_context import project_native_date_context
 from unittest.mock import patch
 from tests.audit_test_context import (assert_native_review,assert_runtime_roster,
     native_contracts,prior_source_entry,read_original_patch,read_review)
@@ -22,7 +23,8 @@ LEDGER='compatibility/f10/disposition-ledger/ledger.json'
 
 class AuditTestContext(unittest.TestCase):
     def test_exact_original_methods_and_finite_reader_edits(self):
-        task=json.loads((ROOT/'compatibility/rc/audit-test-current-context-worksheet.json').read_bytes())
+        _,read=project_native_date_context(ROOT)
+        task=json.loads(read('compatibility/rc/audit-test-current-context-worksheet.json'))
         file='tests/test_upstream_audit_disposition.py'
         if task['line']=='21.x':
             # This old main-only class was never present on21.x. The shared
@@ -46,10 +48,12 @@ class AuditTestContext(unittest.TestCase):
         self.assertEqual(names(original),rules['original_methods'])
         self.assertEqual(names(current),rules['current_methods'])
         for member in [LEDGER,'compatibility/f10/authored-dependency-dispositions.json','compatibility/f10/authored-dependency-current-dispositions.json']:
-            self.assertEqual((ROOT/member).read_bytes(),subprocess.check_output(['git','show',task['source_parent']+':'+member],cwd=ROOT))
+            self.assertEqual(read(member),subprocess.check_output(['git','show',task['source_parent']+':'+member],cwd=ROOT))
         self.assertEqual(subprocess.check_output(['git','diff',task['source_parent'],'--name-only','--','projects','testing','reference','fixtures'],cwd=ROOT),b'')
         changed=subprocess.check_output(['git','diff',task['source_parent'],'--name-only','--','scripts'],cwd=ROOT).decode().splitlines()
-        self.assertTrue(set(changed)<={'scripts/historical-source-replay.mjs'})
+        new_context={p for p in changed if read(p)!=(ROOT/p).read_bytes()}
+        new_files={'scripts/upstream-native-date-evidence.mjs','scripts/native-date-packed-contract.mjs','scripts/native-date-packed-fixture.mjs','scripts/native-date-packed-source-context.mjs'}
+        self.assertTrue(set(changed)-new_context-new_files<={'scripts/historical-source-replay.mjs'})
         if changed:
             # The subsequent coherence-frame step owns exactly the two
             # registry hash pins. The91 replay controls validate their values.
@@ -64,7 +68,7 @@ class AuditTestContext(unittest.TestCase):
 
     def test_all_registered_subjects_still_require_actual_coordinator_execution(self):
         contracts=native_contracts(ROOT)
-        self.assertEqual(len(contracts['rows']),23 if contracts['line']=='main' else 22)
+        self.assertEqual(len(contracts['rows']),24 if contracts['line']=='main' else 23)
         entries=json.loads((ROOT/LEDGER).read_bytes())['entries'];indexed={e['sha']:e for e in entries}
         self.assertEqual(len(indexed),1697)
         for row in contracts['rows']:

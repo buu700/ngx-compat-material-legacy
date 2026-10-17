@@ -87,7 +87,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-77ffdf98ba71c11d908b29e02b516dddf487ae0b.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-77ffdf98ba71c11d908b29e02b516dddf487ae0b.json",
       "source_review_followup": "compatibility/f10/disposition-ledger/evidence/closeout-reopened-autocomplete-source-review.json",
       "recorded_at_utc": "2026-10-16T02:41:33.522610+00:00",
       "individual_proof": {
@@ -124,7 +124,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
@@ -1151,7 +1151,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-source-review.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-current-run-review.json",
       "prior_dispositions": [
         {
           "sha": "b423c0e0b754b1f1d118d17e022981c357c3aa68",
@@ -1199,13 +1199,88 @@
         "affected_branches": [
           "21.x"
         ],
-        "decision": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open.",
-        "proof_kind": "source-and-executed-packed-constructor-provider",
-        "execution": {
-          "source_commit": "9b016947bbf8a8cf05ad16ab32782330788df282",
-          "run": 37515479277,
-          "job": 112447179667,
-          "library_sha256": "08bc08f1ff28cf697f0c59cc154400920c2eee6cd8ae977c70062722ca3a2ac5"
+        "decision": "Do not adopt this constructor-breaking upstream change into the legacy export. The whole patch removes Platform from NativeDateAdapter and forces inject(MAT_DATE_LOCALE); its second hunk narrows the public declaration and factory. The add-on now owns the untouched Material16 helper under LegacyNativeDateAdapter, preserves locale:string plus Platform? and the original two-token factory, and owns its provider modules. It no longer delegates this helper to the current peer. Both exact release-line packed consumers passed constructor/subclass/calendar and provider/locale tests, and API observations show no NativeDateAdapter discrepancy. This is historical-contract preservation, not a claimed vulnerability fix; unrelated DI failures and global G11 remain open. Current qualification additionally requires the complete current clean same-library packed106 run and both rich constructor/provider observations; the retained old Actions receipts are historical.",
+        "proof_kind": "packed-required-individual-native-date",
+        "native_date_behavior": {
+          "kind": "owned-original-native-date-constructor-and-isolated-providers",
+          "case_ids": [
+            "packed-consumer/harness/native-date-constructor",
+            "packed-consumer/harness/native-date-provider"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/upstream-native-date-evidence.mjs",
+              "sha256": "5ca276bb33b14048781b161937aa76dc04f7a2e0a3e4e7da75d00f4c09eb17cf"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/packed-consumer-evidence.mjs",
+              "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+            },
+            {
+              "path": "scripts/packed-consumer-aot-smoke.mjs",
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "7ad45f46e30876888753c2cf2dbebab11d12327dc87cc0dbdec520440cd098ed"
+            },
+            {
+              "path": "compatibility/rc/matrices/library-exports.json",
+              "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+            },
+            {
+              "path": "projects/ngx-material-legacy/package.json",
+              "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts",
+              "sha256": "b69f5c2bbc12deb6ff4c420252733f51742616e016b2a6193de066cf4eecade5"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+              "sha256": "ea7b50c1618c5631f6dddb395461a144fb2d9448d2e1cb05222664ade19b23c1"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+              "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d"
+            },
+            {
+              "path": "reference/material-16.2.14/datetime/native-date-adapter.ts",
+              "sha256": "9764348262387bc4d76f3c1724620074288167e8d2b13ebd5e109bab23f8e797"
+            },
+            {
+              "path": "reference/material-16.2.14/datetime/source-provenance.json",
+              "sha256": "e9273638fd232a9845eeda741cff2c243cb4a64b273145a983aaa689776f6643"
+            },
+            {
+              "path": "reference/material-16.2.14/factory-metadata.json",
+              "sha256": "1b124aab1f570e111647f8142cdea8066ae9db673efc405a6999c178709602b6"
+            },
+            {
+              "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-source-review.json",
+              "sha256": "cf2fec7b589a1c6f8a8df9ad5b2c4523a9a85e9d1fda3a2db86cc2739d1cd989"
+            },
+            {
+              "path": "compatibility/f10/disposition-ledger/evidence/patches/b423c0e0b754b1f1d118d17e022981c357c3aa68.patch",
+              "sha256": "0fc17a9693eca8bb91cf85b9e1bd5129acf63ccc8a761482a7e8e2ba5d9dd31d"
+            }
+          ]
         }
       }
     },
@@ -1286,7 +1361,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-cf456a2d43837497367662e7de22f1b2bcbf4f00.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-cf456a2d43837497367662e7de22f1b2bcbf4f00.json",
       "prior_dispositions": [
         {
           "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
@@ -1341,7 +1416,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/rc-verify.py",
@@ -1453,7 +1528,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/historical-roster-reconciliation-ca9c490ee30dbf7c9c147079197d0dbc0abcd611.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-ca9c490ee30dbf7c9c147079197d0dbc0abcd611.json",
       "individual_proof": {
         "proof_kind": "artifact-required-individual-behavior",
         "diff_sha256": "3630c1798278c09cfd65afa8a4d5853034cfd2a0bd67eff9dc2edd6aa4d8808f",
@@ -1510,7 +1585,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/packed-consumer-evidence.mjs",
@@ -1522,7 +1597,7 @@
             },
             {
               "path": "scripts/upstream-artifact-behavior-evidence.mjs",
-              "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+              "sha256": "97196bb8c7a27e3501da839bd15ef612db4ee0134db5b9d8a1c2ab3de57d51df"
             },
             {
               "path": "scripts/bidi-isolated-packed-contract.mjs",
@@ -1539,6 +1614,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "compatibility/rc/matrices/library-exports.json",
@@ -2600,7 +2683,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-db06fa8d8939d793f598bc3dbedc96a5a71c0db0.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-db06fa8d8939d793f598bc3dbedc96a5a71c0db0.json",
       "individual_proof": {
         "proof_kind": "historical-required-individual-behavior",
         "review_depth": "individual-compatibility",
@@ -2633,7 +2716,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
@@ -5357,7 +5440,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-5dd614aa100e28f0815fdd83e5b68f4239ef01f9.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-5dd614aa100e28f0815fdd83e5b68f4239ef01f9.json",
       "source_review_followup": "compatibility/f10/disposition-ledger/evidence/closeout-reopened-tab_link-source-review.json",
       "recorded_at_utc": "2026-10-16T02:41:33.522610+00:00",
       "individual_proof": {
@@ -5394,7 +5477,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
@@ -8230,7 +8313,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc.json",
       "prior_dispositions": [
         {
           "sha": "8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc",
@@ -8277,11 +8360,11 @@
           "source_members": [
             {
               "path": "scripts/upstream-bidi-evidence.mjs",
-              "sha256": "146b245f86532b11330b863827f11fbb9792bc8e024a54251d8f600b2dc97fa8"
+              "sha256": "c1c12a976109f1e6f64718494c3b0d55fec1217f2dd983242bc1e468f0bada9e"
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/upstream-packed-run-evidence.mjs",
@@ -8293,7 +8376,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/bidi-isolated-packed-contract.mjs",
@@ -8314,6 +8397,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "compatibility/rc/matrices/full-verify.json",
@@ -10165,7 +10256,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/historical-roster-reconciliation-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
       "individual_proof": {
         "proof_kind": "artifact-required-individual-behavior",
         "diff_sha256": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
@@ -10198,7 +10289,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/packed-consumer-evidence.mjs",
@@ -10225,8 +10316,16 @@
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
             },
             {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
+            },
+            {
               "path": "scripts/upstream-artifact-behavior-evidence.mjs",
-              "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+              "sha256": "97196bb8c7a27e3501da839bd15ef612db4ee0134db5b9d8a1c2ab3de57d51df"
             },
             {
               "path": "scripts/select-focus-click-packed-fixture.mjs",
@@ -14977,7 +15076,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-d8a6c3edd8d406b3f1b1c26805612eac8856b745.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-d8a6c3edd8d406b3f1b1c26805612eac8856b745.json",
       "recorded_at_utc": "2026-10-17T00:45:07.351249+00:00",
       "source_check": {
         "kind": "individual-complete-original-mixed-cdk-source-review",
@@ -15046,7 +15145,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/rc-verify.py",
@@ -15534,7 +15633,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-cf3506adf1af1556d705dbb651e7e96a7141b81d.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-cf3506adf1af1556d705dbb651e7e96a7141b81d.json",
       "prior_dispositions": [
         {
           "sha": "cf3506adf1af1556d705dbb651e7e96a7141b81d",
@@ -15587,7 +15686,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/rc-verify.py",
@@ -25691,7 +25790,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/historical-roster-reconciliation-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
       "prior_dispositions": [
         {
           "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
@@ -25805,7 +25904,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/packed-consumer-evidence.mjs",
@@ -25817,7 +25916,7 @@
             },
             {
               "path": "scripts/upstream-artifact-behavior-evidence.mjs",
-              "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+              "sha256": "97196bb8c7a27e3501da839bd15ef612db4ee0134db5b9d8a1c2ab3de57d51df"
             },
             {
               "path": "scripts/bidi-isolated-packed-contract.mjs",
@@ -25834,6 +25933,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "compatibility/rc/matrices/library-exports.json",
@@ -27206,7 +27313,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-0064b4218b375b30b65bf1c13530d8620f20d980.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-0064b4218b375b30b65bf1c13530d8620f20d980.json",
       "source_check": {
         "prior_note": "The operator import removal belongs to the same upstream removal of the completion-state filter. The owned source keeps the stable public rxjs/operators distinctUntilChanged import, compatible with the existing RxJS peer range. No modern peer constructor, animation-engine helper, private import or consumer API migration is introduced. The constructor hunk removes both-state equality filtering while preserving the centered/leaving checks. The complete untouched historical base and actual owned base produce the same output histories for duplicate center/leave, real repeated cycles, changed source/destination, obsolete state and both origin names. Removing the filter changes those reference observations and is rejected. The current owned motion lifecycle is tested independently with47 cases/22 rejected mutants; the public group animationDone path and portal detach wiring remain. Keep the original output contract and require genuine trusted native completion on all registered modes/engines/runtimes.",
         "evidence_report_sha256": "8e5bba39c4e5bc9263672d7aeeff13a2c62f48b480a864684e16367df9424562"
@@ -27247,7 +27354,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/rc-verify.py",
@@ -27613,7 +27720,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-938f478efdc96ef0de1217e806f98939beb027cd.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-938f478efdc96ef0de1217e806f98939beb027cd.json",
       "disposition_history": [
         {
           "recorded_at_utc": "2026-10-15T17:25:13.249Z",
@@ -27654,11 +27761,11 @@
           "source_members": [
             {
               "path": "scripts/upstream-generated-identity-evidence.mjs",
-              "sha256": "442dd7910576051ce98d2bf4ad90fe1e1dbf648adc63dc05703bcb40fc8688fd"
+              "sha256": "c8b33d05150afe6c4a1d3e0ee59b0becdd0631f092a5758e38b5bb5932b073a1"
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/upstream-packed-run-evidence.mjs",
@@ -27670,7 +27777,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/generated-identity-packed-fixture.mjs",
@@ -27699,6 +27806,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "compatibility/rc/matrices/library-exports.json",
@@ -28059,7 +28174,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-ea0aed5a0cba3288d89e7448073e0a5556487313.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-ea0aed5a0cba3288d89e7448073e0a5556487313.json",
       "disposition_history": [
         {
           "recorded_at_utc": "2026-10-15T17:25:13.249Z",
@@ -28099,11 +28214,11 @@
           "source_members": [
             {
               "path": "scripts/upstream-generated-identity-evidence.mjs",
-              "sha256": "442dd7910576051ce98d2bf4ad90fe1e1dbf648adc63dc05703bcb40fc8688fd"
+              "sha256": "c8b33d05150afe6c4a1d3e0ee59b0becdd0631f092a5758e38b5bb5932b073a1"
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/upstream-packed-run-evidence.mjs",
@@ -28115,7 +28230,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/generated-identity-packed-fixture.mjs",
@@ -28144,6 +28259,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "compatibility/rc/matrices/library-exports.json",
@@ -28356,7 +28479,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-69968510fb0222ee565f57171640a99768efa972.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-69968510fb0222ee565f57171640a99768efa972.json",
       "disposition_history": [
         {
           "recorded_at_utc": "2026-10-15T17:25:13.249Z",
@@ -28396,11 +28519,11 @@
           "source_members": [
             {
               "path": "scripts/upstream-generated-identity-evidence.mjs",
-              "sha256": "442dd7910576051ce98d2bf4ad90fe1e1dbf648adc63dc05703bcb40fc8688fd"
+              "sha256": "c8b33d05150afe6c4a1d3e0ee59b0becdd0631f092a5758e38b5bb5932b073a1"
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/upstream-packed-run-evidence.mjs",
@@ -28412,7 +28535,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/generated-identity-packed-fixture.mjs",
@@ -28441,6 +28564,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "compatibility/rc/matrices/library-exports.json",
@@ -30313,7 +30444,7 @@
         "src/material/menu/menu-trigger.ts",
         "src/material/menu/menu.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/historical-roster-reconciliation-86a96c9290e3896485c6b6c0d039873652f543df.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-86a96c9290e3896485c6b6c0d039873652f543df.json",
       "batch_id": "closeout-menu-lazy-detachment-source-review",
       "recorded_at_utc": "2026-10-10T16:54:31.972573+00:00",
       "g11_claim": "not-passed",
@@ -30491,7 +30622,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/packed-consumer-evidence.mjs",
@@ -30503,7 +30634,7 @@
             },
             {
               "path": "scripts/upstream-artifact-behavior-evidence.mjs",
-              "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+              "sha256": "97196bb8c7a27e3501da839bd15ef612db4ee0134db5b9d8a1c2ab3de57d51df"
             },
             {
               "path": "scripts/bidi-isolated-packed-contract.mjs",
@@ -30520,6 +30651,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "compatibility/rc/matrices/library-exports.json",
@@ -31323,7 +31462,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-86ad5150110522873dae2801fd3c2957502949e7.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-86ad5150110522873dae2801fd3c2957502949e7.json",
       "source_review_followup": "compatibility/f10/disposition-ledger/evidence/closeout-reopened-select-source-review.json",
       "recorded_at_utc": "2026-10-16T02:41:33.522610+00:00",
       "individual_proof": {
@@ -31358,7 +31497,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
@@ -32549,7 +32688,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/historical-roster-reconciliation-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
       "source_check": {
         "kind": "individual-source-reviewed-runtime-required",
         "diff_sha256": "18b8d7b47b2f26e04cf1d50df6cc26d773af0cb8760c9f1015487e4af356cd90",
@@ -32674,7 +32813,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/packed-consumer-evidence.mjs",
@@ -32686,7 +32825,7 @@
             },
             {
               "path": "scripts/upstream-artifact-behavior-evidence.mjs",
-              "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+              "sha256": "97196bb8c7a27e3501da839bd15ef612db4ee0134db5b9d8a1c2ab3de57d51df"
             },
             {
               "path": "scripts/bidi-isolated-packed-contract.mjs",
@@ -32703,6 +32842,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "compatibility/rc/matrices/library-exports.json",
@@ -33047,7 +33194,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-9494ff2d65c98726046e6a20dd6a6d938e97a2f6.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-9494ff2d65c98726046e6a20dd6a6d938e97a2f6.json",
       "prior_dispositions": [
         {
           "sha": "9494ff2d65c98726046e6a20dd6a6d938e97a2f6",
@@ -33092,11 +33239,11 @@
           "source_members": [
             {
               "path": "scripts/upstream-selection-evidence.mjs",
-              "sha256": "ad26403d8e4b2ebfa8b9d98aaa6e3ef844e8cebaeee56ce6f3432fec0d226fb2"
+              "sha256": "3520e4504dd31914f0899c2736c41229a972f9b68a75249e5fe44711f04615a5"
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/upstream-packed-run-evidence.mjs",
@@ -33108,7 +33255,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/selection-comparator-packed-contract.mjs",
@@ -33117,6 +33264,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "scripts/selection-model-use-review.mjs",
@@ -34328,7 +34483,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/historical-roster-reconciliation-688c430fe8df09152ee59eb8a2ca62b5ba2fb81e.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-688c430fe8df09152ee59eb8a2ca62b5ba2fb81e.json",
       "prior_dispositions": [
         {
           "sha": "688c430fe8df09152ee59eb8a2ca62b5ba2fb81e",
@@ -34476,7 +34631,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/packed-consumer-evidence.mjs",
@@ -34488,7 +34643,7 @@
             },
             {
               "path": "scripts/upstream-artifact-behavior-evidence.mjs",
-              "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+              "sha256": "97196bb8c7a27e3501da839bd15ef612db4ee0134db5b9d8a1c2ab3de57d51df"
             },
             {
               "path": "scripts/bidi-isolated-packed-contract.mjs",
@@ -34505,6 +34660,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "compatibility/rc/matrices/library-exports.json",
@@ -50299,7 +50462,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-878700d10ab042b6a62c6f86f4fcc24d5a0ae685.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-878700d10ab042b6a62c6f86f4fcc24d5a0ae685.json",
       "prior_dispositions": [
         {
           "sha": "878700d10ab042b6a62c6f86f4fcc24d5a0ae685",
@@ -50352,7 +50515,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/rc-verify.py",
@@ -53103,7 +53266,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-25f391a3c545a1b829a74584c4f9235ab8d18497.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-25f391a3c545a1b829a74584c4f9235ab8d18497.json",
       "prior_dispositions": [
         {
           "sha": "25f391a3c545a1b829a74584c4f9235ab8d18497",
@@ -53148,11 +53311,11 @@
           "source_members": [
             {
               "path": "scripts/upstream-bidi-evidence.mjs",
-              "sha256": "146b245f86532b11330b863827f11fbb9792bc8e024a54251d8f600b2dc97fa8"
+              "sha256": "c1c12a976109f1e6f64718494c3b0d55fec1217f2dd983242bc1e468f0bada9e"
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/upstream-packed-run-evidence.mjs",
@@ -53164,7 +53327,7 @@
             },
             {
               "path": "scripts/packed-consumer-aot-smoke.mjs",
-              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+              "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
             },
             {
               "path": "scripts/bidi-isolated-packed-contract.mjs",
@@ -53185,6 +53348,14 @@
             {
               "path": "scripts/selection-comparator-packed-fixture.mjs",
               "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/native-date-packed-contract.mjs",
+              "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+            },
+            {
+              "path": "scripts/native-date-packed-fixture.mjs",
+              "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
             },
             {
               "path": "compatibility/rc/matrices/full-verify.json",
@@ -61994,7 +62165,7 @@
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-date-context-10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb.json",
       "current_owned_repair": {
         "path": "compatibility/rc/ripple-event-manager-source-proof.json",
         "sha256": "72abb9dfade645fef395c3d9507bead935ac889f06c3c80e33aeb592a07876cd"
@@ -62068,7 +62239,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+              "sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
             },
             {
               "path": "scripts/rc-verify.py",

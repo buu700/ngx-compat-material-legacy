@@ -7,6 +7,8 @@
  */
 /** Requalify unchanged product roles after the finite packed tooling change. */
 import assert from 'node:assert/strict';
+import {readNativeDatePackedBefore,nativeDateHistoricalProductRead} from './native-date-packed-source-context.mjs';
+import {readBidiIsolatedReviewBefore} from './bidi-isolated-packed-source-requalification.mjs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {readFileSync,writeFileSync,existsSync} from 'node:fs';
@@ -40,7 +42,10 @@ function replaceRows(text,updates){
  return text;
 }
 export function inspectPackedToolingEvidence({root=rootDefault,readMember}={}){
- const read=p=>readMember?readMember(p):readFileSync(resolve(root,p));
+ const actualRead = path => readMember ? readMember(path) : readFileSync(resolve(root, path));
+ const historicalRead = readMember || (path => readBidiIsolatedReviewBefore(path, name => readNativeDatePackedBefore(name, actualRead)));
+ const productParent = JSON.parse(historicalRead(inputPath)).source_parent;
+ const read = nativeDateHistoricalProductRead(productParent, historicalRead);
  const line=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';
  const input=read(inputPath);assert.equal(hash(input),pins[line],'dependency input changed');const inputs=JSON.parse(input);assert.equal(inputs.line,line);
  const stored=read(inputs.prior.path);assert.equal(hash(stored),inputs.prior.sha256,'prior dependency archive changed');

@@ -7,6 +7,7 @@
  */
 /** Exact finite preceding-source projection only. Never a runtime evidence reader. */
 import assert from 'node:assert/strict';
+import {reverseNativeDatePackedSource,nativeDateRequirementsBefore} from './native-date-packed-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
@@ -55,9 +56,11 @@ export function selectionComparatorSourceContext(readMember = path => readFileSy
   const result = {data, prior}; cache.set(data.line, result); return result;
 }
 export function reverseSelectionComparatorSource(path, text, options = {}) {
-  if (!sourcePaths.has(path)) return text;
+  if (!sourcePaths.has(path)) return reverseNativeDatePackedSource(path, text, options);
   const {data, prior} = selectionComparatorSourceContext(options.readMember), before = prior.members.find(row => row.path === path);
   assert.ok(before); if (hash(text) === before.sha256) return text;
+  text = reverseNativeDatePackedSource(path, text, options);
+  if (hash(text) === before.sha256) return text;
   const change = data.source_changes.find(row => row.path === path); assert.ok(change, 'unreviewed selection comparator source path');
   assert.equal(hash(text), change.current_sha256, 'unreviewed selection comparator source change');
   let result = text;
@@ -81,6 +84,8 @@ export function selectionRequirementsBefore(sha, current, line, options = {}) {
   const {data} = selectionComparatorSourceContext(options.readMember);
   const row = data.before_requirements.find(row => row.sha === sha && (row.line === 'any' || row.line === line));
   assert.ok(row, 'unregistered preceding selection context requirements');
+  if (JSON.stringify(current) === JSON.stringify(row.definition)) return structuredClone(row.definition);
+  current = nativeDateRequirementsBefore(sha, current, line, options);
   if (JSON.stringify(current) === JSON.stringify(row.definition)) return structuredClone(row.definition);
   assert.ok(current && Array.isArray(current.members));
   assert.ok(data.new_dependencies.every(path => current.members.filter(value => value === path).length === 1));

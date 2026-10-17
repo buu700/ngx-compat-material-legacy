@@ -21,7 +21,8 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=path=>read
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex'),oid=(kind,text)=>createHash('sha1').update(kind+' '+Buffer.byteLength(text)+'\0').update(text).digest('hex');
 const line=json('projects/ngx-material-legacy/package.json').version.startsWith('21.')?'21.x':'main';
 const packet=JSON.parse(gunzipSync(read('compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz'))),pins=dateTooltipSliderPins({root});
-const ids=[...packet.subjects.map(row=>row.sha),'b423c0e0b754b1f1d118d17e022981c357c3aa68'];
+const nativeDateSha='b423c0e0b754b1f1d118d17e022981c357c3aa68';
+const ids=[...packet.subjects.map(row=>row.sha),nativeDateSha];
 const entries=new Map(json('compatibility/f10/disposition-ledger/ledger.json').entries.map(row=>[row.sha,row]));
 let originalHunks=0,originalBlobs=0;
 for(const[index,subject]of packet.subjects.entries()){
@@ -51,6 +52,7 @@ try{
   const entry=structuredClone(entries.get(sha)),review=json(entry.evidence_report),patch=read(review.patch_file);
   assert.equal(hash(patch),review.diff_sha256);assert.equal(review.diff_sha256,entry.individual_proof.diff_sha256);assert.deepEqual(entry.individual_proof.affected_branches,[line]);
   put(entry.evidence_report,read(entry.evidence_report));put('seed.json',{commits:[{sha}],fixture_only:true});
+  if(sha===nativeDateSha)for(const member of entry.individual_proof.native_date_behavior.source_members)put(member.path,read(member.path));
   const cases=[];
   function check(name,mutate,valid,requestLine=line){
    const candidate=structuredClone(entry);candidate.bucket='security-deep'; // Test-only trigger for individualPatchBound on all four actual source reviews.
@@ -61,11 +63,14 @@ try{
     '--symbols',join(repo,'symbols.json'),'--report',out],{cwd:repo,encoding:'utf8',timeout:15000,
       env:Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('RC_')))});
    assert.equal(child.status,1,name+': '+child.stderr);assert.ok(child.stdout,name+child.stderr);
-   const body=JSON.parse(child.stdout);assert.equal(body.insufficient_sensitive,valid?0:1,name+': '+child.stderr);
+   const body=JSON.parse(child.stdout),detail=JSON.parse(readFileSync(out));
+   const nativeCurrentRequired=sha===nativeDateSha;
+   assert.equal(body.insufficient_sensitive,valid&&!nativeCurrentRequired?0:1,name+': '+child.stderr);
+   if(nativeCurrentRequired)assert.equal(detail.artifact_behavior_evidence.some(row=>row.sha===sha&&row.ok===false&&row.detail==='missing coordinator run'),valid,name+': current native admission must remain unqualified');
    assert.equal(body.insufficient_inherited,0);assert.equal(body.authored_use_review_evidence.insufficient,1736);
-   assert.equal(body.current_authored_use_inventory.current_source_files,1);assert.equal(body.disposition_admission,'incomplete');
+   assert.equal(body.current_authored_use_inventory.current_source_files,sha===nativeDateSha?4:1);assert.equal(body.disposition_admission,'incomplete');
    assert.equal(body.g11_claim,'not-passed');assert.equal(body.security_clearance,'not-passed');
-   cases.push({name,individual_patch_binding:valid?'accepted':'rejected',overall_admission:'incomplete',fixture_only:true,child_exit:child.status});
+   cases.push({name,individual_patch_binding:valid?'accepted':'rejected',native_current_run_still_required:sha===nativeDateSha,overall_admission:'incomplete',fixture_only:true,child_exit:child.status});
    // Remove symlinks before restoring the normal file for the next control.
    if(name==='symlink-patch')unlinkSync(target);
   }

@@ -26,6 +26,7 @@ export const SELECT_FOCUS_MEMBERS = Object.freeze([
   'scripts/chip-menu-tooltip-packed-contract.mjs',
   'scripts/bidi-isolated-packed-contract.mjs', 'scripts/bidi-isolated-packed-fixture.mjs',
   'scripts/selection-comparator-packed-contract.mjs', 'scripts/selection-comparator-packed-fixture.mjs',
+  'scripts/native-date-packed-contract.mjs', 'scripts/native-date-packed-fixture.mjs',
   'scripts/upstream-artifact-behavior-evidence.mjs',
   'scripts/select-focus-click-packed-fixture.mjs',
   'scripts/select-focus-click-packed-contract.mjs',
@@ -41,6 +42,7 @@ const producerMembers = [
   'scripts/chip-menu-tooltip-packed-contract.mjs', 'scripts/upstream-artifact-behavior-evidence.mjs',
   'scripts/bidi-isolated-packed-contract.mjs', 'scripts/bidi-isolated-packed-fixture.mjs',
   'scripts/selection-comparator-packed-contract.mjs', 'scripts/selection-comparator-packed-fixture.mjs',
+  'scripts/native-date-packed-contract.mjs', 'scripts/native-date-packed-fixture.mjs',
   'compatibility/rc/matrices/library-exports.json', 'compatibility/rc/matrices/full-verify.json',
 ];
 export const SELECT_DETACH_MEMBERS = Object.freeze([

@@ -7,6 +7,7 @@
  */
 /** Actual collector/writer controls; structured native input is synthetic. */
 import assert from 'node:assert/strict';
+import {reverseNativeDatePackedSource} from '../scripts/native-date-packed-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {readFileSync, writeFileSync, mkdtempSync, mkdirSync, rmSync} from 'node:fs';
@@ -120,8 +121,9 @@ const sourceMutants = [fixture.replace("from '@angular/cdk/collections'", "from 
   fixture.replace('node.isConnected', 'true'), fixture.replace('subscription?.unsubscribe()', 'model.changed.next({})'),
   fixture.replace('fixture.detectChanges()', 'fixture.ngOnDestroy()')];
 for (const [index, mutant] of sourceMutants.entries()) {assert.notEqual(mutant, fixture); assert.throws(() => validateFixture(mutant), 'fixture source mutant ' + index);}
-const change = JSON.parse(read('compatibility/rc/selection-comparator-packed-producer-change.json')); assert.equal(hash(raw), change.current_sha256);
-let recovered = raw; for (const [before, after] of [...change.edits].reverse()) {assert.equal(recovered.split(after).length, 2); recovered = recovered.replace(after, () => before);}
+const change = JSON.parse(read('compatibility/rc/selection-comparator-packed-producer-change.json'));
+let recovered = reverseNativeDatePackedSource('scripts/packed-consumer-aot-smoke.mjs', raw, {readMember:read});
+assert.equal(hash(recovered), change.current_sha256); for (const [before, after] of [...change.edits].reverse()) {assert.equal(recovered.split(after).length, 2); recovered = recovered.replace(after, () => before);}
 assert.equal(hash(recovered), change.before_sha256);
 assert.ok(recovered.includes("selectionList.selectedOptions.setSelection({value:'one'} as typeof selectionOptions[number]);fixture.detectChanges();"));
 const result = {schema_version: 1, line, semantic_and_actual_collector_defects_rejected: mutations.length + 6,

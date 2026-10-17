@@ -7,6 +7,7 @@
  */
 /** Exact reviewed source projection only; never product/runtime qualification. */
 import assert from 'node:assert/strict';
+import {nativeDateCurrentRead} from './native-date-packed-source-context.mjs';
 import {reverseSelectionComparatorSource, selectionRequirementsBefore} from './selection-comparator-packed-source-context.mjs';
 import {readBidiPeerReviewSubject} from './bidi-peer-source-context.mjs';
 import {createHash} from 'node:crypto';
@@ -78,6 +79,7 @@ export function bidiChipSourceLedger(readMember) {
 /** Replay the earlier authored-use test's exact review subject. Current stores
  * may differ only by this worksheet's review pointer and one history receipt. */
 export function readBidiIsolatedReviewBefore(path, readMember) {
+  readMember = nativeDateCurrentRead(readMember);
   const isStore = ['compatibility/f10/authored-dependency-dispositions.json',
     'compatibility/f10/authored-dependency-current-dispositions.json'].includes(path);
   const supplied = readMember(path);

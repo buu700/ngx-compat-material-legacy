@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.native_date_source_context import project_native_date_context
 
 ROOT=Path(__file__).resolve().parents[1]
 EDITS_SHA='ea6ba2b3af372490fd22f0579a6b679b295c98fa7ed08d5af8a5dcd8bc0014da'
@@ -22,7 +23,7 @@ SUFFIX=' Require both actual installed minimum-peer identities and the exact nat
 
 def project_media_matcher_context(root,read_member=None):
     """Check the exact complete transition before projecting its retained parent."""
-    read=read_member or (lambda p:(root/p).read_bytes())
+    _,read=project_native_date_context(root,read_member)
     load=lambda p:json.loads(read(p))
     digest=lambda b:hashlib.sha256(b).hexdigest()
     for member,pin in MODULE_PINS.items():assert digest(read(member))==pin

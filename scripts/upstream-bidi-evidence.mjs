@@ -142,6 +142,7 @@ const commonMembers = [
   'scripts/packed-consumer-aot-smoke.mjs', 'scripts/bidi-isolated-packed-contract.mjs',
   'scripts/bidi-isolated-packed-fixture.mjs', 'scripts/bidi-module-use-review.mjs',
   'scripts/selection-comparator-packed-contract.mjs', 'scripts/selection-comparator-packed-fixture.mjs',
+  'scripts/native-date-packed-contract.mjs', 'scripts/native-date-packed-fixture.mjs',
   'compatibility/rc/matrices/full-verify.json', 'compatibility/rc/matrices/library-exports.json',
   'compatibility/rc/material-public-subjects.json', 'projects/ngx-material-legacy/package.json',
   'projects/ngx-material-legacy/legacy-form-field/form-field-module.ts',

@@ -7,6 +7,7 @@
  */
 /** Finite source-context repair. No new semantic closure or runtime credit. */
 import assert from 'node:assert/strict';
+import {readNativeDatePackedBefore,nativeDateHistoricalProductRead} from './native-date-packed-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {execFileSync} from 'node:child_process';
@@ -16,7 +17,7 @@ import {dirname, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {reverseBidiIsolatedPackedSource, bidiRequirementsBefore} from './bidi-isolated-packed-source-requalification.mjs';
 import {artifactBehaviorRequirements} from './upstream-artifact-behavior-evidence.mjs';
-import {selectionRequirementsBefore} from './selection-comparator-packed-source-context.mjs';
+import {selectionRequirementsBefore,readSelectionComparatorBefore} from './selection-comparator-packed-source-context.mjs';
 import {generatedIdentityRequirements} from './upstream-generated-identity-evidence.mjs';
 import {authoredUseReviewEvidence} from './authored-use-inventory.mjs';
 import {scanCurrentAuthoredUses, currentAuthoredUseAdmission} from './authored-current-use-inventory.mjs';
@@ -44,7 +45,10 @@ function replaceRows(text, property, updates, rowKey) {
   return Buffer.from(text);
 }
 export function inspectBidiIsolatedRequalification({root = rootDefault, readMember} = {}) {
-  const read = path => readMember ? readMember(path) : readFileSync(resolve(root, path));
+  const actualRead = path => readMember ? readMember(path) : readFileSync(resolve(root, path));
+  const historicalRead = readMember || (path => readSelectionComparatorBefore(path, name => readNativeDatePackedBefore(name, actualRead)));
+  const productParent = JSON.parse(historicalRead(inputPath)).source_parent;
+  const read = nativeDateHistoricalProductRead(productParent, historicalRead);
   const line = JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.') ? '21.x' : 'main';
   // This call authenticates the input pin and complete archive before parsing it here.
   reverseBidiIsolatedPackedSource('scripts/packed-consumer-aot-smoke.mjs', read('scripts/packed-consumer-aot-smoke.mjs').toString(), line, {readMember: read});
