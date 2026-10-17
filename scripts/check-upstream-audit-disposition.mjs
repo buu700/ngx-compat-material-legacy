@@ -52,6 +52,7 @@ import {SLIDER_THUMB_DESTROY_SHA, SLIDER_THUMB_DESTROY_ROLE, sliderThumbDestroyE
 import {BAZEL_BUILD_SHAS, BAZEL_BUILD_ROLE, bazelBuildEvidenceOk} from './upstream-bazel-build-scope.mjs';
 import {TEST_IMPORT_ROLE, TEST_IMPORT_SHAS, testImportBatchOk, testImportEntryOk} from './upstream-test-import-cleanup-evidence.mjs';
 import {requiresBootstrapPreparation, bootstrapPreparationEntryOk} from './bootstrap-stability-evidence.mjs';
+import {MODERN_CHIP_SCOPE_ROLE,requiresModernChipScope,modernChipScopeEvidenceOk} from './upstream-modern-chip-scope.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -161,6 +162,7 @@ function evidenceJson(file) {
 function evidenceClass(entry) {
   const rel = entry.evidence_report;
   if (typeof rel !== 'string' || !rel.trim()) return 'missing';
+  if (requiresModernChipScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-modern-chip-source-scope';
   if (TEST_IMPORT_SHAS.includes(entry.sha) && !rel.endsWith('.json')) return 'invalid-test-import-cleanup-scope';
   if (SLIDER_INPUT_SHAS.includes(entry.sha) && !rel.endsWith('.json')) return 'invalid-slider-input-scope';
   if (entry.sha === SLIDER_THUMB_DESTROY_SHA && !rel.endsWith('.json')) return 'invalid-slider-thumb-destroy-scope';
@@ -177,6 +179,10 @@ function evidenceClass(entry) {
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
     if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';
+    if (requiresModernChipScope(entry,entry.individual_proof) || body.role === MODERN_CHIP_SCOPE_ROLE) {
+      const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};
+      if (!modernChipScopeEvidenceOk(body,entry,readMember,candidateProductSourcePaths(root).sort(),line || body.line)) return 'invalid-modern-chip-source-scope';
+    }
     if (TEST_IMPORT_SHAS.includes(entry.sha) || body.role === TEST_IMPORT_ROLE) {
       const readMember = rel => {const member = regularRepoMember(rel); return member ? readFileSync(member) : null;};
       if (!testImportCache.has(file)) testImportCache.set(file, testImportBatchOk(body, readMember, line || body.line));
