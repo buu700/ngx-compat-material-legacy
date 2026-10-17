@@ -1,0 +1,115 @@
+diff --git a/src/cdk/stepper/stepper.ts b/src/cdk/stepper/stepper.ts
+index 7d588386fa93c77520d500678aabed49de3502bf..6d17ba3e120c675c718490e64a9a88eccd0ffce1 100644
+--- a/src/cdk/stepper/stepper.ts
++++ b/src/cdk/stepper/stepper.ts
+@@ -402,6 +402,16 @@ export class CdkStepper implements AfterContentInit, AfterViewInit, OnDestroy {
+     if (!this._isValidIndex(this._selectedIndex)) {
+       this._selectedIndex = 0;
+     }
++
++    // For linear step and selected index is greater than zero,
++    // set all the previous steps to interacted so that we can navigate to previous steps.
++    if (this.linear && this._selectedIndex > 0) {
++      const visitedSteps = this.steps.toArray().slice(0, this._selectedIndex);
++
++      for (const step of visitedSteps) {
++        step._markAsInteracted();
++      }
++    }
+   }
+ 
+   ngOnDestroy() {
+diff --git a/src/material/stepper/stepper.spec.ts b/src/material/stepper/stepper.spec.ts
+index feb4c497012cf0fca9f738e3157d6e05464f362a..2a09bff7141962b305e435078587fda53cd75c26 100644
+--- a/src/material/stepper/stepper.spec.ts
++++ b/src/material/stepper/stepper.spec.ts
+@@ -912,6 +912,27 @@ describe('MatStepper', () => {
+     });
+   });
+ 
++  describe('linear stepper with form already filled and on to the last step', () => {
++    let fixture: ComponentFixture<LinearMatVerticalStepperAppForAlreadyFilledForm>;
++    let stepper: MatStepper;
++
++    beforeEach(() => {
++      fixture = createComponent(LinearMatVerticalStepperAppForAlreadyFilledForm);
++      fixture.detectChanges();
++      stepper = fixture.debugElement.query(By.directive(MatStepper))!.componentInstance;
++    });
++
++    it('should navigate to previous steps', () => {
++      expect(stepper.selectedIndex).toBe(2);
++
++      stepper.previous();
++      expect(stepper.selectedIndex).toBe(1);
++
++      stepper.previous();
++      expect(stepper.selectedIndex).toBe(0);
++    });
++  });
++
+   describe('linear stepper with no `stepControl`', () => {
+     let noStepControlFixture: ComponentFixture<SimpleStepperWithoutStepControl>;
+     beforeEach(() => {
+@@ -1984,6 +2005,61 @@ class SimplePreselectedMatHorizontalStepperApp {
+   index = 0;
+ }
+ 
++@Component({
++  template: `
++    <mat-stepper linear [selectedIndex]="selectedIndex()">
++      <mat-step [stepControl]="oneGroup">
++        <form [formGroup]="oneGroup">
++          <ng-template matStepLabel>Step one</ng-template>
++          <input formControlName="oneCtrl" required>
++          <div>
++            <button matStepperPrevious>Back</button>
++            <button matStepperNext>Next</button>
++          </div>
++        </form>
++      </mat-step>
++      <mat-step [stepControl]="twoGroup">
++        <form [formGroup]="twoGroup">
++          <ng-template matStepLabel>Step two</ng-template>
++          <input formControlName="twoCtrl" required>
++          <div>
++            <button matStepperPrevious>Back</button>
++            <button matStepperNext>Next</button>
++          </div>
++        </form>
++      </mat-step>
++      <mat-step [stepControl]="threeGroup" optional>
++        <form [formGroup]="threeGroup">
++          <ng-template matStepLabel>Step two</ng-template>
++          <input formControlName="threeCtrl">
++          <div>
++            <button matStepperPrevious>Back</button>
++            <button matStepperNext>Next</button>
++          </div>
++        </form>
++      </mat-step>
++      <mat-step>
++        Done
++      </mat-step>
++    </mat-stepper>
++  `,
++  imports: [ReactiveFormsModule, MatStepperModule],
++  standalone: false,
++})
++class LinearMatVerticalStepperAppForAlreadyFilledForm {
++  selectedIndex = signal(2);
++
++  oneGroup = new FormGroup({
++    oneCtrl: new FormControl('test 1', Validators.required),
++  });
++  twoGroup = new FormGroup({
++    twoCtrl: new FormControl('test 2', Validators.required),
++  });
++  threeGroup = new FormGroup({
++    threeCtrl: new FormControl('test 3', Validators.required),
++  });
++}
++
+ @Component({
+   template: `
+     <mat-stepper linear>

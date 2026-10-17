@@ -1,0 +1,80 @@
+diff --git a/goldens/cdk/accordion/index.api.md b/goldens/cdk/accordion/index.api.md
+index 8e6254e6293fa264e5c18cddb655846b2d312ff2..bcb6931f8f805f17d9b3ec4084428fbc7871a929 100644
+--- a/goldens/cdk/accordion/index.api.md
++++ b/goldens/cdk/accordion/index.api.md
+@@ -44,7 +44,8 @@ export class CdkAccordionItem implements OnInit, OnDestroy {
+     close(): void;
+     readonly closed: EventEmitter<void>;
+     readonly destroyed: EventEmitter<void>;
+-    disabled: boolean;
++    get disabled(): boolean;
++    set disabled(value: boolean);
+     get expanded(): boolean;
+     set expanded(expanded: boolean);
+     readonly expandedChange: EventEmitter<boolean>;
+diff --git a/src/cdk/accordion/accordion-item.ts b/src/cdk/accordion/accordion-item.ts
+index 97a9cdd07d5b7e17a7d8dd1f626d5ba0bac864ab..bd32f3f10d8c063c5aad58e15f6f7b21320a2730 100644
+--- a/src/cdk/accordion/accordion-item.ts
++++ b/src/cdk/accordion/accordion-item.ts
+@@ -16,6 +16,7 @@ import {
+   booleanAttribute,
+   inject,
+   OnInit,
++  signal,
+ } from '@angular/core';
+ import {_IdGenerator} from '../a11y';
+ import {UniqueSelectionDispatcher} from '../collections';
+@@ -90,7 +91,14 @@ export class CdkAccordionItem implements OnInit, OnDestroy {
+   private _expanded = false;
+ 
+   /** Whether the AccordionItem is disabled. */
+-  @Input({transform: booleanAttribute}) disabled: boolean = false;
++  @Input({transform: booleanAttribute})
++  get disabled() {
++    return this._disabled();
++  }
++  set disabled(value: boolean) {
++    this._disabled.set(value);
++  }
++  private _disabled = signal(false);
+ 
+   /** Unregister function for _expansionDispatcher. */
+   private _removeUniqueSelectionListener: () => void = () => {};
+diff --git a/src/material/expansion/accordion.spec.ts b/src/material/expansion/accordion.spec.ts
+index 10445635c270c0ce51c2cd1fe249e97404dac9fe..b1ce7dac589c3267f9df86f66c9b95df32eb9436 100644
+--- a/src/material/expansion/accordion.spec.ts
++++ b/src/material/expansion/accordion.spec.ts
+@@ -5,13 +5,7 @@ import {
+   dispatchEvent,
+   dispatchKeyboardEvent,
+ } from '@angular/cdk/testing/private';
+-import {
+-  Component,
+-  provideCheckNoChangesConfig,
+-  QueryList,
+-  ViewChild,
+-  ViewChildren,
+-} from '@angular/core';
++import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';
+ import {TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {
+@@ -25,18 +19,6 @@ describe('MatAccordion', () => {
+   let focusMonitor: FocusMonitor;
+ 
+   beforeEach(waitForAsync(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideCheckNoChangesConfig({exhaustive: false})],
+-      imports: [
+-        MatExpansionModule,
+-        AccordionWithHideToggle,
+-        AccordionWithTogglePosition,
+-        NestedPanel,
+-        SetOfItems,
+-        NestedAccordions,
+-      ],
+-    });
+-
+     focusMonitor = TestBed.inject(FocusMonitor);
+   }));
+ 

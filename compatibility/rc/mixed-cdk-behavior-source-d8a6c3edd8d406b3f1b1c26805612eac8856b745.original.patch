@@ -1,0 +1,234 @@
+diff --git a/src/cdk/a11y/live-announcer/live-announcer.spec.ts b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+index 60fb25a0e97371548eb4ecc515035d2f08648160..0dcd02dff1057a88c30939d976af582a01769b5c 100644
+--- a/src/cdk/a11y/live-announcer/live-announcer.spec.ts
++++ b/src/cdk/a11y/live-announcer/live-announcer.spec.ts
+@@ -7,8 +7,8 @@ import {By} from '@angular/platform-browser';
+ import {A11yModule} from '../index';
+ import {LiveAnnouncer} from './live-announcer';
+ import {
+-  LIVE_ANNOUNCER_ELEMENT_TOKEN,
+   LIVE_ANNOUNCER_DEFAULT_OPTIONS,
++  LIVE_ANNOUNCER_ELEMENT_TOKEN,
+   LiveAnnouncerDefaultOptions,
+ } from './live-announcer-tokens';
+ 
+@@ -291,7 +291,7 @@ describe('CdkAriaLive', () => {
+   let announcerSpy: jasmine.Spy;
+   let fixture: ComponentFixture<DivWithCdkAriaLive>;
+ 
+-  const invokeMutationCallbacks = () => mutationCallbacks.forEach(cb => cb());
++  const invokeMutationCallbacks = () => mutationCallbacks.forEach(cb => cb([{type: 'fake'}]));
+ 
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+diff --git a/src/cdk/observers/observe-content.spec.ts b/src/cdk/observers/observe-content.spec.ts
+index 3cf26edbcd3750a60c6728fdfd848ed1e6be9018..7caa7d0cc19d6cfccffb9f581201583f8c228abf 100644
+--- a/src/cdk/observers/observe-content.spec.ts
++++ b/src/cdk/observers/observe-content.spec.ts
+@@ -1,11 +1,11 @@
+ import {Component, ElementRef, ViewChild} from '@angular/core';
+ import {
+-  waitForAsync,
+   ComponentFixture,
++  TestBed,
+   fakeAsync,
+   inject,
+-  TestBed,
+   tick,
++  waitForAsync,
+ } from '@angular/core/testing';
+ import {ContentObserver, MutationObserverFactory, ObserversModule} from './observe-content';
+ 
+@@ -112,9 +112,9 @@ describe('Observe content directive', () => {
+     }));
+ 
+     it('should debounce the content changes', fakeAsync(() => {
+-      invokeCallbacks();
+-      invokeCallbacks();
+-      invokeCallbacks();
++      invokeCallbacks([{type: 'fake'}]);
++      invokeCallbacks([{type: 'fake'}]);
++      invokeCallbacks([{type: 'fake'}]);
+ 
+       tick(500);
+       expect(fixture.componentInstance.spy).toHaveBeenCalledTimes(1);
+@@ -166,7 +166,7 @@ describe('ContentObserver injectable', () => {
+       expect(spy).not.toHaveBeenCalled();
+ 
+       fixture.componentInstance.text = 'text';
+-      invokeCallbacks();
++      invokeCallbacks([{type: 'fake'}]);
+ 
+       expect(spy).toHaveBeenCalled();
+     }));
+@@ -186,19 +186,90 @@ describe('ContentObserver injectable', () => {
+         expect(mof.create).toHaveBeenCalledTimes(1);
+ 
+         fixture.componentInstance.text = 'text';
+-        invokeCallbacks();
++        invokeCallbacks([{type: 'fake'}]);
+ 
+         expect(spy).toHaveBeenCalledTimes(2);
+ 
+         spy.calls.reset();
+         sub1.unsubscribe();
+         fixture.componentInstance.text = 'text text';
+-        invokeCallbacks();
++        invokeCallbacks([{type: 'fake'}]);
+ 
+         expect(spy).toHaveBeenCalledTimes(1);
+       }),
+     ));
+   });
++
++  describe('real behavior', () => {
++    let spy: jasmine.Spy;
++    let contentEl: HTMLElement;
++    let contentObserver: ContentObserver;
++
++    beforeEach(waitForAsync(() => {
++      TestBed.configureTestingModule({
++        imports: [ObserversModule, UnobservedComponentWithTextContent],
++      });
++
++      TestBed.compileComponents();
++      const fixture = TestBed.createComponent(UnobservedComponentWithTextContent);
++      fixture.autoDetectChanges();
++      spy = jasmine.createSpy('content observer');
++      contentObserver = TestBed.inject(ContentObserver);
++      contentEl = fixture.componentInstance.contentEl.nativeElement;
++      contentObserver.observe(contentEl).subscribe(spy);
++    }));
++
++    it('should ignore addition or removal of comments', waitForAsync(async () => {
++      const comment = document.createComment('cool');
++      await new Promise(r => setTimeout(r));
++
++      spy.calls.reset();
++      contentEl.appendChild(comment);
++      await new Promise(r => setTimeout(r));
++      expect(spy).not.toHaveBeenCalled();
++
++      comment.remove();
++      await new Promise(r => setTimeout(r));
++      expect(spy).not.toHaveBeenCalled();
++    }));
++
++    it('should not ignore addition or removal of text', waitForAsync(async () => {
++      const text = document.createTextNode('cool');
++      await new Promise(r => setTimeout(r));
++
++      spy.calls.reset();
++      contentEl.appendChild(text);
++      await new Promise(r => setTimeout(r));
++      expect(spy).toHaveBeenCalled();
++
++      spy.calls.reset();
++      text.remove();
++      await new Promise(r => setTimeout(r));
++      expect(spy).toHaveBeenCalled();
++    }));
++
++    it('should ignore comment content change', waitForAsync(async () => {
++      const comment = document.createComment('cool');
++      contentEl.appendChild(comment);
++      await new Promise(r => setTimeout(r));
++
++      spy.calls.reset();
++      comment.textContent = 'beans';
++      await new Promise(r => setTimeout(r));
++      expect(spy).not.toHaveBeenCalled();
++    }));
++
++    it('should not ignore text content change', waitForAsync(async () => {
++      const text = document.createTextNode('cool');
++      contentEl.appendChild(text);
++      await new Promise(r => setTimeout(r));
++
++      spy.calls.reset();
++      text.textContent = 'beans';
++      await new Promise(r => setTimeout(r));
++      expect(spy).toHaveBeenCalled();
++    }));
++  });
+ });
+ 
+ @Component({
+diff --git a/src/cdk/observers/observe-content.ts b/src/cdk/observers/observe-content.ts
+index c4da23b1b06169cb0fbb5c0f284b303fde2cd5ea..bbaf519ff926ea0aa9e96597098fdb988451e401 100644
+--- a/src/cdk/observers/observe-content.ts
++++ b/src/cdk/observers/observe-content.ts
+@@ -6,7 +6,7 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {coerceNumberProperty, coerceElement, NumberInput} from '@angular/cdk/coercion';
++import {NumberInput, coerceElement, coerceNumberProperty} from '@angular/cdk/coercion';
+ import {
+   AfterContentInit,
+   Directive,
+@@ -20,8 +20,35 @@ import {
+   Output,
+   booleanAttribute,
+ } from '@angular/core';
+-import {Observable, Subject, Subscription, Observer} from 'rxjs';
+-import {debounceTime} from 'rxjs/operators';
++import {Observable, Observer, Subject, Subscription} from 'rxjs';
++import {debounceTime, filter, map} from 'rxjs/operators';
++
++// Angular may add, remove, or edit comment nodes during change detection. We don't care about
++// these changes because they don't affect the user-preceived content, and worse it can cause
++// infinite change detection cycles where the change detection updates a comment, triggering the
++// MutationObserver, triggering another change detection and kicking the cycle off again.
++function shouldIgnoreRecord(record: MutationRecord) {
++  // Ignore changes to comment text.
++  if (record.type === 'characterData' && record.target instanceof Comment) {
++    return true;
++  }
++  // Ignore addition / removal of comments.
++  if (record.type === 'childList') {
++    for (let i = 0; i < record.addedNodes.length; i++) {
++      if (!(record.addedNodes[i] instanceof Comment)) {
++        return false;
++      }
++    }
++    for (let i = 0; i < record.removedNodes.length; i++) {
++      if (!(record.removedNodes[i] instanceof Comment)) {
++        return false;
++      }
++    }
++    return true;
++  }
++  // Observe everything else.
++  return false;
++}
+ 
+ /**
+  * Factory that creates a new MutationObserver and allows us to stub it out in unit tests.
+@@ -70,7 +97,12 @@ export class ContentObserver implements OnDestroy {
+ 
+     return new Observable((observer: Observer<MutationRecord[]>) => {
+       const stream = this._observeElement(element);
+-      const subscription = stream.subscribe(observer);
++      const subscription = stream
++        .pipe(
++          map(records => records.filter(record => !shouldIgnoreRecord(record))),
++          filter(records => !!records.length),
++        )
++        .subscribe(observer);
+ 
+       return () => {
+         subscription.unsubscribe();
+diff --git a/src/material/tabs/tab-header.spec.ts b/src/material/tabs/tab-header.spec.ts
+index 66d741ad5a5849f12de2ac09836c66a22bd16f5e..bcdc940093e163551faf32496f859cb670fc1e74 100644
+--- a/src/material/tabs/tab-header.spec.ts
++++ b/src/material/tabs/tab-header.spec.ts
+@@ -715,7 +715,7 @@ describe('MDC-based MatTabHeader', () => {
+         label.textContent += extraText;
+       });
+ 
+-      mutationCallbacks.forEach(callback => callback());
++      mutationCallbacks.forEach(callback => callback([{type: 'fake'}]));
+       fixture.detectChanges();
+ 
+       expect(tabHeaderElement.classList).toContain(enabledClass);
