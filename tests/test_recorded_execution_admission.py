@@ -19,6 +19,7 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
+from tests.recorded_execution_source_context import recorded_implementation_subject
 
 ROOT=Path(__file__).resolve().parents[1]
 LINE='21.x' if json.loads((ROOT/'projects/ngx-material-legacy/package.json').read_bytes())['version'].startswith('21.') else 'main'
@@ -33,7 +34,7 @@ class RecordedExecutionAdmissionTests(unittest.TestCase):
         prior=json.loads(raw);original=subprocess.check_output(['git','--no-replace-objects','show',task['source_parent']+':'+prior['ledger_path']],cwd=ROOT)
         self.assertEqual(prior['ledger_text'].encode(),original)
         old={row['sha']:row for row in json.loads(original)['entries']}
-        current={row['sha']:row for row in json.loads((ROOT/prior['ledger_path']).read_bytes())['entries']}
+        current={row['sha']:row for row in json.loads(recorded_implementation_subject(ROOT,prior['ledger_path']))['entries']}
         self.assertEqual(set(old),set(current));self.assertEqual(len(current),1697)
         for sha,row in current.items():
             self.assertEqual(row['final_disposition'],old[sha]['final_disposition'])

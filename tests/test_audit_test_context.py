@@ -13,6 +13,7 @@ from pathlib import Path
 import subprocess
 import unittest
 from tests.native_date_source_context import project_native_date_context
+from tests.recorded_execution_source_context import recorded_source_context
 from unittest.mock import patch
 from tests.audit_test_context import (assert_native_review,assert_runtime_roster,
     native_contracts,prior_source_entry,read_original_patch,read_review)
@@ -50,7 +51,10 @@ class AuditTestContext(unittest.TestCase):
         for member in [LEDGER,'compatibility/f10/authored-dependency-dispositions.json','compatibility/f10/authored-dependency-current-dispositions.json']:
             self.assertEqual(read(member),subprocess.check_output(['git','show',task['source_parent']+':'+member],cwd=ROOT))
         self.assertEqual(subprocess.check_output(['git','diff',task['source_parent'],'--name-only','--','projects','testing','reference','fixtures'],cwd=ROOT),b'')
-        changed=subprocess.check_output(['git','diff',task['source_parent'],'--name-only','--','scripts'],cwd=ROOT).decode().splitlines()
+        # This exact earlier test transition is checked at its sealed source commit.
+        # The current complete28/27 guard census is checked independently below.
+        historical_head=recorded_source_context(ROOT,lambda p:(ROOT/p).read_bytes())[0]['baseline']
+        changed=subprocess.check_output(['git','diff',task['source_parent'],historical_head,'--name-only','--','scripts'],cwd=ROOT).decode().splitlines()
         new_context={p for p in changed if read(p)!=(ROOT/p).read_bytes()}
         new_files={'scripts/upstream-native-date-evidence.mjs','scripts/native-date-packed-contract.mjs','scripts/native-date-packed-fixture.mjs','scripts/native-date-packed-source-context.mjs'}
         self.assertTrue(set(changed)-new_context-new_files<={'scripts/historical-source-replay.mjs'})
@@ -60,7 +64,7 @@ class AuditTestContext(unittest.TestCase):
             import re
             member='scripts/historical-source-replay.mjs'
             before=subprocess.check_output(['git','show',task['source_parent']+':'+member],cwd=ROOT).decode()
-            after=(ROOT/member).read_text()
+            after=subprocess.check_output(['git','show',historical_head+':'+member],cwd=ROOT).decode()
             pattern=r"^const pins=\{main:'[0-9a-f]{64}','21\.x':'[0-9a-f]{64}'\};$"
             self.assertEqual(len(re.findall(pattern,before,re.M)),1)
             self.assertEqual(len(re.findall(pattern,after,re.M)),1)
@@ -68,7 +72,7 @@ class AuditTestContext(unittest.TestCase):
 
     def test_all_registered_subjects_still_require_actual_coordinator_execution(self):
         contracts=native_contracts(ROOT)
-        self.assertEqual(len(contracts['rows']),24 if contracts['line']=='main' else 23)
+        self.assertEqual(len(contracts['rows']),28 if contracts['line']=='main' else 27)
         entries=json.loads((ROOT/LEDGER).read_bytes())['entries'];indexed={e['sha']:e for e in entries}
         self.assertEqual(len(indexed),1697)
         for row in contracts['rows']:

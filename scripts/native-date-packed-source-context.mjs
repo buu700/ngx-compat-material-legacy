@@ -7,22 +7,24 @@
  */
 /** Finite exact historical projection. Never a current runtime admission reader. */
 import assert from 'node:assert/strict';
+import {recordedHistoricalRead,reverseRecordedSource} from './recorded-execution-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {dirname,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
-const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),defaultRead=path=>readFileSync(resolve(root,path));
 export const NATIVE_DATE_CONTEXT_INPUT='compatibility/rc/native-date-context-inputs.json';
 export const NATIVE_DATE_CONTEXT_OUTPUT='compatibility/rc/native-date-context-outputs.json';
 const inputPins={main:'454c1b7b78cf9fa0444e206c7ab45638ef118922270a2a34619e29992f5df521','21.x':'ad9b34e36a2083a9cd08e8a730c7b766b928370e8eff8bd5a28ea6ddf9d483f2'};
 const outputPins={main:'bb603329c639354f6350a009a36600ce2e9470cf5ff1793f4be06effd09170c1','21.x':'33fc7db1da33cde995e89a6e4a0b22938ae4162cd29b3d8611c80a22e5f2975b'};
 const hash=value=>createHash('sha256').update(value).digest('hex'),cache=new Map(),historicalContextViews=new WeakMap();
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
-export function nativeDateSourceContext(readMember=path=>readFileSync(resolve(root,path))){
+export function nativeDateSourceContext(readMember=defaultRead){
  // An explicit history view retains the immutable context authenticated at creation.
  // Ordinary readers below still rehash all live input/archive identities.
  if(historicalContextViews.has(readMember))return historicalContextViews.get(readMember);
+ readMember=recordedHistoricalRead(readMember);
  const raw=readMember(NATIVE_DATE_CONTEXT_INPUT),rawHash=hash(raw);
  const previous=[...cache.values()].find(value=>value.output.inputs.sha256===rawHash);
  const data=previous?.data||JSON.parse(raw),line=data.line;
@@ -42,7 +44,8 @@ export function nativeDateSourceContext(readMember=path=>readFileSync(resolve(ro
  const result=freeze({data,before,after,output});cache.set(line,result);return result;
 }
 export function reverseNativeDatePackedSource(path,text,options={}){
- const {data,before}=nativeDateSourceContext(options.readMember);
+ const readMember=recordedHistoricalRead(options.readMember);text=reverseRecordedSource(path,text,{readMember});
+ const {data,before}=nativeDateSourceContext(readMember);
  if(path===before.matrix_history.path){assert.ok([before.matrix_history.current_sha256,before.matrix_history.sha256].includes(hash(text)),'unreviewed retained-matrix history change');return before.matrix_history.text;}
  const original=before.sources.find(row=>row.path===path);
  if(!original)return text;
@@ -56,6 +59,7 @@ export function reverseNativeDatePackedSource(path,text,options={}){
  assert.equal(text,original.text,'complete preceding native date source not recovered');return text;
 }
 export function readNativeDatePackedBefore(path,readMember){
+ readMember=recordedHistoricalRead(readMember);
  const {before,after}=nativeDateSourceContext(readMember),source=before.sources.find(row=>row.path===path);
  if(path===before.matrix_history.path)return Buffer.from(reverseNativeDatePackedSource(path,readMember(path).toString(),{readMember}));
  if(source)return Buffer.from(reverseNativeDatePackedSource(path,readMember(path).toString(),{readMember}));
@@ -77,6 +81,7 @@ export function nativeDateRequirementsBefore(sha,current,line,options={}){
  * to that reader; this function never labels unknown bytes as accepted. */
 const historicalReaderSnapshots=new WeakMap();
 export function nativeDateCurrentRead(readMember){
+ readMember=recordedHistoricalRead(readMember);
  if(historicalReaderSnapshots.has(readMember))return historicalReaderSnapshots.get(readMember);
  // This history-only reader captures an authenticated immutable input snapshot.
  // Source bytes are still read on every call and unknown bytes are not projected.
@@ -103,6 +108,7 @@ export function nativeDateCurrentRead(readMember){
  * Unknown bytes pass unchanged to its original hash assertions. Current
  * product/runtime qualification never uses this historical reader. */
 export function nativeDateHistoricalProductRead(parent,readMember){
+ readMember=recordedHistoricalRead(readMember);
  const snapshot=nativeDateSourceContext(readMember),{before}=snapshot,context=before.historical_products.find(row=>row.source_parent===parent);
  assert.ok(context,'unregistered historical native-context product parent');
  const projected=path=>{const bytes=readMember(path),member=context.changed_members.find(row=>row.path===path);

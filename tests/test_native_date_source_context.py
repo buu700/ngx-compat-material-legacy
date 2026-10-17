@@ -16,9 +16,9 @@ ROOT=Path(__file__).resolve().parents[1]
 
 class NativeDateSourceContext(unittest.TestCase):
     def test_current_source_semantics_and_complete_predecessors(self):
-        command=['node','tests/native_date_source_context_probe.mjs']
+        command=['node','scripts/run-historical-source-probe.mjs','native-date-context-source']
         if os.environ.get('NGX_NATIVE_DATE_CONTEXT_DIAGNOSTIC'):
-            command.append(os.environ['NGX_NATIVE_DATE_CONTEXT_DIAGNOSTIC'])
+            command.extend(['--report',os.environ['NGX_NATIVE_DATE_CONTEXT_DIAGNOSTIC']])
         result=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=45)
         self.assertEqual(result.returncode,0,(result.stdout+result.stderr)[-8000:])
         report=json.loads(result.stdout.strip().splitlines()[-1])
