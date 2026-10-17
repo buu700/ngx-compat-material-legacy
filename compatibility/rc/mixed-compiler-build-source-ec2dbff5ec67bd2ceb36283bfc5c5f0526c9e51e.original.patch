@@ -1,0 +1,679 @@
+diff --git a/goldens/aria/combobox/index.api.md b/goldens/aria/combobox/index.api.md
+index d4edcd91e5b85e7a541bf0f7999c7d68f238dfa8..f09d0a16e56393a0e8c69176a94235ff945ffa75 100644
+--- a/goldens/aria/combobox/index.api.md
++++ b/goldens/aria/combobox/index.api.md
+@@ -51,7 +51,7 @@ export class ComboboxPopup implements OnInit, OnDestroy {
+     ngOnInit(): void;
+     readonly _pattern: ComboboxPopupPattern;
+     readonly popupId: _angular_core.Signal<string | undefined>;
+-    readonly popupType: _angular_core.InputSignal<"listbox" | "tree" | "grid" | "dialog">;
++    readonly popupType: _angular_core.InputSignal<"dialog" | "grid" | "listbox" | "tree">;
+     _registerWidget(widget: ComboboxWidget): void;
+     _unregisterWidget(): void;
+     readonly _widget: _angular_core.WritableSignal<ComboboxWidget | undefined>;
+diff --git a/goldens/aria/grid/index.api.md b/goldens/aria/grid/index.api.md
+index 46fdbe3f841e54140312c56a9de60a9ab0bdcb5f..6c9c142c7b4fdae6be422ada95d96ff0f54015d5 100644
+--- a/goldens/aria/grid/index.api.md
++++ b/goldens/aria/grid/index.api.md
+@@ -24,14 +24,14 @@ export class Grid implements OnDestroy {
+     readonly disabled: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     readonly element: HTMLElement;
+     readonly enableSelection: _angular_core.InputSignalWithTransform<boolean, unknown>;
+-    readonly focusMode: _angular_core.InputSignal<"roving" | "activedescendant">;
++    readonly focusMode: _angular_core.InputSignal<"activedescendant" | "roving">;
+     readonly multi: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     // (undocumented)
+     ngOnDestroy(): void;
+     readonly _pattern: GridPattern;
+     readonly rowWrap: _angular_core.InputSignal<"continuous" | "loop" | "nowrap">;
+     scrollActiveCellIntoView(options?: ScrollIntoViewOptions): void;
+-    readonly selectionMode: _angular_core.InputSignal<"follow" | "explicit">;
++    readonly selectionMode: _angular_core.InputSignal<"explicit" | "follow">;
+     readonly softDisabled: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     readonly tabIndex: _angular_core.InputSignalWithTransform<number | undefined, string | number | undefined>;
+     readonly textDirection: _angular_core.WritableSignal<_angular_cdk_bidi.Direction>;
+@@ -61,7 +61,7 @@ export class GridCell implements OnInit, OnDestroy {
+     // (undocumented)
+     ngOnInit(): void;
+     readonly _pattern: GridCellPattern;
+-    readonly role: _angular_core.InputSignal<"gridcell" | "columnheader" | "rowheader">;
++    readonly role: _angular_core.InputSignal<"columnheader" | "gridcell" | "rowheader">;
+     readonly rowIndex: _angular_core.InputSignal<number | undefined>;
+     readonly rowSpan: _angular_core.InputSignal<number>;
+     readonly selectable: _angular_core.InputSignal<boolean>;
+@@ -79,10 +79,10 @@ export class GridCell implements OnInit, OnDestroy {
+ export class GridCellWidget {
+     constructor();
+     activate(): void;
+-    readonly activated: _angular_core.OutputEmitterRef<KeyboardEvent | FocusEvent | undefined>;
++    readonly activated: _angular_core.OutputEmitterRef<FocusEvent | KeyboardEvent | undefined>;
+     readonly active: Signal<boolean>;
+     deactivate(): void;
+-    readonly deactivated: _angular_core.OutputEmitterRef<KeyboardEvent | FocusEvent | undefined>;
++    readonly deactivated: _angular_core.OutputEmitterRef<FocusEvent | KeyboardEvent | undefined>;
+     readonly disabled: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     readonly element: HTMLElement;
+     readonly focusTarget: _angular_core.InputSignal<ElementResolver<HTMLElement>>;
+@@ -91,7 +91,7 @@ export class GridCellWidget {
+     readonly _pattern: GridCellWidgetPattern;
+     protected readonly _tabIndex: Signal<number>;
+     readonly tabindex: _angular_core.InputSignal<number | undefined>;
+-    readonly widgetType: _angular_core.InputSignal<"simple" | "complex" | "editable">;
++    readonly widgetType: _angular_core.InputSignal<"complex" | "editable" | "simple">;
+     // (undocumented)
+     static ɵdir: _angular_core.ɵɵDirectiveDeclaration<GridCellWidget, "[ngGridCellWidget]", ["ngGridCellWidget"], { "id": { "alias": "id"; "required": false; "isSignal": true; }; "widgetType": { "alias": "widgetType"; "required": false; "isSignal": true; }; "disabled": { "alias": "disabled"; "required": false; "isSignal": true; }; "focusTarget": { "alias": "focusTarget"; "required": false; "isSignal": true; }; "tabindex": { "alias": "tabindex"; "required": false; "isSignal": true; }; }, { "activated": "activated"; "deactivated": "deactivated"; }, never, never, true, never>;
+     // (undocumented)
+diff --git a/goldens/aria/listbox/index.api.md b/goldens/aria/listbox/index.api.md
+index 7bb1076dc422313f674b48412c036477cb03f08f..97b89ef31ba34d08defb0c4408675e57608f0645 100644
+--- a/goldens/aria/listbox/index.api.md
++++ b/goldens/aria/listbox/index.api.md
+@@ -21,19 +21,19 @@ export class Listbox<V> implements OnDestroy {
+     readonly _collection: SortedCollection<Option_2<V>>;
+     readonly disabled: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     readonly element: HTMLElement;
+-    readonly focusMode: _angular_core.InputSignal<"roving" | "activedescendant">;
++    readonly focusMode: _angular_core.InputSignal<"activedescendant" | "roving">;
+     gotoFirst(): void;
+     gotoIndex(index: number): void;
+     readonly id: _angular_core.InputSignal<string>;
+     readonly multi: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     // (undocumented)
+     ngOnDestroy(): void;
+-    readonly orientation: _angular_core.InputSignal<"vertical" | "horizontal">;
++    readonly orientation: _angular_core.InputSignal<"horizontal" | "vertical">;
+     readonly _pattern: ListboxPattern<V>;
+     readonly readonly: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     // (undocumented)
+     scrollActiveItemIntoView(options?: ScrollIntoViewOptions): void;
+-    readonly selectionMode: _angular_core.InputSignal<"follow" | "explicit">;
++    readonly selectionMode: _angular_core.InputSignal<"explicit" | "follow">;
+     readonly softDisabled: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     readonly tabIndex: _angular_core.InputSignalWithTransform<number | undefined, string | number | undefined>;
+     protected readonly textDirection: Signal<_angular_cdk_bidi.Direction>;
+diff --git a/goldens/aria/menu/index.api.md b/goldens/aria/menu/index.api.md
+index a126bde37b0154e207641a823151c5aba195f46c..329dfab0b96ff496b6a4590d78b7225d0e4424cb 100644
+--- a/goldens/aria/menu/index.api.md
++++ b/goldens/aria/menu/index.api.md
+@@ -24,10 +24,10 @@ export class Menu<V> implements OnDestroy {
+     readonly itemSelected: _angular_core.OutputEmitterRef<V>;
+     // (undocumented)
+     ngOnDestroy(): void;
+-    readonly parent: _angular_core.WritableSignal<MenuTrigger<V> | MenuItem<V> | undefined>;
++    readonly parent: _angular_core.WritableSignal<MenuItem<V> | MenuTrigger<V> | undefined>;
+     readonly _pattern: MenuPattern<V>;
+     readonly softDisabled: _angular_core.InputSignalWithTransform<boolean, unknown>;
+-    readonly tabIndex: Signal<0 | -1>;
++    readonly tabIndex: Signal<-1 | 0>;
+     readonly textDirection: _angular_core.WritableSignal<_angular_cdk_bidi.Direction>;
+     readonly typeaheadDelay: _angular_core.InputSignal<number>;
+     readonly visible: Signal<boolean>;
+@@ -90,7 +90,7 @@ export class MenuItem<V> implements OnInit, OnDestroy {
+     open(): void;
+     readonly parent: Menu<V> | MenuBar<V> | null;
+     readonly _pattern: MenuItemPattern<V>;
+-    readonly role: _angular_core.InputSignal<"menuitem" | "menuitemradio" | "menuitemcheckbox">;
++    readonly role: _angular_core.InputSignal<"menuitem" | "menuitemcheckbox" | "menuitemradio">;
+     readonly searchTerm: _angular_core.ModelSignal<string>;
+     readonly submenu: _angular_core.InputSignal<Menu<V> | undefined>;
+     readonly value: _angular_core.InputSignal<V>;
+diff --git a/goldens/aria/private/index.api.md b/goldens/aria/private/index.api.md
+index 9fb23800cbd8cd9e0b2f5279eaa3378cb8be01d7..4b23497429a13cd66b7189ebbf50f511ce2dd269 100644
+--- a/goldens/aria/private/index.api.md
++++ b/goldens/aria/private/index.api.md
+@@ -26,11 +26,11 @@ export class AccordionGroupPattern {
+     readonly inputs: AccordionGroupInputs;
+     readonly keydown: SignalLike<KeyboardEventManager<KeyboardEvent>>;
+     readonly navigationBehavior: ListNavigation<AccordionTriggerPattern>;
+-    readonly nextKey: SignalLike<"ArrowRight" | "ArrowLeft" | "ArrowDown">;
++    readonly nextKey: SignalLike<"ArrowDown" | "ArrowLeft" | "ArrowRight">;
+     onClick(event: PointerEvent): void;
+     onFocus(event: FocusEvent): void;
+     onKeydown(event: KeyboardEvent): void;
+-    readonly prevKey: SignalLike<"ArrowUp" | "ArrowRight" | "ArrowLeft">;
++    readonly prevKey: SignalLike<"ArrowLeft" | "ArrowRight" | "ArrowUp">;
+     toggle(): void;
+     validate(): string[];
+ }
+@@ -77,7 +77,7 @@ export class ComboboxPattern {
+     constructor(inputs: ComboboxInputs);
+     readonly activeDescendant: _angular_core.Signal<string | undefined>;
+     readonly ariaReadonly: _angular_core.Signal<"true" | null>;
+-    readonly autocomplete: _angular_core.Signal<"none" | "inline" | "list" | "both">;
++    readonly autocomplete: _angular_core.Signal<"both" | "inline" | "list" | "none">;
+     click: _angular_core.Signal<ClickEventManager<PointerEvent>>;
+     readonly disabled: () => boolean;
+     readonly element: () => HTMLElement;
+@@ -100,7 +100,7 @@ export class ComboboxPattern {
+     onInput(event: Event): void;
+     onKeydown(event: KeyboardEvent): void;
+     readonly popupId: _angular_core.Signal<string | undefined>;
+-    readonly popupType: _angular_core.Signal<"listbox" | "tree" | "grid" | "dialog" | undefined>;
++    readonly popupType: _angular_core.Signal<"dialog" | "grid" | "listbox" | "tree" | undefined>;
+     readonly readonly: () => boolean;
+     readonly softDisabled: () => boolean;
+     readonly value: WritableSignalLike<string>;
+@@ -125,7 +125,7 @@ export class ComboboxPopupPattern {
+     onFocusin(): void;
+     onFocusout(event: FocusEvent): void;
+     readonly popupId: () => string | undefined;
+-    readonly popupType: () => "listbox" | "tree" | "grid" | "dialog";
++    readonly popupType: () => "dialog" | "grid" | "listbox" | "tree";
+ }
+ 
+ // @public (undocumented)
+@@ -264,18 +264,18 @@ export class GridPattern {
+     readonly isFocused: WritableSignalLike<boolean>;
+     readonly keydown: SignalLike<KeyboardEventManager<KeyboardEvent>>;
+     readonly multiSelectable: SignalLike<boolean | undefined>;
+-    readonly nextColKey: SignalLike<"ArrowRight" | "ArrowLeft">;
++    readonly nextColKey: SignalLike<"ArrowLeft" | "ArrowRight">;
+     onClick(event: PointerEvent): void;
+     onFocusIn(event: FocusEvent): void;
+     onFocusOut(event: FocusEvent): void;
+     onKeydown(event: KeyboardEvent): void;
+     readonly pauseNavigation: SignalLike<boolean>;
+-    readonly prevColKey: SignalLike<"ArrowRight" | "ArrowLeft">;
++    readonly prevColKey: SignalLike<"ArrowLeft" | "ArrowRight">;
+     resetFocusEffect(): void;
+     resetStateEffect(): void;
+     restoreFocusEffect(): void;
+     setDefaultStateEffect(): void;
+-    readonly tabIndex: SignalLike<0 | -1>;
++    readonly tabIndex: SignalLike<-1 | 0>;
+     validate(): string[];
+ }
+ 
+@@ -326,14 +326,14 @@ export class ListboxPattern<V> {
+     // (undocumented)
+     readonly listBehavior: List<OptionPattern<V>, V>;
+     multi: SignalLike<boolean>;
+-    readonly nextKey: SignalLike<"ArrowRight" | "ArrowLeft" | "ArrowDown">;
++    readonly nextKey: SignalLike<"ArrowDown" | "ArrowLeft" | "ArrowRight">;
+     // (undocumented)
+     onClick(event: PointerEvent): void;
+     // (undocumented)
+     onFocusIn(): void;
+     onKeydown(event: KeyboardEvent): void;
+     readonly orientation: SignalLike<'vertical' | 'horizontal'>;
+-    readonly prevKey: SignalLike<"ArrowUp" | "ArrowRight" | "ArrowLeft">;
++    readonly prevKey: SignalLike<"ArrowLeft" | "ArrowRight" | "ArrowUp">;
+     readonly readonly: SignalLike<boolean>;
+     setDefaultState(): void;
+     setDefaultStateEffect(): void;
+@@ -375,7 +375,7 @@ export class MenuBarPattern<V> {
+     prev(): void;
+     setDefaultState(): void;
+     setDefaultStateEffect(): void;
+-    readonly tabIndex: () => 0 | -1;
++    readonly tabIndex: () => -1 | 0;
+     readonly typeaheadRegexp: RegExp;
+ }
+ 
+@@ -419,11 +419,11 @@ export class MenuItemPattern<V> implements ListItem<V> {
+         first?: boolean;
+         last?: boolean;
+     }): void;
+-    readonly role: () => "menuitem" | "menuitemradio" | "menuitemcheckbox";
++    readonly role: () => "menuitem" | "menuitemcheckbox" | "menuitemradio";
+     readonly searchTerm: SignalLike<string>;
+     readonly selectable: SignalLike<boolean>;
+     readonly submenu: SignalLike<MenuPattern<V> | undefined>;
+-    readonly tabIndex: SignalLike<0 | -1>;
++    readonly tabIndex: SignalLike<-1 | 0>;
+     readonly value: SignalLike<V>;
+ }
+ 
+@@ -465,7 +465,7 @@ export class MenuPattern<V> {
+     setDefaultStateEffect(): void;
+     readonly shouldFocus: SignalLike<boolean>;
+     submit(item?: MenuItemPattern<V> | undefined): void;
+-    readonly tabIndex: () => 0 | -1;
++    readonly tabIndex: () => -1 | 0;
+     trigger(): void;
+     readonly typeaheadRegexp: RegExp;
+     validate(): string[];
+@@ -526,7 +526,7 @@ export class OptionPattern<V> {
+     readonly searchTerm: SignalLike<string>;
+     readonly selectable: () => boolean;
+     readonly selected: SignalLike<boolean | undefined>;
+-    readonly tabIndex: SignalLike<0 | -1 | undefined>;
++    readonly tabIndex: SignalLike<-1 | 0 | undefined>;
+     readonly value: SignalLike<V>;
+ }
+ 
+@@ -543,7 +543,7 @@ export function signal<T>(initialValue: T): WritableSignalLike<T>;
+ export type SignalLike<T> = () => T;
+ 
+ // @public
+-export function sortDirectives(a: HasElement, b: HasElement): 1 | -1;
++export function sortDirectives(a: HasElement, b: HasElement): -1 | 1;
+ 
+ // @public
+ export class SortedCollection<T extends HasElement> {
+@@ -589,17 +589,17 @@ export class TabListPattern {
+     readonly inputs: TabListInputs;
+     readonly keydown: SignalLike<KeyboardEventManager<KeyboardEvent>>;
+     readonly navigationBehavior: ListNavigation<TabPattern>;
+-    readonly nextKey: SignalLike<"ArrowRight" | "ArrowLeft" | "ArrowDown">;
++    readonly nextKey: SignalLike<"ArrowDown" | "ArrowLeft" | "ArrowRight">;
+     onClick(event: PointerEvent): void;
+     onFocusIn(): void;
+     onKeydown(event: KeyboardEvent): void;
+     open(tab?: TabPattern): boolean;
+     readonly orientation: SignalLike<'vertical' | 'horizontal'>;
+-    readonly prevKey: SignalLike<"ArrowUp" | "ArrowRight" | "ArrowLeft">;
++    readonly prevKey: SignalLike<"ArrowLeft" | "ArrowRight" | "ArrowUp">;
+     readonly selectedTab: WritableSignalLike<TabPattern | undefined>;
+     setDefaultState(): void;
+     setDefaultStateEffect(): void;
+-    readonly tabIndex: SignalLike<0 | -1>;
++    readonly tabIndex: SignalLike<-1 | 0>;
+ }
+ 
+ // @public
+@@ -634,7 +634,7 @@ export class TabPattern {
+     readonly inputs: TabInputs;
+     open(): boolean;
+     readonly selected: SignalLike<boolean>;
+-    readonly tabIndex: SignalLike<0 | -1>;
++    readonly tabIndex: SignalLike<-1 | 0>;
+ }
+ 
+ // @public
+@@ -664,7 +664,7 @@ export class ToolbarPattern<V> {
+     setDefaultState(): void;
+     setDefaultStateEffect(): void;
+     readonly softDisabled: SignalLike<boolean>;
+-    readonly tabIndex: SignalLike<0 | -1>;
++    readonly tabIndex: SignalLike<-1 | 0>;
+     validate(): string[];
+ }
+ 
+@@ -714,7 +714,7 @@ export class ToolbarWidgetPattern<V> implements ListItem<V> {
+     readonly searchTerm: () => string;
+     readonly selectable: () => boolean;
+     readonly selected: SignalLike<boolean>;
+-    readonly tabIndex: SignalLike<0 | -1>;
++    readonly tabIndex: SignalLike<-1 | 0>;
+     readonly toolbar: () => ToolbarPattern<V>;
+     readonly value: () => V;
+ }
+@@ -755,7 +755,7 @@ export class TreeItemPattern<V> implements TreeItem<V, TreeItemPattern<V>> {
+     readonly selectable: SignalLike<boolean>;
+     readonly selected: SignalLike<boolean | undefined>;
+     readonly setsize: SignalLike<number>;
+-    readonly tabIndex: SignalLike<0 | -1>;
++    readonly tabIndex: SignalLike<-1 | 0>;
+     readonly tree: SignalLike<TreePattern<V>>;
+     readonly value: SignalLike<V>;
+     readonly visible: SignalLike<boolean>;
+@@ -768,14 +768,14 @@ export class TreePattern<V> implements TreeInputs<V> {
+     readonly activeItem: WritableSignalLike<TreeItemPattern<V> | undefined>;
+     readonly children: SignalLike<TreeItemPattern<V>[]>;
+     readonly clickManager: SignalLike<ClickEventManager<PointerEvent>>;
+-    readonly collapseKey: SignalLike<"ArrowUp" | "ArrowRight" | "ArrowLeft">;
++    readonly collapseKey: SignalLike<"ArrowLeft" | "ArrowRight" | "ArrowUp">;
+     _collapseOrParent(opts?: SelectOptions): void;
+     readonly currentType: SignalLike<'page' | 'step' | 'location' | 'date' | 'time' | 'true' | 'false'>;
+     readonly disabled: SignalLike<boolean>;
+     readonly dynamicSpaceKey: SignalLike<"" | " ">;
+     readonly element: SignalLike<HTMLElement>;
+     readonly expanded: () => boolean;
+-    readonly expandKey: SignalLike<"ArrowRight" | "ArrowLeft" | "ArrowDown">;
++    readonly expandKey: SignalLike<"ArrowDown" | "ArrowLeft" | "ArrowRight">;
+     _expandOrFirstChild(opts?: SelectOptions): void;
+     readonly focusMode: SignalLike<'roving' | 'activedescendant'>;
+     readonly followFocus: SignalLike<boolean>;
+@@ -791,12 +791,12 @@ export class TreePattern<V> implements TreeInputs<V> {
+     readonly level: () => number;
+     readonly multi: SignalLike<boolean>;
+     readonly nav: SignalLike<boolean>;
+-    readonly nextKey: SignalLike<"ArrowRight" | "ArrowLeft" | "ArrowDown">;
++    readonly nextKey: SignalLike<"ArrowDown" | "ArrowLeft" | "ArrowRight">;
+     onClick(event: PointerEvent): void;
+     onFocusIn(): void;
+     onKeydown(event: KeyboardEvent): void;
+     readonly orientation: SignalLike<'vertical' | 'horizontal'>;
+-    readonly prevKey: SignalLike<"ArrowUp" | "ArrowRight" | "ArrowLeft">;
++    readonly prevKey: SignalLike<"ArrowLeft" | "ArrowRight" | "ArrowUp">;
+     readonly selectionMode: SignalLike<'follow' | 'explicit'>;
+     setDefaultState(): void;
+     setDefaultStateEffect(): void;
+diff --git a/goldens/aria/tabs/index.api.md b/goldens/aria/tabs/index.api.md
+index 25ff29133c75c8d664c7bc67ebebe5643cddd583..7426ed6e6694cea0490863e883fd9ea5c9f384e3 100644
+--- a/goldens/aria/tabs/index.api.md
++++ b/goldens/aria/tabs/index.api.md
+@@ -52,16 +52,16 @@ export class TabList implements OnInit, OnDestroy {
+     readonly element: HTMLElement;
+     // (undocumented)
+     findTab(value?: string): Tab | undefined;
+-    readonly focusMode: _angular_core.InputSignal<"roving" | "activedescendant">;
++    readonly focusMode: _angular_core.InputSignal<"activedescendant" | "roving">;
+     // (undocumented)
+     ngOnDestroy(): void;
+     // (undocumented)
+     ngOnInit(): void;
+     open(value: string): boolean;
+-    readonly orientation: _angular_core.InputSignal<"vertical" | "horizontal">;
++    readonly orientation: _angular_core.InputSignal<"horizontal" | "vertical">;
+     readonly _pattern: TabListPattern;
+     readonly selectedTab: _angular_core.ModelSignal<string | undefined>;
+-    readonly selectionMode: _angular_core.InputSignal<"follow" | "explicit">;
++    readonly selectionMode: _angular_core.InputSignal<"explicit" | "follow">;
+     readonly softDisabled: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     readonly _tabPatterns: _angular_core.Signal<TabPattern[]>;
+     readonly _tabsParent: Tabs;
+diff --git a/goldens/aria/toolbar/index.api.md b/goldens/aria/toolbar/index.api.md
+index 73f492dfdb47f5b4201031fa132e38b9c6670f5f..214740b5035731721bb1eb556dc9ac42ddc90a11 100644
+--- a/goldens/aria/toolbar/index.api.md
++++ b/goldens/aria/toolbar/index.api.md
+@@ -20,7 +20,7 @@ export class Toolbar<V> implements OnDestroy {
+     readonly _itemPatterns: _angular_core.Signal<ToolbarWidgetPattern<V>[]>;
+     // (undocumented)
+     ngOnDestroy(): void;
+-    readonly orientation: _angular_core.InputSignal<"vertical" | "horizontal">;
++    readonly orientation: _angular_core.InputSignal<"horizontal" | "vertical">;
+     readonly _pattern: ToolbarPattern<V>;
+     readonly softDisabled: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     readonly textDirection: _angular_core.WritableSignal<_angular_cdk_bidi.Direction>;
+diff --git a/goldens/aria/tree/index.api.md b/goldens/aria/tree/index.api.md
+index fdc2b867deadd161658cbae236ba126f465415af..43ebd9647e0092105da0de890319ce78ee219713 100644
+--- a/goldens/aria/tree/index.api.md
++++ b/goldens/aria/tree/index.api.md
+@@ -15,20 +15,20 @@ export class Tree<V> implements OnDestroy {
+     constructor();
+     readonly activeDescendant: Signal<string | undefined>;
+     readonly _collection: SortedCollection<TreeItem<V>>;
+-    readonly currentType: _angular_core.InputSignal<"page" | "step" | "location" | "date" | "time" | "true" | "false">;
++    readonly currentType: _angular_core.InputSignal<"date" | "false" | "location" | "page" | "step" | "time" | "true">;
+     readonly disabled: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     readonly element: HTMLElement;
+-    readonly focusMode: _angular_core.InputSignal<"roving" | "activedescendant">;
++    readonly focusMode: _angular_core.InputSignal<"activedescendant" | "roving">;
+     readonly id: _angular_core.InputSignal<string>;
+     readonly multi: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     readonly nav: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     // (undocumented)
+     ngOnDestroy(): void;
+-    readonly orientation: _angular_core.InputSignal<"vertical" | "horizontal">;
++    readonly orientation: _angular_core.InputSignal<"horizontal" | "vertical">;
+     readonly _pattern: TreePattern<V>;
+     // (undocumented)
+     scrollActiveItemIntoView(options?: ScrollIntoViewOptions): void;
+-    readonly selectionMode: _angular_core.InputSignal<"follow" | "explicit">;
++    readonly selectionMode: _angular_core.InputSignal<"explicit" | "follow">;
+     readonly softDisabled: _angular_core.InputSignalWithTransform<boolean, unknown>;
+     readonly tabIndex: _angular_core.InputSignalWithTransform<number | undefined, string | number | undefined>;
+     readonly textDirection: _angular_core.WritableSignal<_angular_cdk_bidi.Direction>;
+@@ -56,7 +56,7 @@ export class TreeItem<V> extends DeferredContentAware implements OnInit, OnDestr
+     ngOnDestroy(): void;
+     // (undocumented)
+     ngOnInit(): void;
+-    readonly parent: _angular_core.InputSignal<TreeItemGroup<V> | Tree<V>>;
++    readonly parent: _angular_core.InputSignal<Tree<V> | TreeItemGroup<V>>;
+     _pattern: TreeItemPattern<V>;
+     // (undocumented)
+     _register(group: TreeItemGroup<V>): void;
+diff --git a/goldens/cdk/menu/index.api.md b/goldens/cdk/menu/index.api.md
+index 9a4e965ef739409895d83395838e22ba937c54a4..fadaa2fa7bbe640279139847c7f468848b0b3074 100644
+--- a/goldens/cdk/menu/index.api.md
++++ b/goldens/cdk/menu/index.api.md
+@@ -93,7 +93,7 @@ export abstract class CdkMenuBase extends CdkMenuGroup implements Menu, AfterCon
+     protected readonly dir: Directionality | null;
+     focusFirstItem(focusOrigin?: FocusOrigin): void;
+     focusLastItem(focusOrigin?: FocusOrigin): void;
+-    _getTabIndex(): 0 | -1 | null;
++    _getTabIndex(): -1 | 0 | null;
+     id: string;
+     isInline: boolean;
+     readonly items: QueryList<CdkMenuItem>;
+@@ -333,7 +333,7 @@ export class MenuStack {
+     hasInlineMenu(): boolean;
+     readonly id: string;
+     static inline(orientation: 'vertical' | 'horizontal'): MenuStack;
+-    inlineMenuOrientation(): "vertical" | "horizontal" | null;
++    inlineMenuOrientation(): "horizontal" | "vertical" | null;
+     isEmpty(): boolean;
+     length(): number;
+     peek(): MenuStackItem | undefined;
+diff --git a/goldens/material/datepicker/index.api.md b/goldens/material/datepicker/index.api.md
+index c2ae996fb88b1148e7e2f2f0ebea9e2ae7e268ca..c5e918118b579d026c3596a9e59e2ee70de10a6b 100644
+--- a/goldens/material/datepicker/index.api.md
++++ b/goldens/material/datepicker/index.api.md
+@@ -580,7 +580,7 @@ export class MatDateRangeInput<D> implements MatFormFieldControl<DateRange<D>>,
+     separator: string;
+     setDescribedByIds(ids: string[]): void;
+     _shouldHidePlaceholders(): boolean;
+-    _shouldHideSeparator(): boolean | "" | null;
++    _shouldHideSeparator(): "" | boolean | null;
+     get shouldLabelFloat(): boolean;
+     // (undocumented)
+     _startInput: MatStartDate<D>;
+diff --git a/goldens/material/expansion/index.api.md b/goldens/material/expansion/index.api.md
+index b2b134b9a58957f3defcec7b9e4f0e19ab054e8a..dcd76f2ee636bbc3e004cdf01f327e60dc737c98 100644
+--- a/goldens/material/expansion/index.api.md
++++ b/goldens/material/expansion/index.api.md
+@@ -96,6 +96,14 @@ export class MatExpansionPanel extends CdkAccordionItem implements AfterContentI
+     get hideToggle(): boolean;
+     set hideToggle(value: boolean);
+     readonly _inputChanges: Subject<{
++        readonly closed?: i0.SimpleChange<EventEmitter<void>> | undefined;
++        readonly opened?: i0.SimpleChange<EventEmitter<void>> | undefined;
++        readonly destroyed?: i0.SimpleChange<EventEmitter<void>> | undefined;
++        readonly expandedChange?: i0.SimpleChange<EventEmitter<boolean>> | undefined;
++        readonly id?: i0.SimpleChange<string> | undefined;
++        expanded?: i0.SimpleChange<boolean> | undefined;
++        disabled?: i0.SimpleChange<boolean> | undefined;
++        ngOnInit?: i0.SimpleChange<() => void> | undefined;
+         hideToggle?: i0.SimpleChange<boolean> | undefined;
+         togglePosition?: i0.SimpleChange<MatAccordionTogglePosition> | undefined;
+         readonly afterExpand?: i0.SimpleChange<EventEmitter<void>> | undefined;
+@@ -115,14 +123,6 @@ export class MatExpansionPanel extends CdkAccordionItem implements AfterContentI
+         ngOnChanges?: i0.SimpleChange<(changes: /*elided*/ any) => void> | undefined;
+         ngOnDestroy?: i0.SimpleChange<() => void> | undefined;
+         _containsFocus?: i0.SimpleChange<() => boolean> | undefined;
+-        readonly closed?: i0.SimpleChange<EventEmitter<void>> | undefined;
+-        readonly opened?: i0.SimpleChange<EventEmitter<void>> | undefined;
+-        readonly destroyed?: i0.SimpleChange<EventEmitter<void>> | undefined;
+-        readonly expandedChange?: i0.SimpleChange<EventEmitter<boolean>> | undefined;
+-        readonly id?: i0.SimpleChange<string> | undefined;
+-        expanded?: i0.SimpleChange<boolean> | undefined;
+-        disabled?: i0.SimpleChange<boolean> | undefined;
+-        ngOnInit?: i0.SimpleChange<() => void> | undefined;
+     }>;
+     _lazyContent: MatExpansionPanelContent;
+     // (undocumented)
+diff --git a/goldens/material/form-field/index.api.md b/goldens/material/form-field/index.api.md
+index f22a18d98f330c357b4a69835aa67923bfe773b5..275c4d2f960206602522c85c5cf3c708d472bd82 100644
+--- a/goldens/material/form-field/index.api.md
++++ b/goldens/material/form-field/index.api.md
+@@ -75,7 +75,7 @@ export class MatFormField implements FloatingLabelParent, AfterContentInit, Afte
+     _floatingLabel: MatFormFieldFloatingLabel | undefined;
+     get floatLabel(): FloatLabelType;
+     set floatLabel(value: FloatLabelType);
+-    _forceDisplayInfixLabel(): boolean | 0;
++    _forceDisplayInfixLabel(): 0 | boolean;
+     // (undocumented)
+     _formFieldControl: MatFormFieldControl_2<any>;
+     getConnectedOverlayOrigin(): ElementRef;
+diff --git a/goldens/material/input/index.api.md b/goldens/material/input/index.api.md
+index 8f32fa7d9afd2c9505842fcd0076db93785292b6..0abf0f3f5bf4a0e4fc9fd4d256fa7ba085f567a5 100644
+--- a/goldens/material/input/index.api.md
++++ b/goldens/material/input/index.api.md
+@@ -69,7 +69,7 @@ export class MatFormField implements FloatingLabelParent, AfterContentInit, Afte
+     _floatingLabel: MatFormFieldFloatingLabel | undefined;
+     get floatLabel(): FloatLabelType;
+     set floatLabel(value: FloatLabelType);
+-    _forceDisplayInfixLabel(): boolean | 0;
++    _forceDisplayInfixLabel(): 0 | boolean;
+     // (undocumented)
+     _formFieldControl: MatFormFieldControl<any>;
+     getConnectedOverlayOrigin(): ElementRef;
+diff --git a/goldens/material/menu/index.api.md b/goldens/material/menu/index.api.md
+index 0a6dd25c09c3240fddca2fcfaf2c629d9f84fe0d..27b6b16eb500e86f535445191ae9bc3240a9eee8 100644
+--- a/goldens/material/menu/index.api.md
++++ b/goldens/material/menu/index.api.md
+@@ -79,7 +79,7 @@ export class MatMenu implements AfterContentInit, MatMenuPanel<MatMenuItem>, OnI
+     // (undocumented)
+     addItem(_item: MatMenuItem): void;
+     _allItems: QueryList<MatMenuItem>;
+-    readonly _animationDone: Subject<"void" | "enter">;
++    readonly _animationDone: Subject<"enter" | "void">;
+     protected _animationsDisabled: boolean;
+     ariaDescribedby: string;
+     ariaLabel: string;
+diff --git a/goldens/material/select/index.api.md b/goldens/material/select/index.api.md
+index 9f92404f9399c54cac91a7a95b07e19157ebab4d..16a2c385582a17548cccfd6203469db53916d8c0 100644
+--- a/goldens/material/select/index.api.md
++++ b/goldens/material/select/index.api.md
+@@ -82,7 +82,7 @@ export class MatFormField implements FloatingLabelParent, AfterContentInit, Afte
+     _floatingLabel: MatFormFieldFloatingLabel | undefined;
+     get floatLabel(): FloatLabelType;
+     set floatLabel(value: FloatLabelType);
+-    _forceDisplayInfixLabel(): boolean | 0;
++    _forceDisplayInfixLabel(): 0 | boolean;
+     // (undocumented)
+     _formFieldControl: MatFormFieldControl<any>;
+     getConnectedOverlayOrigin(): ElementRef;
+diff --git a/goldens/material/sort/index.api.md b/goldens/material/sort/index.api.md
+index 93bf0f87427dfe3f6baa9e13de3ff9d511de8603..a5c3346f1312847d4243d05f876f81196a50c65f 100644
+--- a/goldens/material/sort/index.api.md
++++ b/goldens/material/sort/index.api.md
+@@ -72,7 +72,7 @@ export class MatSortHeader implements MatSortable, OnDestroy, OnInit, AfterViewI
+     arrowPosition: SortHeaderArrowPosition;
+     disableClear: boolean;
+     disabled: boolean;
+-    _getAriaSortAttribute(): "none" | "ascending" | "descending";
++    _getAriaSortAttribute(): "ascending" | "descending" | "none";
+     // (undocumented)
+     _handleKeydown(event: KeyboardEvent): void;
+     id: string;
+diff --git a/goldens/material/timepicker/index.api.md b/goldens/material/timepicker/index.api.md
+index 7b4e10a2666b5cdbe1f268a0d4470c7ae81b4bff..35bcb453799060b14abb977e6624ef6c30703d52 100644
+--- a/goldens/material/timepicker/index.api.md
++++ b/goldens/material/timepicker/index.api.md
+@@ -57,7 +57,7 @@ export class MatTimepicker<D> implements OnDestroy, MatOptionParentComponent {
+     readonly opened: OutputEmitterRef<void>;
+     readonly options: InputSignal<readonly MatTimepickerOption<D>[] | null>;
+     // (undocumented)
+-    protected _options: Signal<readonly MatOption<any>[]>;
++    protected _options: Signal<readonly MatOption<D>[]>;
+     readonly panelClass: InputSignal<string | string[] | undefined>;
+     readonly panelId: string;
+     // (undocumented)
+diff --git a/src/aria/toolbar/toolbar-widget-group.ts b/src/aria/toolbar/toolbar-widget-group.ts
+index 304d3cd21ab576ebf9de70f86059d6471a927684..7eeab108d66891d76493e0b67d8a0b3acebbdd92 100644
+--- a/src/aria/toolbar/toolbar-widget-group.ts
++++ b/src/aria/toolbar/toolbar-widget-group.ts
+@@ -43,7 +43,7 @@ export class ToolbarWidgetGroup<V> {
+   private readonly _toolbar = inject<Toolbar<V>>(Toolbar, {optional: true});
+ 
+   /** The list of child widgets within the group. */
+-  private readonly _widgets = contentChildren(ToolbarWidget, {descendants: true});
++  private readonly _widgets = contentChildren<ToolbarWidget<V>>(ToolbarWidget, {descendants: true});
+ 
+   /** The parent Toolbar UIPattern. */
+   private readonly _toolbarPattern = computed(() => this._toolbar?._pattern);
+diff --git a/src/bazel-tsconfig-build.json b/src/bazel-tsconfig-build.json
+index 8aabfba4feb24c6e3bcdff161eb12facb2c20ea3..2b39e1c95f43809c4575617f0bab96fd2fbce137 100644
+--- a/src/bazel-tsconfig-build.json
++++ b/src/bazel-tsconfig-build.json
+@@ -4,6 +4,7 @@
+ {
+   "compilerOptions": {
+     "declaration": true,
++    "stableTypeOrdering": true,
+     "stripInternal": false,
+     "experimentalDecorators": true,
+     "emitDecoratorMetadata": true,
+diff --git a/src/cdk/listbox/listbox.ts b/src/cdk/listbox/listbox.ts
+index f721f8b3ab0482faf3bd485f90491bdcdcf7ec9c..f6f68e2e0d295ceb583ded294cf8842e2de942d1 100644
+--- a/src/cdk/listbox/listbox.ts
++++ b/src/cdk/listbox/listbox.ts
+@@ -149,7 +149,7 @@ export class CdkOption<T = unknown> implements ListKeyManagerOption, Highlightab
+   readonly element: HTMLElement = inject(ElementRef).nativeElement;
+ 
+   /** The parent listbox this option belongs to. */
+-  protected readonly listbox: CdkListbox<T> = inject(CdkListbox);
++  protected readonly listbox = inject<CdkListbox<T>>(CdkListbox);
+ 
+   /** Emits when the option is destroyed. */
+   protected destroyed = new Subject<void>();
+diff --git a/src/components-examples/aria/menu/simple-menu.ts b/src/components-examples/aria/menu/simple-menu.ts
+index 87a71501ff71c94de0d2454c01cb1460328ef08d..1c62aed7c90e700377bc64e558d341fc2a69b2e0 100644
+--- a/src/components-examples/aria/menu/simple-menu.ts
++++ b/src/components-examples/aria/menu/simple-menu.ts
+@@ -65,7 +65,7 @@ export class SimpleMenuBar {}
+   host: {class: 'example-menu-bar-item'},
+ })
+ export class SimpleMenuBarItem {
+-  menuItem = inject(MenuItem);
++  menuItem = inject<MenuItem<string>>(MenuItem);
+ 
+   constructor() {
+     effect(() => this.menuItem.searchTerm.set(this.menuItem.value()));
+@@ -78,7 +78,7 @@ export class SimpleMenuBarItem {
+   host: {class: 'example-menu-item'},
+ })
+ export class SimpleMenuItem {
+-  menuItem = inject(MenuItem);
++  menuItem = inject<MenuItem<string>>(MenuItem);
+ 
+   constructor() {
+     effect(() => this.menuItem.searchTerm.set(this.menuItem.value()));
+diff --git a/src/material/datepicker/datepicker.spec.ts b/src/material/datepicker/datepicker.spec.ts
+index a2699bb300ada9f28ad52e75110e002453930c1a..3e6ef9ded20abf3c32b23e56a72ded35ff550a4f 100644
+--- a/src/material/datepicker/datepicker.spec.ts
++++ b/src/material/datepicker/datepicker.spec.ts
+@@ -90,7 +90,7 @@ describe('MatDatepicker', () => {
+         testComponent = fixture.componentInstance;
+         model = fixture.debugElement
+           .query(By.directive(MatDatepicker))
+-          .injector.get(MatDateSelectionModel);
++          .injector.get<MatDateSelectionModel<Date | null, Date>>(MatDateSelectionModel);
+       });
+ 
+       afterEach(() => {
+@@ -798,7 +798,7 @@ describe('MatDatepicker', () => {
+         testComponent = fixture.componentInstance;
+         model = fixture.debugElement
+           .query(By.directive(MatDatepicker))
+-          .injector.get(MatDateSelectionModel);
++          .injector.get<MatDateSelectionModel<Date | null, Date>>(MatDateSelectionModel);
+       });
+ 
+       afterEach(() => {
+@@ -968,7 +968,7 @@ describe('MatDatepicker', () => {
+         testComponent = fixture.componentInstance;
+         model = fixture.debugElement
+           .query(By.directive(MatDatepicker))
+-          .injector.get(MatDateSelectionModel);
++          .injector.get<MatDateSelectionModel<Date | null, Date>>(MatDateSelectionModel);
+       });
+ 
+       afterEach(() => {
+diff --git a/src/material/timepicker/timepicker.ts b/src/material/timepicker/timepicker.ts
+index 83df2e3f90aa5618df6cfe49c6b79650feead36a..566b0e8baedcbcbddb1a7001cd86127e58d8050b 100644
+--- a/src/material/timepicker/timepicker.ts
++++ b/src/material/timepicker/timepicker.ts
+@@ -146,7 +146,7 @@ export class MatTimepicker<D> implements OnDestroy, MatOptionParentComponent {
+ 
+   protected _panelTemplate = viewChild.required<TemplateRef<unknown>>('panelTemplate');
+   protected _timeOptions: readonly MatTimepickerOption<D>[] = [];
+-  protected _options = viewChildren(MatOption);
++  protected _options = viewChildren<MatOption<D>>(MatOption);
+ 
+   private _keyManager = new ActiveDescendantKeyManager(this._options, this._injector)
+     .withHomeAndEnd(true)
+diff --git a/tsconfig.json b/tsconfig.json
+index 83da867646f1aac091db9de299d3da38d5d0070c..7c91076e0a64a8e0365fa2c122a5bb60d180eb29 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -4,6 +4,7 @@
+   "compilerOptions": {
+     "outDir": "./dist/packages/all",
+     "rootDir": "./",
++    "stableTypeOrdering": true,
+     "experimentalDecorators": true,
+     "module": "esnext",
+     "moduleResolution": "bundler",
