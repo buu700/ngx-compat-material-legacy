@@ -9,6 +9,7 @@ import gzip
 import hashlib
 import json
 import subprocess
+from tests.recorded_execution_source_context import recorded_historical_read,validate_recorded_subjects
 
 INPUT='compatibility/rc/native-date-context-inputs.json'
 OUTPUT='compatibility/rc/native-date-context-outputs.json'
@@ -19,7 +20,9 @@ _CACHE={}
 
 
 def project_native_date_context(root,read_member=None):
-    read=read_member or (lambda p:(root/p).read_bytes())
+    raw_read=read_member or (lambda p:(root/p).read_bytes())
+    validate_recorded_subjects(root,raw_read)
+    read=recorded_historical_read(root,raw_read)
     digest=lambda raw:hashlib.sha256(raw).hexdigest()
     raw=read(INPUT);data=json.loads(raw);line=data['line']
     assert digest(raw)==INPUT_PINS[line]

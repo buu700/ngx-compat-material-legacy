@@ -32,6 +32,7 @@ const definitions=[
  ['content-observer','CONTENT_OBSERVER_KIND','content_observer_behavior','contentObserverRequirements','validateContentObserver'],
  ['media-matcher','MEDIA_MATCHER_KIND','media_matcher_behavior','mediaMatcherRequirements','validateMediaMatcher'],
  ['native-date','NATIVE_DATE_KIND','native_date_behavior','nativeDateRequirements','validateNativeDate'],
+ ['owned-style','OWNED_STYLE_KIND','owned_style_behavior','ownedStyleRequirements','validateOwnedStyle'],
 ];
 const rows=[];
 for(const[name,kind,field,requirements,validator]of definitions){
@@ -43,7 +44,7 @@ for(const[name,kind,field,requirements,validator]of definitions){
   rows.push({sha:entry.sha,kind:m[kind],field,definition,no_run:noRun});
  }
 }
-assert.equal(rows.length,line==='main'?24:23);assert.equal(new Set(rows.map(r=>r.sha)).size,rows.length);
+assert.equal(rows.length,line==='main'?28:27);assert.equal(new Set(rows.map(r=>r.sha)).size,rows.length);
 console.log(JSON.stringify({line,rows,actual_native_or_packed_qualified:false}));
 '''
 
@@ -126,6 +127,7 @@ def source_history(root,entry):
         yield current,body,review
         priors=[*current.get('prior_dispositions',[]),*current.get('superseded_closeout_source_judgments',[]),review.get('prior_entry'),review.get('previous_row')]
         priors.append(review.get('native_date_source_context',{}).get('prior_entry'))
+        priors.append(review.get('recorded_source_context',{}).get('prior_entry'))
         if 'original_source_review' in review:
             ref=review['original_source_review'];raw=member_path(root,ref['path']).read_bytes()
             assert hashlib.sha256(raw).hexdigest()==ref['sha256']

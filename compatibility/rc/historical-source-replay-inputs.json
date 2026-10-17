@@ -1,5 +1,5 @@
 {
-  "schema_version": 9,
+  "schema_version": 10,
   "line": "21.x",
   "scope": "Finite original historical source probes only. Current-source coherence is mandatory; historical execution never admits current source, runtime, compiler, peer floors or G11. Two additional unchanged source programs use the exact pre-harness-preparation frame; current preparation requires its separate current qualification.",
   "current_frame": {
@@ -316,6 +316,18 @@
         "members": 6738
       },
       "timeout_ms": 120000
+    },
+    {
+      "id": "native-date-context-source",
+      "probe": "tests/native_date_source_context_probe.mjs",
+      "probe_sha256": "907ef84e83d09069b5083921052b222f68070588e68747e8a0b62d4a572a5b86",
+      "frame": {
+        "commit": "bf7de7a90e71be3122bd802674bc24baf03ca8a4",
+        "tree": "78e2c0700b8de9f4c87f246ccf2f9eae4902ceaa",
+        "tree_listing_sha256": "c0bfb952ed15496c4d03c049f7f42bf7fb958ba1be3710dccd5ba28d9df9834c",
+        "members": 7564
+      },
+      "timeout_ms": 45000
     }
   ],
   "wrapper_edits": [
@@ -579,6 +591,22 @@
         {
           "before": "['node', 'tests/upstream_test_consolidation_probe.mjs']",
           "after": "['node', 'scripts/run-historical-source-probe.mjs', 'test-consolidation-source']"
+        }
+      ]
+    },
+    {
+      "path": "tests/test_native_date_source_context.py",
+      "reference_commit": "bf7de7a90e71be3122bd802674bc24baf03ca8a4",
+      "before_sha256": "43bd74440ab1b10ce63d5e471a833e1557144e931cb0b76b52e6639e119acdf9",
+      "after_sha256": "fe6fbc3e043ff5653154c01c356290d5f324ebb6f4a11c96acdd3e9b748453a3",
+      "edits": [
+        {
+          "before": "command=['node','tests/native_date_source_context_probe.mjs']",
+          "after": "command=['node','scripts/run-historical-source-probe.mjs','native-date-context-source']"
+        },
+        {
+          "before": "command.append(os.environ['NGX_NATIVE_DATE_CONTEXT_DIAGNOSTIC'])",
+          "after": "command.extend(['--report',os.environ['NGX_NATIVE_DATE_CONTEXT_DIAGNOSTIC']])"
         }
       ]
     }
