@@ -39,6 +39,7 @@ import {requiresHistoricalBehavior,validateHistoricalBehavior} from './upstream-
 import {requiresProgressCsp,validateProgressCsp} from './upstream-progress-csp-evidence.mjs';
 import {requiresGeneratedIdentity,validateGeneratedIdentity} from './upstream-generated-identity-evidence.mjs';
 import {requiresNativeDate,validateNativeDate} from './upstream-native-date-evidence.mjs';
+import {requiresOwnedStyle,validateOwnedStyle} from './upstream-owned-style-evidence.mjs';
 import {requiresBidiBehavior,validateBidiBehavior} from './upstream-bidi-evidence.mjs';
 import {requiresSelectionBehavior,validateSelectionBehavior} from './upstream-selection-evidence.mjs';
 import {requiresFormFieldHover,validateFormFieldHover} from './upstream-form-field-hover-evidence.mjs';
@@ -245,7 +246,7 @@ function individualPatchBound(entry, proof) {
     ? body.reviews.find(item => item?.sha === entry.sha) : body;
   if (!review || review.sha !== entry.sha || review.diff_sha256 !== proof.diff_sha256) return false;
   if(!individualReviewScopeOk({entry,proof,body,review,
-    requiresIndividual:Boolean(sensitiveClass(entry))||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),
+    requiresIndividual:Boolean(sensitiveClass(entry))||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),
     claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)}))return false;
   let bytes;
   if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {
@@ -279,6 +280,11 @@ function individualProofOk(entry) {
   if (proof.proof_kind === 'batch' || proof.proof_kind === 'ancestry' || proof.proof_kind === 'import') return false;
   if (requiresNativeDate(entry, proof)) {
     const result = validateNativeDate({root, entry, proof, request});
+    artifactBehaviorResults.set(entry.sha, result);
+    if (!result.ok) return false;
+  }
+  if (requiresOwnedStyle(entry, proof)) {
+    const result = validateOwnedStyle({root, entry, proof, request});
     artifactBehaviorResults.set(entry.sha, result);
     if (!result.ok) return false;
   }
@@ -384,7 +390,7 @@ for (const entry of ledgerBySha.values()) {
     missingEvidence.push(entry.sha);
     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});
   }
-  const sensitive = sensitiveClass(entry) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)
+  const sensitive = sensitiveClass(entry) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)
     || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof);
   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);
   if (needsIndividual && !individualProofOk(entry)) {
@@ -553,6 +559,11 @@ function coordinatorRequest() {
     try { historicalExecution = JSON.parse(process.env.RC_UPSTREAM_HISTORICAL); }
     catch { return {error: 'RC_UPSTREAM_HISTORICAL is not JSON'}; }
   }
+  let sassExecution;
+  if (process.env.RC_UPSTREAM_SASS_SEAL !== undefined) {
+    try { sassExecution = JSON.parse(process.env.RC_UPSTREAM_SASS_SEAL); }
+    catch { return {error: 'RC_UPSTREAM_SASS_SEAL is not JSON'}; }
+  }
   let browserExecution;
   if (process.env.RC_UPSTREAM_BROWSER_MATRIX !== undefined) {
     try { browserExecution = JSON.parse(process.env.RC_UPSTREAM_BROWSER_MATRIX); }
@@ -563,7 +574,7 @@ function coordinatorRequest() {
     try { nativeMotionExecution = JSON.parse(process.env.RC_UPSTREAM_NATIVE_MOTION); }
     catch { return {error: 'RC_UPSTREAM_NATIVE_MOTION is not JSON'}; }
   }
-  return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line, packedConsumerExecution, historicalExecution, browserExecution, nativeMotionExecution};
+  return {binding, invocation, runId: process.env.RC_RUN_ID, outputDir, runDir: resolve(outputDir, '..', '..', '..'), line: binding.source_line, packedConsumerExecution, sassExecution, historicalExecution, browserExecution, nativeMotionExecution};
 }
 
 const dependencyGroups = request ? JSON.parse(readFileSync(join(root, 'compatibility/rc/matrices/full-verify.json'), 'utf8'))

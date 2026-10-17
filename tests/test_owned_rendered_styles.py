@@ -20,17 +20,23 @@ assert.equal(ownedStyleCaseIds().length,37);
 assert.equal(Object.values(OWNED_STYLE_PROBES).filter(p=>p.context==='typography').length,4);
 for(const probe of Object.values(OWNED_STYLE_PROBES).filter(p=>p.context==='typography'))for(const property of ['font-family','font-size','line-height','rect-height','rect-width'])assert.ok(probe.properties.includes(property));
 const reference=Object.fromEntries(Object.entries(OWNED_STYLE_PROBES).map(([id,p])=>[id,{found:true,values:Object.fromEntries(p.properties.map(k=>[k,k.startsWith('rect-')?'40':'tagged-value']))}]));
+for(const [id,p]of Object.entries(OWNED_STYLE_PROBES))if(['theme-light','theme-dark'].includes(p.context))for(const property of p.properties)if(['color','background-color'].includes(property))reference[id].values[property]=p.context==='theme-light'?'rgb(11, 22, 33)':'rgb(44, 55, 66)';
 const negative=structuredClone(reference);
 for(const [id,p] of Object.entries(OWNED_STYLE_PROBES)){const property=p.properties.includes('line-height')?'line-height':p.properties[0];negative[id].values[property]='wrong-but-nonempty';}
 assert.ok(Object.values(assessOwnedStyles(reference,reference,negative)).every(r=>r.result==='pass'));
+const baseline=assessOwnedStyles(reference,reference,negative);
 for(const [id,p] of Object.entries(OWNED_STYLE_PROBES)){
  const bad=structuredClone(reference);bad[id].values[p.properties[0]]='unrelated-wrong-value';
  const failed=Object.entries(assessOwnedStyles(reference,bad,negative)).filter(([,r])=>r.result==='fail').map(([id])=>id);
- assert.deepEqual(failed,[id]);
+ const affected=[id,...Object.entries(baseline).filter(([,row])=>{const w=row.customization_witness;return w&&w.property===p.properties[0]&&[w.baseline_case_id,w.themed_case_id].includes('owned-style/'+id);}).map(([id])=>id)];
+ assert.deepEqual(failed.toSorted(),[...new Set(affected)].toSorted());
  bad[id]={found:false,values:{}};assert.equal(assessOwnedStyles(reference,bad,negative)[id].result,'fail');
 }
 assert.ok(Object.values(assessOwnedStyles(reference,reference,reference)).every(r=>r.result==='fail'));
 for(const id of Object.keys(negative)){const inert=structuredClone(negative);inert[id]=structuredClone(reference[id]);assert.equal(assessOwnedStyles(reference,reference,inert)[id].result,'fail');}
+const flat=structuredClone(reference);
+for(const [id,p]of Object.entries(OWNED_STYLE_PROBES))if(['theme-light','theme-dark'].includes(p.context))flat[id]=structuredClone(reference['light/'+id.split('/')[1]]);
+for(const [id,p]of Object.entries(OWNED_STYLE_PROBES))if(['theme-light','theme-dark'].includes(p.context))assert.equal(assessOwnedStyles(flat,flat,negative)[id].result,'fail','inert full theme '+id);
 '''
         result=subprocess.run(['node','--input-type=module','-e',code],cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
@@ -64,13 +70,24 @@ for(const id of Object.keys(negative)){const inert=structuredClone(negative);ine
                         self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
 
                 if body['context'] in ('theme-light','theme-dark'):
-                    for field,value in [('custom_theme',{}),('theme_frames',{}),('reference_kind','untouched-material-16.2.14-css')]:
+                    snack='/snack-' in case;dark=body['context']=='theme-dark'
+                    target=('snack-container' if dark else 'snack-primary-action') if snack else ('disabled-placeholder' if dark else 'invalid-arrow')
+                    witness=body['customization_witness']
+                    self.assertEqual(witness['baseline_case_id'],'owned-style/light/'+target)
+                    self.assertEqual(witness['themed_case_id'],'owned-style/'+body['context']+'/'+target)
+                    self.assertEqual(witness['property'],'background-color' if snack and dark else 'color')
+                    for field,value in [('custom_theme',{}),('theme_frames',{}),('customization_witness',{}),('reference_kind','untouched-material-16.2.14-css')]:
                         bad=copy.deepcopy(body);bad[field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
                     for field,value in [('case_id','mixin-argument/all-legacy-component-themes/raw-color-config'),('line','foreign'),('identity',{}),('expected',{}),('actual',{})]:
                         bad=copy.deepcopy(body);bad['custom_theme'][field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
                     for mode in ('reference','candidate','negative'):
                         for field,value in [('context','light'),('body_scope',False),('body_scope',1),('nested_scope',True),('overlay_in_body',False),('overlay_outside_nested',False),('mutation_present',mode!='negative'),('theme_stylesheet_sha256','f'*64)]:
                             bad=copy.deepcopy(body);bad['theme_frames'][mode][field]=value;self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'),(case,mode,field))
+                    bad=copy.deepcopy(body)
+                    for mode in ('reference','candidate'):bad['customization_witness'][mode]['themed']=bad['customization_witness'][mode]['baseline']
+                    self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
+                    bad=copy.deepcopy(body);bad['customization_witness']['baseline_case_id']='owned-style/light/button-inheritance'
+                    self.assertFalse(owned_rendered_ok(ROOT,active,bad,'one'))
 
     def test_added_cases_preserve_the_original_branch_roster(self):
         task=json.loads((ROOT/'compatibility/rc/custom-owned-rendered-worksheet.json').read_bytes())
@@ -93,6 +110,7 @@ for(const id of Object.keys(negative)){const inert=structuredClone(negative);ine
             for suffix in ('light/snack-action','typography/snack-action','theme-light/snack-primary-action','theme-dark/snack-container'):
                 body=style_receipt(ROOT,active,'owned-style/'+suffix,'writer');context=body['context']
                 item={k:body[k] for k in ('case_id','group','kind','result','selector','context','reference_kind','found','properties','mutation_detected','mutation')}
+                if 'customization_witness' in body:item['customization_witness']=body['customization_witness']
                 rendered={k:body[k] for k in ('line','identities','versions','browser')}
                 rendered['settlement']={mode:{context:frame} for mode,frame in body['settlement'].items()}
                 if context=='typography':rendered['custom_typography_theme']=body['custom_typography_theme']
@@ -108,7 +126,7 @@ for(const id of Object.keys(negative)){const inert=structuredClone(negative);ine
         for (active,context),body in zip(subjects,outputs):
             self.assertTrue(owned_rendered_ok(ROOT,active,body,'writer'))
             if context in ('theme-light','theme-dark'):
-                for field in ('custom_theme','theme_frames'):
+                for field in ('custom_theme','theme_frames','customization_witness'):
                     bad=copy.deepcopy(body);del bad[field];self.assertFalse(owned_rendered_ok(ROOT,active,bad,'writer'))
 
     def test_actual_context_program_scopes_body_overlays_and_resets_prior_sheets(self):

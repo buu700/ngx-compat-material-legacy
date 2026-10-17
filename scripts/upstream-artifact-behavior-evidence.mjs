@@ -106,6 +106,19 @@ export const TOOLTIP_CONTAINER_MEMBERS=Object.freeze([
   'compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-portal.mjs',
   'compatibility/rc/dialog-public-container-peer-sources/cdk-22.1.7-_portal-directives-chunk.d.ts', ...producerMembers,
 ]);
+export const CHIP_BACKSPACE_SHA='46bcc21cbc19ff8ec946485febf70a85146f1026';
+export const CHIP_SEPARATOR_SHA='5153a5cd4bdd69649f07ba6596cad56bfd9eb2b1';
+const chipKeyboardCases=[
+  ['packed-consumer/harness/chip-input-backspace-release','chipBackspaceRelease'],
+  ['packed-consumer/harness/chip-repeated-removal-and-separator','chipRepeatedEvents'],
+];
+export const CHIP_KEYBOARD_MEMBERS=Object.freeze([
+  'projects/ngx-material-legacy/legacy-chips/chip-input.ts',
+  'projects/ngx-material-legacy/legacy-chips/chip.ts',
+  'projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts',
+  ...['chip-input.ts','chip.ts','chip-list.spec.ts','provenance.json'].map(path=>'reference/material-16.2.14/chips-keyboard-sources/'+path),
+  'scripts/check-upstream-audit-disposition.mjs','scripts/upstream-packed-run-evidence.mjs',...producerMembers,
+]);
 const scopes = new Map([
   [SELECT_FOCUS_SHA, {patch: SELECT_FOCUS_PATCH, kind: 'select-focus-before-click', members: SELECT_FOCUS_MEMBERS,
     caseId: SELECT_FOCUS_CLICK_CASE_ID, harness: 'selectFocusClick', evaluate: packedSelectFocusClickCase}],
@@ -119,18 +132,51 @@ const scopes = new Map([
     caseId:MENU_LAZY_CASE_ID,harness:'menuLazyObservation',legacyField:'lazyMenuLifecycle',evaluate:packedMenuLazyCase}],
   [TOOLTIP_CONTAINER_SHA,{patch:TOOLTIP_CONTAINER_PATCH,kind:'tooltip-eager-view-container',members:TOOLTIP_CONTAINER_MEMBERS,
     caseId:TOOLTIP_CONTAINER_CASE_ID,harness:'tooltipContainerObservation',legacyField:'tooltipOriginalEagerDependencies',evaluate:packedTooltipContainerCase}],
+  [CHIP_BACKSPACE_SHA,{patch:'83a4860a58a3fb63c5f26224735f2c0dbe7834d50889693f0468ba27796ee036',
+    kind:'original-chip-keyup-backspace-state',members:CHIP_KEYBOARD_MEMBERS,keyboard:true}],
+  [CHIP_SEPARATOR_SHA,{patch:'7be37f5426716aafd2a70dcaed7730abf6af48a625da0120252c819c7627e67e',
+    kind:'original-chip-repeated-separator-events',members:CHIP_KEYBOARD_MEMBERS,keyboard:true}],
 ]);
 /** Read-only finite metadata for individual source review and focused validation. */
 export function artifactBehaviorRequirements(sha){
   const row=scopes.get(sha);
-  return row?{sha,patch:row.patch,kind:row.kind,case_ids:[row.caseId],members:[...row.members],
-    harness:row.harness,legacy_field:row.legacyField||null}:null;
+  return row?{sha,patch:row.patch,kind:row.kind,case_ids:row.keyboard?chipKeyboardCases.map(([id])=>id):[row.caseId],members:[...row.members],
+    harness:row.keyboard?chipKeyboardCases.map(([,field])=>field):row.harness,legacy_field:row.legacyField||null}:null;
 }
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const demand = (value, message) => { if (!value) throw new Error(message); };
 const sameIds = (actual, expected) => Array.isArray(actual) && actual.length === expected.length
   && new Set(actual).size === actual.length && actual.every(id => expected.includes(id));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+
+/** Exact historical implementation and assertion, independent of current peers.
+ * Source hashes alone cannot authorize transplanting modern repeat semantics. */
+function originalChipKeyboardSource(root){
+  const base='reference/material-16.2.14/chips-keyboard-sources/';
+  const pins={
+    'chip-input.ts':'8970d734fc5404e9e54341a21bea9753311ed3447f415006ac41234ca9890680',
+    'chip.ts':'a3809031dbb69a835b3766f2af6052073939bab62a70161fe57e39260377fe5a',
+    'chip-list.spec.ts':'a64a9468dd842c9a944c381b466d135497baa7d25f1d7503b5a1aefd0e363053',
+  };
+  const originals=Object.fromEntries(Object.entries(pins).map(([path,pin])=>{
+    const bytes=readEvidenceMember(root,base+path);demand(hash(bytes)===pin,'changed original chip keyboard source');return [path,bytes.toString()];
+  }));
+  const read=name=>readEvidenceMember(root,'projects/ngx-material-legacy/legacy-chips/'+name).toString();
+  let candidate=read('chip-input.ts'),expected=originals['chip-input.ts'];
+  const replaceOnce=(text,before,after)=>{demand(text.split(before).length===2,'changed original chip input transform');return text.replace(before,after);};
+  candidate=replaceOnce(candidate,' * Copyright (c) 2026 Ryan Lester.\n','');
+  candidate=replaceOnce(candidate,"import {coerceBooleanProperty} from '@angular/cdk/coercion';\ntype BooleanInput = string | boolean | null | undefined;","import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';");
+  expected=replaceOnce(expected,'@Directive({','@Directive({\n  standalone: false,');
+  for(const declaration of ['MatChipInputEvent','MatChipInput'])expected=replaceOnce(expected,
+    ' * @deprecated Use `'+declaration+'` from `@angular/material/chips` instead. See https://material.angular.io/guide/mdc-migration for information about migrating.\n * @breaking-change 17.0.0\n','');
+  demand(candidate===expected,'changed original chip input algorithm or API');
+  const method=text=>{const matches=[...text.matchAll(/^  _handleKeydown\(event: KeyboardEvent\)(?:\s*:\s*void)?\s*\{[\s\S]*?^  }/gm)];demand(matches.length===1,'missing original chip keydown handler');return matches[0][0];};
+  demand(method(read('chip.ts'))===method(originals['chip.ts']),'changed original chip repeated-removal handler');
+  const begin="        it(\n          'should not focus the last chip when pressing BACKSPACE after changing input, '",
+    end="        it('should focus last chip after pressing BACKSPACE after creating a chip'";
+  const assertion=text=>{const start=text.indexOf(begin),finish=text.indexOf(end,start);demand(start>=0&&finish>start,'missing original chip keyup assertion');return text.slice(start,finish);};
+  demand(assertion(read('chip-list.spec.ts'))===assertion(originals['chip-list.spec.ts']),'changed original chip keyup assertion');
+}
 
 /** Registered subjects cannot fall back to a generic proof kind. */
 export function requiresArtifactBehavior(entry, proof) {
@@ -146,11 +192,17 @@ export function validateArtifactBehavior({root, entry, proof, request}) {
       && proof.diff_sha256 === registered.patch, 'unregistered artifact behavior subject');
     const scope = proof.artifact_behavior;
     demand(object(scope) && scope.kind === registered.kind
-      && sameIds(scope.case_ids, [registered.caseId]), 'wrong artifact behavior scope');
+      && sameIds(scope.case_ids, registered.keyboard?chipKeyboardCases.map(([id])=>id):[registered.caseId]), 'wrong artifact behavior scope');
     demand(Array.isArray(scope.source_members)
       && sameIds(scope.source_members.map(row => row?.path), registered.members), 'incomplete reviewed source scope');
     for (const row of scope.source_members) {
       demand(/^[0-9a-f]{64}$/.test(row.sha256) && hash(readEvidenceMember(root, row.path)) === row.sha256, 'stale reviewed source member');
+    }
+    if(registered.keyboard){
+      const line=request?.line??proof.affected_branches?.[0];
+      demand(entry.final_disposition==='do-not-adopt'&&['main','21.x'].includes(line)
+        &&isDeepStrictEqual(proof.affected_branches,[line]),'wrong original chip decision or source branch');
+      originalChipKeyboardSource(root);
     }
     if (entry.sha === TABLE_ONPUSH_SHA) {
       const line = request?.line ?? proof.affected_branches?.[0];
@@ -167,7 +219,11 @@ export function validateArtifactBehavior({root, entry, proof, request}) {
     demand(runtime.ok, runtime.detail);
     const selected = runtime.observation.cases.find(row => row.case_id === registered.caseId);
     const harness = runtime.observation.extra?.harness;
-    if (entry.sha === SELECT_FOCUS_SHA) {
+    if(registered.keyboard){
+      demand(harness?.ok===true&&chipKeyboardCases.every(([id,field])=>harness[field]===true
+        &&runtime.observation.cases.find(row=>row.case_id===id)?.legacy_harness_passed===true),
+      'insufficient original chip keyboard observations');
+    } else if (entry.sha === SELECT_FOCUS_SHA) {
       demand(selected?.legacy_harness_passed === true && harness?.selectOpened === true && harness.selectClosed === true
         && harness.viewportShared === true && isDeepStrictEqual(harness.selectFocusClick, selected.observation)
         && packedSelectFocusClickCase(selected.observation).result === 'pass', 'insufficient select focus/click observations');
