@@ -1,0 +1,1394 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "judgment_stage": "source-complete-runtime-required",
+  "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+  "final_disposition": "already-adapted",
+  "diff_sha256": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+  "patch_file": "compatibility/rc/select-focus-click-original.patch",
+  "complete_original_files": [
+    "src/material/select/select.html",
+    "src/material/select/select.ts"
+  ],
+  "original_patch_has_test_hunk": false,
+  "source_parent": "555d7ae9c5f1c5e9db08240e8d3304c2d73d9fb0",
+  "source_conclusion": "The complete two-file/four-hunk focus-handler fix is already incorporated in the owned legacy select: trigger click opens idempotently, both base and derived open guards precede side effects/geometry, closed close() performs no touch/notification work, and public toggle() remains available. Modern-only MDC state notification mechanics are not copied into the historical form-field lifecycle. This is a completed source disposition with mandatory artifact-required behavior evidence; it is not a local packed/native execution, G11 pass or security clearance.",
+  "hunk_reviews": [
+    {
+      "hunk": 1,
+      "file": "src/material/select/select.html",
+      "change": "Trigger click toggle() -> open().",
+      "candidate": "legacy-select/select.html",
+      "judgment": "The owned trigger already calls open(). A focus listener can open before click; calling open again is idempotent. Explicit public toggle remains a separate operation. This changes event behavior intentionally while preserving rendered hierarchy/classes and all consumer HTML/CSS/SCSS requirements.",
+      "evidence": [
+        "select-focus-click-original-review.json",
+        "select-focus-click-method-diagnostic.json",
+        "select-focus-click-packed-admission-diagnostic.json"
+      ]
+    },
+    {
+      "hunk": 2,
+      "file": "src/material/select/select.ts",
+      "change": "Move _canOpen() early return before geometry/modal work.",
+      "candidate": "legacy-select/internal/select-base.ts and legacy-select/select.ts",
+      "judgment": "Owned base open checks destroyed/_canOpen before motion, modal or key-manager work. Derived public open checks super._canOpen before base open and trigger measurement, font-size reads, position calculation or render subscription. Disabled, empty and already-open calls avoid work; whole-method protocol reversions expose missing base/derived guards.",
+      "evidence": [
+        "select-focus-click-method-diagnostic.json"
+      ]
+    },
+    {
+      "hunk": 3,
+      "file": "src/material/select/select.ts",
+      "change": "Flatten successful-open block after early guard; avoid unconditional MDC stateChanges on no-op open.",
+      "candidate": "legacy-select/internal/select-base.ts",
+      "judgment": "Successful legacy opening still sets its own panel/overlay state and drives the existing historical attach/motion lifecycle. No-op focus-trigger open returns before those effects. Historical legacy open did not need the unconditional MDC form-field stateChanges notification; adding it would change the owned lifecycle without serving this fix. Both minimum current peer methods likewise guard first; their explicit attach/notification implementation remains peer-owned.",
+      "evidence": [
+        "select-focus-click-peer-source-review.json",
+        "select-focus-click-method-diagnostic.json"
+      ]
+    },
+    {
+      "hunk": 4,
+      "file": "src/material/select/select.ts",
+      "change": "Emit MDC close stateChanges only when previously open.",
+      "candidate": "legacy-select/internal/select-base.ts",
+      "judgment": "Owned close guards !_motionDestroyed && _panelOpen before state mutation, touch, key-manager work and exit/detach. It already lacks an unconditional legacy close notification, so a closed close remains a no-op. The original16 legacy lifecycle is preserved; there is no justification to add the MDC notification. Whole-owned-method protocol and the mandatory packed case cover repeated close/touch/state/output effects.",
+      "evidence": [
+        "select-focus-click-method-diagnostic.json",
+        "select-focus-click-packed-admission-diagnostic.json"
+      ]
+    }
+  ],
+  "branch_review": {
+    "source_line": "21.x",
+    "minimum_material": "21.2.14",
+    "scope": "Own branch source and authenticated public minimum package, not tag ancestry or cross-line execution attribution.",
+    "both_minimum_sources_reauthenticated": true,
+    "current_peer_static_only": true
+  },
+  "original16": {
+    "sources": [
+      {
+        "path": "reference/material-16.2.14/select-render-sources/select-base.ts",
+        "sha256": "ba939bcc724eab50cc71c628c3977ddd68f052bfb265a77de8793ec09562cd73"
+      },
+      {
+        "path": "reference/material-16.2.14/select-render-sources/select.ts",
+        "sha256": "f75594460cc49d590a74643ce2888990f498262d83c63d907966d5095ee0098d"
+      },
+      {
+        "path": "reference/material-16.2.14/template-control-flow/legacy-select--select.html",
+        "sha256": "bf085c3364ffb1ab2956416abaa8725e0b7d78e25ac88763c7c9b16add8b72fd"
+      }
+    ],
+    "expected_focus_click_bug_reproduced_by_whole_prototype_protocol": true,
+    "actual_constructor_or_Angular_node_executed": false
+  },
+  "reviewed_source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.html",
+      "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+      "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+      "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+    },
+    {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+    },
+    {
+      "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+      "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-contract.mjs",
+      "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-fixture.mjs",
+      "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-contract.mjs",
+      "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-fixture.mjs",
+      "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+    },
+    {
+      "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+      "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+    },
+    {
+      "path": "scripts/select-focus-click-packed-fixture.mjs",
+      "sha256": "2219e4ce6ffab2f631f2577466fe79bb862542eda877a97d31a59a3178bf730e"
+    },
+    {
+      "path": "scripts/select-focus-click-packed-contract.mjs",
+      "sha256": "649c152cc7655ef086ee2eaf362810d279a03c6858d7d3c334fce1f46e707897"
+    },
+    {
+      "path": "compatibility/rc/matrices/library-exports.json",
+      "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "7ad45f46e30876888753c2cf2dbebab11d12327dc87cc0dbdec520440cd098ed"
+    }
+  ],
+  "independent_evidence": [
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-click-review.json",
+      "sha256": "11a6fbf21095b6b0c3c66b44973b4106f4a91b595561d0b0e8456bfd11c7ecce"
+    },
+    {
+      "path": "compatibility/rc/select-focus-click-original-review.json",
+      "sha256": "5b8227ba98aad4f15df04f61d158e548793249201f2b0b8aa99885f8c1d1c010"
+    },
+    {
+      "path": "compatibility/rc/select-focus-click-peer-source-review.json",
+      "sha256": "6554b451129749bb1bdc17b49570693c9b3605f16b9842a3096807925c28b98b"
+    },
+    {
+      "path": "compatibility/rc/select-focus-click-method-diagnostic.json",
+      "sha256": "24221c9b2dd17b76006879d779f5b50c6160bd3191ea1ea2e22c0e5de4604f87"
+    },
+    {
+      "path": "compatibility/rc/select-focus-click-packed-admission-diagnostic.json",
+      "sha256": "bfc180b530258b589490521591bbcb9eb99fd7a388a4e1a4e11321509e430b95"
+    },
+    {
+      "path": "compatibility/rc/select-focus-source-judgment-authentication.json",
+      "sha256": "17a853e89dd8970e440a0e87c29560bcd74184d74b7bb8445c3bfc903f509aa5"
+    },
+    {
+      "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+      "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+    },
+    {
+      "path": "scripts/select-focus-click-packed-fixture.mjs",
+      "sha256": "2219e4ce6ffab2f631f2577466fe79bb862542eda877a97d31a59a3178bf730e"
+    },
+    {
+      "path": "scripts/select-focus-click-packed-contract.mjs",
+      "sha256": "649c152cc7655ef086ee2eaf362810d279a03c6858d7d3c334fce1f46e707897"
+    },
+    {
+      "path": "tests/select_focus_click_method_probe.mjs",
+      "sha256": "6801359e2c7c6b7a7215758c636e720ceb5e086a41a476cf1a4e1ea5dda20eef"
+    },
+    {
+      "path": "tests/select_focus_click_packed_contract_probe.mjs",
+      "sha256": "4dff316d3fedd6218011a429434245e8312084325e63c2416f66ea1260b64c49"
+    },
+    {
+      "path": "tests/select_public_open_lifetime_probe.mjs",
+      "sha256": "ad8b78eac9eb8ec6db234ac7246eaae80821847e8ce26268a99ad520710b3c08"
+    },
+    {
+      "path": "scripts/upstream-packed-run-evidence.mjs",
+      "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-inputs.json",
+      "sha256": "0fca9a08785217834aa5a5777738f7a09b81a62408311338eac7f51da9ea34d7"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-source-proof.json",
+      "sha256": "390d7d38836f29f6a4b31d9d588da4c941741b7a291085aa910814dcfd1bb952"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-registration-controls.json",
+      "sha256": "923a6b5035ea8ea6380c99497fd096fb7256ac4ee178df4db9174a068b735312"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-writer-controls.json",
+      "sha256": "4c143f183009c4b9cbe4fd27d3f6fb45bc3eb93e49ba0e5e0dce0b42f076d230"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-current-roster.json",
+      "sha256": "863714792eff495ea4e4e2bcdc71c716c01103ae5a5a05dc97dc046ddd5796e3"
+    },
+    {
+      "path": "compatibility/rc/historical-branch-admission-prior-contexts.json.gz",
+      "sha256": "d7b14e464bafa91e716160958288fb751bd51780b883228f09a611d69e5231b2"
+    },
+    {
+      "path": "tests/upstream_artifact_extended_scope_probe.mjs",
+      "sha256": "456c00f80f7f8667adb3c01428d9fd7b99636ea44f5d01042a12a8ea09653aaf"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-admission-requalification.json",
+      "sha256": "7ca3a17fa1f7c7c4daa62d4e5de20ab665cb5cf3d3c87edd99246e52fc407236"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-checkpoint.json",
+      "sha256": "561e83f7ec266bca4f3fa65816c4089ca2a4d17fc173f2bc3702a6d9fa67127c"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-controls.json",
+      "sha256": "c515f2f6d0c86feadadeabc6a894fc2835b10d8645feb420df6b05143db79522"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-source-inputs.json",
+      "sha256": "d40f82b76e481eba9b16969b42d9de9269e7523c48d308a3167557512977679c"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-dependency-proof.json",
+      "sha256": "c321b31b07057090704e4c2ba85249045dbb58a5af3dd3654b6a4f2adcadc0de"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-final-g11.json.gz",
+      "sha256": "2cc7bd67a75b4c58e34d18d2ad1cc991d72afcc2f30a4f6132eb8b0531530568"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-source-proof.json",
+      "sha256": "f67307481823c46627f2e9a735ec5dff4f2a09b16cfc4fbefbf481d503721653"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-menu-tooltip-focus-context-source-judgment.json",
+      "sha256": "52ee9a65165048c990d5b59c1c29b4ad95dc5fd1ad779bfa844794ec74e0053a"
+    },
+    {
+      "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+      "sha256": "6c31a5a9483c17da1420559d530f8a39a3a8f4d90b55346d23ed2d099c5b57b8"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-contract.mjs",
+      "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-fixture.mjs",
+      "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-source-requalification.mjs",
+      "sha256": "8af454d84a753f57d57af6df261527dfbabc9c940f06410080d614d3fa28e266"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-evidence-requalification.mjs",
+      "sha256": "ebe0e1614336e5fcf4b088a83f4f2968b52400808d7b975f6605a701ebce1333"
+    },
+    {
+      "path": "tests/bidi_isolated_packed_sample.mjs",
+      "sha256": "460a9ae10da400dc743f5f05238b2ac97b0b8783a9e9fbfb9d31bc2ab9c2af94"
+    },
+    {
+      "path": "tests/bidi_isolated_packed_probe.mjs",
+      "sha256": "6b5a1ff2b2cffea149930970dac2e8b9ac5e0d48a4115b28ca71bf1af8e01f77"
+    },
+    {
+      "path": "tests/bidi_isolated_requalification_probe.mjs",
+      "sha256": "30de1f8c0e8a5642ab60febd34384db53803f130489b29e27135992c3f4dff24"
+    },
+    {
+      "path": "tests/test_bidi_isolated_requalification.py",
+      "sha256": "6bccc20589803ac755b21664920e6be9f83fd43c37e6ca5bea24c16db508c1af"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "sha256": "31e376673c1aee1fe5f71ee7bda0ae7d485dc7d5f8adb05fea36d182c28dcdfd"
+    },
+    {
+      "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+      "sha256": "a78a1af851fad2da87d8f9ec4df96463bbe017b94a84d79d858360086bb0ca57"
+    },
+    {
+      "path": "scripts/selection-comparator-source-judgments.mjs",
+      "sha256": "75e7e1714918123085897d39692cd586f997ad14ef38a7e68d055fb61119d473"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-source-context.mjs",
+      "sha256": "d1fc5106e9591c48f0118eec4fb06503390369e68499b0315ddc049dd94cc512"
+    },
+    {
+      "path": "scripts/upstream-selection-evidence.mjs",
+      "sha256": "ad26403d8e4b2ebfa8b9d98aaa6e3ef844e8cebaeee56ce6f3432fec0d226fb2"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-contract.mjs",
+      "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-fixture.mjs",
+      "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-source-proof.json",
+      "sha256": "005a5cb62409fa5bbc5130d867a41fa7e2203ca2d83e29906ffb7aa5fb207ece"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-context-proof.json",
+      "sha256": "1f4265cd3759543e89610efd007fcf2981357531f63cb4c9f6cd019b55d18b4e"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-proof.json",
+      "sha256": "011533399904f0dff41c7ed4c2c883400c61f8f5824efe50c0a0ea2e8d4d1a80"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "21cc8dfa42197436dae5abda6c37b181cb8f232a66848be412267d6610cbbddf"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "9604d03f776294bb8a22c3015c4d40d2e0f98bd65b4a8b45ceb7738458706438"
+    }
+  ],
+  "prior_entry": {
+    "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/select): flicker if opened from inside a focus handler (#28287)",
+    "files": [
+      "src/material/select/select.html",
+      "src/material/select/select.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Complete original hunk and21.x owned/peer source review support the focus-before-click regression preparation. This line remains pending until the strengthened actual artifact-bound select case executes; no earlier21.x behavior qualification is inferred from main or from source presence.",
+    "read_note_disposition": "complete-source-review-awaiting-packed-focus-click-execution",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-click-review.json"
+  },
+  "prior_pending_record": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-click-review.json",
+    "sha256": "11a6fbf21095b6b0c3c66b44973b4106f4a91b595561d0b0e8456bfd11c7ecce"
+  },
+  "runtime_qualification": {
+    "required": true,
+    "qualified_by_this_document": false,
+    "check": "packed-consumer",
+    "case_ids": [
+      "packed-consumer/harness/legacy-select"
+    ],
+    "contract": "Current coordinator-observed successful invocation and complete106-case report, same clean source/line/run/library bytes and hashed owned assertion, structured bare/form-field legacy/current focus-click, native backdrop, no-op guards, public toggle and teardown. Re-evaluated by registered artifact-required proof; absent or insufficient runtime stays failed."
+  },
+  "consumer": {
+    "cyph_read_only": true,
+    "related_files_rehashed": 12,
+    "required_consumer_HTML_CSS_SCSS_changes": false,
+    "component_structure_or_styles_changed": false,
+    "TS_API_changed": false
+  },
+  "actual_packed_or_native_executed": false,
+  "semantic_pass": false,
+  "security_clearance": "not-passed",
+  "g11_claim": "not-passed",
+  "prior_source_judgment": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-click-source-judgment.json",
+    "sha256": "ae42373e2dab130ffbb4e6e2dbfb5d267483007cd7a08b7343cb83c921bf213e"
+  },
+  "admission_refactor_review": {
+    "worksheet": {
+      "path": "compatibility/rc/artifact-extended-worksheet.json",
+      "sha256": "ffc65285e09a908d4d6f556d772b49ad49741b5b3fa1ee9d04112d44a5f5a992"
+    },
+    "exact_before_helper": {
+      "path": "compatibility/rc/artifact-extended-focus-helper-preimage.mjs",
+      "sha256": "f6bd49a06b6ed991d1ebe230c2bcf7ca2ffcfb68c4d892f6654d9b8644dcdfd6"
+    },
+    "scope": "Only the admission helper is factored into shared packed-run validation plus a finite three-SHA wrapper. Focus source judgment, original hunk/peer/caller evidence, all ten pinned source/producer members and its exact observation predicate are retained. Existing87 controls and real-source11 actual CLI fixture cases must pass; no runtime or G11 qualification follows from this requalification."
+  },
+  "shared_guard_source_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "77fc11f555ebe0c847b333825721ae7546c72a3c",
+    "prior_contexts": {
+      "path": "compatibility/rc/table-onpush-constructor-prior-contexts.json.gz",
+      "sha256": "e8b8007f6d234d50f3222ef2477cb504e3b3ef6a0498e62cd3677e9357a319e4",
+      "raw_sha256": "d00900547c73588b750a7c21ddd65971d707e48af314605250458ac052b7138c"
+    },
+    "shared_guard_before_sha256": "15a5155eaaf3276e8204652dc706baa5535e4a9f997f9f0af39a2ab46e142d89",
+    "shared_guard_current_sha256": "06deea33059729448f3b095be0e14bf1ea10c8bf1f9f3e0a522129d5a75af52b",
+    "complete_guard_recovered_by_removing_only_helper_member": true,
+    "reviewed_table_source_members": 14,
+    "whole_preceding_table_recovered": true,
+    "owned_renderer_overrides": [],
+    "detector_node_lookup_forwarded": true,
+    "actual_minimum_constructor_namespaces": [
+      {
+        "framework": "22.1.7",
+        "cdk": "22.1.7",
+        "node": "v22.23.3"
+      },
+      {
+        "framework": "21.2.23",
+        "cdk": "21.2.14",
+        "node": "v22.23.3"
+      }
+    ],
+    "minimum_renderer_modules": [
+      {
+        "path": "compatibility/rc/table-public-module-sources/cdk-22.1.7-table.mjs",
+        "sha256": "2bdeb437714a07914ccb8d2f749fd75d72b63da1ab4cc0c069f64e714c2a6ad4",
+        "version": "22.1.7",
+        "methods": [
+          {
+            "name": "renderRows",
+            "sha256": "d4a15a7f60cc5acef448a4f7cd05b534fbbd78d8e0403c5203a56fe6e46f59c7"
+          },
+          {
+            "name": "_observeRenderChanges",
+            "sha256": "c7b67b142da6e984c2b1046f6199ef0ceb59eaa5635a68c174ab7e2a4ac240cb"
+          },
+          {
+            "name": "_updateNoDataRow",
+            "sha256": "f8d51c0877f69ef7bf3d1237d39f910a4f70c226f6afa01470cfeee75d33db3a"
+          },
+          {
+            "name": "_switchDataSource",
+            "sha256": "d0e567895f80a53a92b223b112290ec742179a6bfca3dec6117e45ef6d211cfb"
+          }
+        ],
+        "no_data_visibility_mark_retained": true
+      },
+      {
+        "path": "compatibility/rc/table-public-module-sources/cdk-21.2.14-table.mjs",
+        "sha256": "ea8d99a22482768bab22e19aba83b2a1498be6be340e46991965f539036b6c11",
+        "version": "21.2.14",
+        "methods": [
+          {
+            "name": "renderRows",
+            "sha256": "c0c6678790c8360d77f0399b2fb96d035b8d4799550b0887ee847395da016f8f"
+          },
+          {
+            "name": "_observeRenderChanges",
+            "sha256": "c7b67b142da6e984c2b1046f6199ef0ceb59eaa5635a68c174ab7e2a4ac240cb"
+          },
+          {
+            "name": "_updateNoDataRow",
+            "sha256": "f8d51c0877f69ef7bf3d1237d39f910a4f70c226f6afa01470cfeee75d33db3a"
+          },
+          {
+            "name": "_switchDataSource",
+            "sha256": "d0e567895f80a53a92b223b112290ec742179a6bfca3dec6117e45ef6d211cfb"
+          }
+        ],
+        "no_data_visibility_mark_retained": true
+      }
+    ],
+    "complete_original_files": 2,
+    "complete_original_hunks": 8,
+    "constructor_diagnostic_scope": "Genuine minimum public CdkTable constructors/node DI with renderer/viewport/service protocols and lifecycle substitutions; focused Angular22 full/partial AOT fixture. Not a full legacy view, compiler21, packed/native or floor pass.",
+    "source_only": true,
+    "semantic_pass": false,
+    "g11_claim": "not-passed"
+  },
+  "historical_branch_matrix_requalification": {
+    "source_proof": {
+      "path": "compatibility/rc/historical-branch-admission-source-proof.json",
+      "sha256": "390d7d38836f29f6a4b31d9d588da4c941741b7a291085aa910814dcfd1bb952"
+    },
+    "scope": "Only current-line historical native matrix requirements expand by68, with every2157 preceding case identity retained. Finite dialog/table registration is resolved and actual Jasmine registration fixtures agree; own branch literal guard behavior and complete historical writer semantics are preserved. All product source, packed106 identities/predicates and shared same-run validators remain unchanged. This updates only the matrix identity used by the existing source review; actual current packed behavior and full native qualification remain mandatory."
+  },
+  "producer_context_source_conclusion": "The complete select focus-before-click predicate and its original three harness conditions are byte-identical. The pure new helper handles three different existing case IDs; its stronger final harness aggregate can reject more incomplete runs but cannot admit a weaker select result. Bare/form-field legacy/current focus, native backdrop, blocked/no-op paths, toggle and teardown fixtures are unchanged. Only the packed producer context and the two explicit helper/guard source dependencies are requalified.",
+  "chip_menu_tooltip_context_requalification": {
+    "source_parent": "555d7ae9c5f1c5e9db08240e8d3304c2d73d9fb0",
+    "subject_sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+    "preceding_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-admission-requalification.json",
+      "sha256": "7ca3a17fa1f7c7c4daa62d4e5de20ab665cb5cf3d3c87edd99246e52fc407236"
+    },
+    "inputs": {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-inputs.json",
+      "sha256": "7be7c160690ed24054fac496bffa824e2c168ad03c6911a74245216def90699a"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-source-proof.json",
+      "sha256": "f67307481823c46627f2e9a735ec5dff4f2a09b16cfc4fbefbf481d503721653"
+    },
+    "guard_change": {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-guard-change.json",
+      "sha256": "6c80d13b7d4e9d80273cf44e0cce148d62861492113d6153bfd9d9984ba56341"
+    },
+    "added_source_members": [
+      {
+        "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+        "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+      },
+      {
+        "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+        "sha256": "75835d3151a185ef0cf4e85c3e695b1b8a07081c4cfb7c56331446591ee74875"
+      }
+    ],
+    "original_hunks_and_prior_source_conclusions_retained": true,
+    "actual_runtime_qualified": false
+  },
+  "bidi_isolated_source_context": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-menu-tooltip-focus-context-source-judgment.json",
+      "sha256": "52ee9a65165048c990d5b59c1c29b4ad95dc5fd1ad779bfa844794ec74e0053a"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+      "sha256": "6c31a5a9483c17da1420559d530f8a39a3a8f4d90b55346d23ed2d099c5b57b8"
+    },
+    "original_hunk_decisions_retained": true,
+    "runtime_validation_bodies_unchanged": true,
+    "actual_runtime_qualified": false
+  },
+  "selection_comparator_context_requalification": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "sha256": "31e376673c1aee1fe5f71ee7bda0ae7d485dc7d5f8adb05fea36d182c28dcdfd"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+      "sha256": "a78a1af851fad2da87d8f9ec4df96463bbe017b94a84d79d858360086bb0ca57"
+    },
+    "complete_preceding_source_and_scope_recovered": true,
+    "original_runtime_predicate_and_hunk_decisions_retained": true,
+    "actual_runtime_qualified": false
+  },
+  "individual_proof": {
+    "proof_kind": "artifact-required-individual-behavior",
+    "diff_sha256": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "The complete two-file/four-hunk focus-handler fix is already incorporated in the owned legacy select: trigger click opens idempotently, both base and derived open guards precede side effects/geometry, closed close() performs no touch/notification work, and public toggle() remains available. Modern-only MDC state notification mechanics are not copied into the historical form-field lifecycle. This is a completed source disposition with mandatory artifact-required behavior evidence; it is not a local packed/native execution, G11 pass or security clearance.",
+    "artifact_behavior": {
+      "kind": "select-focus-before-click",
+      "case_ids": [
+        "packed-consumer/harness/legacy-select"
+      ],
+      "source_members": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.html",
+          "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+          "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+          "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+        },
+        {
+          "path": "scripts/packed-consumer-aot-smoke.mjs",
+          "sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
+        },
+        {
+          "path": "scripts/packed-consumer-evidence.mjs",
+          "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+        },
+        {
+          "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+        },
+        {
+          "path": "scripts/bidi-isolated-packed-contract.mjs",
+          "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+        },
+        {
+          "path": "scripts/bidi-isolated-packed-fixture.mjs",
+          "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+        },
+        {
+          "path": "scripts/selection-comparator-packed-contract.mjs",
+          "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+        },
+        {
+          "path": "scripts/selection-comparator-packed-fixture.mjs",
+          "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+        },
+        {
+          "path": "scripts/native-date-packed-contract.mjs",
+          "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+        },
+        {
+          "path": "scripts/native-date-packed-fixture.mjs",
+          "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
+        },
+        {
+          "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+          "sha256": "815acad5ae822d885db27db66f486e0c762b30796ea93b6bb4fd0c77302ad8a3"
+        },
+        {
+          "path": "scripts/select-focus-click-packed-fixture.mjs",
+          "sha256": "2219e4ce6ffab2f631f2577466fe79bb862542eda877a97d31a59a3178bf730e"
+        },
+        {
+          "path": "scripts/select-focus-click-packed-contract.mjs",
+          "sha256": "649c152cc7655ef086ee2eaf362810d279a03c6858d7d3c334fce1f46e707897"
+        },
+        {
+          "path": "compatibility/rc/matrices/library-exports.json",
+          "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "e7a4875c48d489e268beaef1ed02adebb0522b85bd3127d8e08dffe9be6d1244"
+        }
+      ]
+    },
+    "historical_roster_source_context": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "442187db5e0b01d8eecc12e9095fd494b8e6a87040ed5d08aa158768454fb2ea"
+    }
+  },
+  "remaining_native_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "3ac4d4a8342fbe669550c4581e519f7163fb5d9d",
+    "release_reference_parent": "db8d09d3cde8d41d93d685e65a274838bd4fd874",
+    "inputs": {
+      "path": "compatibility/rc/remaining-native-admission-source-inputs.json",
+      "sha256": "4fc2837d8522c891df277eda3cf3a63cf56f6c657e4ae5c113390f7d943da727"
+    },
+    "prior": {
+      "path": "compatibility/rc/remaining-native-admission-integration-prior.json.gz",
+      "sha256": "4d6e21f046f28c693c52d7de2768c1b8c1271a71c6bcb08a06ae0a03e62fa235",
+      "source_parent": "db8d09d3cde8d41d93d685e65a274838bd4fd874"
+    },
+    "changed_product": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+        "before_sha256": "bf02faabd1d0fff61c0e756ee6422af4d417b4d045c475179807c195b4edf7b4",
+        "current_sha256": "7a84291a13db6e907e84b42a581f993d81e6da1f28966696861d0b325e6def14"
+      }
+    ],
+    "unchanged_product_members": 1140,
+    "original_decisions_hunks_and_analyses_retained": true,
+    "public_tab_boundary_roles": 13,
+    "implementation_evidence": [
+      {
+        "path": "compatibility/rc/remaining-native-admission-root-dispatch-controls.json",
+        "sha256": "f47360ff39d54fa6533adb7f5d4370545fdaeea0e089bac3abd618e3a9ba17e3"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-ripple-controls.json",
+        "sha256": "c98211a60a99ab2d21146ab4096d92d0c6baa56da5460452b156f799ca992aba"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-lifecycle.json",
+        "sha256": "d8a6d6fd6a38cc128188b6c569d49b9c4e1e6bf60fae67f68b5981bdf5c52e43"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-controls.json",
+        "sha256": "c9b9bc967d3043acc29816130f6f8869cce7c62f3d1a349ebc73ee260709d445"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-layout-native-css.json.gz",
+        "sha256": "bff5c3857027bac41978d1e6be34276364b6550fe48074cbe8198ef99e5b1651"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-cyph-style-sanity.json",
+        "sha256": "1068d53ce0cb4505decd40b3a6a3bf4e2eb79f6ef560aea6c288e4d0acb93015"
+      }
+    ],
+    "scope": "The exact11-line private incoming-pane layout insertion changes no package membership, peer import/API, constructor, decorator, build input or resource. Original build/test/slider exclusions remain unchanged; no new upstream/runtime/security decision.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-selection-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "sha256": "9c3190918971838b2ea5f1faed528ed574432e0d584656c7ca6cb5846435ba87"
+    },
+    "prior_individual_proof": {
+      "proof_kind": "artifact-required-individual-behavior",
+      "diff_sha256": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "decision": "The complete two-file/four-hunk focus-handler fix is already incorporated in the owned legacy select: trigger click opens idempotently, both base and derived open guards precede side effects/geometry, closed close() performs no touch/notification work, and public toggle() remains available. Modern-only MDC state notification mechanics are not copied into the historical form-field lifecycle. This is a completed source disposition with mandatory artifact-required behavior evidence; it is not a local packed/native execution, G11 pass or security clearance.",
+      "artifact_behavior": {
+        "kind": "select-focus-before-click",
+        "case_ids": [
+          "packed-consumer/harness/legacy-select"
+        ],
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+            "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+            "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+          },
+          {
+            "path": "scripts/packed-consumer-aot-smoke.mjs",
+            "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+          },
+          {
+            "path": "scripts/packed-consumer-evidence.mjs",
+            "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+          },
+          {
+            "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+            "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-contract.mjs",
+            "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-fixture.mjs",
+            "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-contract.mjs",
+            "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-fixture.mjs",
+            "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+          },
+          {
+            "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+            "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+          },
+          {
+            "path": "scripts/select-focus-click-packed-fixture.mjs",
+            "sha256": "2219e4ce6ffab2f631f2577466fe79bb862542eda877a97d31a59a3178bf730e"
+          },
+          {
+            "path": "scripts/select-focus-click-packed-contract.mjs",
+            "sha256": "649c152cc7655ef086ee2eaf362810d279a03c6858d7d3c334fce1f46e707897"
+          },
+          {
+            "path": "compatibility/rc/matrices/library-exports.json",
+            "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+          },
+          {
+            "path": "compatibility/rc/matrices/full-verify.json",
+            "sha256": "f72e2b5715c760a709aa62678e0352c16eed8945ffe0ebb4a136ec4daa57cfe0"
+          }
+        ]
+      }
+    },
+    "original_hunk_and_branch_judgments_retained": true
+  },
+  "tab_lifecycle_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "fd212e1d7b7a48854544391b1963ef44b74b6385",
+    "release_reference_parent": "9d7f09cc55d85979272f0e42aaad564ad3ec1fd6",
+    "inputs": {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-inputs.json",
+      "sha256": "75bbfe68fcdc37978ea257e2c4c5a3370002c7e4bef6691281ceb28cf49e477f"
+    },
+    "prior": {
+      "path": "compatibility/rc/remaining-native-admission-tab-lifecycle-repair-prior.json.gz",
+      "sha256": "a15203c1865926d53ba5f1ca6d6a1e4fbae1f9a9cc1dbb0e158a8827afdcad35"
+    },
+    "changed_product": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+        "before_sha256": "7a84291a13db6e907e84b42a581f993d81e6da1f28966696861d0b325e6def14",
+        "current_sha256": "9133c2404db7ef40b39819969e310a71caf660c9d9c05ecfd16a8a4fe6ea0154"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+        "before_sha256": "fb4e59b10d5d2f72cf8aa00688a67ad21a415928e588957d9e5ae0b00782aa53",
+        "current_sha256": "c4d86c99bfeed0a10d6451e034ade808bfb52b4240471e1aef5ccd47e3f124f1"
+      }
+    ],
+    "unchanged_product_members": 1139,
+    "original_decisions_hunks_and_analyses_retained": true,
+    "public_tab_boundary_roles": 13,
+    "implementation_evidence": [
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-lifecycle-controls.json",
+        "sha256": "7a855591fe8cc4bcb66c0b7c2900820fa54ac862d2168bf832d0859747a0c96d"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-producer-controls.json",
+        "sha256": "e2d96d2d159ba09bc3599cc8600d4e337e3b0640445f1ba9400b7f71b5f3884e"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-admission-controls.json",
+        "sha256": "63f6d1776a334d1ea9a2d4d8e13ff5b999960dcfc4d511b771e0fcf046cdd3d9"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-dispatch-controls.json",
+        "sha256": "f47360ff39d54fa6533adb7f5d4370545fdaeea0e089bac3abd618e3a9ba17e3"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-source-controls.json",
+        "sha256": "196de43e45c3180027e9d86fd1d9eacbec3a12d1d801f6d5d83233427d2b9f69"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-cyph-style.json",
+        "sha256": "ddbe385744bc4b59f8af2e3dec3b1212b92ce0de12c393b790ba6baf05ef39c5"
+      }
+    ],
+    "scope": "The independently reviewed departure/origin lifecycle repair changes four owned method bodies, adds four owned members and changes exactly one private visibility expression. All existing imports/reference roles, constructor, metadata, outputs, element/class structure, CSS/SCSS, package membership and build inputs remain exact. Tagged lifecycle and focused controls support the bounded repair; original build/test/slider exclusions remain unchanged. No new SHA/use closure or runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "sha256": "c6df4badeffdae9b100a0d2425ca869ae5780859e32677df15a3db16cfb07f5f"
+    },
+    "prior_individual_proof": {
+      "proof_kind": "artifact-required-individual-behavior",
+      "diff_sha256": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "decision": "The complete two-file/four-hunk focus-handler fix is already incorporated in the owned legacy select: trigger click opens idempotently, both base and derived open guards precede side effects/geometry, closed close() performs no touch/notification work, and public toggle() remains available. Modern-only MDC state notification mechanics are not copied into the historical form-field lifecycle. This is a completed source disposition with mandatory artifact-required behavior evidence; it is not a local packed/native execution, G11 pass or security clearance.",
+      "artifact_behavior": {
+        "kind": "select-focus-before-click",
+        "case_ids": [
+          "packed-consumer/harness/legacy-select"
+        ],
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.html",
+            "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+            "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+            "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+            "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+          },
+          {
+            "path": "scripts/packed-consumer-aot-smoke.mjs",
+            "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+          },
+          {
+            "path": "scripts/packed-consumer-evidence.mjs",
+            "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+          },
+          {
+            "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+            "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-contract.mjs",
+            "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-fixture.mjs",
+            "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-contract.mjs",
+            "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-fixture.mjs",
+            "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+          },
+          {
+            "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+            "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+          },
+          {
+            "path": "scripts/select-focus-click-packed-fixture.mjs",
+            "sha256": "2219e4ce6ffab2f631f2577466fe79bb862542eda877a97d31a59a3178bf730e"
+          },
+          {
+            "path": "scripts/select-focus-click-packed-contract.mjs",
+            "sha256": "649c152cc7655ef086ee2eaf362810d279a03c6858d7d3c334fce1f46e707897"
+          },
+          {
+            "path": "compatibility/rc/matrices/library-exports.json",
+            "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+          },
+          {
+            "path": "compatibility/rc/matrices/full-verify.json",
+            "sha256": "f72e2b5715c760a709aa62678e0352c16eed8945ffe0ebb4a136ec4daa57cfe0"
+          }
+        ]
+      }
+    },
+    "original_hunk_and_branch_judgments_retained": true
+  },
+  "spec_fixture_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "a3c213a4e33b28b8757dabfb89b56aeaf669a8d3",
+    "qualified_reference_parent": "c0d81221a4bbc5073e26a770c40f29b6c85f7dc2",
+    "inputs": {
+      "path": "compatibility/rc/spec-small-context-inputs.json",
+      "sha256": "bd405a528bd41ec8279ab9356d2c8e39316a873faf47ca40e71c23d02f4c963c"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "84e5ca0c5060c756ac186c409097556315882a88b280a12e34def1080e5a1dcf",
+        "current_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "2a485e6a37f0bfffacf13efebb57c86848cee04c359a324ec34d1d6d61dee929",
+        "current_sha256": "c6869cf4cb9bf3dccb409899130d3dc231512f783b8f7e177dfaad6a9a3687df"
+      }
+    ],
+    "fixture_controls": {
+      "path": "compatibility/rc/spec-small-source-controls.json",
+      "sha256": "745522c6f8e1a4d0f358bc93e1006353698d82a708c175fa1bddcc137813d835"
+    },
+    "unchanged_other_product_members": 1140,
+    "changed_private_fixture_data_names": 3,
+    "historical_paths": 57,
+    "case_identities_order_names": 2220,
+    "discovery_controls": 5,
+    "all_original_hunks_decisions_and_runtime_requirements_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only three private test-data keys and their explicit current source snapshot differ. Complete tagged templates, states/label values, all cases/assertions, all other product sources and all production peer uses stay exact. The48 source/semantic/adapter controls support this finite source repair. Current packed/native/floor qualification remains mandatory.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_entry": {
+      "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/select): flicker if opened from inside a focus handler (#28287)",
+      "files": [
+        "src/material/select/select.html",
+        "src/material/select/select.ts"
+      ],
+      "final_disposition": "already-adapted",
+      "reason": "The complete two-file/four-hunk focus-handler fix is already incorporated in the owned legacy select: trigger click opens idempotently, both base and derived open guards precede side effects/geometry, closed close() performs no touch/notification work, and public toggle() remains available. Modern-only MDC state notification mechanics are not copied into the historical form-field lifecycle. This is a completed source disposition with mandatory artifact-required behavior evidence; it is not a local packed/native execution, G11 pass or security clearance.",
+      "read_note_disposition": "owned-retained-source-reviewed-runtime-required",
+      "affected_branches": [
+        "21.x"
+      ],
+      "g11_claim": "not-passed",
+      "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "individual_proof": {
+        "proof_kind": "artifact-required-individual-behavior",
+        "diff_sha256": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "21.x"
+        ],
+        "decision": "The complete two-file/four-hunk focus-handler fix is already incorporated in the owned legacy select: trigger click opens idempotently, both base and derived open guards precede side effects/geometry, closed close() performs no touch/notification work, and public toggle() remains available. Modern-only MDC state notification mechanics are not copied into the historical form-field lifecycle. This is a completed source disposition with mandatory artifact-required behavior evidence; it is not a local packed/native execution, G11 pass or security clearance.",
+        "artifact_behavior": {
+          "kind": "select-focus-before-click",
+          "case_ids": [
+            "packed-consumer/harness/legacy-select"
+          ],
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/select.html",
+              "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+              "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+              "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+              "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+            },
+            {
+              "path": "scripts/packed-consumer-aot-smoke.mjs",
+              "sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146"
+            },
+            {
+              "path": "scripts/packed-consumer-evidence.mjs",
+              "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+            },
+            {
+              "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+              "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+            },
+            {
+              "path": "scripts/bidi-isolated-packed-contract.mjs",
+              "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+            },
+            {
+              "path": "scripts/bidi-isolated-packed-fixture.mjs",
+              "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+            },
+            {
+              "path": "scripts/selection-comparator-packed-contract.mjs",
+              "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+            },
+            {
+              "path": "scripts/selection-comparator-packed-fixture.mjs",
+              "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+              "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+            },
+            {
+              "path": "scripts/select-focus-click-packed-fixture.mjs",
+              "sha256": "2219e4ce6ffab2f631f2577466fe79bb862542eda877a97d31a59a3178bf730e"
+            },
+            {
+              "path": "scripts/select-focus-click-packed-contract.mjs",
+              "sha256": "649c152cc7655ef086ee2eaf362810d279a03c6858d7d3c334fce1f46e707897"
+            },
+            {
+              "path": "compatibility/rc/matrices/library-exports.json",
+              "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "f72e2b5715c760a709aa62678e0352c16eed8945ffe0ebb4a136ec4daa57cfe0"
+            }
+          ]
+        }
+      },
+      "prior_dispositions": [
+        {
+          "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/select): flicker if opened from inside a focus handler (#28287)",
+          "files": [
+            "src/material/select/select.html",
+            "src/material/select/select.ts"
+          ],
+          "final_disposition": "already-adapted",
+          "reason": "The complete two-file/four-hunk focus-handler fix is already incorporated in the owned legacy select: trigger click opens idempotently, both base and derived open guards precede side effects/geometry, closed close() performs no touch/notification work, and public toggle() remains available. Modern-only MDC state notification mechanics are not copied into the historical form-field lifecycle. This is a completed source disposition with mandatory artifact-required behavior evidence; it is not a local packed/native execution, G11 pass or security clearance.",
+          "read_note_disposition": "owned-retained-source-reviewed-runtime-required",
+          "affected_branches": [
+            "21.x"
+          ],
+          "g11_claim": "not-passed",
+          "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-select-focus-admission-requalification.json",
+          "individual_proof": {
+            "proof_kind": "artifact-required-individual-behavior",
+            "diff_sha256": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+            "review_depth": "individual-compatibility",
+            "affected_branches": [
+              "21.x"
+            ],
+            "decision": "The complete two-file/four-hunk focus-handler fix is already incorporated in the owned legacy select: trigger click opens idempotently, both base and derived open guards precede side effects/geometry, closed close() performs no touch/notification work, and public toggle() remains available. Modern-only MDC state notification mechanics are not copied into the historical form-field lifecycle. This is a completed source disposition with mandatory artifact-required behavior evidence; it is not a local packed/native execution, G11 pass or security clearance.",
+            "artifact_behavior": {
+              "kind": "select-focus-before-click",
+              "case_ids": [
+                "packed-consumer/harness/legacy-select"
+              ],
+              "source_members": [
+                {
+                  "path": "projects/ngx-material-legacy/legacy-select/select.html",
+                  "sha256": "a3f08f4c1c73087287590f3c69f8355db7c37546547f6bb9eff30dc6c71494da"
+                },
+                {
+                  "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+                  "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+                },
+                {
+                  "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+                  "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+                },
+                {
+                  "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+                  "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+                },
+                {
+                  "path": "scripts/packed-consumer-aot-smoke.mjs",
+                  "sha256": "232fb42f805683f6daa35971948bfb1b0b3249b31d38ba5271b8945dc34e908a"
+                },
+                {
+                  "path": "scripts/packed-consumer-evidence.mjs",
+                  "sha256": "c2152e7c9144ada5732d0a2f884beaca96f03aef2e740656683748dcebe96672"
+                },
+                {
+                  "path": "scripts/select-focus-click-packed-fixture.mjs",
+                  "sha256": "2219e4ce6ffab2f631f2577466fe79bb862542eda877a97d31a59a3178bf730e"
+                },
+                {
+                  "path": "scripts/select-focus-click-packed-contract.mjs",
+                  "sha256": "649c152cc7655ef086ee2eaf362810d279a03c6858d7d3c334fce1f46e707897"
+                },
+                {
+                  "path": "compatibility/rc/matrices/library-exports.json",
+                  "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+                },
+                {
+                  "path": "compatibility/rc/matrices/full-verify.json",
+                  "sha256": "f72e2b5715c760a709aa62678e0352c16eed8945ffe0ebb4a136ec4daa57cfe0"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "source_check": {
+        "kind": "individual-source-reviewed-runtime-required",
+        "diff_sha256": "b937a4a631c52484825a5a3ab74a301b01b64ba494ff72ef4eb7d0de7c992aba",
+        "patch_path": "compatibility/rc/select-focus-click-original.patch",
+        "evidence_report_sha256": "9c3190918971838b2ea5f1faed528ed574432e0d584656c7ca6cb5846435ba87"
+      },
+      "bidi_isolated_source_context": {
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-menu-tooltip-focus-context-source-judgment.json",
+          "sha256": "52ee9a65165048c990d5b59c1c29b4ad95dc5fd1ad779bfa844794ec74e0053a"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+          "sha256": "6c31a5a9483c17da1420559d530f8a39a3a8f4d90b55346d23ed2d099c5b57b8"
+        }
+      },
+      "selection_comparator_source_context": {
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+          "sha256": "31e376673c1aee1fe5f71ee7bda0ae7d485dc7d5f8adb05fea36d182c28dcdfd"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+          "sha256": "a78a1af851fad2da87d8f9ec4df96463bbe017b94a84d79d858360086bb0ca57"
+        }
+      }
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "sha256": "5dfd1b0b4955073378b84b0e20502241459d8340069b63fc596e62552676983f"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "control_case_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "e1f0d83fe9477279cc7400d41c0304972d62bdbc",
+    "qualified_reference_parent": "58a2faabf1216f6b271f1c688c8861504f55489e",
+    "inputs": {
+      "path": "compatibility/rc/spec-control-context-inputs.json",
+      "sha256": "802868cd4c19cbad3bd7e037c4b95702c3a1b9e778b296e98deb5e1129cf7239"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+        "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54",
+        "current_sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "c6869cf4cb9bf3dccb409899130d3dc231512f783b8f7e177dfaad6a9a3687df",
+        "current_sha256": "cb1935def422492f26410e71c150dd174ef190403242ad7fd73cf7d08f8052d1"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "7e8cf166761529583a0c5dadd958e69f36d01ff9eb5a5f4d7484cb7697ef5459"
+    },
+    "unchanged_other_product_members": 1139,
+    "original_cases_preserved": 2220,
+    "additional_cases": 2,
+    "current_case_cells": 2227,
+    "all_original_hunks_decisions_and_runtime_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only two appended candidate cases and their exact two-row inventory update differ. Preserve every prior case/body/template, all production resources and all original source judgments. This is source-context qualification, never actual Angular/native/packed/floor or complete G11 admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "21cc8dfa42197436dae5abda6c37b181cb8f232a66848be412267d6610cbbddf"
+    },
+    "prior_entry": {
+      "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "58a2faabf1216f6b271f1c688c8861504f55489e",
+      "entry_sha256": "6ba775794586e5b21e13c393975252e07fc197a9cb58b114f073a846f4723c32"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-spec-fixture-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "sha256": "08b15738f18905bf17100f9211d493877fe1d31363c4971fe71f099de42de599"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "chip_empty_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "799f80f440ea2ab044cb4754399f18177a9ec99b",
+    "qualified_reference_parent": "c92ef282d7d022c4e8c8711dd0fa4c9e996ad662",
+    "inputs": {
+      "path": "compatibility/rc/spec-stability-context-inputs.json",
+      "sha256": "15628f1c418a3f3fd507860234209055db4b268aec2d7cf2ec353d29849620ff"
+    },
+    "prequalified_wrapper_receipt_transitions": [
+      {
+        "path": "tests/test_spec_standalone_environment_source.py",
+        "reference_commit": "ee251cff600805900f6e5816951e3abee714adaa",
+        "before_sha256": "3e74aaee57ff849163758989b2f59f588fc975d95504ca3f6cb3ce0ce32923d9",
+        "after_sha256": "7717141028f282aeb800a7e045b7f6a1009fd4ed60974d1cab3c26e553ef23c8",
+        "edits": [
+          {
+            "before": "['node', 'tests/spec_standalone_environment_source_probe.mjs']",
+            "after": "['node', 'scripts/run-historical-source-probe.mjs', 'standalone-environment-source']"
+          }
+        ],
+        "affected_shas": [
+          "31077c2eae76b0bc0bc348ee2bd2801864aa409a",
+          "83006db94a2912fa3cd3b7e1f1dcca9be064d183"
+        ],
+        "qualification": {
+          "path": "compatibility/rc/historical-stability-source-replay-checkpoint.json",
+          "sha256": "ee6a31039d5e83770ac7a18dae9c8c9145f652365e4d40fdc7ae6596f988e7b2"
+        }
+      }
+    ],
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "before_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "current_sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "before_sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+        "current_sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "cb1935def422492f26410e71c150dd174ef190403242ad7fd73cf7d08f8052d1",
+        "current_sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-source-proof.json",
+      "sha256": "85fd33bb0dfffcdb0070070b1ead4ce30588f5d78659929014e268897725e10d"
+    },
+    "original_cases_preserved": 2222,
+    "additional_cases": 1,
+    "current_case_cells": 2228,
+    "all_original_branch_hunk_verdicts_and_native_requirement_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only the authenticated chip empty-query reset, one appended Angular lifecycle case and exact inventory refresh differ. Current API call details are qualified against both fixed public minima; every prior verdict and actual native/packed/compiler/floor requirement remains. No source-only runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "9604d03f776294bb8a22c3015c4d40d2e0f98bd65b4a8b45ceb7738458706438"
+    },
+    "prior_entry": {
+      "sha": "1b6db8c89b00ace8aaa0e0824866acec5369635f",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "c92ef282d7d022c4e8c8711dd0fa4c9e996ad662",
+      "entry_sha256": "8dc8f1ab03860d4cb886a30109b92e1107b4418740e76b60823ad45f86e54a7b"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-control-case-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "sha256": "e3874a81c086d1d15fcde465836555d5a3c417b834436cf210db442c0af1e07c"
+    },
+    "original_judgments_preserved": true
+  },
+  "historical_roster_reconciliation": {
+    "qualification": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "442187db5e0b01d8eecc12e9095fd494b8e6a87040ed5d08aa158768454fb2ea"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-stability-chip-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "sha256": "4d56b7e1b4dc363251f21c4d2896f0d1a0b31bceb63918f7f0845d22f6b64270"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "ad050b2264709390e9a5db23c4d542fceadbd766",
+      "entry_sha256": "bdb3f1ba16e0a783740f23df5928811f299a346616904010f87a7b305417bf94"
+    },
+    "source_judgment_and_actual_runtime_obligations_preserved": true
+  },
+  "native_date_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/native-date-context-inputs.json",
+      "sha256": "ad9b34e36a2083a9cd08e8a730c7b766b928370e8eff8bd5a28ea6ddf9d483f2"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "ce9d00877a1b4cffe645776b8e733a5e87e79039",
+      "entry_sha256": "c5d4e5c3c82aef9fb434164f14a9f0d9764a5fd5de236c58564564e7055b70b2"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/historical-roster-reconciliation-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "sha256": "fcef6785569b9df0db63aec816f0daa73f9efefb56522377bbf010765b9677eb"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/packed-consumer-aot-smoke.mjs",
+        "before_sha256": "1d8a4bd076b77ed5e74561c74496dfe39bce114b16fa7a6f87dfed8a2765b146",
+        "after_sha256": "c31370151548c507ac627023f71ad65a97d4a769fa762efa7883885563395b4c"
+      },
+      {
+        "path": "scripts/native-date-packed-contract.mjs",
+        "before_sha256": null,
+        "after_sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+      },
+      {
+        "path": "scripts/native-date-packed-fixture.mjs",
+        "before_sha256": null,
+        "after_sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
+      },
+      {
+        "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+        "before_sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06",
+        "after_sha256": "97196bb8c7a27e3501da839bd15ef612db4ee0134db5b9d8a1c2ab3de57d51df"
+      }
+    ],
+    "original_verdict_and_runtime_requirements_unchanged": true,
+    "new_fixture_dependencies_bound": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "recorded_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/chip-audit-source-requalification-inputs.json",
+      "sha256": "c75de0148f54b8b70e3d35f819435c96f72743c530bc935bf849896db64c2ef0"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "c9825f7e1d8532391b16f420caad2c54409fb247",
+      "entry_sha256": "6bf64289527e5ce8bb4a5577b229c7c42821f07f2f46aaf7037fc0d36a6b3358"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-recorded-source-context-1b6db8c89b00ace8aaa0e0824866acec5369635f.json",
+      "sha256": "30d9e168d6db10f7519da1cad7c17bbaff1ef9addf834e0120a7009d49dd3166"
+    },
+    "source_scope_only": true,
+    "actual_native_packed_or_floor_qualified": false,
+    "note": "Exact current source bindings after classic first-enabled-focus restoration,4 appended historical regressions and3 mandatory historical scopes. Preserve the full prior decision and all runtime/floor obligations; this document records source qualification only.",
+    "prior_document_seal": {
+      "recorded_sha256": "9c3190918971838b2ea5f1faed528ed574432e0d584656c7ca6cb5846435ba87",
+      "actual_prior_document_sha256": "30d9e168d6db10f7519da1cad7c17bbaff1ef9addf834e0120a7009d49dd3166",
+      "matched": false
+    }
+  }
+}

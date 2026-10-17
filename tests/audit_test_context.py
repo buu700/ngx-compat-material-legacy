@@ -44,7 +44,7 @@ for(const[name,kind,field,requirements,validator]of definitions){
   rows.push({sha:entry.sha,kind:m[kind],field,definition,no_run:noRun});
  }
 }
-assert.equal(rows.length,line==='main'?28:27);assert.equal(new Set(rows.map(r=>r.sha)).size,rows.length);
+assert.equal(rows.length,line==='main'?31:30);assert.equal(new Set(rows.map(r=>r.sha)).size,rows.length);
 console.log(JSON.stringify({line,rows,actual_native_or_packed_qualified:false}));
 '''
 
@@ -74,7 +74,17 @@ def assert_native_review(test,root,entry,body=None):
     actual,review=read_review(root,entry)
     if body is not None:test.assertEqual(body,actual)
     proof=entry['individual_proof'];test.assertEqual(proof['proof_kind'],contract['kind'])
-    test.assertEqual(actual['individual_proof'],proof)
+    if isinstance(actual.get('reviews'),list):
+        # Exactly the three individually owned classic chip-list rows use this
+        # container. A root-level proof must not compete with the selected row.
+        test.assertEqual(actual['role'],'individual-whole-original-patch-classic-chip-list-focus-and-state-review')
+        test.assertEqual([row['sha'] for row in actual['reviews']],['e69b2b09efaf577cd5fe92b70808479f975913af','2861a306aebc54eafe4a72b4a53860d8612af5d4','8980ad584c7ab7d8a0553528cbff88958e94a22a'])
+        test.assertNotIn('individual_proof',actual)
+        test.assertEqual(review['status'],'reviewed')
+        test.assertEqual(actual['line'],native_contracts(root)['line'])
+        test.assertEqual(review['individual_proof'],proof)
+    else:
+        test.assertEqual(actual['individual_proof'],proof)
     test.assertEqual(proof['affected_branches'],[native_contracts(root)['line']])
     test.assertEqual(actual.get('final_disposition',entry['final_disposition']),entry['final_disposition'])
     test.assertEqual(actual['g11_claim'],'not-passed')
