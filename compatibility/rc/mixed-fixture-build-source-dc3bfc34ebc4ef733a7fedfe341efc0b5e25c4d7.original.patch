@@ -1,0 +1,62 @@
+diff --git a/src/cdk/table/table.spec.ts b/src/cdk/table/table.spec.ts
+index e7604ccd9c0b51c7f12ed82f0556813cd2dd788a..08b7928386943c8423ccccaf9a1981dfa05623b5 100644
+--- a/src/cdk/table/table.spec.ts
++++ b/src/cdk/table/table.spec.ts
+@@ -2892,9 +2892,9 @@ class RowContextCdkTableApp {
+   imports: [CdkTableModule],
+ })
+ class WrapperCdkTableApp<T> implements AfterContentInit {
+-  @ContentChildren(CdkColumnDef) columnDefs: QueryList<CdkColumnDef>;
++  @ContentChildren(CdkColumnDef, {descendants: false}) columnDefs: QueryList<CdkColumnDef>;
+   @ContentChild(CdkHeaderRowDef) headerRowDef: CdkHeaderRowDef;
+-  @ContentChildren(CdkRowDef) rowDefs: QueryList<CdkRowDef<T>>;
++  @ContentChildren(CdkRowDef, {descendants: false}) rowDefs: QueryList<CdkRowDef<T>>;
+   @ContentChild(CdkNoDataRow) noDataRow: CdkNoDataRow;
+ 
+   @ViewChild(CdkTable, {static: true}) table: CdkTable<T>;
+diff --git a/tslint.json b/tslint.json
+index a4b39f1a8481f06387b60f0c83e493cab32327ab..156971b3c5e4fd4304cc20b4124635896dc7a867 100644
+--- a/tslint.json
++++ b/tslint.json
+@@ -95,20 +95,26 @@
+             "argument": 0,
+             "properties": {
+               "!preserveWhitespaces": ".*",
+-              "!styles": ".*",
+               "!moduleId": ".*",
++              "!standalone": ".*"
++            }
++          },
++          // Don't require `ViewEncapsulation.None` and allow inline styles in non-production code.
++          {
++            "argument": 0,
++            "properties": {
++              "!styles": ".*",
+               "encapsulation": "\\.None$"
+             },
+-            "excludeFiles": ["**/dev-app/**", "**/docs/**"]
++            "excludeFiles": ["**/dev-app/**", "**/docs/**", "**/*.spec.ts"]
+           },
+           // Enforce OnPush & standalone even in the dev-app.
+           {
+             "argument": 0,
+             "properties": {
+-              "changeDetection": "\\.OnPush$",
+-              "!standalone": ".*"
++              "changeDetection": "\\.OnPush$"
+             },
+-            "excludeFiles": ["**/docs/**"]
++            "excludeFiles": ["**/docs/**", "**/*.spec.ts"]
+           }
+         ],
+         "Directive": [
+@@ -142,8 +148,7 @@
+       },
+       [
+         // Internal code that doesn't need to follow the same standards.
+-        "**/+(e2e-app|components-examples|universal-app|integration)/**",
+-        "**/*.spec.ts"
++        "**/+(e2e-app|components-examples|universal-app|integration)/**"
+       ]
+     ],
+     "require-license-banner": [

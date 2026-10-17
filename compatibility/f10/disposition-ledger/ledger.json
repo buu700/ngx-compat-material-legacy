@@ -37633,9 +37633,9 @@
       "sha": "544257ad0f58e70688abe0d80eccaa73d25ba5d8",
       "bucket": "test-only-batch-candidate",
       "subject": "test(multiple): remove unnecessary compileComponents calls",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=4ad53a735824197b89f92b9d0f73fa8731a22d5bee6a219c6cadd23c46b39fef, bytes=9640). Changed paths are only a harness guide markdown and CDK/experimental unit specs (guides/using-component-harnesses.md, src/cdk-experimental/accordion/accordion.spec.ts, src/cdk-experimental/listbox/listbox.spec.ts, src/cdk-experimental/radio/radio.spec.ts, src/cdk/overlay/overlay.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material/CDK unit-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
-      "read_note_disposition": null,
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not wholesale remove historical compilation preparation or substitute a new error boundary. The guide and experimental accordion/listbox/radio fixtures drop compileComponents calls and some async/await setup. The Overlay app-initialization case moves configureTestingModule inside not.toThrow and removes the compileComponents operation previously inside that assertion; this changes what failure phase is asserted. All 226 cases survive and 225 complete callbacks are equal, while full helpers/hooks retain the other preparation changes. Preserve owned module-era compileComponents and strict public stability/errors unless an individually executed fixture proves a narrow repair. No actual Angular compilation, app-initialization or advertised-floor pass is claimed. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+      "read_note_disposition": "individual-source-judgment-only",
       "files": [
         "guides/using-component-harnesses.md",
         "src/cdk-experimental/accordion/accordion.spec.ts",
@@ -37643,11 +37643,134 @@
         "src/cdk-experimental/radio/radio.spec.ts",
         "src/cdk/overlay/overlay.spec.ts"
       ],
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/544257ad0f58e70688abe0d80eccaa73d25ba5d8.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-544257ad0f58e70688abe0d80eccaa73d25ba5d8.json",
       "batch_id": "needs-triage-companion-docs-examples-spec-2026-10-01",
-      "recorded_at_utc": "2026-10-01T19:19:46Z",
+      "recorded_at_utc": "2026-10-17T03:26:02.251229+00:00",
       "g11_claim": "not-passed",
-      "patch_sha256": "4ad53a735824197b89f92b9d0f73fa8731a22d5bee6a219c6cadd23c46b39fef"
+      "patch_sha256": "4ad53a735824197b89f92b9d0f73fa8731a22d5bee6a219c6cadd23c46b39fef",
+      "source_check": {
+        "kind": "individual-complete-original-fixture-build-source-review",
+        "diff_sha256": "12176daa2c8a727dbd5e28ed29bcb3053f49e42ed88a1b3e0ab043b714db96b3",
+        "evidence_report_sha256": "417b098bdef121902b9595632e0b59f043a115534351182c0590821dc27ff667"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-fixture-build-source-applicability",
+        "diff_sha256": "12176daa2c8a727dbd5e28ed29bcb3053f49e42ed88a1b3e0ab043b714db96b3",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not wholesale remove historical compilation preparation or substitute a new error boundary. The guide and experimental accordion/listbox/radio fixtures drop compileComponents calls and some async/await setup. The Overlay app-initialization case moves configureTestingModule inside not.toThrow and removes the compileComponents operation previously inside that assertion; this changes what failure phase is asserted. All 226 cases survive and 225 complete callbacks are equal, while full helpers/hooks retain the other preparation changes. Preserve owned module-era compileComponents and strict public stability/errors unless an individually executed fixture proves a narrow repair. No actual Angular compilation, app-initialization or advertised-floor pass is claimed. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-fixture-build-source-review.mjs",
+            "sha256": "c97f3adb73def6bb5eeb43d3260cfb3d48350c8ca6cf0ddb6d8628a7fb4274e0"
+          },
+          {
+            "path": "tests/mixed_fixture_build_source_probe.mjs",
+            "sha256": "91d93c2589efa668b80ce3922d80e97dc464ec77b0c5c42438b3d2ba0cc025cb"
+          },
+          {
+            "path": "tests/test_mixed_fixture_build_source.py",
+            "sha256": "c940b30e6b7bd3fcf21545ce6f644566ba48fa15c01c7b06dfd77191b714f57c"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-qualification-record.py",
+            "sha256": "0abf790ec252f15d414df7c282cf40d06f02d5c63c1bfd8bb5cb5026c36c87b3"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/mixed-zone-moves-source-review.mjs",
+            "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-fixture-build-originals.py",
+            "sha256": "d2daa61695a33a5dffce4475ebf5c7fc8e85d9f34546b750703a0aa5867d483e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-authenticator.mjs",
+            "sha256": "a51b250960598cec181e87e916ccd313313ba038414ab9b191fccff271a7fcda"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-subjects.json.gz",
+            "sha256": "4f6e6615472479909868ad093197763e2aae7997141f463e9f4ae17faf6995c3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition.json.gz",
+            "sha256": "3aad484601039473e1088e02b061624d1f1b3b2ff3af5e13793249c35bd629d0"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-authentication.json.gz",
+            "sha256": "7239000a610801b64eefc22a8513c106de3f0a35d0ac562dc3be11cedc85363e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.json",
+            "sha256": "23511ac65c58300d9be1865bebff5ed2bcc7a55947bd80fed0be848ca6920856"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.py",
+            "sha256": "08fbd7a8581e6fb0b87370c3175131785896f679e012f999c56ea57c0b5ecd7b"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-inspector.mjs",
+            "sha256": "3e647aeae29b650c9b9b3a81320e42ef3a398651d25eedee9aad196f1c6e5277"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-checkpoint.json",
+            "sha256": "9a969d2edb6bba4da74c1f63942dce459096d27e9a8db4f35ba8413b531730d3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-intake.json",
+            "sha256": "aa2d73755020288dc73d62b31c7f73ccc1ba4d1081c12dd7a2230edbd1c10530"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-observation-pins.json.gz",
+            "sha256": "345feb090aac7a4a63a8a8ba7f80c6b138348004a22d028412c130cd14b6b03c"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-prior.json.gz",
+            "sha256": "19f4e2e57f4d1de9414b717e48d70ecb81f254926a006eefb6422c39713e1cd3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-review.json.gz",
+            "sha256": "46d7106e8e27b66fd04c033536cad1882b5c88b519903a5a348c3c324194c475"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-controls.json",
+            "sha256": "ae815d304888dffaef04fdd1e56762f4400f6b90b47afe878e36e75297d14b3e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-python.log.gz",
+            "sha256": "5d674723370e986d2275d779ca4a5c7597e8a9678c3ffc4e0e130b934c0ec35a"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-cyph-sanity.json",
+            "sha256": "e8a2d0ea54f025e7e1e3496a731cdc5e0cf415ed0c9821b80d897b26037d1c1b"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "456741a61a8e85e597e82503941ccab97777bc97",
@@ -39421,8 +39544,8 @@
       "sha": "a0eb8b06917b6fc83e13578a8a7358e008844c6f",
       "bucket": "test-only-batch-candidate",
       "subject": "build: update angular version",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=9750fa9e44a807a861299a657ba0628596b63490ec73220fdf5677bf69b561ee, bytes=31936). Changed paths: package.json, src/cdk/portal/portal.spec.ts, yarn.lock. repository build/toolchain/test-infrastructure change; not a retained legacy product adaptation. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not adopt the obsolete Angular17 prerelease dependency/tooling update. The complete package/lock changes raise framework ranges to next.5 and pin CLI/Devkit/schematics next.1 alongside transitive updates. Our exact private Node/pnpm/npm/compiler/peer pins and published consumer ranges remain independent. The portal spec changes ChocolateInjector.get to accept and forward notFoundValue for non-Chocolate tokens; all 39 complete case callbacks are equal but injector fallback behavior changes. Four owned public-constructor contexts already accept and forward notFoundValue through public Injector.NULL, without copying this test injector. Actual injector/default/lifetime and floor execution remains a separate obligation. No historical dependency install, peer-floor narrowing or advisory-clearance claim. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "package.json",
@@ -39430,11 +39553,134 @@
         "yarn.lock"
       ],
       "patch_sha256": "9750fa9e44a807a861299a657ba0628596b63490ec73220fdf5677bf69b561ee",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/a0eb8b06917b6fc83e13578a8a7358e008844c6f.json",
-      "read_note_disposition": "irrelevant",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-a0eb8b06917b6fc83e13578a8a7358e008844c6f.json",
+      "read_note_disposition": "individual-source-judgment-only",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-17T03:26:02.247199+00:00",
+      "source_check": {
+        "kind": "individual-complete-original-fixture-build-source-review",
+        "diff_sha256": "0a0fe49c8bf7e9f38940f747bdc919eabd504570dfffa9545bbef19448c6b205",
+        "evidence_report_sha256": "b55cc34a79ed3e001050b48e2bded52d4c4e3e9ff0b5a38a64433ca95cb455d1"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-fixture-build-source-applicability",
+        "diff_sha256": "0a0fe49c8bf7e9f38940f747bdc919eabd504570dfffa9545bbef19448c6b205",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not adopt the obsolete Angular17 prerelease dependency/tooling update. The complete package/lock changes raise framework ranges to next.5 and pin CLI/Devkit/schematics next.1 alongside transitive updates. Our exact private Node/pnpm/npm/compiler/peer pins and published consumer ranges remain independent. The portal spec changes ChocolateInjector.get to accept and forward notFoundValue for non-Chocolate tokens; all 39 complete case callbacks are equal but injector fallback behavior changes. Four owned public-constructor contexts already accept and forward notFoundValue through public Injector.NULL, without copying this test injector. Actual injector/default/lifetime and floor execution remains a separate obligation. No historical dependency install, peer-floor narrowing or advisory-clearance claim. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-fixture-build-source-review.mjs",
+            "sha256": "c97f3adb73def6bb5eeb43d3260cfb3d48350c8ca6cf0ddb6d8628a7fb4274e0"
+          },
+          {
+            "path": "tests/mixed_fixture_build_source_probe.mjs",
+            "sha256": "91d93c2589efa668b80ce3922d80e97dc464ec77b0c5c42438b3d2ba0cc025cb"
+          },
+          {
+            "path": "tests/test_mixed_fixture_build_source.py",
+            "sha256": "c940b30e6b7bd3fcf21545ce6f644566ba48fa15c01c7b06dfd77191b714f57c"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-qualification-record.py",
+            "sha256": "0abf790ec252f15d414df7c282cf40d06f02d5c63c1bfd8bb5cb5026c36c87b3"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/mixed-zone-moves-source-review.mjs",
+            "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-fixture-build-originals.py",
+            "sha256": "d2daa61695a33a5dffce4475ebf5c7fc8e85d9f34546b750703a0aa5867d483e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-authenticator.mjs",
+            "sha256": "a51b250960598cec181e87e916ccd313313ba038414ab9b191fccff271a7fcda"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-subjects.json.gz",
+            "sha256": "4f6e6615472479909868ad093197763e2aae7997141f463e9f4ae17faf6995c3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition.json.gz",
+            "sha256": "3aad484601039473e1088e02b061624d1f1b3b2ff3af5e13793249c35bd629d0"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-authentication.json.gz",
+            "sha256": "7239000a610801b64eefc22a8513c106de3f0a35d0ac562dc3be11cedc85363e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.json",
+            "sha256": "23511ac65c58300d9be1865bebff5ed2bcc7a55947bd80fed0be848ca6920856"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.py",
+            "sha256": "08fbd7a8581e6fb0b87370c3175131785896f679e012f999c56ea57c0b5ecd7b"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-inspector.mjs",
+            "sha256": "3e647aeae29b650c9b9b3a81320e42ef3a398651d25eedee9aad196f1c6e5277"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-checkpoint.json",
+            "sha256": "9a969d2edb6bba4da74c1f63942dce459096d27e9a8db4f35ba8413b531730d3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-intake.json",
+            "sha256": "aa2d73755020288dc73d62b31c7f73ccc1ba4d1081c12dd7a2230edbd1c10530"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-observation-pins.json.gz",
+            "sha256": "345feb090aac7a4a63a8a8ba7f80c6b138348004a22d028412c130cd14b6b03c"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-prior.json.gz",
+            "sha256": "19f4e2e57f4d1de9414b717e48d70ecb81f254926a006eefb6422c39713e1cd3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-review.json.gz",
+            "sha256": "46d7106e8e27b66fd04c033536cad1882b5c88b519903a5a348c3c324194c475"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-controls.json",
+            "sha256": "ae815d304888dffaef04fdd1e56762f4400f6b90b47afe878e36e75297d14b3e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-python.log.gz",
+            "sha256": "5d674723370e986d2275d779ca4a5c7597e8a9678c3ffc4e0e130b934c0ec35a"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-cyph-sanity.json",
+            "sha256": "e8a2d0ea54f025e7e1e3496a731cdc5e0cf415ed0c9821b80d897b26037d1c1b"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "d38798a474278c3d4b1533ae3ad7273786be9372",
@@ -40909,19 +41155,142 @@
       "sha": "dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7",
       "bucket": "test-only-batch-candidate",
       "subject": "build: enforce that all components are standalone during CI",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=6472d25ff7324844d7b5ce59d8a937d94f1c6bb6a96732212b79714ed5c37b1f, bytes=2360). Changed paths: src/cdk/table/table.spec.ts, tslint.json. repository build/toolchain/test-infrastructure change; not a retained legacy product adaptation. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not inherit the upstream blanket standalone CI rule or rewrite historical module fixtures. Two WrapperCdkTableApp ContentChildren queries add descendants:false; all 74 case callbacks are equal but query depth is a substantive fixture contract. Lint decorator requirements and spec exemptions also change. The owned legacy table suite retains its module/declarations preparation, compileComponents and finite legacy selectors. These complete source changes do not authorize forcing every fixture/component standalone, changing local query behavior or inferring compiler/peer-floor results. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "src/cdk/table/table.spec.ts",
         "tslint.json"
       ],
       "patch_sha256": "6472d25ff7324844d7b5ce59d8a937d94f1c6bb6a96732212b79714ed5c37b1f",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7.json",
-      "read_note_disposition": "irrelevant",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7.json",
+      "read_note_disposition": "individual-source-judgment-only",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-17T03:26:02.249280+00:00",
+      "source_check": {
+        "kind": "individual-complete-original-fixture-build-source-review",
+        "diff_sha256": "9932ca1885608e8d05e7c0822cf43289c058e324b02a0366043334018b9f51ef",
+        "evidence_report_sha256": "731724ec2b02e840b0c96d65b99ee5baa92af762efeedeaeececa69af346aaf9"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-fixture-build-source-applicability",
+        "diff_sha256": "9932ca1885608e8d05e7c0822cf43289c058e324b02a0366043334018b9f51ef",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not inherit the upstream blanket standalone CI rule or rewrite historical module fixtures. Two WrapperCdkTableApp ContentChildren queries add descendants:false; all 74 case callbacks are equal but query depth is a substantive fixture contract. Lint decorator requirements and spec exemptions also change. The owned legacy table suite retains its module/declarations preparation, compileComponents and finite legacy selectors. These complete source changes do not authorize forcing every fixture/component standalone, changing local query behavior or inferring compiler/peer-floor results. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-fixture-build-source-review.mjs",
+            "sha256": "c97f3adb73def6bb5eeb43d3260cfb3d48350c8ca6cf0ddb6d8628a7fb4274e0"
+          },
+          {
+            "path": "tests/mixed_fixture_build_source_probe.mjs",
+            "sha256": "91d93c2589efa668b80ce3922d80e97dc464ec77b0c5c42438b3d2ba0cc025cb"
+          },
+          {
+            "path": "tests/test_mixed_fixture_build_source.py",
+            "sha256": "c940b30e6b7bd3fcf21545ce6f644566ba48fa15c01c7b06dfd77191b714f57c"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-qualification-record.py",
+            "sha256": "0abf790ec252f15d414df7c282cf40d06f02d5c63c1bfd8bb5cb5026c36c87b3"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/mixed-zone-moves-source-review.mjs",
+            "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-fixture-build-originals.py",
+            "sha256": "d2daa61695a33a5dffce4475ebf5c7fc8e85d9f34546b750703a0aa5867d483e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-authenticator.mjs",
+            "sha256": "a51b250960598cec181e87e916ccd313313ba038414ab9b191fccff271a7fcda"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-subjects.json.gz",
+            "sha256": "4f6e6615472479909868ad093197763e2aae7997141f463e9f4ae17faf6995c3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition.json.gz",
+            "sha256": "3aad484601039473e1088e02b061624d1f1b3b2ff3af5e13793249c35bd629d0"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-authentication.json.gz",
+            "sha256": "7239000a610801b64eefc22a8513c106de3f0a35d0ac562dc3be11cedc85363e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.json",
+            "sha256": "23511ac65c58300d9be1865bebff5ed2bcc7a55947bd80fed0be848ca6920856"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.py",
+            "sha256": "08fbd7a8581e6fb0b87370c3175131785896f679e012f999c56ea57c0b5ecd7b"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-inspector.mjs",
+            "sha256": "3e647aeae29b650c9b9b3a81320e42ef3a398651d25eedee9aad196f1c6e5277"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-checkpoint.json",
+            "sha256": "9a969d2edb6bba4da74c1f63942dce459096d27e9a8db4f35ba8413b531730d3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-intake.json",
+            "sha256": "aa2d73755020288dc73d62b31c7f73ccc1ba4d1081c12dd7a2230edbd1c10530"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-observation-pins.json.gz",
+            "sha256": "345feb090aac7a4a63a8a8ba7f80c6b138348004a22d028412c130cd14b6b03c"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-prior.json.gz",
+            "sha256": "19f4e2e57f4d1de9414b717e48d70ecb81f254926a006eefb6422c39713e1cd3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-review.json.gz",
+            "sha256": "46d7106e8e27b66fd04c033536cad1882b5c88b519903a5a348c3c324194c475"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-controls.json",
+            "sha256": "ae815d304888dffaef04fdd1e56762f4400f6b90b47afe878e36e75297d14b3e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-python.log.gz",
+            "sha256": "5d674723370e986d2275d779ca4a5c7597e8a9678c3ffc4e0e130b934c0ec35a"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-cyph-sanity.json",
+            "sha256": "e8a2d0ea54f025e7e1e3496a731cdc5e0cf415ed0c9821b80d897b26037d1c1b"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "03adcb539967937f1113d3afddf90aa9574f9e0f",
@@ -41342,19 +41711,142 @@
       "sha": "2b82d638c90df83d44613b81c2eeeab24821e8b2",
       "bucket": "test-only-batch-candidate",
       "subject": "build: fix build failure (#33408)",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=6fa34d6d07e9261f7c3be7090af9c8405a3356229b43ccee03d116d11305ed95, bytes=3216). Changed paths: goldens/material/chips/index.api.md, src/material/chips/chip-grid.spec.ts. repository build/toolchain/test-infrastructure change; not a retained legacy product adaptation. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not adopt this modern chip build workaround or update historical goldens. The source comments out one active last-focused-chip destruction regression with a TODO, reducing 67 cases to66; the remaining66 callbacks are identical. Its API golden adds protected modern MatChipGrid/MatChipSet focus-redirection declarations without a runtime implementation change in this SHA. The owned legacy chip list retains its active empty-list/repopulation regression and all historical callbacks; no modern chip class or protected API mirror is introduced. Preserve actual focus/reset/lifetime execution obligations and untouched Material16 reference goldens. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "goldens/material/chips/index.api.md",
         "src/material/chips/chip-grid.spec.ts"
       ],
       "patch_sha256": "6fa34d6d07e9261f7c3be7090af9c8405a3356229b43ccee03d116d11305ed95",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/2b82d638c90df83d44613b81c2eeeab24821e8b2.json",
-      "read_note_disposition": "irrelevant",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-2b82d638c90df83d44613b81c2eeeab24821e8b2.json",
+      "read_note_disposition": "individual-source-judgment-only",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-17T03:26:02.252911+00:00",
+      "source_check": {
+        "kind": "individual-complete-original-fixture-build-source-review",
+        "diff_sha256": "29474919b4df34410bcda73f7125b40eb6956971a946659dc900eed1dd4ef0de",
+        "evidence_report_sha256": "fa9060e86864a45f5f5b324043183c76b978eb4b947165f898d2afc38f31ae9a"
+      },
+      "individual_proof": {
+        "proof_kind": "individual-complete-fixture-build-source-applicability",
+        "diff_sha256": "29474919b4df34410bcda73f7125b40eb6956971a946659dc900eed1dd4ef0de",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not adopt this modern chip build workaround or update historical goldens. The source comments out one active last-focused-chip destruction regression with a TODO, reducing 67 cases to66; the remaining66 callbacks are identical. Its API golden adds protected modern MatChipGrid/MatChipSet focus-redirection declarations without a runtime implementation change in this SHA. The owned legacy chip list retains its active empty-list/repopulation regression and all historical callbacks; no modern chip class or protected API mirror is introduced. Preserve actual focus/reset/lifetime execution obligations and untouched Material16 reference goldens. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+        "source_conclusion_only": true,
+        "source_evidence": [
+          {
+            "path": "scripts/mixed-fixture-build-source-review.mjs",
+            "sha256": "c97f3adb73def6bb5eeb43d3260cfb3d48350c8ca6cf0ddb6d8628a7fb4274e0"
+          },
+          {
+            "path": "tests/mixed_fixture_build_source_probe.mjs",
+            "sha256": "91d93c2589efa668b80ce3922d80e97dc464ec77b0c5c42438b3d2ba0cc025cb"
+          },
+          {
+            "path": "tests/test_mixed_fixture_build_source.py",
+            "sha256": "c940b30e6b7bd3fcf21545ce6f644566ba48fa15c01c7b06dfd77191b714f57c"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-qualification-record.py",
+            "sha256": "0abf790ec252f15d414df7c282cf40d06f02d5c63c1bfd8bb5cb5026c36c87b3"
+          },
+          {
+            "path": "scripts/spec-test-environment-source-review.mjs",
+            "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+          },
+          {
+            "path": "scripts/spec-overlay-async-source-review.mjs",
+            "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+          },
+          {
+            "path": "scripts/mixed-zone-moves-source-review.mjs",
+            "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+          },
+          {
+            "path": "scripts/spec-stability-chip-repair.mjs",
+            "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+          },
+          {
+            "path": "scripts/upstream-candidate-source-evidence.mjs",
+            "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+          },
+          {
+            "path": "scripts/historical-case-roster.mjs",
+            "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+          },
+          {
+            "path": "scripts/acquire-mixed-fixture-build-originals.py",
+            "sha256": "d2daa61695a33a5dffce4475ebf5c7fc8e85d9f34546b750703a0aa5867d483e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-authenticator.mjs",
+            "sha256": "a51b250960598cec181e87e916ccd313313ba038414ab9b191fccff271a7fcda"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-subjects.json.gz",
+            "sha256": "4f6e6615472479909868ad093197763e2aae7997141f463e9f4ae17faf6995c3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition.json.gz",
+            "sha256": "3aad484601039473e1088e02b061624d1f1b3b2ff3af5e13793249c35bd629d0"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-authentication.json.gz",
+            "sha256": "7239000a610801b64eefc22a8513c106de3f0a35d0ac562dc3be11cedc85363e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.json",
+            "sha256": "23511ac65c58300d9be1865bebff5ed2bcc7a55947bd80fed0be848ca6920856"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.py",
+            "sha256": "08fbd7a8581e6fb0b87370c3175131785896f679e012f999c56ea57c0b5ecd7b"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-inspector.mjs",
+            "sha256": "3e647aeae29b650c9b9b3a81320e42ef3a398651d25eedee9aad196f1c6e5277"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-acquisition-checkpoint.json",
+            "sha256": "9a969d2edb6bba4da74c1f63942dce459096d27e9a8db4f35ba8413b531730d3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-intake.json",
+            "sha256": "aa2d73755020288dc73d62b31c7f73ccc1ba4d1081c12dd7a2230edbd1c10530"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-observation-pins.json.gz",
+            "sha256": "345feb090aac7a4a63a8a8ba7f80c6b138348004a22d028412c130cd14b6b03c"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-prior.json.gz",
+            "sha256": "19f4e2e57f4d1de9414b717e48d70ecb81f254926a006eefb6422c39713e1cd3"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-review.json.gz",
+            "sha256": "46d7106e8e27b66fd04c033536cad1882b5c88b519903a5a348c3c324194c475"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-controls.json",
+            "sha256": "ae815d304888dffaef04fdd1e56762f4400f6b90b47afe878e36e75297d14b3e"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-python.log.gz",
+            "sha256": "5d674723370e986d2275d779ca4a5c7597e8a9678c3ffc4e0e130b934c0ec35a"
+          },
+          {
+            "path": "compatibility/rc/mixed-fixture-build-source-cyph-sanity.json",
+            "sha256": "e8a2d0ea54f025e7e1e3496a731cdc5e0cf415ed0c9821b80d897b26037d1c1b"
+          }
+        ],
+        "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+      },
+      "source_conclusion_only": true
     },
     {
       "sha": "ec2dbff5ec67bd2ceb36283bfc5c5f0526c9e51e",
