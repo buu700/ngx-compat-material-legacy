@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class UpstreamTestConsolidationTests(unittest.TestCase):
     def test_original_sources_and_real_cli_reject_modified_evidence(self):
         result = subprocess.run(
-            ['node', 'tests/upstream_test_consolidation_probe.mjs'],
+            ['node', 'scripts/run-historical-source-probe.mjs', 'test-consolidation-source'],
             cwd=ROOT, capture_output=True, text=True, timeout=90)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         observed = json.loads(result.stdout.strip().splitlines()[-1])

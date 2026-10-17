@@ -94,17 +94,29 @@ for(const wrapper of data.wrapper_edits.slice(18,19)){
 }
 assert.equal(cases.length,84);
 assert.deepEqual(cases,JSON.parse(read('compatibility/rc/spec-wide-fixture-source-replay-controls.json')).cases,'prior84 controls changed');
-assert.equal(data.entries.slice(21).length,1);assert.equal(data.wrapper_edits.slice(19).length,1);
-for(const path of [...data.entries.slice(21).map(row=>row.probe),...data.wrapper_edits.slice(19).map(row=>row.path)]){
+assert.equal(data.entries.slice(21,22).length,1);assert.equal(data.wrapper_edits.slice(19,20).length,1);
+for(const path of [...data.entries.slice(21,22).map(row=>row.probe),...data.wrapper_edits.slice(19,20).map(row=>row.path)]){
  const changed=Buffer.concat([cached(path),Buffer.from('\n// unreviewed historical native protocol subject\n')]);
  assert.throws(()=>inspect(name=>name===path?changed:cached(name)),/changed/,path);cases.push({id:'historical-native-frame-changed-subject-'+path,result:'rejected'});
 }
-for(const wrapper of data.wrapper_edits.slice(19)){
+for(const wrapper of data.wrapper_edits.slice(19,20)){
  const before=git(['show',wrapper.reference_commit+':'+wrapper.path]);assert.deepEqual(inspect(name=>name===wrapper.path?before:cached(name)),guard);
  let after=before.toString();for(const edit of wrapper.edits)after=after.replace(edit.before,edit.after);
  assert.deepEqual(inspect(name=>name===wrapper.path?Buffer.from(after):cached(name)),guard);cases.push({id:'historical-native-frame-exact-command-only-wrapper-'+wrapper.path,result:'pass'});
 }
 assert.equal(cases.length,87);
-const report={schema_version:8,line:data.line,scope:'Actual current coherence guard and exact wrapper/reference checks with cached original bytes. No historical program, build, installer, peer, browser or runtime qualification in these controls.',current_guard:guard,registered_original_programs:22,controls:cases.length,cases,inputs_sha256:hash(read(HISTORICAL_REPLAY_INPUTS)),helper_sha256:hash(read('scripts/historical-source-replay.mjs')),cli_sha256:hash(read('scripts/run-historical-source-probe.mjs')),producer_sha256:hash(read('tests/historical_source_replay_probe.mjs')),actual_current_source_or_native_or_packed_qualified:false,g11_claim:'not-passed'};
+assert.deepEqual(cases,JSON.parse(read('compatibility/rc/spec-animation-fixture-source-replay-controls.json')).cases,'prior87 controls changed');
+assert.equal(data.entries.slice(22).length,2);assert.equal(data.wrapper_edits.slice(20).length,1);
+for(const path of [...data.entries.slice(22).map(row=>row.probe),...data.wrapper_edits.slice(20).map(row=>row.path)]){
+ const changed=Buffer.concat([cached(path),Buffer.from('\n// unreviewed harness source replay subject\n')]);
+ assert.throws(()=>inspect(name=>name===path?changed:cached(name)),/changed/,path);cases.push({id:'harness-frame-changed-subject-'+path,result:'rejected'});
+}
+for(const wrapper of data.wrapper_edits.slice(20)){
+ const before=git(['show',wrapper.reference_commit+':'+wrapper.path]);assert.deepEqual(inspect(name=>name===wrapper.path?before:cached(name)),guard);
+ let after=before.toString();for(const edit of wrapper.edits)after=after.replace(edit.before,edit.after);
+ assert.deepEqual(inspect(name=>name===wrapper.path?Buffer.from(after):cached(name)),guard);cases.push({id:'harness-frame-exact-command-only-wrapper-'+wrapper.path,result:'pass'});
+}
+assert.equal(cases.length,91);
+const report={schema_version:9,line:data.line,scope:'Actual current coherence guard and exact wrapper/reference checks with cached original bytes. No historical program, build, installer, peer, browser or runtime qualification in these controls.',current_guard:guard,registered_original_programs:24,controls:cases.length,cases,inputs_sha256:hash(read(HISTORICAL_REPLAY_INPUTS)),helper_sha256:hash(read('scripts/historical-source-replay.mjs')),cli_sha256:hash(read('scripts/run-historical-source-probe.mjs')),producer_sha256:hash(read('tests/historical_source_replay_probe.mjs')),actual_current_source_or_native_or_packed_qualified:false,g11_claim:'not-passed'};
 const out=process.argv.indexOf('--out');if(out>=0)writeFileSync(process.argv[out+1],JSON.stringify(report,null,2)+'\n',{flag:'wx'});
 console.log(JSON.stringify({line:data.line,controls:cases.length,current_members:guard.guarded_current_members,current_product_members:guard.current_product_members,historical_probes_executed:0,actual_current_native_or_packed_qualified:false}));
