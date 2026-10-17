@@ -1,0 +1,1086 @@
+diff --git a/src/dev-app/select/select-demo.html b/src/dev-app/select/select-demo.html
+index 190d3ed68ff7a943b8c28e5d2255dfc9fd24c28e..d84caffd3dfe270c96d13ad450de3f5c708db1c7 100644
+--- a/src/dev-app/select/select-demo.html
++++ b/src/dev-app/select/select-demo.html
+@@ -11,7 +11,7 @@ Space above cards: <input type="number" [formControl]="topHeightCtrl">
+                       [class.demo-drinks-width-large]="drinksWidth === '400px'">
+         <mat-label>Drink</mat-label>
+         <mat-select [(ngModel)]="currentDrink" [required]="drinksRequired"
+-          [disabled]="drinksDisabled" #drinkControl="ngModel">
++          [disabled]="drinksDisabled" #drinkControl="ngModel" [panelClass]="m3ForceSecondary ? 'demo-force-secondary' : ''">
+           <mat-option [disabled]="drinksOptionsDisabled === 'all'">None</mat-option>
+           @for (drink of drinks; track drink; let index = $index) {
+             <mat-option [value]="drink.value"
+@@ -59,6 +59,9 @@ Space above cards: <input type="number" [formControl]="topHeightCtrl">
+           <option value="all">Disable All Options</option>
+         </select>
+       </p>
++      <p>
++        <mat-checkbox [(ngModel)]="m3ForceSecondary">Force secondary color for options in M3</mat-checkbox>
++      </p>
+ 
+       <button mat-button (click)="currentDrink='water-2'">SET VALUE</button>
+       <button mat-button (click)="drinksRequired=!drinksRequired">TOGGLE REQUIRED</button>
+diff --git a/src/dev-app/select/select-demo.ts b/src/dev-app/select/select-demo.ts
+index 61f2da697ebde1deb31605ab9a8c1daf6151e593..ffa817bd84f9c362c520c3197bf02b934423689b 100644
+--- a/src/dev-app/select/select-demo.ts
++++ b/src/dev-app/select/select-demo.ts
+@@ -71,6 +71,7 @@ export class SelectDemo {
+   pokemonTheme: ThemePalette = 'primary';
+   compareByValue = true;
+   selectFormControl = new FormControl('', Validators.required);
++  m3ForceSecondary = true;
+ 
+   sandwichBread = '';
+   sandwichMeat = '';
+diff --git a/src/dev-app/theme-m3.scss b/src/dev-app/theme-m3.scss
+index eea80f08b06f0854ff806eaf23d5917b62f46d49..46fe1f812c527e1de81daf41ef9dbf5320088eed 100644
+--- a/src/dev-app/theme-m3.scss
++++ b/src/dev-app/theme-m3.scss
+@@ -83,10 +83,10 @@
+   }
+ 
+   .mat-accent {
+-    @include color-variant-styles($theme, secondary);
++    @include color-variant-styles($theme, tertiary);
+   }
+   .mat-badge-accent {
+-    @include mat.badge-color($theme, $color-variant: secondary);
++    @include mat.badge-color($theme, $color-variant: tertiary);
+   }
+ 
+   .mat-warn {
+@@ -120,8 +120,7 @@ dev-app {
+ $m3-base-config: (
+   color: (
+     primary: matx.$m3-green-palette,
+-    secondary: matx.$m3-blue-palette,
+-    tertiary: matx.$m3-yellow-palette,
++    tertiary: matx.$m3-violet-palette,
+   ),
+ );
+ 
+@@ -174,6 +173,10 @@ html {
+ 
+ @include color-variants-back-compat($light-theme);
+ 
++.demo-force-secondary {
++  @include mat.option-color($light-theme, $color-variant: secondary);
++}
++
+ // Emit dark theme styles.
+ .demo-unicorn-dark-theme {
+   // TODO(mmalerba): choose colors from the theming API.
+@@ -219,6 +222,10 @@ html {
+   @include mat.tree-color($dark-theme);
+ 
+   @include color-variants-back-compat($dark-theme);
++
++  .demo-force-secondary {
++    @include mat.option-color($dark-theme, $color-variant: secondary);
++  }
+ }
+ 
+ // Emit density styles for each scale.
+diff --git a/src/material-experimental/_index.scss b/src/material-experimental/_index.scss
+index efb0c3ff415a0ed9795e9fb423f0f10bb0b4833a..90772c3d6ec252ece3d58136472513cf79570570 100644
+--- a/src/material-experimental/_index.scss
++++ b/src/material-experimental/_index.scss
+@@ -6,7 +6,8 @@
+ 
+ // Token-based theming API
+ @forward './theming/definition' show define-theme, define-colors, define-typography, define-density;
+-@forward './theming/m3-palettes' as m3-* show $m3-red-palette, $m3-orange-palette,
+-$m3-yellow-palette, $m3-green-palette, $m3-blue-palette, $m3-indigo-palette, $m3-violet-palette;
++@forward './theming/m3-palettes' as m3-* show $m3-red-palette, $m3-green-palette, $m3-blue-palette,
++  $m3-yellow-palette, $m3-cyan-palette, $m3-magenta-palette, $m3-orange-palette,
++  $m3-chartreuse-palette, $m3-azure-palette, $m3-violet-palette, $m3-rose-palette;
+ 
+ // Additional public APIs for individual components
+diff --git a/src/material-experimental/theming/_config-validation.scss b/src/material-experimental/theming/_config-validation.scss
+index 102d89bd4ccaadfc871df79e87fbda7783dbb9ee..4dbf6a4dc58dbadcafe06e0c11c74312d87ff439 100644
+--- a/src/material-experimental/theming/_config-validation.scss
++++ b/src/material-experimental/theming/_config-validation.scss
+@@ -89,7 +89,7 @@
+   @if $err {
+     @return (#{'$config should be a color configuration object. Got:'} $config);
+   }
+-  $allowed: (theme-type, primary, secondary, tertiary);
++  $allowed: (theme-type, primary, tertiary);
+   $err: mat.private-validate-allowed-values(map.keys($config or ()), $allowed...);
+   @if $err {
+     @return (
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index dd2b8ac74b366e5139a7b4d252069c913c1d74bc..d364606b0d5ce82002a2496668ed40859502053c 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -1058,7 +1058,7 @@
+       focus-state-layer-color: mat.private-safe-color-change(
+           map.get($systems, md-sys-color, secondary), $alpha: 0.2),
+     ),
+-    teriatiary: (
++    tertiary: (
+       ripple-color: map.get($systems, md-sys-color, tertiary),
+       hover-state-layer-color: mat.private-safe-color-change(
+           map.get($systems, md-sys-color, tertiary), $alpha: 0.05),
+diff --git a/src/material-experimental/theming/_definition.scss b/src/material-experimental/theming/_definition.scss
+index 9d3e2a251e0c534b79a43658e56525a4f9012a9a..03f47aa0b81a357ed8f60eb89a612a57cde81a60 100644
+--- a/src/material-experimental/theming/_definition.scss
++++ b/src/material-experimental/theming/_definition.scss
+@@ -38,24 +38,23 @@ $theme-version: 1;
+   }
+ 
+   $type: map.get($config, theme-type) or light;
+-  $primary: map.get($config, primary) or m3-palettes.$purple-palette;
+-  $secondary: map.get($config, secondary) or $primary;
+-  $tertiary: map.get($config, tertiary) or $secondary;
++  $primary: map.get($config, primary) or m3-palettes.$violet-palette;
++  $tertiary: map.get($config, tertiary) or $primary;
+ 
+   @return (
+     $internals: (
+       theme-version: $theme-version,
+       theme-type: $type,
+       palettes: (
+-        primary: map.remove($primary, neutral, neutral-variant),
+-        secondary: map.remove($secondary, neutral, neutral-variant),
+-        tertiary: map.remove($tertiary, neutral, neutral-variant),
++        primary: map.remove($primary, neutral, neutral-variant, secondary),
++        secondary: map.get($primary, secondary),
++        tertiary: map.remove($tertiary, neutral, neutral-variant, secondary),
+         neutral: map.get($primary, neutral),
+         neutral-variant: map.get($primary, neutral-variant),
+-        error: map.remove(m3-palettes.$red-palette, neutral, neutral-variant),
++        error: m3-palettes.$private-error-palette,
+       ),
+       color-tokens: m3-tokens.generate-color-tokens(
+-          $type, $primary, $secondary, $tertiary, m3-palettes.$red-palette)
++          $type, $primary, $tertiary, m3-palettes.$private-error-palette)
+     )
+   );
+ }
+diff --git a/src/material-experimental/theming/_m3-palettes.scss b/src/material-experimental/theming/_m3-palettes.scss
+index 60bf1a77422c451c85cf8009449830d2aea55d9c..49b835ebba0296a11a87d2889c3f231cfbf4cde3 100644
+--- a/src/material-experimental/theming/_m3-palettes.scss
++++ b/src/material-experimental/theming/_m3-palettes.scss
+@@ -27,7 +27,155 @@
+   @return $palette;
+ }
+ 
+-/// Blue color palette to be used as primary, secondary, or tertiary palette.
++/// Red color palette to be used as primary or tertiary palette.
++$red-palette: _patch-missing-hues((
++  0: #000000,
++  10: #410000,
++  20: #690100,
++  25: #7e0100,
++  30: #930100,
++  35: #a90100,
++  40: #c00100,
++  50: #ef0000,
++  60: #ff5540,
++  70: #ff8a78,
++  80: #ffb4a8,
++  90: #ffdad4,
++  95: #ffedea,
++  98: #fff8f6,
++  99: #fffbff,
++  100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #2c1512,
++    20: #442925,
++    25: #513430,
++    30: #5d3f3b,
++    35: #6a4b46,
++    40: #775651,
++    50: #926f69,
++    60: #ae8882,
++    70: #caa29c,
++    80: #e7bdb6,
++    90: #ffdad4,
++    95: #ffedea,
++    98: #fff8f6,
++    99: #fffbff,
++    100: #ffffff,
++  ),
++  neutral: (
++    0: #000000,
++    10: #201a19,
++    20: #362f2e,
++    25: #413a38,
++    30: #4d4544,
++    35: #59504f,
++    40: #655c5b,
++    50: #7f7573,
++    60: #998e8d,
++    70: #b4a9a7,
++    80: #d0c4c2,
++    90: #ede0dd,
++    95: #fbeeec,
++    98: #fff8f6,
++    99: #fffbff,
++    100: #ffffff,
++  ),
++  neutral-variant: (
++    0: #000000,
++    10: #251917,
++    20: #3b2d2b,
++    25: #473836,
++    30: #534341,
++    35: #5f4f4c,
++    40: #6c5a58,
++    50: #857370,
++    60: #a08c89,
++    70: #bca7a3,
++    80: #d8c2be,
++    90: #f5ddda,
++    95: #ffedea,
++    98: #fff8f6,
++    99: #fffbff,
++    100: #ffffff,
++  ),
++));
++
++/// Green color palette to be used as primary or tertiary palette.
++$green-palette: _patch-missing-hues((
++  0: #000000,
++  10: #002200,
++  20: #013a00,
++  25: #014600,
++  30: #015300,
++  35: #026100,
++  40: #026e00,
++  50: #038b00,
++  60: #03a800,
++  70: #03c700,
++  80: #02e600,
++  90: #77ff61,
++  95: #cbffb8,
++  98: #edffe1,
++  99: #f7ffee,
++  100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #121f0e,
++    20: #263422,
++    25: #313f2c,
++    30: #3c4b37,
++    35: #485642,
++    40: #54634d,
++    50: #6c7b65,
++    60: #86957e,
++    70: #a0b097,
++    80: #bbcbb2,
++    90: #d7e8cd,
++    95: #e5f6da,
++    98: #eeffe3,
++    99: #f7ffee,
++    100: #ffffff,
++  ),
++  neutral: (
++    0: #000000,
++    10: #1a1c18,
++    20: #2f312d,
++    25: #3a3c38,
++    30: #454743,
++    35: #51534e,
++    40: #5d5f5a,
++    50: #767872,
++    60: #90918c,
++    70: #abaca6,
++    80: #c6c7c1,
++    90: #e2e3dc,
++    95: #f1f1eb,
++    98: #f9faf3,
++    99: #fcfdf6,
++    100: #ffffff,
++  ),
++  neutral-variant: (
++    0: #000000,
++    10: #181d15,
++    20: #2c3229,
++    25: #373d34,
++    30: #43483f,
++    35: #4e544a,
++    40: #5a6056,
++    50: #73796e,
++    60: #8d9387,
++    70: #a7ada1,
++    80: #c3c8bc,
++    90: #dfe4d7,
++    95: #edf3e5,
++    98: #f6fbee,
++    99: #f9fef1,
++    100: #ffffff,
++  ),
++));
++
++/// Blue color palette to be used as primary or tertiary palette.
+ $blue-palette: _patch-missing-hues((
+   0: #000000,
+   10: #00006e,
+@@ -45,6 +193,24 @@ $blue-palette: _patch-missing-hues((
+   98: #fbf8ff,
+   99: #fffbff,
+   100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #191a2c,
++    20: #2e2f42,
++    25: #393a4d,
++    30: #444559,
++    35: #505165,
++    40: #5c5d72,
++    50: #75758b,
++    60: #8f8fa6,
++    70: #a9a9c1,
++    80: #c5c4dd,
++    90: #e1e0f9,
++    95: #f1efff,
++    98: #fbf8ff,
++    99: #fffbff,
++    100: #ffffff,
++  ),
+   neutral: (
+     0: #000000,
+     10: #1b1b1f,
+@@ -83,7 +249,81 @@ $blue-palette: _patch-missing-hues((
+   ),
+ ));
+ 
+-/// Cyan color palette to be used as primary, secondary, or tertiary palette.
++/// Yellow color palette to be used as primary or tertiary palette.
++$yellow-palette: _patch-missing-hues((
++  0: #000000,
++  10: #1d1d00,
++  20: #323200,
++  25: #3e3e00,
++  30: #494900,
++  35: #555500,
++  40: #626200,
++  50: #7b7b00,
++  60: #969600,
++  70: #b1b100,
++  80: #cdcd00,
++  90: #eaea00,
++  95: #f9f900,
++  98: #fffeac,
++  99: #fffbff,
++  100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #1d1d06,
++    20: #323218,
++    25: #3d3d22,
++    30: #49482d,
++    35: #545438,
++    40: #606043,
++    50: #7a795a,
++    60: #949272,
++    70: #aead8b,
++    80: #cac8a5,
++    90: #e7e4bf,
++    95: #f5f3cd,
++    98: #fefbd5,
++    99: #fffbff,
++    100: #ffffff,
++  ),
++  neutral: (
++    0: #000000,
++    10: #1c1c17,
++    20: #31312b,
++    25: #3c3c35,
++    30: #484741,
++    35: #54524c,
++    40: #605e58,
++    50: #797770,
++    60: #939189,
++    70: #aeaba3,
++    80: #c9c6be,
++    90: #e6e2d9,
++    95: #f4f0e8,
++    98: #fdf9f0,
++    99: #fffbff,
++    100: #ffffff,
++  ),
++  neutral-variant: (
++    0: #000000,
++    10: #1c1c11,
++    20: #313125,
++    25: #3d3c2f,
++    30: #48473a,
++    35: #545345,
++    40: #605f51,
++    50: #797869,
++    60: #939182,
++    70: #aeac9b,
++    80: #cac7b6,
++    90: #e6e3d1,
++    95: #f4f1df,
++    98: #fdfae7,
++    99: #fffbff,
++    100: #ffffff,
++  ),
++));
++
++/// Cyan color palette to be used as primary or tertiary palette.
+ $cyan-palette: _patch-missing-hues((
+   0: #000000,
+   10: #002020,
+@@ -101,6 +341,24 @@ $cyan-palette: _patch-missing-hues((
+   98: #e2fffe,
+   99: #f1fffe,
+   100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #051f1f,
++    20: #1b3534,
++    25: #27403f,
++    30: #324b4b,
++    35: #3e5757,
++    40: #4a6363,
++    50: #627c7b,
++    60: #7b9695,
++    70: #95b0b0,
++    80: #b0cccb,
++    90: #cce8e7,
++    95: #daf6f5,
++    98: #e3fffe,
++    99: #f1fffe,
++    100: #ffffff,
++  ),
+   neutral: (
+     0: #000000,
+     10: #191c1c,
+@@ -139,63 +397,7 @@ $cyan-palette: _patch-missing-hues((
+   ),
+ ));
+ 
+-/// Green color palette to be used as primary, secondary, or tertiary palette.
+-$green-palette: _patch-missing-hues((
+-  0: #000000,
+-  10: #002200,
+-  20: #013a00,
+-  25: #014600,
+-  30: #015300,
+-  35: #026100,
+-  40: #026e00,
+-  50: #038b00,
+-  60: #03a800,
+-  70: #03c700,
+-  80: #02e600,
+-  90: #77ff61,
+-  95: #cbffb8,
+-  98: #edffe1,
+-  99: #f7ffee,
+-  100: #ffffff,
+-  neutral: (
+-    0: #000000,
+-    10: #1a1c18,
+-    20: #2f312d,
+-    25: #3a3c38,
+-    30: #454743,
+-    35: #51534e,
+-    40: #5d5f5a,
+-    50: #767872,
+-    60: #90918c,
+-    70: #abaca6,
+-    80: #c6c7c1,
+-    90: #e2e3dc,
+-    95: #f1f1eb,
+-    98: #f9faf3,
+-    99: #fcfdf6,
+-    100: #ffffff,
+-  ),
+-  neutral-variant: (
+-    0: #000000,
+-    10: #181d15,
+-    20: #2c3229,
+-    25: #373d34,
+-    30: #43483f,
+-    35: #4e544a,
+-    40: #5a6056,
+-    50: #73796e,
+-    60: #8d9387,
+-    70: #a7ada1,
+-    80: #c3c8bc,
+-    90: #dfe4d7,
+-    95: #edf3e5,
+-    98: #f6fbee,
+-    99: #f9fef1,
+-    100: #ffffff,
+-  ),
+-));
+-
+-/// Magenta color palette to be used as primary, secondary, or tertiary palette.
++/// Magenta color palette to be used as primary or tertiary palette.
+ $magenta-palette: _patch-missing-hues((
+   0: #000000,
+   10: #380038,
+@@ -213,6 +415,24 @@ $magenta-palette: _patch-missing-hues((
+   98: #fff7f9,
+   99: #fffbff,
+   100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #271624,
++    20: #3d2b3a,
++    25: #493545,
++    30: #554151,
++    35: #614c5d,
++    40: #6e5869,
++    50: #877082,
++    60: #a2899c,
++    70: #bea4b7,
++    80: #dabfd2,
++    90: #f7daef,
++    95: #ffebf8,
++    98: #fff7f9,
++    99: #fffbff,
++    100: #ffffff,
++  ),
+   neutral: (
+     0: #000000,
+     10: #1e1a1d,
+@@ -251,7 +471,7 @@ $magenta-palette: _patch-missing-hues((
+   ),
+ ));
+ 
+-/// Orange color palette to be used as primary, secondary, or tertiary palette.
++/// Orange color palette to be used as primary or tertiary palette.
+ $orange-palette: _patch-missing-hues((
+   0: #000000,
+   10: #311300,
+@@ -269,6 +489,24 @@ $orange-palette: _patch-missing-hues((
+   98: #fff8f5,
+   99: #fffbff,
+   100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #2b1708,
++    20: #422b1b,
++    25: #4f3625,
++    30: #5b4130,
++    35: #684c3b,
++    40: #755846,
++    50: #90715d,
++    60: #ab8a75,
++    70: #c8a48e,
++    80: #e5bfa8,
++    90: #ffdcc7,
++    95: #ffede4,
++    98: #fff8f5,
++    99: #fffbff,
++    100: #ffffff,
++  ),
+   neutral: (
+     0: #000000,
+     10: #201a17,
+@@ -307,8 +545,230 @@ $orange-palette: _patch-missing-hues((
+   ),
+ ));
+ 
+-/// Purple color palette to be used as primary, secondary, or tertiary palette.
+-$purple-palette: _patch-missing-hues((
++/// Chartreuse color palette to be used as primary or tertiary palette.
++$chartreuse-palette: _patch-missing-hues((
++  0: #000000,
++  10: #0b2000,
++  20: #173800,
++  25: #1e4400,
++  30: #245100,
++  35: #2b5e00,
++  40: #326b00,
++  50: #418700,
++  60: #50a400,
++  70: #60c100,
++  80: #70e000,
++  90: #82ff10,
++  95: #cfffa9,
++  98: #eeffdc,
++  99: #f8ffeb,
++  100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #141e0c,
++    20: #293420,
++    25: #333f2a,
++    30: #3f4a35,
++    35: #4a5640,
++    40: #56624b,
++    50: #6f7b62,
++    60: #88957b,
++    70: #a2b094,
++    80: #becbaf,
++    90: #dae7ca,
++    95: #e8f5d7,
++    98: #f0fee0,
++    99: #f8ffeb,
++    100: #ffffff,
++  ),
++  neutral: (
++    0: #000000,
++    10: #1a1c18,
++    20: #2f312c,
++    25: #3a3c37,
++    30: #464742,
++    35: #52534e,
++    40: #5e5f5a,
++    50: #767872,
++    60: #90918b,
++    70: #abaca5,
++    80: #c7c7c0,
++    90: #e3e3dc,
++    95: #f1f1ea,
++    98: #fafaf2,
++    99: #fdfdf5,
++    100: #ffffff,
++  ),
++  neutral-variant: (
++    0: #000000,
++    10: #181d14,
++    20: #2d3228,
++    25: #383d33,
++    30: #44483e,
++    35: #4f5449,
++    40: #5b6055,
++    50: #74796d,
++    60: #8e9286,
++    70: #a8ada0,
++    80: #c4c8bb,
++    90: #e0e4d6,
++    95: #eef2e4,
++    98: #f7fbec,
++    99: #fafeef,
++    100: #ffffff,
++  ),
++));
++
++/// Spring Green color palette to be used as primary or tertiary palette.
++$spring-green-palette: _patch-missing-hues((
++  0: #000000,
++  10: #00210b,
++  20: #003917,
++  25: #00461e,
++  30: #005225,
++  35: #00602c,
++  40: #006d33,
++  50: #008942,
++  60: #00a751,
++  70: #00c561,
++  80: #00e472,
++  90: #63ff94,
++  95: #c4ffcb,
++  98: #eaffe9,
++  99: #f5fff2,
++  100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #0e1f12,
++    20: #233425,
++    25: #2e4030,
++    30: #394b3b,
++    35: #445746,
++    40: #506352,
++    50: #697c6a,
++    60: #829682,
++    70: #9cb19c,
++    80: #b7ccb7,
++    90: #d3e8d2,
++    95: #e1f6e0,
++    98: #eaffe9,
++    99: #f5fff2,
++    100: #ffffff,
++  ),
++  neutral: (
++    0: #000000,
++    10: #191c19,
++    20: #2e312e,
++    25: #393c39,
++    30: #454744,
++    35: #51534f,
++    40: #5d5f5b,
++    50: #757873,
++    60: #8f918d,
++    70: #aaaca7,
++    80: #c5c7c2,
++    90: #e2e3de,
++    95: #f0f1ec,
++    98: #f9faf4,
++    99: #fcfdf7,
++    100: #ffffff,
++  ),
++  neutral-variant: (
++    0: #000000,
++    10: #161d17,
++    20: #2b322b,
++    25: #363d36,
++    30: #414941,
++    35: #4d544c,
++    40: #596058,
++    50: #717970,
++    60: #8b9389,
++    70: #a6ada4,
++    80: #c1c9be,
++    90: #dde5da,
++    95: #ebf3e8,
++    98: #f4fcf0,
++    99: #f7fef3,
++    100: #ffffff,
++  ),
++));
++
++/// Azure color palette to be used as primary or tertiary palette.
++$azure-palette: _patch-missing-hues((
++  0: #000000,
++  10: #001b3f,
++  20: #002f65,
++  25: #003a7a,
++  30: #00458f,
++  35: #0050a5,
++  40: #005cbb,
++  50: #0074e9,
++  60: #438fff,
++  70: #7cabff,
++  80: #abc7ff,
++  90: #d7e3ff,
++  95: #ecf0ff,
++  98: #f9f9ff,
++  99: #fdfbff,
++  100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #131c2b,
++    20: #283041,
++    25: #333c4d,
++    30: #3e4759,
++    35: #4a5365,
++    40: #565e71,
++    50: #6f778b,
++    60: #8891a5,
++    70: #a3abc0,
++    80: #bec6dc,
++    90: #dae2f9,
++    95: #ecf0ff,
++    98: #f9f9ff,
++    99: #fdfbff,
++    100: #ffffff,
++  ),
++  neutral: (
++    0: #000000,
++    10: #1a1b1f,
++    20: #2f3033,
++    25: #3b3b3f,
++    30: #46464a,
++    35: #525256,
++    40: #5e5e62,
++    50: #77777a,
++    60: #919094,
++    70: #ababaf,
++    80: #c7c6ca,
++    90: #e3e2e6,
++    95: #f2f0f4,
++    98: #faf9fd,
++    99: #fdfbff,
++    100: #ffffff,
++  ),
++  neutral-variant: (
++    0: #000000,
++    10: #181c22,
++    20: #2d3038,
++    25: #383b43,
++    30: #44474e,
++    35: #4f525a,
++    40: #5b5e66,
++    50: #74777f,
++    60: #8e9099,
++    70: #a9abb4,
++    80: #c4c6d0,
++    90: #e0e2ec,
++    95: #eff0fa,
++    98: #f9f9ff,
++    99: #fdfbff,
++    100: #ffffff,
++  ),
++));
++
++/// Violet color palette to be used as primary or tertiary palette.
++$violet-palette: _patch-missing-hues((
+   0: #000000,
+   10: #270057,
+   20: #42008a,
+@@ -325,6 +785,24 @@ $purple-palette: _patch-missing-hues((
+   98: #fef7ff,
+   99: #fffbff,
+   100: #ffffff,
++  secondary: (
++    0: #000000,
++    10: #1f182a,
++    20: #352d40,
++    25: #40384c,
++    30: #4b4357,
++    35: #574f63,
++    40: #645b70,
++    50: #7d7389,
++    60: #978ca4,
++    70: #b2a7bf,
++    80: #cec2db,
++    90: #eadef7,
++    95: #f7edff,
++    98: #fef7ff,
++    99: #fffbff,
++    100: #ffffff,
++  ),
+   neutral: (
+     0: #000000,
+     10: #1d1b1e,
+@@ -363,114 +841,96 @@ $purple-palette: _patch-missing-hues((
+   ),
+ ));
+ 
+-/// Red color palette to be used as primary, secondary, or tertiary palette.
+-$red-palette: _patch-missing-hues((
++/// Rose color palette to be used as primary or tertiary palette.
++$rose-palette: _patch-missing-hues((
+   0: #000000,
+-  10: #410000,
+-  20: #690100,
+-  25: #7e0100,
+-  30: #930100,
+-  35: #a90100,
+-  40: #c00100,
+-  50: #ef0000,
+-  60: #ff5540,
+-  70: #ff8a78,
+-  80: #ffb4a8,
+-  90: #ffdad4,
+-  95: #ffedea,
+-  98: #fff8f6,
++  10: #3f001b,
++  20: #65002f,
++  25: #7a003a,
++  30: #8f0045,
++  35: #a40050,
++  40: #ba005c,
++  50: #e80074,
++  60: #ff4a8e,
++  70: #ff84a9,
++  80: #ffb1c5,
++  90: #ffd9e1,
++  95: #ffecef,
++  98: #fff8f8,
+   99: #fffbff,
+   100: #ffffff,
+-  neutral: (
+-    0: #000000,
+-    10: #201a19,
+-    20: #362f2e,
+-    25: #413a38,
+-    30: #4d4544,
+-    35: #59504f,
+-    40: #655c5b,
+-    50: #7f7573,
+-    60: #998e8d,
+-    70: #b4a9a7,
+-    80: #d0c4c2,
+-    90: #ede0dd,
+-    95: #fbeeec,
+-    98: #fff8f6,
+-    99: #fffbff,
+-    100: #ffffff,
+-  ),
+-  neutral-variant: (
++  secondary: (
+     0: #000000,
+-    10: #251917,
+-    20: #3b2d2b,
+-    25: #473836,
+-    30: #534341,
+-    35: #5f4f4c,
+-    40: #6c5a58,
+-    50: #857370,
+-    60: #a08c89,
+-    70: #bca7a3,
+-    80: #d8c2be,
+-    90: #f5ddda,
+-    95: #ffedea,
+-    98: #fff8f6,
++    10: #2b151b,
++    20: #422930,
++    25: #4f343b,
++    30: #5b3f46,
++    35: #684b52,
++    40: #74565d,
++    50: #8f6f76,
++    60: #aa888f,
++    70: #c6a2aa,
++    80: #e3bdc5,
++    90: #ffd9e1,
++    95: #ffecef,
++    98: #fff8f8,
+     99: #fffbff,
+     100: #ffffff,
+   ),
+-));
+-
+-/// Yellow color palette to be used as primary, secondary, or tertiary palette.
+-$yellow-palette: _patch-missing-hues((
+-  0: #000000,
+-  10: #1d1d00,
+-  20: #323200,
+-  25: #3e3e00,
+-  30: #494900,
+-  35: #555500,
+-  40: #626200,
+-  50: #7b7b00,
+-  60: #969600,
+-  70: #b1b100,
+-  80: #cdcd00,
+-  90: #eaea00,
+-  95: #f9f900,
+-  98: #fffeac,
+-  99: #fffbff,
+-  100: #ffffff,
+   neutral: (
+     0: #000000,
+-    10: #1c1c17,
+-    20: #31312b,
+-    25: #3c3c35,
+-    30: #484741,
+-    35: #54524c,
+-    40: #605e58,
+-    50: #797770,
+-    60: #939189,
+-    70: #aeaba3,
+-    80: #c9c6be,
+-    90: #e6e2d9,
+-    95: #f4f0e8,
+-    98: #fdf9f0,
++    10: #201a1b,
++    20: #352f30,
++    25: #413a3b,
++    30: #4c4546,
++    35: #585052,
++    40: #655c5e,
++    50: #7e7576,
++    60: #988e90,
++    70: #b3a9aa,
++    80: #cfc4c5,
++    90: #ece0e1,
++    95: #faeeef,
++    98: #fff8f8,
+     99: #fffbff,
+     100: #ffffff,
+   ),
+   neutral-variant: (
+     0: #000000,
+-    10: #1c1c11,
+-    20: #313125,
+-    25: #3d3c2f,
+-    30: #48473a,
+-    35: #545345,
+-    40: #605f51,
+-    50: #797869,
+-    60: #939182,
+-    70: #aeac9b,
+-    80: #cac7b6,
+-    90: #e6e3d1,
+-    95: #f4f1df,
+-    98: #fdfae7,
++    10: #24191b,
++    20: #3a2d30,
++    25: #45383b,
++    30: #514346,
++    35: #5d4f52,
++    40: #6a5a5e,
++    50: #847376,
++    60: #9e8c90,
++    70: #baa7aa,
++    80: #d6c2c5,
++    90: #f3dde1,
++    95: #ffecef,
++    98: #fff8f8,
+     99: #fffbff,
+     100: #ffffff,
+   ),
+ ));
++
++/// Color palette to be used for error colors.
++$private-error-palette: (
++  0: #000000,
++  10: #410002,
++  20: #690005,
++  25: #7e0007,
++  30: #93000a,
++  35: #a80710,
++  40: #ba1a1a,
++  50: #de3730,
++  60: #ff5449,
++  70: #ff897d,
++  80: #ffb4ab,
++  90: #ffdad6,
++  95: #ffedea,
++  98: #fff8f7,
++  99: #fffbff,
++  100: #ffffff,
++);
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index 33c9e8ac9d56ecf0a32c256c3b2131667228df0f..817ef4c4fdf5ef558fc67463ac0d2881aeefb31a 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -114,11 +114,11 @@
+ /// @param {Map} $tertiary The tertiary palette
+ /// @param {Map} $error The error palette
+ /// @return {Map} A set of `md-ref-palette` tokens
+-@function _generate-ref-palette-tokens($primary, $secondary, $tertiary, $error) {
++@function _generate-ref-palette-tokens($primary, $tertiary, $error) {
+   @return mat.private-merge-all(
+       (black: #000, white: #fff),
+       _generate-palette-tokens($primary, primary),
+-      _generate-palette-tokens($secondary, secondary),
++      _generate-palette-tokens(map.get($primary, secondary), secondary),
+       _generate-palette-tokens($tertiary, tertiary),
+       _generate-palette-tokens(map.get($primary, neutral), neutral),
+       _generate-palette-tokens(map.get($primary, neutral-variant), neutral-variant),
+@@ -941,13 +941,12 @@
+ /// Generates a set of namespaced color tokens for all components.
+ /// @param {String} $type The type of theme system (light or dark)
+ /// @param {Map} $primary The primary palette
+-/// @param {Map} $secondary The secondary palette
+ /// @param {Map} $tertiary The tertiary palette
+ /// @param {Map} $error The error palette
+ /// @return {Map} A map of namespaced color tokens
+-@function generate-color-tokens($type, $primary, $secondary, $tertiary, $error) {
++@function generate-color-tokens($type, $primary, $tertiary, $error) {
+   $ref: (
+-    md-ref-palette: _generate-ref-palette-tokens($primary, $secondary, $tertiary, $error)
++    md-ref-palette: _generate-ref-palette-tokens($primary, $tertiary, $error)
+   );
+   $sys-color: if($type == dark,
+     mdc-tokens.md-sys-color-values-dark($ref),
+diff --git a/src/material/core/theming/tests/theming-definition-api.spec.ts b/src/material/core/theming/tests/theming-definition-api.spec.ts
+index 93ee46da3afdc1672a809afdd8b9f7a89cf00def..fc47dbc9be760c7ca32735033cc386dd0c86043f 100644
+--- a/src/material/core/theming/tests/theming-definition-api.spec.ts
++++ b/src/material/core/theming/tests/theming-definition-api.spec.ts
+@@ -112,7 +112,6 @@ describe('theming definition api', () => {
+           color: (
+             theme-type: dark,
+             primary: matx.$m3-yellow-palette,
+-            secondary: matx.$m3-orange-palette,
+             tertiary: matx.$m3-red-palette,
+           )
+         ));
+@@ -131,10 +130,10 @@ describe('theming definition api', () => {
+       const vars = getRootVars(css);
+       expect(vars['token-surface']).toBe('#1c1c17');
+       expect(vars['token-primary']).toBe('#cdcd00');
+-      expect(vars['token-secondary']).toBe('#ffb787');
++      expect(vars['token-secondary']).toBe('#cac8a5');
+       expect(vars['token-tertiary']).toBe('#ffb4a8');
+       expect(vars['palette-primary']).toBe('#7b7b00');
+-      expect(vars['palette-secondary']).toBe('#bc5d00');
++      expect(vars['palette-secondary']).toBe('#7a795a');
+       expect(vars['palette-tertiary']).toBe('#ef0000');
+       expect(vars['type']).toBe('dark');
+     });
