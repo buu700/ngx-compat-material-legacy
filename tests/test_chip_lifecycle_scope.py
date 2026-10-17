@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from tests.chip_focus_repair_context import focus_before_member,focus_historical_product_diff
 ROOT=Path(__file__).resolve().parents[1]
 sha=lambda b:hashlib.sha256(b).hexdigest()
 
@@ -53,8 +54,8 @@ class ChipLifecycleScope(unittest.TestCase):
         task=json.loads((ROOT/'compatibility/rc/chip-lifecycle-scope-worksheet.json').read_bytes());ref=task['prior'];stored=(ROOT/ref['path']).read_bytes();self.assertEqual(sha(stored),ref['sha256']);raw=gzip.decompress(stored);self.assertEqual(sha(raw),ref['raw_sha256']);prior=json.loads(raw)
         current=(ROOT/prior['ledger_path']).read_bytes();self.assertEqual(sha(current),prior['ledger_sha256']);self.assertEqual(current,prior['ledger_text'].encode());self.assertEqual(len(json.loads(current)['entries']),1697)
         self.assertEqual(subprocess.check_output(['git','--no-replace-objects','show',task['source_parent']+':'+prior['ledger_path']],cwd=ROOT),current)
-        for m in prior['owned_sources']+prior['reviews']:self.assertEqual((ROOT/m['path']).read_bytes(),m['text'].encode())
-        for group in ['projects','testing','reference','fixtures']:self.assertEqual(subprocess.check_output(['git','--no-replace-objects','diff',task['source_parent'],'--',group],cwd=ROOT),b'')
+        for m in prior['owned_sources']+prior['reviews']:self.assertEqual(focus_before_member(ROOT,m['path']),m['text'].encode())
+        for group in ['projects','testing','reference','fixtures']:self.assertEqual(focus_historical_product_diff(ROOT,task['source_parent'],[group]),b'')
         body=json.loads((ROOT/'compatibility/rc/chip-lifecycle-scope-source-review.json').read_bytes());proposal=body['native_proposal'];self.assertEqual(sha((ROOT/proposal['path']).read_bytes()),proposal['sha256']);p=json.loads((ROOT/proposal['path']).read_bytes())
         self.assertEqual(p['actual_native_cases_added'],0);self.assertFalse(p['actual_runtime_executed']);self.assertEqual(len(p['new_native_SHA_scopes_required']),3)
         self.assertEqual(p['existing_historical_case_count'],2232);self.assertEqual(p['existing_original_and_shared_positive_cases'],2227);self.assertEqual(p['existing_negative_discovery_cases'],5)

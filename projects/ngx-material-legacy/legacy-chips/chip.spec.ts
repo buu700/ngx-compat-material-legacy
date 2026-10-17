@@ -1,11 +1,12 @@
 import {Directionality} from '@angular/cdk/bidi';
 import {BACKSPACE, DELETE, SPACE} from '@angular/cdk/keycodes';
 import {createKeyboardEvent, dispatchFakeEvent} from '../../cdk/testing/private';
-import {Component, DebugElement, ViewChild} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {Component, DebugElement, NgZone, ViewChild} from '@angular/core';
+import {waitForAsync, ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions} from '@angular/material/core';
 import {By} from '@angular/platform-browser';
 import {Subject} from 'rxjs';
+import {MockNgZone} from '../internal/testing/owned-test-events';
 import {
   MatLegacyChip,
   MatLegacyChipEvent,
@@ -449,6 +450,132 @@ describe('MatChip', () => {
 
     it('should have a focus indicator', () => {
       expect(chipNativeElement.classList.contains('mat-focus-indicator')).toBe(true);
+    });
+  });
+
+  describe('owned blur lifecycle', () => {
+    let lifecycleZone: MockNgZone;
+
+    beforeEach(() => {
+      lifecycleZone = new MockNgZone();
+      Object.defineProperty(lifecycleZone, 'isStable', {
+        value: false,
+        writable: true,
+        configurable: true,
+      });
+      TestBed.overrideProvider(NgZone, {useValue: lifecycleZone});
+      fixture = TestBed.createComponent(SingleChip);
+      fixture.detectChanges();
+      chipDebugElement = fixture.debugElement.query(By.directive(MatLegacyChip))!;
+      chipNativeElement = chipDebugElement.nativeElement;
+      chipInstance = chipDebugElement.injector.get(MatLegacyChip);
+    });
+
+    it('should restore DOM focus while an earlier blur is pending', fakeAsync(() => {
+      const outside = document.createElement('button');
+      document.body.appendChild(outside);
+      let blurs = 0;
+      const subscription = chipInstance._onBlur.subscribe(() => blurs++);
+      try {
+        chipNativeElement.focus();
+        outside.focus();
+        expect(document.activeElement).toBe(outside);
+        expect(chipInstance._hasFocus).toBe(true);
+
+        chipInstance.focus();
+        expect(document.activeElement).toBe(chipNativeElement);
+        expect(chipInstance._hasFocus).toBe(true);
+        lifecycleZone.simulateZoneExit();
+        flushMicrotasks();
+        expect(document.activeElement).toBe(chipNativeElement);
+        expect(chipInstance._hasFocus).toBe(true);
+        expect(blurs).toBe(0);
+      } finally {
+        subscription.unsubscribe();
+        outside.remove();
+      }
+    }));
+
+    it('should emit one blur for repeated requests and racing stability', fakeAsync(() => {
+      Object.defineProperty(lifecycleZone, 'isStable', {value: true});
+      let blurs = 0;
+      const subscription = chipInstance._onBlur.subscribe(() => blurs++);
+      try {
+        chipNativeElement.focus();
+        chipInstance._blur();
+        chipInstance._blur();
+        expect(blurs).toBe(0);
+        expect(chipInstance._hasFocus).toBe(true);
+        flushMicrotasks();
+        expect(blurs).toBe(1);
+        expect(chipInstance._hasFocus).toBe(false);
+
+        chipInstance.focus();
+        chipInstance._blur();
+        chipInstance._blur();
+        lifecycleZone.simulateZoneExit();
+        expect(blurs).toBe(2);
+        flushMicrotasks();
+        lifecycleZone.simulateZoneExit();
+        expect(blurs).toBe(2);
+        expect(chipInstance._hasFocus).toBe(false);
+      } finally {
+        subscription.unsubscribe();
+      }
+    }));
+
+    it('should cancel pending blur and notify destruction before ripple cleanup', fakeAsync(() => {
+      Object.defineProperty(lifecycleZone, 'isStable', {value: true});
+      const ripple = (chipInstance as unknown as {
+        _chipRipple: {_removeTriggerEvents(): void};
+      })._chipRipple;
+      const cleanup = spyOn(ripple, '_removeTriggerEvents').and.callThrough();
+      const events: string[] = [];
+      const blurSubscription = chipInstance._onBlur.subscribe(() => events.push('blur'));
+      const destroySubscription = chipInstance.destroyed.subscribe(() => {
+        expect(cleanup).not.toHaveBeenCalled();
+        expect(chipInstance._hasFocus).toBe(true);
+        events.push('destroyed');
+      });
+      try {
+        chipNativeElement.focus();
+        chipInstance._blur();
+        fixture.componentInstance.shouldShow = false;
+        fixture.detectChanges();
+        lifecycleZone.simulateZoneExit();
+        flushMicrotasks();
+        chipInstance.ngOnDestroy();
+        chipInstance.focus();
+        expect(events).toEqual(['destroyed']);
+        expect(cleanup).toHaveBeenCalledTimes(1);
+      } finally {
+        blurSubscription.unsubscribe();
+        destroySubscription.unsubscribe();
+      }
+    }));
+
+    it('should notify programmatic focus once during synchronous host reentry', () => {
+      const outside = document.createElement('button');
+      document.body.appendChild(outside);
+      const observations: {focused: boolean; active: Element | null}[] = [];
+      const nativeFocus = spyOn(chipNativeElement, 'focus').and.callThrough();
+      const subscription = chipInstance._onFocus.subscribe(() => observations.push({
+        focused: chipInstance._hasFocus,
+        active: document.activeElement,
+      }));
+      try {
+        outside.focus();
+        chipInstance.focus();
+        expect(nativeFocus).toHaveBeenCalledTimes(1);
+        expect(observations).toEqual([{focused: true, active: chipNativeElement}]);
+        chipInstance.focus();
+        expect(nativeFocus).toHaveBeenCalledTimes(1);
+        chipNativeElement.focus();
+        expect(observations).toEqual([{focused: true, active: chipNativeElement}]);
+      } finally {
+        subscription.unsubscribe();
+        outside.remove();
+      }
     });
   });
 });

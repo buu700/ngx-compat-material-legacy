@@ -13,7 +13,7 @@ import {CHIP_LIST_SOURCE,CHIP_LIST_REFERENCE,CHIP_LIST_ORIGINALS,inspectChipList
 export const HISTORICAL_BEHAVIOR_KIND = 'historical-required-individual-behavior';
 const checkId = 'historical-legacy-artifact';
 // Expansion requires reviewing this finite contract alongside its indexed names.
-const requiredCaseCount = 2232;
+const requiredCaseCount = 2236;
 const casePrefix = checkId + '/original-and-shared-cases/';
 const commonMembers = [
   'scripts/rc-test-legacy-family.mjs', 'scripts/historical-case-roster.mjs',
@@ -39,6 +39,10 @@ const retainedRegressionCases = [
   nativeCase('legacy-autocomplete/autocomplete.spec.ts', 172, 'MatAutocomplete > should not throw errors when closing without options'),
   nativeCase('legacy-chips/chip-list.spec.ts', 87, 'MatChipList > should clear a destroyed active chip when the list becomes empty'),
   nativeCase('legacy-table/table-data-source.spec.ts', 6, 'MatTableDataSource > sort > should be able to correctly sort an array of strings and numbers with left zero'),
+  nativeCase('legacy-chips/chip.spec.ts', 34, "MatChip > owned blur lifecycle > should restore DOM focus while an earlier blur is pending"),
+  nativeCase('legacy-chips/chip.spec.ts', 35, "MatChip > owned blur lifecycle > should emit one blur for repeated requests and racing stability"),
+  nativeCase('legacy-chips/chip.spec.ts', 36, "MatChip > owned blur lifecycle > should cancel pending blur and notify destruction before ripple cleanup"),
+  nativeCase('legacy-chips/chip.spec.ts', 37, "MatChip > owned blur lifecycle > should notify programmatic focus once during synchronous host reentry"),
 ];
 export function historicalRegressionRequirements() {
   return structuredClone(retainedRegressionCases);
