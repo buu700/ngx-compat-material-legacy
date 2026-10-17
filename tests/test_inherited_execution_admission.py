@@ -65,7 +65,20 @@ class InheritedExecutionAdmission(unittest.TestCase):
             self.assertEqual(context['prior_review'], {'path': old_entry['evidence_report'], 'sha256': digest(read(old_entry['evidence_report']))})
             self.assertEqual(load(old_entry['evidence_report']), row['review'])
             self.assertFalse(context['actual_native_packed_or_floor_qualified'])
-            self.assertEqual(context['finite_inherited_gate']['sha256'], digest(read(context['finite_inherited_gate']['path'])))
+            finite = context['finite_inherited_gate']
+            current_gate = read(finite['path'])
+            if digest(current_gate) != finite['sha256']:
+                # The next qualified task adds only the two finite helper routes.
+                task = load('compatibility/rc/inherited-helper-execution-worksheet.json')
+                previous_gate = subprocess.check_output(['git', 'show', task['source_parent'] + ':' + finite['path']], cwd=ROOT)
+                old_import = "import {bidiBehaviorRequirements, validateBidiBehavior} from './upstream-bidi-evidence.mjs';"
+                new_import = "import {inheritedHelperRequirements, validateInheritedHelperExecution} from './upstream-inherited-helper-evidence.mjs';"
+                old_guard = '    if (entry?.sha === TABLE_ONPUSH_SHA) {'
+                new_guard = '    if (inheritedHelperRequirements(entry?.sha, line)) return validateInheritedHelperExecution({root, entry, proof, line});'
+                expected_gate = previous_gate.decode().replace(old_import, old_import + '\n' + new_import).replace(old_guard, new_guard + '\n' + old_guard)
+                self.assertEqual(current_gate.decode(), expected_gate)
+                current_gate = previous_gate
+            self.assertEqual(finite['sha256'], digest(current_gate))
             expected_review = json.loads(json.dumps(row['review']))
             expected_review['individual_proof'] = current['individual_proof']
             self.assertEqual(review, expected_review)
