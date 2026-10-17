@@ -108,3 +108,39 @@ export function chipEditSourceContext(read,productPaths){
  const moduleFile=parse('chips-module.ts',read('projects/ngx-material-legacy/legacy-chips/chips-module.ts').toString()),declarations=moduleFile.statements.filter(ts.isVariableStatement).flatMap(s=>[...s.declarationList.declarations]).filter(d=>d.name.getText(moduleFile)==='CHIP_DECLARATIONS');assert.equal(declarations.length,1);assert.ok(ts.isArrayLiteralExpression(declarations[0].initializer));assert.deepEqual(declarations[0].initializer.elements.map(e=>e.getText(moduleFile)),['MatLegacyChipList','MatLegacyChip','MatLegacyChipInput','MatLegacyChipRemove','MatLegacyChipAvatar','MatLegacyChipTrailingIcon']);
  return {line:current.line,modern_type_boundary:current,authored_TS_and_resource_members:facts,reviewed_owned_sources:prior.owned_sources.map(({path,sha256})=>({path,sha256})),legacy_click_and_remove_methods_match_tag:true,tagged_chip:{path:taggedChip,sha256:taggedChipPin},tagged_structural_styles:{path:taggedStyles,sha256:taggedStylesPin},classic_structural_Sass_equal_after_module_source_normalization:true,preserved_Sass_namespace_bindings:own.bindings.map(b=>b.namespace),candidate_Sass_modules:own.bindings,legacy_module_declarations:6,authored_row_or_editing_surfaces:0,historical_Material16_MDC_style_members:historicalMdcStyleMembers,source_scope_only:true,actual_native_packed_or_floor_qualified:false};
 }
+
+export const CHIP_EDIT_SCOPE_ROLE='C04 individual complete modern chip editing and edit-only padding source exclusions';
+export const CHIP_EDIT_PROOF_KIND='individual-modern-chip-edit-source-exclusion';
+const foundationPath='compatibility/rc/chip-edit-scope-source-review.json';
+const foundationPins={main:'5654bd82c0653d52d2a0c48dd35fef02230ec587c9b69d0c0c12fcd00e13942b','21.x':'25ccc1c7a1dc3cb90b1374b5d2b2698d2a15e2ac3ae3c92fbca3207d97a2d0d1'};
+const json=value=>JSON.stringify(value,null,2)+'\n';
+export function requiresChipEditScope(entry,proof){return CHIP_EDIT_SHAS.includes(entry?.sha)||proof?.proof_kind===CHIP_EDIT_PROOF_KIND||proof?.chip_edit_source_scope!==undefined;}
+/** Exact source identities and individually retained reviews, never runtime goldens. */
+export function chipEditSourceBody(read,productPaths,line){
+ assert.ok(['main','21.x'].includes(line));
+ const bytes=read(foundationPath);assert.equal(hash(bytes),foundationPins[line],'changed chip editing foundation');const foundation=JSON.parse(bytes);
+ assert.equal(foundation.line,line);assert.deepEqual(foundation.reviews.map(r=>r.sha),CHIP_EDIT_SHAS);
+ const prior=readChipEditPrior(read,line),originals=readChipEditOriginals(read).subjects,analysis=analyzeChipEditOriginals(read),context=chipEditSourceContext(read,productPaths);assert.equal(context.line,line);
+ for(const old of prior.reviews)assert.equal(hash(read(old.path)),old.sha256,'changed retained chip editing review');
+ return {schema_version:1,role:CHIP_EDIT_SCOPE_ROLE,line,status:'reviewed',scope_sha_ids:[...CHIP_EDIT_SHAS],source_scope_only:true,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed',
+  prior:{path:'compatibility/rc/chip-edit-scope-prior.json.gz',sha256:priorPins[line],source_parent:prior.source_parent},foundation_review:{path:foundationPath,sha256:foundationPins[line]},candidate_context:context,
+  reviews:analysis.map((subject,i)=>{
+   const source=foundation.reviews[i];assert.deepEqual(source.original_analysis,subject);assert.equal(source.proposed_disposition,'not-applicable');assert.equal(source.whole_original_hunk_reviews.length,subject.hunks);
+   return {sha:subject.sha,status:'reviewed',final_disposition:'not-applicable',review_depth:'individual-compatibility',affected_branches:[line],decision:source.candidate_review,whole_original_hunk_reviews:source.whole_original_hunk_reviews,original_analysis:subject,patch_paths:subject.paths,diff_sha256:subject.diff_sha256,diff:originals[i].diff,original_sources:{path:CHIP_EDIT_ORIGINALS,sha256:originalPin},prior_entry:{ledger_path:prior.ledger_path,ledger_commit:prior.source_parent,entry_sha256:hash(json(prior.entries[i]))},actual_native_packed_or_floor_qualified:false};
+  })};
+}
+export function chipEditSourceProof(subject,context,decision){
+ assert.ok(CHIP_EDIT_SHAS.includes(subject?.sha));assert.ok(['main','21.x'].includes(context?.line));
+ return {proof_kind:CHIP_EDIT_PROOF_KIND,diff_sha256:subject.diff_sha256,review_depth:'individual-compatibility',affected_branches:[context.line],decision,
+  chip_edit_source_scope:{kind:'three-complete-modern-editing-and-padding-source-exclusions',case_id:'source/chip-edit/'+subject.sha,originals_sha256:originalPin,foundation_review_sha256:foundationPins[context.line],source_context_sha256:hash(JSON.stringify(context)),original_hunks:subject.hunks,changed_path_occurrences:subject.paths.length,existing_blob_occurrences:subject.existing_blob_occurrences,absent_preimages:subject.absent_preimages,source_scope_only:true,actual_native_packed_or_floor_qualified:false}};
+}
+/** Mandatory by SHA even when proof, kind, label or evidence suffix is removed. */
+export function chipEditScopeEvidenceOk(body,entry,read,productPaths,line){
+ try{
+  assert.ok(CHIP_EDIT_SHAS.includes(entry.sha));const expected=chipEditSourceBody(read,productPaths,line);assert.deepEqual(body,expected);
+  const row=expected.reviews.find(r=>r.sha===entry.sha);assert.equal(entry.final_disposition,row.final_disposition);assert.equal(entry.reason,row.decision);assert.equal(entry.diff_sha256,row.diff_sha256);assert.deepEqual(entry.files,row.patch_paths);assert.equal(entry.review_depth,row.review_depth);assert.deepEqual(entry.affected_branches,[line]);assert.equal(entry.g11_claim,'not-passed');
+  assert.deepEqual(entry.individual_proof,chipEditSourceProof(row.original_analysis,expected.candidate_context,row.decision));
+  const bytes=read(entry.evidence_report);assert.equal(bytes.toString(),json(body),'evidence bytes differ from selected source body');assert.deepEqual(entry.source_check,{proof_kind:CHIP_EDIT_PROOF_KIND,review_membership:entry.sha,evidence_report_sha256:hash(bytes)});
+  return true;
+ }catch{return false;}
+}
