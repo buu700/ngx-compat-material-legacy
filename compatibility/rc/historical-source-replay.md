@@ -4,6 +4,8 @@ Copyright (c) 2026 Ryan Lester.
 Use of this source code is governed by the MIT-style license in LICENSE.
 -->
 
+The registry contains26 historical programs and23 exact Python wrappers. The descriptions below retain their historical frame counts. Current31main/30line native source obligations are checked separately; replay supplies no current runtime qualification.
+
 The finite source-review probes below describe specific historical source populations and receipt rosters. Later reviewed changes can invalidate their original source hashes or move a receipt into a newer review. Their Python tests use a registered immutable Git graph so the complete original JavaScript programs and rejection assertions remain unchanged.
 
 | Registered probe | Original program |
@@ -30,6 +32,10 @@ The finite source-review probes below describe specific historical source popula
 | `stability-chip-context` | `tests/spec_stability_context_probe.mjs` |
 | `wide-fixture-adapter-context` | `tests/spec_wide_fixture_adapter_qualification_probe.mjs` |
 | `historical-native-admission` | `tests/upstream/historical-behavior-admission.mjs` |
+| `test-consolidation-source` | `tests/upstream_test_consolidation_probe.mjs` |
+| `deferred-control-upstream-source` | `tests/deferred_control_upstream_admission_probe.mjs` |
+| `native-date-context-source` | `tests/native_date_source_context_probe.mjs` |
+| `recorded-execution-source-context` | `tests/recorded_execution_source_context_probe.mjs` |
 
 Run one with the already prepared workspace dependencies:
 
