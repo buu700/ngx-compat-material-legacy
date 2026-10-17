@@ -1,0 +1,1871 @@
+diff --git a/src/material/core/ripple/ripple.spec.ts b/src/material/core/ripple/ripple.spec.ts
+index 2f910349e81ad6ffd1d3137c75541c3efaa5f138..96019a45fcd8c70d3c07955a0bf20096bcceb5ab 100644
+--- a/src/material/core/ripple/ripple.spec.ts
++++ b/src/material/core/ripple/ripple.spec.ts
+@@ -286,17 +286,6 @@ describe('MatRipple', () => {
+       expect(rippleTarget.querySelectorAll('.mat-ripple-element').length).toBe(0);
+     });
+ 
+-    it('does not run events inside the NgZone', () => {
+-      const spy = jasmine.createSpy('zone unstable callback');
+-      const subscription = fixture.ngZone!.onUnstable.subscribe(spy);
+-
+-      dispatchMouseEvent(rippleTarget, 'mousedown');
+-      dispatchMouseEvent(rippleTarget, 'mouseup');
+-
+-      expect(spy).not.toHaveBeenCalled();
+-      subscription.unsubscribe();
+-    });
+-
+     it('should only persist the latest ripple on pointer down', () => {
+       dispatchMouseEvent(rippleTarget, 'mousedown');
+       expect(rippleTarget.querySelectorAll('.mat-ripple-element').length).toBe(1);
+diff --git a/src/material/core/ripple/ripple.zone.spec.ts b/src/material/core/ripple/ripple.zone.spec.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..3ec711a2536aaac38499e174b8d3e8d40b87f18d
+--- /dev/null
++++ b/src/material/core/ripple/ripple.zone.spec.ts
+@@ -0,0 +1,60 @@
++import {dispatchMouseEvent} from '@angular/cdk/testing/private';
++import {Component, ViewChild} from '@angular/core';
++import {ComponentFixture, TestBed} from '@angular/core/testing';
++import {MatRippleModule} from '.';
++import {MatRipple} from './ripple';
++
++describe('MatRipple Zone.js integration', () => {
++  let fixture: ComponentFixture<any>;
++  let rippleTarget: HTMLElement;
++  let originalBodyMargin: string | null;
++
++  beforeEach(() => {
++    TestBed.configureTestingModule({
++      imports: [MatRippleModule, BasicRippleContainer],
++    });
++  });
++
++  beforeEach(() => {
++    // Set body margin to 0 during tests so it doesn't mess up position calculations.
++    originalBodyMargin = document.body.style.margin;
++    document.body.style.margin = '0';
++  });
++
++  afterEach(() => {
++    document.body.style.margin = originalBodyMargin!;
++  });
++
++  describe('basic ripple', () => {
++    beforeEach(() => {
++      fixture = TestBed.createComponent(BasicRippleContainer);
++      fixture.detectChanges();
++
++      rippleTarget = fixture.nativeElement.querySelector('.mat-ripple');
++    });
++
++    it('does not run events inside the NgZone', () => {
++      const spy = jasmine.createSpy('zone unstable callback');
++      const subscription = fixture.ngZone!.onUnstable.subscribe(spy);
++
++      dispatchMouseEvent(rippleTarget, 'mousedown');
++      dispatchMouseEvent(rippleTarget, 'mouseup');
++
++      expect(spy).not.toHaveBeenCalled();
++      subscription.unsubscribe();
++    });
++  });
++});
++
++@Component({
++  template: `
++      <div id="container" #ripple="matRipple" matRipple
++           style="position: relative; width:300px; height:200px;">
++      </div>
++    `,
++  standalone: true,
++  imports: [MatRippleModule],
++})
++class BasicRippleContainer {
++  @ViewChild('ripple') ripple: MatRipple;
++}
+diff --git a/src/material/sidenav/drawer.spec.ts b/src/material/sidenav/drawer.spec.ts
+index 495f5f2203f0e5813dd9681199dbcfcd6d892846..c917f06356b8d60020b195f6d8aa56a0e7e9a4ef 100644
+--- a/src/material/sidenav/drawer.spec.ts
++++ b/src/material/sidenav/drawer.spec.ts
+@@ -1,39 +1,28 @@
++import {A11yModule} from '@angular/cdk/a11y';
++import {Direction} from '@angular/cdk/bidi';
++import {ESCAPE} from '@angular/cdk/keycodes';
++import {CdkScrollable} from '@angular/cdk/scrolling';
++import {
++  createKeyboardEvent,
++  dispatchEvent,
++  dispatchKeyboardEvent,
++} from '@angular/cdk/testing/private';
++import {CommonModule} from '@angular/common';
++import {Component, ElementRef, ErrorHandler, ViewChild} from '@angular/core';
+ import {
+-  fakeAsync,
+-  waitForAsync,
+-  tick,
+   ComponentFixture,
+   TestBed,
+   discardPeriodicTasks,
++  fakeAsync,
+   flush,
++  tick,
++  waitForAsync,
+ } from '@angular/core/testing';
+-import {
+-  Component,
+-  ElementRef,
+-  ErrorHandler,
+-  ViewChild,
+-  provideZoneChangeDetection,
+-} from '@angular/core';
+ import {By} from '@angular/platform-browser';
+ import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
+-import {MatDrawer, MatSidenavModule, MatDrawerContainer} from './index';
+-import {Direction} from '@angular/cdk/bidi';
+-import {A11yModule} from '@angular/cdk/a11y';
+-import {ESCAPE} from '@angular/cdk/keycodes';
+-import {
+-  dispatchKeyboardEvent,
+-  createKeyboardEvent,
+-  dispatchEvent,
+-} from '@angular/cdk/testing/private';
+-import {CdkScrollable} from '@angular/cdk/scrolling';
+-import {CommonModule} from '@angular/common';
++import {MatDrawer, MatDrawerContainer, MatSidenavModule} from './index';
+ 
+ describe('MatDrawer', () => {
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+-    });
+-  });
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [
+@@ -267,6 +256,7 @@ describe('MatDrawer', () => {
+       const drawer = fixture.debugElement.query(By.directive(MatDrawer))!;
+ 
+       drawer.componentInstance.disableClose = true;
++      fixture.changeDetectorRef.markForCheck();
+       drawer.componentInstance.open();
+       fixture.detectChanges();
+       tick();
+@@ -308,6 +298,7 @@ describe('MatDrawer', () => {
+       drawer.open();
+       fixture.detectChanges();
+       flush();
++      fixture.detectChanges();
+ 
+       const backdrop = fixture.nativeElement.querySelector('.mat-drawer-backdrop');
+       expect(backdrop).toBeTruthy();
+@@ -340,6 +331,7 @@ describe('MatDrawer', () => {
+       drawer.open();
+       fixture.detectChanges();
+       flush();
++      fixture.detectChanges();
+       drawerButton.focus();
+ 
+       drawer.close();
+@@ -363,6 +355,7 @@ describe('MatDrawer', () => {
+       drawer.open();
+       fixture.detectChanges();
+       flush();
++      fixture.detectChanges();
+       drawerButton.focus();
+ 
+       drawer.close();
+@@ -389,6 +382,7 @@ describe('MatDrawer', () => {
+ 
+       fixture.detectChanges();
+       tick();
++      fixture.detectChanges();
+       closeButton.focus();
+ 
+       drawer.close();
+@@ -490,6 +484,7 @@ describe('MatDrawer', () => {
+ 
+       const testComponent: DrawerDynamicPosition = fixture.debugElement.componentInstance;
+       testComponent.drawer1Position = 'end';
++      fixture.changeDetectorRef.markForCheck();
+ 
+       fixture.detectChanges();
+       tick();
+@@ -504,6 +499,7 @@ describe('MatDrawer', () => {
+       const testComponent: DrawerDynamicPosition = fixture.debugElement.componentInstance;
+       testComponent.drawer1Position = 'end';
+       testComponent.drawer2Position = 'start';
++      fixture.changeDetectorRef.markForCheck();
+ 
+       expect(() => fixture.detectChanges()).not.toThrow();
+     });
+@@ -537,10 +533,12 @@ describe('MatDrawer', () => {
+       // in order to test it correctly.
+       setTimeout(() => {
+         fixture.componentInstance.isOpen = !fixture.componentInstance.isOpen;
++        fixture.changeDetectorRef.markForCheck();
+         expect(() => fixture.detectChanges()).not.toThrow();
+ 
+         setTimeout(() => {
+           fixture.componentInstance.isOpen = !fixture.componentInstance.isOpen;
++          fixture.changeDetectorRef.markForCheck();
+           expect(() => fixture.detectChanges()).not.toThrow();
+         }, 1);
+ 
+@@ -570,24 +568,28 @@ describe('MatDrawer', () => {
+ 
+     it('should trap focus when opened in "over" mode', fakeAsync(() => {
+       testComponent.mode = 'over';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       lastFocusableElement.focus();
+ 
+       drawer.open();
+       fixture.detectChanges();
+       tick();
++      fixture.detectChanges();
+ 
+       expect(document.activeElement).toBe(firstFocusableElement);
+     }));
+ 
+     it('should trap focus when opened in "push" mode', fakeAsync(() => {
+       testComponent.mode = 'push';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       lastFocusableElement.focus();
+ 
+       drawer.open();
+       fixture.detectChanges();
+       tick();
++      fixture.detectChanges();
+ 
+       expect(document.activeElement).toBe(firstFocusableElement);
+     }));
+@@ -595,18 +597,21 @@ describe('MatDrawer', () => {
+     it('should trap focus when opened in "side" mode if backdrop is explicitly enabled', fakeAsync(() => {
+       testComponent.mode = 'push';
+       testComponent.hasBackdrop = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       lastFocusableElement.focus();
+ 
+       drawer.open();
+       fixture.detectChanges();
+       tick();
++      fixture.detectChanges();
+ 
+       expect(document.activeElement).toBe(firstFocusableElement);
+     }));
+ 
+     it('should not auto-focus by default when opened in "side" mode', fakeAsync(() => {
+       testComponent.mode = 'side';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       lastFocusableElement.focus();
+ 
+@@ -623,12 +628,14 @@ describe('MatDrawer', () => {
+       fakeAsync(() => {
+         drawer.autoFocus = 'first-tabbable';
+         testComponent.mode = 'side';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         lastFocusableElement.focus();
+ 
+         drawer.open();
+         fixture.detectChanges();
+         tick();
++        fixture.detectChanges();
+ 
+         expect(document.activeElement).toBe(firstFocusableElement);
+       }),
+@@ -640,12 +647,14 @@ describe('MatDrawer', () => {
+       fakeAsync(() => {
+         testComponent.mode = 'push';
+         testComponent.hasBackdrop = true;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         lastFocusableElement.focus();
+ 
+         drawer.open();
+         fixture.detectChanges();
+         tick();
++        fixture.detectChanges();
+ 
+         expect(document.activeElement).toBe(firstFocusableElement);
+       }),
+@@ -661,6 +670,7 @@ describe('MatDrawer', () => {
+       drawerEl.componentInstance.open();
+       nonFocusableFixture.detectChanges();
+       tick();
++      nonFocusableFixture.detectChanges();
+ 
+       expect(document.activeElement).toBe(drawerEl.nativeElement);
+     }));
+@@ -668,6 +678,7 @@ describe('MatDrawer', () => {
+     it('should be able to disable auto focus', fakeAsync(() => {
+       drawer.autoFocus = 'dialog';
+       testComponent.mode = 'push';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       lastFocusableElement.focus();
+ 
+@@ -680,6 +691,7 @@ describe('MatDrawer', () => {
+ 
+     it('should update the focus trap enable state if the mode changes while open', fakeAsync(() => {
+       testComponent.mode = 'side';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       drawer.open();
+@@ -695,6 +707,7 @@ describe('MatDrawer', () => {
+         .toBe(true);
+ 
+       testComponent.mode = 'over';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(anchors.every(anchor => anchor.getAttribute('tabindex') === '0'))
+@@ -717,6 +730,7 @@ describe('MatDrawer', () => {
+     it('should project start drawer before the content', () => {
+       const fixture = TestBed.createComponent(BasicTestApp);
+       fixture.componentInstance.position = 'start';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       const allNodes = getDrawerNodesArray(fixture);
+@@ -739,6 +753,7 @@ describe('MatDrawer', () => {
+     it('should project end drawer after the content', () => {
+       const fixture = TestBed.createComponent(BasicTestApp);
+       fixture.componentInstance.position = 'end';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       const allNodes = getDrawerNodesArray(fixture);
+@@ -764,6 +779,7 @@ describe('MatDrawer', () => {
+       () => {
+         const fixture = TestBed.createComponent(BasicTestApp);
+         fixture.componentInstance.position = 'start';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         const drawer = fixture.nativeElement.querySelector('.mat-drawer');
+@@ -784,6 +800,7 @@ describe('MatDrawer', () => {
+           .toBeLessThan(startContentIndex);
+ 
+         fixture.componentInstance.position = 'end';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         allNodes = getDrawerNodesArray(fixture);
+ 
+@@ -792,6 +809,7 @@ describe('MatDrawer', () => {
+           .toBeGreaterThan(allNodes.indexOf(content));
+ 
+         fixture.componentInstance.position = 'start';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         allNodes = getDrawerNodesArray(fixture);
+ 
+@@ -807,6 +825,7 @@ describe('MatDrawer', () => {
+       () => {
+         const fixture = TestBed.createComponent(BasicTestApp);
+         fixture.componentInstance.position = 'end';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         const drawer = fixture.nativeElement.querySelector('.mat-drawer');
+@@ -827,6 +846,7 @@ describe('MatDrawer', () => {
+         );
+ 
+         fixture.componentInstance.position = 'start';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         allNodes = getDrawerNodesArray(fixture);
+ 
+@@ -836,6 +856,7 @@ describe('MatDrawer', () => {
+         );
+ 
+         fixture.componentInstance.position = 'end';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         allNodes = getDrawerNodesArray(fixture);
+ 
+@@ -853,11 +874,6 @@ describe('MatDrawer', () => {
+ });
+ 
+ describe('MatDrawerContainer', () => {
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+-    });
+-  });
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [
+@@ -910,6 +926,7 @@ describe('MatDrawerContainer', () => {
+     expect(parseInt(contentElement.style.marginLeft)).toBeFalsy();
+ 
+     fixture.componentInstance.showDrawer = true;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     fixture.componentInstance.drawer.open();
+@@ -935,6 +952,7 @@ describe('MatDrawerContainer', () => {
+     expect(initialMargin).toBeGreaterThan(0);
+ 
+     fixture.componentInstance.renderDrawer = false;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     tick();
+ 
+@@ -956,6 +974,7 @@ describe('MatDrawerContainer', () => {
+     expect(initialMargin).toBeGreaterThan(0);
+ 
+     fixture.componentInstance.mode = 'over';
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(contentElement.style.marginLeft).toBe('');
+@@ -976,6 +995,7 @@ describe('MatDrawerContainer', () => {
+     expect(margin).toBeGreaterThan(0);
+ 
+     fixture.componentInstance.direction = 'rtl';
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(contentElement.style.marginLeft).toBe('');
+@@ -1016,6 +1036,7 @@ describe('MatDrawerContainer', () => {
+     expect(initialMargin).toBeGreaterThan(0);
+ 
+     fixture.componentInstance.fillerWidth = 200;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     tick(10);
+     fixture.detectChanges();
+@@ -1061,6 +1082,7 @@ describe('MatDrawerContainer', () => {
+     expect(fixture.nativeElement.querySelector('.mat-drawer-backdrop')).toBeTruthy();
+ 
+     fixture.componentInstance.hasBackdrop = false;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(fixture.nativeElement.querySelector('.mat-drawer-backdrop')).toBeFalsy();
+@@ -1072,6 +1094,7 @@ describe('MatDrawerContainer', () => {
+     fixture.detectChanges();
+ 
+     fixture.componentInstance.drawer.mode = 'side';
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     fixture.componentInstance.drawer.open();
+     fixture.detectChanges();
+@@ -1083,6 +1106,7 @@ describe('MatDrawerContainer', () => {
+     expect(backdrop).toBeFalsy();
+ 
+     fixture.componentInstance.hasBackdrop = true;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     backdrop = root.querySelector('.mat-drawer-backdrop.mat-drawer-shown');
+ 
+diff --git a/src/material/sidenav/sidenav.spec.ts b/src/material/sidenav/sidenav.spec.ts
+index d1a7c2801f265e7cafa9483d0f5d39e0cea1500d..2d4d9ad28756984c3936c99c76b6cd5be6c8fb98 100644
+--- a/src/material/sidenav/sidenav.spec.ts
++++ b/src/material/sidenav/sidenav.spec.ts
+@@ -1,16 +1,11 @@
+-import {Component, ViewChild, provideZoneChangeDetection} from '@angular/core';
+-import {waitForAsync, TestBed, fakeAsync, tick} from '@angular/core/testing';
+-import {MatSidenav, MatSidenavModule, MatSidenavContainer} from './index';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+-import {By} from '@angular/platform-browser';
+ import {CommonModule} from '@angular/common';
++import {Component, ViewChild} from '@angular/core';
++import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
++import {By} from '@angular/platform-browser';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
++import {MatSidenav, MatSidenavContainer, MatSidenavModule} from './index';
+ 
+ describe('MatSidenav', () => {
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+-    });
+-  });
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [
+@@ -34,6 +29,7 @@ describe('MatSidenav', () => {
+     expect(sidenavEl.classList).toContain('mat-sidenav-fixed');
+ 
+     fixture.componentInstance.fixed = false;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(sidenavEl.classList).not.toContain('mat-sidenav-fixed');
+@@ -48,6 +44,7 @@ describe('MatSidenav', () => {
+     expect(sidenavEl.style.bottom).toBe('30px');
+ 
+     fixture.componentInstance.fixed = false;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(sidenavEl.style.top).toBeFalsy();
+diff --git a/src/material/slide-toggle/slide-toggle.spec.ts b/src/material/slide-toggle/slide-toggle.spec.ts
+index 2b4a26718723a7fdd941cef6bcf9cc1f56b9d421..546d6e656934d2dc7d1fefd2ad7e2a7cbeca90e6 100644
+--- a/src/material/slide-toggle/slide-toggle.spec.ts
++++ b/src/material/slide-toggle/slide-toggle.spec.ts
+@@ -1,27 +1,22 @@
++import {FocusMonitor} from '@angular/cdk/a11y';
+ import {BidiModule, Direction} from '@angular/cdk/bidi';
+ import {dispatchFakeEvent} from '@angular/cdk/testing/private';
+-import {Component, provideZoneChangeDetection} from '@angular/core';
++import {Component} from '@angular/core';
+ import {
+   ComponentFixture,
++  TestBed,
+   fakeAsync,
+   flush,
+   flushMicrotasks,
+   inject,
+-  TestBed,
+   tick,
+ } from '@angular/core/testing';
+ import {FormControl, FormsModule, NgModel, ReactiveFormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+-import {FocusMonitor} from '@angular/cdk/a11y';
+ import {MatSlideToggle, MatSlideToggleChange, MatSlideToggleModule} from './index';
+ import {MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS} from './slide-toggle-config';
+ 
+ describe('MDC-based MatSlideToggle without forms', () => {
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+-    });
+-  });
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [
+@@ -71,11 +66,13 @@ describe('MDC-based MatSlideToggle without forms', () => {
+ 
+     it('should apply class based on color attribute', fakeAsync(() => {
+       testComponent.slideColor = 'primary';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(slideToggleElement.classList).toContain('mat-primary');
+ 
+       testComponent.slideColor = 'accent';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(slideToggleElement.classList).toContain('mat-accent');
+@@ -85,6 +82,7 @@ describe('MDC-based MatSlideToggle without forms', () => {
+       expect(buttonElement.disabled).toBeFalsy();
+ 
+       testComponent.isDisabled = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.disabled).toBeTruthy();
+@@ -95,6 +93,7 @@ describe('MDC-based MatSlideToggle without forms', () => {
+       expect(buttonElement.getAttribute('aria-checked')).toBe('false');
+ 
+       testComponent.slideChecked = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.getAttribute('aria-checked')).toBe('true');
+@@ -147,6 +146,7 @@ describe('MDC-based MatSlideToggle without forms', () => {
+       expect(slideToggleElement.classList).not.toContain('mat-mdc-slide-toggle-checked');
+ 
+       testComponent.slideChecked = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(slideToggleElement.classList).toContain('mat-mdc-slide-toggle-checked');
+@@ -157,18 +157,21 @@ describe('MDC-based MatSlideToggle without forms', () => {
+ 
+     it('should add a suffix to the element id', fakeAsync(() => {
+       testComponent.slideId = 'myId';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(slideToggleElement.id).toBe('myId');
+       expect(buttonElement.id).toBe(`${slideToggleElement.id}-button`);
+ 
+       testComponent.slideId = 'nextId';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(slideToggleElement.id).toBe('nextId');
+       expect(buttonElement.id).toBe(`${slideToggleElement.id}-button`);
+ 
+       testComponent.slideId = null;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       // Once the id binding is set to null, the id property should auto-generate a unique id.
+@@ -181,6 +184,7 @@ describe('MDC-based MatSlideToggle without forms', () => {
+       expect(buttonElement.tabIndex).toBe(0);
+ 
+       testComponent.slideTabindex = 4;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.tabIndex).toBe(4);
+@@ -188,16 +192,19 @@ describe('MDC-based MatSlideToggle without forms', () => {
+ 
+     it('should forward the specified name to the element', fakeAsync(() => {
+       testComponent.slideName = 'myName';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.name).toBe('myName');
+ 
+       testComponent.slideName = 'nextName';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.name).toBe('nextName');
+ 
+       testComponent.slideName = null;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.name).toBe('');
+@@ -205,11 +212,13 @@ describe('MDC-based MatSlideToggle without forms', () => {
+ 
+     it('should forward the aria-label attribute to the element', fakeAsync(() => {
+       testComponent.slideLabel = 'ariaLabel';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.getAttribute('aria-label')).toBe('ariaLabel');
+ 
+       testComponent.slideLabel = null;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.hasAttribute('aria-label')).toBeFalsy();
+@@ -217,11 +226,13 @@ describe('MDC-based MatSlideToggle without forms', () => {
+ 
+     it('should forward the aria-labelledby attribute to the element', fakeAsync(() => {
+       testComponent.slideLabelledBy = 'ariaLabelledBy';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.getAttribute('aria-labelledby')).toBe('ariaLabelledBy');
+ 
+       testComponent.slideLabelledBy = null;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       // We fall back to pointing to the label if a value isn't provided.
+@@ -232,11 +243,13 @@ describe('MDC-based MatSlideToggle without forms', () => {
+ 
+     it('should forward the aria-describedby attribute to the element', fakeAsync(() => {
+       testComponent.slideAriaDescribedBy = 'some-element';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.getAttribute('aria-describedby')).toBe('some-element');
+ 
+       testComponent.slideAriaDescribedBy = null;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.hasAttribute('aria-describedby')).toBe(false);
+@@ -273,11 +286,13 @@ describe('MDC-based MatSlideToggle without forms', () => {
+ 
+     it('should forward the required attribute', () => {
+       testComponent.isRequired = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.getAttribute('aria-required')).toBe('true');
+ 
+       testComponent.isRequired = false;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(buttonElement.getAttribute('aria-required')).toBe(null);
+@@ -315,6 +330,7 @@ describe('MDC-based MatSlideToggle without forms', () => {
+       expect(formField.classList).not.toContain('mdc-form-field--align-end');
+ 
+       testComponent.labelPosition = 'before';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(formField.classList).toContain('mdc-form-field--align-end');
+@@ -337,6 +353,7 @@ describe('MDC-based MatSlideToggle without forms', () => {
+       const switchElement = slideToggleElement.querySelector('.mdc-switch')!;
+       const rippleSelector = '.mat-ripple-element';
+       testComponent.disableRipple = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(slideToggleElement.querySelectorAll(rippleSelector).length).toBe(0);
+@@ -357,6 +374,7 @@ describe('MDC-based MatSlideToggle without forms', () => {
+       expect(slideToggleElement.querySelector('.mdc-switch__icons')).toBeTruthy();
+ 
+       testComponent.hideIcon = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(slideToggleElement.querySelector('.mdc-switch__icons')).toBeFalsy();
+@@ -368,6 +386,7 @@ describe('MDC-based MatSlideToggle without forms', () => {
+       const fixture = TestBed.createComponent(SlideToggleBasic);
+ 
+       fixture.componentInstance.slideChecked = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(fixture.componentInstance.lastEvent).toBeFalsy();
+@@ -415,6 +434,7 @@ describe('MDC-based MatSlideToggle without forms', () => {
+       const fixture = TestBed.createComponent(SlideToggleWithTabindexAttr);
+ 
+       fixture.componentInstance.disabled = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       const slideToggle = fixture.debugElement.query(By.directive(MatSlideToggle))!.nativeElement;
+@@ -539,6 +559,7 @@ describe('MDC-based MatSlideToggle with forms', () => {
+       expect(slideToggleElement.classList).not.toContain('mat-mdc-slide-toggle-checked');
+ 
+       testComponent.modelValue = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       // Flush the microtasks because the forms module updates the model state asynchronously.
+@@ -585,6 +606,7 @@ describe('MDC-based MatSlideToggle with forms', () => {
+         tick();
+ 
+         fixture.componentInstance.isDisabled = true;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         flushMicrotasks();
+@@ -596,6 +618,7 @@ describe('MDC-based MatSlideToggle with forms', () => {
+       expect(slideToggleModel.touched).toBe(false);
+ 
+       testComponent.isChecked = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(slideToggleModel.touched).toBe(false);
+@@ -616,6 +639,7 @@ describe('MDC-based MatSlideToggle with forms', () => {
+       expect(slideToggleModel.touched).toBe(false);
+ 
+       testComponent.modelValue = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       // Flush the microtasks because the forms module updates the model state asynchronously.
+@@ -636,6 +660,7 @@ describe('MDC-based MatSlideToggle with forms', () => {
+       labelElement = fixture.debugElement.query(By.css('label'))!.nativeElement;
+ 
+       fixture.componentInstance.modelValue = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       // Flush the microtasks because the forms module updates the model state asynchronously.
+@@ -662,6 +687,7 @@ describe('MDC-based MatSlideToggle with forms', () => {
+       fixture = TestBed.createComponent(SlideToggleWithModel);
+ 
+       fixture.componentInstance.modelValue = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       const debugElement = fixture.debugElement.query(By.directive(MatSlideToggle))!;
+@@ -745,6 +771,7 @@ describe('MDC-based MatSlideToggle with forms', () => {
+ 
+     it('should have proper invalid state if unchecked', fakeAsync(() => {
+       testComponent.isRequired = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       const slideToggleEl = fixture.nativeElement.querySelector('.mat-mdc-slide-toggle');
+diff --git a/src/material/slider/slider.spec.ts b/src/material/slider/slider.spec.ts
+index a700eea4f76546bafa384f9702e934780189af3d..a722dd24f30dffb4f222c019071dcf1b318a0e41 100644
+--- a/src/material/slider/slider.spec.ts
++++ b/src/material/slider/slider.spec.ts
+@@ -9,31 +9,23 @@
+ import {BidiModule, Directionality} from '@angular/cdk/bidi';
+ import {Platform} from '@angular/cdk/platform';
+ import {dispatchEvent, dispatchFakeEvent, dispatchPointerEvent} from '@angular/cdk/testing/private';
+-import {
+-  Component,
+-  Provider,
+-  QueryList,
+-  Type,
+-  ViewChild,
+-  ViewChildren,
+-  provideZoneChangeDetection,
+-} from '@angular/core';
++import {Component, Provider, QueryList, Type, ViewChild, ViewChildren} from '@angular/core';
+ import {
+   ComponentFixture,
++  TestBed,
+   fakeAsync,
+   flush,
+-  TestBed,
+-  waitForAsync,
+   tick,
++  waitForAsync,
+ } from '@angular/core/testing';
+ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
++import {of} from 'rxjs';
+ import {MatSliderModule} from './module';
+ import {MatSlider} from './slider';
+-import {MatSliderVisualThumb} from './slider-thumb';
+-import {MatSliderThumb, MatSliderRangeThumb} from './slider-input';
++import {MatSliderRangeThumb, MatSliderThumb} from './slider-input';
+ import {_MatThumb} from './slider-interface';
+-import {of} from 'rxjs';
++import {MatSliderVisualThumb} from './slider-thumb';
+ 
+ interface Point {
+   x: number;
+@@ -41,11 +33,6 @@ interface Point {
+ }
+ 
+ describe('MDC-based MatSlider', () => {
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+-    });
+-  });
+   let platform: Platform;
+ 
+   function createComponent<T>(component: Type<T>, providers: Provider[] = []): ComponentFixture<T> {
+@@ -292,18 +279,21 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should update the min when the bound value changes', () => {
+       fixture.componentInstance.min = 0;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       checkInput(input, {min: 0, max: 75, value: 25, translateX: 100});
+     });
+ 
+     it('should update the max when the bound value changes', () => {
+       fixture.componentInstance.max = 90;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       checkInput(input, {min: 25, max: 90, value: 25, translateX: 0});
+     });
+ 
+     it('should update the value if the min increases past it', () => {
+       fixture.componentInstance.min = 50;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       checkInput(input, {min: 50, max: 75, value: 50, translateX: 0});
+     });
+@@ -311,18 +301,21 @@ describe('MDC-based MatSlider', () => {
+     it('should update the value if the max decreases below it', () => {
+       input.value = 75;
+       fixture.componentInstance.max = 50;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       checkInput(input, {min: 25, max: 50, value: 50, translateX: 300});
+     });
+ 
+     it('should allow the min increase above the max', () => {
+       fixture.componentInstance.min = 80;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       checkInput(input, {min: 80, max: 75, value: 80, translateX: 0});
+     });
+ 
+     it('should allow the max to decrease below the min', () => {
+       fixture.componentInstance.max = -10;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       checkInput(input, {min: 25, max: -10, value: 25, translateX: 0});
+     });
+@@ -330,6 +323,7 @@ describe('MDC-based MatSlider', () => {
+     it('should update the thumb translateX when the min changes', () => {
+       checkInput(input, {min: 25, max: 75, value: 25, translateX: 0});
+       fixture.componentInstance.min = -25;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       checkInput(input, {min: -25, max: 75, value: 25, translateX: 150});
+     });
+@@ -338,6 +332,7 @@ describe('MDC-based MatSlider', () => {
+       setValueByClick(slider, input, 50);
+       checkInput(input, {min: 25, max: 75, value: 50, translateX: 150});
+       fixture.componentInstance.max = 125;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       checkInput(input, {min: 25, max: 125, value: 50, translateX: 75});
+     }));
+@@ -369,6 +364,7 @@ describe('MDC-based MatSlider', () => {
+         checkInput(endInput, {min: 25, max: 75, value: 75, translateX: 300});
+ 
+         fixture.componentInstance.min = -25;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: -25, max: 75, value: 25, translateX: 150});
+@@ -377,6 +373,7 @@ describe('MDC-based MatSlider', () => {
+ 
+       it('that affect the start value', () => {
+         fixture.componentInstance.min = 50;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         checkInput(startInput, {min: 50, max: 75, value: 50, translateX: 0});
+         checkInput(endInput, {min: 50, max: 75, value: 75, translateX: 300});
+@@ -385,6 +382,7 @@ describe('MDC-based MatSlider', () => {
+       it('that affect both values', () => {
+         endInput.value = 50;
+         fixture.componentInstance.min = 60;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         checkInput(startInput, {min: 60, max: 60, value: 60, translateX: 0});
+         checkInput(endInput, {min: 60, max: 75, value: 60, translateX: 0});
+@@ -393,6 +391,7 @@ describe('MDC-based MatSlider', () => {
+       it('where the new start tx is greater than the old end tx', fakeAsync(() => {
+         fixture.componentInstance.min = 0;
+         fixture.componentInstance.max = 100;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         slideToValue(slider, startInput, 10);
+@@ -402,6 +401,7 @@ describe('MDC-based MatSlider', () => {
+         checkInput(endInput, {min: 10, max: 100, value: 20, translateX: 60});
+ 
+         fixture.componentInstance.min = -1000;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: -1000, max: 20, value: 10, translateX: 275.5});
+@@ -411,6 +411,7 @@ describe('MDC-based MatSlider', () => {
+       it('where the new end tx is less than the old start tx', fakeAsync(() => {
+         fixture.componentInstance.min = 0;
+         fixture.componentInstance.max = 100;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         slideToValue(slider, endInput, 92);
+@@ -420,6 +421,7 @@ describe('MDC-based MatSlider', () => {
+         checkInput(endInput, {min: 91, max: 100, value: 92, translateX: 276});
+ 
+         fixture.componentInstance.min = 90;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: 90, max: 92, value: 91, translateX: 30});
+@@ -428,6 +430,7 @@ describe('MDC-based MatSlider', () => {
+ 
+       it('that make min and max equal', () => {
+         fixture.componentInstance.min = 75;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: 75, max: 75, value: 75, translateX: 0});
+@@ -436,6 +439,7 @@ describe('MDC-based MatSlider', () => {
+ 
+       it('that increase above the max', () => {
+         fixture.componentInstance.min = 80;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: 80, max: 75, value: 80, translateX: 0});
+@@ -449,6 +453,7 @@ describe('MDC-based MatSlider', () => {
+         checkInput(endInput, {min: 25, max: 75, value: 75, translateX: 300});
+ 
+         fixture.componentInstance.max = 125;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: 25, max: 75, value: 25, translateX: 0});
+@@ -457,6 +462,7 @@ describe('MDC-based MatSlider', () => {
+ 
+       it('that affect the end value', () => {
+         fixture.componentInstance.max = 50;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         checkInput(endInput, {min: 25, max: 50, value: 50, translateX: 300});
+         checkInput(startInput, {min: 25, max: 50, value: 25, translateX: 0});
+@@ -465,6 +471,7 @@ describe('MDC-based MatSlider', () => {
+       it('that affect both values', () => {
+         startInput.value = 60;
+         fixture.componentInstance.max = 50;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         checkInput(endInput, {min: 50, max: 50, value: 50, translateX: 300});
+         checkInput(startInput, {min: 25, max: 50, value: 50, translateX: 300});
+@@ -473,6 +480,7 @@ describe('MDC-based MatSlider', () => {
+       it('where the new start tx is greater than the old end tx', fakeAsync(() => {
+         fixture.componentInstance.min = 0;
+         fixture.componentInstance.max = 100;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         slideToValue(slider, startInput, 1);
+@@ -482,6 +490,7 @@ describe('MDC-based MatSlider', () => {
+         checkInput(endInput, {min: 1, max: 100, value: 2, translateX: 6});
+ 
+         fixture.componentInstance.max = 10;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: 0, max: 2, value: 1, translateX: 30});
+@@ -491,6 +500,7 @@ describe('MDC-based MatSlider', () => {
+       it('where the new end tx is less than the old start tx', fakeAsync(() => {
+         fixture.componentInstance.min = 0;
+         fixture.componentInstance.max = 100;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         slideToValue(slider, endInput, 95);
+@@ -500,6 +510,7 @@ describe('MDC-based MatSlider', () => {
+         checkInput(endInput, {min: 90, max: 100, value: 95, translateX: 285});
+ 
+         fixture.componentInstance.max = 1000;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: 0, max: 95, value: 90, translateX: 27});
+@@ -508,6 +519,7 @@ describe('MDC-based MatSlider', () => {
+ 
+       it('that make min and max equal', () => {
+         fixture.componentInstance.max = 25;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: 25, max: 25, value: 25, translateX: 0});
+@@ -516,6 +528,7 @@ describe('MDC-based MatSlider', () => {
+ 
+       it('that decrease below the min', () => {
+         fixture.componentInstance.max = 0;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         // For some reason there was a bug with Safari 15.3.
+@@ -806,6 +819,7 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should not add decimals to the value if it is a whole number', fakeAsync(() => {
+       fixture.componentInstance.step = 0.1;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       slideToValue(slider, input, 11);
+       expect(input.value).toBe(11);
+@@ -813,6 +827,7 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should truncate long decimal values when using a decimal step', fakeAsync(() => {
+       fixture.componentInstance.step = 0.5;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       slideToValue(slider, input, 55.555);
+       expect(input.value).toBe(55.5);
+@@ -821,6 +836,7 @@ describe('MDC-based MatSlider', () => {
+     it('should update the value on step change', fakeAsync(() => {
+       slideToValue(slider, input, 30);
+       fixture.componentInstance.step = 50;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expect(input.value).toBe(50);
+     }));
+@@ -853,6 +869,7 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should not add decimals to the end value if it is a whole number', fakeAsync(() => {
+       fixture.componentInstance.step = 0.1;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       slideToValue(slider, endInput, 11);
+       expect(endInput.value).toBe(11);
+@@ -860,6 +877,7 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should not add decimals to the start value if it is a whole number', fakeAsync(() => {
+       fixture.componentInstance.step = 0.1;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       slideToValue(slider, startInput, 11);
+       expect(startInput.value).toBe(11);
+@@ -867,6 +885,7 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should truncate long decimal start values when using a decimal step', fakeAsync(() => {
+       fixture.componentInstance.step = 0.1;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       slideToValue(slider, startInput, 33.666);
+       expect(startInput.value).toBe(33.7);
+@@ -874,6 +893,7 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should truncate long decimal end values when using a decimal step', fakeAsync(() => {
+       fixture.componentInstance.step = 0.1;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       slideToValue(slider, endInput, 33.6666);
+       expect(endInput.value).toBe(33.7);
+@@ -882,6 +902,7 @@ describe('MDC-based MatSlider', () => {
+     describe('should handle step changes', () => {
+       it('where the new start tx is greater than the old end tx', fakeAsync(() => {
+         fixture.componentInstance.step = 0;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         slideToValue(slider, startInput, 45);
+@@ -891,6 +912,7 @@ describe('MDC-based MatSlider', () => {
+         checkInput(endInput, {min: 45, max: 100, value: 46, translateX: 138});
+ 
+         fixture.componentInstance.step = 50;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: 0, max: 50, value: 50, translateX: 150});
+@@ -899,6 +921,7 @@ describe('MDC-based MatSlider', () => {
+ 
+       it('where the new end tx is less than the old start tx', fakeAsync(() => {
+         fixture.componentInstance.step = 0;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         slideToValue(slider, startInput, 21);
+@@ -908,6 +931,7 @@ describe('MDC-based MatSlider', () => {
+         checkInput(endInput, {min: 21, max: 100, value: 22, translateX: 66});
+ 
+         fixture.componentInstance.step = 50;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         checkInput(startInput, {min: 0, max: 0, value: 0, translateX: 0});
+@@ -1029,6 +1053,7 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should update when bound value changes', () => {
+       fixture.componentInstance.value = 75;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expect(input.value).toBe(75);
+     });
+@@ -1050,12 +1075,14 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should update when bound start value changes', () => {
+       fixture.componentInstance.startValue = 30;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expect(startInput.value).toBe(30);
+     });
+ 
+     it('should update when bound end value changes', () => {
+       fixture.componentInstance.endValue = 70;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expect(endInput.value).toBe(70);
+     });
+@@ -1066,6 +1093,7 @@ describe('MDC-based MatSlider', () => {
+       const startInputWidthBefore = startInputEl.getBoundingClientRect().width;
+       const endInputWidthBefore = endInputEl.getBoundingClientRect().width;
+       fixture.componentInstance.startValue = 10;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       const startInputWidthAfter = startInputEl.getBoundingClientRect().width;
+       const endInputWidthAfter = endInputEl.getBoundingClientRect().width;
+@@ -1079,6 +1107,7 @@ describe('MDC-based MatSlider', () => {
+       const startInputWidthBefore = startInputEl.getBoundingClientRect().width;
+       const endInputWidthBefore = endInputEl.getBoundingClientRect().width;
+       fixture.componentInstance.endValue = 90;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       const startInputWidthAfter = startInputEl.getBoundingClientRect().width;
+       const endInputWidthAfter = endInputEl.getBoundingClientRect().width;
+@@ -1160,6 +1189,7 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should update the slider', fakeAsync(() => {
+       fixture.componentInstance.val = 20;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+       checkInput(input, {min: 0, max: 100, value: 20, translateX: 60});
+@@ -1167,11 +1197,13 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should be able to reset a slider by setting the model back to undefined', fakeAsync(() => {
+       fixture.componentInstance.val = 5;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+       checkInput(input, {min: 0, max: 100, value: 5, translateX: 15});
+ 
+       fixture.componentInstance.val = undefined;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+       checkInput(input, {min: 0, max: 100, value: 0, translateX: 0});
+@@ -1207,11 +1239,13 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should update the thumbs on ngModel value change', fakeAsync(() => {
+       fixture.componentInstance.startVal = 50;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+       checkInput(startInput, {min: 0, max: 100, value: 50, translateX: 150});
+ 
+       fixture.componentInstance.endVal = 75;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+       checkInput(endInput, {min: 50, max: 100, value: 75, translateX: 225});
+@@ -1219,11 +1253,13 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should be able to reset a start input', fakeAsync(() => {
+       fixture.componentInstance.startVal = 5;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+       checkInput(startInput, {min: 0, max: 100, value: 5, translateX: 15});
+ 
+       fixture.componentInstance.startVal = undefined;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+       checkInput(startInput, {min: 0, max: 100, value: 0, translateX: 0});
+@@ -1231,11 +1267,13 @@ describe('MDC-based MatSlider', () => {
+ 
+     it('should be able to reset an end input', fakeAsync(() => {
+       fixture.componentInstance.endVal = 99;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+       checkInput(endInput, {min: 0, max: 100, value: 99, translateX: 297});
+ 
+       fixture.componentInstance.endVal = undefined;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       flush();
+       checkInput(endInput, {min: 0, max: 100, value: 0, translateX: 0});
+@@ -1453,6 +1491,7 @@ describe('MDC-based MatSlider', () => {
+       checkInput(input, {min: 0, max: 100, value: 10, step: 1, translateX: 30});
+ 
+       fixture.componentInstance.value = 20;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expect(fixture.componentInstance.value).toBe(20);
+       checkInput(input, {min: 0, max: 100, value: 20, step: 1, translateX: 60});
+@@ -1484,6 +1523,7 @@ describe('MDC-based MatSlider', () => {
+       expect(startInput.value).toBe(10);
+ 
+       fixture.componentInstance.startValue = 20;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expect(fixture.componentInstance.startValue).toBe(20);
+       expect(startInput.value).toBe(20);
+@@ -1498,6 +1538,7 @@ describe('MDC-based MatSlider', () => {
+       expect(endInput.value).toBe(90);
+ 
+       fixture.componentInstance.endValue = 80;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expect(fixture.componentInstance.endValue).toBe(80);
+       expect(endInput.value).toBe(80);
+diff --git a/src/material/snack-bar/snack-bar.spec.ts b/src/material/snack-bar/snack-bar.spec.ts
+index c9b62f52e4553eb212fe1d6f9aa2dde432ac2af9..fc9305db414462dea6423d41db7e4ecd6020d62d 100644
+--- a/src/material/snack-bar/snack-bar.spec.ts
++++ b/src/material/snack-bar/snack-bar.spec.ts
+@@ -1,5 +1,6 @@
+ import {LiveAnnouncer} from '@angular/cdk/a11y';
+ import {OverlayContainer} from '@angular/cdk/overlay';
++import {Platform} from '@angular/cdk/platform';
+ import {
+   ChangeDetectionStrategy,
+   Component,
+@@ -8,29 +9,22 @@ import {
+   TemplateRef,
+   ViewChild,
+   ViewContainerRef,
+-  provideZoneChangeDetection,
+   signal,
+ } from '@angular/core';
+-import {ComponentFixture, fakeAsync, flush, inject, TestBed, tick} from '@angular/core/testing';
++import {ComponentFixture, TestBed, fakeAsync, flush, inject, tick} from '@angular/core/testing';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {
+   MAT_SNACK_BAR_DATA,
+-  SimpleSnackBar,
+   MatSnackBar,
+   MatSnackBarConfig,
+   MatSnackBarContainer,
+   MatSnackBarModule,
+   MatSnackBarRef,
++  SimpleSnackBar,
+ } from './index';
+-import {Platform} from '@angular/cdk/platform';
+ import {MAT_SNACK_BAR_DEFAULT_OPTIONS} from './snack-bar';
+ 
+ describe('MatSnackBar', () => {
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+-    });
+-  });
+   let snackBar: MatSnackBar;
+   let liveAnnouncer: LiveAnnouncer;
+   let overlayContainerElement: HTMLElement;
+@@ -517,6 +511,7 @@ describe('MatSnackBar', () => {
+     snackBarRef.onAction().subscribe({complete: actionCompleteSpy});
+ 
+     snackBarRef.dismissWithAction();
++    viewContainerFixture.detectChanges();
+     flush();
+ 
+     expect(dismissCompleteSpy).toHaveBeenCalled();
+@@ -530,6 +525,7 @@ describe('MatSnackBar', () => {
+ 
+     snackBarRef.afterDismissed().subscribe(dismissSpy);
+     snackBarRef.dismissWithAction();
++    viewContainerFixture.detectChanges();
+     flush();
+ 
+     expect(dismissSpy).toHaveBeenCalledWith(jasmine.objectContaining({dismissedByAction: true}));
+@@ -565,33 +561,6 @@ describe('MatSnackBar', () => {
+     expect(afterDismissSpy).toHaveBeenCalled();
+   }));
+ 
+-  it('should clear the dismiss timeout when dismissed before timeout expiration', fakeAsync(() => {
+-    let config = new MatSnackBarConfig();
+-    config.duration = 1000;
+-    snackBar.open('content', 'test', config);
+-
+-    setTimeout(() => snackBar.dismiss(), 500);
+-
+-    tick(600);
+-    flush();
+-
+-    expect(viewContainerFixture.isStable()).toBe(true);
+-  }));
+-
+-  it('should clear the dismiss timeout when dismissed with action', fakeAsync(() => {
+-    let config = new MatSnackBarConfig();
+-    config.duration = 1000;
+-    const snackBarRef = snackBar.open('content', 'test', config);
+-
+-    setTimeout(() => snackBarRef.dismissWithAction(), 500);
+-
+-    tick(600);
+-    viewContainerFixture.detectChanges();
+-    tick();
+-
+-    expect(viewContainerFixture.isStable()).toBe(true);
+-  }));
+-
+   it('should add extra classes to the container', () => {
+     snackBar.open(simpleMessage, simpleActionLabel, {panelClass: ['one', 'two']});
+     viewContainerFixture.detectChanges();
+@@ -724,6 +693,7 @@ describe('MatSnackBar', () => {
+       snackBarRef.onAction().subscribe({complete: actionCompleteSpy});
+ 
+       snackBarRef.dismissWithAction();
++      viewContainerFixture.detectChanges();
+       flush();
+ 
+       expect(dismissCompleteSpy).toHaveBeenCalled();
+@@ -741,6 +711,7 @@ describe('MatSnackBar', () => {
+ 
+     it('should be able to open a snack bar using a TemplateRef', () => {
+       templateFixture.componentInstance.localValue = 'Pizza';
++      templateFixture.changeDetectorRef.markForCheck();
+       snackBar.openFromTemplate(templateFixture.componentInstance.templateRef);
+       templateFixture.detectChanges();
+ 
+@@ -750,6 +721,7 @@ describe('MatSnackBar', () => {
+       expect(containerElement.textContent).toContain('Pizza');
+ 
+       templateFixture.componentInstance.localValue = 'Pasta';
++      templateFixture.changeDetectorRef.markForCheck();
+       templateFixture.detectChanges();
+ 
+       expect(containerElement.textContent).toContain('Pasta');
+diff --git a/src/material/snack-bar/snack-bar.zone.spec.ts b/src/material/snack-bar/snack-bar.zone.spec.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..3f26f168f708891ee4234f4c1e9b77bf76168446
+--- /dev/null
++++ b/src/material/snack-bar/snack-bar.zone.spec.ts
+@@ -0,0 +1,94 @@
++import {
++  ChangeDetectionStrategy,
++  Component,
++  Directive,
++  ViewChild,
++  ViewContainerRef,
++  provideZoneChangeDetection,
++  signal,
++} from '@angular/core';
++import {ComponentFixture, TestBed, fakeAsync, flush, inject, tick} from '@angular/core/testing';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
++import {MatSnackBarModule} from './module';
++import {MatSnackBar} from './snack-bar';
++import {MatSnackBarConfig} from './snack-bar-config';
++
++describe('MatSnackBar Zone.js integration', () => {
++  let snackBar: MatSnackBar;
++
++  let viewContainerFixture: ComponentFixture<ComponentWithChildViewContainer>;
++
++  beforeEach(fakeAsync(() => {
++    TestBed.configureTestingModule({
++      imports: [
++        MatSnackBarModule,
++        NoopAnimationsModule,
++        ComponentWithChildViewContainer,
++        DirectiveWithViewContainer,
++      ],
++      providers: [provideZoneChangeDetection()],
++    }).compileComponents();
++  }));
++
++  beforeEach(inject([MatSnackBar], (sb: MatSnackBar) => {
++    snackBar = sb;
++  }));
++
++  beforeEach(() => {
++    viewContainerFixture = TestBed.createComponent(ComponentWithChildViewContainer);
++
++    viewContainerFixture.detectChanges();
++  });
++
++  it('should clear the dismiss timeout when dismissed before timeout expiration', fakeAsync(() => {
++    let config = new MatSnackBarConfig();
++    config.duration = 1000;
++    snackBar.open('content', 'test', config);
++
++    setTimeout(() => snackBar.dismiss(), 500);
++
++    tick(600);
++    flush();
++
++    expect(viewContainerFixture.isStable()).toBe(true);
++  }));
++
++  it('should clear the dismiss timeout when dismissed with action', fakeAsync(() => {
++    let config = new MatSnackBarConfig();
++    config.duration = 1000;
++    const snackBarRef = snackBar.open('content', 'test', config);
++
++    setTimeout(() => snackBarRef.dismissWithAction(), 500);
++
++    tick(600);
++    viewContainerFixture.detectChanges();
++    tick();
++
++    expect(viewContainerFixture.isStable()).toBe(true);
++  }));
++});
++
++@Directive({
++  selector: 'dir-with-view-container',
++  standalone: true,
++})
++class DirectiveWithViewContainer {
++  constructor(public viewContainerRef: ViewContainerRef) {}
++}
++
++@Component({
++  selector: 'arbitrary-component',
++  template: `@if (childComponentExists()) {<dir-with-view-container></dir-with-view-container>}`,
++  standalone: true,
++  imports: [DirectiveWithViewContainer],
++  changeDetection: ChangeDetectionStrategy.OnPush,
++})
++class ComponentWithChildViewContainer {
++  @ViewChild(DirectiveWithViewContainer) childWithViewContainer: DirectiveWithViewContainer;
++
++  childComponentExists = signal(true);
++
++  get childViewContainer() {
++    return this.childWithViewContainer.viewContainerRef;
++  }
++}
+diff --git a/src/material/sort/sort.spec.ts b/src/material/sort/sort.spec.ts
+index 008a5406d03ab271239f16164ab3da0ebd9894e0..ba170e422b9196a523399aa610b13cde5b8cfaad 100644
+--- a/src/material/sort/sort.spec.ts
++++ b/src/material/sort/sort.spec.ts
+@@ -6,13 +6,13 @@ import {
+   dispatchMouseEvent,
+   wrappedErrorMessage,
+ } from '@angular/cdk/testing/private';
+-import {Component, ElementRef, ViewChild, provideZoneChangeDetection} from '@angular/core';
+-import {waitForAsync, ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
++import {Component, ElementRef, ViewChild} from '@angular/core';
++import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
++import {MatTableModule} from '@angular/material/table';
+ import {By} from '@angular/platform-browser';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Observable} from 'rxjs';
+ import {map} from 'rxjs/operators';
+-import {MatTableModule} from '@angular/material/table';
+ import {
+   MAT_SORT_DEFAULT_OPTIONS,
+   MatSort,
+@@ -29,11 +29,6 @@ import {
+ } from './sort-errors';
+ 
+ describe('MatSort', () => {
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+-    });
+-  });
+   describe('without default options', () => {
+     let fixture: ComponentFixture<SimpleMatSortApp>;
+     let component: SimpleMatSortApp;
+@@ -200,6 +195,7 @@ describe('MatSort', () => {
+       it('should be correct when sort has been disabled', () => {
+         // Mousing over the first sort should set the view state to hint
+         component.disabledColumnSort = true;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         component.dispatchMouseEvent('defaultA', 'mouseenter');
+@@ -209,6 +205,7 @@ describe('MatSort', () => {
+       it('should be correct when sorting programmatically', () => {
+         component.active = 'defaultB';
+         component.direction = 'asc';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+ 
+         expectedStates.set('defaultB', {viewState: 'asc-to-active', arrowDirection: 'active-asc'});
+@@ -220,20 +217,24 @@ describe('MatSort', () => {
+       component.disableClear = true;
+ 
+       component.start = 'asc';
++      fixture.changeDetectorRef.markForCheck();
+       testSingleColumnSortDirectionSequence(fixture, ['asc', 'desc']);
+ 
+       // Reverse directions
+       component.start = 'desc';
++      fixture.changeDetectorRef.markForCheck();
+       testSingleColumnSortDirectionSequence(fixture, ['desc', 'asc']);
+     });
+ 
+     it('should be able to cycle asc -> desc -> [none]', () => {
+       component.start = 'asc';
++      fixture.changeDetectorRef.markForCheck();
+       testSingleColumnSortDirectionSequence(fixture, ['asc', 'desc', '']);
+     });
+ 
+     it('should be able to cycle desc -> asc -> [none]', () => {
+       component.start = 'desc';
++      fixture.changeDetectorRef.markForCheck();
+       testSingleColumnSortDirectionSequence(fixture, ['desc', 'asc', '']);
+     });
+ 
+@@ -246,6 +247,7 @@ describe('MatSort', () => {
+       expect(container.getAttribute('role')).toBe('button');
+ 
+       component.disabledColumnSort = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       component.sort('defaultA');
+@@ -263,6 +265,7 @@ describe('MatSort', () => {
+       expect(container.getAttribute('tabindex')).toBe('0');
+ 
+       component.disableAllSort = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       component.sort('defaultA');
+@@ -396,6 +399,7 @@ describe('MatSort', () => {
+       // Switch sorting to a different column before asserting.
+       component.sort('defaultB');
+       fixture.componentInstance.disabledColumnSort = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       tick();
+       fixture.detectChanges();
+@@ -408,6 +412,7 @@ describe('MatSort', () => {
+ 
+       component.sort('defaultA');
+       fixture.componentInstance.disabledColumnSort = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       tick();
+       fixture.detectChanges();
+@@ -444,6 +449,7 @@ describe('MatSort', () => {
+       expect(descriptionElement?.textContent).toBe('Sort second column');
+ 
+       fixture.componentInstance.secondColumnDescription = 'Sort 2nd column';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       descriptionId = sortButton.getAttribute('aria-describedby');
+       descriptionElement = document.getElementById(descriptionId);
+@@ -501,6 +507,7 @@ describe('MatSort', () => {
+       expect(containerB.classList.contains('mat-sort-header-position-before')).toBe(false);
+ 
+       matSortWithArrowPositionComponent.arrowPosition = 'before';
++      matSortWithArrowPositionFixture.changeDetectorRef.markForCheck();
+ 
+       matSortWithArrowPositionFixture.detectChanges();
+ 
+diff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts
+index 65be8d7a8a1ee295764655a8e10097d7977d8a11..b61eb94799820099d385866db57db23bfd874397 100644
+--- a/src/material/tooltip/tooltip.spec.ts
++++ b/src/material/tooltip/tooltip.spec.ts
+@@ -18,20 +18,19 @@ import {
+   Component,
+   DebugElement,
+   ElementRef,
+-  NgZone,
+   ViewChild,
+-  provideZoneChangeDetection,
+ } from '@angular/core';
+ import {
+   ComponentFixture,
++  TestBed,
+   fakeAsync,
+   flush,
+   inject,
+-  TestBed,
+   tick,
+   waitForAsync,
+ } from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
++import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {Subject} from 'rxjs';
+ import {
+   MAT_TOOLTIP_DEFAULT_OPTIONS,
+@@ -41,7 +40,6 @@ import {
+   TooltipPosition,
+   TooltipTouchGestures,
+ } from './index';
+-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ 
+ const initialTooltipMessage = 'initial tooltip message';
+ 
+@@ -50,11 +48,6 @@ describe('MDC-based MatTooltip', () => {
+   let dir: {value: Direction; change: Subject<Direction>};
+   let platform: Platform;
+   let focusMonitor: FocusMonitor;
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+-    });
+-  });
+ 
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+@@ -180,7 +173,6 @@ describe('MDC-based MatTooltip', () => {
+         .configureTestingModule({
+           imports: [MatTooltipModule, OverlayModule, BasicTooltipDemo],
+           providers: [
+-            provideZoneChangeDetection(),
+             {
+               provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
+               useValue: {showDelay: 1337, hideDelay: 7331},
+@@ -218,7 +210,6 @@ describe('MDC-based MatTooltip', () => {
+           imports: [MatTooltipModule, OverlayModule],
+           declarations: [TooltipDemoWithoutPositionBinding],
+           providers: [
+-            provideZoneChangeDetection(),
+             {
+               provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
+               useValue: {position: 'right'},
+@@ -360,6 +351,7 @@ describe('MDC-based MatTooltip', () => {
+     it('should not show if disabled', fakeAsync(() => {
+       // Test that disabling the tooltip will not set the tooltip visible
+       tooltipDirective.disabled = true;
++      fixture.changeDetectorRef.markForCheck();
+       tooltipDirective.show();
+       fixture.detectChanges();
+       tick(0);
+@@ -368,6 +360,7 @@ describe('MDC-based MatTooltip', () => {
+       // Test to make sure setting disabled to false will show the tooltip
+       // Sanity check to make sure everything was correct before (detectChanges, tick)
+       tooltipDirective.disabled = false;
++      fixture.changeDetectorRef.markForCheck();
+       tooltipDirective.show();
+       fixture.detectChanges();
+       tick(0);
+@@ -541,6 +534,7 @@ describe('MDC-based MatTooltip', () => {
+ 
+       // Enable the classes via ngClass syntax
+       fixture.componentInstance.showTooltipClass = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       // Make sure classes are correctly added
+@@ -666,6 +660,7 @@ describe('MDC-based MatTooltip', () => {
+     it('should throw when trying to assign an invalid position', () => {
+       expect(() => {
+         fixture.componentInstance.position = 'everywhere';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         tooltipDirective.show();
+       }).toThrowError('Tooltip position "everywhere" is invalid.');
+@@ -723,6 +718,7 @@ describe('MDC-based MatTooltip', () => {
+ 
+     it('should be able to set the tooltip message as a number', fakeAsync(() => {
+       fixture.componentInstance.message = 100;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(tooltipDirective.message).toBe('100');
+@@ -896,6 +892,7 @@ describe('MDC-based MatTooltip', () => {
+       buttonElement.style.top = buttonElement.style.left = '200px';
+ 
+       fixture.componentInstance.message = 'hi';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       setPositionAndShow('below');
+ 
+@@ -932,10 +929,12 @@ describe('MDC-based MatTooltip', () => {
+       buttonElement.style.position = 'fixed';
+       buttonElement.style.top = buttonElement.style.left = '200px';
+       fixture.componentInstance.message = 'hi';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       dir.value = 'ltr';
+       tooltipDirective.position = 'after';
++      fixture.changeDetectorRef.markForCheck();
+       tooltipDirective.show(0);
+       fixture.detectChanges();
+       tick(0);
+@@ -1184,25 +1183,6 @@ describe('MDC-based MatTooltip', () => {
+         .withContext('Expected tooltip hidden when scrolled out of view, after throttle limit')
+         .toBe(false);
+     }));
+-
+-    it('should execute the `hide` call, after scrolling away, inside the NgZone', fakeAsync(() => {
+-      const inZoneSpy = jasmine.createSpy('in zone spy');
+-
+-      tooltipDirective.show();
+-      fixture.detectChanges();
+-      tick(0);
+-
+-      spyOn(tooltipDirective._tooltipInstance!, 'hide').and.callFake(() => {
+-        inZoneSpy(NgZone.isInAngularZone());
+-      });
+-
+-      fixture.componentInstance.scrollDown();
+-      tick(100);
+-      fixture.detectChanges();
+-
+-      expect(inZoneSpy).toHaveBeenCalled();
+-      expect(inZoneSpy).toHaveBeenCalledWith(true);
+-    }));
+   });
+ 
+   describe('with OnPush', () => {
+diff --git a/src/material/tooltip/tooltip.zone.spec.ts b/src/material/tooltip/tooltip.zone.spec.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..bc3b7d0edaca06899cabef2515e69a560e24513e
+--- /dev/null
++++ b/src/material/tooltip/tooltip.zone.spec.ts
+@@ -0,0 +1,98 @@
++import {Directionality} from '@angular/cdk/bidi';
++import {CdkScrollable, OverlayModule} from '@angular/cdk/overlay';
++import {dispatchFakeEvent} from '@angular/cdk/testing/private';
++import {
++  Component,
++  DebugElement,
++  NgZone,
++  ViewChild,
++  provideZoneChangeDetection,
++} from '@angular/core';
++import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
++import {By} from '@angular/platform-browser';
++import {Subject} from 'rxjs';
++import {MatTooltipModule} from './module';
++import {MatTooltip} from './tooltip';
++
++const initialTooltipMessage = 'initial tooltip message';
++
++describe('MDC-based MatTooltip Zone.js integration', () => {
++  beforeEach(waitForAsync(() => {
++    TestBed.configureTestingModule({
++      imports: [MatTooltipModule, OverlayModule, ScrollableTooltipDemo],
++      providers: [
++        provideZoneChangeDetection(),
++        {
++          provide: Directionality,
++          useFactory: () => ({value: 'ltr', change: new Subject()}),
++        },
++      ],
++    });
++
++    TestBed.compileComponents();
++  }));
++
++  describe('scrollable usage', () => {
++    let fixture: ComponentFixture<ScrollableTooltipDemo>;
++    let buttonDebugElement: DebugElement;
++    let tooltipDirective: MatTooltip;
++
++    beforeEach(() => {
++      fixture = TestBed.createComponent(ScrollableTooltipDemo);
++      fixture.detectChanges();
++      buttonDebugElement = fixture.debugElement.query(By.css('button'))!;
++      tooltipDirective = buttonDebugElement.injector.get<MatTooltip>(MatTooltip);
++    });
++
++    it('should execute the `hide` call, after scrolling away, inside the NgZone', fakeAsync(() => {
++      const inZoneSpy = jasmine.createSpy('in zone spy');
++
++      tooltipDirective.show();
++      fixture.detectChanges();
++      tick(0);
++
++      spyOn(tooltipDirective._tooltipInstance!, 'hide').and.callFake(() => {
++        inZoneSpy(NgZone.isInAngularZone());
++      });
++
++      fixture.componentInstance.scrollDown();
++      tick(100);
++      fixture.detectChanges();
++
++      expect(inZoneSpy).toHaveBeenCalled();
++      expect(inZoneSpy).toHaveBeenCalledWith(true);
++    }));
++  });
++});
++
++@Component({
++  selector: 'app',
++  template: `
++      <div cdkScrollable style="padding: 100px; margin: 300px;
++                                 height: 200px; width: 200px; overflow: auto;">
++        @if (showButton) {
++          <button style="margin-bottom: 600px"
++                [matTooltip]="message"
++                [matTooltipPosition]="position">Button</button>
++        }
++      </div>`,
++  standalone: true,
++  imports: [MatTooltipModule, OverlayModule],
++})
++class ScrollableTooltipDemo {
++  position: string = 'below';
++  message: string = initialTooltipMessage;
++  showButton: boolean = true;
++
++  @ViewChild(CdkScrollable) scrollingContainer: CdkScrollable;
++
++  scrollDown() {
++    const scrollingContainerEl = this.scrollingContainer.getElementRef().nativeElement;
++    scrollingContainerEl.scrollTop = 250;
++
++    // Emit a scroll event from the scrolling element in our component.
++    // This event should be picked up by the scrollable directive and notify.
++    // The notification should be picked up by the service.
++    dispatchFakeEvent(scrollingContainerEl, 'scroll');
++  }
++}
+diff --git a/tslint.json b/tslint.json
+index ee66cbd96d369abba6f9dfc92370b6b756a161a9..c5eef598c56031695457de0bd5d54b69c1ec6550 100644
+--- a/tslint.json
++++ b/tslint.json
+@@ -188,9 +188,11 @@
+         // Allow in tests that specficially test integration with Zone.js.
+         "**/*.zone.spec.ts",
+         // TODO(mmalerba): following files to be cleaned up and removed from this list:
+-        "**/src/cdk/a11y/focus-trap/focus-trap.ts",
+         "**/src/cdk/testing/tests/testbed.spec.ts",
+-        "**/src/material/**/*.spec.ts"
++        "**/src/material/select/**/*.spec.ts",
++        "**/src/material/stepper/**/*.spec.ts",
++        "**/src/material/tabs/**/*.spec.ts",
++        "**/src/material/tooltip/testing/tooltip-harness.spec.ts"
+       ]
+     ]
+   },

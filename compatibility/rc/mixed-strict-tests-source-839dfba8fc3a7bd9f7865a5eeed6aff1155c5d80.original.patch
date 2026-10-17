@@ -1,0 +1,419 @@
+diff --git a/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts b/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
+index e0aa8068ac75ac220c5d025fda78741f2e583515..73ad62b93ce2fca9e12efd39a0a80a8b74738293 100644
+--- a/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
++++ b/src/cdk-experimental/scrolling/virtual-scroll-viewport.spec.ts
+@@ -1,5 +1,11 @@
+ import {CdkVirtualScrollViewport, ScrollingModule} from '@angular/cdk/scrolling';
+-import {Component, Input, ViewChild, ViewEncapsulation} from '@angular/core';
++import {
++  Component,
++  Input,
++  provideCheckNoChangesConfig,
++  ViewChild,
++  ViewEncapsulation,
++} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush, waitForAsync} from '@angular/core/testing';
+ import {ScrollingModule as ExperimentalScrollingModule} from './scrolling-module';
+ 
+@@ -11,6 +17,7 @@ describe('CdkVirtualScrollViewport', () => {
+ 
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
++        providers: [provideCheckNoChangesConfig({exhaustive: false})],
+         imports: [ScrollingModule, ExperimentalScrollingModule, AutoSizeVirtualScroll],
+       });
+     }));
+diff --git a/src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.spec.ts b/src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.spec.ts
+index a1d93372507185fa107c49faf5ec5708fd94696f..e09cd3bc6b5a2f6a79b96dabee3c8c37902a38d5 100644
+--- a/src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.spec.ts
++++ b/src/components-examples/material/checkbox/checkbox-harness/checkbox-harness-example.spec.ts
+@@ -3,12 +3,14 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {MatCheckboxHarness} from '@angular/material/checkbox/testing';
+ import {CheckboxHarnessExample} from './checkbox-harness-example';
++import {provideCheckNoChangesConfig} from '@angular/core';
+ 
+ describe('CheckboxHarnessExample', () => {
+   let fixture: ComponentFixture<CheckboxHarnessExample>;
+   let loader: HarnessLoader;
+ 
+   beforeEach(() => {
++    TestBed.configureTestingModule({providers: [provideCheckNoChangesConfig({exhaustive: false})]});
+     fixture = TestBed.createComponent(CheckboxHarnessExample);
+     fixture.detectChanges();
+     loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/button-toggle/button-toggle.spec.ts b/src/material/button-toggle/button-toggle.spec.ts
+index 3c37aa3f1008ba12cae8d4f423b547545bccac3b..643541356e1b3cfc97b57dab6087bb8142942577 100644
+--- a/src/material/button-toggle/button-toggle.spec.ts
++++ b/src/material/button-toggle/button-toggle.spec.ts
+@@ -1,5 +1,12 @@
+ import {dispatchMouseEvent} from '@angular/cdk/testing/private';
+-import {Component, DebugElement, QueryList, ViewChild, ViewChildren} from '@angular/core';
++import {
++  Component,
++  DebugElement,
++  provideCheckNoChangesConfig,
++  QueryList,
++  ViewChild,
++  ViewChildren,
++} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+ import {FormControl, FormsModule, NgModel, ReactiveFormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+@@ -14,6 +21,7 @@ import {
+ describe('MatButtonToggle with forms', () => {
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
++      providers: [provideCheckNoChangesConfig({exhaustive: false})],
+       imports: [
+         MatButtonToggleModule,
+         FormsModule,
+@@ -327,6 +335,7 @@ describe('MatButtonToggle with forms', () => {
+ describe('MatButtonToggle without forms', () => {
+   beforeEach(fakeAsync(() => {
+     TestBed.configureTestingModule({
++      providers: [provideCheckNoChangesConfig({exhaustive: false})],
+       imports: [
+         MatButtonToggleModule,
+         ButtonTogglesInsideButtonToggleGroup,
+diff --git a/src/material/checkbox/testing/checkbox-harness.spec.ts b/src/material/checkbox/testing/checkbox-harness.spec.ts
+index bcd2f57fd4c9a35a9688f1a88ba44453ba05b98c..23944e61ac94f7eba777662f9b654920036dd4f8 100644
+--- a/src/material/checkbox/testing/checkbox-harness.spec.ts
++++ b/src/material/checkbox/testing/checkbox-harness.spec.ts
+@@ -1,4 +1,4 @@
+-import {Component, signal} from '@angular/core';
++import {Component, provideCheckNoChangesConfig, signal} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+@@ -12,6 +12,7 @@ describe('MatCheckboxHarness', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
++      providers: [provideCheckNoChangesConfig({exhaustive: false})],
+       imports: [MatCheckboxModule, ReactiveFormsModule, CheckboxHarnessTest],
+     });
+ 
+diff --git a/src/material/datepicker/calendar.spec.ts b/src/material/datepicker/calendar.spec.ts
+index 7ec08bdf71b151303f80bf22e10ce650c3c4efcc..f9a4244f20df2b306d7826f78a93c8944f64913a 100644
+--- a/src/material/datepicker/calendar.spec.ts
++++ b/src/material/datepicker/calendar.spec.ts
+@@ -5,7 +5,7 @@ import {
+   dispatchKeyboardEvent,
+   dispatchMouseEvent,
+ } from '@angular/cdk/testing/private';
+-import {Component} from '@angular/core';
++import {Component, provideCheckNoChangesConfig} from '@angular/core';
+ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {DateAdapter, MatNativeDateModule} from '../core';
+ import {By} from '@angular/platform-browser';
+@@ -21,7 +21,11 @@ describe('MatCalendar', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+       imports: [MatNativeDateModule, MatDatepickerModule],
+-      providers: [MatDatepickerIntl, {provide: Directionality, useFactory: () => ({value: 'ltr'})}],
++      providers: [
++        MatDatepickerIntl,
++        {provide: Directionality, useFactory: () => ({value: 'ltr'})},
++        provideCheckNoChangesConfig({exhaustive: false}),
++      ],
+       declarations: [
+         // Test components.
+         StandardCalendar,
+diff --git a/src/material/datepicker/date-range-input.spec.ts b/src/material/datepicker/date-range-input.spec.ts
+index e1a1f7d583624783978bafeb7f3087ef363706db..169ce44f530455af842aacf6433c504d2356805e 100644
+--- a/src/material/datepicker/date-range-input.spec.ts
++++ b/src/material/datepicker/date-range-input.spec.ts
+@@ -3,7 +3,16 @@ import {Direction, Directionality} from '@angular/cdk/bidi';
+ import {BACKSPACE, LEFT_ARROW, RIGHT_ARROW} from '@angular/cdk/keycodes';
+ import {OverlayContainer} from '@angular/cdk/overlay';
+ import {dispatchFakeEvent, dispatchKeyboardEvent} from '@angular/cdk/testing/private';
+-import {Component, Directive, ElementRef, Provider, signal, Type, ViewChild} from '@angular/core';
++import {
++  Component,
++  Directive,
++  ElementRef,
++  provideCheckNoChangesConfig,
++  Provider,
++  signal,
++  Type,
++  ViewChild,
++} from '@angular/core';
+ import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
+ import {
+   FormControl,
+@@ -37,6 +46,7 @@ describe('MatDateRangeInput', () => {
+         component,
+       ],
+       providers: [
++        provideCheckNoChangesConfig({exhaustive: false}),
+         ...providers,
+         {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+diff --git a/src/material/expansion/accordion.spec.ts b/src/material/expansion/accordion.spec.ts
+index 1cb2987d6c6b245289a9a8ed9a9410b107740d02..10445635c270c0ce51c2cd1fe249e97404dac9fe 100644
+--- a/src/material/expansion/accordion.spec.ts
++++ b/src/material/expansion/accordion.spec.ts
+@@ -5,7 +5,13 @@ import {
+   dispatchEvent,
+   dispatchKeyboardEvent,
+ } from '@angular/cdk/testing/private';
+-import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';
++import {
++  Component,
++  provideCheckNoChangesConfig,
++  QueryList,
++  ViewChild,
++  ViewChildren,
++} from '@angular/core';
+ import {TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {
+@@ -20,6 +26,7 @@ describe('MatAccordion', () => {
+ 
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
++      providers: [provideCheckNoChangesConfig({exhaustive: false})],
+       imports: [
+         MatExpansionModule,
+         AccordionWithHideToggle,
+diff --git a/src/material/list/selection-list.spec.ts b/src/material/list/selection-list.spec.ts
+index 2afcc06ef32b7d4553e97b05a60b71d0b214c068..911dd94d077db501b4c355dc37e8819641e07aa8 100644
+--- a/src/material/list/selection-list.spec.ts
++++ b/src/material/list/selection-list.spec.ts
+@@ -10,6 +10,7 @@ import {
+   ChangeDetectionStrategy,
+   Component,
+   DebugElement,
++  provideCheckNoChangesConfig,
+   QueryList,
+   ViewChildren,
+ } from '@angular/core';
+@@ -44,6 +45,7 @@ describe('MatSelectionList without forms', () => {
+ 
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
++        providers: [provideCheckNoChangesConfig({exhaustive: false})],
+         imports: [
+           MatListModule,
+           SelectionListWithListOptions,
+@@ -1277,6 +1279,7 @@ describe('MatSelectionList without forms', () => {
+ describe('MatSelectionList with forms', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
++      providers: [provideCheckNoChangesConfig({exhaustive: false})],
+       imports: [
+         MatListModule,
+         FormsModule,
+diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts
+index cebabbc76fcb50e5ecb0812606773d58b7740876..cce50535ab93a905b23acd1a70a63bb65a49d1be 100644
+--- a/src/material/menu/menu.spec.ts
++++ b/src/material/menu/menu.spec.ts
+@@ -22,6 +22,7 @@ import {
+   Input,
+   OnDestroy,
+   Output,
++  provideCheckNoChangesConfig,
+   Provider,
+   QueryList,
+   TemplateRef,
+@@ -68,6 +69,7 @@ describe('MatMenu', () => {
+   ): ComponentFixture<T> {
+     TestBed.configureTestingModule({
+       providers: [
++        provideCheckNoChangesConfig({exhaustive: false}),
+         ...providers,
+         {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ],
+diff --git a/src/material/radio/radio.spec.ts b/src/material/radio/radio.spec.ts
+index 0d2e0ccb5af46b02f5353d6ab3c420a2a2b7a392..94f5f98d422f2a1e661cd4baaf1fc5712c0347e2 100644
+--- a/src/material/radio/radio.spec.ts
++++ b/src/material/radio/radio.spec.ts
+@@ -1,5 +1,5 @@
+ import {dispatchFakeEvent} from '@angular/cdk/testing/private';
+-import {Component, DebugElement, ViewChild} from '@angular/core';
++import {Component, DebugElement, provideCheckNoChangesConfig, ViewChild} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {FormControl, FormsModule, NgModel, ReactiveFormsModule} from '@angular/forms';
+ import {By} from '@angular/platform-browser';
+@@ -14,6 +14,7 @@ import {
+ describe('MatRadio', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
++      providers: [provideCheckNoChangesConfig({exhaustive: false})],
+       imports: [
+         MatRadioModule,
+         FormsModule,
+diff --git a/src/material/select/select.spec.ts b/src/material/select/select.spec.ts
+index 1c30d8cfe89aeb7b8092cb70c0e6dc5b1ad98e0f..ca6545b198a4f4dede570a0c20161fdcf21f1ef6 100644
+--- a/src/material/select/select.spec.ts
++++ b/src/material/select/select.spec.ts
+@@ -37,6 +37,7 @@ import {
+   ViewChild,
+   ViewChildren,
+   inject,
++  provideCheckNoChangesConfig,
+ } from '@angular/core';
+ import {
+   ComponentFixture,
+@@ -96,6 +97,7 @@ describe('MatSelect', () => {
+         OverlayModule,
+       ],
+       providers: [
++        provideCheckNoChangesConfig({exhaustive: false}),
+         {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+         {provide: Directionality, useFactory: () => (dir = {value: 'ltr', change: EMPTY})},
+         {
+diff --git a/src/material/sidenav/drawer.spec.ts b/src/material/sidenav/drawer.spec.ts
+index d02766ae3ea6a4e56ac629f519686d74bd60c692..1499ef71bcdeab162a8c3f636c4511e0221ff99e 100644
+--- a/src/material/sidenav/drawer.spec.ts
++++ b/src/material/sidenav/drawer.spec.ts
+@@ -7,7 +7,13 @@ import {
+   dispatchEvent,
+   dispatchKeyboardEvent,
+ } from '@angular/cdk/testing/private';
+-import {Component, ElementRef, ErrorHandler, ViewChild} from '@angular/core';
++import {
++  Component,
++  ElementRef,
++  ErrorHandler,
++  provideCheckNoChangesConfig,
++  ViewChild,
++} from '@angular/core';
+ import {
+   ComponentFixture,
+   TestBed,
+@@ -24,7 +30,10 @@ import {MATERIAL_ANIMATIONS} from '../core';
+ describe('MatDrawer', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      providers: [{provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}}],
++      providers: [
++        {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
++        provideCheckNoChangesConfig({exhaustive: false}),
++      ],
+       imports: [
+         MatSidenavModule,
+         A11yModule,
+@@ -891,6 +900,7 @@ describe('MatDrawer', () => {
+ describe('MatDrawerContainer', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
++      providers: [provideCheckNoChangesConfig({exhaustive: false})],
+       imports: [
+         MatSidenavModule,
+         A11yModule,
+diff --git a/src/material/sidenav/sidenav.spec.ts b/src/material/sidenav/sidenav.spec.ts
+index f711e135e42f81d0f65171223f52239843f2ce3a..39cced481ce2d5906100902dbf2adefc2c678d51 100644
+--- a/src/material/sidenav/sidenav.spec.ts
++++ b/src/material/sidenav/sidenav.spec.ts
+@@ -1,4 +1,4 @@
+-import {Component, ViewChild} from '@angular/core';
++import {Component, provideCheckNoChangesConfig, ViewChild} from '@angular/core';
+ import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {MatSidenav, MatSidenavContainer, MatSidenavModule} from './index';
+@@ -6,6 +6,7 @@ import {MatSidenav, MatSidenavContainer, MatSidenavModule} from './index';
+ describe('MatSidenav', () => {
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
++      providers: [provideCheckNoChangesConfig({exhaustive: false})],
+       imports: [
+         MatSidenavModule,
+         SidenavWithFixedPosition,
+diff --git a/src/material/sidenav/testing/sidenav-harness.spec.ts b/src/material/sidenav/testing/sidenav-harness.spec.ts
+index abe8d3ac42766a88fc379e6610b021fa8d089c46..08b0a54916b1de6b07ca22848e6e7f3a9e0c9f5f 100644
+--- a/src/material/sidenav/testing/sidenav-harness.spec.ts
++++ b/src/material/sidenav/testing/sidenav-harness.spec.ts
+@@ -1,4 +1,4 @@
+-import {Component, signal} from '@angular/core';
++import {Component, provideCheckNoChangesConfig, signal} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader, parallel} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+@@ -16,6 +16,9 @@ describe('MatSidenavHarness', () => {
+     let loader: HarnessLoader;
+ 
+     beforeEach(() => {
++      TestBed.configureTestingModule({
++        providers: [provideCheckNoChangesConfig({exhaustive: false})],
++      });
+       fixture = TestBed.createComponent(DrawerHarnessTest);
+       fixture.detectChanges();
+       loader = TestbedHarnessEnvironment.loader(fixture);
+diff --git a/src/material/stepper/stepper.spec.ts b/src/material/stepper/stepper.spec.ts
+index 959e36d93a3ef5589ba3e3ad5fc8991de6965245..efc39d23777742680269bdd020b7f66e6b70c5c2 100644
+--- a/src/material/stepper/stepper.spec.ts
++++ b/src/material/stepper/stepper.spec.ts
+@@ -32,6 +32,7 @@ import {
+   ViewChildren,
+   ViewEncapsulation,
+   inject,
++  provideCheckNoChangesConfig,
+   signal,
+ } from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+@@ -1829,6 +1830,7 @@ function createComponent<T>(
+   TestBed.configureTestingModule({
+     imports: [MatStepperModule, ReactiveFormsModule, ...imports],
+     providers: [
++      provideCheckNoChangesConfig({exhaustive: false}),
+       {provide: Directionality, useFactory: () => dir},
+       {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
+       ...providers,
+diff --git a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+index d23b685fcfacb3e8bcada49423a46c6090400578..51a076042151730e2af1298ca0cc2a89cd5177f3 100644
+--- a/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
++++ b/src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts
+@@ -6,7 +6,13 @@ import {
+   dispatchKeyboardEvent,
+   dispatchMouseEvent,
+ } from '@angular/cdk/testing/private';
+-import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';
++import {
++  Component,
++  provideCheckNoChangesConfig,
++  QueryList,
++  ViewChild,
++  ViewChildren,
++} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions} from '../../core';
+ import {By} from '@angular/platform-browser';
+@@ -32,6 +38,7 @@ describe('MatTabNavBar', () => {
+         TabBarWithInactiveTabsOnInit,
+       ],
+       providers: [
++        provideCheckNoChangesConfig({exhaustive: false}),
+         {provide: MAT_RIPPLE_GLOBAL_OPTIONS, useFactory: () => globalRippleOptions},
+         {provide: Directionality, useFactory: () => ({value: dir, change: dirChange})},
+       ],
+diff --git a/test/angular-test.init.ts b/test/angular-test.init.ts
+index 8b22fd63a2a2e2dd869d207f43ca37e9ff4086d6..79ec9117b0cd28007f1028a8eda3062979803f48 100644
+--- a/test/angular-test.init.ts
++++ b/test/angular-test.init.ts
+@@ -10,22 +10,12 @@ import 'zone.js';
+ import 'zone.js/testing';
+ import 'reflect-metadata';
+ 
+-import {ErrorHandler, NgModule, provideZonelessChangeDetection} from '@angular/core';
++import {NgModule, provideCheckNoChangesConfig, provideZonelessChangeDetection} from '@angular/core';
+ import {TestBed} from '@angular/core/testing';
+ import {BrowserTestingModule, platformBrowserTesting} from '@angular/platform-browser/testing';
+ 
+ @NgModule({
+-  providers: [
+-    provideZonelessChangeDetection(),
+-    {
+-      provide: ErrorHandler,
+-      useValue: {
+-        handleError: (e: any) => {
+-          throw e;
+-        },
+-      },
+-    },
+-  ],
++  providers: [provideZonelessChangeDetection(), provideCheckNoChangesConfig({exhaustive: true})],
+ })
+ export class TestModule {}
+ 
