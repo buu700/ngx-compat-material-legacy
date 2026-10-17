@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "ba39843428bd07c9a1c3f80ea528b0153ff5e66f",
+  "path": "scripts/check-upstream-audit-disposition.mjs",
+  "before_sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2",
+  "current_sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25",
+  "edits": [
+    [
+      "import {requiresGeneratedIdentity,validateGeneratedIdentity} from './upstream-generated-identity-evidence.mjs';",
+      "import {requiresGeneratedIdentity,validateGeneratedIdentity} from './upstream-generated-identity-evidence.mjs';\nimport {requiresNativeDate,validateNativeDate} from './upstream-native-date-evidence.mjs';"
+    ],
+    [
+      "  if (requiresGeneratedIdentity(entry, proof)) {",
+      "  if (requiresNativeDate(entry, proof)) {\n    const result = validateNativeDate({root, entry, proof, request});\n    artifactBehaviorResults.set(entry.sha, result);\n    if (!result.ok) return false;\n  }\n  if (requiresGeneratedIdentity(entry, proof)) {"
+    ],
+    [
+      "  const sensitive = sensitiveClass(entry) || requiresProgressCsp(entry, entry.individual_proof)",
+      "  const sensitive = sensitiveClass(entry) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof)"
+    ]
+  ],
+  "qualification": "pending exact combined source qualification; no G11 or runtime credit"
+}
