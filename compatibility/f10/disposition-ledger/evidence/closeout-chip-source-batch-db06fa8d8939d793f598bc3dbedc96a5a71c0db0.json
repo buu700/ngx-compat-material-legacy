@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "db06fa8d8939d793f598bc3dbedc96a5a71c0db0",
+  "status": "reviewed",
+  "final_disposition": "already-adapted",
+  "source_conclusion_only": true,
+  "actual_native_packed_or_floor_qualified": false,
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent complete audit remains separate",
+  "recorded_at_utc": "2026-10-17T06:12:28.641Z",
+  "patch_file": "compatibility/rc/autocomplete-empty-selection-original.patch",
+  "diff_sha256": "097bc267621c07d520fd9aac2e3329a90c05c0ca308a9cc4e3aa4ecb43dc68b7",
+  "original_files": 2,
+  "original_hunks": 6,
+  "hunk_reviews": [
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -132,8 +132,8 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "826df65ce9c5d16b865e85fe7e017518aae89f865665819f27d5c4b71f3bc80c",
+      "judgment": "The field and comment change distinguish attached overlay state from visible options. The owned field is _valueOnAttach; empty options do not prevent capture. This is owned legacy behavior, not delegated to the current Material directive."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -589,6 +589,7 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "c52a31ba1e3f83dc058f21d07cb337912b1b4c2edc62dca692b5a10994efa465",
+      "judgment": "The upstream option-change stream captures when the panel becomes visible. The candidate keeps the later stable attachment snapshot instead of recapturing through this branch; no option visibility event is required for its initial capture. This review qualifies the original empty-option preservation boundary, not equivalence for all subsequent option-list timing."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -611,10 +612,14 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "b34dae9ad0f55a1ab9581af115aa4045186e14e056ea2ee5a426401399ec69cf",
+      "judgment": "The original helper moves value capture out of opened emission. The tagged16 source already contains that helper. Candidate _emitOpened only emits, while _attachOverlay performs inline capture once per actual attachment. The former claim that the current candidate contains _captureValueOnAttach is corrected."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -665,7 +670,10 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "ab48df2aea4f056a632be3f6cea5ea5fc7127ffb8f1caa808d46eaa81bd8983c",
+      "judgment": "Required-selection dismissal compares native text with the captured attachment value. Unchanged text retains the selected object and display; changed unmatched text clears once. Selection-event and optional-mode paths remain separate and are included as source diagnostic controls."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -727,8 +735,8 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "d8292bb2acd5eff7f3e58ecb7ae9fe2309e38c300a88fa08aa107a21daf5420b",
+      "judgment": "The attachment path captures even when panelOpen is false because options are empty. Candidate capture occurs inside the actual unattached-overlay attach branch before closing subscription registration, and both authenticated public floor source prototypes have that same arrangement. First overlay creation and native event routing remain required artifact work."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -2663,6 +2663,37 @@ describe('MDC-based MatAutocomplete', () => {",
+      "hunk_sha256": "b77e206a6f91fe67fcfe04c79ef125ed48b2553ca5f39010129e98b8f8466ded",
+      "judgment": "The complete added upstream regression selects California, removes all options, opens the invisible panel, dismisses by document click and requires unchanged display/model with no option selection. Existing named legacy #172 now covers those observations and retains its original direct close not-to-throw assertion. All other test identities/bodies are preserved; native execution remains mandatory."
+    }
+  ],
+  "prior_entry": {
+    "sha": "db06fa8d8939d793f598bc3dbedc96a5a71c0db0",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/autocomplete): requireSelection incorrectly resetting value when there are no options",
+    "final_disposition": "already-adapted",
+    "reason": "autocomplete-trigger-base.ts already captures attach value via _captureValueOnAttach and compares against it for requireSelection.",
+    "read_note_disposition": "already-present",
+    "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+    "source_check": "_captureValueOnAttach / _valueOnAttach present",
+    "files": [
+      "src/material/autocomplete/autocomplete-trigger.ts",
+      "src/material/autocomplete/autocomplete.spec.ts"
+    ],
+    "batch_id": "security-already-present-2026-10-01-b",
+    "recorded_at_utc": "2026-10-01T16:30:02Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+  },
+  "decision": "The owned trigger retains the tagged16 fix for an attached but invisible empty autocomplete: it records the input value on actual overlay attachment and compares that value on required-selection close. Its inline capture replaces the old helper; the earlier current-helper citation was false. Both exact peer source implementations likewise capture once on attachment. Complete source-method observations cover unchanged and edited text, visible and empty panels, optional mode and reopen with a new model. The strengthened existing #172 test retains its direct-close assertion and additionally checks unchanged selected display/model and no value/selection emission after a real outside click. No runtime implementation, public API, DOM or stylesheet change is required. Actual Angular/CVA/overlay behavior requires the complete same-run packed historical regression; source diagnostics do not satisfy it.",
+  "individual_proof": {
+    "proof_kind": "historical-required-individual-behavior",
+    "review_depth": "individual-compatibility",
+    "diff_sha256": "097bc267621c07d520fd9aac2e3329a90c05c0ca308a9cc4e3aa4ecb43dc68b7",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The owned trigger retains the tagged16 fix for an attached but invisible empty autocomplete: it records the input value on actual overlay attachment and compares that value on required-selection close. Its inline capture replaces the old helper; the earlier current-helper citation was false. Both exact peer source implementations likewise capture once on attachment. Complete source-method observations cover unchanged and edited text, visible and empty panels, optional mode and reopen with a new model. The strengthened existing #172 test retains its direct-close assertion and additionally checks unchanged selected display/model and no value/selection emission after a real outside click. No runtime implementation, public API, DOM or stylesheet change is required. Actual Angular/CVA/overlay behavior requires the complete same-run packed historical regression; source diagnostics do not satisfy it.",
+    "historical_behavior": {
+      "kind": "autocomplete-empty-required-selection",
+      "case_ids": [
+        "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#172"
+      ],
+      "source_members": [
+        {
+          "path": "scripts/rc-test-legacy-family.mjs",
+          "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+        },
+        {
+          "path": "scripts/historical-case-roster.mjs",
+          "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+        },
+        {
+          "path": "scripts/resolve-run-library.mjs",
+          "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+        },
+        {
+          "path": "scripts/rc-verify.py",
+          "sha256": "1434d36fae6f72ec2f5460eb5fdeb158f5b14da9d722f4a5313573f49edb1ff0"
+        },
+        {
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "sha256": "7f093cf3899def097dca506191ef220bbd3a54042bbd14a713100882b1e72ba1"
+        },
+        {
+          "path": "scripts/upstream-historical-behavior-evidence.mjs",
+          "sha256": "5b9c8e242fd4db1166f417652010c2a15293b5664b5718b7b151ce487127e023"
+        },
+        {
+          "path": "testing/legacy-runner/build.mjs",
+          "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+        },
+        {
+          "path": "testing/legacy-runner/adapt-spec.mjs",
+          "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+        },
+        {
+          "path": "testing/legacy-runner/entry.ts",
+          "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+        },
+        {
+          "path": "testing/legacy-runner/init-test-env.ts",
+          "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+        },
+        {
+          "path": "testing/legacy-runner/karma.conf.cjs",
+          "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+        },
+        {
+          "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+          "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+        },
+        {
+          "path": "testing/legacy-runner/historical-inventory.json",
+          "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+        },
+        {
+          "path": "testing/legacy-runner/historical-specs.json",
+          "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+          "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+        },
+        {
+          "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+          "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "cc6736be8df2d496443855154d59d7abc60b17ae5f72f9340bca420b02a90075"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+          "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+          "sha256": "6b9c00dbf365e6b6ea9b2b65eb7e67911775322c78848b996d3590f8fded3d58"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+          "sha256": "09a96761ccbb96309989dfc13517170c3600fb2bd57b3fb7e9c9cb02f788d423"
+        }
+      ]
+    }
+  },
+  "required_native_cases": [
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#172",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > should not throw errors when closing without options"
+    }
+  ],
+  "independent_evidence": [
+    {
+      "path": "compatibility/rc/autocomplete-empty-selection-inputs.json",
+      "sha256": "620ee58ee6ec1905908006b289e5f102293b9cfd5c4f67c5216ba227ceb82606"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-empty-selection-diagnostics.json.gz",
+      "sha256": "5994b35e9837c4fb15ad39110a931d5bbb5c419837f4e4fc1b878cf704b06b0c"
+    },
+    {
+      "path": "tests/autocomplete_empty_selection_probe.mjs",
+      "sha256": "b6f1387a579eba3e6ce8dff1292ad9349fbdd00bbea1682798c13147b344937e"
+    },
+    {
+      "path": "compatibility/rc/autocomplete-input-peer-sources/identities.json",
+      "sha256": "0445290e1b84caee4fbf650d1ee3f40be0cc70f38ed001ad81b2f8457fa5b2cd"
+    },
+    {
+      "path": "reference/material-16.2.14/component-behavior-sources/autocomplete/autocomplete-trigger.ts",
+      "sha256": "b69decaf81ef29dd665a0b267f3a121837212157b31ddd02c3b617fa958844f2"
+    }
+  ],
+  "g11_claim": "not-passed",
+  "slider_range_followup_source_context": {
+    "path": "compatibility/rc/slider-range-followup-native-prior.json.gz",
+    "sha256": "a710dc77d8db2836c347e99034e3886f648b72c6153481a506f0fa8b8c1516ac",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-empty-selection-source-judgment.json",
+      "sha256": "6c643a01b56883f4c88328351e2d8aac690fae0a2dd8ebed55a6adf897427d7c"
+    },
+    "only_current_root_source_dispatch_added": true,
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "slider_range_followup_native_context_materialization": {
+    "group": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-slider-range-followup-native-context.json",
+      "sha256": "862898e50f5a5bf1018fcaab62448d40922dda73ceb50940f49cc22af867ee98"
+    },
+    "individual_document_interface_preserved": true
+  },
+  "inherited_execution_admission_source_context": {
+    "prior": {
+      "path": "compatibility/rc/inherited-execution-admission-native-prior.json.gz",
+      "sha256": "f6a947e5deae3de8da5198733ce1461ecf7199c057b317cb05b3075d8b8863b7"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-slider-range-followup-native-db06fa8d8939d793f598bc3dbedc96a5a71c0db0.json",
+      "sha256": "4a757190b744901b2096150779b16bce44a7cb72cad04975b779029cc3bdc59a"
+    },
+    "changed_member": {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "before_sha256": "4f6065b4a867df90e4189343cf1d7e5623ff0f54a9050f64b8fec563cca51e47",
+      "after_sha256": "f9d61a1f3ab771d273117126fba137ad91eae0268e695e6fb58e4486fee98cef"
+    },
+    "finite_inherited_gate": {
+      "path": "scripts/upstream-inherited-execution-evidence.mjs",
+      "sha256": "5e1753ee092510acf4d6253d73bda21e8646914a343e8c03209b5c76e0dbcbbb"
+    },
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "content_observer_admission_source_context": {
+    "prior": {
+      "path": "compatibility/rc/content-observer-admission-context-prior.json.gz",
+      "sha256": "f79c549df7896225e312ad8b45daa1653e181888491200278f6e675184feea65"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-inherited-execution-native-db06fa8d8939d793f598bc3dbedc96a5a71c0db0.json",
+      "sha256": "2ebcf5b176d2ac9a65872ce2d19189a316fb67e8b716ffea0be5a6b1e29b0d61"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "before_sha256": "f9d61a1f3ab771d273117126fba137ad91eae0268e695e6fb58e4486fee98cef",
+        "after_sha256": "5e80c5b606e4b04b4591f4b5547b4a7d081b19a4b61197b8968c600f3f49a8f9"
+      }
+    ],
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "media_matcher_admission_source_context": {
+    "prior": {
+      "path": "compatibility/rc/media-matcher-admission-context-prior.json.gz",
+      "sha256": "c9d1e3e188a920d9a75efa7867c1a649aa1843454976082afa882fcdf542d72d"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-content-observer-admission-native-db06fa8d8939d793f598bc3dbedc96a5a71c0db0.json",
+      "sha256": "8f1592be59ae0ed2da9e2da3e820704483dd5fcb723de9a8392598c2e750ce0e"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "before_sha256": "5e80c5b606e4b04b4591f4b5547b4a7d081b19a4b61197b8968c600f3f49a8f9",
+        "after_sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+      }
+    ],
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "native_date_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/native-date-context-inputs.json",
+      "sha256": "454c1b7b78cf9fa0444e206c7ab45638ef118922270a2a34619e29992f5df521"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "f6f9557a2fdd14811d67b951755db19985b94b7b",
+      "entry_sha256": "d553e68764749680a0996c649c94aed4cd3678317121fc5be6bfaf926be758df"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-media-matcher-admission-native-db06fa8d8939d793f598bc3dbedc96a5a71c0db0.json",
+      "sha256": "d6db3324c923242894f779947593aa0d9647474280bba54a04b465584a5e7983"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "before_sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2",
+        "after_sha256": "ce0042841e12b0b0c70892cef00e34f2718ce44e0d97a9c3b09b098ddb611d25"
+      }
+    ],
+    "original_verdict_and_runtime_requirements_unchanged": true,
+    "new_fixture_dependencies_bound": false,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "recorded_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/chip-source-batch-inputs.json",
+      "sha256": "f34efd9b3c3bcd6e46b0c8feacd80444864d28d93fba581f4da3fafdfad9f642"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "818e1f3af34474a271e7f9ceda1f29fe4f19d092",
+      "entry_sha256": "3b3f547b4b1484df348313999b21a4334d41a3fe309816228fbb0eda1e6b5f77"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-audit-source-db06fa8d8939d793f598bc3dbedc96a5a71c0db0.json",
+      "sha256": "83150b549687a481a6e5b95e5f896172a5add1c382ea20c8b0b26bc0278ea0aa"
+    },
+    "source_scope_only": true,
+    "actual_native_packed_or_floor_qualified": false,
+    "note": "Rebind the existing native requirement to current checker source after nine independently reviewed modern chip source decisions. All prior disposition, historical contracts, artifact cases, floor and real coordinator obligations remain unchanged; no runtime credit."
+  }
+}
