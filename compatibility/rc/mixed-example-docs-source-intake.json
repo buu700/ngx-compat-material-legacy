@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "All four complete originals acquired/authenticated; all four individual semantic source decisions remain pending.",
+  "complete_original_files": 34,
+  "complete_original_bodies": 68,
+  "original_hunks": 77,
+  "original_before_after_bytes": 524310,
+  "owned_context_read": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-content-directives.ts",
+      "sha256": "698b2fea49964c4cea0cfa07b0847ada413130055c032de94d16df3cc4b59ca5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-module.ts",
+      "sha256": "d2578c37a69df07570fff8706160c61a3486268c85e7b4384b45a0f808a5de70"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.spec.ts",
+      "sha256": "dfc5961661c06ae15f186d25846f4a40f61880ac2c09e9975e0d9faabbbdea2b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-module.ts",
+      "sha256": "6ad8d8687288b979759b12456189c1dac16ca9caa1970787bf16692c78ebd68f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-input.ts",
+      "sha256": "33570050813994128c0ba997912c66de993ea75fd9f27d03b85842ee509cbe27"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+      "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/dialog/shared.spec.ts",
+      "sha256": "c267e892aaff14ac6f174e4dcbed6789b1be32e774e7dcb5c6ffd555c88e5b7d"
+    },
+    {
+      "path": "testing/legacy-runner/shims/harness/snack-bar/shared.spec.ts",
+      "sha256": "715b181859372b98a1dcdb16705453d63b82ab49c18ff206205d13528e90d67a"
+    }
+  ],
+  "review_leads": [
+    "Dialog standalone changes remove MatDialogModule from application/example imports, add individual title/content/action/close directives to dialog components and convert a modern harness fixture to standalone. Owned legacy dialog directives remain standalone:false and its shared fixture uses a declaration and owned animation provider. Review complete provider/import/template/assertion frames rather than treating this title as docs only or making legacy directives standalone.",
+    "Snack-bar standalone changes remove MatSnackBarModule from examples and modern harness setup, add individual label/actions/action imports and mark the harness fixture standalone. Preserve distinct owned legacy tokens/module/markup and the already qualified owned animation preparation; do not silently copy modern module/provider assumptions.",
+    "Dialog heading changes replace h1 with h2 in four external templates, an inline demo and CDK/Material fixture templates; first-heading focus query expectations change to h2. Owned historical dialog still explicitly tests h1[tabindex=-1]. No consumer markup or CSS/SCSS change is authorized by this docs migration; review actual focus behavior without claiming h1/h2 accessibility or typography equivalence.",
+    "Chip forms change real example behavior: reactive displayed keywords now come from one non-null FormControl initial array, adding/removing calls setValue, and removal uses lastIndexOf. Template form signal/handler names and announcer visibility also change. The same SHA changes a tooltip touchstart case from async waits250/600 and whenStable to fakeAsync ticks250/500 and flush, with a CI-only-failure comment. Owned legacy tooltip already uses fakeAsync ticks250/500 and explicit owned animation completion; the owned chipInput event already requires chipInput. Preserve the historical form/DOM/CSS/SCSS and native timing obligations rather than labeling the whole commit editorial."
+  ],
+  "worksheet_snapshot_sha256": "68e7b2454a8efe2a7cde6ceff3916d54114d9505ac1f02ff0a0d52942c08a2c4",
+  "current_previous_qualification": {
+    "path": "compatibility/rc/mixed-tree-source-replay-checkpoint.json",
+    "sha256": "8b95ab5e62dba0e5543f38d32d00d8b3c54eae170efe6894587908a0b435af0a"
+  },
+  "source_decisions_qualified_in_this_task": 0,
+  "remaining_mixed_source_candidates": 29,
+  "required_consumer_HTML_CSS_SCSS_changes": 0,
+  "actual_Angular_native_artifact_browser_SSR_or_floor_qualified": false,
+  "ready_for_Actions": false,
+  "g11_claim": "not-passed"
+}
