@@ -45,6 +45,15 @@ const entries = reviews.map((row, index) => {
 });
 for (const entry of entries) assert.equal(review.sliderRangeEvidenceOk(body, entry, p => writes.get(p) || read(p), () => candidateProductSourcePaths(root), line), true, entry.sha);
 const native = await review.qualifySliderRangeNativeContext({root, read}); writes.set(native.path, Buffer.from(encode(native.body)));
+// Keep the existing per-SHA document interface for the native source probes.
+// The complete grouped context remains a retained source-qualification record.
+for (const [index, entry] of native.entries.entries()) {
+  const document = structuredClone(native.body.reviews[index]);
+  entry.evidence_report = 'compatibility/f10/disposition-ledger/evidence/closeout-slider-range-followup-native-' + entry.sha + '.json';
+  document.slider_range_followup_native_context_materialization = {group: {path: native.path,
+    sha256: hash(writes.get(native.path))}, individual_document_interface_preserved: true};
+  writes.set(entry.evidence_report, Buffer.from(encode(document)));
+}
 const ledgerPath = 'compatibility/f10/disposition-ledger/ledger.json', ledger = JSON.parse(read(ledgerPath));
 const updates = new Map([...entries, ...native.entries].map(row => [row.sha, row])); assert.equal(updates.size, 19);
 const oldNative = JSON.parse(gunzipSync(read('compatibility/rc/slider-range-followup-native-prior.json.gz'))).rows;

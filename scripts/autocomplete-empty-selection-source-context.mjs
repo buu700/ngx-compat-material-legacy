@@ -19,7 +19,7 @@ import {buildScopeEvidenceOk} from './upstream-build-scope-evidence.mjs';
 import {testConsolidationBatchOk, testConsolidationEntryOk} from './upstream-test-consolidation-evidence.mjs';
 import {reviewSliderInputScope, sliderInputScopeEvidenceOk} from './upstream-slider-input-scope.mjs';
 import {reviewSliderThumbDestroyScope, sliderThumbDestroyEvidenceOk} from './upstream-slider-thumb-destroy-scope.mjs';
-import {reviewBazelBuildContext, bazelBuildEvidenceOk} from './upstream-bazel-build-scope.mjs';
+import {analyzeBazelBuildSubjects, reviewBazelBuildContext, bazelBuildEvidenceOk} from './upstream-bazel-build-scope.mjs';
 const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const bytes = value => Buffer.from(JSON.stringify(value, null, 2) + '\n');
@@ -55,6 +55,31 @@ export function inspectEmptySelectionSourceContext({root = defaultRoot, readMemb
   const oldRead = p => oldReports.get(p) || (p === spec.path ? Buffer.from(spec.before) : read(p));
   const decisions = bodies.map(body => structuredClone(body.reviews ?? body.hunk_reviews));
   const originals = bodies.map(body => structuredClone(body));
+  // The original task used a borrowed6.0.3 parser. A later branch-native
+  // qualification changes only this diagnostic identity on21.x. Authenticate
+  // that exact transition and recheck every original source-analysis field;
+  // do not treat an arbitrary extra context object as accepted drift.
+  let compilerAlignment = null;
+  const currentBazel = JSON.parse(read(prior.reports[4].path));
+  if (currentBazel.slider_range_followup_branch_compiler_context !== undefined) {
+    assert.equal(line, '21.x');
+    const alignment = currentBazel.slider_range_followup_branch_compiler_context;
+    const previousPath = 'compatibility/rc/slider-range-followup-floor-compiler-prior.json.gz';
+    const previousRaw = read(previousPath), previous = JSON.parse(gunzipSync(previousRaw));
+    assert.equal(hash(previousRaw), '9ca79a96da3c3df19a1843c23a7c8a967c71d16ce691deebdbb229ec4ba1ac24');
+    assert.equal(previous.line, '21.x'); assert.equal(previous.path, prior.reports[4].path);
+    assert.equal(hash(previous.text), previous.sha256);
+    const actual = analyzeBazelBuildSubjects(read);
+    assert.equal(actual.compiler, '5.9.2'); assert.equal(originals[4].source_analysis.compiler, '6.0.3');
+    const before = structuredClone(originals[4].source_analysis), after = structuredClone(actual);
+    delete before.compiler; delete after.compiler; assert.deepEqual(after, before);
+    assert.deepEqual(currentBazel.source_analysis, actual);
+    assert.deepEqual(alignment, {prior: {path: previousPath, sha256: hash(previousRaw)}, before_compiler: '6.0.3',
+      current_branch_compiler: '5.9.2', all_other_source_analysis_and_original_verdicts_unchanged: true,
+      actual_native_packed_or_floor_qualified: false});
+    assert.deepEqual(previous.entries.map(row => row.sha).sort(), currentBazel.scope_sha_ids.slice().sort());
+    compilerAlignment = {actual, alignment, previous};
+  }
   bodies[0].candidate_context.product_members = bodies[0].candidate_context.product_members.map(row => {
     if (row.path !== spec.path) return row;
     const value = read(row.path); return {...row, sha256: hash(value), bytes: value.length};
@@ -83,6 +108,11 @@ export function inspectEmptySelectionSourceContext({root = defaultRoot, readMemb
     assert.deepEqual(body.reviews ?? body.hunk_reviews, decisions[index]);
     body.autocomplete_empty_selection_context_requalification = qualification;
     if (index === 1) body.candidate_context.sha256 = hash(writes.get(prior.reports[0].path));
+    if (index === 4 && compilerAlignment) {
+      assert.equal(bytes(body).toString(), compilerAlignment.previous.text, 'unreviewed change before compiler alignment');
+      body.source_analysis = compilerAlignment.actual;
+      body.slider_range_followup_branch_compiler_context = compilerAlignment.alignment;
+    }
     writes.set(prior.reports[index].path, bytes(body));
   }
   const entries = prior.entries.map(old => {
@@ -113,7 +143,17 @@ export function inspectEmptySelectionSourceContext({root = defaultRoot, readMemb
   const proposedRead = p => writes.get(p) || read(p);
   const oldLedger = structuredClone(proposed);
   oldLedger.entries = oldLedger.entries.map(row => prior.entries.find(old => old.sha === row.sha) || row);
-  const beforeRead = p => p === ledgerPath ? bytes(oldLedger) : oldRead(p);
+  let beforeBazel = null;
+  if (compilerAlignment) {
+    const body = JSON.parse(oldReports.get(prior.reports[4].path));
+    body.source_analysis = compilerAlignment.actual;
+    beforeBazel = bytes(body);
+  }
+  // The historical source analyses are unchanged. Align their compiler
+  // diagnostic for this current consistency check, rather than claiming that
+  // the untouched old6.0.3 receipt was executed under5.9.2.
+  const beforeRead = p => p === ledgerPath ? bytes(oldLedger)
+    : p === prior.reports[4].path && beforeBazel ? beforeBazel : oldRead(p);
   const validate = (read, sourceEntries) => {
     const docs = prior.reports.map(row => JSON.parse(read(row.path))), results = [];
     const batch = testConsolidationBatchOk(docs[1], read, productPaths);
@@ -132,6 +172,8 @@ export function inspectEmptySelectionSourceContext({root = defaultRoot, readMemb
   for (const row of prior.reports) assert.ok(read(row.path).equals(oldReports.get(row.path)) || read(row.path).equals(writes.get(row.path)), 'unreviewed report delta');
   return {line, writes, summary: {line, source_rows_requalified: entries.length, product_members: productPaths.length,
     changed_product_members: 1, other_product_members_unchanged: 1140, original_source_judgments_unchanged: true,
+    qualified_branch_compiler_alignment: compilerAlignment ? {historical_compiler: '6.0.3', current_compiler: '5.9.2',
+      other_original_source_analysis_fields_unchanged: true, historical_diagnostic_aligned_for_current_consistency_check: true} : null,
     actual_native_packed_or_floor_qualified: false}};
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
