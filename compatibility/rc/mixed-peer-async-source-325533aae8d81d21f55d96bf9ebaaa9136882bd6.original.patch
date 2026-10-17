@@ -1,0 +1,405 @@
+diff --git a/src/cdk/menu/context-menu-trigger.spec.ts b/src/cdk/menu/context-menu-trigger.spec.ts
+index 489429982c378227c7c6c0d8b68ed8fb0f23dd18..7691d1ac3c27d90bf462ccfa5292e071c5b238b6 100644
+--- a/src/cdk/menu/context-menu-trigger.spec.ts
++++ b/src/cdk/menu/context-menu-trigger.spec.ts
+@@ -1,12 +1,4 @@
+-import {
+-  Component,
+-  ViewChild,
+-  ElementRef,
+-  Type,
+-  ViewChildren,
+-  QueryList,
+-  provideZoneChangeDetection,
+-} from '@angular/core';
++import {Component, ViewChild, ElementRef, Type, ViewChildren, QueryList} from '@angular/core';
+ import {CdkMenuModule} from './menu-module';
+ import {TestBed, waitForAsync, ComponentFixture} from '@angular/core/testing';
+ import {CdkMenu} from './menu';
+@@ -26,7 +18,6 @@ describe('CdkContextMenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [SimpleContextMenu],
+-        providers: [provideZoneChangeDetection()],
+       }).compileComponents();
+     }));
+ 
+@@ -160,7 +151,6 @@ describe('CdkContextMenuTrigger', () => {
+     beforeEach(waitForAsync(() => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+-        providers: [provideZoneChangeDetection()],
+         declarations: [NestedContextMenu],
+       }).compileComponents();
+     }));
+@@ -223,6 +213,7 @@ describe('CdkContextMenuTrigger', () => {
+         ' is disabled',
+       () => {
+         fixture.componentInstance.copyMenuDisabled = true;
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         openCopyContextMenu();
+ 
+@@ -410,7 +401,6 @@ describe('CdkContextMenuTrigger', () => {
+     function createComponent<T>(componentClass: Type<T>) {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+-        providers: [provideZoneChangeDetection()],
+         declarations: [componentClass],
+       }).compileComponents();
+ 
+diff --git a/src/cdk/menu/context-menu-trigger.ts b/src/cdk/menu/context-menu-trigger.ts
+index 93db6f5d47547fc4883904f5cf27b77a6e62e4a1..eb190aabc0cfa353b20dd07d68c2b8c620f1601d 100644
+--- a/src/cdk/menu/context-menu-trigger.ts
++++ b/src/cdk/menu/context-menu-trigger.ts
+@@ -6,7 +6,15 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {booleanAttribute, Directive, inject, Injectable, Input, OnDestroy} from '@angular/core';
++import {
++  booleanAttribute,
++  ChangeDetectorRef,
++  Directive,
++  inject,
++  Injectable,
++  Input,
++  OnDestroy,
++} from '@angular/core';
+ import {Directionality} from '@angular/cdk/bidi';
+ import {
+   FlexibleConnectedPositionStrategy,
+@@ -83,6 +91,8 @@ export class CdkContextMenuTrigger extends CdkMenuTriggerBase implements OnDestr
+   /** The app's context menu tracking registry */
+   private readonly _contextMenuTracker = inject(ContextMenuTracker);
+ 
++  private readonly _changeDetectorRef = inject(ChangeDetectorRef);
++
+   /** Whether the context menu is disabled. */
+   @Input({alias: 'cdkContextMenuDisabled', transform: booleanAttribute}) disabled: boolean = false;
+ 
+@@ -97,6 +107,7 @@ export class CdkContextMenuTrigger extends CdkMenuTriggerBase implements OnDestr
+    */
+   open(coordinates: ContextMenuCoordinates) {
+     this._open(null, coordinates);
++    this._changeDetectorRef.markForCheck();
+   }
+ 
+   /** Close the currently opened context menu. */
+diff --git a/src/cdk/menu/menu-item-checkbox.spec.ts b/src/cdk/menu/menu-item-checkbox.spec.ts
+index 33eb5b1bd8e3237ca43a05fc60ca0725065e06bf..365184fc52b26fa51e5bf0f573d12e6c56f788b2 100644
+--- a/src/cdk/menu/menu-item-checkbox.spec.ts
++++ b/src/cdk/menu/menu-item-checkbox.spec.ts
+@@ -1,4 +1,4 @@
+-import {Component, ElementRef, provideZoneChangeDetection} from '@angular/core';
++import {Component, ElementRef} from '@angular/core';
+ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {CdkMenuModule} from './menu-module';
+@@ -16,7 +16,6 @@ describe('MenuItemCheckbox', () => {
+     TestBed.configureTestingModule({
+       imports: [CdkMenuModule, SingleCheckboxButton],
+       providers: [
+-        provideZoneChangeDetection(),
+         {provide: CDK_MENU, useClass: CdkMenu},
+         {provide: MENU_STACK, useClass: MenuStack},
+         // View engine can't figure out the ElementRef to inject so we need to provide a fake
+@@ -43,6 +42,7 @@ describe('MenuItemCheckbox', () => {
+     expect(checkboxElement.getAttribute('aria-disabled')).toBeNull();
+ 
+     checkbox.disabled = true;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(checkboxElement.getAttribute('aria-disabled')).toBe('true');
+diff --git a/src/cdk/menu/menu-item-radio.spec.ts b/src/cdk/menu/menu-item-radio.spec.ts
+index c4a1e3f853492dea3937cc075ab565460a787d32..b7fd137dcd6422e640dab378db60faf1f4050d5c 100644
+--- a/src/cdk/menu/menu-item-radio.spec.ts
++++ b/src/cdk/menu/menu-item-radio.spec.ts
+@@ -1,4 +1,4 @@
+-import {Component, ElementRef, provideZoneChangeDetection} from '@angular/core';
++import {Component, ElementRef} from '@angular/core';
+ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {UniqueSelectionDispatcher} from '@angular/cdk/collections';
+@@ -19,7 +19,6 @@ describe('MenuItemRadio', () => {
+     TestBed.configureTestingModule({
+       imports: [CdkMenuModule, SimpleRadioButton],
+       providers: [
+-        provideZoneChangeDetection(),
+         {provide: UniqueSelectionDispatcher, useValue: selectionDispatcher},
+         {provide: CDK_MENU, useClass: CdkMenu},
+         {provide: MENU_STACK, useClass: MenuStack},
+@@ -47,6 +46,7 @@ describe('MenuItemRadio', () => {
+     expect(radioElement.getAttribute('aria-disabled')).toBeNull();
+ 
+     radioButton.disabled = true;
++    fixture.componentRef.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(radioElement.getAttribute('aria-disabled')).toBe('true');
+diff --git a/src/cdk/menu/menu-item.spec.ts b/src/cdk/menu/menu-item.spec.ts
+index fd2e3a74f51114125e5f7a53688899e4628eddfb..3a14c93b5605e79e0b8443ec30744b0ff41b74cd 100644
+--- a/src/cdk/menu/menu-item.spec.ts
++++ b/src/cdk/menu/menu-item.spec.ts
+@@ -1,4 +1,4 @@
+-import {Component, Type, ElementRef, provideZoneChangeDetection} from '@angular/core';
++import {Component, Type, ElementRef} from '@angular/core';
+ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+ import {dispatchKeyboardEvent} from '@angular/cdk/testing/private';
+ import {By} from '@angular/platform-browser';
+@@ -20,7 +20,6 @@ describe('MenuItem', () => {
+         imports: [CdkMenuModule],
+         declarations: [SingleMenuItem],
+         providers: [
+-          provideZoneChangeDetection(),
+           {provide: CDK_MENU, useClass: CdkMenu},
+           {provide: MENU_STACK, useClass: MenuStack},
+           // View engine can't figure out the ElementRef to inject so we need to provide a fake
+@@ -49,11 +48,13 @@ describe('MenuItem', () => {
+       expect(nativeButton.hasAttribute('aria-disabled')).toBeFalse();
+ 
+       menuItem.disabled = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(nativeButton.getAttribute('aria-disabled')).toBe('true');
+ 
+       menuItem.disabled = false;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(nativeButton.hasAttribute('aria-disabled')).toBeFalse();
+@@ -83,7 +84,6 @@ describe('MenuItem', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule, MatIcon],
+         providers: [
+-          provideZoneChangeDetection(),
+           {provide: CDK_MENU, useClass: CdkMenu},
+           {provide: MENU_STACK, useClass: MenuStack},
+           // View engine can't figure out the ElementRef to inject so we need to provide a fake
+@@ -108,6 +108,7 @@ describe('MenuItem', () => {
+       const fixture = createComponent(MenuItemWithIcon);
+       expect(menuItem.getLabel()).toEqual('unicorn Click me!');
+       fixture.componentInstance.typeahead = 'Click me!';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+       expect(menuItem.getLabel()).toEqual('Click me!');
+     });
+@@ -119,6 +120,7 @@ describe('MenuItem', () => {
+         const fixture = createComponent(MenuItemWithIconClass);
+         expect(menuItem.getLabel()).toEqual('unicorn Click me!');
+         fixture.componentInstance.typeahead = 'Click me!';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         expect(menuItem.getLabel()).toEqual('Click me!');
+       },
+@@ -136,6 +138,7 @@ describe('MenuItem', () => {
+         const fixture = createComponent(MenuItemWithMultipleNestings);
+         expect(menuItem.getLabel()).toEqual('unicorn Click menume!');
+         fixture.componentInstance.typeahead = 'Click me!';
++        fixture.changeDetectorRef.markForCheck();
+         fixture.detectChanges();
+         expect(menuItem.getLabel()).toEqual('Click me!');
+       },
+diff --git a/src/cdk/menu/menu-trigger.spec.ts b/src/cdk/menu/menu-trigger.spec.ts
+index 933a44ba9a0a524b7c9a17d926afffe8b4d17579..a55df9b19d55b943e313a621ba2394e6fdcf1991 100644
+--- a/src/cdk/menu/menu-trigger.spec.ts
++++ b/src/cdk/menu/menu-trigger.spec.ts
+@@ -1,12 +1,4 @@
+-import {
+-  Component,
+-  ViewChildren,
+-  QueryList,
+-  ElementRef,
+-  ViewChild,
+-  Type,
+-  provideZoneChangeDetection,
+-} from '@angular/core';
++import {Component, ViewChildren, QueryList, ElementRef, ViewChild, Type} from '@angular/core';
+ import {ComponentFixture, TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+ import {By} from '@angular/platform-browser';
+ import {dispatchKeyboardEvent} from '../../cdk/testing/private';
+@@ -27,7 +19,6 @@ describe('MenuTrigger', () => {
+       TestBed.configureTestingModule({
+         imports: [CdkMenuModule],
+         declarations: [TriggerForEmptyMenu],
+-        providers: [provideZoneChangeDetection()],
+       }).compileComponents();
+     }));
+ 
+@@ -51,6 +42,7 @@ describe('MenuTrigger', () => {
+       expect(menuItemElement.getAttribute('aria-disabled')).toBeNull();
+ 
+       menuItem.disabled = true;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(menuItemElement.getAttribute('aria-disabled')).toBe('true');
+@@ -60,6 +52,7 @@ describe('MenuTrigger', () => {
+       expect(menuItemElement.getAttribute('aria-haspopup')).toEqual('menu');
+ 
+       fixture.componentInstance.trigger.menuTemplateRef = null;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(menuItemElement.hasAttribute('aria-haspopup')).toBe(false);
+@@ -69,6 +62,7 @@ describe('MenuTrigger', () => {
+       expect(menuItem.hasMenu).toBeTrue();
+ 
+       fixture.componentInstance.trigger.menuTemplateRef = null;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(menuItem.hasMenu).toBeFalse();
+@@ -83,6 +77,7 @@ describe('MenuTrigger', () => {
+       expect(menuItemElement.getAttribute('aria-expanded')).toBe('false');
+ 
+       fixture.componentInstance.trigger.menuTemplateRef = null;
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       expect(menuItemElement.hasAttribute('aria-expanded')).toBeFalse();
+diff --git a/src/cdk/menu/pointer-focus-tracker.spec.ts b/src/cdk/menu/pointer-focus-tracker.spec.ts
+index f47fa078ac7d1c3a17af2b82abc76fac4e4cc110..0fe8b7a88b53177af4f125ccbf0ddb0e7799cf68 100644
+--- a/src/cdk/menu/pointer-focus-tracker.spec.ts
++++ b/src/cdk/menu/pointer-focus-tracker.spec.ts
+@@ -1,11 +1,4 @@
+-import {
+-  Component,
+-  QueryList,
+-  ElementRef,
+-  ViewChildren,
+-  AfterViewInit,
+-  provideZoneChangeDetection,
+-} from '@angular/core';
++import {Component, QueryList, ElementRef, ViewChildren, AfterViewInit} from '@angular/core';
+ import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+ import {createMouseEvent, dispatchEvent} from '../../cdk/testing/private';
+ import {Observable} from 'rxjs';
+@@ -26,7 +19,6 @@ describe('FocusMouseManger', () => {
+ 
+   beforeEach(waitForAsync(() => {
+     TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+       imports: [MultiElementWithConditionalComponent, MockWrapper],
+     }).compileComponents();
+   }));
+@@ -68,6 +60,7 @@ describe('FocusMouseManger', () => {
+ 
+     expect(mockElements.length).toBe(2);
+     fixture.componentInstance.showThird = true;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     getComponentsForTesting();
+ 
+diff --git a/src/material/menu/menu.spec.ts b/src/material/menu/menu.spec.ts
+index 435fb96256ccff2cf7c3d58584494b1840ce2940..50ce8f1bfdcbf8780cd95c285d28eaf661cbf369 100644
+--- a/src/material/menu/menu.spec.ts
++++ b/src/material/menu/menu.spec.ts
+@@ -25,7 +25,6 @@ import {
+   Type,
+   ViewChild,
+   ViewChildren,
+-  provideZoneChangeDetection,
+ } from '@angular/core';
+ import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
+ import {MatRipple} from '@angular/material/core';
+@@ -64,7 +63,7 @@ describe('MDC-based MatMenu', () => {
+     declarations: any[] = [],
+   ): ComponentFixture<T> {
+     TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection(), ...providers],
++      providers,
+       imports: [MatMenuModule, NoopAnimationsModule],
+       declarations: [component, ...declarations],
+     }).compileComponents();
+@@ -96,6 +95,7 @@ describe('MDC-based MatMenu', () => {
+     expect(triggerElement.getAttribute('aria-haspopup')).toBe('menu');
+ 
+     fixture.componentInstance.trigger.menu = null;
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(triggerElement.hasAttribute('aria-haspopup')).toBe(false);
+@@ -371,6 +371,7 @@ describe('MDC-based MatMenu', () => {
+ 
+     // Add 50 items to make the menu scrollable
+     fixture.componentInstance.extraItems = new Array(50).fill('Hello there');
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     const triggerEl = fixture.componentInstance.triggerEl.nativeElement;
+@@ -650,6 +651,7 @@ describe('MDC-based MatMenu', () => {
+     instance.ariaLabel = 'Custom aria-label';
+     instance.ariaLabelledby = 'custom-labelled-by';
+     instance.ariaDescribedby = 'custom-described-by';
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(menuPanel.getAttribute('aria-label')).toBe('Custom aria-label');
+@@ -658,6 +660,7 @@ describe('MDC-based MatMenu', () => {
+ 
+     // Change these to empty strings to make sure that we don't preserve empty attributes.
+     instance.ariaLabel = instance.ariaLabelledby = instance.ariaDescribedby = '';
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+ 
+     expect(menuPanel.hasAttribute('aria-label')).toBe(false);
+@@ -904,11 +907,11 @@ describe('MDC-based MatMenu', () => {
+   }));
+ 
+   it('should throw if assigning a menu that contains the trigger', fakeAsync(() => {
+-    expect(() => {
+-      const fixture = createComponent(InvalidRecursiveMenu, [], [FakeIcon]);
+-      fixture.detectChanges();
+-      tick(500);
+-    }).toThrowError(/menu cannot contain its own trigger/);
++    const errorSpy = spyOn(console, 'error');
++    const fixture = createComponent(InvalidRecursiveMenu, [], [FakeIcon]);
++    fixture.detectChanges();
++    tick(500);
++    expect(errorSpy.calls.first().args[1]).toMatch(/menu cannot contain its own trigger/);
+   }));
+ 
+   it('should be able to swap out a menu after the first time it is opened', fakeAsync(() => {
+@@ -1222,6 +1225,7 @@ describe('MDC-based MatMenu', () => {
+     expect(Math.floor(panelRect.bottom)).toBeLessThan(viewportHeight);
+ 
+     fixture.componentInstance.extraItems = new Array(50).fill('Hello there');
++    fixture.changeDetectorRef.markForCheck();
+     fixture.detectChanges();
+     panelRect = panel.getBoundingClientRect();
+     expect(Math.floor(panelRect.bottom)).toBe(viewportHeight);
+@@ -1408,6 +1412,7 @@ describe('MDC-based MatMenu', () => {
+       trigger.style.top = '200px';
+ 
+       fixture.componentInstance.yPosition = 'above';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       fixture.componentInstance.trigger.openMenu();
+@@ -1425,6 +1430,7 @@ describe('MDC-based MatMenu', () => {
+       tick(500);
+ 
+       fixture.componentInstance.yPosition = 'below';
++      fixture.changeDetectorRef.markForCheck();
+       fixture.detectChanges();
+ 
+       fixture.componentInstance.trigger.openMenu();
+@@ -2499,6 +2505,7 @@ describe('MDC-based MatMenu', () => {
+       fixture.detectChanges();
+       tick(500);
+       fixture.detectChanges();
++      flush();
+ 
+       expect(lazyTrigger.classList)
+         .withContext('Expected the trigger to be highlighted')
+@@ -2711,7 +2718,6 @@ describe('MatMenu default overrides', () => {
+     TestBed.configureTestingModule({
+       imports: [MatMenuModule, NoopAnimationsModule],
+       providers: [
+-        provideZoneChangeDetection(),
+         {
+           provide: MAT_MENU_DEFAULT_OPTIONS,
+           useValue: {overlapTrigger: true, xPosition: 'before', yPosition: 'above'},
