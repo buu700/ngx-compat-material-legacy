@@ -1,0 +1,203 @@
+diff --git a/src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.html b/src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.html
+index 57d9876d271d933fc4ec1bf22b2f8439f2c617b9..7b9b699e0f1ba64ce8037958ce3133b3838531af 100644
+--- a/src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.html
++++ b/src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.html
+@@ -3,8 +3,8 @@
+   <mat-form-field class="example-form-field">
+     <mat-label>Video keywords</mat-label>
+     <mat-chip-grid #reactiveChipGrid aria-label="Enter reactive form keywords" [formControl]="formControl">
+-    @for (keyword of reactiveKeywords(); track keyword) {
+-      <mat-chip-row (removed)="removeReactiveKeyword(keyword)">
++    @for (keyword of formControl.value; track keyword) {
++      <mat-chip-row (removed)="removeKeyword(keyword)">
+         {{keyword}}
+       <button matChipRemove [attr.aria-label]="'remove reactive form' + keyword">
+         <mat-icon>cancel</mat-icon>
+@@ -15,7 +15,7 @@
+     <input
+       placeholder="New keyword..."
+       [matChipInputFor]="reactiveChipGrid"
+-      (matChipInputTokenEnd)="addReactiveKeyword($event)"
++      (matChipInputTokenEnd)="addKeyword($event)"
+     />
+   </mat-form-field>
+ </section>
+diff --git a/src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.ts b/src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.ts
+index 3f6125a926e0cbc8dd644e18b0e876373679e78a..30e9b8e97866db3cae8a71337b4a84fd592aacf3 100644
+--- a/src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.ts
++++ b/src/components-examples/material/chips/chips-reactive-form/chips-reactive-form-example.ts
+@@ -1,5 +1,5 @@
+ import {LiveAnnouncer} from '@angular/cdk/a11y';
+-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
++import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+ import {FormControl, ReactiveFormsModule} from '@angular/forms';
+ import {MatButtonModule} from '@angular/material/button';
+ import {MatChipInputEvent, MatChipsModule} from '@angular/material/chips';
+@@ -23,34 +23,31 @@ import {MatIconModule} from '@angular/material/icon';
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })
+ export class ChipsReactiveFormExample {
+-  readonly reactiveKeywords = signal(['angular', 'how-to', 'tutorial', 'accessibility']);
+-  readonly formControl = new FormControl(['angular']);
++  private _announcer = inject(LiveAnnouncer);
+ 
+-  announcer = inject(LiveAnnouncer);
++  readonly formControl = new FormControl(['angular', 'how-to', 'tutorial', 'accessibility'], {
++    nonNullable: true,
++  });
+ 
+-  removeReactiveKeyword(keyword: string) {
+-    this.reactiveKeywords.update(keywords => {
+-      const index = keywords.indexOf(keyword);
+-      if (index < 0) {
+-        return keywords;
+-      }
+-
+-      keywords.splice(index, 1);
+-      this.announcer.announce(`removed ${keyword} from reactive form`);
+-      return [...keywords];
+-    });
+-  }
+-
+-  addReactiveKeyword(event: MatChipInputEvent): void {
++  addKeyword(event: MatChipInputEvent): void {
+     const value = (event.value || '').trim();
+ 
+-    // Add our keyword
+     if (value) {
+-      this.reactiveKeywords.update(keywords => [...keywords, value]);
+-      this.announcer.announce(`added ${value} to reactive form`);
++      this.formControl.setValue([...this.formControl.value, value]);
++      this._announcer.announce(`added ${value} to reactive form`);
+     }
+ 
+-    // Clear the input value
+-    event.chipInput!.clear();
++    event.chipInput.clear();
++  }
++
++  removeKeyword(keyword: string) {
++    const keywords = this.formControl.value;
++    const index = keywords.lastIndexOf(keyword);
++
++    if (index > -1) {
++      keywords.splice(index, 1);
++      this.formControl.setValue([...keywords]);
++      this._announcer.announce(`removed ${keyword} from reactive form`);
++    }
+   }
+ }
+diff --git a/src/components-examples/material/chips/chips-template-form/chips-template-form-example.html b/src/components-examples/material/chips/chips-template-form/chips-template-form-example.html
+index 46dd40bdeb30d766d421b2ed108f8bf08bcfb757..1feb99194dfceee0bcd1ee8cfe398b1f67023641 100644
+--- a/src/components-examples/material/chips/chips-template-form/chips-template-form-example.html
++++ b/src/components-examples/material/chips/chips-template-form/chips-template-form-example.html
+@@ -2,9 +2,9 @@
+   <h4>Chips inside of a Template-driven form</h4>
+   <mat-form-field class="example-form-field">
+     <mat-label>Video keywords</mat-label>
+-    <mat-chip-grid #templateChipGrid aria-label="Enter template form keywords" [(ngModel)]="templateKeywords">
+-    @for (keyword of templateKeywords(); track keyword) {
+-      <mat-chip-row (removed)="removeTemplateKeyword(keyword)">
++    <mat-chip-grid #templateChipGrid aria-label="Enter template form keywords" [(ngModel)]="keywords">
++    @for (keyword of keywords(); track keyword) {
++      <mat-chip-row (removed)="removeKeyword(keyword)">
+         {{keyword}}
+       <button matChipRemove [attr.aria-label]="'remove template form' + keyword">
+         <mat-icon>cancel</mat-icon>
+@@ -15,7 +15,7 @@
+     <input
+       placeholder="New keyword..."
+       [matChipInputFor]="templateChipGrid"
+-      (matChipInputTokenEnd)="addTemplateKeyword($event)"
++      (matChipInputTokenEnd)="addKeyword($event)"
+     />
+   </mat-form-field>
+ </section>
+diff --git a/src/components-examples/material/chips/chips-template-form/chips-template-form-example.ts b/src/components-examples/material/chips/chips-template-form/chips-template-form-example.ts
+index 5c0f01338ffefd2888217a0a08406a0cea155833..1721385ba8067aed93bb7e8a3b86657a504bcfbf 100644
+--- a/src/components-examples/material/chips/chips-template-form/chips-template-form-example.ts
++++ b/src/components-examples/material/chips/chips-template-form/chips-template-form-example.ts
+@@ -17,33 +17,30 @@ import {MatIconModule} from '@angular/material/icon';
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })
+ export class ChipsTemplateFormExample {
+-  readonly templateKeywords = signal(['angular', 'how-to', 'tutorial', 'accessibility']);
++  private _announcer = inject(LiveAnnouncer);
++  readonly keywords = signal(['angular', 'how-to', 'tutorial', 'accessibility']);
+ 
+-  announcer = inject(LiveAnnouncer);
++  addKeyword(event: MatChipInputEvent): void {
++    const value = (event.value || '').trim();
++
++    if (value) {
++      this.keywords.update(keywords => [...keywords, value]);
++      this._announcer.announce(`added ${value} to template form`);
++    }
+ 
+-  removeTemplateKeyword(keyword: string) {
+-    this.templateKeywords.update(keywords => {
++    event.chipInput.clear();
++  }
++
++  removeKeyword(keyword: string) {
++    this.keywords.update(keywords => {
+       const index = keywords.indexOf(keyword);
+       if (index < 0) {
+         return keywords;
+       }
+ 
+       keywords.splice(index, 1);
+-      this.announcer.announce(`removed ${keyword} from template form`);
++      this._announcer.announce(`removed ${keyword} from template form`);
+       return [...keywords];
+     });
+   }
+-
+-  addTemplateKeyword(event: MatChipInputEvent): void {
+-    const value = (event.value || '').trim();
+-
+-    // Add our keyword
+-    if (value) {
+-      this.templateKeywords.update(keywords => [...keywords, value]);
+-      this.announcer.announce(`added ${value} to template form`);
+-    }
+-
+-    // Clear the input value
+-    event.chipInput!.clear();
+-  }
+ }
+diff --git a/src/material/tooltip/tooltip.spec.ts b/src/material/tooltip/tooltip.spec.ts
+index 7d12b2f40fa288e6856caf412ee17ea4c52aa868..248555811dab9f55153d7e0416d5914956e2b321 100644
+--- a/src/material/tooltip/tooltip.spec.ts
++++ b/src/material/tooltip/tooltip.spec.ts
+@@ -1270,24 +1270,25 @@ describe('MatTooltip', () => {
+       platform.ANDROID = true;
+     });
+ 
+-    it('should have a delay when showing on touchstart', async () => {
++    // Note: switching this test away from `fakeAsync` causes it to fail only on CI.
++    it('should have a delay when showing on touchstart', fakeAsync(() => {
+       const fixture = TestBed.createComponent(BasicTooltipDemo);
+       fixture.detectChanges();
+       const button: HTMLButtonElement = fixture.nativeElement.querySelector('button');
+ 
+       dispatchFakeEvent(button, 'touchstart');
+       fixture.detectChanges();
+-      await wait(250); // Halfway through the delay.
++      tick(250); // Halfway through the delay.
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, false);
+ 
+-      await wait(600); // Finish the delay.
++      tick(500); // Finish the delay.
+       fixture.detectChanges();
+-      await fixture.whenStable();
+       finishCurrentTooltipAnimation(overlayContainerElement, true); // Finish the animation.
+ 
+       assertTooltipInstance(fixture.componentInstance.tooltip, true);
+-    });
++      flush();
++    }));
+ 
+     it('should be able to disable opening on touch', async () => {
+       const fixture = TestBed.createComponent(BasicTooltipDemo);

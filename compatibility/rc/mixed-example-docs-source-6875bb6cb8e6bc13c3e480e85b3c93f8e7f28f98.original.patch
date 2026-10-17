@@ -1,0 +1,216 @@
+diff --git a/src/components-examples/material-experimental/popover-edit/popover-edit-mat-table/popover-edit-mat-table-example.ts b/src/components-examples/material-experimental/popover-edit/popover-edit-mat-table/popover-edit-mat-table-example.ts
+index 1e051a32a336db736ed03f3e71ed9d40f78aa0ee..72aef700b26650718efe8958f2df650885b77133 100644
+--- a/src/components-examples/material-experimental/popover-edit/popover-edit-mat-table/popover-edit-mat-table-example.ts
++++ b/src/components-examples/material-experimental/popover-edit/popover-edit-mat-table/popover-edit-mat-table-example.ts
+@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
+ import {DataSource} from '@angular/cdk/collections';
+ import {FormValueContainer, CdkPopoverEditModule} from '@angular/cdk-experimental/popover-edit';
+ import {NgForm, FormsModule} from '@angular/forms';
+-import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
++import {MatSnackBar} from '@angular/material/snack-bar';
+ import {BehaviorSubject, Observable} from 'rxjs';
+ import {MatListModule} from '@angular/material/list';
+ import {MatCheckboxModule} from '@angular/material/checkbox';
+@@ -218,7 +218,6 @@ const FANTASY_ELEMENTS: readonly FantasyElement[] = [
+     MatIconModule,
+     MatCheckboxModule,
+     MatListModule,
+-    MatSnackBarModule,
+   ],
+ })
+ export class PopoverEditMatTableExample {
+diff --git a/src/components-examples/material/snack-bar/snack-bar-annotated-component/snack-bar-annotated-component-example.ts b/src/components-examples/material/snack-bar/snack-bar-annotated-component/snack-bar-annotated-component-example.ts
+index 66b03ab98879b3036d07162ad4e652fb51863983..c6c7b4445746a7d141d74f04c6f24553b220be99 100644
+--- a/src/components-examples/material/snack-bar/snack-bar-annotated-component/snack-bar-annotated-component-example.ts
++++ b/src/components-examples/material/snack-bar/snack-bar-annotated-component/snack-bar-annotated-component-example.ts
+@@ -1,5 +1,11 @@
+ import {Component, inject} from '@angular/core';
+-import {MatSnackBar, MatSnackBarRef, MatSnackBarModule} from '@angular/material/snack-bar';
++import {
++  MatSnackBar,
++  MatSnackBarAction,
++  MatSnackBarActions,
++  MatSnackBarLabel,
++  MatSnackBarRef,
++} from '@angular/material/snack-bar';
+ import {MatButtonModule} from '@angular/material/button';
+ import {MatInputModule} from '@angular/material/input';
+ import {FormsModule} from '@angular/forms';
+@@ -13,7 +19,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
+   templateUrl: 'snack-bar-annotated-component-example.html',
+   styleUrls: ['snack-bar-annotated-component-example.css'],
+   standalone: true,
+-  imports: [MatFormFieldModule, FormsModule, MatInputModule, MatButtonModule, MatSnackBarModule],
++  imports: [MatFormFieldModule, FormsModule, MatInputModule, MatButtonModule],
+ })
+ export class SnackBarAnnotatedComponentExample {
+   durationInSeconds = 5;
+@@ -42,7 +48,7 @@ export class SnackBarAnnotatedComponentExample {
+   `,
+   ],
+   standalone: true,
+-  imports: [MatButtonModule, MatSnackBarModule],
++  imports: [MatButtonModule, MatSnackBarLabel, MatSnackBarActions, MatSnackBarAction],
+ })
+ export class PizzaPartyAnnotatedComponent {
+   snackBarRef = inject(MatSnackBarRef);
+diff --git a/src/components-examples/material/snack-bar/snack-bar-component/snack-bar-component-example.ts b/src/components-examples/material/snack-bar/snack-bar-component/snack-bar-component-example.ts
+index 04fb85354cc26d2c37e8d1ca0ea9e3b325404b1e..8d92c2270e098281f41e7f86a907f900aa7a79b8 100644
+--- a/src/components-examples/material/snack-bar/snack-bar-component/snack-bar-component-example.ts
++++ b/src/components-examples/material/snack-bar/snack-bar-component/snack-bar-component-example.ts
+@@ -1,5 +1,5 @@
+ import {Component} from '@angular/core';
+-import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
++import {MatSnackBar} from '@angular/material/snack-bar';
+ import {MatButtonModule} from '@angular/material/button';
+ import {MatInputModule} from '@angular/material/input';
+ import {FormsModule} from '@angular/forms';
+@@ -13,7 +13,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
+   templateUrl: 'snack-bar-component-example.html',
+   styleUrls: ['snack-bar-component-example.css'],
+   standalone: true,
+-  imports: [MatFormFieldModule, FormsModule, MatInputModule, MatButtonModule, MatSnackBarModule],
++  imports: [MatFormFieldModule, FormsModule, MatInputModule, MatButtonModule],
+ })
+ export class SnackBarComponentExample {
+   durationInSeconds = 5;
+diff --git a/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.spec.ts b/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.spec.ts
+index 00e534d3f15a1258bfa32e5de735d1b07d1644ef..72cd81317f0a0b4b1b6f71e08afd106e85962e21 100644
+--- a/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.spec.ts
++++ b/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.spec.ts
+@@ -4,7 +4,6 @@ import {HarnessLoader} from '@angular/cdk/testing';
+ import {SnackBarHarnessExample} from './snack-bar-harness-example';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatSnackBarHarness} from '@angular/material/snack-bar/testing';
+-import {MatSnackBarModule} from '@angular/material/snack-bar';
+ 
+ describe('SnackBarHarnessExample', () => {
+   let fixture: ComponentFixture<SnackBarHarnessExample>;
+@@ -12,7 +11,7 @@ describe('SnackBarHarnessExample', () => {
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({
+-      imports: [MatSnackBarModule, NoopAnimationsModule],
++      imports: [NoopAnimationsModule],
+     }).compileComponents();
+     fixture = TestBed.createComponent(SnackBarHarnessExample);
+     fixture.detectChanges();
+diff --git a/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.ts b/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.ts
+index 2d678a2d785d0fce93d6f5d9df9420c03a6f9858..b95db9a4f45e4ec8e14ad6cbab8a4e5de2565b81 100644
+--- a/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.ts
++++ b/src/components-examples/material/snack-bar/snack-bar-harness/snack-bar-harness-example.ts
+@@ -1,5 +1,5 @@
+ import {Component} from '@angular/core';
+-import {MatSnackBar, MatSnackBarConfig, MatSnackBarModule} from '@angular/material/snack-bar';
++import {MatSnackBar, MatSnackBarConfig} from '@angular/material/snack-bar';
+ 
+ /**
+  * @title Testing with MatSnackBarHarness
+@@ -8,7 +8,6 @@ import {MatSnackBar, MatSnackBarConfig, MatSnackBarModule} from '@angular/materi
+   selector: 'snack-bar-harness-example',
+   templateUrl: 'snack-bar-harness-example.html',
+   standalone: true,
+-  imports: [MatSnackBarModule],
+ })
+ export class SnackBarHarnessExample {
+   constructor(readonly snackBar: MatSnackBar) {}
+diff --git a/src/components-examples/material/snack-bar/snack-bar-overview/snack-bar-overview-example.ts b/src/components-examples/material/snack-bar/snack-bar-overview/snack-bar-overview-example.ts
+index 59931d41d0848664b0ca90d6f8870d253da72286..5a389aeca5c8faff83418bcef90443985e814745 100644
+--- a/src/components-examples/material/snack-bar/snack-bar-overview/snack-bar-overview-example.ts
++++ b/src/components-examples/material/snack-bar/snack-bar-overview/snack-bar-overview-example.ts
+@@ -1,5 +1,5 @@
+ import {Component} from '@angular/core';
+-import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
++import {MatSnackBar} from '@angular/material/snack-bar';
+ import {MatButtonModule} from '@angular/material/button';
+ import {MatInputModule} from '@angular/material/input';
+ import {MatFormFieldModule} from '@angular/material/form-field';
+@@ -12,7 +12,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
+   templateUrl: 'snack-bar-overview-example.html',
+   styleUrls: ['snack-bar-overview-example.css'],
+   standalone: true,
+-  imports: [MatFormFieldModule, MatInputModule, MatButtonModule, MatSnackBarModule],
++  imports: [MatFormFieldModule, MatInputModule, MatButtonModule],
+ })
+ export class SnackBarOverviewExample {
+   constructor(private _snackBar: MatSnackBar) {}
+diff --git a/src/components-examples/material/snack-bar/snack-bar-position/snack-bar-position-example.ts b/src/components-examples/material/snack-bar/snack-bar-position/snack-bar-position-example.ts
+index 6d1762fdbe2544fa60f9eed28c3f119a3b46fa70..b063a580196534490a96dab41fcf7252bde5b850 100644
+--- a/src/components-examples/material/snack-bar/snack-bar-position/snack-bar-position-example.ts
++++ b/src/components-examples/material/snack-bar/snack-bar-position/snack-bar-position-example.ts
+@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
+ import {
+   MatSnackBar,
+   MatSnackBarHorizontalPosition,
+-  MatSnackBarModule,
+   MatSnackBarVerticalPosition,
+ } from '@angular/material/snack-bar';
+ import {MatButtonModule} from '@angular/material/button';
+@@ -17,7 +16,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
+   templateUrl: 'snack-bar-position-example.html',
+   styleUrls: ['snack-bar-position-example.css'],
+   standalone: true,
+-  imports: [MatFormFieldModule, MatSelectModule, MatButtonModule, MatSnackBarModule],
++  imports: [MatFormFieldModule, MatSelectModule, MatButtonModule],
+ })
+ export class SnackBarPositionExample {
+   horizontalPosition: MatSnackBarHorizontalPosition = 'start';
+diff --git a/src/material/snack-bar/testing/snack-bar-harness.spec.ts b/src/material/snack-bar/testing/snack-bar-harness.spec.ts
+index 5def8c89960628ef98920f686f7beb20db3a895d..fc83c3c6b6ceb796a780e195b7028fa61c1a3ba5 100644
+--- a/src/material/snack-bar/testing/snack-bar-harness.spec.ts
++++ b/src/material/snack-bar/testing/snack-bar-harness.spec.ts
+@@ -2,7 +2,13 @@ import {Component, TemplateRef, ViewChild} from '@angular/core';
+ import {ComponentFixture, TestBed} from '@angular/core/testing';
+ import {HarnessLoader} from '@angular/cdk/testing';
+ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+-import {MatSnackBar, MatSnackBarConfig, MatSnackBarModule} from '@angular/material/snack-bar';
++import {
++  MatSnackBar,
++  MatSnackBarAction,
++  MatSnackBarActions,
++  MatSnackBarConfig,
++  MatSnackBarLabel,
++} from '@angular/material/snack-bar';
+ import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+ import {MatSnackBarHarness} from './snack-bar-harness';
+ 
+@@ -12,8 +18,7 @@ describe('MatSnackBarHarness', () => {
+ 
+   beforeEach(async () => {
+     await TestBed.configureTestingModule({
+-      imports: [MatSnackBarModule, NoopAnimationsModule],
+-      declarations: [SnackbarHarnessTest],
++      imports: [NoopAnimationsModule],
+     }).compileComponents();
+ 
+     fixture = TestBed.createComponent(SnackbarHarnessTest);
+@@ -166,6 +171,8 @@ describe('MatSnackBarHarness', () => {
+       <div matSnackBarActions><button matSnackBarAction>Ok</button></div>
+     </ng-template>
+   `,
++  standalone: true,
++  imports: [MatSnackBarLabel, MatSnackBarActions, MatSnackBarAction],
+ })
+ class SnackbarHarnessTest {
+   @ViewChild('custom') customTmpl: TemplateRef<any>;
+diff --git a/src/universal-app/kitchen-sink/kitchen-sink.ts b/src/universal-app/kitchen-sink/kitchen-sink.ts
+index ee0a82360597d44b2100ea36e1d34f3fb485825d..6503fd402389030a3220223b917083c46ce5b65a 100644
+--- a/src/universal-app/kitchen-sink/kitchen-sink.ts
++++ b/src/universal-app/kitchen-sink/kitchen-sink.ts
+@@ -27,7 +27,7 @@ import {MatSelectModule} from '@angular/material/select';
+ import {MatSidenavModule} from '@angular/material/sidenav';
+ import {MatSliderModule} from '@angular/material/slider';
+ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+-import {MatSnackBarModule, MatSnackBar} from '@angular/material/snack-bar';
++import {MatSnackBar} from '@angular/material/snack-bar';
+ import {MatTabsModule} from '@angular/material/tabs';
+ import {MatToolbarModule} from '@angular/material/toolbar';
+ import {MatTooltipModule} from '@angular/material/tooltip';
+@@ -92,7 +92,6 @@ export class TestEntryComponent {}
+     MatSidenavModule,
+     MatSliderModule,
+     MatSlideToggleModule,
+-    MatSnackBarModule,
+     MatTabsModule,
+     MatToolbarModule,
+     MatTooltipModule,

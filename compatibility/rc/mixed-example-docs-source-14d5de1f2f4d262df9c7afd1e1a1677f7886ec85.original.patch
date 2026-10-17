@@ -1,0 +1,131 @@
+diff --git a/src/cdk/dialog/dialog.spec.ts b/src/cdk/dialog/dialog.spec.ts
+index 85e4e96bc3973b23e8aa3b8cb3240e8e1ec9754f..688949e10bf8f6cadb16ea44822e7684a6307041 100644
+--- a/src/cdk/dialog/dialog.spec.ts
++++ b/src/cdk/dialog/dialog.spec.ts
+@@ -875,7 +875,7 @@ describe('Dialog', () => {
+       flushMicrotasks();
+ 
+       let firstHeader = overlayContainerElement.querySelector(
+-        'h1[tabindex="-1"]',
++        'h2[tabindex="-1"]',
+       ) as HTMLInputElement;
+ 
+       expect(document.activeElement)
+@@ -1270,7 +1270,7 @@ class PizzaMsg {
+ 
+ @Component({
+   template: `
+-    <h1>This is the title</h1>
++    <h2>This is the title</h2>
+   `,
+   standalone: true,
+   imports: [DialogModule],
+diff --git a/src/components-examples/material/dialog/dialog-animations/dialog-animations-example-dialog.html b/src/components-examples/material/dialog/dialog-animations/dialog-animations-example-dialog.html
+index 383de5d18a112bb07b63866834843cb719c107f9..1c983e5e89be1a95088c2dc89f9e8253b0556f39 100644
+--- a/src/components-examples/material/dialog/dialog-animations/dialog-animations-example-dialog.html
++++ b/src/components-examples/material/dialog/dialog-animations/dialog-animations-example-dialog.html
+@@ -1,4 +1,4 @@
+-<h1 mat-dialog-title>Delete file</h1>
++<h2 mat-dialog-title>Delete file</h2>
+ <mat-dialog-content>
+   Would you like to delete cat.jpeg?
+ </mat-dialog-content>
+diff --git a/src/components-examples/material/dialog/dialog-data/dialog-data-example-dialog.html b/src/components-examples/material/dialog/dialog-data/dialog-data-example-dialog.html
+index cb99aabd92162b78a59fa9c8b1bce626351a9711..6b7e7cc8b5215d9153b1a1632e53e4ba629da07f 100644
+--- a/src/components-examples/material/dialog/dialog-data/dialog-data-example-dialog.html
++++ b/src/components-examples/material/dialog/dialog-data/dialog-data-example-dialog.html
+@@ -1,4 +1,4 @@
+-<h1 mat-dialog-title>Favorite Animal</h1>
++<h2 mat-dialog-title>Favorite Animal</h2>
+ <mat-dialog-content>
+   My favorite animal is:
+   <ul>
+diff --git a/src/components-examples/material/dialog/dialog-elements/dialog-elements-example-dialog.html b/src/components-examples/material/dialog/dialog-elements/dialog-elements-example-dialog.html
+index 8b0bf4346eb86b9d69bdfe27a458fa74c080b2ee..206c9a3efa6009b890b7da45febe4bde36cff1ba 100644
+--- a/src/components-examples/material/dialog/dialog-elements/dialog-elements-example-dialog.html
++++ b/src/components-examples/material/dialog/dialog-elements/dialog-elements-example-dialog.html
+@@ -1,4 +1,4 @@
+-<h1 mat-dialog-title>Dialog with elements</h1>
++<h2 mat-dialog-title>Dialog with elements</h2>
+ <mat-dialog-content>This dialog showcases the title, close, content and actions elements.</mat-dialog-content>
+ <mat-dialog-actions>
+   <button mat-button mat-dialog-close>Close</button>
+diff --git a/src/components-examples/material/dialog/dialog-overview/dialog-overview-example-dialog.html b/src/components-examples/material/dialog/dialog-overview/dialog-overview-example-dialog.html
+index 9f19909a6f2fd37fa76b8d15a72af64611a75fcd..212816310692d8e3d619ecf961c86255aecf06e7 100644
+--- a/src/components-examples/material/dialog/dialog-overview/dialog-overview-example-dialog.html
++++ b/src/components-examples/material/dialog/dialog-overview/dialog-overview-example-dialog.html
+@@ -1,4 +1,4 @@
+-<h1 mat-dialog-title>Hi {{data.name}}</h1>
++<h2 mat-dialog-title>Hi {{data.name}}</h2>
+ <mat-dialog-content>
+   <p>What's your favorite animal?</p>
+   <mat-form-field>
+diff --git a/src/dev-app/slider/slider-demo.ts b/src/dev-app/slider/slider-demo.ts
+index e7a6a703ba8036a00ce221584ac1ef875d7694ad..a0715e5fb16d7975c78b5f7c62d1d7999011b00b 100644
+--- a/src/dev-app/slider/slider-demo.ts
++++ b/src/dev-app/slider/slider-demo.ts
+@@ -123,7 +123,7 @@ export class SliderDemo {
+   selector: 'slider-dialog-demo',
+   styleUrls: ['slider-demo.css'],
+   template: `
+-  <h1 mat-dialog-title>Slider in a dialog</h1>
++  <h2 mat-dialog-title>Slider in a dialog</h2>
+   <mat-dialog-content class="demo-dialog-content">
+   <mat-slider [discrete]="this.data.discrete" [showTickMarks]="this.data.showTickMarks" [color]="this.data.color" step="10">
+       <input value="50" matSliderThumb>
+diff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts
+index 0c36e322b8c9fba8f0a079f98ebb4a98ae061c65..e0bb260b150604bb5bceba9321322d92f273906b 100644
+--- a/src/material/dialog/dialog.spec.ts
++++ b/src/material/dialog/dialog.spec.ts
+@@ -1214,7 +1214,7 @@ describe('MDC-based MatDialog', () => {
+       flushMicrotasks();
+ 
+       let firstHeader = overlayContainerElement.querySelector(
+-        'h1[tabindex="-1"]',
++        'h2[tabindex="-1"]',
+       ) as HTMLInputElement;
+ 
+       expect(document.activeElement)
+@@ -1625,7 +1625,7 @@ describe('MDC-based MatDialog', () => {
+       @Component({
+         standalone: true,
+         imports: [MatDialogTitle],
+-        template: `@if (showTitle()) { <h1 mat-dialog-title>This is the first title</h1> }`,
++        template: `@if (showTitle()) { <h2 mat-dialog-title>This is the first title</h2> }`,
+       })
+       class DialogCmp {
+         showTitle = signal(true);
+@@ -2240,13 +2240,13 @@ class PizzaMsg {
+ @Component({
+   template: `
+     @if (shouldShowTitle('first')) {
+-      <h1 mat-dialog-title>This is the first title</h1>
++      <h2 mat-dialog-title>This is the first title</h2>
+     }
+     @if (shouldShowTitle('second')) {
+-      <h1 mat-dialog-title>This is the second title</h1>
++      <h2 mat-dialog-title>This is the second title</h2>
+     }
+     @if (shouldShowTitle('third')) {
+-      <h1 mat-dialog-title>This is the third title</h1>
++      <h2 mat-dialog-title>This is the third title</h2>
+     }
+     <mat-dialog-content>Lorem ipsum dolor sit amet.</mat-dialog-content>
+     <mat-dialog-actions align="end">
+@@ -2275,13 +2275,13 @@ class ContentElementDialog {
+   template: `
+     <ng-template>
+       @if (shouldShowTitle('first')) {
+-        <h1 mat-dialog-title>This is the first title</h1>
++        <h2 mat-dialog-title>This is the first title</h2>
+       }
+       @if (shouldShowTitle('second')) {
+-        <h1 mat-dialog-title>This is the second title</h1>
++        <h2 mat-dialog-title>This is the second title</h2>
+       }
+       @if (shouldShowTitle('third')) {
+-        <h1 mat-dialog-title>This is the third title</h1>
++        <h2 mat-dialog-title>This is the third title</h2>
+       }
+       <mat-dialog-content>Lorem ipsum dolor sit amet.</mat-dialog-content>
+       <mat-dialog-actions align="end">
