@@ -1,0 +1,874 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "original_files": 1,
+  "original_hunks": 2,
+  "diff": "diff --git a/src/material/tabs/tab-body.ts b/src/material/tabs/tab-body.ts\nindex a52281986e79c4ec0123b23e7009190e59a0fbe1..e9f3ecc5d32539340a9a98accdb1e707970bd43e 100644\n--- a/src/material/tabs/tab-body.ts\n+++ b/src/material/tabs/tab-body.ts\n@@ -26,7 +26,7 @@ import {\n   inject,\n } from '@angular/core';\n import {Subject, Subscription} from 'rxjs';\n-import {distinctUntilChanged, startWith} from 'rxjs/operators';\n+import {startWith} from 'rxjs/operators';\n import {matTabsAnimations} from './tabs-animations';\n \n /**\n@@ -174,24 +174,16 @@ export class MatTabBody implements OnInit, OnDestroy {\n       });\n     }\n \n-    // Ensure that we get unique animation events, because the `.done` callback can get\n-    // invoked twice in some browsers. See https://github.com/angular/angular/issues/24084.\n-    this._translateTabComplete\n-      .pipe(\n-        distinctUntilChanged((x, y) => {\n-          return x.fromState === y.fromState && x.toState === y.toState;\n-        }),\n-      )\n-      .subscribe(event => {\n-        // If the transition to the center is complete, emit an event.\n-        if (this._isCenterPosition(event.toState) && this._isCenterPosition(this._position)) {\n-          this._onCentered.emit();\n-        }\n+    this._translateTabComplete.subscribe(event => {\n+      // If the transition to the center is complete, emit an event.\n+      if (this._isCenterPosition(event.toState) && this._isCenterPosition(this._position)) {\n+        this._onCentered.emit();\n+      }\n \n-        if (this._isCenterPosition(event.fromState) && !this._isCenterPosition(this._position)) {\n-          this._afterLeavingCenter.emit();\n-        }\n-      });\n+      if (this._isCenterPosition(event.fromState) && !this._isCenterPosition(this._position)) {\n+        this._afterLeavingCenter.emit();\n+      }\n+    });\n   }\n \n   /**\n",
+  "diff_sha256": "8c5c7c7e24faef142a0320faf51bd61cecd10c7e06eeeeb15ddc0f53cb654083",
+  "hunk_reviews": [
+    {
+      "path": "src/material/tabs/tab-body.ts",
+      "header": "@@ -26,7 +26,7 @@ import {",
+      "hunk_sha256": "7068f6d2b038ac8fd5ea581fd89df4a2a44eb9bf934d53e83351c42e09799be4",
+      "judgment": "The operator import removal belongs to the same upstream removal of the completion-state filter. The owned source keeps the stable public rxjs/operators distinctUntilChanged import, compatible with the existing RxJS peer range. No modern peer constructor, animation-engine helper, private import or consumer API migration is introduced."
+    },
+    {
+      "path": "src/material/tabs/tab-body.ts",
+      "header": "@@ -174,24 +174,16 @@ export class MatTabBody implements OnInit, OnDestroy {",
+      "hunk_sha256": "be438418832d87a2f0fba80632f324d83dbaf0eeaec5b266c3f12f94ce3f673c",
+      "judgment": "The constructor hunk removes both-state equality filtering while preserving the centered/leaving checks. The complete untouched historical base and actual owned base produce the same output histories for duplicate center/leave, real repeated cycles, changed source/destination, obsolete state and both origin names. Removing the filter changes those reference observations and is rejected. The current owned motion lifecycle is tested independently with47 cases/22 rejected mutants; the public group animationDone path and portal detach wiring remain. Keep the original output contract and require genuine trusted native completion on all registered modes/engines/runtimes."
+    }
+  ],
+  "decision": "Retain the complete historical completion subscription, including distinctUntilChanged on both state names and the existing asynchronous centered output. Removing the RxJS operator changes the untouched Material16 output contract under duplicate callbacks; both exact minimum current peer methods belong to the modern component and are not the legacy subscription contract. The current owned source preserves this filter and constructor/output metadata while separately repairing incoming/departing and newly created origin lifecycle timing. Require trusted native incoming/departing/both-origin transitions, correct height, exactly-once public completion and cleanup in the complete same-run native matrix. Source protocols and historical replay do not qualify native execution.",
+  "individual_proof": {
+    "proof_kind": "native-required-individual-tab-completion",
+    "diff_sha256": "8c5c7c7e24faef142a0320faf51bd61cecd10c7e06eeeeb15ddc0f53cb654083",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Retain the complete historical completion subscription, including distinctUntilChanged on both state names and the existing asynchronous centered output. Removing the RxJS operator changes the untouched Material16 output contract under duplicate callbacks; both exact minimum current peer methods belong to the modern component and are not the legacy subscription contract. The current owned source preserves this filter and constructor/output metadata while separately repairing incoming/departing and newly created origin lifecycle timing. Require trusted native incoming/departing/both-origin transitions, correct height, exactly-once public completion and cleanup in the complete same-run native matrix. Source protocols and historical replay do not qualify native execution.",
+    "peer_reference": {
+      "package": "@angular/material",
+      "version": "21.2.14",
+      "path": "compatibility/rc/tab-completion-peer-sources/21.2.14.tabs.mjs.gz",
+      "sha256": "5a798a54a86a966501288531be98f12338b28463543324c2b16e9756b64b418d",
+      "member": "unmodified peer tabs module"
+    },
+    "tab_completion_behavior": {
+      "kind": "historical-tab-completion-state-filter",
+      "source_members": [
+        {
+          "path": "scripts/upstream-tab-completion-evidence.mjs",
+          "sha256": "558cfa249b8befa05b24387d22f09033208f09a0da76440be40c98cafe65d74a"
+        },
+        {
+          "path": "scripts/upstream-native-motion-run-evidence.mjs",
+          "sha256": "2bcc912bef254c6a6365bda192ac9f887359e1f5d1068376fc21289ee983d399"
+        },
+        {
+          "path": "scripts/upstream-packed-run-evidence.mjs",
+          "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+        },
+        {
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+        },
+        {
+          "path": "scripts/rc-verify.py",
+          "sha256": "665d42097cfd383e4f99e9e46ab7639813414051360f2569581aed2e669855e8"
+        },
+        {
+          "path": "scripts/native-motion-acceptance.mjs",
+          "sha256": "859cc5e981bce80c4c54e7c36b25f2303b324fe63470eed0ef51914da4581518"
+        },
+        {
+          "path": "scripts/native-motion-roster.mjs",
+          "sha256": "91e6cc5b79463407f7b47ca6cad32eb04e7f25b90859461c0796901c618430f2"
+        },
+        {
+          "path": "scripts/native-motion-run.mjs",
+          "sha256": "a1385e9604f8b243ef766e85669c09f2200115938f6eb52fecbaab92ebba6c59"
+        },
+        {
+          "path": "scripts/native-motion-page.mjs",
+          "sha256": "376072104c126bae2a18d0cc2c6afd28ece6cffb2ff2e90691ab924c66757596"
+        },
+        {
+          "path": "scripts/native-motion-consumer.ts",
+          "sha256": "e9bf194677879f978ddbc574f33f13b0d709ade42d53dbb0542d1bb670a77e3a"
+        },
+        {
+          "path": "scripts/browser-matrix-roster.mjs",
+          "sha256": "f2e7a47be98d5cc5650930e663ff13de7f27554c7180d1cb3eb8661c394637ca"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "7ad45f46e30876888753c2cf2dbebab11d12327dc87cc0dbdec520440cd098ed"
+        },
+        {
+          "path": "compatibility/rc/matrices/library-exports.json",
+          "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+        },
+        {
+          "path": "projects/ngx-material-legacy/package.json",
+          "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+          "sha256": "9133c2404db7ef40b39819969e310a71caf660c9d9c05ecfd16a8a4fe6ea0154"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.ts",
+          "sha256": "7560de8c08198b04eddb701df4008225bbaa1f93847de7a17439295fec85fd80"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+          "sha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.html",
+          "sha256": "c2357fd60f548fb15f4a347be322b6ec36279c5bcd5729124962f7fcf03d2161"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+          "sha256": "c4d86c99bfeed0a10d6451e034ade808bfb52b4240471e1aef5ccd47e3f124f1"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.scss",
+          "sha256": "7fedca13e121d806da356e39836d1abb3353c62a3a54745790c9cdaa50e07d5a"
+        },
+        {
+          "path": "reference/material-16.2.14/component-motion-sources/tabs/tab-body.ts",
+          "sha256": "b8cae68f00521586ecf1b69d3bce277c3e1eeba35997b05b91223b1ffcbdfaf7"
+        },
+        {
+          "path": "compatibility/rc/tab-completion-peer-sources/21.2.14.tabs.mjs.gz",
+          "sha256": "a30b867e686a96fba2b3ef62d784e323fdacd753e069222258427188d77c7463"
+        }
+      ],
+      "engines": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "runtimes": [
+        "zoneful",
+        "zoneless"
+      ],
+      "modes": [
+        "enabled",
+        "provider-disabled",
+        "reduced",
+        "zero"
+      ],
+      "case_ids": [
+        "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/enabled",
+        "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/enabled",
+        "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/enabled",
+        "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/enabled",
+        "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/enabled",
+        "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/enabled",
+        "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+        "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+        "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+        "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+        "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+        "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+        "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/reduced",
+        "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/reduced",
+        "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/reduced",
+        "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/reduced",
+        "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/reduced",
+        "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/reduced",
+        "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/zero",
+        "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/zero",
+        "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/zero",
+        "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/zero",
+        "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/zero",
+        "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/zero",
+        "native-motion/21.x/chromium/zoneful/interruption-destruction/tabs/rapid-reversal",
+        "native-motion/21.x/firefox/zoneful/interruption-destruction/tabs/rapid-reversal",
+        "native-motion/21.x/webkit/zoneful/interruption-destruction/tabs/rapid-reversal",
+        "native-motion/21.x/chromium/zoneless/interruption-destruction/tabs/rapid-reversal",
+        "native-motion/21.x/firefox/zoneless/interruption-destruction/tabs/rapid-reversal",
+        "native-motion/21.x/webkit/zoneless/interruption-destruction/tabs/rapid-reversal",
+        "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+        "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+        "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+        "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+        "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+        "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+        "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+        "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+        "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+        "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+        "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+        "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+        "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+        "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+        "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+        "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+        "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+        "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+        "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/zero",
+        "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/zero",
+        "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/zero",
+        "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/zero",
+        "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/zero",
+        "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/zero"
+      ]
+    },
+    "historical_roster_source_context": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "442187db5e0b01d8eecc12e9095fd494b8e6a87040ed5d08aa158768454fb2ea"
+    }
+  },
+  "prior_entry": {
+    "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/tabs): remove IE animation workaround (#29899)",
+    "files": [
+      "src/material/tabs/tab-body.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Source review proposes retaining the Material16 completion filter; exact original/candidate outputs match and removing it changes behavior. Native/floor and independent admission remain pending. Prior contradictory adaptation claim is preserved in the individual source review.",
+    "read_note_disposition": "owned-retained-source-reviewed-native-pending",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-tab-completion-source-review.json",
+    "source_check": "legacy-tabs/internal/tab-body-base.ts retains distinctUntilChanged on fromState/toState; public animationDone is now required by the producer and branch roster.",
+    "product_adaptation": false,
+    "recorded_at_utc": "2026-10-09T16:17:17.722946+00:00"
+  },
+  "prior_source_review": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-tab-completion-source-review.json",
+    "sha256": "806c426bffb79325d1fb28b3d3567dde8bdd6914242bd167c6125d970edec2ce"
+  },
+  "independent_evidence": [
+    {
+      "path": "compatibility/rc/remaining-native-admission-individual-source-proof.json",
+      "sha256": "82d018c28f0ba77c442e324328e16ec916f748cc6a12c50826697a1585714895"
+    },
+    {
+      "path": "compatibility/rc/form-field-hover-followup-source-review.json",
+      "sha256": "f0bab6623905894a78bf3a32667125b16aac4417fe1f385d6e843b0d0bf47218"
+    },
+    {
+      "path": "compatibility/rc/form-field-hover-followup-source-diagnostic.json.gz",
+      "sha256": "605f9b6fa36d2da9848c1e5196a2170f46b52736500baac99dd595c80292f7fa"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-lifecycle-controls.json",
+      "sha256": "7a855591fe8cc4bcb66c0b7c2900820fa54ac862d2168bf832d0859747a0c96d"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-controls.json",
+      "sha256": "196de43e45c3180027e9d86fd1d9eacbec3a12d1d801f6d5d83233427d2b9f69"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-cyph-style.json",
+      "sha256": "ddbe385744bc4b59f8af2e3dec3b1212b92ce0de12c393b790ba6baf05ef39c5"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-ripple-route-source-controls.json",
+      "sha256": "980370f05a18d09e25bebce67f96955963e080d1dc77734fb74a8a0601125e7b"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-ripple-source-disposition-controls.json",
+      "sha256": "09e49140f3a253b0fc53fcd8e5fb9661de0c935e125c85f2683d1811ad917d9f"
+    },
+    {
+      "path": "compatibility/rc/ripple-event-manager-source-proof.json",
+      "sha256": "72abb9dfade645fef395c3d9507bead935ac889f06c3c80e33aeb592a07876cd"
+    },
+    {
+      "path": "compatibility/rc/ripple-native-channel-floor-source.json",
+      "sha256": "6b0bc9c8bf28eaf1eeaf5c50fcd00bc4fe582c25f7f95f05708f53c8247e8204"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-proof.json",
+      "sha256": "011533399904f0dff41c7ed4c2c883400c61f8f5824efe50c0a0ea2e8d4d1a80"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "21cc8dfa42197436dae5abda6c37b181cb8f232a66848be412267d6610cbbddf"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "9604d03f776294bb8a22c3015c4d40d2e0f98bd65b4a8b45ceb7738458706438"
+    }
+  ],
+  "required_native_contract": {
+    "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+    "patch": "8c5c7c7e24faef142a0320faf51bd61cecd10c7e06eeeeb15ddc0f53cb654083",
+    "kind": "historical-tab-completion-state-filter",
+    "engines": [
+      "chromium",
+      "firefox",
+      "webkit"
+    ],
+    "runtimes": [
+      "zoneful",
+      "zoneless"
+    ],
+    "modes": [
+      "enabled",
+      "provider-disabled",
+      "reduced",
+      "zero"
+    ],
+    "case_ids": [
+      "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/enabled",
+      "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/enabled",
+      "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/enabled",
+      "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/enabled",
+      "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/enabled",
+      "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/enabled",
+      "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+      "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+      "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+      "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+      "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+      "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+      "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/reduced",
+      "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/reduced",
+      "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/reduced",
+      "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/reduced",
+      "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/reduced",
+      "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/reduced",
+      "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/zero",
+      "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/zero",
+      "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/zero",
+      "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/zero",
+      "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/zero",
+      "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/zero",
+      "native-motion/21.x/chromium/zoneful/interruption-destruction/tabs/rapid-reversal",
+      "native-motion/21.x/firefox/zoneful/interruption-destruction/tabs/rapid-reversal",
+      "native-motion/21.x/webkit/zoneful/interruption-destruction/tabs/rapid-reversal",
+      "native-motion/21.x/chromium/zoneless/interruption-destruction/tabs/rapid-reversal",
+      "native-motion/21.x/firefox/zoneless/interruption-destruction/tabs/rapid-reversal",
+      "native-motion/21.x/webkit/zoneless/interruption-destruction/tabs/rapid-reversal",
+      "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+      "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+      "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+      "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+      "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+      "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+      "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+      "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+      "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+      "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+      "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+      "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+      "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+      "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+      "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+      "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+      "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+      "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+      "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/zero",
+      "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/zero",
+      "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/zero",
+      "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/zero",
+      "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/zero",
+      "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/zero"
+    ],
+    "members": [
+      "scripts/upstream-tab-completion-evidence.mjs",
+      "scripts/upstream-native-motion-run-evidence.mjs",
+      "scripts/upstream-packed-run-evidence.mjs",
+      "scripts/check-upstream-audit-disposition.mjs",
+      "scripts/rc-verify.py",
+      "scripts/native-motion-acceptance.mjs",
+      "scripts/native-motion-roster.mjs",
+      "scripts/native-motion-run.mjs",
+      "scripts/native-motion-page.mjs",
+      "scripts/native-motion-consumer.ts",
+      "scripts/browser-matrix-roster.mjs",
+      "compatibility/rc/matrices/full-verify.json",
+      "compatibility/rc/matrices/library-exports.json",
+      "projects/ngx-material-legacy/package.json",
+      "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+      "projects/ngx-material-legacy/legacy-tabs/tab-body.ts",
+      "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+      "projects/ngx-material-legacy/legacy-tabs/tab-group.html",
+      "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+      "projects/ngx-material-legacy/legacy-tabs/tab-body.scss",
+      "reference/material-16.2.14/component-motion-sources/tabs/tab-body.ts",
+      "compatibility/rc/tab-completion-peer-sources/21.2.14.tabs.mjs.gz"
+    ],
+    "peer_reference": {
+      "package": "@angular/material",
+      "version": "21.2.14",
+      "path": "compatibility/rc/tab-completion-peer-sources/21.2.14.tabs.mjs.gz",
+      "sha256": "5a798a54a86a966501288531be98f12338b28463543324c2b16e9756b64b418d",
+      "member": "unmodified peer tabs module"
+    }
+  },
+  "private_peer_fix_inherited": null,
+  "actual_native_or_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "spec_fixture_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "a3c213a4e33b28b8757dabfb89b56aeaf669a8d3",
+    "qualified_reference_parent": "c0d81221a4bbc5073e26a770c40f29b6c85f7dc2",
+    "inputs": {
+      "path": "compatibility/rc/spec-small-context-inputs.json",
+      "sha256": "bd405a528bd41ec8279ab9356d2c8e39316a873faf47ca40e71c23d02f4c963c"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "84e5ca0c5060c756ac186c409097556315882a88b280a12e34def1080e5a1dcf",
+        "current_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "2a485e6a37f0bfffacf13efebb57c86848cee04c359a324ec34d1d6d61dee929",
+        "current_sha256": "c6869cf4cb9bf3dccb409899130d3dc231512f783b8f7e177dfaad6a9a3687df"
+      }
+    ],
+    "fixture_controls": {
+      "path": "compatibility/rc/spec-small-source-controls.json",
+      "sha256": "745522c6f8e1a4d0f358bc93e1006353698d82a708c175fa1bddcc137813d835"
+    },
+    "unchanged_other_product_members": 1140,
+    "changed_private_fixture_data_names": 3,
+    "historical_paths": 57,
+    "case_identities_order_names": 2220,
+    "discovery_controls": 5,
+    "all_original_hunks_decisions_and_runtime_requirements_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only three private test-data keys and their explicit current source snapshot differ. Complete tagged templates, states/label values, all cases/assertions, all other product sources and all production peer uses stay exact. The48 source/semantic/adapter controls support this finite source repair. Current packed/native/floor qualification remains mandatory.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_entry": {
+      "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/tabs): remove IE animation workaround (#29899)",
+      "files": [
+        "src/material/tabs/tab-body.ts"
+      ],
+      "final_disposition": "do-not-adopt",
+      "reason": "Retain the complete historical completion subscription, including distinctUntilChanged on both state names and the existing asynchronous centered output. Removing the RxJS operator changes the untouched Material16 output contract under duplicate callbacks; both exact minimum current peer methods belong to the modern component and are not the legacy subscription contract. The current owned source preserves this filter and constructor/output metadata while separately repairing incoming/departing and newly created origin lifecycle timing. Require trusted native incoming/departing/both-origin transitions, correct height, exactly-once public completion and cleanup in the complete same-run native matrix. Source protocols and historical replay do not qualify native execution.",
+      "read_note_disposition": "individual whole-source decision; mandatory current native admission separate",
+      "affected_branches": [
+        "21.x"
+      ],
+      "g11_claim": "not-passed",
+      "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-individual-0064b4218b375b30b65bf1c13530d8620f20d980.json",
+      "source_check": "The operator import removal belongs to the same upstream removal of the completion-state filter. The owned source keeps the stable public rxjs/operators distinctUntilChanged import, compatible with the existing RxJS peer range. No modern peer constructor, animation-engine helper, private import or consumer API migration is introduced. The constructor hunk removes both-state equality filtering while preserving the centered/leaving checks. The complete untouched historical base and actual owned base produce the same output histories for duplicate center/leave, real repeated cycles, changed source/destination, obsolete state and both origin names. Removing the filter changes those reference observations and is rejected. The current owned motion lifecycle is tested independently with47 cases/22 rejected mutants; the public group animationDone path and portal detach wiring remain. Keep the original output contract and require genuine trusted native completion on all registered modes/engines/runtimes.",
+      "product_adaptation": false,
+      "recorded_at_utc": "2026-10-09T16:17:17.722946+00:00",
+      "diff_sha256": "8c5c7c7e24faef142a0320faf51bd61cecd10c7e06eeeeb15ddc0f53cb654083",
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "native-required-individual-tab-completion",
+        "diff_sha256": "8c5c7c7e24faef142a0320faf51bd61cecd10c7e06eeeeb15ddc0f53cb654083",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "21.x"
+        ],
+        "decision": "Retain the complete historical completion subscription, including distinctUntilChanged on both state names and the existing asynchronous centered output. Removing the RxJS operator changes the untouched Material16 output contract under duplicate callbacks; both exact minimum current peer methods belong to the modern component and are not the legacy subscription contract. The current owned source preserves this filter and constructor/output metadata while separately repairing incoming/departing and newly created origin lifecycle timing. Require trusted native incoming/departing/both-origin transitions, correct height, exactly-once public completion and cleanup in the complete same-run native matrix. Source protocols and historical replay do not qualify native execution.",
+        "peer_reference": {
+          "package": "@angular/material",
+          "version": "21.2.14",
+          "path": "compatibility/rc/tab-completion-peer-sources/21.2.14.tabs.mjs.gz",
+          "sha256": "5a798a54a86a966501288531be98f12338b28463543324c2b16e9756b64b418d",
+          "member": "unmodified peer tabs module"
+        },
+        "tab_completion_behavior": {
+          "kind": "historical-tab-completion-state-filter",
+          "source_members": [
+            {
+              "path": "scripts/upstream-tab-completion-evidence.mjs",
+              "sha256": "558cfa249b8befa05b24387d22f09033208f09a0da76440be40c98cafe65d74a"
+            },
+            {
+              "path": "scripts/upstream-native-motion-run-evidence.mjs",
+              "sha256": "2bcc912bef254c6a6365bda192ac9f887359e1f5d1068376fc21289ee983d399"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "5021aee6224fe16f9ff8030c9503e90c6359a4fd96cd3fe3d1ffdece41a0f4be"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "665d42097cfd383e4f99e9e46ab7639813414051360f2569581aed2e669855e8"
+            },
+            {
+              "path": "scripts/native-motion-acceptance.mjs",
+              "sha256": "859cc5e981bce80c4c54e7c36b25f2303b324fe63470eed0ef51914da4581518"
+            },
+            {
+              "path": "scripts/native-motion-roster.mjs",
+              "sha256": "91e6cc5b79463407f7b47ca6cad32eb04e7f25b90859461c0796901c618430f2"
+            },
+            {
+              "path": "scripts/native-motion-run.mjs",
+              "sha256": "a1385e9604f8b243ef766e85669c09f2200115938f6eb52fecbaab92ebba6c59"
+            },
+            {
+              "path": "scripts/native-motion-page.mjs",
+              "sha256": "376072104c126bae2a18d0cc2c6afd28ece6cffb2ff2e90691ab924c66757596"
+            },
+            {
+              "path": "scripts/native-motion-consumer.ts",
+              "sha256": "e9bf194677879f978ddbc574f33f13b0d709ade42d53dbb0542d1bb670a77e3a"
+            },
+            {
+              "path": "scripts/browser-matrix-roster.mjs",
+              "sha256": "f2e7a47be98d5cc5650930e663ff13de7f27554c7180d1cb3eb8661c394637ca"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "f72e2b5715c760a709aa62678e0352c16eed8945ffe0ebb4a136ec4daa57cfe0"
+            },
+            {
+              "path": "compatibility/rc/matrices/library-exports.json",
+              "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+            },
+            {
+              "path": "projects/ngx-material-legacy/package.json",
+              "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+              "sha256": "9133c2404db7ef40b39819969e310a71caf660c9d9c05ecfd16a8a4fe6ea0154"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.ts",
+              "sha256": "7560de8c08198b04eddb701df4008225bbaa1f93847de7a17439295fec85fd80"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts",
+              "sha256": "c053b92f4cb5cc3ee9316190e99ba636dc645d984a57b6d572da17114f71182b"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.html",
+              "sha256": "c2357fd60f548fb15f4a347be322b6ec36279c5bcd5729124962f7fcf03d2161"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+              "sha256": "c4d86c99bfeed0a10d6451e034ade808bfb52b4240471e1aef5ccd47e3f124f1"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.scss",
+              "sha256": "7fedca13e121d806da356e39836d1abb3353c62a3a54745790c9cdaa50e07d5a"
+            },
+            {
+              "path": "reference/material-16.2.14/component-motion-sources/tabs/tab-body.ts",
+              "sha256": "b8cae68f00521586ecf1b69d3bce277c3e1eeba35997b05b91223b1ffcbdfaf7"
+            },
+            {
+              "path": "compatibility/rc/tab-completion-peer-sources/21.2.14.tabs.mjs.gz",
+              "sha256": "a30b867e686a96fba2b3ef62d784e323fdacd753e069222258427188d77c7463"
+            }
+          ],
+          "engines": [
+            "chromium",
+            "firefox",
+            "webkit"
+          ],
+          "runtimes": [
+            "zoneful",
+            "zoneless"
+          ],
+          "modes": [
+            "enabled",
+            "provider-disabled",
+            "reduced",
+            "zero"
+          ],
+          "case_ids": [
+            "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/enabled",
+            "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/enabled",
+            "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/enabled",
+            "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/enabled",
+            "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/enabled",
+            "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/enabled",
+            "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+            "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+            "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/provider-disabled",
+            "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+            "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+            "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/provider-disabled",
+            "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/reduced",
+            "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/reduced",
+            "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/reduced",
+            "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/reduced",
+            "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/reduced",
+            "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/reduced",
+            "native-motion/21.x/chromium/zoneful/enabled-disabled-reduced/tabs/zero",
+            "native-motion/21.x/firefox/zoneful/enabled-disabled-reduced/tabs/zero",
+            "native-motion/21.x/webkit/zoneful/enabled-disabled-reduced/tabs/zero",
+            "native-motion/21.x/chromium/zoneless/enabled-disabled-reduced/tabs/zero",
+            "native-motion/21.x/firefox/zoneless/enabled-disabled-reduced/tabs/zero",
+            "native-motion/21.x/webkit/zoneless/enabled-disabled-reduced/tabs/zero",
+            "native-motion/21.x/chromium/zoneful/interruption-destruction/tabs/rapid-reversal",
+            "native-motion/21.x/firefox/zoneful/interruption-destruction/tabs/rapid-reversal",
+            "native-motion/21.x/webkit/zoneful/interruption-destruction/tabs/rapid-reversal",
+            "native-motion/21.x/chromium/zoneless/interruption-destruction/tabs/rapid-reversal",
+            "native-motion/21.x/firefox/zoneless/interruption-destruction/tabs/rapid-reversal",
+            "native-motion/21.x/webkit/zoneless/interruption-destruction/tabs/rapid-reversal",
+            "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+            "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+            "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/enabled",
+            "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+            "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+            "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/enabled",
+            "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+            "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+            "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/provider-disabled",
+            "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+            "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+            "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/provider-disabled",
+            "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+            "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+            "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/reduced",
+            "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+            "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+            "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/reduced",
+            "native-motion/21.x/chromium/zoneful/exactly-once-notification/tabs/animationDone/zero",
+            "native-motion/21.x/firefox/zoneful/exactly-once-notification/tabs/animationDone/zero",
+            "native-motion/21.x/webkit/zoneful/exactly-once-notification/tabs/animationDone/zero",
+            "native-motion/21.x/chromium/zoneless/exactly-once-notification/tabs/animationDone/zero",
+            "native-motion/21.x/firefox/zoneless/exactly-once-notification/tabs/animationDone/zero",
+            "native-motion/21.x/webkit/zoneless/exactly-once-notification/tabs/animationDone/zero"
+          ]
+        }
+      },
+      "source_conclusion_only": true
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-individual-0064b4218b375b30b65bf1c13530d8620f20d980.json",
+      "sha256": "9e9a3fdb58a884a4cdac31b41cd6884820ddd688e44d8c8db3f202fc4c81c544"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "control_case_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "e1f0d83fe9477279cc7400d41c0304972d62bdbc",
+    "qualified_reference_parent": "58a2faabf1216f6b271f1c688c8861504f55489e",
+    "inputs": {
+      "path": "compatibility/rc/spec-control-context-inputs.json",
+      "sha256": "802868cd4c19cbad3bd7e037c4b95702c3a1b9e778b296e98deb5e1129cf7239"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+        "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54",
+        "current_sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "c6869cf4cb9bf3dccb409899130d3dc231512f783b8f7e177dfaad6a9a3687df",
+        "current_sha256": "cb1935def422492f26410e71c150dd174ef190403242ad7fd73cf7d08f8052d1"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "7e8cf166761529583a0c5dadd958e69f36d01ff9eb5a5f4d7484cb7697ef5459"
+    },
+    "unchanged_other_product_members": 1139,
+    "original_cases_preserved": 2220,
+    "additional_cases": 2,
+    "current_case_cells": 2227,
+    "all_original_hunks_decisions_and_runtime_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only two appended candidate cases and their exact two-row inventory update differ. Preserve every prior case/body/template, all production resources and all original source judgments. This is source-context qualification, never actual Angular/native/packed/floor or complete G11 admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "21cc8dfa42197436dae5abda6c37b181cb8f232a66848be412267d6610cbbddf"
+    },
+    "prior_entry": {
+      "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "58a2faabf1216f6b271f1c688c8861504f55489e",
+      "entry_sha256": "90860647c3d61c8565b74f516494406558f1cad952cb3483f11a8aa43543449c"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-spec-fixture-context-0064b4218b375b30b65bf1c13530d8620f20d980.json",
+      "sha256": "421f4fce277d9fa75068061e70afca3b634c4266564039f6de8fbb363832dc1d"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "chip_empty_context_requalification": {
+    "schema_version": 1,
+    "line": "21.x",
+    "source_parent": "799f80f440ea2ab044cb4754399f18177a9ec99b",
+    "qualified_reference_parent": "c92ef282d7d022c4e8c8711dd0fa4c9e996ad662",
+    "inputs": {
+      "path": "compatibility/rc/spec-stability-context-inputs.json",
+      "sha256": "15628f1c418a3f3fd507860234209055db4b268aec2d7cf2ec353d29849620ff"
+    },
+    "prequalified_wrapper_receipt_transitions": [
+      {
+        "path": "tests/test_spec_standalone_environment_source.py",
+        "reference_commit": "ee251cff600805900f6e5816951e3abee714adaa",
+        "before_sha256": "3e74aaee57ff849163758989b2f59f588fc975d95504ca3f6cb3ce0ce32923d9",
+        "after_sha256": "7717141028f282aeb800a7e045b7f6a1009fd4ed60974d1cab3c26e553ef23c8",
+        "edits": [
+          {
+            "before": "['node', 'tests/spec_standalone_environment_source_probe.mjs']",
+            "after": "['node', 'scripts/run-historical-source-probe.mjs', 'standalone-environment-source']"
+          }
+        ],
+        "affected_shas": [
+          "31077c2eae76b0bc0bc348ee2bd2801864aa409a",
+          "83006db94a2912fa3cd3b7e1f1dcca9be064d183"
+        ],
+        "qualification": {
+          "path": "compatibility/rc/historical-stability-source-replay-checkpoint.json",
+          "sha256": "ee6a31039d5e83770ac7a18dae9c8c9145f652365e4d40fdc7ae6596f988e7b2"
+        }
+      }
+    ],
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "before_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "current_sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "before_sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+        "current_sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "cb1935def422492f26410e71c150dd174ef190403242ad7fd73cf7d08f8052d1",
+        "current_sha256": "e8f170e74b9cd1cff7f7e712d7fff5ca1c9e5a41a64c3dc622c0af1ae075fa70"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-source-proof.json",
+      "sha256": "85fd33bb0dfffcdb0070070b1ead4ce30588f5d78659929014e268897725e10d"
+    },
+    "original_cases_preserved": 2222,
+    "additional_cases": 1,
+    "current_case_cells": 2228,
+    "all_original_branch_hunk_verdicts_and_native_requirement_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only the authenticated chip empty-query reset, one appended Angular lifecycle case and exact inventory refresh differ. Current API call details are qualified against both fixed public minima; every prior verdict and actual native/packed/compiler/floor requirement remains. No source-only runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "9604d03f776294bb8a22c3015c4d40d2e0f98bd65b4a8b45ceb7738458706438"
+    },
+    "prior_entry": {
+      "sha": "0064b4218b375b30b65bf1c13530d8620f20d980",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "c92ef282d7d022c4e8c8711dd0fa4c9e996ad662",
+      "entry_sha256": "eba2ec84e3bfb85dfbbccbd1a46a22642b49242d6594df50f57fc6cc27fea321"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-control-case-context-0064b4218b375b30b65bf1c13530d8620f20d980.json",
+      "sha256": "4de9596110cef434ca8de2034fdb5a652b45666252b5cf0533f32cdae7ac4220"
+    },
+    "original_judgments_preserved": true
+  },
+  "historical_roster_reconciliation": {
+    "qualification": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "442187db5e0b01d8eecc12e9095fd494b8e6a87040ed5d08aa158768454fb2ea"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-stability-chip-context-0064b4218b375b30b65bf1c13530d8620f20d980.json",
+      "sha256": "df62b07bfc1d5b227ae90c3ad9a668f0fe7c11925a6581bb4d613262395ec805"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "ad050b2264709390e9a5db23c4d542fceadbd766",
+      "entry_sha256": "59b1e703dd8d21a08279dd490f2064af244252eb354376b61bc58521439edc97"
+    },
+    "source_judgment_and_actual_runtime_obligations_preserved": true
+  },
+  "bootstrap_stability_input_refresh": {
+    "path": "compatibility/rc/bootstrap-stability-native-input-refresh.json",
+    "sha256": "fa42419ff7ddf93e15dc2231c9b6986a70e4595e89fe6cd537074dc1fcec1cbd"
+  },
+  "actual_current_native_or_floor_qualified": false,
+  "slider_range_followup_source_context": {
+    "path": "compatibility/rc/slider-range-followup-native-prior.json.gz",
+    "sha256": "97cbe5ec72193f2e88794121b5eaf591c9660abc53f19a12d527f04fd0252dab",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/bootstrap-stability-native-0064b4218b375b30b65bf1c13530d8620f20d980.json",
+      "sha256": "8e5bba39c4e5bc9263672d7aeeff13a2c62f48b480a864684e16367df9424562"
+    },
+    "only_current_root_source_dispatch_added": true,
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "slider_range_followup_native_context_materialization": {
+    "group": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-slider-range-followup-native-context.json",
+      "sha256": "03cb0c5beea6f6b61a4427444a64b1169094d01ff943e62d9ef2c3a886a73230"
+    },
+    "individual_document_interface_preserved": true
+  },
+  "inherited_execution_admission_source_context": {
+    "prior": {
+      "path": "compatibility/rc/inherited-execution-admission-native-prior.json.gz",
+      "sha256": "58f51cd6872183a5ce1646d4c87a9b5bcb4831e8b909554c1e5f1e8c6ad74cc9"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-slider-range-followup-native-0064b4218b375b30b65bf1c13530d8620f20d980.json",
+      "sha256": "b1209d8a947f749d234db89bbcd44d3d9816b122cbfacf5055acdf8df7803ab9"
+    },
+    "changed_member": {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "before_sha256": "4f6065b4a867df90e4189343cf1d7e5623ff0f54a9050f64b8fec563cca51e47",
+      "after_sha256": "f9d61a1f3ab771d273117126fba137ad91eae0268e695e6fb58e4486fee98cef"
+    },
+    "finite_inherited_gate": {
+      "path": "scripts/upstream-inherited-execution-evidence.mjs",
+      "sha256": "5e1753ee092510acf4d6253d73bda21e8646914a343e8c03209b5c76e0dbcbbb"
+    },
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "content_observer_admission_source_context": {
+    "prior": {
+      "path": "compatibility/rc/content-observer-admission-context-prior.json.gz",
+      "sha256": "ad7d63184af9fb90213b68d859d540fb3b0fa73c3be2fe2d4f4e8afb8a68ce6c"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-inherited-execution-native-0064b4218b375b30b65bf1c13530d8620f20d980.json",
+      "sha256": "1cdafe2815e1fb72c97565fa4bbc930eb4130cb9993e2408fca308c824ff0713"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "before_sha256": "f9d61a1f3ab771d273117126fba137ad91eae0268e695e6fb58e4486fee98cef",
+        "after_sha256": "5e80c5b606e4b04b4591f4b5547b4a7d081b19a4b61197b8968c600f3f49a8f9"
+      }
+    ],
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "media_matcher_admission_source_context": {
+    "prior": {
+      "path": "compatibility/rc/media-matcher-admission-context-prior.json.gz",
+      "sha256": "5978540f15e93ebf57e133f20c5d8afc4e187336532664859193c62b4d3bdb9d"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-content-observer-admission-native-0064b4218b375b30b65bf1c13530d8620f20d980.json",
+      "sha256": "ff42057c9f0c576f8bf05450c86cc886fbdc2f8836f3f6e550ba5c76c3bae43f"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/check-upstream-audit-disposition.mjs",
+        "before_sha256": "5e80c5b606e4b04b4591f4b5547b4a7d081b19a4b61197b8968c600f3f49a8f9",
+        "after_sha256": "fe08dc0bc73c6496e98ac8cc525ecee088ab0c330c14159ad7caca995263c8c2"
+      }
+    ],
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  }
+}

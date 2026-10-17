@@ -20,6 +20,7 @@ import {PEER_ICON_TT_CSP, peerIconTtOkay} from './peer-icon-tt-admission.mjs';
 import {progressCspStyleOkay} from './progress-csp-style-contract.mjs';
 import {formFieldStateTokensOkay} from './form-field-state-style-observation.mjs';
 import {contentObserverNativeFixture, installContentObserverNativeTrace, contentObserverNativeOkay} from './content-observer-native-contract.mjs';
+import {readMediaMatcherPeer} from './media-matcher-peer-identity.mjs';
 import {spawnSync as __spawnSyncForWs} from 'node:child_process';
 if (typeof globalThis.WebSocket !== 'function') {
   // Local Node 20 shells need the experimental flag; CI/Chainman Node 22+ has WebSocket.
@@ -139,6 +140,8 @@ const contentObserverPeer = {
   types_member: observerPeerExports.types.replace(/^\.\//, ''),
   types_sha256: createHash('sha256').update(observerPublicMember(observerPeerExports.types)).digest('hex'),
 };
+
+const mediaMatcherPeer = readMediaMatcherPeer(consumer);
 
 // Compile the exported ordinary and legacy progress-bar themes from the packed
 // consumer. The historical IE-only data URI stays intact; the guard requires modern dots and CSP enforcement.
@@ -738,6 +741,7 @@ const report = {
   families,
   peer_icon_tt: peerIconTt,
   peer_media_matcher: peerMediaMatcher,
+  media_matcher_peer: mediaMatcherPeer,
   progress_csp: progressCsp,
   peer_form_hover: peerFormHover,
   core_high_contrast: coreHighContrast,
@@ -780,6 +784,7 @@ console.log(JSON.stringify({
   families,
   peer_icon_tt: peerIconTt,
   peer_media_matcher: peerMediaMatcher,
+  media_matcher_peer: mediaMatcherPeer,
   progress_csp: progressCsp,
   peer_form_hover: peerFormHover,
   core_high_contrast: coreHighContrast,

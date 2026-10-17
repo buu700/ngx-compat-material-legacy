@@ -1,0 +1,46 @@
+{
+  "files": [
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "before": "import {requiresContentObserver,validateContentObserver} from './upstream-content-observer-evidence.mjs';",
+      "after": "import {requiresContentObserver,validateContentObserver} from './upstream-content-observer-evidence.mjs';\nimport {requiresMediaMatcher,validateMediaMatcher} from './upstream-media-matcher-evidence.mjs';",
+      "occurrences": 1
+    },
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "before": "  if (requiresContentObserver(entry, proof)) {",
+      "after": "  if (requiresMediaMatcher(entry, proof)) {\n    const result = validateMediaMatcher({root, entry, proof, request});\n    artifactBehaviorResults.set(entry.sha, result);\n    inheritedExecutionResults.set(entry.sha, result);\n    return result.ok;\n  }\n  if (requiresContentObserver(entry, proof)) {",
+      "occurrences": 1
+    },
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "before": "|| requiresContentObserver(entry, entry.individual_proof);",
+      "after": "|| requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof);",
+      "occurrences": 1
+    },
+    {
+      "path": "scripts/browser-surface-families.mjs",
+      "before": "import {contentObserverNativeFixture, installContentObserverNativeTrace, contentObserverNativeOkay} from './content-observer-native-contract.mjs';",
+      "after": "import {contentObserverNativeFixture, installContentObserverNativeTrace, contentObserverNativeOkay} from './content-observer-native-contract.mjs';\nimport {readMediaMatcherPeer} from './media-matcher-peer-identity.mjs';",
+      "occurrences": 1
+    },
+    {
+      "path": "scripts/browser-surface-families.mjs",
+      "before": "// Compile the exported ordinary and legacy progress-bar themes from the packed",
+      "after": "const mediaMatcherPeer = readMediaMatcherPeer(consumer);\n\n// Compile the exported ordinary and legacy progress-bar themes from the packed",
+      "occurrences": 1
+    },
+    {
+      "path": "scripts/browser-surface-families.mjs",
+      "before": "  peer_media_matcher: peerMediaMatcher,",
+      "after": "  peer_media_matcher: peerMediaMatcher,\n  media_matcher_peer: mediaMatcherPeer,",
+      "occurrences": 2
+    },
+    {
+      "path": "tests/test_content_observer_admission.py",
+      "before": "    read = read_member or (lambda p: (root / p).read_bytes())",
+      "after": "    if (root / \"compatibility/rc/media-matcher-admission-worksheet.json\").exists():\n        from tests.test_media_matcher_admission import project_media_matcher_context\n        _, read_member = project_media_matcher_context(root, read_member)\n    read = read_member or (lambda p: (root / p).read_bytes())",
+      "occurrences": 1
+    }
+  ]
+}

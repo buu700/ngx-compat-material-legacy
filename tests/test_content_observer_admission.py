@@ -28,6 +28,9 @@ def project_observer_admission_context(root, read_member=None):
     entries, new observer requirements, source bytes and prior documents are
     independently checked here; this grants no runtime or release clearance.
     """
+    if (root / "compatibility/rc/media-matcher-admission-worksheet.json").exists():
+        from tests.test_media_matcher_admission import project_media_matcher_context
+        _, read_member = project_media_matcher_context(root, read_member)
     read = read_member or (lambda p: (root / p).read_bytes())
     load = lambda p: json.loads(read(p))
     digest = lambda raw: hashlib.sha256(raw).hexdigest()
