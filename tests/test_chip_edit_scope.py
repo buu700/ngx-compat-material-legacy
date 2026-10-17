@@ -74,7 +74,9 @@ class ChipEditScope(unittest.TestCase):
         parent=prior['source_parent']
         # This bounded foundation owns neither ledger nor product. Later admission
         # must preserve this exact stage and independently validate its live migration.
-        self.assertEqual((ROOT/prior['ledger_path']).read_bytes(),prior['ledger_text'].encode())
+        admission=json.loads((ROOT/'compatibility/rc/chip-edit-admission-worksheet.json').read_bytes())
+        foundation=subprocess.check_output(['git','--no-replace-objects','show',admission['source_parent']+':'+prior['ledger_path']],cwd=ROOT)
+        self.assertEqual(foundation,prior['ledger_text'].encode())
         self.assertEqual(sha(prior['ledger_text'].encode()),prior['ledger_sha256'])
         for m in prior['reviews']+prior['owned_sources']:
             self.assertEqual(sha(m['text'].encode()),m['sha256']);self.assertEqual((ROOT/m['path']).read_bytes(),m['text'].encode())
