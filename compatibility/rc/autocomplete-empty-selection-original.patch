@@ -1,0 +1,103 @@
+diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts
+index 44c041a2228023ed3dac6eb6afd8e5de7489b230..5e881a9f9ae6ffbe6f5d7392573eb36cefd4ef21 100644
+--- a/src/material/autocomplete/autocomplete-trigger.ts
++++ b/src/material/autocomplete/autocomplete-trigger.ts
+@@ -132,8 +132,8 @@ export class MatAutocompleteTrigger
+   /** Old value of the native input. Used to work around issues with the `input` event on IE. */
+   private _previousValue: string | number | null;
+ 
+-  /** Value of the input element when the panel was opened. */
+-  private _valueOnOpen: string | number | null;
++  /** Value of the input element when the panel was attached (even if there are no options). */
++  private _valueOnAttach: string | number | null;
+ 
+   /** Strategy that is used to position the panel. */
+   private _positionStrategy: FlexibleConnectedPositionStrategy;
+@@ -589,6 +589,7 @@ export class MatAutocompleteTrigger
+                 //   of the available options,
+                 // - if a valid string is entered after an invalid one.
+                 if (this.panelOpen) {
++                  this._captureValueOnAttach();
+                   this._emitOpened();
+                 } else {
+                   this.autocomplete.closed.emit();
+@@ -611,10 +612,14 @@ export class MatAutocompleteTrigger
+    * the state of the trigger right before the opening sequence was finished.
+    */
+   private _emitOpened() {
+-    this._valueOnOpen = this._element.nativeElement.value;
+     this.autocomplete.opened.emit();
+   }
+ 
++  /** Intended to be called when the panel is attached. Captures the current value of the input. */
++  private _captureValueOnAttach() {
++    this._valueOnAttach = this._element.nativeElement.value;
++  }
++
+   /** Destroys the autocomplete suggestion panel. */
+   private _destroyPanel(): void {
+     if (this._overlayRef) {
+@@ -665,7 +670,10 @@ export class MatAutocompleteTrigger
+       this._onChange(toSelect.value);
+       panel._emitSelectEvent(toSelect);
+       this._element.nativeElement.focus();
+-    } else if (panel.requireSelection && this._element.nativeElement.value !== this._valueOnOpen) {
++    } else if (
++      panel.requireSelection &&
++      this._element.nativeElement.value !== this._valueOnAttach
++    ) {
+       this._clearPreviousSelectedOption(null);
+       this._assignOptionValue(null);
+       // Wait for the animation to finish before clearing the form control value, otherwise
+@@ -727,8 +735,8 @@ export class MatAutocompleteTrigger
+     this.autocomplete._isOpen = this._overlayAttached = true;
+     this.autocomplete._setColor(this._formField?.color);
+     this._updatePanelState();
+-
+     this._applyModalPanelOwnership();
++    this._captureValueOnAttach();
+ 
+     // We need to do an extra `panelOpen` check in here, because the
+     // autocomplete won't be shown if there are no options.
+diff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts
+index 27365fa5b76f32a8dff87648d2d5bad410843568..41e51dd5a3d7e4045eb39fe21effcda0a70f554a 100644
+--- a/src/material/autocomplete/autocomplete.spec.ts
++++ b/src/material/autocomplete/autocomplete.spec.ts
+@@ -2663,6 +2663,37 @@ describe('MDC-based MatAutocomplete', () => {
+       expect(spy).not.toHaveBeenCalled();
+       subscription.unsubscribe();
+     }));
++
++    it('should preserve the value if a selection is required, and there are no options', fakeAsync(() => {
++      const input = fixture.nativeElement.querySelector('input');
++      const {stateCtrl, trigger, states} = fixture.componentInstance;
++      fixture.componentInstance.requireSelection = true;
++      stateCtrl.setValue(states[1]);
++      fixture.detectChanges();
++      tick();
++
++      expect(input.value).toBe('California');
++      expect(stateCtrl.value).toEqual({code: 'CA', name: 'California'});
++
++      fixture.componentInstance.states = fixture.componentInstance.filteredStates = [];
++      fixture.detectChanges();
++
++      trigger.openPanel();
++      fixture.detectChanges();
++      zone.simulateZoneExit();
++
++      const spy = jasmine.createSpy('optionSelected spy');
++      const subscription = trigger.optionSelections.subscribe(spy);
++
++      dispatchFakeEvent(document, 'click');
++      fixture.detectChanges();
++      tick();
++
++      expect(input.value).toBe('California');
++      expect(stateCtrl.value).toEqual({code: 'CA', name: 'California'});
++      expect(spy).not.toHaveBeenCalled();
++      subscription.unsubscribe();
++    }));
+   });
+ 
+   describe('panel closing', () => {

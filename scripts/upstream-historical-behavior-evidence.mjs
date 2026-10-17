@@ -46,6 +46,17 @@ export function historicalRegressionRequirements() {
 // Names are checked in addition to indexed ids: an inserted test cannot silently
 // turn the same numeric id into an unrelated behavior assertion.
 const scopes = new Map([
+  ['db06fa8d8939d793f598bc3dbedc96a5a71c0db0', {
+    patch: '097bc267621c07d520fd9aac2e3329a90c05c0ca308a9cc4e3aa4ecb43dc68b7',
+    kind: 'autocomplete-empty-required-selection',
+    members: [...commonMembers,
+      'projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts',
+      'projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts',
+      'projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts',
+    ],
+    cases: [nativeCase('legacy-autocomplete/autocomplete.spec.ts', 172,
+      'MatAutocomplete > should not throw errors when closing without options')],
+  }],
   ['77ffdf98ba71c11d908b29e02b516dddf487ae0b', {
     patch: '651a4d5c27086e2011a17b2d97a58a7a0f32f8dc8000bc3d7ee5ffd98b3d098b',
     kind: 'autocomplete-required-selection-model',
