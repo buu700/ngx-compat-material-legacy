@@ -9,6 +9,7 @@ import {isolatedBidiPackedSample} from './bidi_isolated_packed_sample.mjs';
 import {selectionComparatorPackedSample} from './selection_comparator_packed_sample.mjs';
 import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';
 import {packedSelectionComparatorCase} from '../scripts/selection-comparator-packed-contract.mjs';
+import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
@@ -38,7 +39,7 @@ export function probeRequiredPackedContract(name){
  const {id,field}=contracts[name]||{};assert.ok(id,'unknown finite contract');
  const path='scripts/packed-consumer-aot-smoke.mjs',raw=readFileSync(join(root,path),'utf8'),file=ts.createSourceFile(path,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);assert.equal(file.parseDiagnostics.length,0);
  const node=file.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases');assert.ok(node);const source=node.getText(file),keys=loadExportKeys();
- const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);
+ const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);
  const expected=allConsumerCaseIds(keys);assert.equal(new Set(expected).size,expected.length);assert.ok(expected.includes(id));
  const manifest=JSON.parse(readFileSync(join(root,'projects/ngx-material-legacy/package.json'))),line=manifest.version.startsWith('21.')?'21.x':'main';
  const matrix=JSON.parse(readFileSync(join(root,'compatibility/rc/matrices/full-verify.json')));

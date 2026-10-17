@@ -3,7 +3,7 @@
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
-"""Native date observation foundation; actual packed collector integration is pending."""
+"""Native date observation foundation; collector integration has separate controls."""
 import json
 import os
 from pathlib import Path
@@ -26,7 +26,7 @@ class NativeDatePackedTests(unittest.TestCase):
                 self.assertEqual(report['generated_observer_protocol_defects_detected'],9)
                 self.assertEqual(report['observer_status_mutants_rejected'],4)
                 self.assertEqual(report['existing_case_ids_unchanged'],106)
-                self.assertFalse(report['packed_collector_integrated'])
+                self.assertFalse(report['packed_collector_exercised'])
                 self.assertFalse(report['actual_Angular_DI_or_artifact_factory_executed'])
                 self.assertFalse(report['actual_native_packed_or_floor_qualified'])
 

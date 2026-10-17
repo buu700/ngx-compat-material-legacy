@@ -7,6 +7,7 @@
  */
 import {packedLegacyBidiScopeCase} from '../scripts/bidi-isolated-packed-contract.mjs';
 import {packedSelectionComparatorCase} from '../scripts/selection-comparator-packed-contract.mjs';
+import {packedNativeDateConstructorCase,packedNativeDateProviderCase} from '../scripts/native-date-packed-contract.mjs';
 /** Actual collector/writer controls; actual Angular focus/click remains deferred. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -44,8 +45,8 @@ const sample={execution:'packed-angular-testbed-dom',error:null,contexts:['legac
 assert.equal(packedSelectFocusClickCase(sample).result,'pass');
 const producerPath='scripts/packed-consumer-aot-smoke.mjs',raw=read(producerPath),sf=ts.createSourceFile(producerPath,raw,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);assert.equal(sf.parseDiagnostics.length,0);
 const source=sf.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='collectAcceptanceCases').getText(sf);
-const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase',text+';return collectAcceptanceCases;')(
- declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase);
+const load=text=>new Function('declarationObservations','declarationKeys','packagedSpec','harnessCaseIds','packedValueAccessorCases','packedTableOnPushCase','packedRadioIdentityCase','packedGeneratedIdentityCase','packedSelectDetachCase','packedMenuItemTokenCase','packedSelectFocusClickCase','packedChipDisabledCase','packedMenuLazyCase','packedTooltipContainerCase','packedLegacyBidiScopeCase', 'packedSelectionComparatorCase', 'packedNativeDateConstructorCase', 'packedNativeDateProviderCase',text+';return collectAcceptanceCases;')(
+ declarationObservations,declarationKeys,librarySpec,harnessCaseIds,packedValueAccessorCases,packedTableOnPushCase,packedRadioIdentityCase,packedGeneratedIdentityCase,packedSelectDetachCase,packedMenuItemTokenCase,packedSelectFocusClickCase,packedChipDisabledCase,packedMenuLazyCase,packedTooltipContainerCase,packedLegacyBidiScopeCase, packedSelectionComparatorCase,packedNativeDateConstructorCase,packedNativeDateProviderCase);
 const keys=loadExportKeys(),expected=allConsumerCaseIds(keys);assert.equal(expected.length,106);assert.equal(new Set(expected).size,106);
 const baseline={selectOpened:true,selectClosed:true,viewportShared:true};
 const observe=(value,base=baseline,fn=load(source))=>{const rows=fn({harness:{status:'ok',result:{...base,selectFocusClick:value}}},keys,'/tmp/consumer','/tmp/source').filter(row=>row.case_id===SELECT_FOCUS_CLICK_CASE_ID);assert.equal(rows.length,1);return rows[0];};
