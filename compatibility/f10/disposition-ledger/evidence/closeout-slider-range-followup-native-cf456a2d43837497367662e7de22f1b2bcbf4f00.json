@@ -1,0 +1,664 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "original_files": 1,
+  "original_hunks": 1,
+  "diff": "diff --git a/src/material/form-field/_form-field-focus-overlay.scss b/src/material/form-field/_form-field-focus-overlay.scss\nindex ade624aaf..9dfd64cc7 100644\n--- a/src/material/form-field/_form-field-focus-overlay.scss\n+++ b/src/material/form-field/_form-field-focus-overlay.scss\n@@ -19,7 +19,7 @@\n       tokens-mat-form-field.$prefix, tokens-mat-form-field.get-token-slots()) {\n       @include token-utils.create-token-slot(background-color, state-layer-color);\n \n-      .mat-mdc-form-field:hover & {\n+      .mat-mdc-text-field-wrapper:hover & {\n         @include token-utils.create-token-slot(opacity, hover-state-layer-opacity);\n       }\n \n",
+  "diff_sha256": "e2ca404fabad6af81c12ef841957e5d3a05a9439627b3302751baccde7ec9d69",
+  "hunk_reviews": [
+    {
+      "path": "src/material/form-field/_form-field-focus-overlay.scss",
+      "header": "@@ -19,7 +19,7 @@",
+      "hunk_sha256": "fd896786b52c37e1f17acef1a5d3119730f6c0e66517c38e036bb1563ad2c647",
+      "judgment": "The changed selector is a behavior change to historical ordinary MDC form-field Sass, not a missing source import or current component implementation. Preserve the whole tagged host-hover helper after only the two recorded module relocations. All four complete configurable outputs equal the untouched tagged CSS plus the independently compiled finite three-token insertion; rehashed wrapper-hover and unrelated-rule mutations fail. The public minimum component structural wrapper selector is already present, while legacy-form-field selectors and DOM are separate. No selector, palette, namespace binding, map or golden is changed."
+    }
+  ],
+  "decision": "Retain the independently owned Material16 ordinary form-field Sass host-hover selector and the finite three-token current state bridge. The upstream one-hunk wrapper-hover change narrows the ordinary MDC helper behavior over the hint/error area. Porting that selector changes the complete historical exported CSS and violates the legacy Sass contract. Both exact minimum public components already provide wrapper-hover structural CSS and consume the independently measured public state tokens. The owned legacy-form-field markup/style family is distinct and remains unchanged. Require the complete same-run packed browser pointer/focus/light/dark/token-mutation/restoration observations; the source/CSS decision alone never admits this SHA.",
+  "individual_proof": {
+    "proof_kind": "browser-required-individual-form-field-hover",
+    "diff_sha256": "e2ca404fabad6af81c12ef841957e5d3a05a9439627b3302751baccde7ec9d69",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Retain the independently owned Material16 ordinary form-field Sass host-hover selector and the finite three-token current state bridge. The upstream one-hunk wrapper-hover change narrows the ordinary MDC helper behavior over the hint/error area. Porting that selector changes the complete historical exported CSS and violates the legacy Sass contract. Both exact minimum public components already provide wrapper-hover structural CSS and consume the independently measured public state tokens. The owned legacy-form-field markup/style family is distinct and remains unchanged. Require the complete same-run packed browser pointer/focus/light/dark/token-mutation/restoration observations; the source/CSS decision alone never admits this SHA.",
+    "installed_member": {
+      "package": "@angular/material",
+      "version": "22.1.7",
+      "path": "compatibility/rc/form-field-hover-followup-peer-members/8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85.mjs.gz",
+      "sha256": "8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85",
+      "member": "MatFormField structural styles"
+    },
+    "form_field_hover_behavior": {
+      "kind": "historical-exported-form-field-host-hover",
+      "source_members": [
+        {
+          "path": "scripts/upstream-form-field-hover-evidence.mjs",
+          "sha256": "a15fe10a8c24d55948d7bc7b246886dc49447d8ee4581b1839889556e79a4cf2"
+        },
+        {
+          "path": "scripts/upstream-browser-run-evidence.mjs",
+          "sha256": "a60c4e7bb1c61de9c5672861a04ee57df229ff695d44298b85e3a6a6a7c4a886"
+        },
+        {
+          "path": "scripts/upstream-packed-run-evidence.mjs",
+          "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+        },
+        {
+          "path": "scripts/check-upstream-audit-disposition.mjs",
+          "sha256": "4f6065b4a867df90e4189343cf1d7e5623ff0f54a9050f64b8fec563cca51e47"
+        },
+        {
+          "path": "scripts/rc-verify.py",
+          "sha256": "3e51512d06909dd6abcdef4df47dad431b5f82fd1ae607f362380132b8f57150"
+        },
+        {
+          "path": "scripts/packed-consumer-evidence.mjs",
+          "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+        },
+        {
+          "path": "scripts/browser-matrix-acceptance.mjs",
+          "sha256": "89825af639a7d8dfae33cfec9849035b913adecd165d5cfe94ac300350178142"
+        },
+        {
+          "path": "scripts/browser-matrix-roster.mjs",
+          "sha256": "370350b69325c8b9a54c6c5cffa2c62c7e4b616096598d78a5c87345116b0c8c"
+        },
+        {
+          "path": "scripts/browser-required-cells.mjs",
+          "sha256": "f9b966720d7a49b9c1e59138dc6a3dd43b10ae13a8c5c1dea9cc095db812755f"
+        },
+        {
+          "path": "scripts/browser-surface-families.mjs",
+          "sha256": "91a1457d0b1dae836c4252ece38fc65df177996d8c74576341d4646eeee48d0b"
+        },
+        {
+          "path": "scripts/form-field-state-style-observation.mjs",
+          "sha256": "745360b452f6d7c3cf7158c5dbfd6f9749e2c23213d05ae4e9cbe2180bf6a4bb"
+        },
+        {
+          "path": "scripts/sass-form-field-state-contract.mjs",
+          "sha256": "d1de0c7df16d21aaa4eefc54a2ea61662665f41b9134f80bf7f92b9359bf8134"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "ce5746a3721935ab59e5c10087341c661b2b477a8f17f8c49e589c5b3410584b"
+        },
+        {
+          "path": "compatibility/rc/matrices/library-exports.json",
+          "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+        },
+        {
+          "path": "testing/legacy-runner/historical-inventory.json",
+          "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+        },
+        {
+          "path": "projects/ngx-material-legacy/package.json",
+          "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+          "sha256": "f6bd446f5e7931d0349f6b59a11b3c63a4974ef0d4de10a56412936fb796be9e"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+          "sha256": "c9ecd831e3a2f771b82a86626875e0f4638e832c231b672e554b994d1e0dc623"
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-theme.scss",
+          "sha256": "3d9f82fc2196ccff48a1e0adf21fbf718cf10db117cb9db5431e78af583bc244"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+        },
+        {
+          "path": "reference/material-16.2.14/error-helper-sources/form-field-focus-overlay.scss",
+          "sha256": "29be39f281b7079368ae00750de8dbe8a7693ef7bfc640960562dd8805f4110a"
+        },
+        {
+          "path": "compatibility/rc/form-field-hover-followup-peer-members/8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85.mjs.gz",
+          "sha256": "72202b1ccb60a18c41ddfa45fb5cd6a545f56ce1b20b4b58bb9cb2e7379ffd46"
+        }
+      ],
+      "runtimes": [
+        "zoneful",
+        "zoneless"
+      ],
+      "themes": [
+        "peer-form-hover",
+        "peer-form-hover-dark"
+      ]
+    },
+    "historical_roster_source_context": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "7694977ba8e20050d29e2d1c605a9b168f5232345a42f589eb70f0977c5f172b"
+    }
+  },
+  "prior_entry": {
+    "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/form-field): don't toggle hover state over subscript (#27683)",
+    "final_disposition": "needs-individual-review",
+    "reason": "Main claimed already-adapted but its actual owned helper retains the tagged parent-hover selector.21 copied the modern wrapper-hover selector and differs in four complete custom field mixin outputs. The original helper is now restored on21 with only two approved vendor module relocations; no binding/value/selector golden or exception is changed. Read the entire upstream modern patch; its source structure and token-slot implementation differ from the owned16 helper. Required fresh CSS/current-peer scope review remains open rather than treating source presence or an issue number as adaptation proof.",
+    "read_note_disposition": "not-applied",
+    "files": [
+      "src/material/form-field/_form-field-focus-overlay.scss"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-form-field-hover-source-review.json",
+    "source_check": "styles/form-field/_form-field-focus-overlay.scss text-field-wrapper:hover",
+    "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+    "recorded_at_utc": "2026-10-06T23:48:52.659657+00:00",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "product_adaptation": true,
+    "prior_dispositions": [
+      {
+        "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+        "bucket": "behavior-semantic",
+        "subject": "fix(material/form-field): don't toggle hover state over subscript (#27683)",
+        "final_disposition": "already-adapted",
+        "reason": "Adapted focus-overlay hover to .mat-mdc-text-field-wrapper:hover so subscript hover no longer shows the field hover state.",
+        "read_note_disposition": "not-applied",
+        "files": [
+          "src/material/form-field/_form-field-focus-overlay.scss"
+        ],
+        "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+        "source_check": "styles/form-field/_form-field-focus-overlay.scss text-field-wrapper:hover",
+        "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+        "recorded_at_utc": "2026-10-01T17:10:57Z",
+        "g11_claim": "not-passed",
+        "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+        "product_adaptation": true
+      }
+    ],
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main",
+      "21.x"
+    ]
+  },
+  "prior_source_review": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-form-field-hover-source-review.json",
+    "sha256": "1faa216bb0f3138087b84d942fcbdfef31b9cb4445dfd08cd933a48f639ff76a"
+  },
+  "independent_evidence": [
+    {
+      "path": "compatibility/rc/remaining-native-admission-individual-source-proof.json",
+      "sha256": "1b6cafbd9224ebf4a0ed84833b97b1bdad1e444f588c191ebb20f6e06959e5cc"
+    },
+    {
+      "path": "compatibility/rc/form-field-hover-followup-source-review.json",
+      "sha256": "1620b9c7bcee6cd09055a18292646dff30381b970c0df4ba62133585f016a017"
+    },
+    {
+      "path": "compatibility/rc/form-field-hover-followup-source-diagnostic.json.gz",
+      "sha256": "757297f28f2bbb34032696a2b4854d131671a4858ff292f33a2c33b36e67b1ff"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-lifecycle-controls.json",
+      "sha256": "7a855591fe8cc4bcb66c0b7c2900820fa54ac862d2168bf832d0859747a0c96d"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-controls.json",
+      "sha256": "0c9625aba2c20522df499d7263214efdfc85d9f8129c301cd23a1c2f84e6e98c"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-cyph-style.json",
+      "sha256": "8512aa2ccd9dda09e550386a3da93866887ecf5c472179e91f6d65d89d22a286"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-ripple-route-source-controls.json",
+      "sha256": "980370f05a18d09e25bebce67f96955963e080d1dc77734fb74a8a0601125e7b"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-ripple-source-disposition-controls.json",
+      "sha256": "d10da2454047360d8eaf5f83b73e8fb8583d0e16cce411be641b752cf1ff2839"
+    },
+    {
+      "path": "compatibility/rc/ripple-event-manager-source-proof.json",
+      "sha256": "440ebc7b3bdd92b354dcb47eae97c3c9d24841aa3d548cadc8a811110d64c8d0"
+    },
+    {
+      "path": "compatibility/rc/ripple-native-channel-floor-source.json",
+      "sha256": "6b0bc9c8bf28eaf1eeaf5c50fcd00bc4fe582c25f7f95f05708f53c8247e8204"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-proof.json",
+      "sha256": "835ff94c0a8ffdd4c49f6e3816bb908c35f6464c8a5017c76b9e4fcaeca91888"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    }
+  ],
+  "required_native_contract": {
+    "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+    "patch": "e2ca404fabad6af81c12ef841957e5d3a05a9439627b3302751baccde7ec9d69",
+    "kind": "historical-exported-form-field-host-hover",
+    "members": [
+      "scripts/upstream-form-field-hover-evidence.mjs",
+      "scripts/upstream-browser-run-evidence.mjs",
+      "scripts/upstream-packed-run-evidence.mjs",
+      "scripts/check-upstream-audit-disposition.mjs",
+      "scripts/rc-verify.py",
+      "scripts/packed-consumer-evidence.mjs",
+      "scripts/browser-matrix-acceptance.mjs",
+      "scripts/browser-matrix-roster.mjs",
+      "scripts/browser-required-cells.mjs",
+      "scripts/browser-surface-families.mjs",
+      "scripts/form-field-state-style-observation.mjs",
+      "scripts/sass-form-field-state-contract.mjs",
+      "compatibility/rc/matrices/full-verify.json",
+      "compatibility/rc/matrices/library-exports.json",
+      "testing/legacy-runner/historical-inventory.json",
+      "projects/ngx-material-legacy/package.json",
+      "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+      "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+      "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-theme.scss",
+      "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+      "reference/material-16.2.14/error-helper-sources/form-field-focus-overlay.scss",
+      "compatibility/rc/form-field-hover-followup-peer-members/8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85.mjs.gz"
+    ],
+    "runtimes": [
+      "zoneful",
+      "zoneless"
+    ],
+    "themes": [
+      "peer-form-hover",
+      "peer-form-hover-dark"
+    ],
+    "installed_member": {
+      "package": "@angular/material",
+      "version": "22.1.7",
+      "path": "compatibility/rc/form-field-hover-followup-peer-members/8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85.mjs.gz",
+      "sha256": "8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85",
+      "member": "MatFormField structural styles"
+    }
+  },
+  "private_peer_fix_inherited": null,
+  "actual_native_or_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "spec_fixture_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "ee94710c4e98c5c30c89d0e1710370674d3ac0ba",
+    "qualified_reference_parent": "251b24059fe51c340f484002a25399f7d53290fb",
+    "inputs": {
+      "path": "compatibility/rc/spec-small-context-inputs.json",
+      "sha256": "517745e4e287814633468cb8ab5b75bfb79083d2e98047941863c3f77d34bad0"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "84e5ca0c5060c756ac186c409097556315882a88b280a12e34def1080e5a1dcf",
+        "current_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "0d1d0fd2757060ea9f4b6fbe77f08aa732ca562cc91330b65c0085dbb6d00ed6",
+        "current_sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a"
+      }
+    ],
+    "fixture_controls": {
+      "path": "compatibility/rc/spec-small-source-controls.json",
+      "sha256": "b81aa3d32cbce32f51164dcc63776ada5c1e7e63537ae150c8693783b6d666ba"
+    },
+    "unchanged_other_product_members": 1140,
+    "changed_private_fixture_data_names": 3,
+    "historical_paths": 57,
+    "case_identities_order_names": 2220,
+    "discovery_controls": 5,
+    "all_original_hunks_decisions_and_runtime_requirements_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only three private test-data keys and their explicit current source snapshot differ. Complete tagged templates, states/label values, all cases/assertions, all other product sources and all production peer uses stay exact. The48 source/semantic/adapter controls support this finite source repair. Current packed/native/floor qualification remains mandatory.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_entry": {
+      "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/form-field): don't toggle hover state over subscript (#27683)",
+      "final_disposition": "do-not-adopt",
+      "reason": "Retain the independently owned Material16 ordinary form-field Sass host-hover selector and the finite three-token current state bridge. The upstream one-hunk wrapper-hover change narrows the ordinary MDC helper behavior over the hint/error area. Porting that selector changes the complete historical exported CSS and violates the legacy Sass contract. Both exact minimum public components already provide wrapper-hover structural CSS and consume the independently measured public state tokens. The owned legacy-form-field markup/style family is distinct and remains unchanged. Require the complete same-run packed browser pointer/focus/light/dark/token-mutation/restoration observations; the source/CSS decision alone never admits this SHA.",
+      "read_note_disposition": "individual whole-source decision; mandatory current native admission separate",
+      "files": [
+        "src/material/form-field/_form-field-focus-overlay.scss"
+      ],
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-individual-cf456a2d43837497367662e7de22f1b2bcbf4f00.json",
+      "source_check": "The changed selector is a behavior change to historical ordinary MDC form-field Sass, not a missing source import or current component implementation. Preserve the whole tagged host-hover helper after only the two recorded module relocations. All four complete configurable outputs equal the untouched tagged CSS plus the independently compiled finite three-token insertion; rehashed wrapper-hover and unrelated-rule mutations fail. The public minimum component structural wrapper selector is already present, while legacy-form-field selectors and DOM are separate. No selector, palette, namespace binding, map or golden is changed.",
+      "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+      "recorded_at_utc": "2026-10-06T23:48:52.659657+00:00",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "product_adaptation": false,
+      "prior_dispositions": [
+        {
+          "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/form-field): don't toggle hover state over subscript (#27683)",
+          "final_disposition": "already-adapted",
+          "reason": "Adapted focus-overlay hover to .mat-mdc-text-field-wrapper:hover so subscript hover no longer shows the field hover state.",
+          "read_note_disposition": "not-applied",
+          "files": [
+            "src/material/form-field/_form-field-focus-overlay.scss"
+          ],
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "styles/form-field/_form-field-focus-overlay.scss text-field-wrapper:hover",
+          "batch_id": "product-adapt-a11y-overlay-2026-10-01-i",
+          "recorded_at_utc": "2026-10-01T17:10:57Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "product_adaptation": true
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "diff_sha256": "e2ca404fabad6af81c12ef841957e5d3a05a9439627b3302751baccde7ec9d69",
+      "individual_proof": {
+        "proof_kind": "browser-required-individual-form-field-hover",
+        "diff_sha256": "e2ca404fabad6af81c12ef841957e5d3a05a9439627b3302751baccde7ec9d69",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Retain the independently owned Material16 ordinary form-field Sass host-hover selector and the finite three-token current state bridge. The upstream one-hunk wrapper-hover change narrows the ordinary MDC helper behavior over the hint/error area. Porting that selector changes the complete historical exported CSS and violates the legacy Sass contract. Both exact minimum public components already provide wrapper-hover structural CSS and consume the independently measured public state tokens. The owned legacy-form-field markup/style family is distinct and remains unchanged. Require the complete same-run packed browser pointer/focus/light/dark/token-mutation/restoration observations; the source/CSS decision alone never admits this SHA.",
+        "installed_member": {
+          "package": "@angular/material",
+          "version": "22.1.7",
+          "path": "compatibility/rc/form-field-hover-followup-peer-members/8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85.mjs.gz",
+          "sha256": "8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85",
+          "member": "MatFormField structural styles"
+        },
+        "form_field_hover_behavior": {
+          "kind": "historical-exported-form-field-host-hover",
+          "source_members": [
+            {
+              "path": "scripts/upstream-form-field-hover-evidence.mjs",
+              "sha256": "a15fe10a8c24d55948d7bc7b246886dc49447d8ee4581b1839889556e79a4cf2"
+            },
+            {
+              "path": "scripts/upstream-browser-run-evidence.mjs",
+              "sha256": "a60c4e7bb1c61de9c5672861a04ee57df229ff695d44298b85e3a6a6a7c4a886"
+            },
+            {
+              "path": "scripts/upstream-packed-run-evidence.mjs",
+              "sha256": "4ca01cf54f88ddd557556955ce987986a53ad21f95adfaed3fb3686d31bbd5ac"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "5021aee6224fe16f9ff8030c9503e90c6359a4fd96cd3fe3d1ffdece41a0f4be"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "3e51512d06909dd6abcdef4df47dad431b5f82fd1ae607f362380132b8f57150"
+            },
+            {
+              "path": "scripts/packed-consumer-evidence.mjs",
+              "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+            },
+            {
+              "path": "scripts/browser-matrix-acceptance.mjs",
+              "sha256": "89825af639a7d8dfae33cfec9849035b913adecd165d5cfe94ac300350178142"
+            },
+            {
+              "path": "scripts/browser-matrix-roster.mjs",
+              "sha256": "370350b69325c8b9a54c6c5cffa2c62c7e4b616096598d78a5c87345116b0c8c"
+            },
+            {
+              "path": "scripts/browser-required-cells.mjs",
+              "sha256": "f9b966720d7a49b9c1e59138dc6a3dd43b10ae13a8c5c1dea9cc095db812755f"
+            },
+            {
+              "path": "scripts/browser-surface-families.mjs",
+              "sha256": "91a1457d0b1dae836c4252ece38fc65df177996d8c74576341d4646eeee48d0b"
+            },
+            {
+              "path": "scripts/form-field-state-style-observation.mjs",
+              "sha256": "745360b452f6d7c3cf7158c5dbfd6f9749e2c23213d05ae4e9cbe2180bf6a4bb"
+            },
+            {
+              "path": "scripts/sass-form-field-state-contract.mjs",
+              "sha256": "d1de0c7df16d21aaa4eefc54a2ea61662665f41b9134f80bf7f92b9359bf8134"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+            },
+            {
+              "path": "compatibility/rc/matrices/library-exports.json",
+              "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "0d1d0fd2757060ea9f4b6fbe77f08aa732ca562cc91330b65c0085dbb6d00ed6"
+            },
+            {
+              "path": "projects/ngx-material-legacy/package.json",
+              "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+              "sha256": "f6bd446f5e7931d0349f6b59a11b3c63a4974ef0d4de10a56412936fb796be9e"
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+              "sha256": "c9ecd831e3a2f771b82a86626875e0f4638e832c231b672e554b994d1e0dc623"
+            },
+            {
+              "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-theme.scss",
+              "sha256": "3d9f82fc2196ccff48a1e0adf21fbf718cf10db117cb9db5431e78af583bc244"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+              "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67"
+            },
+            {
+              "path": "reference/material-16.2.14/error-helper-sources/form-field-focus-overlay.scss",
+              "sha256": "29be39f281b7079368ae00750de8dbe8a7693ef7bfc640960562dd8805f4110a"
+            },
+            {
+              "path": "compatibility/rc/form-field-hover-followup-peer-members/8796ccc010d8fa1862a78c3a799af465b989fecf19a90fb0a8859079a4777d85.mjs.gz",
+              "sha256": "72202b1ccb60a18c41ddfa45fb5cd6a545f56ce1b20b4b58bb9cb2e7379ffd46"
+            }
+          ],
+          "runtimes": [
+            "zoneful",
+            "zoneless"
+          ],
+          "themes": [
+            "peer-form-hover",
+            "peer-form-hover-dark"
+          ]
+        }
+      },
+      "source_conclusion_only": true
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-individual-cf456a2d43837497367662e7de22f1b2bcbf4f00.json",
+      "sha256": "b34ff9ffe58fefff36e3a75d848351f231883238c3c5f5d77a3a671cd987445d"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "control_case_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "05500bf4d60693c715030349d818440465c57b6d",
+    "qualified_reference_parent": "804b5c68b177c8eff2ed0fdac92caa73d5e9aaf1",
+    "inputs": {
+      "path": "compatibility/rc/spec-control-context-inputs.json",
+      "sha256": "c68029f9ff43fb4c47f58cfa21c9924400f1fbdd142c54c37457399272685fbb"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+        "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54",
+        "current_sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a",
+        "current_sha256": "766c955ca56694fcf3c82ab00296194103bb0fac812cd22571bf89a960f1d9c7"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+    },
+    "unchanged_other_product_members": 1139,
+    "original_cases_preserved": 2220,
+    "additional_cases": 2,
+    "current_case_cells": 2227,
+    "all_original_hunks_decisions_and_runtime_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only two appended candidate cases and their exact two-row inventory update differ. Preserve every prior case/body/template, all production resources and all original source judgments. This is source-context qualification, never actual Angular/native/packed/floor or complete G11 admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    "prior_entry": {
+      "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "804b5c68b177c8eff2ed0fdac92caa73d5e9aaf1",
+      "entry_sha256": "245183e5a37bcf37a4ea8612a1c6db46026674789e91d6f6862543283375a243"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-spec-fixture-context-cf456a2d43837497367662e7de22f1b2bcbf4f00.json",
+      "sha256": "6db182e8a73e8ffcf3faa9e69901c980ed00f40e744ff065989489d63cd8ed9f"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "chip_empty_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "e89625fa8145b1d746f24728a83ba25bbfe81871",
+    "qualified_reference_parent": "00fd476b50ad0eb6777e709d13b990e22a785717",
+    "inputs": {
+      "path": "compatibility/rc/spec-stability-context-inputs.json",
+      "sha256": "7259c44866d5e9f1d7c69a8685ad4682c6a0cfbb26eb9330a10879ac6a2b6638"
+    },
+    "prequalified_wrapper_receipt_transitions": [
+      {
+        "path": "tests/test_spec_standalone_environment_source.py",
+        "reference_commit": "a95969e7b493b70141ffa25e5c98f8b9499ace7a",
+        "before_sha256": "3e74aaee57ff849163758989b2f59f588fc975d95504ca3f6cb3ce0ce32923d9",
+        "after_sha256": "7717141028f282aeb800a7e045b7f6a1009fd4ed60974d1cab3c26e553ef23c8",
+        "edits": [
+          {
+            "before": "['node', 'tests/spec_standalone_environment_source_probe.mjs']",
+            "after": "['node', 'scripts/run-historical-source-probe.mjs', 'standalone-environment-source']"
+          }
+        ],
+        "affected_shas": [
+          "31077c2eae76b0bc0bc348ee2bd2801864aa409a",
+          "83006db94a2912fa3cd3b7e1f1dcca9be064d183"
+        ],
+        "qualification": {
+          "path": "compatibility/rc/historical-stability-source-replay-checkpoint.json",
+          "sha256": "7af49a12a6dcda906fc1a8fbf21817a60bf3cee09550ef38074b6e61c282dde1"
+        }
+      }
+    ],
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "before_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "current_sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "before_sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+        "current_sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "766c955ca56694fcf3c82ab00296194103bb0fac812cd22571bf89a960f1d9c7",
+        "current_sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-source-proof.json",
+      "sha256": "f6ea8843244aee5e2eb3a20632ad8d30c27627e151ab912d61ad7272564d3506"
+    },
+    "original_cases_preserved": 2222,
+    "additional_cases": 1,
+    "current_case_cells": 2228,
+    "all_original_branch_hunk_verdicts_and_native_requirement_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only the authenticated chip empty-query reset, one appended Angular lifecycle case and exact inventory refresh differ. Current API call details are qualified against both fixed public minima; every prior verdict and actual native/packed/compiler/floor requirement remains. No source-only runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    },
+    "prior_entry": {
+      "sha": "cf456a2d43837497367662e7de22f1b2bcbf4f00",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "00fd476b50ad0eb6777e709d13b990e22a785717",
+      "entry_sha256": "05a60f54ba5cb2e630abf28a1db0d12ab8a794d09e68d9df925d74cca6f0bdee"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-control-case-context-cf456a2d43837497367662e7de22f1b2bcbf4f00.json",
+      "sha256": "e272e07ece6a6d9b6511368010ba66990fb18cafb5454db21aa900c2b6a9c09e"
+    },
+    "original_judgments_preserved": true
+  },
+  "historical_roster_reconciliation": {
+    "qualification": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "7694977ba8e20050d29e2d1c605a9b168f5232345a42f589eb70f0977c5f172b"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-stability-chip-context-cf456a2d43837497367662e7de22f1b2bcbf4f00.json",
+      "sha256": "6dc0d3b500aa21b80e06278b7e36f9fcb5e51c966e8f2cada1918d04125a6189"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "44365daf1ce5985fb2b178bf6882b6ae24b6ddc1",
+      "entry_sha256": "b2e7087565e7c51162b5e16b63b32c92e41122b36c8cd984a7b89a4f9671447d"
+    },
+    "source_judgment_and_actual_runtime_obligations_preserved": true
+  },
+  "bootstrap_stability_input_refresh": {
+    "path": "compatibility/rc/bootstrap-stability-native-input-refresh.json",
+    "sha256": "89647e17082a568132af362b11cd9d9118628151dfc2f9b8ca1bd85be66da84a"
+  },
+  "actual_current_native_or_floor_qualified": false,
+  "slider_range_followup_source_context": {
+    "path": "compatibility/rc/slider-range-followup-native-prior.json.gz",
+    "sha256": "a710dc77d8db2836c347e99034e3886f648b72c6153481a506f0fa8b8c1516ac",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/bootstrap-stability-native-cf456a2d43837497367662e7de22f1b2bcbf4f00.json",
+      "sha256": "8dc8426390b56c6952f5045e9873a2edcca6ea52f1012bcdc16c9f602f0e6179"
+    },
+    "only_current_root_source_dispatch_added": true,
+    "original_verdict_and_native_requirements_unchanged": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "slider_range_followup_native_context_materialization": {
+    "group": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-slider-range-followup-native-context.json",
+      "sha256": "862898e50f5a5bf1018fcaab62448d40922dda73ceb50940f49cc22af867ee98"
+    },
+    "individual_document_interface_preserved": true
+  }
+}
