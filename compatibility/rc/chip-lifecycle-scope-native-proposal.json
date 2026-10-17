@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "proposal;not-implemented-or-executed",
+  "source_parent": "3f2b1bd7208e084480d15c2a98bffa5e7b4dc821",
+  "source_confirmed_focus_counterexamples": [
+    {
+      "id": "programmatic-refocus-during-pending-blur",
+      "actual_DOM_protocol_active": "outside",
+      "cached_hasFocus": true,
+      "pending_request_cancelled": true,
+      "focus_was_called_on_element": false,
+      "status": "source-counterexample;native-regression-and-repair-required"
+    },
+    {
+      "id": "synchronous-host-focus-reentry",
+      "native_focus_calls": 2,
+      "focus_notifications": 2,
+      "expected_focus_notifications": 1,
+      "status": "source-counterexample;native-regression-and-repair-required"
+    }
+  ],
+  "pending_TypeScript_focus_repair_required": true,
+  "pending_TypeScript_focus_repair": "Ensure pending-blur programmatic focus actually restores the host DOM focus,and make focus bookkeeping safe against synchronous host focus-handler reentry so one transition emits once. Preserve manual construction,repeat-focus idempotence and the owned blur timing/cancellation protocol; no public signature or style change.",
+  "new_native_SHA_scopes_required": [
+    "20bf71c40f565c59101b63b5a878d2ddb7fe251d",
+    "7c9c898faac8daac1bbb20a0807168a74360760d",
+    "8e1711216f7d07324e311e0f6ada3d2426c7891e"
+  ],
+  "existing_registered_native_scopes_preserved": 30,
+  "existing_historical_case_count": 2232,
+  "existing_original_and_shared_positive_cases": 2227,
+  "existing_negative_discovery_cases": 5,
+  "existing_escape_case_ids_to_strengthen": [
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#27",
+      "full_name": "MatChipList > StandardChipList > keyboard behavior > RTL > should allow focus to escape when tabbing away"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-chips/chip-list.spec.ts#28",
+      "full_name": "MatChipList > StandardChipList > keyboard behavior > RTL > should use user defined tabIndex"
+    }
+  ],
+  "escape_assertion_changes": [
+    "Keep every existing field/public-user-index assertion and the two exact case ids/names.",
+    "Add immediate nativeElement.tabIndex===-1 checks before any extra detectChanges/flush,then native restoration checks after the macrotask for default0/custom4.",
+    "Demonstrate that substituting a field-only write or microtask restoration fails actual native assertions."
+  ],
+  "append_native_chip_lifetime_case_count": 4,
+  "proposed_chip_spec_indices": [
+    34,
+    35,
+    36,
+    37
+  ],
+  "proposed_native_lifetime_behaviors": [
+    "Within the pending-blur turn,programmatic focus restores document.activeElement to the chip and cancels stale blur.",
+    "Repeated blur replaces the prior request;the stable/zoneless fallback and a racing stability event still deliver one notification.",
+    "Destroy cancels pending blur and emits destroyed once before owned ripple cleanup.",
+    "Programmatic focus with a synchronous native host focus callback emits one focus notification;repeated focus stays idempotent."
+  ],
+  "future_full_historical_case_count_if_exact4_appended": 2236,
+  "actual_scope_registration_and_case_derivation_required": true,
+  "runtime_requirements": "Bind the complete same-artifact historical run plus actual packed chip/form blur observations through the coordinator. Explicitly verify zoneful/zoneless coverage and lifecycle scheduling; a field-only assertion,stub protocol or prior report is insufficient. All earlier native requirements stay mandatory.",
+  "actual_native_cases_added": 0,
+  "actual_runtime_executed": false,
+  "HTML_CSS_SCSS_changes_permitted": false,
+  "minimum_peer_or_engine_changes_permitted": false,
+  "actual_native_packed_or_floor_qualified": false
+}
