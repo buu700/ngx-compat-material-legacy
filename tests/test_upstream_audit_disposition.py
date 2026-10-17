@@ -13,6 +13,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from tests.audit_test_context import assert_native_review, assert_runtime_roster, native_contracts, prior_source_entry, read_review, read_original_patch
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKER = ROOT / "scripts" / "check-upstream-audit-disposition.mjs"
@@ -50,7 +51,13 @@ ARTIFACT_REQUIRED_SUBJECTS = {
     'ca9c490ee30dbf7c9c147079197d0dbc0abcd611':
         ('inherited', 'table-no-data-row-on-push', 'packed-consumer/harness/table-no-data-row-on-push-rendering', 14),
 }
-ARTIFACT_REQUIRED_SHA_IDS = frozenset(ARTIFACT_REQUIRED_SUBJECTS)
+# The original three-entry map above remains historical traceability. Current
+# complete members/cases are checked against the six production contracts.
+ARTIFACT_REQUIRED_SHA_IDS = frozenset(ARTIFACT_REQUIRED_SUBJECTS) | frozenset({
+    '86ebb9bfd55e637be1e6d0117a10e290c5247ebd',
+    '86a96c9290e3896485c6b6c0d039873652f543df',
+    '68b267dd59f3addf92a3b9f8ce9e8baa479df7f4',
+})
 LATER_METHOD_PROOFS = {
     '737c7a8f1a5bc4df0e790d3ecdd227f8342499f8':
         ('complete-public-predicate-and-exact-owned-handler-replay',
@@ -98,21 +105,10 @@ def run_checker(
 
 class UpstreamAuditDispositionTests(unittest.TestCase):
     def assert_pending_roster(self, entries):
-        pending = {row['sha'] for row in entries
-                   if row['final_disposition'] == 'needs-individual-review'}
-        self.assertEqual(pending, PENDING_SHA_IDS)
-        runtime_required = {row['sha'] for row in entries
-                            if (row.get('individual_proof') or {}).get('proof_kind') == 'artifact-required-individual-behavior'}
-        self.assertEqual(runtime_required, ARTIFACT_REQUIRED_SHA_IDS)
-        for row in entries:
-            if row['sha'] in runtime_required:
-                disposition, kind, case_id, members = ARTIFACT_REQUIRED_SUBJECTS[row['sha']]
-                self.assertEqual(row['final_disposition'], disposition)
-                proof = row['individual_proof']
-                self.assertEqual(proof['affected_branches'], ['main'])
-                self.assertEqual(proof['artifact_behavior']['kind'], kind)
-                self.assertEqual(proof['artifact_behavior']['case_ids'], [case_id])
-                self.assertEqual(len(proof['artifact_behavior']['source_members']), members)
+        # This name is retained for existing callers. All former pending source
+        # judgments now require their registered runtime contracts; no source
+        # label or prior observation admits them without the real current run.
+        assert_runtime_roster(self, ROOT, entries)
 
     def test_intact_ledger_covers_every_seed_sha(self) -> None:
         self.assert_pending_roster(json.loads(LEDGER.read_text())['entries'])
@@ -123,7 +119,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, combined)
             summary = json.loads(result.stdout)
             self.assertFalse(summary["ok"])
-            self.assertEqual(summary["unresolved"], len(PENDING_SHA_IDS))
+            self.assertEqual(summary["unresolved"], 0)
             self.assertEqual(summary["seed_rows"], 1697)
             self.assertEqual(summary["ledger_rows"], 1697)
             self.assertEqual(summary["missing"], 0)
@@ -131,7 +127,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertEqual(summary["outside_seed"], 0)
             self.assertEqual(summary["security_hunk_labeled_docs_only"], 0)
             self.assertEqual(summary["g11_claim"], "not-passed")
-            self.assertEqual(summary["structural_inventory"], "fail")
+            self.assertEqual(summary["structural_inventory"], "pass")
             self.assertEqual(summary["disposition_admission"], "incomplete")
             self.assertEqual(summary["security_clearance"], "not-passed")
             self.assertGreater(summary["insufficient_inherited"], 0)
@@ -141,18 +137,18 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertGreater(summary["symbol_uses_open"], 0)
             report_body = json.loads(report.read_text())
             self.assertEqual(report_body["result"], "fail")
-            self.assertEqual(report_body["structural_inventory"], "fail")
+            self.assertEqual(report_body["structural_inventory"], "pass")
             self.assertEqual(report_body["disposition_admission"], "incomplete")
             self.assertEqual(report_body["g11_claim"], "not-passed")
             self.assertEqual(report_body["security_clearance"], "not-passed")
 
     def test_reopened_source_findings_remain_pending_and_preserve_old_proofs(self):
-        entries={e["sha"]:e for e in json.loads(LEDGER.read_text())["entries"]}
+        entries={e['sha']:e for e in json.loads(LEDGER.read_text())['entries']}
         for sha in ['77ffdf98ba71c11d908b29e02b516dddf487ae0b','5dd614aa100e28f0815fdd83e5b68f4239ef01f9','86ad5150110522873dae2801fd3c2957502949e7']:
             entry=entries[sha]
-            self.assertEqual(entry['final_disposition'],'needs-individual-review')
-            self.assertNotIn('individual_proof',entry)
-            evidence=json.loads((ROOT/entry['evidence_report']).read_text())
+            assert_native_review(self, ROOT, entry)
+            prior, evidence, _ = prior_source_entry(ROOT, entry,
+                lambda old, body, review: old['final_disposition']=='needs-individual-review' and 'individual_proof' not in old)
             self.assertEqual(evidence['sha'],sha)
             self.assertIn('individual_proof',evidence['prior_entry'])
             self.assertEqual(evidence['g11_claim'],'not-passed')
@@ -257,20 +253,24 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
 
     def test_ancestry_only_inherited_row_is_not_admission(self) -> None:
         ledger = json.loads(LEDGER.read_text())
+        assert_runtime_roster(self, ROOT, ledger['entries'])
+        entry = json.loads(json.dumps(next(row for row in ledger['entries'] if row['sha']=='231f94f5557bb58afc0070585688b3014d541eb2')))
+        entry.pop('individual_proof')
+        entry['peer_floor']={'sha_is_ancestor_of_tag':True,'delegation':'@angular/cdk/layout imported'}
         with tempfile.TemporaryDirectory() as tmp:
-            directory = Path(tmp)
-            result = run_checker(SEED, LEDGER, directory / "report.json", admission=True, line="main")
-            summary = json.loads(result.stdout)
-            self.assertNotEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(summary["structural_inventory"], "fail")
-            self.assertEqual(summary["disposition_admission"], "incomplete")
-            self.assertGreaterEqual(summary["insufficient_inherited"], 1)
-            self.assertIn(f"unresolved={summary['unresolved']}", result.stderr)
-            self.assert_pending_roster(ledger['entries'])
-            self.assertEqual(summary["unresolved"], len(PENDING_SHA_IDS))
-            self.assertEqual(summary["security_clearance"], "not-passed")
-            # The ledger object above is only used to prove the file still parses.
-            self.assertEqual(ledger["g11_claim"], "not-passed")
+            directory=Path(tmp); seed=directory/'seed.json'; candidate=directory/'ledger.json'
+            seed.write_text(json.dumps({'commits':[{'sha':entry['sha']}]}))
+            candidate.write_text(json.dumps({'entries':[entry],'g11_claim':'not-passed'}))
+            result=run_checker(seed,candidate,directory/'report.json',admission=True,line='main')
+            summary=json.loads(result.stdout)
+            self.assertNotEqual(result.returncode,0,result.stderr)
+            self.assertEqual(summary['structural_inventory'],'pass')
+            self.assertEqual(summary['disposition_admission'],'incomplete')
+            self.assertEqual(summary['insufficient_inherited'],1)
+            self.assertEqual(summary['insufficient_sensitive'],1)
+            self.assertEqual(summary['unresolved'],0)
+            self.assertEqual(summary['security_clearance'],'not-passed')
+            self.assertEqual(summary['g11_claim'],'not-passed')
 
 
     def test_media_matcher_main_proof_cannot_admit_21_or_missing_evidence(self) -> None:
@@ -284,7 +284,7 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             seed.write_text(json.dumps({"commits": [{"sha": sha}]}))
             symbols = directory / "symbols.json"
             symbols.write_text(json.dumps({"status": "closed", "symbol_uses": [{**row, "disposition": "closed", "status": "reviewed"} for row in json.loads((ROOT / "compatibility/f10/authored-dependency-inventory-seed.json").read_text())["symbol_uses"]]}))
-            for label, line, remove_proof, expected in [("main", "main", False, 0), ("wrong-line", "21.x", False, 1), ("missing-proof", "main", True, 1)]:
+            for label, line, remove_proof, expected in [("main-without-coordinator", "main", False, 1), ("wrong-line", "21.x", False, 1), ("missing-proof", "main", True, 1)]:
                 candidate = json.loads(json.dumps(entry))
                 if remove_proof:
                     candidate.pop("individual_proof")
@@ -387,10 +387,11 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
                 with self.subTest(label=label):
                     target = next(e for e in mechanical if e["sha"] not in listed)
                     mutated = json.loads(json.dumps(ledger))
-                    mutated["entries"] = [change(e) if e["sha"] == target["sha"] else e for e in mutated["entries"]]
+                    mutated["entries"] = [change(target)]
                     path = directory / f"{label}.json"
                     path.write_text(json.dumps(mutated))
-                    summary = json.loads(run_checker(SEED, path, directory / f"{label}-report.json").stdout)
+                    seed=directory/'seed.json';seed.write_text(json.dumps({'commits':[{'sha':target['sha']}]}))
+                    summary = json.loads(run_checker(seed, path, directory / f"{label}-report.json").stdout)
                     self.assertEqual(summary["missing_evidence"] + summary["circular_evidence"], 1, label)
 
     def assert_table_transform_superseding_review(self, entry):
@@ -460,6 +461,12 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         self.assertEqual(observed['g11_claim'], 'not-passed')
 
     def assert_reopened_inherited_history(self, entry, report):
+        if entry['sha'] in {row['sha'] for row in native_contracts(ROOT)['rows']} and entry.get('individual_proof'):
+            assert_native_review(self, ROOT, entry, report)
+            prior, body, _ = prior_source_entry(ROOT, entry,
+                lambda old, body, review: old['evidence_report']==REOPENED_INHERITED_REPORTS[entry['sha']])
+            self.assert_reopened_inherited_history(prior, body)
+            return
         if entry['sha'] == 'ca9c490ee30dbf7c9c147079197d0dbc0abcd611' and (entry.get('individual_proof') or {}).get('proof_kind') == 'artifact-required-individual-behavior':
             self.assertEqual(entry['evidence_report'], 'compatibility/f10/disposition-ledger/evidence/closeout-table-onpush-source-judgment.json')
             self.assertEqual(entry['final_disposition'], 'inherited')
@@ -499,71 +506,39 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
             self.assertFalse(report['semantic_pass'])
 
     def test_mechanical_evidence_and_join_are_per_sha_and_change_no_disposition(self) -> None:
-        ledger = {e["sha"]: e for e in json.loads(LEDGER.read_text())["entries"]}
-        join = json.loads(JOIN.read_text())
-        rows = {row["sha"]: row for row in join["rows"]}
-        self.assertEqual(set(rows), set(ledger))
-        files = sorted(MECHANICAL.glob("*.json"))
-        self.assertGreater(len(files), 0)
+        ledger={e['sha']:e for e in json.loads(LEDGER.read_text())['entries']}
+        rows={row['sha']:row for row in json.loads(JOIN.read_text())['rows']}
+        self.assertEqual(set(rows),set(ledger))
+        files=sorted(MECHANICAL.glob('*.json'));self.assertTrue(files)
+        registered={row['sha'] for row in native_contracts(ROOT)['rows']}
         for path in files:
-            body = json.loads(path.read_text())
-            entry = ledger[path.stem]
-            self.assertEqual(body["sha"], path.stem)
-            self.assertFalse(body["final_disposition_changed"])
-            self.assertTrue(body["not_individual_proof"])
-            self.assertEqual(body["diff_sha256"], rows[path.stem]["diff_sha256"])
-            self.assertNotIn("individual_proof", body)
-            evidence_path = path.relative_to(ROOT).as_posix()
-            if entry["evidence_report"] != evidence_path:
-                # Retain immutable earlier observations; a later semantic review supersedes them.
-                if entry.get('batch_id') == 'closeout-complete31-test-import-cleanup-predicate':
-                    self.assert_import_cleanup_history(entry, body, evidence_path)
-                    continue
-                if entry['sha'] == 'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3':
-                    prior = entry['superseded_closeout_source_judgments']
-                    self.assertTrue(any(row.get('evidence_report') == evidence_path and row.get('final_disposition') == body['final_disposition'] for row in prior))
-                    self.assert_table_transform_superseding_review(entry)
-                    continue
-                prior = entry.get("prior_dispositions", [])
-                if entry['sha'] == '10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb':
-                    correction_path = 'compatibility/rc/ripple-event-replay-upstream-correction.json'
-                    self.assertTrue(any(row.get('evidence_report') == correction_path for row in prior))
-                    correction = json.loads((ROOT / correction_path).read_text())
-                    self.assertEqual(correction['sha'], path.stem)
-                    prior = [correction['previous_row']]
-                self.assertTrue(any(row.get("evidence_report") == evidence_path
-                                    and row.get("final_disposition") == body["final_disposition"] for row in prior))
-                report = json.loads((ROOT / entry["evidence_report"]).read_text())
-                if path.stem in {
-                    '10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb',
-                    '8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc',
-                    '25f391a3c545a1b829a74584c4f9235ab8d18497',
-                }:
-                    self.assert_pending_behavior_review(entry, report)
-                    continue
-                review = next(row for row in report["reviews"] if row["sha"] == path.stem)
-                self.assertEqual(review["final_disposition"], entry["final_disposition"])
-                if report.get('role') == 'C04 finite original32 shared harness consolidation source review':
-                    self.assertEqual(len(report['reviews']), 32)
-                    patch = (ROOT / review['patch_file']).read_bytes()
-                    self.assertTrue(patch.startswith(b'diff --git '))
-                    self.assertEqual(hashlib.sha256(patch).hexdigest(), review['diff_sha256'])
-                    self.assertEqual(entry['source_check']['diff_sha256'], review['diff_sha256'])
-                    self.assertEqual(entry['source_check']['patch_path'], review['patch_file'])
-                    self.assertEqual(entry['source_check']['evidence_report_sha256'], hashlib.sha256((ROOT / entry['evidence_report']).read_bytes()).hexdigest())
-                    self.assertEqual(review['source_analysis']['sha'], entry['sha'])
-                    self.assertEqual(review['source_analysis']['diff_sha256'], review['diff_sha256'])
-                    self.assertEqual(review['source_analysis']['patch_paths'], review['patch_paths'])
-                    self.assertEqual(report['g11_claim'], 'not-passed')
-                else:
-                    self.assertTrue(review["diff"])
+            body=json.loads(path.read_text());entry=ledger[path.stem]
+            self.assertEqual(body['sha'],path.stem)
+            self.assertFalse(body['final_disposition_changed'])
+            self.assertTrue(body['not_individual_proof'])
+            self.assertEqual(body['diff_sha256'],rows[path.stem]['diff_sha256'])
+            self.assertNotIn('individual_proof',body)
+            evidence_path=path.relative_to(ROOT).as_posix()
+            prior, _, _ = prior_source_entry(ROOT, entry,
+                lambda old, record, review: old['evidence_report']==evidence_path)
+            self.assertEqual(prior['final_disposition'],body['final_disposition'])
+            if entry['evidence_report']==evidence_path:
+                self.assertEqual(body['final_disposition'],entry['final_disposition'])
                 continue
-            self.assertEqual(body["final_disposition"], entry["final_disposition"])
-            self.assertFalse(body["final_disposition_changed"])
-            self.assertTrue(body["not_individual_proof"])
-            self.assertEqual(body["diff_sha256"], rows[path.stem]["diff_sha256"])
-            self.assertEqual(entry["evidence_report"], path.relative_to(ROOT).as_posix())
-            self.assertNotIn("individual_proof", body)
+            if entry['sha'] in registered:
+                assert_native_review(self, ROOT, entry)
+                continue
+            if entry.get('batch_id')=='closeout-complete31-test-import-cleanup-predicate':
+                self.assert_import_cleanup_history(entry,body,evidence_path)
+                continue
+            if entry['sha']=='dd04fe910c4587f11cd37b1d0b216e4a56cac2e3':
+                self.assert_table_transform_superseding_review(entry)
+                continue
+            record,review=read_review(ROOT,entry)
+            self.assertEqual(review.get('final_disposition',entry['final_disposition']),entry['final_disposition'])
+            raw=read_original_patch(ROOT,entry['sha'],review)
+            self.assertIn(b'diff --git ',raw)
+            self.assertEqual(hashlib.sha256(raw).hexdigest(),review['diff_sha256'])
 
     def test_review_queue_is_finite_disjoint_and_covers_sensitive_rows(self) -> None:
         queue = json.loads(QUEUE.read_text())
@@ -609,6 +584,8 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         tooltip = rows['68b267dd59f3addf92a3b9f8ce9e8baa479df7f4']
         review = json.loads((ROOT / tooltip['evidence_report']).read_text())
         self.assert_pending_behavior_review(tooltip, review)
+        _, review, _ = prior_source_entry(ROOT, tooltip,
+            lambda old, body, row: old['final_disposition']=='needs-individual-review' and 'individual_proof' not in old)
         old = review['prior_entry']['individual_proof']
         self.assertEqual(old['candidate_member']['sha256'], '672a9d4219e6c251022a3c2d5a311d4c920d99be128cecaf90513e3ad2a1428e')
         member = review['current_candidate_source']
@@ -625,6 +602,12 @@ for(const proof of proofs)assert.equal(candidateSourceEvidenceOk(proof,p=>readFi
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def assert_pending_behavior_review(self, entry, report):
+        if entry['sha'] in {row['sha'] for row in native_contracts(ROOT)['rows']} and entry.get('individual_proof'):
+            assert_native_review(self, ROOT, entry, report)
+            prior, body, _ = prior_source_entry(ROOT, entry,
+                lambda old, body, review: old['final_disposition']=='needs-individual-review' and 'individual_proof' not in old)
+            self.assert_pending_behavior_review(prior, body)
+            return
         self.assertEqual(entry['final_disposition'], 'needs-individual-review')
         self.assertNotIn('individual_proof', entry)
         self.assertEqual(report['sha'], entry['sha'])
@@ -671,8 +654,13 @@ for(const proof of proofs)assert.equal(candidateSourceEvidenceOk(proof,p=>readFi
         ledger = json.loads(LEDGER.read_text())["entries"]
         inherited = {e["sha"] for e in ledger if e["final_disposition"] == "inherited" and not e.get("individual_proof")}
         self.assertTrue(inherited.issubset(rows))
+        native_ids={row['sha'] for row in native_contracts(ROOT)['rows']}
         for sha in set(rows) - inherited:
             entry = next(row for row in ledger if row["sha"] == sha)
+            if sha in native_ids:
+                assert_native_review(self, ROOT, entry)
+                prior_source_entry(ROOT, entry, lambda old, body, review: old['final_disposition']=='inherited')
+                continue
             if sha in LATER_METHOD_PROOFS:
                 self.assert_later_method_review(entry)
                 continue
@@ -759,9 +747,11 @@ for(const proof of proofs)assert.equal(candidateSourceEvidenceOk(proof,p=>readFi
             self.assert_reopened_inherited_history(entry, json.loads((ROOT / entry['evidence_report']).read_text()))
         independent = [e for e in ledger if e['sha'] in rows and e['sha'] not in ARTIFACT_REQUIRED_SHA_IDS
                        and (e.get('individual_proof') or {}).get('reachable_behavior')]
-        self.assertEqual({e['sha'] for e in independent}, {'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3', *LATER_METHOD_PROOFS})
+        self.assertEqual({e['sha'] for e in independent}, {'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3', *LATER_METHOD_PROOFS} | ((native_ids & set(rows)) - ARTIFACT_REQUIRED_SHA_IDS - {'938f478efdc96ef0de1217e806f98939beb027cd','10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb'}))
         for entry in independent:
-            if entry['sha'] in LATER_METHOD_PROOFS:
+            if entry['sha'] in native_ids:
+                assert_native_review(self, ROOT, entry)
+            elif entry['sha'] in LATER_METHOD_PROOFS:
                 self.assert_later_method_review(entry)
             else:
                 self.assert_table_transform_superseding_review(entry)
@@ -810,7 +800,7 @@ for(const proof of proofs)assert.equal(candidateSourceEvidenceOk(proof,p=>readFi
             entry = next(row for row in entries if row['sha'] == sha)
             report = json.loads((ROOT / entry['evidence_report']).read_text())
             self.assert_reopened_inherited_history(entry, report)
-            status = 'pending' if sha in ARTIFACT_REQUIRED_SHA_IDS else 'reviewed'
+            status = 'tampered-review-stage'
             for field, replacement in [('status', status), ('line', '21.x'), ('g11_claim', 'passed')]:
                 mutated = json.loads(json.dumps(report))
                 mutated[field] = replacement

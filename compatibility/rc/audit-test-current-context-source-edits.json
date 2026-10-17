@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "path": "tests/test_upstream_audit_disposition.py",
+  "before_sha256": "9a402721837e77f636fbb51de5145036065435281da45a7d90d0e7cc964424e3",
+  "after_sha256": "0ec63e7bb2b839349112e1b8e035b33080ac8e3f397970009f1f0d1b4bd001b4",
+  "edits": [
+    {
+      "before": "from pathlib import Path",
+      "after": "from pathlib import Path\nfrom tests.audit_test_context import assert_native_review, assert_runtime_roster, native_contracts, prior_source_entry, read_review",
+      "occurrences": 1
+    },
+    {
+      "before": "    def assert_pending_roster(self, entries):\n        pending = {row['sha'] for row in entries\n                   if row['final_disposition'] == 'needs-individual-review'}\n        self.assertEqual(pending, PENDING_SHA_IDS)\n        runtime_required = {row['sha'] for row in entries\n                            if (row.get('individual_proof') or {}).get('proof_kind') == 'artifact-required-individual-behavior'}\n        self.assertEqual(runtime_required, ARTIFACT_REQUIRED_SHA_IDS)\n        for row in entries:\n            if row['sha'] in runtime_required:\n                disposition, kind, case_id, members = ARTIFACT_REQUIRED_SUBJECTS[row['sha']]\n                self.assertEqual(row['final_disposition'], disposition)\n                proof = row['individual_proof']\n                self.assertEqual(proof['affected_branches'], ['main'])\n                self.assertEqual(proof['artifact_behavior']['kind'], kind)\n                self.assertEqual(proof['artifact_behavior']['case_ids'], [case_id])\n                self.assertEqual(len(proof['artifact_behavior']['source_members']), members)\n",
+      "after": "    def assert_pending_roster(self, entries):\n        # This name is retained for existing callers. All former pending source\n        # judgments now require their registered runtime contracts; no source\n        # label or prior observation admits them without the real current run.\n        assert_runtime_roster(self, ROOT, entries)\n",
+      "occurrences": 1
+    },
+    {
+      "before": "ARTIFACT_REQUIRED_SHA_IDS = frozenset(ARTIFACT_REQUIRED_SUBJECTS)",
+      "after": "ARTIFACT_REQUIRED_SUBJECTS.update({\n    '86ebb9bfd55e637be1e6d0117a10e290c5247ebd': ('already-present', 'chip-disabled-own-input-isolation', 'packed-consumer/harness/chip-individual-disabled-form-isolation', None),\n    '86a96c9290e3896485c6b6c0d039873652f543df': ('already-adapted', 'menu-lazy-owned-view-detach', 'packed-consumer/harness/menu-lazy-item-destruction', None),\n    '68b267dd59f3addf92a3b9f8ce9e8baa479df7f4': ('already-present', 'tooltip-eager-view-container', 'packed-consumer/harness/tooltip-original-eager-dependencies', None),\n})\nARTIFACT_REQUIRED_SHA_IDS = frozenset(ARTIFACT_REQUIRED_SUBJECTS)",
+      "occurrences": 1
+    },
+    {
+      "before": "self.assertEqual(summary[\"unresolved\"], len(PENDING_SHA_IDS))",
+      "after": "self.assertEqual(summary[\"unresolved\"], 0)",
+      "occurrences": 2
+    },
+    {
+      "before": "self.assertEqual(summary[\"structural_inventory\"], \"fail\")",
+      "after": "self.assertEqual(summary[\"structural_inventory\"], \"pass\")",
+      "occurrences": 3
+    },
+    {
+      "before": "self.assertGreaterEqual(summary[\"unknown_disposition\"], 1)\n            self.assertEqual(summary[\"structural_inventory\"], \"pass\")",
+      "after": "self.assertGreaterEqual(summary[\"unknown_disposition\"], 1)\n            self.assertEqual(summary[\"structural_inventory\"], \"fail\")",
+      "occurrences": 1
+    },
+    {
+      "before": "self.assertEqual(report_body[\"structural_inventory\"], \"fail\")",
+      "after": "self.assertEqual(report_body[\"structural_inventory\"], \"pass\")",
+      "occurrences": 1
+    },
+    {
+      "before": "    def test_reopened_source_findings_remain_pending_and_preserve_old_proofs(self):\n        entries={e[\"sha\"]:e for e in json.loads(LEDGER.read_text())[\"entries\"]}\n        for sha in ['77ffdf98ba71c11d908b29e02b516dddf487ae0b','5dd614aa100e28f0815fdd83e5b68f4239ef01f9','86ad5150110522873dae2801fd3c2957502949e7']:\n            entry=entries[sha]\n            self.assertEqual(entry['final_disposition'],'needs-individual-review')\n            self.assertNotIn('individual_proof',entry)\n            evidence=json.loads((ROOT/entry['evidence_report']).read_text())\n            self.assertEqual(evidence['sha'],sha)\n            self.assertIn('individual_proof',evidence['prior_entry'])\n            self.assertEqual(evidence['g11_claim'],'not-passed')\n",
+      "after": "    def test_reopened_source_findings_remain_pending_and_preserve_old_proofs(self):\n        entries={e['sha']:e for e in json.loads(LEDGER.read_text())['entries']}\n        for sha in ['77ffdf98ba71c11d908b29e02b516dddf487ae0b','5dd614aa100e28f0815fdd83e5b68f4239ef01f9','86ad5150110522873dae2801fd3c2957502949e7']:\n            entry=entries[sha]\n            assert_native_review(self, ROOT, entry)\n            prior, evidence, _ = prior_source_entry(ROOT, entry,\n                lambda old, body, review: old['final_disposition']=='needs-individual-review' and 'individual_proof' not in old)\n            self.assertEqual(evidence['sha'],sha)\n            self.assertIn('individual_proof',evidence['prior_entry'])\n            self.assertEqual(evidence['g11_claim'],'not-passed')\n",
+      "occurrences": 1
+    },
+    {
+      "before": "[(\"main\", \"main\", False, 0), (\"wrong-line\", \"21.x\", False, 1), (\"missing-proof\", \"main\", True, 1)]",
+      "after": "[(\"main-without-coordinator\", \"main\", False, 1), (\"wrong-line\", \"21.x\", False, 1), (\"missing-proof\", \"main\", True, 1)]",
+      "occurrences": 1
+    },
+    {
+      "before": "    def test_ancestry_only_inherited_row_is_not_admission(self) -> None:\n        ledger = json.loads(LEDGER.read_text())\n        with tempfile.TemporaryDirectory() as tmp:\n            directory = Path(tmp)\n            result = run_checker(SEED, LEDGER, directory / \"report.json\", admission=True, line=\"main\")\n            summary = json.loads(result.stdout)\n            self.assertNotEqual(result.returncode, 0, result.stderr)\n            self.assertEqual(summary[\"structural_inventory\"], \"pass\")\n            self.assertEqual(summary[\"disposition_admission\"], \"incomplete\")\n            self.assertGreaterEqual(summary[\"insufficient_inherited\"], 1)\n            self.assertIn(f\"unresolved={summary['unresolved']}\", result.stderr)\n            self.assert_pending_roster(ledger['entries'])\n            self.assertEqual(summary[\"unresolved\"], 0)\n            self.assertEqual(summary[\"security_clearance\"], \"not-passed\")\n            # The ledger object above is only used to prove the file still parses.\n            self.assertEqual(ledger[\"g11_claim\"], \"not-passed\")\n",
+      "after": "    def test_ancestry_only_inherited_row_is_not_admission(self) -> None:\n        ledger = json.loads(LEDGER.read_text())\n        assert_runtime_roster(self, ROOT, ledger['entries'])\n        entry = json.loads(json.dumps(next(row for row in ledger['entries'] if row['sha']=='231f94f5557bb58afc0070585688b3014d541eb2')))\n        entry.pop('individual_proof')\n        entry['peer_floor']={'sha_is_ancestor_of_tag':True,'delegation':'@angular/cdk/layout imported'}\n        with tempfile.TemporaryDirectory() as tmp:\n            directory=Path(tmp); seed=directory/'seed.json'; candidate=directory/'ledger.json'\n            seed.write_text(json.dumps({'commits':[{'sha':entry['sha']}]}))\n            candidate.write_text(json.dumps({'entries':[entry],'g11_claim':'not-passed'}))\n            result=run_checker(seed,candidate,directory/'report.json',admission=True,line='main')\n            summary=json.loads(result.stdout)\n            self.assertNotEqual(result.returncode,0,result.stderr)\n            self.assertEqual(summary['structural_inventory'],'pass')\n            self.assertEqual(summary['disposition_admission'],'incomplete')\n            self.assertEqual(summary['insufficient_inherited'],1)\n            self.assertEqual(summary['insufficient_sensitive'],1)\n            self.assertEqual(summary['unresolved'],0)\n            self.assertEqual(summary['security_clearance'],'not-passed')\n            self.assertEqual(summary['g11_claim'],'not-passed')\n",
+      "occurrences": 1
+    },
+    {
+      "before": "    def assert_reopened_inherited_history(self, entry, report):\n",
+      "after": "    def assert_reopened_inherited_history(self, entry, report):\n        if entry['sha'] in {row['sha'] for row in native_contracts(ROOT)['rows']}:\n            assert_native_review(self, ROOT, entry, report)\n            prior, body, _ = prior_source_entry(ROOT, entry,\n                lambda old, body, review: old['evidence_report']==REOPENED_INHERITED_REPORTS[entry['sha']])\n            self.assert_reopened_inherited_history(prior, body)\n            return\n",
+      "occurrences": 1
+    },
+    {
+      "before": "    def assert_pending_behavior_review(self, entry, report):\n",
+      "after": "    def assert_pending_behavior_review(self, entry, report):\n        if entry['sha'] in {row['sha'] for row in native_contracts(ROOT)['rows']} and entry.get('individual_proof'):\n            assert_native_review(self, ROOT, entry, report)\n            prior, body, _ = prior_source_entry(ROOT, entry,\n                lambda old, body, review: old['final_disposition']=='needs-individual-review' and 'individual_proof' not in old)\n            self.assert_pending_behavior_review(prior, body)\n            return\n",
+      "occurrences": 1
+    },
+    {
+      "before": "        old = review['prior_entry']['individual_proof']",
+      "after": "        _, review, _ = prior_source_entry(ROOT, tooltip,\n            lambda old, body, row: old['final_disposition']=='needs-individual-review' and 'individual_proof' not in old)\n        old = review['prior_entry']['individual_proof']",
+      "occurrences": 1
+    },
+    {
+      "before": "    def test_mechanical_evidence_and_join_are_per_sha_and_change_no_disposition(self) -> None:\n        ledger = {e[\"sha\"]: e for e in json.loads(LEDGER.read_text())[\"entries\"]}\n        join = json.loads(JOIN.read_text())\n        rows = {row[\"sha\"]: row for row in join[\"rows\"]}\n        self.assertEqual(set(rows), set(ledger))\n        files = sorted(MECHANICAL.glob(\"*.json\"))\n        self.assertGreater(len(files), 0)\n        for path in files:\n            body = json.loads(path.read_text())\n            entry = ledger[path.stem]\n            self.assertEqual(body[\"sha\"], path.stem)\n            self.assertFalse(body[\"final_disposition_changed\"])\n            self.assertTrue(body[\"not_individual_proof\"])\n            self.assertEqual(body[\"diff_sha256\"], rows[path.stem][\"diff_sha256\"])\n            self.assertNotIn(\"individual_proof\", body)\n            evidence_path = path.relative_to(ROOT).as_posix()\n            if entry[\"evidence_report\"] != evidence_path:\n                # Retain immutable earlier observations; a later semantic review supersedes them.\n                if entry.get('batch_id') == 'closeout-complete31-test-import-cleanup-predicate':\n                    self.assert_import_cleanup_history(entry, body, evidence_path)\n                    continue\n                if entry['sha'] == 'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3':\n                    prior = entry['superseded_closeout_source_judgments']\n                    self.assertTrue(any(row.get('evidence_report') == evidence_path and row.get('final_disposition') == body['final_disposition'] for row in prior))\n                    self.assert_table_transform_superseding_review(entry)\n                    continue\n                prior = entry.get(\"prior_dispositions\", [])\n                if entry['sha'] == '10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb':\n                    correction_path = 'compatibility/rc/ripple-event-replay-upstream-correction.json'\n                    self.assertTrue(any(row.get('evidence_report') == correction_path for row in prior))\n                    correction = json.loads((ROOT / correction_path).read_text())\n                    self.assertEqual(correction['sha'], path.stem)\n                    prior = [correction['previous_row']]\n                self.assertTrue(any(row.get(\"evidence_report\") == evidence_path\n                                    and row.get(\"final_disposition\") == body[\"final_disposition\"] for row in prior))\n                report = json.loads((ROOT / entry[\"evidence_report\"]).read_text())\n                if path.stem in {\n                    '10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb',\n                    '8c3165582fcc1e307f8ddd261f5977c6f2f8b0fc',\n                    '25f391a3c545a1b829a74584c4f9235ab8d18497',\n                }:\n                    self.assert_pending_behavior_review(entry, report)\n                    continue\n                review = next(row for row in report[\"reviews\"] if row[\"sha\"] == path.stem)\n                self.assertEqual(review[\"final_disposition\"], entry[\"final_disposition\"])\n                if report.get('role') == 'C04 finite original32 shared harness consolidation source review':\n                    self.assertEqual(len(report['reviews']), 32)\n                    patch = (ROOT / review['patch_file']).read_bytes()\n                    self.assertTrue(patch.startswith(b'diff --git '))\n                    self.assertEqual(hashlib.sha256(patch).hexdigest(), review['diff_sha256'])\n                    self.assertEqual(entry['source_check']['diff_sha256'], review['diff_sha256'])\n                    self.assertEqual(entry['source_check']['patch_path'], review['patch_file'])\n                    self.assertEqual(entry['source_check']['evidence_report_sha256'], hashlib.sha256((ROOT / entry['evidence_report']).read_bytes()).hexdigest())\n                    self.assertEqual(review['source_analysis']['sha'], entry['sha'])\n                    self.assertEqual(review['source_analysis']['diff_sha256'], review['diff_sha256'])\n                    self.assertEqual(review['source_analysis']['patch_paths'], review['patch_paths'])\n                    self.assertEqual(report['g11_claim'], 'not-passed')\n                else:\n                    self.assertTrue(review[\"diff\"])\n                continue\n            self.assertEqual(body[\"final_disposition\"], entry[\"final_disposition\"])\n            self.assertFalse(body[\"final_disposition_changed\"])\n            self.assertTrue(body[\"not_individual_proof\"])\n            self.assertEqual(body[\"diff_sha256\"], rows[path.stem][\"diff_sha256\"])\n            self.assertEqual(entry[\"evidence_report\"], path.relative_to(ROOT).as_posix())\n            self.assertNotIn(\"individual_proof\", body)\n",
+      "after": "    def test_mechanical_evidence_and_join_are_per_sha_and_change_no_disposition(self) -> None:\n        ledger={e['sha']:e for e in json.loads(LEDGER.read_text())['entries']}\n        rows={row['sha']:row for row in json.loads(JOIN.read_text())['rows']}\n        self.assertEqual(set(rows),set(ledger))\n        files=sorted(MECHANICAL.glob('*.json'));self.assertTrue(files)\n        registered={row['sha'] for row in native_contracts(ROOT)['rows']}\n        for path in files:\n            body=json.loads(path.read_text());entry=ledger[path.stem]\n            self.assertEqual(body['sha'],path.stem)\n            self.assertFalse(body['final_disposition_changed'])\n            self.assertTrue(body['not_individual_proof'])\n            self.assertEqual(body['diff_sha256'],rows[path.stem]['diff_sha256'])\n            self.assertNotIn('individual_proof',body)\n            evidence_path=path.relative_to(ROOT).as_posix()\n            prior, _, _ = prior_source_entry(ROOT, entry,\n                lambda old, record, review: old['evidence_report']==evidence_path)\n            self.assertEqual(prior['final_disposition'],body['final_disposition'])\n            if entry['evidence_report']==evidence_path:\n                self.assertEqual(body['final_disposition'],entry['final_disposition'])\n                continue\n            if entry['sha'] in registered:\n                assert_native_review(self, ROOT, entry)\n                continue\n            if entry.get('batch_id')=='closeout-complete31-test-import-cleanup-predicate':\n                self.assert_import_cleanup_history(entry,body,evidence_path)\n                continue\n            if entry['sha']=='dd04fe910c4587f11cd37b1d0b216e4a56cac2e3':\n                self.assert_table_transform_superseding_review(entry)\n                continue\n            record,review=read_review(ROOT,entry)\n            self.assertEqual(review.get('final_disposition',entry['final_disposition']),entry['final_disposition'])\n            raw=review['diff'].encode() if isinstance(review.get('diff'),str) else (ROOT/review['patch_file']).read_bytes()\n            self.assertIn(b'diff --git ',raw)\n            self.assertEqual(hashlib.sha256(raw).hexdigest(),review['diff_sha256'])\n",
+      "occurrences": 1
+    },
+    {
+      "before": "        for sha in set(rows) - inherited:\n            entry = next(row for row in ledger if row[\"sha\"] == sha)",
+      "after": "        native_ids={row['sha'] for row in native_contracts(ROOT)['rows']}\n        for sha in set(rows) - inherited:\n            entry = next(row for row in ledger if row[\"sha\"] == sha)\n            if sha in native_ids:\n                assert_native_review(self, ROOT, entry)\n                prior_source_entry(ROOT, entry, lambda old, body, review: old['final_disposition']=='inherited')\n                continue",
+      "occurrences": 1
+    },
+    {
+      "before": "self.assertEqual({e['sha'] for e in independent}, {'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3', *LATER_METHOD_PROOFS})",
+      "after": "self.assertEqual({e['sha'] for e in independent}, {'dd04fe910c4587f11cd37b1d0b216e4a56cac2e3', *LATER_METHOD_PROOFS} | ((native_ids & set(rows)) - ARTIFACT_REQUIRED_SHA_IDS))",
+      "occurrences": 1
+    },
+    {
+      "before": "        for entry in independent:\n            if entry['sha'] in LATER_METHOD_PROOFS:",
+      "after": "        for entry in independent:\n            if entry['sha'] in native_ids:\n                assert_native_review(self, ROOT, entry)\n            elif entry['sha'] in LATER_METHOD_PROOFS:",
+      "occurrences": 1
+    },
+    {
+      "before": "status = 'pending' if sha in ARTIFACT_REQUIRED_SHA_IDS else 'reviewed'",
+      "after": "status = 'tampered-review-stage'",
+      "occurrences": 1
+    },
+    {
+      "before": "                    mutated[\"entries\"] = [change(e) if e[\"sha\"] == target[\"sha\"] else e for e in mutated[\"entries\"]]",
+      "after": "                    mutated[\"entries\"] = [change(target)]",
+      "occurrences": 1
+    },
+    {
+      "before": "                    summary = json.loads(run_checker(SEED, path, directory / f\"{label}-report.json\").stdout)",
+      "after": "                    seed=directory/'seed.json';seed.write_text(json.dumps({'commits':[{'sha':target['sha']}]}))\n                    summary = json.loads(run_checker(seed, path, directory / f\"{label}-report.json\").stdout)",
+      "occurrences": 1
+    },
+    {
+      "before": "if entry['sha'] in {row['sha'] for row in native_contracts(ROOT)['rows']}:",
+      "after": "if entry['sha'] in {row['sha'] for row in native_contracts(ROOT)['rows']} and entry.get('individual_proof'):",
+      "occurrences": 1
+    },
+    {
+      "before": "from tests.audit_test_context import assert_native_review, assert_runtime_roster, native_contracts, prior_source_entry, read_review",
+      "after": "from tests.audit_test_context import assert_native_review, assert_runtime_roster, native_contracts, prior_source_entry, read_review, read_original_patch",
+      "occurrences": 1
+    },
+    {
+      "before": "            raw=review['diff'].encode() if isinstance(review.get('diff'),str) else (ROOT/review['patch_file']).read_bytes()",
+      "after": "            raw=read_original_patch(ROOT,entry['sha'],review)",
+      "occurrences": 1
+    },
+    {
+      "before": "((native_ids & set(rows)) - ARTIFACT_REQUIRED_SHA_IDS))",
+      "after": "((native_ids & set(rows)) - ARTIFACT_REQUIRED_SHA_IDS - {'938f478efdc96ef0de1217e806f98939beb027cd','10db3e30f94c8cfd160679da7ba22e4c6c0dd8bb'}))",
+      "occurrences": 1
+    },
+    {
+      "before": "ARTIFACT_REQUIRED_SUBJECTS.update({\n    '86ebb9bfd55e637be1e6d0117a10e290c5247ebd': ('already-present', 'chip-disabled-own-input-isolation', 'packed-consumer/harness/chip-individual-disabled-form-isolation', None),\n    '86a96c9290e3896485c6b6c0d039873652f543df': ('already-adapted', 'menu-lazy-owned-view-detach', 'packed-consumer/harness/menu-lazy-item-destruction', None),\n    '68b267dd59f3addf92a3b9f8ce9e8baa479df7f4': ('already-present', 'tooltip-eager-view-container', 'packed-consumer/harness/tooltip-original-eager-dependencies', None),\n})\nARTIFACT_REQUIRED_SHA_IDS = frozenset(ARTIFACT_REQUIRED_SUBJECTS)",
+      "after": "# The original three-entry map above remains historical traceability. Current\n# complete members/cases are checked against the six production contracts.\nARTIFACT_REQUIRED_SHA_IDS = frozenset(ARTIFACT_REQUIRED_SUBJECTS) | frozenset({\n    '86ebb9bfd55e637be1e6d0117a10e290c5247ebd',\n    '86a96c9290e3896485c6b6c0d039873652f543df',\n    '68b267dd59f3addf92a3b9f8ce9e8baa479df7f4',\n})",
+      "occurrences": 1
+    }
+  ],
+  "original_methods": [
+    "run_checker",
+    "assert_pending_roster",
+    "test_intact_ledger_covers_every_seed_sha",
+    "test_reopened_source_findings_remain_pending_and_preserve_old_proofs",
+    "test_removed_seed_row_conflicts_and_docs_only_security_hunk_fail",
+    "test_unknown_disposition_and_forged_clearance_fail",
+    "test_ancestry_only_inherited_row_is_not_admission",
+    "test_media_matcher_main_proof_cannot_admit_21_or_missing_evidence",
+    "test_individual_proof_is_accepted_and_ancestry_is_not",
+    "test_evidence_must_speak_about_the_row",
+    "assert_table_transform_superseding_review",
+    "assert_import_cleanup_history",
+    "assert_later_method_review",
+    "assert_reopened_inherited_history",
+    "test_mechanical_evidence_and_join_are_per_sha_and_change_no_disposition",
+    "test_review_queue_is_finite_disjoint_and_covers_sensitive_rows",
+    "test_stale_source_proofs_are_retired_without_rehashing_them",
+    "assert_pending_behavior_review",
+    "test_recorded_candidate_line_proofs_still_match_the_candidate",
+    "test_execution_observation_covers_every_inherited_row_and_matches_groups",
+    "test_history_guards_reject_missing_pending_and_changed_later_proofs"
+  ],
+  "current_methods": [
+    "run_checker",
+    "assert_pending_roster",
+    "test_intact_ledger_covers_every_seed_sha",
+    "test_reopened_source_findings_remain_pending_and_preserve_old_proofs",
+    "test_removed_seed_row_conflicts_and_docs_only_security_hunk_fail",
+    "test_unknown_disposition_and_forged_clearance_fail",
+    "test_ancestry_only_inherited_row_is_not_admission",
+    "test_media_matcher_main_proof_cannot_admit_21_or_missing_evidence",
+    "test_individual_proof_is_accepted_and_ancestry_is_not",
+    "test_evidence_must_speak_about_the_row",
+    "assert_table_transform_superseding_review",
+    "assert_import_cleanup_history",
+    "assert_later_method_review",
+    "assert_reopened_inherited_history",
+    "test_mechanical_evidence_and_join_are_per_sha_and_change_no_disposition",
+    "test_review_queue_is_finite_disjoint_and_covers_sensitive_rows",
+    "test_stale_source_proofs_are_retired_without_rehashing_them",
+    "assert_pending_behavior_review",
+    "test_recorded_candidate_line_proofs_still_match_the_candidate",
+    "test_execution_observation_covers_every_inherited_row_and_matches_groups",
+    "test_history_guards_reject_missing_pending_and_changed_later_proofs"
+  ]
+}
