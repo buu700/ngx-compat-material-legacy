@@ -1,0 +1,604 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "82844b3d52235f67119eb5f0fe4e5c56474440c3",
+  "subject": "feat(material/theming): Open up new APIs to access theme values (#27865)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material-experimental/column-resize/_column-resize-theme.scss",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "da557219419b22484f4b7f590cbbe215055f8b78",
+      "after_blob": "4bda0a7e66d96f9cec5020a6a893cf531c151d4f"
+    },
+    {
+      "path": "src/material-experimental/popover-edit/_popover-edit-theme.scss",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "102ceaf5683d45f6ca1952048c3cbf6315bbe987",
+      "after_blob": "a5ca15aac76a957e841463b898a22eb951f0b4c5"
+    },
+    {
+      "path": "src/material/_index.scss",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "67f5981b2bd7ea0605dfde3ba15537b97003ba23",
+      "after_blob": "10e11d74c54e8d9bd309f1792b115c9509124cc5"
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "744005583c47465e528002710764308272c9e316",
+      "after_blob": "74c72bf5aa175294a94d69aa643e22d5b1843602"
+    }
+  ],
+  "original_files": 4,
+  "original_hunks": 33,
+  "raw_commit_sha256": "e6bf23108eaf1dd5b70b8e35a877660284011befc892b9e36881bb84097152d6",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-theming-source-subjects.json.gz",
+    "sha256": "84dd92ec520dc78c191779a6e585cd60da2c5a6f31594acffe754e41db1d08ce"
+  },
+  "patch_file": "compatibility/rc/mixed-theming-source-82844b3d52235f67119eb5f0fe4e5c56474440c3.original.patch",
+  "diff_sha256": "426bd94bfa44f574050904252b5c025f594c3eb681073d9c26b5c1b87dc989d0",
+  "hunk_reviews": [
+    {
+      "path": "src/material-experimental/column-resize/_column-resize-theme.scss",
+      "header": "@@ -1,9 +1,9 @@",
+      "sha256": "11d0f128980c6d663f1fab8785902c290e2ee99b86ca4c77e41a2b8ed6f88680",
+      "judgment": "Complete experimental theme: rename only the explicitly published inspection calls and theme-has guards, retaining full color/typography/density/selector/metadata bodies. These callers are not owned legacy scope."
+    },
+    {
+      "path": "src/material-experimental/column-resize/_column-resize-theme.scss",
+      "header": "@@ -136,13 +136,13 @@",
+      "sha256": "64b9b049aeccd500aade26a47187594700c17abf542882a448e5533a65be46c8",
+      "judgment": "Complete experimental theme: rename only the explicitly published inspection calls and theme-has guards, retaining full color/typography/density/selector/metadata bodies. These callers are not owned legacy scope."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/_popover-edit-theme.scss",
+      "header": "@@ -6,7 +6,7 @@",
+      "sha256": "7c50b3dde77812b4bc38bcec0b98a5fe79978490662e043dd64200f88b2d235f",
+      "judgment": "Complete experimental theme: rename only the explicitly published inspection calls and theme-has guards, retaining full color/typography/density/selector/metadata bodies. These callers are not owned legacy scope."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/_popover-edit-theme.scss",
+      "header": "@@ -42,7 +42,7 @@",
+      "sha256": "b08cf86d0e49b82c91e1994f9b9050c64e7e0c1829616696eae71f0e007030fb",
+      "judgment": "Complete experimental theme: rename only the explicitly published inspection calls and theme-has guards, retaining full color/typography/density/selector/metadata bodies. These callers are not owned legacy scope."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/_popover-edit-theme.scss",
+      "header": "@@ -78,7 +78,7 @@",
+      "sha256": "9f077955060d374ecc59a6b648ae76bc61b5ba67440949822aaecb7a212dd9b3",
+      "judgment": "Complete experimental theme: rename only the explicitly published inspection calls and theme-has guards, retaining full color/typography/density/selector/metadata bodies. These callers are not owned legacy scope."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/_popover-edit-theme.scss",
+      "header": "@@ -144,8 +144,8 @@",
+      "sha256": "bcb42122f169d7341fd980547890f3a5b8b291984a6f505aca39d604f53377de",
+      "judgment": "Complete experimental theme: rename only the explicitly published inspection calls and theme-has guards, retaining full color/typography/density/selector/metadata bodies. These callers are not owned legacy scope."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/_popover-edit-theme.scss",
+      "header": "@@ -154,13 +154,13 @@",
+      "sha256": "3cd39c111e27da257b912c684e5f4923176442193b43a020b679953572a0bf7f",
+      "judgment": "Complete experimental theme: rename only the explicitly published inspection calls and theme-has guards, retaining full color/typography/density/selector/metadata bodies. These callers are not owned legacy scope."
+    },
+    {
+      "path": "src/material/_index.scss",
+      "header": "@@ -142,7 +142,6 @@ list-density, list-base;",
+      "sha256": "468971b29d5fe2acd46d9111d05da7835778db22c858d1834b44e0df290ab801",
+      "judgment": "Current public index publishes six inspection names previously private-prefixed. None exists in the authenticated historical16 API inventory. Preserve finite owned historical forwards; no new modern API mirror."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -55,7 +55,7 @@ describe('theming inspection api', () => {",
+      "sha256": "a069b7501c012879461abc50e28459a11a2fcf297842239c447a7447b816b04b",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -71,7 +71,7 @@ describe('theming inspection api', () => {",
+      "sha256": "657dc41ceee8b4706156dc21f4449e046b550d5e421df3a228308ef9a0c0b3c6",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -87,7 +87,7 @@ describe('theming inspection api', () => {",
+      "sha256": "9bb9b206bd3051562f77fbcbbe0eb1345aa1098a801f25b8b7d33e13e9ab2a24",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -103,7 +103,7 @@ describe('theming inspection api', () => {",
+      "sha256": "85d6af0effffeb29f15901d14921de272aa8743432a3103e9526f84d3bb8668d",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -115,12 +115,12 @@ describe('theming inspection api', () => {",
+      "sha256": "7bde30a76f57d0616646626db74d4924dae9336648548d6cc9d2d3d3bc6477e7",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -138,7 +138,7 @@ describe('theming inspection api', () => {",
+      "sha256": "9c5a04acaad103d1b1fef0fd1e784d113233c513fd1642fbfa5850d0e7f55af4",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -174,28 +174,28 @@ describe('theming inspection api', () => {",
+      "sha256": "668e10bd0caff3c3ce155a830597d4b71f1de7507be5cb5816809b2a1d4be66a",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -216,7 +216,7 @@ describe('theming inspection api', () => {",
+      "sha256": "2f886b32e061a1ae7c3dee45913d23e1f83b1ab8f1e0666fd5694f582a2c234a",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -248,7 +248,7 @@ describe('theming inspection api', () => {",
+      "sha256": "fd2c30863b4209b993f730fd152c2e8cc03a9b532ad6c9da4489bd4619a98f99",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -259,7 +259,7 @@ describe('theming inspection api', () => {",
+      "sha256": "463a6ba8bbc5fa7c324e3dad6864da2ee2ae92bbb7acdcea1b5189d31c601d6b",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -270,7 +270,7 @@ describe('theming inspection api', () => {",
+      "sha256": "b6a93b54b4757c37bd879936b0b2e81f2f5bc8e5aa3fd94b0aa78a29aeda81ac",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -281,7 +281,7 @@ describe('theming inspection api', () => {",
+      "sha256": "ef9afcb13ff0decb89b5efc95060776473a8cda4f7843f9b582d34ea4341f562",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -292,7 +292,7 @@ describe('theming inspection api', () => {",
+      "sha256": "02d60185a876cf420ba372142f8a186abd3ea1cc8f3e213fccf5fb6e3c54ef2a",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -303,7 +303,7 @@ describe('theming inspection api', () => {",
+      "sha256": "8dfe0d611760ef90900dbf64ded4bb0d18e32320d744ac04f24b6a290074ea59",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -314,7 +314,7 @@ describe('theming inspection api', () => {",
+      "sha256": "f9a545611adbdde56e7570378825c0f0cc32984059cfab3d063956509f394a98",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -325,7 +325,7 @@ describe('theming inspection api', () => {",
+      "sha256": "611912af351f85b966b47c3ea9c4d53c5492bfbc612fb37b66b276b25a174eab",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -335,12 +335,12 @@ describe('theming inspection api', () => {",
+      "sha256": "64ee2c78e7216eab85aaf4202ac31bc3e1f82cca56df6b08a601bbfcb47e7743",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -356,7 +356,7 @@ describe('theming inspection api', () => {",
+      "sha256": "d711f29043929aa68ef85cd8c601e8658e8fb708cd28fb9ac96b117de1cf72b5",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -367,7 +367,7 @@ describe('theming inspection api', () => {",
+      "sha256": "725faaa27678f9887f3d0b784c63e38584c909e2367e99ba5d516a6aeffeb250",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -378,7 +378,7 @@ describe('theming inspection api', () => {",
+      "sha256": "0f6ff4f4560e5b8786d78e41c1b6ae7d819235ecdd6772b079813c8f6838ae9b",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -392,28 +392,28 @@ describe('theming inspection api', () => {",
+      "sha256": "2f3d3027f71d110c786fbefe59d389b42721406040bc5f3a82cc9a047ef61b12",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -428,7 +428,7 @@ describe('theming inspection api', () => {",
+      "sha256": "527ad358fb0e52401992f5933226e86b780680e1f4d12347cc45df3191f21b73",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -439,7 +439,7 @@ describe('theming inspection api', () => {",
+      "sha256": "e351dfe2688b8a802898a93e78bceded0d097152814e289df78a0bccac8d1c0a",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -450,7 +450,7 @@ describe('theming inspection api', () => {",
+      "sha256": "18ba124d29211100bbc7f9cb55fd051b97b03bab00d8a41b70cdcd1087c8c45d",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "header": "@@ -461,7 +461,7 @@ describe('theming inspection api', () => {",
+      "sha256": "e22262e82ac999728eee64816aa6fb96828d9f49718746b4893e4808db1ec447",
+      "judgment": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "src/material-experimental/column-resize/_column-resize-theme.scss",
+      "review": "Complete experimental theme: rename only the explicitly published inspection calls and theme-has guards, retaining full color/typography/density/selector/metadata bodies. These callers are not owned legacy scope."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/_popover-edit-theme.scss",
+      "review": "Complete experimental theme: rename only the explicitly published inspection calls and theme-has guards, retaining full color/typography/density/selector/metadata bodies. These callers are not owned legacy scope."
+    },
+    {
+      "path": "src/material/_index.scss",
+      "review": "Current public index publishes six inspection names previously private-prefixed. None exists in the authenticated historical16 API inventory. Preserve finite owned historical forwards; no new modern API mirror."
+    },
+    {
+      "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+      "review": "Complete original test file: retain case identities, hooks, helpers, compiler/Sass program strings and exact expected values. Inspection-call publication or changed M3 expected colors are reviewed in this SHA; do not transplant new expectations into historical goldens. No Sass, rendering or timing equivalence from source alone."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-theming-source-review.json.gz",
+    "sha256": "91cb74da3cf666bf53860d7f12e8663e89d212234a8a6641507dd29a4466e9a6"
+  },
+  "source_semantics": {
+    "sha": "82844b3d52235f67119eb5f0fe4e5c56474440c3",
+    "data": {
+      "published_names": [
+        "get-theme-version",
+        "get-theme-type",
+        "get-theme-color",
+        "get-theme-typography",
+        "get-theme-density",
+        "theme-has"
+      ],
+      "ownership": "public upstream API outside historical16 namespace"
+    },
+    "cases_before": 26,
+    "cases_after": 26,
+    "unchanged_complete_callbacks": 1,
+    "source_conclusion_only": true,
+    "actual_Sass_Angular_native_artifact_browser_SSR_or_floor_qualified": false,
+    "review": "Individually review all four complete files and33 hunks of the inspection API publication. Current Material replaces six private inspection forwards with get-theme-version/type/color/typography/density and theme-has; the experimental resize/popover callers and inspection tests rename those exact calls. No implementation of those functions changes in this commit. All26 source case identities remain; one complete callback is unchanged and25 contain the renamed Sass calls. The authentic retained16 oracle explicitly contains47 variables,25 functions and286 mixins, and none of these six inspection names. That358-member inventory is a historical namespace, not a newly executed Sass seal or an assertion about other argument/CSS case rosters. The owned finite facade forwards owned M2 modules; the complete1028-member source scan finds no new inspection calls, no experimental Material Sass dependency, no current-Material facade forward and no current m2-* call-through. Four already owned companion/current-peer style routes remain explicitly unchanged. Preserve the historical namespace/model, helper names, maps and consumer bindings rather than expanding a modern API mirror or performing a helper-call migration. No product, HTML, CSS, SCSS, golden or consumer API change; real Sass/compiler/peer/native/SSR/floor and mixed M2/M3 coexistence execution remain separate."
+  },
+  "decision": "Individually review all four complete files and33 hunks of the inspection API publication. Current Material replaces six private inspection forwards with get-theme-version/type/color/typography/density and theme-has; the experimental resize/popover callers and inspection tests rename those exact calls. No implementation of those functions changes in this commit. All26 source case identities remain; one complete callback is unchanged and25 contain the renamed Sass calls. The authentic retained16 oracle explicitly contains47 variables,25 functions and286 mixins, and none of these six inspection names. That358-member inventory is a historical namespace, not a newly executed Sass seal or an assertion about other argument/CSS case rosters. The owned finite facade forwards owned M2 modules; the complete1028-member source scan finds no new inspection calls, no experimental Material Sass dependency, no current-Material facade forward and no current m2-* call-through. Four already owned companion/current-peer style routes remain explicitly unchanged. Preserve the historical namespace/model, helper names, maps and consumer bindings rather than expanding a modern API mirror or performing a helper-call migration. No product, HTML, CSS, SCSS, golden or consumer API change; real Sass/compiler/peer/native/SSR/floor and mixed M2/M3 coexistence execution remain separate. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "owned_context": {
+    "source_members": 1028,
+    "members_sha256": "5d1d290d9405e02363840fb94fb743739ef52a3b9afd9d0f111d418967c77b05",
+    "owned_context": [
+      {
+        "path": "projects/ngx-material-legacy/_index.scss",
+        "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/theming/_theming.scss",
+        "sha256": "54d065537ee74a0def763b52f37cdabd792b4a29820b02d135d7daf4b05c06e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/theming/_palette.scss",
+        "sha256": "86fcb97f4fe3c1c005edc4840c48ebe7a677d35fa558988db62fb268b0aef300"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/tokens/m2/_index.scss",
+        "sha256": "a28e7498f3e8ee4c7f6644c2bcb3dce3f99710d11764e12a53a98b7a776f41d4"
+      },
+      {
+        "path": "compatibility/rc/oracles/material-16.2.14-sass-api.json",
+        "sha256": "76908825fdbb55fc188f0add372d371f473cd7874cbf575894247231ab854e2d"
+      },
+      {
+        "path": "compatibility/rc/oracles/material-16.2.14-sass-argument-cases.json",
+        "sha256": "8613cc1432b2ae351e655a59b3e39b2c48d80da12c875b5233f4fac2192d657a"
+      },
+      {
+        "path": "toolchain-lock.json",
+        "sha256": "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b"
+      },
+      {
+        "path": ".node-version",
+        "sha256": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f"
+      },
+      {
+        "path": ".npm-version",
+        "sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2"
+      },
+      {
+        "path": "package.json",
+        "sha256": "e55e954caf2e9313f8f6e94d7427ac27fc1c1e780f91dff1a3ee988cdd7ee6d6"
+      }
+    ],
+    "historical_oracle_counts": {
+      "variables": 47,
+      "functions": 25,
+      "mixins": 286
+    },
+    "historical_oracle_members": 358,
+    "modern_inspection_names_added": 0,
+    "allowed_current_companion_style_routes": [
+      "projects/ngx-material-legacy/styles/bridges/_companion-overrides.scss",
+      "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+      "projects/ngx-material-legacy/styles/datepicker/_datepicker-theme.scss",
+      "projects/ngx-material-legacy/styles/progress-bar/_progress-bar-theme.scss"
+    ],
+    "current_private_tools": {
+      "node": "24.21.0",
+      "pnpm": "12.4.2"
+    },
+    "current_private_npm": "11.19.0",
+    "published_node_engine": "^22.22.3 || ^24.15.0 || ^26.0.0",
+    "peer_dependencies": {
+      "@angular/core": "^22.1.7",
+      "@angular/common": "^22.1.7",
+      "@angular/forms": "^22.1.7",
+      "@angular/platform-browser": "^22.1.7",
+      "@angular/cdk": "^22.1.7",
+      "@angular/material": "^22.1.7",
+      "rxjs": "^6.5.3 || ^7.5.5"
+    },
+    "consumer_engine_narrowed_or_required_HTML_CSS_SCSS_changes": false,
+    "actual_compiler_floor_or_Sass_executed": false
+  },
+  "prior_entry": {
+    "sha": "82844b3d52235f67119eb5f0fe4e5c56474440c3",
+    "bucket": "test-only-batch-candidate",
+    "subject": "feat(material/theming): Open up new APIs to access theme values (#27865)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=6d20c55922e070be648001fad483366ddf41ce650c5a08c38717a04e458ff67d, bytes=18634). Changed paths: src/material-experimental/column-resize/_column-resize-theme.scss, src/material-experimental/popover-edit/_popover-edit-theme.scss, src/material/_index.scss, src/material/core/theming/tests/theming-inspection-api.spec.ts. material-experimental theming/M3 palette work is not a retained legacy product surface. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+    "batch_id": "needs-triage-experimental-m3-build-docs-harness-input-transform-2026-10-01",
+    "files": [
+      "src/material-experimental/column-resize/_column-resize-theme.scss",
+      "src/material-experimental/popover-edit/_popover-edit-theme.scss",
+      "src/material/_index.scss",
+      "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+    ],
+    "patch_sha256": "6d20c55922e070be648001fad483366ddf41ce650c5a08c38717a04e458ff67d",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/82844b3d52235f67119eb5f0fe4e5c56474440c3.json",
+    "read_note_disposition": "irrelevant",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-theming-source-prior.json.gz",
+    "sha256": "0cd82daba73313931ae36f1f43109db553fd52071fb4e5253de305fb4ac736f0"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-theming-source-applicability",
+    "diff_sha256": "426bd94bfa44f574050904252b5c025f594c3eb681073d9c26b5c1b87dc989d0",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Individually review all four complete files and33 hunks of the inspection API publication. Current Material replaces six private inspection forwards with get-theme-version/type/color/typography/density and theme-has; the experimental resize/popover callers and inspection tests rename those exact calls. No implementation of those functions changes in this commit. All26 source case identities remain; one complete callback is unchanged and25 contain the renamed Sass calls. The authentic retained16 oracle explicitly contains47 variables,25 functions and286 mixins, and none of these six inspection names. That358-member inventory is a historical namespace, not a newly executed Sass seal or an assertion about other argument/CSS case rosters. The owned finite facade forwards owned M2 modules; the complete1028-member source scan finds no new inspection calls, no experimental Material Sass dependency, no current-Material facade forward and no current m2-* call-through. Four already owned companion/current-peer style routes remain explicitly unchanged. Preserve the historical namespace/model, helper names, maps and consumer bindings rather than expanding a modern API mirror or performing a helper-call migration. No product, HTML, CSS, SCSS, golden or consumer API change; real Sass/compiler/peer/native/SSR/floor and mixed M2/M3 coexistence execution remain separate. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-theming-source-review.mjs",
+        "sha256": "f1efd83c60e40aa79461c1bd1e5b42d2f50278933356540cd832364d87c91de5"
+      },
+      {
+        "path": "tests/mixed_theming_source_probe.mjs",
+        "sha256": "a9653a6aa5a373ad0c10a666dc4b88d5dcea78101ba8833615e52299663bdabb"
+      },
+      {
+        "path": "tests/test_mixed_theming_source.py",
+        "sha256": "e611cd82f417fee29386ca154088c6b729c7666e5625237e74abcdde4518969f"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-qualification-record.py",
+        "sha256": "d4aab473c58987bb990d4a6d1d436267436e0e8ac0681da0ba04cc6db055faba"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-theming-originals.py",
+        "sha256": "b819d3634db1e641a58443d32207cfb8ebb661a32d9b3a81f75423d217660308"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-authenticator.mjs",
+        "sha256": "3798a7ce48a278bb9e62f4bdcb224ae40a1e5908b24ac98f547ab9fe42038989"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-subjects.json.gz",
+        "sha256": "84dd92ec520dc78c191779a6e585cd60da2c5a6f31594acffe754e41db1d08ce"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-acquisition.json.gz",
+        "sha256": "a3f4126fa5748a283089e7802ca0fdfe952af20577a35d0e99628c28fb03418c"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-authentication.json.gz",
+        "sha256": "3a1a6cb7e4adcd2d14a59a364f864a5bb29467b851e633c721a2ad36b79094b0"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-eof-control-results.json",
+        "sha256": "824131e8b47cbbdfca42aaacd3980244d6a4610a97b4d58ea6a3fce141f9b5cb"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-eof-controls.mjs",
+        "sha256": "668fda17abccf4e1bb66a7500fd5c445ddf131f477306e58acffb532ea2fe525"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-acquisition-checkpoint.json",
+        "sha256": "492d5fbe3f7d69c47c3da1199c8b5acea3c7b63ec3a05543b2697e9f1e008586"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-intake.json",
+        "sha256": "a60bdcd2af6ea5667dce3489d2455c41f37c9fdce3b718ea41d4c8cc57b6ab8e"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-observation-pins.json.gz",
+        "sha256": "df334c7929358b366ca55fb32345a2458b286e7bf6ebe35c7e2afd9ea6e693d2"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-prior.json.gz",
+        "sha256": "0cd82daba73313931ae36f1f43109db553fd52071fb4e5253de305fb4ac736f0"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-review.json.gz",
+        "sha256": "91cb74da3cf666bf53860d7f12e8663e89d212234a8a6641507dd29a4466e9a6"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-controls.json",
+        "sha256": "018066b169cc830044116d27ec163333acd522332ac6027d37cbe3cc2929dfae"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-python.log.gz",
+        "sha256": "c4f814beece45e0c0509441ccc9c451ef87f28f23ef6157f1394d1fd5ea94526"
+      },
+      {
+        "path": "compatibility/rc/mixed-theming-source-cyph-sanity.json",
+        "sha256": "01734b3f5330903beafe3e28a0fb16f5753943e57e0310022fe4e9fe0f0d49ea"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-theming-source-review.mjs",
+      "sha256": "f1efd83c60e40aa79461c1bd1e5b42d2f50278933356540cd832364d87c91de5"
+    },
+    {
+      "path": "tests/mixed_theming_source_probe.mjs",
+      "sha256": "a9653a6aa5a373ad0c10a666dc4b88d5dcea78101ba8833615e52299663bdabb"
+    },
+    {
+      "path": "tests/test_mixed_theming_source.py",
+      "sha256": "e611cd82f417fee29386ca154088c6b729c7666e5625237e74abcdde4518969f"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-qualification-record.py",
+      "sha256": "d4aab473c58987bb990d4a6d1d436267436e0e8ac0681da0ba04cc6db055faba"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-theming-originals.py",
+      "sha256": "b819d3634db1e641a58443d32207cfb8ebb661a32d9b3a81f75423d217660308"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-authenticator.mjs",
+      "sha256": "3798a7ce48a278bb9e62f4bdcb224ae40a1e5908b24ac98f547ab9fe42038989"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-subjects.json.gz",
+      "sha256": "84dd92ec520dc78c191779a6e585cd60da2c5a6f31594acffe754e41db1d08ce"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-acquisition.json.gz",
+      "sha256": "a3f4126fa5748a283089e7802ca0fdfe952af20577a35d0e99628c28fb03418c"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-authentication.json.gz",
+      "sha256": "3a1a6cb7e4adcd2d14a59a364f864a5bb29467b851e633c721a2ad36b79094b0"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-eof-control-results.json",
+      "sha256": "824131e8b47cbbdfca42aaacd3980244d6a4610a97b4d58ea6a3fce141f9b5cb"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-eof-controls.mjs",
+      "sha256": "668fda17abccf4e1bb66a7500fd5c445ddf131f477306e58acffb532ea2fe525"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-acquisition-checkpoint.json",
+      "sha256": "492d5fbe3f7d69c47c3da1199c8b5acea3c7b63ec3a05543b2697e9f1e008586"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-intake.json",
+      "sha256": "a60bdcd2af6ea5667dce3489d2455c41f37c9fdce3b718ea41d4c8cc57b6ab8e"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-observation-pins.json.gz",
+      "sha256": "df334c7929358b366ca55fb32345a2458b286e7bf6ebe35c7e2afd9ea6e693d2"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-prior.json.gz",
+      "sha256": "0cd82daba73313931ae36f1f43109db553fd52071fb4e5253de305fb4ac736f0"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-review.json.gz",
+      "sha256": "91cb74da3cf666bf53860d7f12e8663e89d212234a8a6641507dd29a4466e9a6"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-controls.json",
+      "sha256": "018066b169cc830044116d27ec163333acd522332ac6027d37cbe3cc2929dfae"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-python.log.gz",
+      "sha256": "c4f814beece45e0c0509441ccc9c451ef87f28f23ef6157f1394d1fd5ea94526"
+    },
+    {
+      "path": "compatibility/rc/mixed-theming-source-cyph-sanity.json",
+      "sha256": "01734b3f5330903beafe3e28a0fb16f5753943e57e0310022fe4e9fe0f0d49ea"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
