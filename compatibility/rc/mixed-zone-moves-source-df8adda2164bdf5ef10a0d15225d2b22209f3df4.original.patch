@@ -1,0 +1,414 @@
+diff --git a/src/cdk/scrolling/scroll-dispatcher.spec.ts b/src/cdk/scrolling/scroll-dispatcher.spec.ts
+index 228b21b6c428aa9317b5ebfbceb04d971468bce5..d46f649d366ff8a87a0e5b534d0e19cbeb883381 100644
+--- a/src/cdk/scrolling/scroll-dispatcher.spec.ts
++++ b/src/cdk/scrolling/scroll-dispatcher.spec.ts
+@@ -71,18 +71,6 @@ describe('ScrollDispatcher', () => {
+       expect(serviceSpy).toHaveBeenCalled();
+     }));
+ 
+-    it('should not execute the global events in the Angular zone', () => {
+-      scroll.scrolled(0).subscribe(() => {});
+-      dispatchFakeEvent(document, 'scroll', false);
+-
+-      expect(fixture.ngZone!.isStable).toBe(true);
+-    });
+-
+-    it('should not execute the scrollable events in the Angular zone', () => {
+-      dispatchFakeEvent(fixture.componentInstance.scrollingElement.nativeElement, 'scroll');
+-      expect(fixture.ngZone!.isStable).toBe(true);
+-    });
+-
+     it('should be able to unsubscribe from the global scrollable', () => {
+       const spy = jasmine.createSpy('global scroll callback');
+       const subscription = scroll.scrolled(0).subscribe(spy);
+diff --git a/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts b/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..b50d0a6a50993818cac333b53b418a6c99af92f3
+--- /dev/null
++++ b/src/cdk/scrolling/scroll-dispatcher.zone.spec.ts
+@@ -0,0 +1,52 @@
++import {Component, ElementRef, ViewChild, provideZoneChangeDetection} from '@angular/core';
++import {ComponentFixture, TestBed, inject, waitForAsync} from '@angular/core/testing';
++import {dispatchFakeEvent} from '../testing/private';
++import {ScrollDispatcher} from './scroll-dispatcher';
++import {CdkScrollable} from './scrollable';
++import {ScrollingModule} from './scrolling-module';
++
++describe('ScrollDispatcher Zone.js integration', () => {
++  beforeEach(waitForAsync(() => {
++    TestBed.configureTestingModule({
++      imports: [ScrollingModule, ScrollingComponent],
++      providers: [provideZoneChangeDetection()],
++    });
++
++    TestBed.compileComponents();
++  }));
++
++  describe('Basic usage', () => {
++    let scroll: ScrollDispatcher;
++    let fixture: ComponentFixture<ScrollingComponent>;
++
++    beforeEach(inject([ScrollDispatcher], (s: ScrollDispatcher) => {
++      scroll = s;
++
++      fixture = TestBed.createComponent(ScrollingComponent);
++      fixture.detectChanges();
++    }));
++
++    it('should not execute the global events in the Angular zone', () => {
++      scroll.scrolled(0).subscribe(() => {});
++      dispatchFakeEvent(document, 'scroll', false);
++
++      expect(fixture.ngZone!.isStable).toBe(true);
++    });
++
++    it('should not execute the scrollable events in the Angular zone', () => {
++      dispatchFakeEvent(fixture.componentInstance.scrollingElement.nativeElement, 'scroll');
++      expect(fixture.ngZone!.isStable).toBe(true);
++    });
++  });
++});
++
++/** Simple component that contains a large div and can be scrolled. */
++@Component({
++  template: `<div #scrollingElement cdkScrollable style="height: 9999px"></div>`,
++  standalone: true,
++  imports: [ScrollingModule],
++})
++class ScrollingComponent {
++  @ViewChild(CdkScrollable) scrollable: CdkScrollable;
++  @ViewChild('scrollingElement') scrollingElement: ElementRef<HTMLElement>;
++}
+diff --git a/src/cdk/scrolling/viewport-ruler.spec.ts b/src/cdk/scrolling/viewport-ruler.spec.ts
+index 78a87f351dd9f1727a377aabe42d87af50d8b6e3..1b33803e9c165c93e4784591b51798d6dd009e3f 100644
+--- a/src/cdk/scrolling/viewport-ruler.spec.ts
++++ b/src/cdk/scrolling/viewport-ruler.spec.ts
+@@ -1,13 +1,10 @@
+-import {TestBed, inject, fakeAsync, tick} from '@angular/core/testing';
++import {TestBed, fakeAsync, inject, tick} from '@angular/core/testing';
++import {dispatchFakeEvent} from '../testing/private';
+ import {ScrollingModule} from './public-api';
+ import {ViewportRuler} from './viewport-ruler';
+-import {dispatchFakeEvent} from '../testing/private';
+-import {NgZone} from '@angular/core';
+-import {Subscription} from 'rxjs';
+ 
+ describe('ViewportRuler', () => {
+   let viewportRuler: ViewportRuler;
+-  let ngZone: NgZone;
+ 
+   let startingWindowWidth = window.innerWidth;
+   let startingWindowHeight = window.innerHeight;
+@@ -24,9 +21,8 @@ describe('ViewportRuler', () => {
+     }),
+   );
+ 
+-  beforeEach(inject([ViewportRuler, NgZone], (v: ViewportRuler, n: NgZone) => {
++  beforeEach(inject([ViewportRuler], (v: ViewportRuler) => {
+     viewportRuler = v;
+-    ngZone = n;
+     scrollTo(0, 0);
+   }));
+ 
+@@ -133,27 +129,5 @@ describe('ViewportRuler', () => {
+       expect(spy).toHaveBeenCalledTimes(1);
+       subscription.unsubscribe();
+     }));
+-
+-    it('should run the resize event outside the NgZone', () => {
+-      const spy = jasmine.createSpy('viewport changed spy');
+-      const subscription = viewportRuler.change(0).subscribe(() => spy(NgZone.isInAngularZone()));
+-
+-      dispatchFakeEvent(window, 'resize');
+-      expect(spy).toHaveBeenCalledWith(false);
+-      subscription.unsubscribe();
+-    });
+-
+-    it('should run events outside of the NgZone, even if the subcription is from inside', () => {
+-      const spy = jasmine.createSpy('viewport changed spy');
+-      let subscription: Subscription;
+-
+-      ngZone.run(() => {
+-        subscription = viewportRuler.change(0).subscribe(() => spy(NgZone.isInAngularZone()));
+-        dispatchFakeEvent(window, 'resize');
+-      });
+-
+-      expect(spy).toHaveBeenCalledWith(false);
+-      subscription!.unsubscribe();
+-    });
+   });
+ });
+diff --git a/src/cdk/scrolling/viewport-ruler.zone.spec.ts b/src/cdk/scrolling/viewport-ruler.zone.spec.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..ef68ae5de9c58118c08dfdb8319a690050de328c
+--- /dev/null
++++ b/src/cdk/scrolling/viewport-ruler.zone.spec.ts
+@@ -0,0 +1,53 @@
++import {NgZone, provideZoneChangeDetection} from '@angular/core';
++import {TestBed, inject} from '@angular/core/testing';
++import {Subscription} from 'rxjs';
++import {dispatchFakeEvent} from '../testing/private';
++import {ScrollingModule} from './scrolling-module';
++import {ViewportRuler} from './viewport-ruler';
++
++describe('ViewportRuler', () => {
++  let viewportRuler: ViewportRuler;
++  let ngZone: NgZone;
++
++  // Create a very large element that will make the page scrollable.
++  let veryLargeElement: HTMLElement = document.createElement('div');
++  veryLargeElement.style.width = '6000px';
++  veryLargeElement.style.height = '6000px';
++
++  beforeEach(() =>
++    TestBed.configureTestingModule({
++      imports: [ScrollingModule],
++      providers: [provideZoneChangeDetection(), ViewportRuler],
++    }),
++  );
++
++  beforeEach(inject([ViewportRuler, NgZone], (v: ViewportRuler, n: NgZone) => {
++    viewportRuler = v;
++    ngZone = n;
++    scrollTo(0, 0);
++  }));
++
++  describe('changed event', () => {
++    it('should run the resize event outside the NgZone', () => {
++      const spy = jasmine.createSpy('viewport changed spy');
++      const subscription = viewportRuler.change(0).subscribe(() => spy(NgZone.isInAngularZone()));
++
++      dispatchFakeEvent(window, 'resize');
++      expect(spy).toHaveBeenCalledWith(false);
++      subscription.unsubscribe();
++    });
++
++    it('should run events outside of the NgZone, even if the subcription is from inside', () => {
++      const spy = jasmine.createSpy('viewport changed spy');
++      let subscription: Subscription;
++
++      ngZone.run(() => {
++        subscription = viewportRuler.change(0).subscribe(() => spy(NgZone.isInAngularZone()));
++        dispatchFakeEvent(window, 'resize');
++      });
++
++      expect(spy).toHaveBeenCalledWith(false);
++      subscription!.unsubscribe();
++    });
++  });
++});
+diff --git a/src/cdk/text-field/autofill.zone.spec.ts b/src/cdk/text-field/autofill.zone.spec.ts
+index 5efa4704cca551621a763b8ec6805377e868bcc8..31a8d5a87b3e39d11148fb48a751f09deffde1fa 100644
+--- a/src/cdk/text-field/autofill.zone.spec.ts
++++ b/src/cdk/text-field/autofill.zone.spec.ts
+@@ -3,7 +3,7 @@ import {ComponentFixture, TestBed, inject} from '@angular/core/testing';
+ import {AutofillMonitor} from './autofill';
+ import {TextFieldModule} from './text-field-module';
+ 
+-describe('AutofillMonitor', () => {
++describe('AutofillMonitor Zone.js integration', () => {
+   let autofillMonitor: AutofillMonitor;
+   let fixture: ComponentFixture<Inputs>;
+   let testComponent: Inputs;
+diff --git a/src/dev-app/main.ts b/src/dev-app/main.ts
+index 19e8d61e4d6f22f9bc78407fbe67d768400419ba..4766971d7769b95abcd944e2c0723e9695b96a96 100644
+--- a/src/dev-app/main.ts
++++ b/src/dev-app/main.ts
+@@ -9,14 +9,15 @@
+ // Load `$localize` for examples using it.
+ import '@angular/localize/init';
+ 
++import {provideHttpClient} from '@angular/common/http';
+ import {
+   importProvidersFrom,
+-  provideZoneChangeDetection,
+   provideExperimentalZonelessChangeDetection,
++  // tslint:disable-next-line:no-zone-dependencies -- Allow manual testing of dev-app with zones
++  provideZoneChangeDetection,
+ } from '@angular/core';
+ import {bootstrapApplication} from '@angular/platform-browser';
+ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+-import {provideHttpClient} from '@angular/common/http';
+ import {RouterModule} from '@angular/router';
+ 
+ import {Directionality} from '@angular/cdk/bidi';
+diff --git a/src/material-experimental/popover-edit/popover-edit.spec.ts b/src/material-experimental/popover-edit/popover-edit.spec.ts
+index a66e632b9906eae1f6dd19299bf793b7c3b1180e..070c3edc673dbeb952dd82a41eb563ed63964092 100644
+--- a/src/material-experimental/popover-edit/popover-edit.spec.ts
++++ b/src/material-experimental/popover-edit/popover-edit.spec.ts
+@@ -1,23 +1,17 @@
+ import {DataSource} from '@angular/cdk/collections';
+-import {LEFT_ARROW, UP_ARROW, RIGHT_ARROW, DOWN_ARROW, TAB} from '@angular/cdk/keycodes';
+-import {MatTableModule} from '@angular/material/table';
+-import {dispatchKeyboardEvent} from '../../cdk/testing/private';
++import {DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, TAB, UP_ARROW} from '@angular/cdk/keycodes';
+ import {CommonModule} from '@angular/common';
+-import {
+-  Component,
+-  Directive,
+-  ElementRef,
+-  ViewChild,
+-  provideZoneChangeDetection,
+-} from '@angular/core';
+-import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
++import {Component, Directive, ElementRef, ViewChild} from '@angular/core';
++import {ComponentFixture, TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+ import {FormsModule, NgForm} from '@angular/forms';
++import {MatTableModule} from '@angular/material/table';
+ import {BehaviorSubject} from 'rxjs';
++import {dispatchKeyboardEvent} from '../../cdk/testing/private';
+ 
+ import {
+   CdkPopoverEditColspan,
+-  HoverContentState,
+   FormValueContainer,
++  HoverContentState,
+   PopoverEditClickOutBehavior,
+ } from '@angular/cdk-experimental/popover-edit';
+ import {MatPopoverEditModule} from './index';
+@@ -297,12 +291,6 @@ const testCases = [
+ ] as const;
+ 
+ describe('Material Popover Edit', () => {
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({
+-      providers: [provideZoneChangeDetection()],
+-    });
+-  });
+-
+   for (const [componentClass, label] of testCases) {
+     describe(label, () => {
+       let component: BaseTestComponent;
+@@ -317,6 +305,7 @@ describe('Material Popover Edit', () => {
+         component = fixture.componentInstance;
+         fixture.detectChanges();
+         tick(10);
++        fixture.detectChanges();
+       }));
+ 
+       describe('row hover content', () => {
+@@ -432,6 +421,7 @@ describe('Material Popover Edit', () => {
+ 
+         it('does not trigger edit when disabled', fakeAsync(() => {
+           component.nameEditDisabled = true;
++          fixture.changeDetectorRef.markForCheck();
+           fixture.detectChanges();
+ 
+           // Uses Enter to open the lens.
+@@ -452,6 +442,7 @@ describe('Material Popover Edit', () => {
+ 
+           it('unsets tabindex to 0 on disabled cells', () => {
+             component.nameEditDisabled = true;
++            fixture.changeDetectorRef.markForCheck();
+             fixture.detectChanges();
+ 
+             expect(component.getEditCell().hasAttribute('tabindex')).toBe(false);
+@@ -594,6 +585,7 @@ matPopoverEditTabOut`, fakeAsync(() => {
+ 
+         it('positions the lens at the top left corner and spans the full width of the cell', fakeAsync(() => {
+           component.openLens();
++          fixture.detectChanges();
+ 
+           const paneRect = component.getEditPane()!.getBoundingClientRect();
+           const cellRect = component.getEditCell().getBoundingClientRect();
+@@ -610,9 +602,11 @@ matPopoverEditTabOut`, fakeAsync(() => {
+           );
+ 
+           component.colspan = {before: 1};
++          fixture.changeDetectorRef.markForCheck();
+           fixture.detectChanges();
+ 
+           component.openLens();
++          fixture.detectChanges();
+ 
+           let paneRect = component.getEditPane()!.getBoundingClientRect();
+           expectPixelsToEqual(paneRect.top, cellRects[0].top);
+@@ -620,6 +614,7 @@ matPopoverEditTabOut`, fakeAsync(() => {
+           expectPixelsToEqual(paneRect.right, cellRects[1].right);
+ 
+           component.colspan = {after: 1};
++          fixture.changeDetectorRef.markForCheck();
+           fixture.detectChanges();
+ 
+           paneRect = component.getEditPane()!.getBoundingClientRect();
+@@ -630,6 +625,7 @@ matPopoverEditTabOut`, fakeAsync(() => {
+           // expectPixelsToEqual(paneRect.right, cellRects[2].right);
+ 
+           component.colspan = {before: 1, after: 1};
++          fixture.changeDetectorRef.markForCheck();
+           fixture.detectChanges();
+ 
+           paneRect = component.getEditPane()!.getBoundingClientRect();
+@@ -706,6 +702,7 @@ matPopoverEditTabOut`, fakeAsync(() => {
+           expect(component.lensIsOpen()).toBe(false);
+ 
+           component.openLens();
++          fixture.detectChanges();
+ 
+           expect(component.getInput()!.value).toBe('Hydragon');
+           clearLeftoverTimers();
+@@ -713,6 +710,7 @@ matPopoverEditTabOut`, fakeAsync(() => {
+ 
+         it('resets the lens to original value', fakeAsync(() => {
+           component.openLens();
++          fixture.detectChanges();
+ 
+           component.getInput()!.value = 'Hydragon';
+           component.getInput()!.dispatchEvent(new Event('input'));
+@@ -733,6 +731,7 @@ matPopoverEditTabOut`, fakeAsync(() => {
+           fixture.detectChanges();
+ 
+           component.openLens();
++          fixture.detectChanges();
+ 
+           component.getInput()!.value = 'Hydragon X';
+           component.getInput()!.dispatchEvent(new Event('input'));
+diff --git a/tools/tslint-rules/noZoneDependenciesRule.ts b/tools/tslint-rules/noZoneDependenciesRule.ts
+index a3e888cba2b43b33eab2e5a21a49779f13e05a48..5f050b9a198c3489703ee1478dbf95cdc06a082c 100644
+--- a/tools/tslint-rules/noZoneDependenciesRule.ts
++++ b/tools/tslint-rules/noZoneDependenciesRule.ts
+@@ -1,6 +1,6 @@
++import minimatch from 'minimatch';
+ import * as Lint from 'tslint';
+ import ts from 'typescript';
+-import minimatch from 'minimatch';
+ 
+ /**
+  * NgZone properties that are ok to access.
+@@ -49,4 +49,16 @@ class Walker extends Lint.RuleWalker {
+ 
+     return super.visitPropertyAccessExpression(node);
+   }
++
++  override visitNamedImports(node: ts.NamedImports): void {
++    if (!this._enabled) {
++      return;
++    }
++
++    node.elements.forEach(specifier => {
++      if (specifier.name.getText() === 'provideZoneChangeDetection') {
++        this.addFailureAtNode(specifier, `Using zone change detection is not allowed.`);
++      }
++    });
++  }
+ }
+diff --git a/tslint.json b/tslint.json
+index 0bbce003ac8f0c81e2cf39164d0b478120db9f94..ee66cbd96d369abba6f9dfc92370b6b756a161a9 100644
+--- a/tslint.json
++++ b/tslint.json
+@@ -185,10 +185,12 @@
+     "no-zone-dependencies": [
+       true,
+       [
+-        // Tests may need to verify behavior with zones.
+-        "**/*.spec.ts",
++        // Allow in tests that specficially test integration with Zone.js.
++        "**/*.zone.spec.ts",
+         // TODO(mmalerba): following files to be cleaned up and removed from this list:
+-        "**/cdk/a11y/focus-trap/focus-trap.ts"
++        "**/src/cdk/a11y/focus-trap/focus-trap.ts",
++        "**/src/cdk/testing/tests/testbed.spec.ts",
++        "**/src/material/**/*.spec.ts"
+       ]
+     ]
+   },
