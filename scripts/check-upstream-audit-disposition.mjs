@@ -55,6 +55,7 @@ import {requiresBootstrapPreparation, bootstrapPreparationEntryOk} from './boots
 import {MODERN_CHIP_SCOPE_ROLE,requiresModernChipScope,modernChipScopeEvidenceOk} from './upstream-modern-chip-scope.mjs';
 import {CHIP_EDIT_SCOPE_ROLE,requiresChipEditScope,chipEditScopeEvidenceOk} from './upstream-chip-edit-scope.mjs';
 import {CHIP_INPUT_API_SCOPE_ROLE,requiresChipInputApiScope,chipInputApiScopeEvidenceOk} from './upstream-chip-input-api-scope.mjs';
+import {CHIP_MODERNIZATION_SCOPE_ROLE,requiresChipModernizationScope,chipModernizationScopeEvidenceOk} from './upstream-chip-modernization-scope.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -167,6 +168,7 @@ function evidenceClass(entry) {
   if (requiresModernChipScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-modern-chip-source-scope';
   if (requiresChipEditScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-edit-source-scope';
   if (requiresChipInputApiScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-input-api-source-scope';
+  if (requiresChipModernizationScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-modernization-source-scope';
   if (TEST_IMPORT_SHAS.includes(entry.sha) && !rel.endsWith('.json')) return 'invalid-test-import-cleanup-scope';
   if (SLIDER_INPUT_SHAS.includes(entry.sha) && !rel.endsWith('.json')) return 'invalid-slider-input-scope';
   if (entry.sha === SLIDER_THUMB_DESTROY_SHA && !rel.endsWith('.json')) return 'invalid-slider-thumb-destroy-scope';
@@ -183,6 +185,10 @@ function evidenceClass(entry) {
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
     if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';
+    if (requiresChipModernizationScope(entry,entry.individual_proof) || body.role === CHIP_MODERNIZATION_SCOPE_ROLE) {
+      const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};
+      if (!chipModernizationScopeEvidenceOk(body,entry,readMember,candidateProductSourcePaths(root).sort(),line || body.line)) return 'invalid-chip-modernization-source-scope';
+    }
     if (requiresChipInputApiScope(entry,entry.individual_proof) || body.role === CHIP_INPUT_API_SCOPE_ROLE) {
       const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};
       if (!chipInputApiScopeEvidenceOk(body,entry,readMember,candidateProductSourcePaths(root).sort(),line || body.line)) return 'invalid-chip-input-api-source-scope';
@@ -264,7 +270,7 @@ function individualPatchBound(entry, proof) {
     ? body.reviews.find(item => item?.sha === entry.sha) : body;
   if (!review || review.sha !== entry.sha || review.diff_sha256 !== proof.diff_sha256) return false;
   if(!individualReviewScopeOk({entry,proof,body,review,
-    requiresIndividual:Boolean(sensitiveClass(entry))||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),
+    requiresIndividual:Boolean(sensitiveClass(entry))||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),
     claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)}))return false;
   let bytes;
   if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {
@@ -409,7 +415,7 @@ for (const entry of ledgerBySha.values()) {
     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});
   }
   const sensitive = sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)
-    || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof) || requiresChipEditScope(entry, entry.individual_proof) || requiresChipInputApiScope(entry, entry.individual_proof);
+    || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof) || requiresChipEditScope(entry, entry.individual_proof) || requiresChipInputApiScope(entry, entry.individual_proof) || requiresChipModernizationScope(entry, entry.individual_proof);
   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);
   if (needsIndividual && !individualProofOk(entry)) {
     if (sensitive) insufficientSensitive.push(entry.sha);
