@@ -12,11 +12,12 @@ import {execFileSync,spawn} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {existsSync,lstatSync,mkdirSync,mkdtempSync,readFileSync,readdirSync,rmSync,symlinkSync,writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
+import {gunzipSync} from 'node:zlib';
 import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export const HISTORICAL_REPLAY_INPUTS='compatibility/rc/historical-source-replay-inputs.json';
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'80f54447895354110b5b1b5358cfd373aad209651670ba585cce57a723d00e4f','21.x':'97514c2055c2bbf28bf51f1d202f327c0d810b5c84cc3ebad570be5f91b300e4'};
+const pins={main:'0edb29167f891fd53a80ac02788e9ad53036865610151ba4532852ad115fb5bb','21.x':'864cdd61803b224c04f503b1be0142a8b2a8d89f727406e262e76e617ae42ed1'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
  'native-individual-source','native-individual-admission','spec-fixture-context',
  'small-spec-source','followup-spec-source','peer-spec-source','control-case-context',
@@ -30,6 +31,8 @@ const ids=['historical-menu-import','historical-menu-import-admission','menu-exi
 const toolingPaths=['scripts/historical-source-replay.mjs','scripts/run-historical-source-probe.mjs',HISTORICAL_REPLAY_INPUTS,
  'tests/historical_source_replay_probe.mjs','tests/test_historical_source_replay.py','compatibility/rc/historical-source-replay.md'];
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+const successorPaths=['tests/test_native_date_source_context.py','tests/test_recorded_execution_source_context.py'];
+const olderRegistry='compatibility/rc/older-audit-history-inputs.json';
 const blobHash=bytes=>createHash('sha1').update('blob '+bytes.length+'\0').update(bytes).digest('hex');
 function environment(){
  const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
@@ -42,7 +45,8 @@ function relativePath(path){assert.equal(typeof path,'string');assert.ok(!path.i
 export function historicalReplayInputs({root=rootDefault,readMember}={}){
  const read=readMember||((path)=>readFileSync(resolve(root,path))),bytes=read(HISTORICAL_REPLAY_INPUTS),data=JSON.parse(bytes);
  assert.ok(Object.hasOwn(pins,data.line),'unregistered historical line');assert.equal(hash(bytes),pins[data.line],'historical replay input changed');
- assert.equal(data.schema_version,11);assert.deepEqual(data.entries.map(row=>row.id),ids);assert.equal(new Set(data.entries.map(row=>row.probe)).size,26);
+ assert.equal(data.schema_version,12);assert.deepEqual(data.entries.map(row=>row.id),ids);assert.equal(new Set(data.entries.map(row=>row.probe)).size,26);
+ assert.deepEqual(data.current_wrapper_successors.map(row=>row.path),successorPaths);
  assert.deepEqual(data.mutable_progress_paths,['compatibility/rc/remaining-native-admission-worksheet.json','compatibility/rc/session-handoff.json']);
  assert.deepEqual(data.current_head_tooling_paths,toolingPaths);
  for(const entry of data.entries)assert.equal(entry.report_option,['tab-lifecycle-source','native-individual-source','native-individual-admission','spec-fixture-context','small-spec-source','followup-spec-source','peer-spec-source','control-case-context','control-test-source','render-setup-source','theme-date-source','test-environment-zone-source','standalone-environment-source','stability-chip-method','stability-chip-context'].includes(entry.id)?'--out':undefined,'historical report invocation changed');
@@ -69,9 +73,31 @@ function sourceFiles(root,prefix){
   if(entry.isDirectory())visit(path);else if(entry.isFile())paths.push(path);else assert.fail('non-file in current product route '+path);
  }}visit(prefix);return paths.sort();
 }
+/** Two finite wrapper transitions; their original records and assertions are
+ * still authenticated above. No current-HEAD source exception is introduced. */
+function currentWrapperSuccessors(root,data,members,read){
+ const memberMap=new Map(members.map(m=>[m.path,m]));assert.ok(memberMap.has(olderRegistry),'missing successor source registry');
+ const raw=read(olderRegistry),captured=git(root,['show',data.current_frame.commit+':'+olderRegistry]);
+ assert.ok(raw.equals(captured),'current wrapper successor registry changed');
+ const inputs=JSON.parse(raw);assert.equal(inputs.line,data.line);assert.equal(inputs.module_count,20);assert.equal(inputs.case_count,50);
+ const stored=read(inputs.prior.path);assert.equal(hash(stored),inputs.prior.sha256,'wrapper successor prior changed');
+ const priorBytes=gunzipSync(stored);assert.equal(hash(priorBytes),inputs.prior.raw_sha256);const prior=JSON.parse(priorBytes);
+ const result=new Map(),expected=[];
+ for(const path of successorPaths){
+  const wrapper=data.wrapper_edits.find(w=>w.path===path),entry=inputs.entries.find(e=>e.program===path),before=prior.preimages.find(m=>m.path===path);
+  assert.ok(wrapper&&entry&&before&&memberMap.has(path));assert.equal(hash(before.text),before.sha256);assert.equal(before.sha256,wrapper.after_sha256);
+  const original=git(root,['show',inputs.frame.commit+':'+path]);assert.equal(hash(original),entry.program_sha256);assert.equal(hash(original),wrapper.after_sha256);
+  const current=git(root,['show',data.current_frame.commit+':'+path]);assert.equal(hash(current),entry.wrapper_sha256);
+  expected.push({path,original_wrapper_record_sha256:hash(JSON.stringify(wrapper)),original_after_sha256:wrapper.after_sha256,
+   current_sha256:entry.wrapper_sha256,originals_registry:{path:olderRegistry,sha256:hash(raw)},
+   original_program:{commit:inputs.frame.commit,sha256:entry.program_sha256},source_scope_only:true,actual_native_or_packed_qualified:false});
+  result.set(path,{bytes:current,sha256:entry.wrapper_sha256});
+ }
+ assert.deepEqual(data.current_wrapper_successors,expected,'unregistered wrapper successor identity');return result;
+}
 export function verifyHistoricalCurrentSubjects({root=rootDefault,data,members,readMember,productPaths}={}){
  const read=readMember||((path)=>{let cursor=root;assert.ok(lstatSync(root).isDirectory()&&!lstatSync(root).isSymbolicLink());for(const part of path.split('/')){cursor=join(cursor,part);assert.ok(!lstatSync(cursor).isSymbolicLink(),'symlink in current source route '+path);}assert.ok(lstatSync(cursor).isFile());return readFileSync(cursor);}),mutable=new Set(data.mutable_progress_paths),wrappers=new Map(data.wrapper_edits.map(row=>[row.path,row]));
- const currentByPath=new Map(members.map(row=>[row.path,row])),tooling=new Set(toolingPaths);let guarded=0;
+ const currentByPath=new Map(members.map(row=>[row.path,row])),tooling=new Set(toolingPaths),successors=currentWrapperSuccessors(root,data,members,read);let guarded=0;
  for(const member of members){
   if(mutable.has(member.path)||tooling.has(member.path))continue;
   const bytes=read(member.path),wrapper=wrappers.get(member.path);
@@ -79,8 +105,9 @@ export function verifyHistoricalCurrentSubjects({root=rootDefault,data,members,r
    const original=git(root,['show',(wrapper.reference_commit||data.wrapper_reference_commit)+':'+member.path]);assert.equal(hash(original),wrapper.before_sha256);
    let proposed=original.toString();for(const edit of wrapper.edits){assert.equal(proposed.split(edit.before).length,2,'wrapper edit not exact');proposed=proposed.replace(edit.before,edit.after);}
    assert.equal(hash(proposed),wrapper.after_sha256);
-   assert.ok([blobHash(original),blobHash(Buffer.from(proposed))].includes(member.blob),'registered wrapper base changed');
-   assert.ok(hash(bytes)===wrapper.before_sha256||hash(bytes)===wrapper.after_sha256,'current historical-replay wrapper changed '+member.path);
+   const successor=successors.get(member.path);
+   assert.ok([blobHash(original),blobHash(Buffer.from(proposed)),...(successor?[blobHash(successor.bytes)]:[])].includes(member.blob),'registered wrapper base changed');
+   assert.ok([wrapper.before_sha256,wrapper.after_sha256,...(successor?[successor.sha256]:[])].includes(hash(bytes)),'current historical-replay wrapper changed '+member.path);
   }else assert.equal(blobHash(bytes),member.blob,'current historical-replay subject changed '+member.path);
   guarded++;
  }
@@ -96,7 +123,7 @@ export function verifyHistoricalCurrentSubjects({root=rootDefault,data,members,r
  for(const entry of data.entries){assert.equal(hash(read(entry.probe)),entry.probe_sha256,'original historical probe changed');assert.ok(currentByPath.has(entry.probe));}
  return {line:data.line,guarded_current_members:guarded,current_product_members:product.length,
   current_tooling_members:toolingPaths.length,tooling_reference:{commit:toolingCommit,tree:toolingTree},
-  exact_wrapper_edits_only:true,mutable_progress_paths:[...mutable],current_source_qualification:false,current_native_or_packed_qualification:false};
+  exact_wrapper_edits_only:true,authenticated_current_wrapper_successors:successors.size,mutable_progress_paths:[...mutable],current_source_qualification:false,current_native_or_packed_qualification:false};
 }
 export function inspectHistoricalReplayCurrent({root=rootDefault,readMember,productPaths}={}){
  const data=historicalReplayInputs({root,readMember}),members=historicalFrameMembers(root,data.current_frame);

@@ -10,10 +10,11 @@ import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {OLDER_AUDIT_HISTORY_INPUTS,olderAuditHistoryInputs,selectOlderAuditModules} from '../scripts/older-audit-history-inputs.mjs';
-import {inspectHistoricalReplayCurrent} from '../scripts/historical-source-replay.mjs';
+import {inspectHistoricalReplayCurrent,verifyHistoricalCurrentSubjects} from '../scripts/historical-source-replay.mjs';
 import {validateRecentCaseReceipt} from '../scripts/chip-recent-history.mjs';
 const read=p=>readFileSync(p),{data,prior}=olderAuditHistoryInputs(),controls=[];
 const current=inspectHistoricalReplayCurrent(),full=selectOlderAuditModules(data);
+assert.equal(current.guard.authenticated_current_wrapper_successors,2);
 assert.equal(full.complete,true);assert.equal(full.modules.length,20);assert.equal(full.entry.case_ids.length,50);
 const subset=selectOlderAuditModules(data,['tests.test_audit_test_context','tests.test_chip_batch_history']);
 assert.equal(subset.complete,false);assert.equal(subset.entry.case_ids.length,8);
@@ -40,6 +41,23 @@ for(const path of ['scripts/older-audit-history-inputs.mjs','tests/older_audit_h
 }
 const cli=spawnSync(process.execPath,['scripts/run-older-audit-history.mjs','--module','unregistered'],{encoding:'utf8'});
 assert.equal(cli.status,1);assert.match(cli.stderr,/unregistered historical module selector/);controls.push('actual-cli-unknown-selector');
+for(const [name,mutate]of [
+  ['missing-successor',d=>d.current_wrapper_successors.pop()],
+  ['extra-successor',d=>d.current_wrapper_successors.push({...d.current_wrapper_successors[0],path:'tests/foreign.py'})],
+  ['wrong-original-record',d=>d.current_wrapper_successors[0].original_wrapper_record_sha256='0'.repeat(64)],
+  ['wrong-before-wrapper',d=>d.current_wrapper_successors[0].original_after_sha256='0'.repeat(64)],
+  ['wrong-current-wrapper',d=>d.current_wrapper_successors[0].current_sha256='0'.repeat(64)],
+  ['wrong-original-frame',d=>d.current_wrapper_successors[0].original_program.commit='0'.repeat(40)],
+  ['wrong-source-registry',d=>d.current_wrapper_successors[0].originals_registry.sha256='0'.repeat(64)],
+  ['wrong-wrapper-path',d=>d.current_wrapper_successors[0].path='tests/foreign.py'],
+]) {
+  const changed=structuredClone(current.data);mutate(changed);
+  assert.throws(()=>verifyHistoricalCurrentSubjects({root:process.cwd(),data:changed,members:current.members}));controls.push(name);
+}
+for(const path of [OLDER_AUDIT_HISTORY_INPUTS,data.prior.path]) {
+  assert.throws(()=>inspectHistoricalReplayCurrent({readMember:p=>p===path?Buffer.concat([read(p),Buffer.from('\n')]):read}));
+  controls.push('changed-successor-source-'+path);
+}
 const report={schema_version:1,line:data.line,registered_modules:20,registered_original_cases:50,diagnostic_cases:8,
   rejection_controls:controls.length,controls,current_guarded_members:current.guard.guarded_current_members,
   current_live_native_helper_protected:prior.protected.some(m=>m.path==='tests/audit_test_context.py'),

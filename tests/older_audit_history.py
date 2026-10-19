@@ -4,7 +4,7 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
 """Complete older source-model cohort; all current native guards remain live."""
-import gzip,hashlib,json,os,subprocess
+import copy,gzip,hashlib,json,os,subprocess
 from functools import lru_cache
 from pathlib import Path
 from tests.chip_recent_history import canonical_recorded_case
@@ -24,6 +24,23 @@ def mixed_context_before_history(root):
     previous=next(m for m in prior['preimages'] if m['path']==path)
     assert _sha(previous['text'].encode())==previous['sha256']
     return previous['text']
+def validate_registered_wrapper_successors(root,before,after):
+    """The original registry stays exact across the finite two-wrapper step."""
+    data,prior,_,_=_inputs(root);old=copy.deepcopy(before);new=copy.deepcopy(after)
+    old.pop('current_frame');new.pop('current_frame');assert old['schema_version']==11 and new['schema_version']==12
+    successors=new.pop('current_wrapper_successors');new['schema_version']=11;assert old==new
+    expected=[]
+    for path in ['tests/test_native_date_source_context.py','tests/test_recorded_execution_source_context.py']:
+        wrapper=next(w for w in old['wrapper_edits'] if w['path']==path)
+        entry=next(e for e in data['entries'] if e['program']==path)
+        preimage=next(m for m in prior['preimages'] if m['path']==path)
+        assert _sha(preimage['text'].encode())==preimage['sha256']==wrapper['after_sha256']==entry['program_sha256']
+        expected.append({'path':path,'original_wrapper_record_sha256':_sha(json.dumps(wrapper,separators=(',',':'),ensure_ascii=False).encode()),
+                         'original_after_sha256':wrapper['after_sha256'],'current_sha256':entry['wrapper_sha256'],
+                         'originals_registry':{'path':INPUT,'sha256':_sha((root/INPUT).read_bytes())},
+                         'original_program':{'commit':data['frame']['commit'],'sha256':entry['program_sha256']},
+                         'source_scope_only':True,'actual_native_or_packed_qualified':False})
+    assert successors==expected
 def validate_complete_older_receipt(data,result):
     assert result['line']==data['line'] and result['id']==data['id']
     assert result['complete_registered_module_set'] is True,'diagnostic subset cannot satisfy the full source cohort'

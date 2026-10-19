@@ -6,7 +6,7 @@
 """Historical source cohorts cannot replace live current native obligations."""
 import ast,copy,hashlib,json,os,subprocess,unittest
 from pathlib import Path
-from tests.older_audit_history import _inputs,mixed_context_before_history,validate_complete_older_receipt
+from tests.older_audit_history import _inputs,mixed_context_before_history,validate_complete_older_receipt,validate_registered_wrapper_successors
 from tests.chip_recent_history import canonical_recorded_case
 ROOT=Path(__file__).resolve().parents[1]
 class OlderAuditHistory(unittest.TestCase):
@@ -16,7 +16,7 @@ class OlderAuditHistory(unittest.TestCase):
         child=subprocess.run(cmd,cwd=ROOT,text=True,capture_output=True,timeout=90)
         self.assertEqual(child.returncode,0,(child.stdout+child.stderr)[-12000:]);r=json.loads(child.stdout)
         self.assertEqual((r['registered_modules'],r['registered_original_cases'],r['diagnostic_cases']),(20,50,8))
-        self.assertEqual(r['rejection_controls'],20);self.assertEqual(r['actual_original_cases_executed'],0)
+        self.assertEqual(r['rejection_controls'],30);self.assertEqual(r['actual_original_cases_executed'],0)
         self.assertFalse(r['actual_native_or_packed_or_floor_qualified'])
     def test_partial_or_forged_receipts_never_satisfy_standard_wrappers(self):
         data,_,_,_=_inputs(ROOT)
@@ -75,4 +75,6 @@ class OlderAuditHistory(unittest.TestCase):
         replacement="        current=(ROOT/'tests/test_audit_test_context.py').read_text()\n        if 'from tests.older_audit_history import assert_recorded_older_case' in current:\n            from tests.older_audit_history import mixed_context_before_history\n            current=mixed_context_before_history(ROOT)\n        self.assertNotEqual(expected,before);self.assertEqual(current,expected)"
         self.assertEqual(old.count(original),1);self.assertEqual(source,old.replace(original,replacement))
         self.assertEqual(subprocess.check_output(['git','diff','--name-only',prior['source_parent'],'--','projects','testing','reference','fixtures','compatibility/f10'],cwd=ROOT),b'')
+        old=json.loads(prior['old_replay_inputs']['text']);now=json.loads((ROOT/prior['old_replay_inputs']['path']).read_bytes())
+        validate_registered_wrapper_successors(ROOT,old,now)
 if __name__=='__main__':unittest.main()

@@ -64,7 +64,8 @@ class ChipRecentHistory(unittest.TestCase):
                 self.assertEqual(ast.literal_eval(call.args[2]),e['id']);self.assertEqual(ast.unparse(call.args[3]),'self.id()')
         self.assertEqual(total,276)
         old=json.loads(prior['previous_replay_inputs']['text']);now=json.loads((ROOT/prior['previous_replay_inputs']['path']).read_bytes())
-        old.pop('current_frame');now.pop('current_frame');self.assertEqual(old,now)
+        from tests.older_audit_history import validate_registered_wrapper_successors
+        validate_registered_wrapper_successors(ROOT,old,now)
         for m in prior['protected_members']:self.assertEqual(sha((ROOT/m['path']).read_bytes()),m['sha256'])
         for path in ['projects','testing','reference','fixtures','compatibility/f10']:
             self.assertEqual(subprocess.check_output(['git','diff','--name-only',data['source_parent'],'--',path],cwd=ROOT),b'')
