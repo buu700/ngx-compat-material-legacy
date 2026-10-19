@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "cda37debd498876c9c9b929a8526dccd7e25056b",
+  "status": "reviewed",
+  "criteria": "Review the tab header and tab body NgZone dependencies, retaining authentic historical render/motion observations and supplementing service identity, optional lookup and callback context.",
+  "reviews": [
+    {
+      "file": "legacy-tabs/internal/paginated-tab-header.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "a738ff2ac3d901f5c2e9614130dddbcb19ce306376a662279a6df7d385148225",
+      "required_parameter_index": 4,
+      "original_authored_constructor_unchanged": true,
+      "references": [
+        {
+          "role": "required-constructor-type",
+          "expression": "private _ngZone: NgZone"
+        }
+      ],
+      "member_accesses": [
+        {
+          "member": "runOutsideAngular",
+          "expression": "_ngZone.runOutsideAngular"
+        },
+        {
+          "member": "run",
+          "expression": "this._ngZone.run"
+        },
+        {
+          "member": "runOutsideAngular",
+          "expression": "this._ngZone.runOutsideAngular"
+        },
+        {
+          "member": "run",
+          "expression": "this._ngZone.run"
+        }
+      ],
+      "forwarding": [
+        {
+          "target": "ownedHeaderResize",
+          "argument_index": 1,
+          "expression": "this._ngZone"
+        },
+        {
+          "target": "afterTabHeaderRender",
+          "argument_index": 0,
+          "expression": "this._ngZone"
+        }
+      ],
+      "other_service_escapes": 0,
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public NgZone import supplies the original required fifth parameter of the seven-argument header constructor; its complete authored declaration/body matches untouched16. Binding accounts for one constructor type, two runOutsideAngular registrations, two run calls and exact same-service forwarding to ownedHeaderResize (slot1) and afterTabHeaderRender (slot0), without other escape. The authentic ten-subject/32-fault render execution is reused only after checking current whole header/helper/worker bytes, unchanged producer and public namespace against its immutable execution commit. It is not claimed freshly rerun. The fresh supplement executes the complete current constructor with genuine public zones/injectors/providers, observes the actual captured view injector and exact helper forwarding, and invokes the real owned resize helper. Node-backed host and ResizeObserver protocols prove outside registration/callback capture, viewport/content reentry, observer replacement/disconnection and destruction cleanup. Content/viewport view calls reenter the genuine zone on the six applicable zoneful cells; no-op cells are not credited with distinguishing contexts. Header geometry/view methods are explicit protocols in the supplement; authentic prior render observations retain their own geometry/renderer limits. Three strict public type subjects and24negative contracts cover the actual consumed service/helper methods. No whole component API, actual legacy node DI, real native ResizeObserver/window delivery/paint/CSS, packed/AOT/consumer or complete runtime/compiler/RxJS floor qualification follows. This approves only this imported public dependency boundary.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/tab-zone-use-diagnostic.json",
+          "sha256": "636348973e1ad3ce593e6a610603693727ab3abeb2714debe59b871d96d7f6b2"
+        },
+        {
+          "path": "scripts/tab-zone-use-review.mjs",
+          "sha256": "2a0259b5dd04c0e5681527dae584732ee26f919a6478e6e23b850617b207dec8"
+        },
+        {
+          "path": "tests/tab_zone_use_probe.mjs",
+          "sha256": "52a65b9e427a9391c10cb95ee1ddc30b9e631e5908bdf9c4d13892cf84f319a3"
+        },
+        {
+          "path": "tests/tab_zone_use_subject.mjs",
+          "sha256": "739447e80a9090c7ed12c7a3f7cc61bd7276c172fe720f7909fecca97ee91714"
+        },
+        {
+          "path": "scripts/form-menu-zone-use-review.mjs",
+          "sha256": "1fa993a605a1c068984952bc6cbdb26796e5da926dbed5d59787f644be080857"
+        },
+        {
+          "path": "reference/material-16.2.14/tab-header-render-sources/paginated-tab-header.ts",
+          "sha256": "aede756f20cc661b3a35aa3afadea8436892a76f4ac015b340a9b55a9a4140a6"
+        },
+        {
+          "path": "reference/material-16.2.14/component-motion-sources/tabs/tab-body.ts",
+          "sha256": "b8cae68f00521586ecf1b69d3bce277c3e1eeba35997b05b91223b1ffcbdfaf7"
+        },
+        {
+          "path": "compatibility/rc/tab-header-render-source-diagnostic.json",
+          "sha256": "4eeebb8cb97e3a08c7073e5f0cad258dc374cede420934a5fa9715bc343900db"
+        },
+        {
+          "path": "tests/tab_header_render_runtime_probe.mjs",
+          "sha256": "31ca524493e1e0df4d73823f25537a55825e7d870b9636dc0704cef96d1825ad"
+        },
+        {
+          "path": "compatibility/rc/tab-zone-use-original-motion.json",
+          "sha256": "cf46d91725491f3457d252e7ed757ab532c04082dac40c518588791884231527"
+        },
+        {
+          "path": "tests/tab_header_render_subject.mjs",
+          "sha256": "d920286a25927cd05b8e5703a89f7661c2050f3827e61ee33e97c970221a9619"
+        },
+        {
+          "path": "tests/test_tab_header_render_runtime.py",
+          "sha256": "04a8b25362a88503e75b81725d8fcf88d0052229984fc5aabdd01c9179618028"
+        },
+        {
+          "path": "tests/tab_body_motion_runtime_probe.mjs",
+          "sha256": "24b4ed06cb7a86ce5ecdfe79637a23fef082873a687a9cc2d170d314ae518eef"
+        },
+        {
+          "path": "tests/test_tab_body_motion_runtime.py",
+          "sha256": "90a8946c213690a1405719ce105cebd701db770c45d8f844bce23d9e43d7ad2d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/after-tab-header-render.ts",
+          "sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/owned-header-resize.ts",
+          "sha256": "1eba9ce3f5595998227e3cd938ccae6aa1428f07d6fc7b1231666e50a9543033"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        }
+      ],
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "file": "legacy-tabs/internal/tab-body-base.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "9133c2404db7ef40b39819969e310a71caf660c9d9c05ecfd16a8a4fe6ea0154",
+      "original_three_parameter_types_names_and_arity_preserved": true,
+      "existing_element_visibility_difference": {
+        "original": "private",
+        "current": "protected"
+      },
+      "authored_constructor_body_identical_claimed": false,
+      "references": [
+        {
+          "role": "nullable-factory-return-type",
+          "expression": "NgZone | null"
+        },
+        {
+          "role": "optional-public-inject-token",
+          "expression": "inject(NgZone, {optional: true})"
+        }
+      ],
+      "member_accesses": [
+        {
+          "member": "run",
+          "expression": "this._ngZone.run"
+        },
+        {
+          "member": "runOutsideAngular",
+          "expression": "this._ngZone.runOutsideAngular"
+        }
+      ],
+      "guards": [
+        {
+          "role": "optional-zone-guard",
+          "expression": "this._ngZone"
+        },
+        {
+          "role": "optional-zone-guard",
+          "expression": "this._ngZone"
+        }
+      ],
+      "optional_factory_and_readonly_field": true,
+      "other_service_escapes": 0,
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public NgZone import is used once as the nullable return type of the local tabBodyNgZone factory and once as its exact public optional inject token. The readonly field calls this factory, with two null guards and precisely run/runOutsideAngular consumption; no service escapes. Static checks retain a narrow context-assertion catch returning null and place optional injection outside that catch so provider errors propagate. The original three constructor parameter names/types/arity remain; the existing ElementRef visibility expansion from private to protected and constructor predicate refactor are recorded, not mislabeled verbatim equivalence. The unchanged original motion producer freshly passes47cases/22faults on each line, including the complete untouched16 completion subscription contract, under its explicit borrowed Angular22/deterministic-clock limits. The new whole-source supplement executes genuine original/minimum public zones/injectors and current zoneful/zoneless providers. Manual construction outside DI and missing-service construction retain null and the direct timer fallback; supplied-service construction retains the actual same public NgZone. A real throwing provider remains observable. Actual Node tasks verify requested500ms plus100ms buffer, run deliberately at0ms, capture registration/callback outside Angular and reenter the supplied real zone for completion. Destruction physically cancels the actual task. Together with header coverage,80supplement cases and82applicable behavior faults pass;16source/declaration/evidence controls and24negative strict compile contracts reject context/token/type/evidence changes. Animation policy, DOM/style/layout and accelerated timer boundaries are protocols, and native600ms timing/CSS, full component API/node DI, packed/AOT/consumer and complete floor matrices remain pending. This decision closes the exact public NgZone dependency only.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/tab-zone-use-diagnostic.json",
+          "sha256": "636348973e1ad3ce593e6a610603693727ab3abeb2714debe59b871d96d7f6b2"
+        },
+        {
+          "path": "scripts/tab-zone-use-review.mjs",
+          "sha256": "2a0259b5dd04c0e5681527dae584732ee26f919a6478e6e23b850617b207dec8"
+        },
+        {
+          "path": "tests/tab_zone_use_probe.mjs",
+          "sha256": "52a65b9e427a9391c10cb95ee1ddc30b9e631e5908bdf9c4d13892cf84f319a3"
+        },
+        {
+          "path": "tests/tab_zone_use_subject.mjs",
+          "sha256": "739447e80a9090c7ed12c7a3f7cc61bd7276c172fe720f7909fecca97ee91714"
+        },
+        {
+          "path": "scripts/form-menu-zone-use-review.mjs",
+          "sha256": "1fa993a605a1c068984952bc6cbdb26796e5da926dbed5d59787f644be080857"
+        },
+        {
+          "path": "reference/material-16.2.14/tab-header-render-sources/paginated-tab-header.ts",
+          "sha256": "aede756f20cc661b3a35aa3afadea8436892a76f4ac015b340a9b55a9a4140a6"
+        },
+        {
+          "path": "reference/material-16.2.14/component-motion-sources/tabs/tab-body.ts",
+          "sha256": "b8cae68f00521586ecf1b69d3bce277c3e1eeba35997b05b91223b1ffcbdfaf7"
+        },
+        {
+          "path": "compatibility/rc/tab-header-render-source-diagnostic.json",
+          "sha256": "4eeebb8cb97e3a08c7073e5f0cad258dc374cede420934a5fa9715bc343900db"
+        },
+        {
+          "path": "tests/tab_header_render_runtime_probe.mjs",
+          "sha256": "31ca524493e1e0df4d73823f25537a55825e7d870b9636dc0704cef96d1825ad"
+        },
+        {
+          "path": "compatibility/rc/tab-zone-use-original-motion.json",
+          "sha256": "cf46d91725491f3457d252e7ed757ab532c04082dac40c518588791884231527"
+        },
+        {
+          "path": "tests/tab_header_render_subject.mjs",
+          "sha256": "d920286a25927cd05b8e5703a89f7661c2050f3827e61ee33e97c970221a9619"
+        },
+        {
+          "path": "tests/test_tab_header_render_runtime.py",
+          "sha256": "04a8b25362a88503e75b81725d8fcf88d0052229984fc5aabdd01c9179618028"
+        },
+        {
+          "path": "tests/tab_body_motion_runtime_probe.mjs",
+          "sha256": "24b4ed06cb7a86ce5ecdfe79637a23fef082873a687a9cc2d170d314ae518eef"
+        },
+        {
+          "path": "tests/test_tab_body_motion_runtime.py",
+          "sha256": "90a8946c213690a1405719ce105cebd701db770c45d8f844bce23d9e43d7ad2d"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/after-tab-header-render.ts",
+          "sha256": "02edb608845d4cb4c28ad410f74309ad1cc02214dae823f3c15ad40fd41c699a"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/owned-header-resize.ts",
+          "sha256": "1eba9ce3f5595998227e3cd938ccae6aa1428f07d6fc7b1231666e50a9543033"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        }
+      ],
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    }
+  ],
+  "ledger_integration": "Pending finite integration batch. Frozen1452reviewed/284open and current178reviewed/130open remain unchanged. Nine NgZone source use receipts now await integration; slider, tooltip and select remain unreviewed.",
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
