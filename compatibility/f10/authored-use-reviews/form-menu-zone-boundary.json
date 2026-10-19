@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "9ed4b51e94d49244c768045fb975f2a30ca577c8",
+  "status": "reviewed",
+  "criteria": "Review two exact NgZone caller boundaries: form-field outside registration/forwarding and optional menu-trigger position reentry.",
+  "reviews": [
+    {
+      "file": "legacy-form-field/form-field.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+      "required_parameter_index": 5,
+      "optional_parameter_index": null,
+      "references": [
+        {
+          "role": "implementation-constructor-type",
+          "expression": "private _ngZone: NgZone"
+        }
+      ],
+      "member_accesses": [
+        {
+          "member": "runOutsideAngular",
+          "expression": "this._ngZone.runOutsideAngular"
+        },
+        {
+          "member": "runOutsideAngular",
+          "expression": "this._ngZone.runOutsideAngular"
+        }
+      ],
+      "forwarding": [
+        {
+          "target": "afterFormFieldRender",
+          "argument_index": 0,
+          "expression": "this._ngZone"
+        }
+      ],
+      "guards": [],
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public NgZone import supplies the required sixth parameter of the owned historical field; it remains identical to the untouched16 parameter, with the original seven required arguments retained and a separately reviewed optional trailing Injector. Checker binding accounts for exactly one constructor type, two runOutsideAngular calls, and one identical service forwarding to afterFormFieldRender, with no other service escape. The existing whole-field constructor/render/geometry/lifetime observations remain usable: both complete product/helper bytes, the unchanged producer and public namespace capsule match their authentic immutable execution commit. That recorded ten-subject/120-fault execution is explicitly reused, never claimed freshly rerun. The fresh supplement executes the complete current constructor and content-init/direction/destruction paths using real public original/minimum NgZone and current public application providers. It observes hook registration outside Angular with identical service/injector, real Node task capture through a RAF protocol, direction omission, cancellation, and captured late callbacks. The hook/trait/CDR/DOM/RAF boundary protocols are explicit; the reused report supplies genuine current render-hook observations. Original/minimum stable method declarations and strict consumed-method fixtures pass at three public namespaces with diagnostic compilers. No zone-patch-rxjs plugin, actual legacy node DI/view, native browser RAF/geometry, packed/AOT/consumer or complete floor qualification follows.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/form-menu-zone-use-diagnostic.json",
+          "sha256": "4bf309651ab912ea336c2f85a280fa5d7d631fa9fd384e5fd88eacc4826d23db"
+        },
+        {
+          "path": "scripts/form-menu-zone-use-review.mjs",
+          "sha256": "1fa993a605a1c068984952bc6cbdb26796e5da926dbed5d59787f644be080857"
+        },
+        {
+          "path": "tests/form_menu_zone_use_probe.mjs",
+          "sha256": "9499d45679c33ddd4f0e994d34b2e2884782a87e5d4e176b9ce0b44f3239f726"
+        },
+        {
+          "path": "tests/form_menu_zone_use_subject.mjs",
+          "sha256": "9f9ac5547e548d24848df928f1708d1626e7067ab5f93a206fa0d27f040a5c28"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "compatibility/rc/form-field-state-frame-runtime-diagnostic.json",
+          "sha256": "2a6827bfb0af87effc786eef493dd6ea608028d8bee352db3bc9c7e17b6bc3c1"
+        },
+        {
+          "path": "tests/form_field_render_runtime_probe.mjs",
+          "sha256": "ffa7240e0fb75376ccf60cf21609a8edd6ddb23c9d3c20ea34533443b921fba7"
+        },
+        {
+          "path": "reference/material-16.2.14/control-forwarding-sources/form-field.ts",
+          "sha256": "c32e86f1be87568387a09abcd7e6c47e6cb33fd63ea0cff8b224e98073dd1726"
+        },
+        {
+          "path": "compatibility/rc/key-manager-tagged-construction-subjects.json",
+          "sha256": "50e7f14e8460bef4eab432c53de985b502678d5c1f0257b1dbcc4a2e30e1aad2"
+        },
+        {
+          "path": "compatibility/rc/key-manager-tagged-construction-sources/menu.mjs.gz",
+          "sha256": "fd024d57b3063be03cda5106027c206b6fe23741a0c8c6dbf8b0a783da0f6d79"
+        }
+      ],
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "file": "legacy-menu/internal/menu-trigger-base.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8",
+      "required_parameter_index": null,
+      "optional_parameter_index": 8,
+      "references": [
+        {
+          "role": "historical-overload-type",
+          "expression": "ngZone: NgZone"
+        },
+        {
+          "role": "implementation-constructor-type",
+          "expression": "private _ngZone?: NgZone"
+        }
+      ],
+      "member_accesses": [
+        {
+          "member": "run",
+          "expression": "this._ngZone.run"
+        }
+      ],
+      "forwarding": [],
+      "guards": [
+        {
+          "role": "optional-service-guard",
+          "expression": "this._ngZone"
+        }
+      ],
+      "original_complete_position_method_unchanged": true,
+      "original_complete_constructor_equal_after_existing_lifetime_defaults": true,
+      "existing_lifetime_defaults": [
+        "this._pendingRemoval = Subscription.EMPTY;",
+        "this._keydownSubscription = Subscription.EMPTY;",
+        "this._attachedMenu = null;",
+        "this._menuGeneration = 0;",
+        "this._destroyed = false;",
+        "this._closedMenus = new WeakSet();"
+      ],
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public NgZone import supplies the ninth optional implementation parameter and the retained historical required overload of the owned menu trigger. Checker binding accounts for both type references, one optional-service guard and one public run call; the service never escapes. The complete position method is token-identical to the untouched16 runtime module. The complete emitted constructor also matches after explicitly removing exactly six existing lifetime defaults; their wider overlay behavior is outside this review. Real constructors execute in genuine public injection contexts and retain the supplied service or omitted undefined value. Both untouched16 and current complete class definitions exercise all four position mappings, outside-to-inside reentry with a real zone, the no-zone fallback, no subscription without a callback, and source completion teardown across development/production original/minimum public subjects and current public zoneful/zoneless application providers. The position stream, element/listener/CDR and overlay surroundings are protocols; RxJS and public zone providers are genuine. Wrong mappings, unnecessary subscriptions and the switched outside wrapper are rejected where zoneful behavior distinguishes it. Strict current method fixtures use genuine public NgZone types with explicit surrounding protocols. This approves this public dependency boundary only; complete overlay lifecycle, actual legacy component node DI, native rendering, packed/AOT/consumer and full floors remain pending.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/form-menu-zone-use-diagnostic.json",
+          "sha256": "4bf309651ab912ea336c2f85a280fa5d7d631fa9fd384e5fd88eacc4826d23db"
+        },
+        {
+          "path": "scripts/form-menu-zone-use-review.mjs",
+          "sha256": "1fa993a605a1c068984952bc6cbdb26796e5da926dbed5d59787f644be080857"
+        },
+        {
+          "path": "tests/form_menu_zone_use_probe.mjs",
+          "sha256": "9499d45679c33ddd4f0e994d34b2e2884782a87e5d4e176b9ce0b44f3239f726"
+        },
+        {
+          "path": "tests/form_menu_zone_use_subject.mjs",
+          "sha256": "9f9ac5547e548d24848df928f1708d1626e7067ab5f93a206fa0d27f040a5c28"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "compatibility/rc/form-field-state-frame-runtime-diagnostic.json",
+          "sha256": "2a6827bfb0af87effc786eef493dd6ea608028d8bee352db3bc9c7e17b6bc3c1"
+        },
+        {
+          "path": "tests/form_field_render_runtime_probe.mjs",
+          "sha256": "ffa7240e0fb75376ccf60cf21609a8edd6ddb23c9d3c20ea34533443b921fba7"
+        },
+        {
+          "path": "reference/material-16.2.14/control-forwarding-sources/form-field.ts",
+          "sha256": "c32e86f1be87568387a09abcd7e6c47e6cb33fd63ea0cff8b224e98073dd1726"
+        },
+        {
+          "path": "compatibility/rc/key-manager-tagged-construction-subjects.json",
+          "sha256": "50e7f14e8460bef4eab432c53de985b502678d5c1f0257b1dbcc4a2e30e1aad2"
+        },
+        {
+          "path": "compatibility/rc/key-manager-tagged-construction-sources/menu.mjs.gz",
+          "sha256": "fd024d57b3063be03cda5106027c206b6fe23741a0c8c6dbf8b0a783da0f6d79"
+        }
+      ],
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    }
+  ],
+  "ledger_integration": "Pending finite integration batch. Frozen1452 reviewed/284 open and current178 reviewed/130 open stay unchanged. Four NgZone use receipts (chip, checkbox, form-field and menu-trigger) now await integration.",
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
