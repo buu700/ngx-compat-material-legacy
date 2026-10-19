@@ -6,6 +6,7 @@
 """Original stage assertions stay executed; no current runtime credit from history."""
 import ast,gzip,hashlib,json,os,subprocess,unittest
 from pathlib import Path
+from tests.chip_recent_history import canonical_recorded_case
 ROOT=Path(__file__).resolve().parents[1]
 PREFIX='compatibility/rc/chip-recent-history-'
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -13,6 +14,27 @@ def assertions(source):
     return [ast.dump(n,include_attributes=False) for n in ast.walk(ast.parse(source)) if isinstance(n,ast.Assert)
             or isinstance(n,ast.Call) and isinstance(n.func,ast.Attribute) and n.func.attr.startswith('assert')]
 class ChipRecentHistory(unittest.TestCase):
+    def test_standard_and_verify_lite_loaders_keep_exact_case_identity(self):
+        data=json.loads((ROOT/(PREFIX+'inputs.json')).read_bytes())
+        def ids(suite):
+            result=[]
+            for item in suite:
+                if isinstance(item,unittest.TestSuite):result.extend(ids(item))
+                else:result.append(item.id())
+            return sorted(result)
+        count=0
+        for entry in data['entries']:
+            normal=ids(unittest.TestLoader().loadTestsFromName(entry['module']))
+            discovered=ids(unittest.TestLoader().discover(str(ROOT/'tests'),pattern=Path(entry['program']).name))
+            self.assertEqual(normal,entry['case_ids'])
+            self.assertEqual(sorted(canonical_recorded_case(entry,c) for c in discovered),entry['case_ids'])
+            self.assertTrue(all(not c.startswith('tests.') for c in discovered))
+            for case in normal:
+                self.assertEqual(canonical_recorded_case(entry,case),case)
+                for bad in ['foreign.'+case,'tests.'+case,case+'.extra',case.replace('.test_', '.missing_',1)]:
+                    with self.assertRaises(AssertionError):canonical_recorded_case(entry,bad)
+            count+=len(normal)
+        self.assertEqual(count,19)
     def test_missing_cases_skips_dirty_graphs_and_unknown_inputs_reject(self):
         command=['node','tests/chip_recent_history_probe.mjs']
         if os.environ.get('NGX_CHIP_RECENT_BOUNDARY_DIAGNOSTIC'):command.append(os.environ['NGX_CHIP_RECENT_BOUNDARY_DIAGNOSTIC'])

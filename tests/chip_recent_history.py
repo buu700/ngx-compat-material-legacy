@@ -22,6 +22,13 @@ PINS={'main':'0bec81d070453c3224e8b06577c49658d53dbb570a48a81bce4d238fedf4d5d9',
       '21.x':'66c698888d08f80322a5c939e05cbabb39c1afbbb6c36f99287edc32f7aee46c'}
 _sha=lambda b:hashlib.sha256(b).hexdigest()
 
+def canonical_recorded_case(entry,case_id):
+    """unittest's two standard module import forms retain the same case ID."""
+    if case_id in entry['case_ids']:return case_id
+    qualified='tests.'+case_id
+    if qualified in entry['case_ids']:return qualified
+    raise AssertionError('Unregistered historical case: '+case_id)
+
 @lru_cache(maxsize=7)
 def _execute(root,stage,inputs_hash,prior_hash,head,report_dir):
     command=['node','scripts/run-chip-recent-history.mjs',stage]
@@ -38,7 +45,8 @@ def assert_recorded_case(test,root,stage,case_id):
     stored=(root/data['prior']['path']).read_bytes();test.assertEqual(_sha(stored),data['prior']['sha256'])
     test.assertEqual(_sha(gzip.decompress(stored)),data['prior']['raw_sha256'])
     entries=[e for e in data['entries'] if e['id']==stage];test.assertEqual(len(entries),1)
-    test.assertIn(case_id,entries[0]['case_ids'])
+    canonical=canonical_recorded_case(entries[0],case_id)
+    test.assertIn(canonical,entries[0]['case_ids'])
     head=subprocess.check_output(['git','--no-replace-objects','rev-parse','HEAD'],cwd=root,text=True).strip()
     result=json.loads(_execute(str(root),stage,fingerprint,_sha(stored),head,
                               os.environ.get('NGX_CHIP_RECENT_HISTORY_REPORT_DIR','')))
