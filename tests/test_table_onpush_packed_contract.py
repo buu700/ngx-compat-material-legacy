@@ -8,21 +8,11 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.packed_collector_history import assert_recorded_collector_case
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class TableOnPushPackedContractTests(unittest.TestCase):
     def test_requires_bound_attributes_stable_input_transitions_and_destroy(self):
-        result = subprocess.run(['node', 'tests/table_onpush_packed_contract_probe.mjs'],
-            cwd=ROOT, capture_output=True, text=True)
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        observed = json.loads(result.stdout.strip().splitlines()[-1])
-        self.assertEqual(observed['derived_cases'], 106)
-        self.assertEqual(observed['collector_mutants'], 2)
-        self.assertEqual(observed['writer_cases'], 3)
-        self.assertGreaterEqual(observed['negative_cases'], 50)
-        self.assertEqual(observed['source_reversal_negative_controls'], 14)
-        self.assertTrue(observed['roster_bound'])
-        self.assertFalse(observed['actual_packed_table_executed'])
-        self.assertFalse(observed['native_browser_executed'])
+        assert_recorded_collector_case(self, ROOT, self.id())

@@ -8,23 +8,14 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.packed_collector_history import assert_recorded_collector_case
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class MenuItemTokenPackedContractTests(unittest.TestCase):
     def test_actual_collector_writer_and_preserved_source_preimages(self):
-        result = subprocess.run(['node', 'tests/menu_item_token_packed_contract_probe.mjs'],
-            cwd=ROOT, text=True, capture_output=True)
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        observed = json.loads(result.stdout.strip().splitlines()[-1])
-        for field, expected in [('derived_cases', 106), ('retained_previous_cases', 105),
-                ('negative_cases', 830), ('collector_mutants', 3), ('writer_cases', 3),
-                ('source_reversal_negative_controls', 67)]:
-            self.assertEqual(observed[field], expected, field)
-        self.assertTrue(observed['roster_bound'])
-        self.assertFalse(observed['actual_packed_menu_or_components_executed'])
-        self.assertFalse(observed['native_browser_executed'])
+        assert_recorded_collector_case(self, ROOT, self.id())
 
     def test_three_live_token_uses_remain_pending(self):
         frozen = json.loads((ROOT / 'compatibility/f10/authored-dependency-dispositions.json').read_text())

@@ -9,21 +9,14 @@ import json
 from pathlib import Path
 import subprocess
 import unittest
+from tests.packed_collector_history import assert_recorded_collector_case
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class SelectFocusClickPackedTests(unittest.TestCase):
     def test_actual_collector_and_previous_conditions_are_both_required(self):
-        result = subprocess.run(['node', 'tests/select_focus_click_packed_contract_probe.mjs'], cwd=ROOT, text=True, capture_output=True)
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        observed = json.loads(result.stdout.strip().splitlines()[-1])
-        for field, expected in [('derived_cases', 106), ('retained_previous_cases', 106),
-                ('original_select_harness_conditions_retained', 3), ('negative_cases', 2016),
-                ('collector_mutants', 4), ('writer_cases', 3), ('source_reversal_negative_controls', 55)]:
-            self.assertEqual(observed[field], expected, field)
-        self.assertTrue(observed['existing_select_case_strengthened'])
-        self.assertFalse(observed['actual_packed_focus_click_executed'])
+        assert_recorded_collector_case(self, ROOT, self.id())
 
     def test_complete_method_protocol_and_tagged_original_reversions(self):
         result = subprocess.run(['node', 'tests/select_focus_click_method_probe.mjs'], cwd=ROOT, text=True, capture_output=True)
