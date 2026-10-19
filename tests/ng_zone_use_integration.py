@@ -54,6 +54,12 @@ def parent_protected_bytes(root, path):
 
 
 def historical_protected_bytes(root, path):
+    # Ordinary source assertions already hash their actual bytes. Only finite
+    # registered substitutions need a validated historical parent projection.
+    context_paths = parent.TEST_PATHS | {'tests/test_ripple_global_options_integration.py',
+                                        'tests/ripple_global_options_integration_probe.mjs'}
+    if path != LEDGER and path not in context_paths:
+        return (root / path).read_bytes()
     return parent.historical_protected_bytes(_ParentRoot(root), path)
 
 

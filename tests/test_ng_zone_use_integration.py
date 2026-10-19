@@ -12,6 +12,8 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from unittest.mock import patch
+from tests.ng_zone_use_integration import historical_protected_bytes
 from tests.test_ripple_global_options_integration import rows
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,6 +40,14 @@ class NgZoneUseIntegration(unittest.TestCase):
         self.assertEqual(report['current_source_reader_substitutions'], 0)
         self.assertEqual(report['native_admission_exceptions_added'], 0)
         self.assertFalse(report['actual_native_packed_or_floor_qualified'])
+
+    def test_raw_source_reads_stay_raw_and_context_substitutions_fail_closed(self):
+        path = 'projects/ngx-material-legacy/legacy-slider/slider.ts'
+        with patch('tests.ng_zone_use_integration.subprocess.run', side_effect=AssertionError('guard required')):
+            self.assertEqual(historical_protected_bytes(ROOT, path), (ROOT / path).read_bytes())
+            for special in [LEDGER, 'tests/test_current_audit_native.py']:
+                with self.subTest(path=special), self.assertRaisesRegex(AssertionError, 'guard required'):
+                    historical_protected_bytes(ROOT, special)
 
     def test_exact_row_bytes_and_original_assertions_and_native_methods(self):
         prior = json.loads(gzip.decompress((ROOT / PRIOR).read_bytes()))
