@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "a57633f149b638009d9715adce7455da2faecfab",
+  "status": "reviewed",
+  "criteria": "Review final frozen slider NgZone dependency with original constructor/pointer/helper identity and genuine listener/callback contexts.",
+  "reviews": [
+    {
+      "file": "legacy-slider/slider.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d",
+      "required_parameter_index": 5,
+      "references": [
+        {
+          "role": "required-constructor-type",
+          "expression": "private _ngZone: NgZone"
+        }
+      ],
+      "member_accesses": [
+        {
+          "member": "runOutsideAngular",
+          "expression": "_ngZone.runOutsideAngular"
+        },
+        {
+          "member": "run",
+          "expression": "this._ngZone.run"
+        }
+      ],
+      "service_forwarding_or_escapes": 0,
+      "original_complete_authored_and_published_emitted_constructors_unchanged": true,
+      "original_pointer_teardown_and_five_helpers_unchanged": true,
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public NgZone import supplies the required sixth parameter of the unchanged eight-argument historical slider constructor. Binding accounts for one constructor type, the bare runOutsideAngular registration and instance run pointer reentry, with no service forwarding or escape. The entire authored constructor matches the untouched16 TypeScript source, and the complete emitted constructor including field initializers is token-identical to the independently authenticated published16 runtime module. Complete pointer-down/move/up, input/change emission and teardown members and all five pointer helpers match the tagged TypeScript reference. Complete current/original class definitions execute with genuine public original/minimum NgZone and current public zoneful/zoneless application providers. Actual patched Node EventEmitter backs explicit host/document/window listener protocols: the two host registrations and callbacks occur outside Angular, pointer work reenters the supplied zone, and global drag listeners capture that inside context. Actual source helpers drive mouse/touch coordinates, values, input/change events, touch identifiers, disabled/nonprimary/active guards and noncancelable handling. Teardown removes exact handler/options identities, removes global listeners, preserves a foreign host listener and prevents late listener effects. Eighty cases and seventy-eight context/lifecycle/guard faults pass across ten development/production subjects; zone distinction faults apply only to six zoneful cells. Sixteen source/declaration/reference corruptions reject stale types, escaped services, modified originals and changed consumed members. Three strict public type subjects retain twenty-four negative contracts. Tagged emission methods establish that input updates during dragging while valueChange commits once at release; the new expectation was corrected against that independent original, with no product or golden change. Trait, focus-monitor/CDR, DOM/listener and geometry surroundings are explicit protocols. Actual legacy node DI, native mouse/touch delivery/CSS/geometry, complete component API, packed/AOT/consumer and all Node/compiler/RxJS floors remain pending. This closes only the exact imported public dependency boundary.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/slider-zone-use-diagnostic.json",
+          "sha256": "a6f3b14d90e5292ea85154c4f397393f27def4a415ad58cda3acb0e5f2b0da52"
+        },
+        {
+          "path": "scripts/slider-zone-use-review.mjs",
+          "sha256": "c5bb1d2a729ed8d7d5539903cd2de4372f582f918fd47a8f5e702318b3171419"
+        },
+        {
+          "path": "tests/slider_zone_use_probe.mjs",
+          "sha256": "b172fc38d732164d308f81c08b3a1af09a726584b7daed466adb9fb18546baeb"
+        },
+        {
+          "path": "tests/slider_zone_use_subject.mjs",
+          "sha256": "14b3b242416e61fbc5f9a51e35abcc9b136f3745cc19e98e0a9ba309d1361b50"
+        },
+        {
+          "path": "scripts/form-menu-zone-use-review.mjs",
+          "sha256": "1fa993a605a1c068984952bc6cbdb26796e5da926dbed5d59787f644be080857"
+        },
+        {
+          "path": "reference/material-16.2.14/value-accessor-token-sources/legacy-slider/slider.ts",
+          "sha256": "e923bb96cd3ca35f8bd0697e3ab797f934103cfb6d8b4cae022f4183d45fd1c9"
+        },
+        {
+          "path": "compatibility/rc/passive-listener-tagged-subjects.json",
+          "sha256": "8b4c2214a65b18a43b0157efddb679682e8e95588e533e70b63c1d97d9f11c5e"
+        },
+        {
+          "path": "compatibility/rc/passive-listener-tagged-sources/legacy-slider.mjs.gz",
+          "sha256": "17f912e1645af20949daceb78c32d3b5cece5ca81d8b5c8bedbb1290673444d0"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        }
+      ],
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    }
+  ],
+  "ledger_integration": "Pending finite twelve-use integration. Frozen1452reviewed/284open and current178reviewed/130open remain unchanged. All twelve queued frozen NgZone owner uses now have substantive source reviews; no ledger closure is claimed yet.",
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
