@@ -118,8 +118,11 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     const line=product.version.startsWith('21.')?'21.x':'main';assert.equal(body.line,line);
     assert.deepEqual(body.scope_sha_ids,Object.keys(TEST_CONSOLIDATION_PATCHES).sort());
     assert.equal(body.reviews.length,32);assert.deepEqual(body.reviews.map(r=>r.sha).sort(),body.scope_sha_ids);
-    const contextPath='compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json';
-    assert.equal(body.candidate_context.path,contextPath);
+    // The current copy preserves the original review and rebinds its complete
+    // product snapshot. Both paths still require the same strict build proof.
+    const contextPath=body.candidate_context.path;
+    assert.ok(['compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json',
+      'compatibility/rc/chip-source-scope-requalification-build.json'].includes(contextPath));
     const contextBytes=readRepo(contextPath);assert.equal(hash(contextBytes),body.candidate_context.sha256);
     const context=JSON.parse(contextBytes),ledger=JSON.parse(readRepo('compatibility/f10/disposition-ledger/ledger.json'));
     const contextEntry=ledger.entries.find(e=>e.sha===context.scope_sha_ids[0]);assert.ok(contextEntry);
