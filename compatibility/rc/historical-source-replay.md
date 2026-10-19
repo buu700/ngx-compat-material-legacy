@@ -4,7 +4,7 @@ Copyright (c) 2026 Ryan Lester.
 Use of this source code is governed by the MIT-style license in LICENSE.
 -->
 
-The registry contains26 historical programs and23 exact Python wrappers. The descriptions below retain their historical frame counts. Current31main/30line native source obligations are checked separately; replay supplies no current runtime qualification.
+The registry contains26 historical programs and23 exact Python wrappers. The descriptions below retain their historical frame counts. Current34main/33line native source obligations are checked separately; replay supplies no current runtime qualification.
 
 The finite source-review probes below describe specific historical source populations and receipt rosters. Later reviewed changes can invalidate their original source hashes or move a receipt into a newer review. Their Python tests use a registered immutable Git graph so the complete original JavaScript programs and rejection assertions remain unchanged.
 
@@ -73,3 +73,5 @@ The twenty-third and twenty-fourth original programs preserve the 32-subject con
 The twenty-fifth program retains the unchanged NativeDate source-context model at its original3ee42e/bf7de7 frame, including its30 complete source predecessors and61 source corruption controls. The twenty-second wrapper substitutes only the exact invocation/diagnostic interface and allows the complete guarded replay to finish. All prior91 controls remain, with three additions for94 total.
 
 The twenty-sixth program retains the unchanged recorded-execution source-context model at its verified4a8a12e/85c21ce frame. Its original17 source preimages,34 source corruption controls,28 exact projection controls,1697 then-current decisions and28main/27line native requirements remain assertions about that historical graph. The twenty-third Python wrapper changes only the Node invocation, diagnostic option and outer replay timeout. All25 prior programs/frames,22 exact wrapper records and94 controls remain unchanged, with three added guard cases for97 total. The current chip source qualification independently requires31main/30line native guards and preserves the6 subsequent modern/classic decisions; the old model is never current or runtime admission. Python readers and the modern/classic exact stage comparisons still require the separately owned finite source/history union.
+
+The chip focus repair and source87 requalification advance only the current coherence frame. All26 historical programs,23 wrapper records,97 original controls and their immutable historical frames remain exact. The source87 checkpoint separately validates the current source decisions and all34main/33line native profiles,which still require real coordinator execution. The newer chip lifecycle/focus stages need a separate finite historical successor; this frame refresh does not qualify them.
