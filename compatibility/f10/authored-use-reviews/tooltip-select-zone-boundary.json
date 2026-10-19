@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "82dc1c8ea62c7388c52bf545d8c350a4f7f4a6eb",
+  "status": "reviewed",
+  "criteria": "Review tooltip and select-base NgZone dependencies, including select inherited forwarding and tooltip callback contexts.",
+  "reviews": [
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+      "required_parameter_index": 4,
+      "original_required_zone_parameter_unchanged": true,
+      "references": [
+        {
+          "role": "required-constructor-type",
+          "expression": "private _ngZone: NgZone"
+        }
+      ],
+      "member_accesses": [
+        {
+          "member": "run",
+          "expression": "this._ngZone.run",
+          "file": "legacy-tooltip/internal/tooltip-base.ts"
+        },
+        {
+          "member": "run",
+          "expression": "this._ngZone.run",
+          "file": "legacy-tooltip/internal/tooltip-base.ts"
+        },
+        {
+          "member": "run",
+          "expression": "this._ngZone.run",
+          "file": "legacy-tooltip/internal/tooltip-base.ts"
+        },
+        {
+          "member": "run",
+          "expression": "this._ngZone.run",
+          "file": "legacy-tooltip/internal/tooltip-base.ts"
+        },
+        {
+          "member": "runOutsideAngular",
+          "expression": "this._ngZone.runOutsideAngular",
+          "file": "legacy-tooltip/internal/tooltip-base.ts"
+        }
+      ],
+      "forwarding": [
+        {
+          "target": "afterTooltipRender",
+          "argument_index": 0,
+          "expression": "this._ngZone",
+          "file": "legacy-tooltip/internal/tooltip-base.ts"
+        }
+      ],
+      "inherited_forwarding_bound_to_same_parameter": false,
+      "other_service_escapes": 0,
+      "full_component_API_equivalence_claimed": false,
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public NgZone import supplies the required fifth argument of the twelve-argument owned tooltip constructor, with the same original tagged parameter declaration. Checker binding accounts for one type reference, four run callbacks, one runOutsideAngular Promise registration and exact same-service forwarding to afterTooltipRender. No other service escape exists. The unchanged original producer and Python assertions were freshly executed against current input bytes on both lines: ten original/minimum development/production subjects retain all fifty-two render/description/lifetime faults. Complete current constructors retain the genuine supplied public zone. The fresh supplement uses real original/minimum zones and current zoneful/zoneless application providers to observe null/keyboard focus callbacks, clipped visible overlay callbacks and unmodified visible Escape callbacks reentering Angular, while irrelevant focus/key/visibility conditions remain ignored and destruction unsubscribes. Tooltip show/hide, focus monitor and overlay/position services are explicit protocols at those callback boundaries. The actual Promise created by _syncAriaDescription captures execution outside Angular and suppresses description after destruction; ARIA service/DOM effects are protocols. Combined with select construction, sixty supplementary cases and forty applicable behavior faults pass across ten genuine subjects. No-op cells are not credited with distinguishing zone contexts. Sixteen source/declaration/evidence controls and twenty-four negative compile contracts pass at three authenticated public namespaces. No actual legacy node DI/native focus/paint/geometry, complete component API, packed/AOT/consumer or all Node/compiler/RxJS floors are qualified. This approves the exact public imported dependency only.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/tooltip-select-zone-use-diagnostic.json",
+          "sha256": "ba51e90790e9c8fedf2348c1d48b6d4390e9022532af70c872a1d466ea1ef96b"
+        },
+        {
+          "path": "scripts/tooltip-select-zone-use-review.mjs",
+          "sha256": "e5deb62903d6e728b9aa35a197f227468c38dae44e9481be8cff7168aff362be"
+        },
+        {
+          "path": "tests/tooltip_select_zone_use_probe.mjs",
+          "sha256": "b749e8f69015d0cf1e08515ab3224ca39b9d8843cd9caa596cf1c83d5bd912d8"
+        },
+        {
+          "path": "tests/tooltip_select_zone_use_subject.mjs",
+          "sha256": "5cac66e7c8c213b0fb057ab65386921afe289ca3c334661ea167b247a8e1493b"
+        },
+        {
+          "path": "scripts/form-menu-zone-use-review.mjs",
+          "sha256": "1fa993a605a1c068984952bc6cbdb26796e5da926dbed5d59787f644be080857"
+        },
+        {
+          "path": "scripts/menu-snack-zone-use-review.mjs",
+          "sha256": "23e3373db6f30bdf57988b24c8bd50ddb40bfe5e447fd709acf3d67a9bae8a65"
+        },
+        {
+          "path": "reference/material-16.2.14/tooltip-render-sources/tooltip.ts",
+          "sha256": "14d7821fe83cdfdc8ac9d6f2f8e095a24178ad286a8f9d4eea4245e879d5501c"
+        },
+        {
+          "path": "reference/material-16.2.14/select-render-sources/select-base.ts",
+          "sha256": "ba939bcc724eab50cc71c628c3977ddd68f052bfb265a77de8793ec09562cd73"
+        },
+        {
+          "path": "compatibility/rc/tooltip-select-zone-use-tooltip-runtime.json",
+          "sha256": "874757e3cfd74638da45897093161db09aa4ee478ba69d33ed56a7008c542691"
+        },
+        {
+          "path": "compatibility/rc/tooltip-select-zone-use-select-runtime.json",
+          "sha256": "c326431694d5a915bdbef74fd4883cfe340ede925ec3de468e9529ee8e079dc5"
+        },
+        {
+          "path": "tests/tooltip_render_runtime_probe.mjs",
+          "sha256": "c9eb1005aae281eafbe9db7214076bd9ea0a42aec4b76a847caab359948a86f6"
+        },
+        {
+          "path": "tests/test_tooltip_render_runtime.py",
+          "sha256": "b2e84e23ee336d3da56e81f5229af58a59f3eb4eb6e578a6e2874ca8d4be35b7"
+        },
+        {
+          "path": "tests/select_render_runtime_probe.mjs",
+          "sha256": "0ed0f30b529ec98d6f1a3bb63c315ae5cf7928b4da1a0acd04aa0317063647ce"
+        },
+        {
+          "path": "tests/test_select_render_runtime.py",
+          "sha256": "ffa4cb27f5c41371cd46c239cb742ece200bc3cda8715e7d547b0fb39e9eaeeb"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/internal/after-tooltip-render.ts",
+          "sha256": "025887d2460a74da9bbbf898ca911d3dd82234e41bf34615b65573f500c125f9"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+          "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        }
+      ],
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "file": "legacy-select/internal/select-base.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91",
+      "required_parameter_index": 2,
+      "original_required_zone_parameter_unchanged": true,
+      "references": [
+        {
+          "role": "required-constructor-type",
+          "expression": "protected _ngZone: NgZone"
+        }
+      ],
+      "member_accesses": [
+        {
+          "member": "onStable",
+          "expression": "this._ngZone.onStable",
+          "file": "legacy-select/internal/select-base.ts"
+        },
+        {
+          "member": "isStable",
+          "expression": "this._ngZone.isStable",
+          "file": "legacy-select/internal/select-base.ts"
+        }
+      ],
+      "forwarding": [
+        {
+          "target": "afterSelectRender",
+          "argument_index": 0,
+          "expression": "this._ngZone",
+          "file": "legacy-select/select.ts"
+        }
+      ],
+      "inherited_forwarding_bound_to_same_parameter": true,
+      "other_service_escapes": 0,
+      "full_component_API_equivalence_claimed": false,
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public NgZone import supplies the unchanged required third parameter of the owned select base, stored as a protected parameter property. Binding accounts for one constructor type, onStable/isStable in deferred option initialization, and the inherited receiver in the complete owned MatLegacySelect subclass. TypeScript resolves that subclass receiver to the actual same base constructor declaration; a local field shadow or lost forwarding is rejected. Exact same-service forwarding reaches afterSelectRender in slot0. The subclass source is directly hash-bound as independent evidence, so changing inherited use invalidates this base import review even if the base file stays unchanged. The unchanged full original select producer and Python test were freshly executed against current base/subclass/helper/event inputs on each line, retaining ten genuine original/minimum subjects and all forty selection/readiness/render/font-transfer/lifetime faults. Its constructor check preserves the first fourteen historical arguments and authored body, with the existing optional trailing public Injector recorded separately. Fresh complete-base constructions with fourteen and fifteen arguments retain the actual supplied public NgZone and optional injector and preserve the manual value-accessor assignment, with an explicit trait parent protocol. Genuine public declarations and consumed deferred-stream source compile at all three namespaces with diagnostic compilers; surrounding option/event/state types are explicit protocols. This is a source dependency boundary judgment, not blanket equivalence of mixin ancestry, all public component types or actual Angular node DI. Native overlay/style/geometry, full component API, packed/AOT/consumer and complete runtime/compiler/RxJS floors remain pending.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/tooltip-select-zone-use-diagnostic.json",
+          "sha256": "ba51e90790e9c8fedf2348c1d48b6d4390e9022532af70c872a1d466ea1ef96b"
+        },
+        {
+          "path": "scripts/tooltip-select-zone-use-review.mjs",
+          "sha256": "e5deb62903d6e728b9aa35a197f227468c38dae44e9481be8cff7168aff362be"
+        },
+        {
+          "path": "tests/tooltip_select_zone_use_probe.mjs",
+          "sha256": "b749e8f69015d0cf1e08515ab3224ca39b9d8843cd9caa596cf1c83d5bd912d8"
+        },
+        {
+          "path": "tests/tooltip_select_zone_use_subject.mjs",
+          "sha256": "5cac66e7c8c213b0fb057ab65386921afe289ca3c334661ea167b247a8e1493b"
+        },
+        {
+          "path": "scripts/form-menu-zone-use-review.mjs",
+          "sha256": "1fa993a605a1c068984952bc6cbdb26796e5da926dbed5d59787f644be080857"
+        },
+        {
+          "path": "scripts/menu-snack-zone-use-review.mjs",
+          "sha256": "23e3373db6f30bdf57988b24c8bd50ddb40bfe5e447fd709acf3d67a9bae8a65"
+        },
+        {
+          "path": "reference/material-16.2.14/tooltip-render-sources/tooltip.ts",
+          "sha256": "14d7821fe83cdfdc8ac9d6f2f8e095a24178ad286a8f9d4eea4245e879d5501c"
+        },
+        {
+          "path": "reference/material-16.2.14/select-render-sources/select-base.ts",
+          "sha256": "ba939bcc724eab50cc71c628c3977ddd68f052bfb265a77de8793ec09562cd73"
+        },
+        {
+          "path": "compatibility/rc/tooltip-select-zone-use-tooltip-runtime.json",
+          "sha256": "874757e3cfd74638da45897093161db09aa4ee478ba69d33ed56a7008c542691"
+        },
+        {
+          "path": "compatibility/rc/tooltip-select-zone-use-select-runtime.json",
+          "sha256": "c326431694d5a915bdbef74fd4883cfe340ede925ec3de468e9529ee8e079dc5"
+        },
+        {
+          "path": "tests/tooltip_render_runtime_probe.mjs",
+          "sha256": "c9eb1005aae281eafbe9db7214076bd9ea0a42aec4b76a847caab359948a86f6"
+        },
+        {
+          "path": "tests/test_tooltip_render_runtime.py",
+          "sha256": "b2e84e23ee336d3da56e81f5229af58a59f3eb4eb6e578a6e2874ca8d4be35b7"
+        },
+        {
+          "path": "tests/select_render_runtime_probe.mjs",
+          "sha256": "0ed0f30b529ec98d6f1a3bb63c315ae5cf7928b4da1a0acd04aa0317063647ce"
+        },
+        {
+          "path": "tests/test_select_render_runtime.py",
+          "sha256": "ffa4cb27f5c41371cd46c239cb742ece200bc3cda8715e7d547b0fb39e9eaeeb"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/internal/after-tooltip-render.ts",
+          "sha256": "025887d2460a74da9bbbf898ca911d3dd82234e41bf34615b65573f500c125f9"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/internal/after-select-render.ts",
+          "sha256": "10a2bbbe02fb0a4578646e802888a5e075bb909a36fd1c19049b5fa2d731e570"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-select/select.ts",
+          "sha256": "8fa3a142a8c70b69300896a96e56a031798ad27feb0d84db22f9fd5083408739"
+        }
+      ],
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    }
+  ],
+  "ledger_integration": "Pending finite integration batch. Frozen1452reviewed/284open and current178reviewed/130open remain unchanged. Eleven NgZone source use receipts now await integration; slider is the final unreviewed NgZone owner.",
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
