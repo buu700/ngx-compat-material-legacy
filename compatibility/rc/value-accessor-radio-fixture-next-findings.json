@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "role": "New C03 producer correctness finding; authenticated original/minimum public type declarations, no repair/packed/native claim",
+  "subjects": [
+    {
+      "line": "original",
+      "version": "16.2.12",
+      "archive_sha256": "9d69069557afd77cd5d73764b8520f5f23808ea1d02d667334d8ba64cd13edf8",
+      "archive_sri_verified": true,
+      "public_testing_types": "package/testing/index.d.ts",
+      "public_testing_types_sha256": "c4c735df97471c74986f1d35a9132396e146228590c8151781b62d4526b45672",
+      "ComponentFixture_declaration_sha256": "4cbb212858f27c54c23a5d320e5f85fea7eed9dcbf6e2eb8a4872bb044bbd414",
+      "ComponentFixture_has_destroyed": false,
+      "ComponentFixture_has_componentRef_and_destroy": true,
+      "ComponentRef_hostView_declaration": "abstract get hostView(): ViewRef;",
+      "ComponentRef_public_binding_chain": [
+        "package/index.d.ts#ComponentRef"
+      ],
+      "ViewRef_destroyed_declaration": "abstract get destroyed(): boolean;",
+      "ViewRef_public_binding_chain": [
+        "package/index.d.ts#ViewRef"
+      ],
+      "ViewRef_declaring_member": "package/index.d.ts",
+      "ViewRef_declaring_member_sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab"
+    },
+    {
+      "line": "main",
+      "version": "22.1.7",
+      "archive_sha256": "7501acbb46d23e099b11f7600077f2aa29a0691fac0308ef703a0e89d6d23a41",
+      "archive_sri_verified": true,
+      "public_testing_types": "package/types/testing.d.ts",
+      "public_testing_types_sha256": "6aa9b93b50df5d11fa672bbabeff9977eb97aa183c2536ee6f7afee037331da6",
+      "ComponentFixture_declaration_sha256": "91dce1f79941cb66d5f1ac2057cd9c880824079a8a97a5f361994e6bceb62a8b",
+      "ComponentFixture_has_destroyed": false,
+      "ComponentFixture_has_componentRef_and_destroy": true,
+      "ComponentRef_hostView_declaration": "abstract get hostView(): ViewRef;",
+      "ComponentRef_public_binding_chain": [
+        "package/types/core.d.ts#ComponentRef",
+        "package/types/_debug_node-chunk.d.ts#ComponentRef"
+      ],
+      "ViewRef_destroyed_declaration": "abstract get destroyed(): boolean;",
+      "ViewRef_public_binding_chain": [
+        "package/types/core.d.ts#ViewRef",
+        "package/types/_debug_node-chunk.d.ts#ViewRef"
+      ],
+      "ViewRef_declaring_member": "package/types/_debug_node-chunk.d.ts",
+      "ViewRef_declaring_member_sha256": "359fdc800f92be1be371c69aa3a01c902976e8de13520eaf03dd5c85160e628b"
+    },
+    {
+      "line": "21.x",
+      "version": "21.2.23",
+      "archive_sha256": "5a5b49f80e3a10ab8ceceaa259fd0bc7e702edac9166314ba07225b2d2ad65eb",
+      "archive_sri_verified": true,
+      "public_testing_types": "package/types/testing.d.ts",
+      "public_testing_types_sha256": "8a347caa7a9833213853faa02aab0202838075595475c0dbf0856aa3ffd4c780",
+      "ComponentFixture_declaration_sha256": "91dce1f79941cb66d5f1ac2057cd9c880824079a8a97a5f361994e6bceb62a8b",
+      "ComponentFixture_has_destroyed": false,
+      "ComponentFixture_has_componentRef_and_destroy": true,
+      "ComponentRef_hostView_declaration": "abstract get hostView(): ViewRef;",
+      "ComponentRef_public_binding_chain": [
+        "package/types/core.d.ts#ComponentRef",
+        "package/types/_discovery-chunk.d.ts#ComponentRef"
+      ],
+      "ViewRef_destroyed_declaration": "abstract get destroyed(): boolean;",
+      "ViewRef_public_binding_chain": [
+        "package/types/core.d.ts#ViewRef",
+        "package/types/_discovery-chunk.d.ts#ViewRef"
+      ],
+      "ViewRef_declaring_member": "package/types/_discovery-chunk.d.ts",
+      "ViewRef_declaring_member_sha256": "779438592d99f241f4f0c961f3973595d4473883630b81c5b19b5d1b79329211"
+    }
+  ],
+  "affected_producer_files": 7,
+  "unsupported_reads": 14,
+  "sites": [
+    {
+      "path": "scripts/value-accessor-packed-fixture.mjs",
+      "sha256": "ce894779c1429f9454fe00ccbfe407e8e986c40452130c5c4ef7a0c902b1f6a1",
+      "unsupported_reads": [
+        {
+          "line": 108,
+          "expression": "fixture.destroyed"
+        },
+        {
+          "line": 112,
+          "expression": "fixture.destroyed"
+        }
+      ]
+    },
+    {
+      "path": "scripts/menu-item-token-packed-fixture.mjs",
+      "sha256": "2369a64def0e5461d6d117095aa42f3749a0bf7d3e251f675a9b7dd684e6d42f",
+      "unsupported_reads": [
+        {
+          "line": 82,
+          "expression": "fixture.destroyed"
+        },
+        {
+          "line": 83,
+          "expression": "fixture?.destroyed"
+        }
+      ]
+    },
+    {
+      "path": "scripts/radio-identity-packed-fixture.mjs",
+      "sha256": "9cd45fc2f82e050570b8afb55d09aa5c50370b30fa24108d9ec63ecf8687e842",
+      "unsupported_reads": [
+        {
+          "line": 72,
+          "expression": "fixture.destroyed"
+        },
+        {
+          "line": 74,
+          "expression": "fixture.destroyed"
+        }
+      ]
+    },
+    {
+      "path": "scripts/select-detach-packed-fixture.mjs",
+      "sha256": "74b3e12b85edb9300c239d4956ba25e0af53b03bc26f0eaa1b8de709c12257cf",
+      "unsupported_reads": [
+        {
+          "line": 69,
+          "expression": "fixture.destroyed"
+        },
+        {
+          "line": 70,
+          "expression": "fixture?.destroyed"
+        }
+      ]
+    },
+    {
+      "path": "scripts/table-onpush-packed-fixture.mjs",
+      "sha256": "df1660fb53c824d02bf2b2403b895ed548146dfb86b10d348744456e5b9f9312",
+      "unsupported_reads": [
+        {
+          "line": 76,
+          "expression": "fixture.destroyed"
+        },
+        {
+          "line": 79,
+          "expression": "fixture.destroyed"
+        }
+      ]
+    },
+    {
+      "path": "scripts/select-focus-click-packed-fixture.mjs",
+      "sha256": "2219e4ce6ffab2f631f2577466fe79bb862542eda877a97d31a59a3178bf730e",
+      "unsupported_reads": [
+        {
+          "line": 80,
+          "expression": "fixture.destroyed"
+        },
+        {
+          "line": 81,
+          "expression": "fixture?.destroyed"
+        }
+      ]
+    },
+    {
+      "path": "scripts/generated-identity-packed-fixture.mjs",
+      "sha256": "e6562475d0347f551b1e7cb775114111fbdb8f9a99450564d0b4d2d6d78b72d5",
+      "unsupported_reads": [
+        {
+          "line": 148,
+          "expression": "fixture.destroyed"
+        },
+        {
+          "line": 149,
+          "expression": "fixture.destroyed"
+        }
+      ]
+    }
+  ],
+  "consequence": "ComponentFixture has no public destroyed property. Strongly typed producers cannot compile; any-typed cleanup observations read undefined and cannot pass required destruction guards.",
+  "recommended_fix": "Use the stable public fixture.componentRef.hostView.destroyed state, preserving every cleanup observation and finally guard; recheck all seven producer families against actual public original/minimum fixture/view lifecycles.",
+  "status": "open; next bounded implementation task",
+  "authoritative_source": "Complete independently pinned Core archive SRI and resolved public testing/Core exports on original/minimum lines. Private concrete ViewRef implementations with the same local name are not mistaken for the public abstract export.",
+  "actual_packed_control_instances_executed": false,
+  "g11_claim": "not-passed"
+}
