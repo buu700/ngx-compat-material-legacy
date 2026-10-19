@@ -16,6 +16,7 @@ import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 import {historicalFrameMembers,inspectHistoricalReplayCurrent,verifyHistoricalCurrentSubjects} from './historical-source-replay.mjs';
 import {olderAuditHistoryInputs,selectOlderAuditModules} from './older-audit-history-inputs.mjs';
+import {chipBlurHistoryInputs} from './chip-blur-history-inputs.mjs';
 
 export const CHIP_RECENT_HISTORY_INPUTS='compatibility/rc/chip-recent-history-inputs.json';
 export const CHIP_RECENT_HISTORY_IDS=Object.freeze(['lifecycle-scope','focus-repair','focus-browser',
@@ -130,7 +131,14 @@ export async function runOlderAuditHistory({root=rootDefault,requested=[],report
     temporaryPrefix:'ngx-older-audit-history-',implementationSources:['scripts/chip-recent-history.mjs',
       'scripts/older-audit-history-inputs.mjs','scripts/run-older-audit-history.mjs','tests/older_audit_history.py']});
 }
-async function runHistoricalModules({root,id,reportPath,data,sha256,entry,modules,complete,temporaryPrefix,implementationSources}) {
+export async function runChipBlurHistory({root=rootDefault,reportPath}={}) {
+  const {data,sha256}=chipBlurHistoryInputs({root});
+  return runHistoricalModules({root,id:data.id,reportPath,data,sha256,entry:data,modules:[data.module],complete:true,
+    temporaryPrefix:'ngx-chip-blur-history-',omittedDiagnosticEnv:['CLOSEOUT_CHIP_BLUR_REPORT'],
+    implementationSources:['scripts/chip-recent-history.mjs','scripts/chip-blur-history-inputs.mjs',
+      'scripts/run-chip-blur-history.mjs','tests/chip_blur_history.py']});
+}
+async function runHistoricalModules({root,id,reportPath,data,sha256,entry,modules,complete,temporaryPrefix,implementationSources,omittedDiagnosticEnv=[]}) {
   const started=Date.now();
   const current=inspectHistoricalReplayCurrent({root}),members=historicalFrameMembers(root,entry.frame);
   const parent=mkdtempSync(join(tmpdir(),temporaryPrefix)),checkout=join(parent,'checkout');mkdirSync(checkout);
@@ -143,8 +151,9 @@ async function runHistoricalModules({root,id,reportPath,data,sha256,entry,module
     writeFileSync(join(checkout,'.git/HEAD'),entry.frame.commit+'\n');git(checkout,['read-tree',entry.frame.commit]);
     symlinkSync(dependencies(root),join(checkout,'node_modules'),'dir');writeFileSync(join(checkout,'.git/info/exclude'),'/node_modules/\n');
     assert.equal(git(checkout,['status','--porcelain','--untracked-files=all']).toString(),'');
+    const childEnv=env();for(const name of omittedDiagnosticEnv)delete childEnv[name];
     const child=spawn('python3',['-B','-c',pythonProgram,JSON.stringify(modules),join(parent,'cases.json')],
-      {cwd:checkout,env:env(),detached:process.platform!=='win32',stdio:['ignore','pipe','pipe']});
+      {cwd:checkout,env:childEnv,detached:process.platform!=='win32',stdio:['ignore','pipe','pipe']});
     let stdout='',stderr='',timedOut=false,overflow=false;
     let escalation;const terminate=()=>{stop(child);escalation??=setTimeout(()=>stop(child,'SIGKILL'),1000);};
     child.stdout.on('data',b=>{stdout+=b;if(stdout.length>8*1024*1024){overflow=true;terminate();}});
