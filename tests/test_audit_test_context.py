@@ -16,6 +16,7 @@ from tests.chip_history_union import historical_product_diff
 from tests.native_date_source_context import project_native_date_context
 from tests.recorded_execution_source_context import recorded_source_context
 from unittest.mock import patch
+from tests.older_audit_history import assert_recorded_older_case
 from tests.audit_test_context import (assert_native_review,assert_runtime_roster,
     native_contracts,prior_source_entry,read_original_patch,read_review)
 
@@ -25,51 +26,7 @@ LEDGER='compatibility/f10/disposition-ledger/ledger.json'
 
 class AuditTestContext(unittest.TestCase):
     def test_exact_original_methods_and_finite_reader_edits(self):
-        _,read=project_native_date_context(ROOT)
-        task=json.loads(read('compatibility/rc/audit-test-current-context-worksheet.json'))
-        file='tests/test_upstream_audit_disposition.py'
-        if task['line']=='21.x':
-            # This old main-only class was never present on21.x. The shared
-            # current native contracts below are actually checked on this line.
-            child=subprocess.run(['git','cat-file','-e',task['source_parent']+':'+file],cwd=ROOT,capture_output=True)
-            self.assertNotEqual(child.returncode,0);self.assertFalse((ROOT/file).exists());return
-        edits_raw=(ROOT/'compatibility/rc/audit-test-current-context-source-edits.json').read_bytes()
-        self.assertEqual(hashlib.sha256(edits_raw).hexdigest(),EDITS_PIN)
-        rules=json.loads(edits_raw)
-        original=gzip.decompress((ROOT/'compatibility/rc/audit-test-current-context-original.py.gz').read_bytes())
-        self.assertEqual(hashlib.sha256(original).hexdigest(),rules['before_sha256'])
-        self.assertEqual(subprocess.check_output(['git','show',task['source_parent']+':'+file],cwd=ROOT),original)
-        text=original.decode()
-        for edit in rules['edits']:
-            self.assertEqual(text.count(edit['before']),edit['occurrences'])
-            text=text.replace(edit['before'],edit['after'])
-        current=(ROOT/file).read_bytes();self.assertEqual(text.encode(),current)
-        self.assertEqual(hashlib.sha256(current).hexdigest(),rules['after_sha256'])
-        names=lambda raw:[n.name for n in ast.walk(ast.parse(raw)) if isinstance(n,ast.FunctionDef)]
-        self.assertEqual(names(original),names(current))
-        self.assertEqual(names(original),rules['original_methods'])
-        self.assertEqual(names(current),rules['current_methods'])
-        for member in [LEDGER,'compatibility/f10/authored-dependency-dispositions.json','compatibility/f10/authored-dependency-current-dispositions.json']:
-            self.assertEqual(read(member),subprocess.check_output(['git','show',task['source_parent']+':'+member],cwd=ROOT))
-        self.assertEqual(historical_product_diff(ROOT,task['source_parent'],read,name_only=True),b'')
-        # This exact earlier test transition is checked at its sealed source commit.
-        # The current complete34/33 guard census is checked independently below.
-        historical_head=recorded_source_context(ROOT,lambda p:(ROOT/p).read_bytes())[0]['baseline']
-        changed=subprocess.check_output(['git','diff',task['source_parent'],historical_head,'--name-only','--','scripts'],cwd=ROOT).decode().splitlines()
-        new_context={p for p in changed if read(p)!=(ROOT/p).read_bytes()}
-        new_files={'scripts/upstream-native-date-evidence.mjs','scripts/native-date-packed-contract.mjs','scripts/native-date-packed-fixture.mjs','scripts/native-date-packed-source-context.mjs'}
-        self.assertTrue(set(changed)-new_context-new_files<={'scripts/historical-source-replay.mjs'})
-        if changed:
-            # The subsequent coherence-frame step owns exactly the two
-            # registry hash pins. The91 replay controls validate their values.
-            import re
-            member='scripts/historical-source-replay.mjs'
-            before=subprocess.check_output(['git','show',task['source_parent']+':'+member],cwd=ROOT).decode()
-            after=subprocess.check_output(['git','show',historical_head+':'+member],cwd=ROOT).decode()
-            pattern=r"^const pins=\{main:'[0-9a-f]{64}','21\.x':'[0-9a-f]{64}'\};$"
-            self.assertEqual(len(re.findall(pattern,before,re.M)),1)
-            self.assertEqual(len(re.findall(pattern,after,re.M)),1)
-            self.assertEqual(re.sub(pattern,'const pins=<frame>',before,flags=re.M),re.sub(pattern,'const pins=<frame>',after,flags=re.M))
+        assert_recorded_older_case(self,ROOT,'tests.test_audit_test_context',self.id())
 
     def test_all_registered_subjects_still_require_actual_coordinator_execution(self):
         contracts=native_contracts(ROOT)
