@@ -1801,9 +1801,17 @@
         [
           "'scripts/ng-zone-use-integration.mjs'",
           "'scripts/fixture-lifecycle-requalification.mjs'"
+        ],
+        [
+          "from tests import ripple_global_options_integration as parent",
+          "from tests import ripple_global_options_integration as parent\nfrom tests.fixture_lifecycle_requalification import parent_bytes as requalification_parent_bytes"
+        ],
+        [
+          "def historical_protected_bytes(root, path):",
+          "def historical_protected_bytes(root, path):\n    if path == \"compatibility/f10/authored-dependency-current-dispositions.json\":\n        return requalification_parent_bytes(root, path)"
         ]
       ],
-      "after_sha256": "7629845c3a2927d83ce1efaedff738ccb8c4a8588619abec62fbb08d5c458fd1"
+      "after_sha256": "9d6ff680e080283fdf8c829e81c81bcde13bf2138780368d2dadfb56f50e4452"
     },
     {
       "path": "tests/test_ng_zone_use_integration.py",

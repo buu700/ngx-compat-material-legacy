@@ -19,7 +19,7 @@ import {ngZoneIntegrationPrior as ngPrior,inspectNgZoneUseIntegration as inspect
 const PRIOR='compatibility/rc/fixture-lifecycle-requalification-prior.json.gz';
 const INPUTS='compatibility/rc/fixture-lifecycle-requalification-inputs.json';
 const priorPins={main:'ca8fe1e3a0afca1e117f7c8700e48c96242748257e9a089c307bab73855987b3','21.x':'ae7fe8eb3aed09c9dfc2b2d185598191addf5f25772998557448d5c1a16dee57'};
-const inputPins={main:'ecf7fa814dd91d68bb857c4898701da73edc39345124abc3f8d32e007adc7ec8','21.x':'2676464c3a665033abe849c45edcd6ce7dd4ae74552bb1803b449094d34c187e'};
+const inputPins={main:'96f1d8d493ce932978dd1c7d68eb359ed8712e1318667a2a324b36226e9719b3','21.x':'697264f8683e8dc910c507bee16b1a9bcfff00d2ce91cba6eb9cdffd48abb012'};
 const hash=b=>createHash('sha256').update(b).digest('hex'),json=v=>JSON.stringify(v,null,2)+'\n';
 const key=r=>JSON.stringify([r.file,r.module,r.symbol]);
 const ref=m=>({path:m.path,sha256:m.sha256});
@@ -76,7 +76,12 @@ export function fixtureLifecycleParentReader(options={}){return validate(options
 export function ngZoneIntegrationParentReader({root=process.cwd(),read=defaultRead(root)}={}){return ngParent({root,read:fixtureLifecycleParentReader({root,read})});}
 export function historicalRippleAuthoredReader({root=process.cwd(),read=defaultRead(root)}={}){return rippleParent({root,read:fixtureLifecycleParentReader({root,read})});}
 /** Original fourteen-repair preservation assertions keep their explicit pre-requalification ledgers. */
-export function inspectFixtureLifecycleDelta(root,{readSource=p=>readFileSync(join(root,p),'utf8')}={}){return validate({root,read:p=>Buffer.from(readSource(p))}).producer;}
+export function inspectFixtureLifecycleDelta(root,{readSource}={}){
+ // Legacy producer overrides are UTF-8 text; compressed authenticated capsules
+ // must retain their raw bytes. Current-source validators use their own raw API.
+ const read=p=>!readSource||p.endsWith('.gz')?readFileSync(join(root,p)):Buffer.from(readSource(p));
+ return validate({root,read}).producer;
+}
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
  const mode=process.argv[2];assert.equal(process.argv.length,3);assert.ok(['--validated-parent','--qualification-parent'].includes(mode));
  const state=validate();
