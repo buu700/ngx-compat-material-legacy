@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "c2230469bf95827a642661a37a8477a0ca1411c0",
+  "status": "reviewed",
+  "criteria": "Review the exact menu-base and snack-bar-container NgZone source dependencies, preserving full existing lifecycle regressions and adding missing outside-caller context observations.",
+  "reviews": [
+    {
+      "file": "legacy-menu/internal/menu-base.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945",
+      "required_parameter_index": 1,
+      "original_authored_constructors_unchanged": true,
+      "field_initializers_or_complete_component_API_unchanged_claimed": false,
+      "references": [
+        {
+          "role": "historical-overload-type",
+          "expression": "ngZone: NgZone"
+        },
+        {
+          "role": "historical-overload-type",
+          "expression": "ngZone: NgZone"
+        },
+        {
+          "role": "required-implementation-type",
+          "expression": "private _ngZone: NgZone"
+        }
+      ],
+      "member_accesses": [
+        {
+          "member": "onStable",
+          "method": "focusFirstItem",
+          "expression": "this._ngZone.onStable"
+        },
+        {
+          "member": "isStable",
+          "method": "focusFirstItem",
+          "expression": "this._ngZone.isStable"
+        }
+      ],
+      "internal_aliases": [],
+      "other_service_escapes": 0,
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public NgZone import supplies the required second parameter in all three retained historical menu constructor declarations. Complete authored constructor declarations and bodies match untouched16; no unchanged-field-initializer or complete component API claim follows. Binding accounts for three constructor type references and exactly onStable/isStable in focusFirstItem, with no service alias or escape. Both permitted three- and four-argument current complete-class constructions retain the identical genuine supplied zone. The unchanged original producer, worker and Python assertions were freshly executed on each line: all ten original/minimum development/production subjects and forty request-lifetime/key-manager behavioral faults pass. Genuine public zones, current public zoneful/zoneless application providers, QueryList/EventEmitter and FocusKeyManager exercise asynchronous stable focus, once-only delivery, latest-request replacement, close/destruction cancellation, reentrant destruction, preserved inside-panel focus and all-disabled fallback. The old producer public-declarations flag is a lexical AST assertion; it grants no blanket equivalence of the separately owned item type, inherited relationships, query metadata or generated IDs. Current source/worker hashes and original constructor identity are bound explicitly. Five consumed public zone member declarations are checked at all three authenticated namespaces, and actual consumed source methods compile against genuine zone types with diagnostic compilers and explicit surrounding protocols. Item/host/DOM/default-options/CDR/animation-policy boundaries remain protocols. Actual legacy menu/item node DI, native DOM focus/CSS/motion, packed/AOT/consumer and all advertised runtime/compiler/RxJS floors remain pending. This decision closes only this public imported dependency boundary.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/menu-snack-zone-use-diagnostic.json",
+          "sha256": "5333cf9bbb99774e83c782eefc139937454243c8eb2f228092586913cba770ab"
+        },
+        {
+          "path": "scripts/menu-snack-zone-use-review.mjs",
+          "sha256": "23e3373db6f30bdf57988b24c8bd50ddb40bfe5e447fd709acf3d67a9bae8a65"
+        },
+        {
+          "path": "tests/menu_snack_zone_use_probe.mjs",
+          "sha256": "5aa8bbebcb2e102ec6cfaf03143189ac91fea6804e4042b7ffdab927df99f9f2"
+        },
+        {
+          "path": "tests/menu_snack_zone_use_subject.mjs",
+          "sha256": "148623136a7b27a07b36f5f210dade73c53932a64ff9293b0675db1da3cb4467"
+        },
+        {
+          "path": "scripts/form-menu-zone-use-review.mjs",
+          "sha256": "1fa993a605a1c068984952bc6cbdb26796e5da926dbed5d59787f644be080857"
+        },
+        {
+          "path": "compatibility/rc/menu-snack-zone-use-menu-runtime.json",
+          "sha256": "2b22ecd1d59620545614488303b83b3bec0c7c6e7839c765c1d72f4845ea4021"
+        },
+        {
+          "path": "compatibility/rc/menu-snack-zone-use-snack-runtime.json",
+          "sha256": "487336a3166cf3435dafb86b4ef26e107c41993da8a53e16acfdc45506756d15"
+        },
+        {
+          "path": "tests/menu_focus_runtime_probe.mjs",
+          "sha256": "54a95be614c169b34caa2fbeff3a5a095fc04658d49928d9d6e9d54a8d899e3a"
+        },
+        {
+          "path": "tests/menu_focus_runtime_subject.mjs",
+          "sha256": "65c2faa754fa13cfba0fa2f1a5faa0dea500ffc2a8ef25903a4f1dcc0efadeda"
+        },
+        {
+          "path": "tests/test_menu_focus_runtime.py",
+          "sha256": "a4e656b916b6734ead928d8ccf137d6ac650ef6c914d00e458dbc85d2b29ca47"
+        },
+        {
+          "path": "tests/snack_exit_runtime_probe.mjs",
+          "sha256": "a42604ac34f1e9bcfdd42a38bd9a7699a1a0ec7badc5df82126f591fa90f7930"
+        },
+        {
+          "path": "tests/snack_exit_runtime_subject.mjs",
+          "sha256": "3c6000fcd516246f4ddc5e14d6a570e92090847c111c5ef985c4eeb849b78ce4"
+        },
+        {
+          "path": "tests/test_snack_exit_runtime.py",
+          "sha256": "cf6fdd418a00819772e7118e936f3bed65bb261c6fe37239ef6704bad7cf56cf"
+        },
+        {
+          "path": "reference/material-16.2.14/menu-focus-sources/menu.ts",
+          "sha256": "6331b83ef79611313f58650d4813eb0de44c2710deec830a292674328afc2bef"
+        },
+        {
+          "path": "reference/material-16.2.14/snack-exit-sources/snack-bar-container.ts",
+          "sha256": "b05c4729015b916f7cb654809d86f9ba3e51e9a9a14b68ad34a47dce1602ff47"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        }
+      ],
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "candidate_source_sha256": "d9ddfcf0a2f5a27a17670b9c4f382b2739c9a4f9ff5baffaef542cd866ecddab",
+      "required_parameter_index": 0,
+      "original_authored_constructors_unchanged": true,
+      "field_initializers_or_complete_component_API_unchanged_claimed": false,
+      "references": [
+        {
+          "role": "required-implementation-type",
+          "expression": "private _ngZone: NgZone"
+        }
+      ],
+      "member_accesses": [
+        {
+          "member": "run",
+          "method": "onAnimationEnd",
+          "expression": "this._ngZone.run"
+        },
+        {
+          "member": "run",
+          "method": "onAnimationEnd",
+          "expression": "this._ngZone.run"
+        },
+        {
+          "member": "run",
+          "method": "_notifyEnter",
+          "expression": "this._ngZone.run"
+        },
+        {
+          "member": "run",
+          "method": "exit",
+          "expression": "this._ngZone.run"
+        },
+        {
+          "member": "run",
+          "method": "_completeExit",
+          "expression": "zone.run"
+        },
+        {
+          "member": "isStable",
+          "method": "_completeExit",
+          "expression": "zone.isStable"
+        },
+        {
+          "member": "onMicrotaskEmpty",
+          "method": "_completeExit",
+          "expression": "zone.onMicrotaskEmpty"
+        },
+        {
+          "member": "runOutsideAngular",
+          "method": "_screenReaderAnnounce",
+          "expression": "this._ngZone.runOutsideAngular"
+        }
+      ],
+      "internal_aliases": [
+        {
+          "name": "zone",
+          "method": "_completeExit",
+          "initializer": "this._ngZone"
+        }
+      ],
+      "other_service_escapes": 0,
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer",
+      "decision": "The stable public NgZone import supplies the required first argument of the unchanged five-argument authored snack-bar constructor. Binding accounts for one constructor type, four direct run calls, one direct runOutsideAngular call and one const zone alias confined to _completeExit. The alias supplies run/isStable/onMicrotaskEmpty and never escapes. Complete current construction retains the supplied genuine zone in a public injection context, with an explicit portal-parent protocol. The unchanged original producer, worker and Python test were freshly executed on each line, preserving all ten original/minimum subjects and fifty-four behavioral faults covering stable/zoneful asynchronous once-only exit, overlay disposal, event/fallback/disabled motion, dismissal/destruction and announcement lifetime. The supplement observes all three direct enter notifications plus exit view/host writes from outside Angular, and actual Node announcement task registration/callback/cancellation. Its timer adapter verifies requested150ms and deliberately runs at0ms; this qualifies public zone capture while leaving browser150ms timing unqualified. Seventy combined menu/snack supplementary cases and forty-six applicable context/cancellation faults pass across ten genuine development/production provider subjects. Context distinction faults are asserted only on the six zoneful cells. Sixteen source/declaration/evidence controls and twenty-four negative strict public type contracts pass at three authenticated namespaces. Original authored constructors are preserved, while owned field initializers, motion state, IDs and complete component API remain under separate judgments. Portal/DOM/CDR/platform/config and clock/animation boundaries are explicit protocols. Native component node DI/CSS/clock/geometry, packed/AOT/consumer and full runtime/compiler/RxJS floors remain pending. This decision approves the exact public zone dependency only.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/menu-snack-zone-use-diagnostic.json",
+          "sha256": "5333cf9bbb99774e83c782eefc139937454243c8eb2f228092586913cba770ab"
+        },
+        {
+          "path": "scripts/menu-snack-zone-use-review.mjs",
+          "sha256": "23e3373db6f30bdf57988b24c8bd50ddb40bfe5e447fd709acf3d67a9bae8a65"
+        },
+        {
+          "path": "tests/menu_snack_zone_use_probe.mjs",
+          "sha256": "5aa8bbebcb2e102ec6cfaf03143189ac91fea6804e4042b7ffdab927df99f9f2"
+        },
+        {
+          "path": "tests/menu_snack_zone_use_subject.mjs",
+          "sha256": "148623136a7b27a07b36f5f210dade73c53932a64ff9293b0675db1da3cb4467"
+        },
+        {
+          "path": "scripts/form-menu-zone-use-review.mjs",
+          "sha256": "1fa993a605a1c068984952bc6cbdb26796e5da926dbed5d59787f644be080857"
+        },
+        {
+          "path": "compatibility/rc/menu-snack-zone-use-menu-runtime.json",
+          "sha256": "2b22ecd1d59620545614488303b83b3bec0c7c6e7839c765c1d72f4845ea4021"
+        },
+        {
+          "path": "compatibility/rc/menu-snack-zone-use-snack-runtime.json",
+          "sha256": "487336a3166cf3435dafb86b4ef26e107c41993da8a53e16acfdc45506756d15"
+        },
+        {
+          "path": "tests/menu_focus_runtime_probe.mjs",
+          "sha256": "54a95be614c169b34caa2fbeff3a5a095fc04658d49928d9d6e9d54a8d899e3a"
+        },
+        {
+          "path": "tests/menu_focus_runtime_subject.mjs",
+          "sha256": "65c2faa754fa13cfba0fa2f1a5faa0dea500ffc2a8ef25903a4f1dcc0efadeda"
+        },
+        {
+          "path": "tests/test_menu_focus_runtime.py",
+          "sha256": "a4e656b916b6734ead928d8ccf137d6ac650ef6c914d00e458dbc85d2b29ca47"
+        },
+        {
+          "path": "tests/snack_exit_runtime_probe.mjs",
+          "sha256": "a42604ac34f1e9bcfdd42a38bd9a7699a1a0ec7badc5df82126f591fa90f7930"
+        },
+        {
+          "path": "tests/snack_exit_runtime_subject.mjs",
+          "sha256": "3c6000fcd516246f4ddc5e14d6a570e92090847c111c5ef985c4eeb849b78ce4"
+        },
+        {
+          "path": "tests/test_snack_exit_runtime.py",
+          "sha256": "cf6fdd418a00819772e7118e936f3bed65bb261c6fe37239ef6704bad7cf56cf"
+        },
+        {
+          "path": "reference/material-16.2.14/menu-focus-sources/menu.ts",
+          "sha256": "6331b83ef79611313f58650d4813eb0de44c2710deec830a292674328afc2bef"
+        },
+        {
+          "path": "reference/material-16.2.14/snack-exit-sources/snack-bar-container.ts",
+          "sha256": "b05c4729015b916f7cb654809d86f9ba3e51e9a9a14b68ad34a47dce1602ff47"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/ng-zone-public-subjects.mjs",
+          "sha256": "0eb7c8966e8c1e8fc0e974a2c25f48e32c28a7d5b6f7448df839a6e67866763d"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-public-subjects.json",
+          "sha256": "5704215458c70cadd96a5a256b90abf45b1828e661e9f02c3472e6a818efa175"
+        }
+      ],
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    }
+  ],
+  "ledger_integration": "Pending finite integration batch. Frozen1452reviewed/284open and current178reviewed/130open remain unchanged. Seven NgZone source use receipts now await integration.",
+  "full_component_API_equivalence_claimed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
