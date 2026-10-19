@@ -1,0 +1,1196 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+  "source_parent": "731e0bed9521c8838b60fcebe591d306b91b948f",
+  "review_depth": "individual-compatibility",
+  "affected_branches": [
+    "main"
+  ],
+  "final_disposition": "already-present",
+  "judgment_stage": "source-complete-runtime-required",
+  "diff_sha256": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+  "patch_file": "compatibility/f10/disposition-ledger/evidence/patches/86ebb9bfd55e637be1e6d0117a10e290c5247ebd-chip-disabled-full.patch",
+  "complete_original_files": [
+    "src/material/chips/chip-listbox.spec.ts",
+    "src/material/chips/chip-set.ts",
+    "src/material/chips/chip.ts",
+    "tools/public_api_guard/material/chips.md"
+  ],
+  "complete_original_hunks": 6,
+  "original_patch_has_test_hunk": true,
+  "source_conclusion": "The complete four-file/six-hunk chip disabled-state fix is already implemented by the untouched Material16 legacy chip/list model. The list writes its own disabled flag separately; the chip getter combines that flag with its independently coerced input. No current chip-set class, API guard or modern component is transplanted. The maintained forms peers must execute the real legacy value accessor: the required packed case observes template-driven initialization and reactive disable/enable, actual getter and aria-disabled values, accessor identities and stable nodes. Source identity alone does not qualify those outcomes. Preserve the earlier incomplete entry and all original receipts; this completed individual source conclusion remains conditional on actual same-run packed behavior and the global release gates.",
+  "decision": "The complete four-file/six-hunk chip disabled-state fix is already implemented by the untouched Material16 legacy chip/list model. The list writes its own disabled flag separately; the chip getter combines that flag with its independently coerced input. No current chip-set class, API guard or modern component is transplanted. The maintained forms peers must execute the real legacy value accessor: the required packed case observes template-driven initialization and reactive disable/enable, actual getter and aria-disabled values, accessor identities and stable nodes. Source identity alone does not qualify those outcomes. Preserve the earlier incomplete entry and all original receipts; this completed individual source conclusion remains conditional on actual same-run packed behavior and the global release gates.",
+  "hunk_reviews": [
+    {
+      "hunk": 1,
+      "file": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -113,6 +113,15 @@ describe('MatChipListbox', () => {",
+      "judgment": "The original NgModel initialization regression asserts that a chip explicitly disabled by its own input stays disabled after the list form initializes. The maintained historical regression and actual packed template form retain that cause; the packed observation records both the genuine NgModel value-accessor identity and disabled/ARIA state after stabilization."
+    },
+    {
+      "hunk": 2,
+      "file": "src/material/chips/chip-listbox.spec.ts",
+      "header": "@@ -1043,3 +1052,17 @@ class FalsyBasicChipListbox {",
+      "judgment": "The added fixture uses a named form list, ngModel null and a disabled individual chip. The packed legacy template uses the same conditions and separately exercises a reactive form with one individual and one inherited chip; this does not replace or edit an original golden."
+    },
+    {
+      "hunk": 3,
+      "file": "src/material/chips/chip-set.ts",
+      "header": "@@ -158,12 +158,10 @@ export class MatChipSet implements AfterViewInit, OnDestroy {",
+      "judgment": "Modern chip-set synchronization moves the list write from chip.disabled to chip._chipListDisabled. Owned legacy _syncChipsState already writes _chipListDisabled without changing the independent input; the complete retained method also preserves multiple/selectability forwarding."
+    },
+    {
+      "hunk": 4,
+      "file": "src/material/chips/chip.ts",
+      "header": "@@ -158,6 +158,9 @@ export class MatChip implements OnInit, AfterViewInit, AfterContentInit, DoCheck",
+      "judgment": "The modern new flag starts false. Untouched16 and the current owned chip already declare the distinct list-disabled flag; no new public legacy input or consumer structure change is required."
+    },
+    {
+      "hunk": 5,
+      "file": "src/material/chips/chip.ts",
+      "header": "@@ -201,7 +204,13 @@ export class MatChip implements OnInit, AfterViewInit, AfterContentInit, DoCheck",
+      "judgment": "The modern disabled accessor ORs own/list state and stores only the own input. The legacy getter and coercing setter retain the same distinct-state contract, including the exact tagged16 bodies. Packed initial/disabled/enabled phases require both getters and the real rendered aria-disabled values."
+    },
+    {
+      "hunk": 6,
+      "file": "tools/public_api_guard/material/chips.md",
+      "header": "@@ -58,9 +58,11 @@ export class MatChip implements OnInit, AfterViewInit, AfterContentInit, DoCheck",
+      "judgment": "The modern public API guard reflects an accessor and internal flag. The legacy accessor/flag already exist in the tagged reference; no modern API mirror or extra legacy setter is introduced. Full consumer/compiler/runtime floors remain separate."
+    }
+  ],
+  "branch_review": {
+    "source_line": "main",
+    "minimum_framework": "22.1.7",
+    "minimum_cdk": "22.1.7",
+    "basis": "Exact own-line source and tagged16 historical ingress. Stable public peer boundaries are retained; actual supported compiler/Node/RxJS/floor executions are still required."
+  },
+  "reviewed_source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+      "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+    },
+    {
+      "path": "reference/material-16.2.14/chips-keyboard-sources/chip.ts",
+      "sha256": "a3809031dbb69a835b3766f2af6052073939bab62a70161fe57e39260377fe5a"
+    },
+    {
+      "path": "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+      "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414"
+    },
+    {
+      "path": "scripts/packed-consumer-aot-smoke.mjs",
+      "sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591"
+    },
+    {
+      "path": "scripts/packed-consumer-evidence.mjs",
+      "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+    },
+    {
+      "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+      "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+    },
+    {
+      "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+      "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-contract.mjs",
+      "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-fixture.mjs",
+      "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-contract.mjs",
+      "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-fixture.mjs",
+      "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+    },
+    {
+      "path": "compatibility/rc/matrices/library-exports.json",
+      "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+    },
+    {
+      "path": "compatibility/rc/matrices/full-verify.json",
+      "sha256": "ce5746a3721935ab59e5c10087341c661b2b477a8f17f8c49e589c5b3410584b"
+    }
+  ],
+  "prior_entry": {
+    "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+    "bucket": "behavior-semantic",
+    "subject": "fix(material/chips): chip set overwriting disabled state (#29795)",
+    "final_disposition": "needs-individual-review",
+    "reason": "Full original four-path patch reviewed: modern chip-set sync moves list disabled writes off the individual disabled input, chip getter combines both flags, listbox forms regression reproduces loss on NgModel initialization, and API guard reflects getter/setter separation. Untouched Material16 legacy chip/list already implement this separate-field contract, including original toggle regression; this is a real behavioral analogue, not a docs-only or ancestry exclusion. The old main already-adapted entry cited field names and omitted the test/API paths, with no executed forms regression. Preserve that historical conclusion but reopen release admission until the newly added exact forms initialization/aria regression and packed template/reactive disable-enable case execute against actual artifact. No product repair appears needed; candidate chip/list implementation remains unchanged. Stable current forms peers must run the actual legacy value accessor. New packed case is distinct and mandatory in both actual line rosters; false/omitted/forged reports fail admission controls. Native/AOT/packed execution is pending; no sensitive or complete G11 pass.",
+    "read_note_disposition": "already-present",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-chip-disabled-source-review.json",
+    "source_check": {
+      "diff_sha256": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+      "patch_path": "compatibility/f10/disposition-ledger/evidence/patches/86ebb9bfd55e637be1e6d0117a10e290c5247ebd-chip-disabled-full.patch",
+      "review_membership": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd"
+    },
+    "files": [
+      "src/material/chips/chip-listbox.spec.ts",
+      "src/material/chips/chip-set.ts",
+      "src/material/chips/chip.ts",
+      "tools/public_api_guard/material/chips.md"
+    ],
+    "batch_id": "individual-chip-disabled-native-pending-2026-10-10",
+    "recorded_at_utc": "2026-10-01T16:46:41Z",
+    "g11_claim": "not-passed",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "prior_dispositions": [
+      {
+        "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+        "bucket": "behavior-semantic",
+        "subject": "fix(material/chips): chip set overwriting disabled state (#29795)",
+        "final_disposition": "already-adapted",
+        "reason": "The patch stores the chip list disabled state separately so it does not overwrite each chip's own disabled input. The owned chip list already writes _chipListDisabled, and the chip disabled getter combines both flags. The change is already present.",
+        "read_note_disposition": "already-present",
+        "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+        "source_check": "The owned chip list already writes _chipListDisabled, and the chip disabled getter combines both flags",
+        "files": [
+          "src/material/chips/chip-set.ts",
+          "src/material/chips/chip.ts"
+        ],
+        "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+        "recorded_at_utc": "2026-10-01T16:46:41Z",
+        "g11_claim": "not-passed",
+        "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+      }
+    ],
+    "review_depth": "individual-compatibility"
+  },
+  "prior_entry_sha256": "f1a61e8da81a2a4e6914034c13611d57b4e9054565fe818e84dceeee8f886150",
+  "prior_source_review": {
+    "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-disabled-source-review.json",
+    "sha256": "79822440ea499b6d63fd2ea52f79f2e63e027e22f79c6f4f3f4d110a4f2c49e3"
+  },
+  "independent_evidence": [
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-disabled-source-review.json",
+      "sha256": "79822440ea499b6d63fd2ea52f79f2e63e027e22f79c6f4f3f4d110a4f2c49e3"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-checkpoint.json",
+      "sha256": "a0f261f7480b32e8d9de34f2734809bd3f21e1f1a6a012d2a295fa6a64f022cc"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-controls.json",
+      "sha256": "ebbf6c2af3755372225e5265e508f30d213746a3cfdde18240181d4c717a3b3f"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-source-inputs.json",
+      "sha256": "4147ee11af9affe20cf5611544bada1d3e0181310d31bf17b9d21de779bc9638"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-dependency-proof.json",
+      "sha256": "93b7d5ad8afcdc68e9e34e30c9b07582898567b2bdbac886d1a167e09670f3c7"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-packed-final-g11.json.gz",
+      "sha256": "fc370ecbae4cf65d8a2ccb3d43f95c4f37871110c5dbbb9ef36a0d039bf25c73"
+    },
+    {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-source-proof.json",
+      "sha256": "0e69bb997557932c551f1ac596d93c5521af8b7e4e6334cecab882af287cf84a"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-menu-tooltip-chip-source-judgment.json",
+      "sha256": "c6132859ad71b82e810cf3b74016ae470751961ac619e7917462b0e239812ae9"
+    },
+    {
+      "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+      "sha256": "402a2af8c924ee04b650da5c7470cbf7b7bd5c4a665e89fe89b1ea88f9618b23"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-contract.mjs",
+      "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-fixture.mjs",
+      "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-source-requalification.mjs",
+      "sha256": "8af454d84a753f57d57af6df261527dfbabc9c940f06410080d614d3fa28e266"
+    },
+    {
+      "path": "scripts/bidi-isolated-packed-evidence-requalification.mjs",
+      "sha256": "ebe0e1614336e5fcf4b088a83f4f2968b52400808d7b975f6605a701ebce1333"
+    },
+    {
+      "path": "tests/bidi_isolated_packed_sample.mjs",
+      "sha256": "460a9ae10da400dc743f5f05238b2ac97b0b8783a9e9fbfb9d31bc2ab9c2af94"
+    },
+    {
+      "path": "tests/bidi_isolated_packed_probe.mjs",
+      "sha256": "6b5a1ff2b2cffea149930970dac2e8b9ac5e0d48a4115b28ca71bf1af8e01f77"
+    },
+    {
+      "path": "tests/bidi_isolated_requalification_probe.mjs",
+      "sha256": "30de1f8c0e8a5642ab60febd34384db53803f130489b29e27135992c3f4dff24"
+    },
+    {
+      "path": "tests/test_bidi_isolated_requalification.py",
+      "sha256": "6bccc20589803ac755b21664920e6be9f83fd43c37e6ca5bea24c16db508c1af"
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "sha256": "6d90b8587c9d7ba4f7b543b3dc5752a5d7d93a42805270fdeb5d8513f5646512"
+    },
+    {
+      "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+      "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+    },
+    {
+      "path": "scripts/selection-comparator-source-judgments.mjs",
+      "sha256": "75e7e1714918123085897d39692cd586f997ad14ef38a7e68d055fb61119d473"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-source-context.mjs",
+      "sha256": "d1fc5106e9591c48f0118eec4fb06503390369e68499b0315ddc049dd94cc512"
+    },
+    {
+      "path": "scripts/upstream-selection-evidence.mjs",
+      "sha256": "ad26403d8e4b2ebfa8b9d98aaa6e3ef844e8cebaeee56ce6f3432fec0d226fb2"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-contract.mjs",
+      "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+    },
+    {
+      "path": "scripts/selection-comparator-packed-fixture.mjs",
+      "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-source-proof.json",
+      "sha256": "5526eabae45cf015ab58df754014c929e0daaca8a48cab8a4ab456e39a38b46f"
+    },
+    {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-context-proof.json",
+      "sha256": "72b63f593128d86380682ad88cb060f7c076df8daef372aa1ba632578b62b374"
+    },
+    {
+      "path": "compatibility/rc/spec-small-context-proof.json",
+      "sha256": "835ff94c0a8ffdd4c49f6e3816bb908c35f6464c8a5017c76b9e4fcaeca91888"
+    },
+    {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    }
+  ],
+  "runtime_qualification": {
+    "required": true,
+    "qualified_by_this_document": false,
+    "check": "packed-consumer",
+    "case_ids": [
+      "packed-consumer/harness/chip-individual-disabled-form-isolation"
+    ],
+    "contract": "Require the captured successful current coordinator invocation, clean source, matching run/line/library/manifest, complete106 packed case roster and hashed owned output. Re-evaluate the selected structured observation, equal raw harness data and original true harness condition. No synthetic report or source status substitutes for execution."
+  },
+  "global_native_SSR_and_floor_gates_independently_required": true,
+  "hydration_claimed": false,
+  "semantic_pass": false,
+  "actual_packed_or_native_executed": false,
+  "g11_claim": "not-passed",
+  "chip_menu_tooltip_context_requalification": {
+    "source_parent": "731e0bed9521c8838b60fcebe591d306b91b948f",
+    "subject_sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+    "preceding_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-disabled-source-review.json",
+      "sha256": "79822440ea499b6d63fd2ea52f79f2e63e027e22f79c6f4f3f4d110a4f2c49e3"
+    },
+    "inputs": {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-inputs.json",
+      "sha256": "be081b35365d33367f0295dfdb52c750cdaea4efe836899eeacc1a4d66561b56"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-source-proof.json",
+      "sha256": "0e69bb997557932c551f1ac596d93c5521af8b7e4e6334cecab882af287cf84a"
+    },
+    "guard_change": {
+      "path": "compatibility/rc/chip-menu-tooltip-admission-guard-change.json",
+      "sha256": "f4ae34add84911483faf58a1102e99b0eb8eb174a6587e3b2aa021ebb6187284"
+    },
+    "added_source_members": [
+      {
+        "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+        "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+      },
+      {
+        "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+        "sha256": "75835d3151a185ef0cf4e85c3e695b1b8a07081c4cfb7c56331446591ee74875"
+      }
+    ],
+    "original_hunks_and_prior_source_conclusions_retained": false,
+    "actual_runtime_qualified": false
+  },
+  "bidi_isolated_source_context": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-menu-tooltip-chip-source-judgment.json",
+      "sha256": "c6132859ad71b82e810cf3b74016ae470751961ac619e7917462b0e239812ae9"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+      "sha256": "402a2af8c924ee04b650da5c7470cbf7b7bd5c4a665e89fe89b1ea88f9618b23"
+    },
+    "original_hunk_decisions_retained": true,
+    "runtime_validation_bodies_unchanged": true,
+    "actual_runtime_qualified": false
+  },
+  "selection_comparator_context_requalification": {
+    "previous_source_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "sha256": "6d90b8587c9d7ba4f7b543b3dc5752a5d7d93a42805270fdeb5d8513f5646512"
+    },
+    "source_proof": {
+      "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+      "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+    },
+    "complete_preceding_source_and_scope_recovered": true,
+    "original_runtime_predicate_and_hunk_decisions_retained": true,
+    "actual_runtime_qualified": false
+  },
+  "individual_proof": {
+    "proof_kind": "artifact-required-individual-behavior",
+    "diff_sha256": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "The complete four-file/six-hunk chip disabled-state fix is already implemented by the untouched Material16 legacy chip/list model. The list writes its own disabled flag separately; the chip getter combines that flag with its independently coerced input. No current chip-set class, API guard or modern component is transplanted. The maintained forms peers must execute the real legacy value accessor: the required packed case observes template-driven initialization and reactive disable/enable, actual getter and aria-disabled values, accessor identities and stable nodes. Source identity alone does not qualify those outcomes. Preserve the earlier incomplete entry and all original receipts; this completed individual source conclusion remains conditional on actual same-run packed behavior and the global release gates.",
+    "artifact_behavior": {
+      "kind": "chip-disabled-own-input-isolation",
+      "case_ids": [
+        "packed-consumer/harness/chip-individual-disabled-form-isolation"
+      ],
+      "source_members": [
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+          "sha256": "73aea18bc4f77958bc69229ea4954a688d92913bbc59fb52e28f342c2d42a5ae"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+          "sha256": "26263b1efa46119fc7a8ea1b8693af78401cb2b78a3a4a6fb1dc7b0c78618750"
+        },
+        {
+          "path": "reference/material-16.2.14/chips-keyboard-sources/chip.ts",
+          "sha256": "a3809031dbb69a835b3766f2af6052073939bab62a70161fe57e39260377fe5a"
+        },
+        {
+          "path": "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+          "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414"
+        },
+        {
+          "path": "scripts/packed-consumer-aot-smoke.mjs",
+          "sha256": "b2f618b78c2df350d3e3dc235626b772f7440877a37627dd0329097b3ebfee91"
+        },
+        {
+          "path": "scripts/packed-consumer-evidence.mjs",
+          "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+        },
+        {
+          "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+          "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+        },
+        {
+          "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+          "sha256": "815acad5ae822d885db27db66f486e0c762b30796ea93b6bb4fd0c77302ad8a3"
+        },
+        {
+          "path": "scripts/bidi-isolated-packed-contract.mjs",
+          "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+        },
+        {
+          "path": "scripts/bidi-isolated-packed-fixture.mjs",
+          "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+        },
+        {
+          "path": "scripts/selection-comparator-packed-contract.mjs",
+          "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+        },
+        {
+          "path": "scripts/selection-comparator-packed-fixture.mjs",
+          "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+        },
+        {
+          "path": "scripts/native-date-packed-contract.mjs",
+          "sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+        },
+        {
+          "path": "scripts/native-date-packed-fixture.mjs",
+          "sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
+        },
+        {
+          "path": "compatibility/rc/matrices/library-exports.json",
+          "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+        },
+        {
+          "path": "compatibility/rc/matrices/full-verify.json",
+          "sha256": "8064929cb9db7067b33c03d58b0dfb498a80ab9307a9b34ac8c013400073697b"
+        }
+      ]
+    },
+    "historical_roster_source_context": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "7694977ba8e20050d29e2d1c605a9b168f5232345a42f589eb70f0977c5f172b"
+    }
+  },
+  "remaining_native_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "682be319d595b478826277b5f239d53f9fd9fe06",
+    "release_reference_parent": "a0d5b5dff1365971e172a1126c3613fdf923e901",
+    "inputs": {
+      "path": "compatibility/rc/remaining-native-admission-source-inputs.json",
+      "sha256": "cac82c2c3b1df2b94d1c7ee1a9b6e7e2a7af4204cce0720c75eb7d20b8c3190d"
+    },
+    "prior": {
+      "path": "compatibility/rc/remaining-native-admission-integration-prior.json.gz",
+      "sha256": "c308ad0dce673dc6be50eea0aa332ee9d86fde9fb353ab23fc2d31b31478b137",
+      "source_parent": "a0d5b5dff1365971e172a1126c3613fdf923e901"
+    },
+    "changed_product": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+        "before_sha256": "bf02faabd1d0fff61c0e756ee6422af4d417b4d045c475179807c195b4edf7b4",
+        "current_sha256": "7a84291a13db6e907e84b42a581f993d81e6da1f28966696861d0b325e6def14"
+      }
+    ],
+    "unchanged_product_members": 1140,
+    "original_decisions_hunks_and_analyses_retained": true,
+    "public_tab_boundary_roles": 13,
+    "implementation_evidence": [
+      {
+        "path": "compatibility/rc/remaining-native-admission-root-dispatch-controls.json",
+        "sha256": "bc8ce291677399ff4c296383a4f4267d26638bdf517e1ae5a655d24c219ca7ea"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-ripple-controls.json",
+        "sha256": "d80df1f440981a296dc8c2c841890d13e61d7688506f237b8f98b1e66bf4fdb9"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-lifecycle.json",
+        "sha256": "d8a6d6fd6a38cc128188b6c569d49b9c4e1e6bf60fae67f68b5981bdf5c52e43"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-controls.json",
+        "sha256": "be8bbecaea4ef23780a4952f585d42e99b043e1c2823d313957eed6dd44f1ffb"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-layout-native-css.json.gz",
+        "sha256": "bff5c3857027bac41978d1e6be34276364b6550fe48074cbe8198ef99e5b1651"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-cyph-style-sanity.json",
+        "sha256": "b38b616b01a0d43009b39e944caa46c3a8f6eb43054a583a2015e9482035d583"
+      }
+    ],
+    "scope": "The exact11-line private incoming-pane layout insertion changes no package membership, peer import/API, constructor, decorator, build input or resource. Original build/test/slider exclusions remain unchanged; no new upstream/runtime/security decision.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-selection-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "sha256": "b252747ac0c618bfd868c74b2b084e5a0c23da288fa587095016cdbc915e921f"
+    },
+    "prior_individual_proof": {
+      "proof_kind": "artifact-required-individual-behavior",
+      "diff_sha256": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "The complete four-file/six-hunk chip disabled-state fix is already implemented by the untouched Material16 legacy chip/list model. The list writes its own disabled flag separately; the chip getter combines that flag with its independently coerced input. No current chip-set class, API guard or modern component is transplanted. The maintained forms peers must execute the real legacy value accessor: the required packed case observes template-driven initialization and reactive disable/enable, actual getter and aria-disabled values, accessor identities and stable nodes. Source identity alone does not qualify those outcomes. Preserve the earlier incomplete entry and all original receipts; this completed individual source conclusion remains conditional on actual same-run packed behavior and the global release gates.",
+      "artifact_behavior": {
+        "kind": "chip-disabled-own-input-isolation",
+        "case_ids": [
+          "packed-consumer/harness/chip-individual-disabled-form-isolation"
+        ],
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+            "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+            "sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+            "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+          },
+          {
+            "path": "reference/material-16.2.14/chips-keyboard-sources/chip.ts",
+            "sha256": "a3809031dbb69a835b3766f2af6052073939bab62a70161fe57e39260377fe5a"
+          },
+          {
+            "path": "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+            "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414"
+          },
+          {
+            "path": "scripts/packed-consumer-aot-smoke.mjs",
+            "sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591"
+          },
+          {
+            "path": "scripts/packed-consumer-evidence.mjs",
+            "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+          },
+          {
+            "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+            "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+          },
+          {
+            "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+            "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-contract.mjs",
+            "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-fixture.mjs",
+            "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-contract.mjs",
+            "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-fixture.mjs",
+            "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+          },
+          {
+            "path": "compatibility/rc/matrices/library-exports.json",
+            "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+          },
+          {
+            "path": "compatibility/rc/matrices/full-verify.json",
+            "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+          }
+        ]
+      }
+    },
+    "original_hunk_and_branch_judgments_retained": true
+  },
+  "tab_lifecycle_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "f1615ad0cbdfbc122e696421b4afd47ddb55c68f",
+    "release_reference_parent": "960d98d87aeac3a24b312cf9112abc6d6383a7fd",
+    "inputs": {
+      "path": "compatibility/rc/remaining-native-admission-tab-repair-source-inputs.json",
+      "sha256": "92a1e6c683bf36815471b90674b949f8972f1fbdc7c1d736c60ec79de7d1ce0e"
+    },
+    "prior": {
+      "path": "compatibility/rc/remaining-native-admission-tab-lifecycle-repair-prior.json.gz",
+      "sha256": "13b9222a165a1bb9a875e523c9cd24ef0f19960d4890060bc5a05833cab0bbeb"
+    },
+    "changed_product": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts",
+        "before_sha256": "7a84291a13db6e907e84b42a581f993d81e6da1f28966696861d0b325e6def14",
+        "current_sha256": "9133c2404db7ef40b39819969e310a71caf660c9d9c05ecfd16a8a4fe6ea0154"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-body.html",
+        "before_sha256": "fb4e59b10d5d2f72cf8aa00688a67ad21a415928e588957d9e5ae0b00782aa53",
+        "current_sha256": "c4d86c99bfeed0a10d6451e034ade808bfb52b4240471e1aef5ccd47e3f124f1"
+      }
+    ],
+    "unchanged_product_members": 1139,
+    "original_decisions_hunks_and_analyses_retained": true,
+    "public_tab_boundary_roles": 13,
+    "implementation_evidence": [
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-lifecycle-controls.json",
+        "sha256": "7a855591fe8cc4bcb66c0b7c2900820fa54ac862d2168bf832d0859747a0c96d"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-producer-controls.json",
+        "sha256": "e2d96d2d159ba09bc3599cc8600d4e337e3b0640445f1ba9400b7f71b5f3884e"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-admission-controls.json",
+        "sha256": "7d73b061d54176ee0545c6a2957b948f7c041f3bde33e65e0aa9187a5aaaf8ef"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-dispatch-controls.json",
+        "sha256": "bc8ce291677399ff4c296383a4f4267d26638bdf517e1ae5a655d24c219ca7ea"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-source-controls.json",
+        "sha256": "0c9625aba2c20522df499d7263214efdfc85d9f8129c301cd23a1c2f84e6e98c"
+      },
+      {
+        "path": "compatibility/rc/remaining-native-admission-tab-repair-cyph-style.json",
+        "sha256": "8512aa2ccd9dda09e550386a3da93866887ecf5c472179e91f6d65d89d22a286"
+      }
+    ],
+    "scope": "The independently reviewed departure/origin lifecycle repair changes four owned method bodies, adds four owned members and changes exactly one private visibility expression. All existing imports/reference roles, constructor, metadata, outputs, element/class structure, CSS/SCSS, package membership and build inputs remain exact. Tagged lifecycle and focused controls support the bounded repair; original build/test/slider exclusions remain unchanged. No new SHA/use closure or runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "sha256": "0afd232af62661fc779f40e968e2d558afc7845ea13b94234cb5c8ad9cd74c42"
+    },
+    "prior_individual_proof": {
+      "proof_kind": "artifact-required-individual-behavior",
+      "diff_sha256": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "The complete four-file/six-hunk chip disabled-state fix is already implemented by the untouched Material16 legacy chip/list model. The list writes its own disabled flag separately; the chip getter combines that flag with its independently coerced input. No current chip-set class, API guard or modern component is transplanted. The maintained forms peers must execute the real legacy value accessor: the required packed case observes template-driven initialization and reactive disable/enable, actual getter and aria-disabled values, accessor identities and stable nodes. Source identity alone does not qualify those outcomes. Preserve the earlier incomplete entry and all original receipts; this completed individual source conclusion remains conditional on actual same-run packed behavior and the global release gates.",
+      "artifact_behavior": {
+        "kind": "chip-disabled-own-input-isolation",
+        "case_ids": [
+          "packed-consumer/harness/chip-individual-disabled-form-isolation"
+        ],
+        "source_members": [
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+            "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+            "sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2"
+          },
+          {
+            "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+            "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+          },
+          {
+            "path": "reference/material-16.2.14/chips-keyboard-sources/chip.ts",
+            "sha256": "a3809031dbb69a835b3766f2af6052073939bab62a70161fe57e39260377fe5a"
+          },
+          {
+            "path": "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+            "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414"
+          },
+          {
+            "path": "scripts/packed-consumer-aot-smoke.mjs",
+            "sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591"
+          },
+          {
+            "path": "scripts/packed-consumer-evidence.mjs",
+            "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+          },
+          {
+            "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+            "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+          },
+          {
+            "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+            "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-contract.mjs",
+            "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+          },
+          {
+            "path": "scripts/bidi-isolated-packed-fixture.mjs",
+            "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-contract.mjs",
+            "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+          },
+          {
+            "path": "scripts/selection-comparator-packed-fixture.mjs",
+            "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+          },
+          {
+            "path": "compatibility/rc/matrices/library-exports.json",
+            "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+          },
+          {
+            "path": "compatibility/rc/matrices/full-verify.json",
+            "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+          }
+        ]
+      }
+    },
+    "original_hunk_and_branch_judgments_retained": true
+  },
+  "spec_fixture_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "ee94710c4e98c5c30c89d0e1710370674d3ac0ba",
+    "qualified_reference_parent": "251b24059fe51c340f484002a25399f7d53290fb",
+    "inputs": {
+      "path": "compatibility/rc/spec-small-context-inputs.json",
+      "sha256": "517745e4e287814633468cb8ab5b75bfb79083d2e98047941863c3f77d34bad0"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "84e5ca0c5060c756ac186c409097556315882a88b280a12e34def1080e5a1dcf",
+        "current_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "0d1d0fd2757060ea9f4b6fbe77f08aa732ca562cc91330b65c0085dbb6d00ed6",
+        "current_sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a"
+      }
+    ],
+    "fixture_controls": {
+      "path": "compatibility/rc/spec-small-source-controls.json",
+      "sha256": "b81aa3d32cbce32f51164dcc63776ada5c1e7e63537ae150c8693783b6d666ba"
+    },
+    "unchanged_other_product_members": 1140,
+    "changed_private_fixture_data_names": 3,
+    "historical_paths": 57,
+    "case_identities_order_names": 2220,
+    "discovery_controls": 5,
+    "all_original_hunks_decisions_and_runtime_requirements_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only three private test-data keys and their explicit current source snapshot differ. Complete tagged templates, states/label values, all cases/assertions, all other product sources and all production peer uses stay exact. The48 source/semantic/adapter controls support this finite source repair. Current packed/native/floor qualification remains mandatory.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "prior_entry": {
+      "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+      "bucket": "behavior-semantic",
+      "subject": "fix(material/chips): chip set overwriting disabled state (#29795)",
+      "final_disposition": "already-present",
+      "reason": "The complete four-file/six-hunk chip disabled-state fix is already implemented by the untouched Material16 legacy chip/list model. The list writes its own disabled flag separately; the chip getter combines that flag with its independently coerced input. No current chip-set class, API guard or modern component is transplanted. The maintained forms peers must execute the real legacy value accessor: the required packed case observes template-driven initialization and reactive disable/enable, actual getter and aria-disabled values, accessor identities and stable nodes. Source identity alone does not qualify those outcomes. Preserve the earlier incomplete entry and all original receipts; this completed individual source conclusion remains conditional on actual same-run packed behavior and the global release gates.",
+      "read_note_disposition": "already-present",
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "source_check": {
+        "kind": "individual-source-reviewed-runtime-required",
+        "diff_sha256": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+        "patch_path": "compatibility/f10/disposition-ledger/evidence/patches/86ebb9bfd55e637be1e6d0117a10e290c5247ebd-chip-disabled-full.patch",
+        "evidence_report_sha256": "b252747ac0c618bfd868c74b2b084e5a0c23da288fa587095016cdbc915e921f"
+      },
+      "files": [
+        "src/material/chips/chip-listbox.spec.ts",
+        "src/material/chips/chip-set.ts",
+        "src/material/chips/chip.ts",
+        "tools/public_api_guard/material/chips.md"
+      ],
+      "batch_id": "individual-chip-disabled-native-pending-2026-10-10",
+      "recorded_at_utc": "2026-10-01T16:46:41Z",
+      "g11_claim": "not-passed",
+      "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+      "prior_dispositions": [
+        {
+          "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/chips): chip set overwriting disabled state (#29795)",
+          "final_disposition": "already-adapted",
+          "reason": "The patch stores the chip list disabled state separately so it does not overwrite each chip's own disabled input. The owned chip list already writes _chipListDisabled, and the chip disabled getter combines both flags. The change is already present.",
+          "read_note_disposition": "already-present",
+          "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+          "source_check": "The owned chip list already writes _chipListDisabled, and the chip disabled getter combines both flags",
+          "files": [
+            "src/material/chips/chip-set.ts",
+            "src/material/chips/chip.ts"
+          ],
+          "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+        },
+        {
+          "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+          "bucket": "behavior-semantic",
+          "subject": "fix(material/chips): chip set overwriting disabled state (#29795)",
+          "final_disposition": "needs-individual-review",
+          "reason": "Full original four-path patch reviewed: modern chip-set sync moves list disabled writes off the individual disabled input, chip getter combines both flags, listbox forms regression reproduces loss on NgModel initialization, and API guard reflects getter/setter separation. Untouched Material16 legacy chip/list already implement this separate-field contract, including original toggle regression; this is a real behavioral analogue, not a docs-only or ancestry exclusion. The old main already-adapted entry cited field names and omitted the test/API paths, with no executed forms regression. Preserve that historical conclusion but reopen release admission until the newly added exact forms initialization/aria regression and packed template/reactive disable-enable case execute against actual artifact. No product repair appears needed; candidate chip/list implementation remains unchanged. Stable current forms peers must run the actual legacy value accessor. New packed case is distinct and mandatory in both actual line rosters; false/omitted/forged reports fail admission controls. Native/AOT/packed execution is pending; no sensitive or complete G11 pass.",
+          "read_note_disposition": "already-present",
+          "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-chip-disabled-source-review.json",
+          "source_check": {
+            "diff_sha256": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+            "patch_path": "compatibility/f10/disposition-ledger/evidence/patches/86ebb9bfd55e637be1e6d0117a10e290c5247ebd-chip-disabled-full.patch",
+            "review_membership": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd"
+          },
+          "files": [
+            "src/material/chips/chip-listbox.spec.ts",
+            "src/material/chips/chip-set.ts",
+            "src/material/chips/chip.ts",
+            "tools/public_api_guard/material/chips.md"
+          ],
+          "batch_id": "individual-chip-disabled-native-pending-2026-10-10",
+          "recorded_at_utc": "2026-10-01T16:46:41Z",
+          "g11_claim": "not-passed",
+          "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+          "prior_dispositions": [
+            {
+              "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+              "bucket": "behavior-semantic",
+              "subject": "fix(material/chips): chip set overwriting disabled state (#29795)",
+              "final_disposition": "already-adapted",
+              "reason": "The patch stores the chip list disabled state separately so it does not overwrite each chip's own disabled input. The owned chip list already writes _chipListDisabled, and the chip disabled getter combines both flags. The change is already present.",
+              "read_note_disposition": "already-present",
+              "evidence_report": "compatibility/rc/reports/behavior-semantic-one-diff.json",
+              "source_check": "The owned chip list already writes _chipListDisabled, and the chip disabled getter combines both flags",
+              "files": [
+                "src/material/chips/chip-set.ts",
+                "src/material/chips/chip.ts"
+              ],
+              "batch_id": "docs-build-already-present-not-owned-2026-10-01-c",
+              "recorded_at_utc": "2026-10-01T16:46:41Z",
+              "g11_claim": "not-passed",
+              "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1"
+            }
+          ],
+          "review_depth": "individual-compatibility"
+        }
+      ],
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "artifact-required-individual-behavior",
+        "diff_sha256": "d3ed5898e018bf496e5769ffd2dfdc1e148c3869beb78d8a992b36323814ea21",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "The complete four-file/six-hunk chip disabled-state fix is already implemented by the untouched Material16 legacy chip/list model. The list writes its own disabled flag separately; the chip getter combines that flag with its independently coerced input. No current chip-set class, API guard or modern component is transplanted. The maintained forms peers must execute the real legacy value accessor: the required packed case observes template-driven initialization and reactive disable/enable, actual getter and aria-disabled values, accessor identities and stable nodes. Source identity alone does not qualify those outcomes. Preserve the earlier incomplete entry and all original receipts; this completed individual source conclusion remains conditional on actual same-run packed behavior and the global release gates.",
+        "artifact_behavior": {
+          "kind": "chip-disabled-own-input-isolation",
+          "case_ids": [
+            "packed-consumer/harness/chip-individual-disabled-form-isolation"
+          ],
+          "source_members": [
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip.ts",
+              "sha256": "df6a4cfe02079393bdbb593ad0654af0c04b47548b8ef2c58a96611be944de15"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+              "sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+              "sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80"
+            },
+            {
+              "path": "reference/material-16.2.14/chips-keyboard-sources/chip.ts",
+              "sha256": "a3809031dbb69a835b3766f2af6052073939bab62a70161fe57e39260377fe5a"
+            },
+            {
+              "path": "reference/material-16.2.14/chip-blur-sources/chip-list.ts",
+              "sha256": "83c17cd61f9ecb8cc4dcc7947a493a78a93a6b880d3c69f9284eb39106662414"
+            },
+            {
+              "path": "scripts/packed-consumer-aot-smoke.mjs",
+              "sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591"
+            },
+            {
+              "path": "scripts/packed-consumer-evidence.mjs",
+              "sha256": "1f58b3ce058288910b0887d02692b4d0595daa0f50365216c467600102940a62"
+            },
+            {
+              "path": "scripts/chip-menu-tooltip-packed-contract.mjs",
+              "sha256": "4c431f5c93a062815c24c858c4506eb26f218f43f9702a609b64b64db9733e6a"
+            },
+            {
+              "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+              "sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06"
+            },
+            {
+              "path": "scripts/bidi-isolated-packed-contract.mjs",
+              "sha256": "fbd4b3e25b5ca44e227eedaf2ef7f6aef0c3deb4007447d2855768a382705426"
+            },
+            {
+              "path": "scripts/bidi-isolated-packed-fixture.mjs",
+              "sha256": "a212ebd6e5002a53d688881611f7c692fc6449644490f5e00a919a903b31501e"
+            },
+            {
+              "path": "scripts/selection-comparator-packed-contract.mjs",
+              "sha256": "4574b1268f03b8447346cb50f744cbc3d29d7b80b47b6745c96965bf7b5d7f86"
+            },
+            {
+              "path": "scripts/selection-comparator-packed-fixture.mjs",
+              "sha256": "c0946403e011eb608720ced002d9a8b590fc6aae4d774532224e437050a82559"
+            },
+            {
+              "path": "compatibility/rc/matrices/library-exports.json",
+              "sha256": "f63246c293f1bd589e7c5e2bee6e9a4ebb995d86dca11697863bccc6ec7d122f"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "a0883d16bbb33049a55fb3729c15e1a9675c42e59eb31f4c43b9c925bd6b3b83"
+            }
+          ]
+        }
+      },
+      "bidi_isolated_source_context": {
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-menu-tooltip-chip-source-judgment.json",
+          "sha256": "c6132859ad71b82e810cf3b74016ae470751961ac619e7917462b0e239812ae9"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/bidi-isolated-packed-requalification-proof.json",
+          "sha256": "402a2af8c924ee04b650da5c7470cbf7b7bd5c4a665e89fe89b1ea88f9618b23"
+        }
+      },
+      "selection_comparator_source_context": {
+        "previous_source_review": {
+          "path": "compatibility/f10/disposition-ledger/evidence/closeout-bidi-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+          "sha256": "6d90b8587c9d7ba4f7b543b3dc5752a5d7d93a42805270fdeb5d8513f5646512"
+        },
+        "source_proof": {
+          "path": "compatibility/rc/selection-comparator-packed-source-proof.json",
+          "sha256": "4eb8d490f7bbaf7ccc842e492e68e93c46680f75d4cf7e3bc39a0a13d7f268b7"
+        }
+      }
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-native-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "sha256": "9b256a491860b86abb2a1ea32f8aaff78571a129ae6f5f7f229f727c9d01c266"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "control_case_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "05500bf4d60693c715030349d818440465c57b6d",
+    "qualified_reference_parent": "804b5c68b177c8eff2ed0fdac92caa73d5e9aaf1",
+    "inputs": {
+      "path": "compatibility/rc/spec-control-context-inputs.json",
+      "sha256": "c68029f9ff43fb4c47f58cfa21c9924400f1fbdd142c54c37457399272685fbb"
+    },
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "before_sha256": "8ca96a3436189c60c375b15bc12dc6c2c36e07f18e8a6cdad5062b5b019285bb",
+        "current_sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "before_sha256": "5731c5c75f794e504cdb52194ab4e7cc02de3d68128870ffe99d2a4e525ddb54",
+        "current_sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "4270f9b670d55a9879a5dc76c1e4faff9a2246155e787379b27ccc519ffffe9a",
+        "current_sha256": "766c955ca56694fcf3c82ab00296194103bb0fac812cd22571bf89a960f1d9c7"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-control-test-repair-source-proof.json",
+      "sha256": "4ea480a640c26b5e30c93aad4cc80d9860566f236b93a77c9bc5902f7a3078cd"
+    },
+    "unchanged_other_product_members": 1139,
+    "original_cases_preserved": 2220,
+    "additional_cases": 2,
+    "current_case_cells": 2227,
+    "all_original_hunks_decisions_and_runtime_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only two appended candidate cases and their exact two-row inventory update differ. Preserve every prior case/body/template, all production resources and all original source judgments. This is source-context qualification, never actual Angular/native/packed/floor or complete G11 admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-control-context-proof.json",
+      "sha256": "f947f053ac5ac48f92962a590de9ca2c2dd4c8dc6c127ce8a7c9fcb6ae94700e"
+    },
+    "prior_entry": {
+      "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "804b5c68b177c8eff2ed0fdac92caa73d5e9aaf1",
+      "entry_sha256": "60f7a0e43d08b4dfa6e1ccf0e2d59f344b6378f7c216b4bc9eb099b88efa32f8"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-spec-fixture-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "sha256": "ecee7504f54f555e2f34aa436f477c3f891d991dc6ce91f55df493a4bd3673ec"
+    },
+    "original_branch_hunk_and_behavior_judgments_preserved": true
+  },
+  "chip_empty_context_requalification": {
+    "schema_version": 1,
+    "line": "main",
+    "source_parent": "e89625fa8145b1d746f24728a83ba25bbfe81871",
+    "qualified_reference_parent": "00fd476b50ad0eb6777e709d13b990e22a785717",
+    "inputs": {
+      "path": "compatibility/rc/spec-stability-context-inputs.json",
+      "sha256": "7259c44866d5e9f1d7c69a8685ad4682c6a0cfbb26eb9330a10879ac6a2b6638"
+    },
+    "prequalified_wrapper_receipt_transitions": [
+      {
+        "path": "tests/test_spec_standalone_environment_source.py",
+        "reference_commit": "a95969e7b493b70141ffa25e5c98f8b9499ace7a",
+        "before_sha256": "3e74aaee57ff849163758989b2f59f588fc975d95504ca3f6cb3ce0ce32923d9",
+        "after_sha256": "7717141028f282aeb800a7e045b7f6a1009fd4ed60974d1cab3c26e553ef23c8",
+        "edits": [
+          {
+            "before": "['node', 'tests/spec_standalone_environment_source_probe.mjs']",
+            "after": "['node', 'scripts/run-historical-source-probe.mjs', 'standalone-environment-source']"
+          }
+        ],
+        "affected_shas": [
+          "31077c2eae76b0bc0bc348ee2bd2801864aa409a",
+          "83006db94a2912fa3cd3b7e1f1dcca9be064d183"
+        ],
+        "qualification": {
+          "path": "compatibility/rc/historical-stability-source-replay-checkpoint.json",
+          "sha256": "7af49a12a6dcda906fc1a8fbf21817a60bf3cee09550ef38074b6e61c282dde1"
+        }
+      }
+    ],
+    "reviewed_delta": [
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "before_sha256": "6be4ef5b4100e7d1122dc3a0842d66c8a57315374e438ecd8ddf2e29e9f8c3e2",
+        "current_sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "before_sha256": "9cc1002428887bd85097fbfac6980b4ce3c88018619b801364c27a7b6ff12c80",
+        "current_sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "before_sha256": "766c955ca56694fcf3c82ab00296194103bb0fac812cd22571bf89a960f1d9c7",
+        "current_sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "source_proof": {
+      "path": "compatibility/rc/spec-stability-source-chip-repair-source-proof.json",
+      "sha256": "f6ea8843244aee5e2eb3a20632ad8d30c27627e151ab912d61ad7272564d3506"
+    },
+    "original_cases_preserved": 2222,
+    "additional_cases": 1,
+    "current_case_cells": 2228,
+    "all_original_branch_hunk_verdicts_and_native_requirement_definitions_preserved": true,
+    "new_source_decisions_or_authored_use_closures": 0,
+    "scope": "Only the authenticated chip empty-query reset, one appended Angular lifecycle case and exact inventory refresh differ. Current API call details are qualified against both fixed public minima; every prior verdict and actual native/packed/compiler/floor requirement remains. No source-only runtime admission.",
+    "actual_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "qualification_proof": {
+      "path": "compatibility/rc/spec-stability-context-proof.json",
+      "sha256": "801e41c8f24f71a98f5cfb10a8c9f27a315573197856a5d4ab0c03eb42a5e450"
+    },
+    "prior_entry": {
+      "sha": "86ebb9bfd55e637be1e6d0117a10e290c5247ebd",
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "00fd476b50ad0eb6777e709d13b990e22a785717",
+      "entry_sha256": "c675e8cdb61f3955136d81937ff0e362282bceaccdcf6d910eb54776e9d20571"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-control-case-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "sha256": "ef0f249ded58dd7684747095fb45a106331eef26633adf32ce448bbebb84c41e"
+    },
+    "original_judgments_preserved": true
+  },
+  "historical_roster_reconciliation": {
+    "qualification": {
+      "path": "compatibility/rc/historical-roster-reconciliation-proof.json",
+      "sha256": "7694977ba8e20050d29e2d1c605a9b168f5232345a42f589eb70f0977c5f172b"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-stability-chip-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "sha256": "f90d1d9ba0505ba2bd2b7ba3742d3db69a581aa49a251f08ad75165a658f1272"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "44365daf1ce5985fb2b178bf6882b6ae24b6ddc1",
+      "entry_sha256": "f2c8a0986d943811719ebd47846e2442699dee4f00b17a3837c4719f8a10a235"
+    },
+    "source_judgment_and_actual_runtime_obligations_preserved": true
+  },
+  "native_date_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/native-date-context-inputs.json",
+      "sha256": "454c1b7b78cf9fa0444e206c7ab45638ef118922270a2a34619e29992f5df521"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "f6f9557a2fdd14811d67b951755db19985b94b7b",
+      "entry_sha256": "e8a0f95049a575f6c12c05085a577d2ad8594ea94db9c2fb50fb685d05174571"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/historical-roster-reconciliation-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "sha256": "024b6d0c9f7fb32a490a6c3c44481cd593bf75922ac1bf1deaaee20d1aa79af9"
+    },
+    "source_changes": [
+      {
+        "path": "scripts/packed-consumer-aot-smoke.mjs",
+        "before_sha256": "5827a9f4705b9f5dd5b6860c989ce94ed1e44f9602b9a828c13802b527457591",
+        "after_sha256": "b2f618b78c2df350d3e3dc235626b772f7440877a37627dd0329097b3ebfee91"
+      },
+      {
+        "path": "scripts/upstream-artifact-behavior-evidence.mjs",
+        "before_sha256": "af5791bc966bc4d67061c3f17f2e12cc1b8e80020ce456a363ced5476c326e06",
+        "after_sha256": "97196bb8c7a27e3501da839bd15ef612db4ee0134db5b9d8a1c2ab3de57d51df"
+      },
+      {
+        "path": "scripts/native-date-packed-contract.mjs",
+        "before_sha256": null,
+        "after_sha256": "89748fc79b28ddf08934f6788be2fa7dba7f3822d26227612dd040bb96ffa3cd"
+      },
+      {
+        "path": "scripts/native-date-packed-fixture.mjs",
+        "before_sha256": null,
+        "after_sha256": "97eef880aeb815b95b59257c36494daee7eb72a4ddf7feb17ac0cd55f099e382"
+      }
+    ],
+    "original_verdict_and_runtime_requirements_unchanged": true,
+    "new_fixture_dependencies_bound": true,
+    "actual_native_packed_or_floor_qualified": false
+  },
+  "recorded_source_context": {
+    "inputs": {
+      "path": "compatibility/rc/chip-focus-native-requalification-inputs.json",
+      "sha256": "a1a75f4ecc415eb85acd7ec05476b3cfafbdbfe8e6767031c52a1a4e80db5a5f"
+    },
+    "prior_entry": {
+      "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+      "ledger_commit": "72679b79d80b3d01910563d1767b72172a21e26e",
+      "entry_sha256": "3a49845cae82e45281fc3707d762f320bc439453b8832177129e6eb6aecc2feb"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/closeout-chip-audit-source-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+      "sha256": "bdbc31e4de702a527e508ce54fa236468c0c2233047a3bab2e592889589e22ed"
+    },
+    "previous_recorded_source_context": {
+      "inputs": {
+        "path": "compatibility/rc/chip-audit-source-requalification-inputs.json",
+        "sha256": "cd8f1f0cafa2d46ae9a438f66703ed064f7454c607441f025fdc690d49b104d9"
+      },
+      "prior_entry": {
+        "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+        "ledger_commit": "430206ae5a23a430b3e6736fa641b09d57ea1bda",
+        "entry_sha256": "55c92158e87e6347e891f256a2693608edc93059d0bbb542e30e900596283260"
+      },
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/closeout-recorded-source-context-86ebb9bfd55e637be1e6d0117a10e290c5247ebd.json",
+        "sha256": "aad071a854804903a1541511c596cfdfc9f974fe29aa673b96f33421737171a7"
+      },
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false,
+      "note": "Exact current source bindings after classic first-enabled-focus restoration,4 appended historical regressions and3 mandatory historical scopes. Preserve the full prior decision and all runtime/floor obligations; this document records source qualification only.",
+      "prior_document_seal": {
+        "recorded_sha256": "b252747ac0c618bfd868c74b2b084e5a0c23da288fa587095016cdbc915e921f",
+        "actual_prior_document_sha256": "aad071a854804903a1541511c596cfdfc9f974fe29aa673b96f33421737171a7",
+        "matched": false
+      }
+    },
+    "source_scope_only": true,
+    "actual_native_packed_or_floor_qualified": false,
+    "note": "Source-only refresh for the authenticated focus/spec/matrix/browser/registry delta. Every existing case,semantic judgment,branch/floor contract and real coordinator requirement is retained. Previous document-seal mismatches,if any,remain in the nested historical context and original report."
+  }
+}
