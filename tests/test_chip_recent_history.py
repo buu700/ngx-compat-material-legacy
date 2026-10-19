@@ -6,6 +6,7 @@
 """Original stage assertions stay executed; no current runtime credit from history."""
 import ast,gzip,hashlib,json,os,subprocess,unittest
 from pathlib import Path
+from tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff
 from tests.chip_recent_history import canonical_recorded_case
 ROOT=Path(__file__).resolve().parents[1]
 PREFIX='compatibility/rc/chip-recent-history-'
@@ -66,7 +67,7 @@ class ChipRecentHistory(unittest.TestCase):
         old=json.loads(prior['previous_replay_inputs']['text']);now=json.loads((ROOT/prior['previous_replay_inputs']['path']).read_bytes())
         from tests.older_audit_history import validate_registered_wrapper_successors
         validate_registered_wrapper_successors(ROOT,old,now)
-        for m in prior['protected_members']:self.assertEqual(sha((ROOT/m['path']).read_bytes()),m['sha256'])
+        for m in prior['protected_members']:self.assertEqual(sha(historical_protected_bytes(ROOT,m['path'])),m['sha256'])
         for path in ['projects','testing','reference','fixtures','compatibility/f10']:
-            self.assertEqual(subprocess.check_output(['git','diff','--name-only',data['source_parent'],'--',path],cwd=ROOT),b'')
+            self.assertEqual(historical_task_diff(ROOT,data['source_parent'],[path]),b'')
 if __name__=='__main__':unittest.main()

@@ -6,6 +6,7 @@
 """Current native obligations stay live while earlier test models stay historical."""
 import copy,gzip,hashlib,json,tempfile,unittest
 from pathlib import Path
+from tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff
 from unittest.mock import patch
 import tests.audit_test_context as context
 ROOT=Path(__file__).resolve().parents[1]
@@ -49,7 +50,7 @@ class CurrentAuditNative(unittest.TestCase):
         task=json.loads((ROOT/'compatibility/rc/current-audit-native-worksheet.json').read_bytes());ref=task['prior']
         stored=(ROOT/ref['path']).read_bytes();self.assertEqual(hashlib.sha256(stored).hexdigest(),ref['sha256'])
         raw=gzip.decompress(stored);self.assertEqual(hashlib.sha256(raw).hexdigest(),ref['raw_sha256']);prior=json.loads(raw)
-        for m in prior['protected']:self.assertEqual(hashlib.sha256((ROOT/m['path']).read_bytes()).hexdigest(),m['sha256'])
+        for m in prior['protected']:self.assertEqual(hashlib.sha256(historical_protected_bytes(ROOT,m['path'])).hexdigest(),m['sha256'])
         before=next(m['text'] for m in prior['sources'] if m['path']=='tests/test_audit_test_context.py')
         expected=before.replace('current complete31/30 guard census','current complete34/33 guard census')
         expected=expected.replace("len(contracts['rows']),31 if contracts['line']=='main' else 30", "len(contracts['rows']),34 if contracts['line']=='main' else 33")

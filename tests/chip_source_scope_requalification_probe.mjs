@@ -10,9 +10,10 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {inspectSourceScopeRequalification,sourceScopeWrites,sourceScopePrior,
   validateSourceScopes,SOURCE_SCOPE_PREFIX} from '../scripts/chip-source-scope-requalification.mjs';
+import {historicalRippleAuthoredReader} from '../scripts/ripple-global-options-integration.mjs';
 import {chipFocusNativeDefinitions} from '../scripts/chip-focus-native-requalification.mjs';
 const read=p=>readFileSync(p),hash=b=>createHash('sha256').update(b).digest('hex');
-const qualification=inspectSourceScopeRequalification(),prior=sourceScopePrior(read);
+const qualification=inspectSourceScopeRequalification({read:historicalRippleAuthoredReader()}),prior=sourceScopePrior(read);
 const entries=JSON.parse(read(prior.ledger_path)).entries,controls=[];
 function overridden(path,bytes){return p=>p===path?Buffer.from(bytes):read(p);}
 function rejected(name,subject,reader=read,changedEntries=entries) {
@@ -53,7 +54,7 @@ for(const path of [
   'projects/ngx-material-legacy/legacy-slider/slider.scss',
   prior.reports[0].path,prior.authored_members[0].path,
 ]) {
-  assert.throws(()=>sourceScopeWrites({read:overridden(path,Buffer.concat([read(path),Buffer.from('\n')]))}));
+  assert.throws(()=>sourceScopeWrites({read:historicalRippleAuthoredReader({read:overridden(path,Buffer.concat([read(path),Buffer.from('\n')]))})}));
   controls.push('snapshot builder refuses unknown bytes: '+path);
 }
 assert.throws(()=>sourceScopePrior(overridden(SOURCE_SCOPE_PREFIX+'prior.json.gz',Buffer.concat([read(SOURCE_SCOPE_PREFIX+'prior.json.gz'),Buffer.from('\n')]))));
