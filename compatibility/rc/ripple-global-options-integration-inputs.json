@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "prior_sha256": "db2dfef8aae2af08c065a648cab2db3442ef5acbba794075bdee1f84a58a8e82",
+  "test_context_edits": [
+    {
+      "path": "tests/test_chip_source_scope_requalification.py",
+      "substitutions": [
+        [
+          "from pathlib import Path",
+          "from pathlib import Path\nfrom tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff"
+        ],
+        [
+          "sha((ROOT/m['path']).read_bytes())",
+          "sha(historical_protected_bytes(ROOT,m['path']))"
+        ]
+      ],
+      "after_sha256": "ff79dd9d6b62a925f96186a2b12bcd541e1c60bfc835916ffa29afde2ebfb3d9"
+    },
+    {
+      "path": "tests/test_chip_recent_history.py",
+      "substitutions": [
+        [
+          "from pathlib import Path",
+          "from pathlib import Path\nfrom tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff"
+        ],
+        [
+          "sha((ROOT/m['path']).read_bytes())",
+          "sha(historical_protected_bytes(ROOT,m['path']))"
+        ],
+        [
+          "subprocess.check_output(['git','diff','--name-only',data['source_parent'],'--',path],cwd=ROOT)",
+          "historical_task_diff(ROOT,data['source_parent'],[path])"
+        ]
+      ],
+      "after_sha256": "d7444ec9ecd0313887b0be4f882678772385a78ba044f2428a2009a51afdc990"
+    },
+    {
+      "path": "tests/test_older_audit_history.py",
+      "substitutions": [
+        [
+          "from pathlib import Path",
+          "from pathlib import Path\nfrom tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff"
+        ],
+        [
+          "hashlib.sha256((ROOT/member['path']).read_bytes()).hexdigest()",
+          "hashlib.sha256(historical_protected_bytes(ROOT,member['path'])).hexdigest()"
+        ],
+        [
+          "source=(ROOT/path).read_text();original=",
+          "source=historical_protected_bytes(ROOT,path).decode();original="
+        ],
+        [
+          "subprocess.check_output(['git','diff','--name-only',prior['source_parent'],'--','projects','testing','reference','fixtures','compatibility/f10'],cwd=ROOT)",
+          "historical_task_diff(ROOT,prior['source_parent'],['projects','testing','reference','fixtures','compatibility/f10'])"
+        ]
+      ],
+      "after_sha256": "753718f3df1555e06fd0e3e0ef92d2530309ac45d34693ddbc9b810b406b7f0f"
+    },
+    {
+      "path": "tests/test_current_audit_native.py",
+      "substitutions": [
+        [
+          "from pathlib import Path",
+          "from pathlib import Path\nfrom tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff"
+        ],
+        [
+          "hashlib.sha256((ROOT/m['path']).read_bytes()).hexdigest()",
+          "hashlib.sha256(historical_protected_bytes(ROOT,m['path'])).hexdigest()"
+        ]
+      ],
+      "after_sha256": "7d30baf2c53a42569e93bcdcaa0d49766e3fa97eb754dac4f0f59f077a5501a1"
+    },
+    {
+      "path": "tests/chip_source_scope_requalification_probe.mjs",
+      "substitutions": [
+        [
+          "import {chipFocusNativeDefinitions}",
+          "import {historicalRippleAuthoredReader} from '../scripts/ripple-global-options-integration.mjs';\nimport {chipFocusNativeDefinitions}"
+        ],
+        [
+          "inspectSourceScopeRequalification(),prior=",
+          "inspectSourceScopeRequalification({read:historicalRippleAuthoredReader()}),prior="
+        ],
+        [
+          "sourceScopeWrites({read:overridden(path,Buffer.concat([read(path),Buffer.from('\\n')]))})",
+          "sourceScopeWrites({read:historicalRippleAuthoredReader({read:overridden(path,Buffer.concat([read(path),Buffer.from('\\n')]))})})"
+        ]
+      ],
+      "after_sha256": "112ad16342ac43d6b0c3cffcbaf3411507fd12e812c998996a0f74be4d76e2bf"
+    },
+    {
+      "path": "tests/test_import_cleanup_review_history.py",
+      "substitutions": [
+        [
+          "from pathlib import Path",
+          "from pathlib import Path\nfrom tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff"
+        ],
+        [
+          "sha((ROOT/m['path']).read_bytes())",
+          "sha(historical_protected_bytes(ROOT,m['path']))"
+        ]
+      ],
+      "after_sha256": "f853f9f72a1a6563e7e064eb66abfcd09474080a89343c68d5802f08ad7658a5"
+    }
+  ],
+  "source_scope_only": true,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

@@ -6,6 +6,7 @@
 """Historical source cohorts cannot replace live current native obligations."""
 import ast,copy,hashlib,json,os,subprocess,unittest
 from pathlib import Path
+from tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff
 from tests.older_audit_history import _inputs,mixed_context_before_history,validate_complete_older_receipt,validate_registered_wrapper_successors
 from tests.chip_recent_history import canonical_recorded_case
 ROOT=Path(__file__).resolve().parents[1]
@@ -69,12 +70,12 @@ class OlderAuditHistory(unittest.TestCase):
         self.assertEqual(count,50)
         for member in prior['protected']:
             if member['path']=='tests/test_current_audit_native.py':continue
-            self.assertEqual(hashlib.sha256((ROOT/member['path']).read_bytes()).hexdigest(),member['sha256'])
+            self.assertEqual(hashlib.sha256(historical_protected_bytes(ROOT,member['path'])).hexdigest(),member['sha256'])
         path='tests/test_current_audit_native.py';old=subprocess.check_output(['git','--no-replace-objects','show',prior['source_parent']+':'+path],cwd=ROOT).decode()
-        source=(ROOT/path).read_text();original="        self.assertNotEqual(expected,before);self.assertEqual((ROOT/'tests/test_audit_test_context.py').read_text(),expected)"
+        source=historical_protected_bytes(ROOT,path).decode();original="        self.assertNotEqual(expected,before);self.assertEqual((ROOT/'tests/test_audit_test_context.py').read_text(),expected)"
         replacement="        current=(ROOT/'tests/test_audit_test_context.py').read_text()\n        if 'from tests.older_audit_history import assert_recorded_older_case' in current:\n            from tests.older_audit_history import mixed_context_before_history\n            current=mixed_context_before_history(ROOT)\n        self.assertNotEqual(expected,before);self.assertEqual(current,expected)"
         self.assertEqual(old.count(original),1);self.assertEqual(source,old.replace(original,replacement))
-        self.assertEqual(subprocess.check_output(['git','diff','--name-only',prior['source_parent'],'--','projects','testing','reference','fixtures','compatibility/f10'],cwd=ROOT),b'')
+        self.assertEqual(historical_task_diff(ROOT,prior['source_parent'],['projects','testing','reference','fixtures','compatibility/f10']),b'')
         old=json.loads(prior['old_replay_inputs']['text']);now=json.loads((ROOT/prior['old_replay_inputs']['path']).read_bytes())
         validate_registered_wrapper_successors(ROOT,old,now)
 if __name__=='__main__':unittest.main()

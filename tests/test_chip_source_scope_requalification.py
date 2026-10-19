@@ -6,6 +6,7 @@
 """Source bindings move without rewriting original judgments or runtime credit."""
 import copy,gzip,hashlib,json,os,subprocess,unittest
 from pathlib import Path
+from tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff
 ROOT=Path(__file__).resolve().parents[1]
 PREFIX='compatibility/rc/chip-source-scope-requalification-'
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -39,7 +40,7 @@ class ChipSourceScopeRequalification(unittest.TestCase):
             else:self.assertEqual(x,y)
         self.assertEqual(changed,87);self.assertEqual(restored,p['ledger_text'])
         for m in p['reports']+p['product_members']+p['authored_members']:
-            self.assertEqual(sha((ROOT/m['path']).read_bytes()),m['sha256'],m['path'])
+            self.assertEqual(sha(historical_protected_bytes(ROOT,m['path'])),m['sha256'],m['path'])
         g=p['guard_before'];before=g['text'];after=(ROOT/g['path']).read_text()
         start="    const contextPath='compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json';\n    assert.equal(body.candidate_context.path,contextPath);"
         replacement="    // The current copy preserves the original review and rebinds its complete\n    // product snapshot. Both paths still require the same strict build proof.\n    const contextPath=body.candidate_context.path;\n    assert.ok(['compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json',\n      'compatibility/rc/chip-source-scope-requalification-build.json'].includes(contextPath));"

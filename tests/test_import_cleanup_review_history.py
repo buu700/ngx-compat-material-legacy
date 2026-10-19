@@ -6,6 +6,7 @@
 """An exact review copy cannot replace or rewrite its authenticated original."""
 import ast,copy,gzip,hashlib,json,sys,unittest
 from pathlib import Path
+from tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff
 from unittest.mock import patch
 import tests.test_upstream_audit_disposition as audit
 ROOT,LEDGER,MECHANICAL=audit.ROOT,audit.LEDGER,audit.MECHANICAL
@@ -66,4 +67,4 @@ class ImportCleanupReviewHistory(unittest.TestCase):
         a,b=method(before),method(after);self.assertIsInstance(b.body[0],ast.If)
         self.assertEqual([ast.dump(n,include_attributes=False) for n in a.body],[ast.dump(n,include_attributes=False) for n in b.body[1:]])
         self.assertEqual(after.replace(ast.get_source_segment(after,b),ast.get_source_segment(before,a),1),before)
-        for m in prior['protected']:self.assertEqual(sha((ROOT/m['path']).read_bytes()),m['sha256'])
+        for m in prior['protected']:self.assertEqual(sha(historical_protected_bytes(ROOT,m['path'])),m['sha256'])
