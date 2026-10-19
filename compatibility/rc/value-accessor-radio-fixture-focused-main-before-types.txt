@@ -1,0 +1,40 @@
+F
+======================================================================
+FAIL: test_supported_public_filters_and_actual_harness_handlers (tests.test_value_accessor_radio_fixture.ValueAccessorRadioFixture.test_supported_public_filters_and_actual_harness_handlers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/test_value_accessor_radio_fixture.py", line 22, in test_supported_public_filters_and_actual_harness_handlers
+    self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-10000:])
+AssertionError: 1 != 0 : node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: [96mconsumer.ts[0m:[93m3[0m:[93m87[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'value' does not exist in type 'RadioButtonHarnessFilters'.
+
+[7m3[0m const actual = {read:()=>radio.getCheckedValue(),interact:()=>radio.checkRadioButton({value:'two'}),touch:async()=>{const buttons=await radio.getRadioButtons({value:'two'});await buttons[0].focus();await buttons[0].blur();},disabled:async()=>{const buttons=await radio.getRadioButtons();return buttons.length===2&&(await Promise.all(buttons.map((button:any)=>button.isDisabled()))).every(Boolean);}};
+[7m [0m [91m                                                                                      ~~~~~[0m
+[96mconsumer.ts[0m:[93m3[0m:[93m160[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'value' does not exist in type 'RadioButtonHarnessFilters'.
+
+[7m3[0m const actual = {read:()=>radio.getCheckedValue(),interact:()=>radio.checkRadioButton({value:'two'}),touch:async()=>{const buttons=await radio.getRadioButtons({value:'two'});await buttons[0].focus();await buttons[0].blur();},disabled:async()=>{const buttons=await radio.getRadioButtons();return buttons.length===2&&(await Promise.all(buttons.map((button:any)=>button.isDisabled()))).every(Boolean);}};
+[7m [0m [91m                                                                                                                                                               ~~~~~[0m
+
+
+2 !== 0
+
+    at compileRadioFixture (file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/value-accessor-radio-fixture-review.mjs:136:10)
+    at file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/value_accessor_radio_fixture_probe.mjs:25:31 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 2,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.23.3
+
+
+----------------------------------------------------------------------
+Ran 1 test in 11.856s
+
+FAILED (failures=1)
