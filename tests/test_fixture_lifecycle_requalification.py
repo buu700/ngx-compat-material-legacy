@@ -12,6 +12,7 @@ from pathlib import Path
 import subprocess
 import unittest
 from tests.test_ripple_global_options_integration import rows
+from tests.fixture_lifecycle_native_requalification import parent_bytes as native_parent_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -57,7 +58,7 @@ class FixtureLifecycleRequalification(unittest.TestCase):
             expected = before
             for start, end in edit['substitutions']:
                 self.assertEqual(expected.count(start),1); expected=expected.replace(start,end)
-            actual = (ROOT/edit['path']).read_text(); self.assertEqual(actual,expected)
+            actual = native_parent_bytes(ROOT, edit['path']).decode(); self.assertEqual(actual,expected)
             if edit['path'].endswith('.py'):
                 def assertions(text):
                     return [n.func.attr for n in ast.walk(ast.parse(text)) if isinstance(n,ast.Call)

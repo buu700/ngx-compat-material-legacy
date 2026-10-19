@@ -13,6 +13,7 @@ import {pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {gunzipSync} from 'node:zlib';
+import {fixtureLifecycleNativeParentReader,fixtureLifecycleNativePrior} from './fixture-lifecycle-native-requalification.mjs';
 import {inspectFixtureLifecycleDelta as inspectProducerEpoch} from './fixture-lifecycle-producer-review.mjs';
 import {ngZoneIntegrationPrior as ngPrior,inspectNgZoneUseIntegration as inspectNgEpoch,
  ngZoneIntegrationParentReader as ngParent,historicalRippleAuthoredReader as rippleParent} from './ng-zone-use-integration.mjs';
@@ -54,6 +55,7 @@ export function expectedFixtureLifecycleLedgers(prior,review){return prior.ledge
  return {path:m.path,bytes:Buffer.from(json(body)),changed:count};
  });}
 function validate({root=process.cwd(),read=defaultRead(root)}={}){
+ read=fixtureLifecycleNativeParentReader({root,read});
  const prior=fixtureLifecycleRequalificationPrior({root,read}),raw=read(INPUTS);assert.equal(hash(raw),inputPins[prior.line],'unknown source requalification inputs');const inputs=JSON.parse(raw);
  assert.equal(inputs.line,prior.line);assert.deepEqual(inputs.prior,{path:PRIOR,sha256:priorPins[prior.line]});
  assert.equal(inputs.context_edits.length,6);assert.equal(inputs.producer_deltas.length,7);
@@ -85,6 +87,6 @@ export function inspectFixtureLifecycleDelta(root,{readSource}={}){
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
  const mode=process.argv[2];assert.equal(process.argv.length,3);assert.ok(['--validated-parent','--qualification-parent'].includes(mode));
  const state=validate();
- if(mode==='--qualification-parent')process.stdout.write(JSON.stringify({ledger_preimages:state.prior.ledger_preimages,context_preimages:state.prior.context_preimages}));
+ if(mode==='--qualification-parent')process.stdout.write(JSON.stringify({ledger_preimages:[...state.prior.ledger_preimages,fixtureLifecycleNativePrior().ledger],context_preimages:state.prior.context_preimages}));
  else{inspectNgEpoch({read:state.parent});const prior=ngPrior({read:state.parent});process.stdout.write(JSON.stringify({line:prior.line,ledger:prior.ledger,test_context_edits:prior.test_context_edits,prior_sha256:hash(state.parent('compatibility/rc/ng-zone-use-integration-prior.json.gz'))}));}
 }

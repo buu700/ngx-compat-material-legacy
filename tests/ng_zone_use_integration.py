@@ -55,7 +55,8 @@ def parent_protected_bytes(root, path):
 
 
 def historical_protected_bytes(root, path):
-    if path == "compatibility/f10/authored-dependency-current-dispositions.json":
+    if path in {"compatibility/f10/authored-dependency-current-dispositions.json",
+                "compatibility/f10/disposition-ledger/ledger.json"}:
         return requalification_parent_bytes(root, path)
     # Ordinary source assertions already hash their actual bytes. Only finite
     # registered substitutions need a validated historical parent projection.
