@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "id": "chip-blur-original",
+  "source_parent": "24656ff856ec8ff87a4cc2f00169c9d2e5baa04d",
+  "module": "tests.test_chip_blur_runtime",
+  "program": "tests/test_chip_blur_runtime.py",
+  "program_sha256": "f51a3b910a559d8f0e04a442ffe4f5ac2da669e9393a3f0e166f8c614a578a07",
+  "wrapper_sha256": "55db53a131d3dc9630411f0737a9650a00e87eb71ac37e59c597d60d7af757bc",
+  "frame": {
+    "commit": "e0e8331a0316fe1da2f3a1b9b25c42c0c2599f96",
+    "tree": "4c9cca97614ce0524b5cba33a4d72e4e7702141a",
+    "tree_listing_sha256": "69cf4de39285de499295f52eaf844d5ea23cad6d65a63831958a42bf15743132",
+    "members": 9145
+  },
+  "case_ids": [
+    "tests.test_chip_blur_runtime.ChipBlurRuntimeTests.test_blur_form_state_and_request_lifetimes"
+  ],
+  "timeout_ms": 150000,
+  "prior": {
+    "path": "compatibility/rc/chip-blur-history-prior.json.gz",
+    "sha256": "4849faf52b802e575ffa91c51898fdf599e7c22e0ec822ed2cfd4dfd12ce796c",
+    "raw_sha256": "49e94c46813d6725c8176ceeb2d8f5927608293631cb13d14b3e11734029fd33"
+  },
+  "shared_engine_edits": [
+    [
+      "import {olderAuditHistoryInputs,selectOlderAuditModules} from './older-audit-history-inputs.mjs';",
+      "import {olderAuditHistoryInputs,selectOlderAuditModules} from './older-audit-history-inputs.mjs';\nimport {chipBlurHistoryInputs} from './chip-blur-history-inputs.mjs';"
+    ],
+    [
+      "async function runHistoricalModules({root,id,reportPath,data,sha256,entry,modules,complete,temporaryPrefix,implementationSources}) {",
+      "export async function runChipBlurHistory({root=rootDefault,reportPath}={}) {\n  const {data,sha256}=chipBlurHistoryInputs({root});\n  return runHistoricalModules({root,id:data.id,reportPath,data,sha256,entry:data,modules:[data.module],complete:true,\n    temporaryPrefix:'ngx-chip-blur-history-',omittedDiagnosticEnv:['CLOSEOUT_CHIP_BLUR_REPORT'],\n    implementationSources:['scripts/chip-recent-history.mjs','scripts/chip-blur-history-inputs.mjs',\n      'scripts/run-chip-blur-history.mjs','tests/chip_blur_history.py']});\n}\nasync function runHistoricalModules({root,id,reportPath,data,sha256,entry,modules,complete,temporaryPrefix,implementationSources,omittedDiagnosticEnv=[]}) {"
+    ],
+    [
+      "    const child=spawn('python3',['-B','-c',pythonProgram,JSON.stringify(modules),join(parent,'cases.json')],\n      {cwd:checkout,env:env(),detached:process.platform!=='win32',stdio:['ignore','pipe','pipe']});",
+      "    const childEnv=env();for(const name of omittedDiagnosticEnv)delete childEnv[name];\n    const child=spawn('python3',['-B','-c',pythonProgram,JSON.stringify(modules),join(parent,'cases.json')],\n      {cwd:checkout,env:childEnv,detached:process.platform!=='win32',stdio:['ignore','pipe','pipe']});"
+    ]
+  ],
+  "shared_engine_after_sha256": "c6b6c962c2908279661d885a3e651aea183ef9b19fb11fca1d64f276b6714bf8",
+  "original_subjects": 10,
+  "original_mutation_rejections": 36,
+  "current_genuine_zone_probe": "tests/chip_zone_use_probe.mjs",
+  "diagnostics": "Use NGX_CHIP_BLUR_HISTORY_REPORT_DIR for the framed execution receipt. The old CLOSEOUT_CHIP_BLUR_REPORT flag is omitted only from this historical child to avoid writing source-era observations into a current diagnostic path.",
+  "actual_current_source_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
