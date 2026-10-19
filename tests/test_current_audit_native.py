@@ -53,4 +53,8 @@ class CurrentAuditNative(unittest.TestCase):
         before=next(m['text'] for m in prior['sources'] if m['path']=='tests/test_audit_test_context.py')
         expected=before.replace('current complete31/30 guard census','current complete34/33 guard census')
         expected=expected.replace("len(contracts['rows']),31 if contracts['line']=='main' else 30", "len(contracts['rows']),34 if contracts['line']=='main' else 33")
-        self.assertNotEqual(expected,before);self.assertEqual((ROOT/'tests/test_audit_test_context.py').read_text(),expected)
+        current=(ROOT/'tests/test_audit_test_context.py').read_text()
+        if 'from tests.older_audit_history import assert_recorded_older_case' in current:
+            from tests.older_audit_history import mixed_context_before_history
+            current=mixed_context_before_history(ROOT)
+        self.assertNotEqual(expected,before);self.assertEqual(current,expected)

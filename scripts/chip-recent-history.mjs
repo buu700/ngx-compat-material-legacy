@@ -15,6 +15,7 @@ import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 import {historicalFrameMembers,inspectHistoricalReplayCurrent,verifyHistoricalCurrentSubjects} from './historical-source-replay.mjs';
+import {olderAuditHistoryInputs,selectOlderAuditModules} from './older-audit-history-inputs.mjs';
 
 export const CHIP_RECENT_HISTORY_INPUTS='compatibility/rc/chip-recent-history-inputs.json';
 export const CHIP_RECENT_HISTORY_IDS=Object.freeze(['lifecycle-scope','focus-repair','focus-browser',
@@ -70,7 +71,7 @@ class RecordedResult(unittest.TextTestResult):
         self.started_ids.append(test.id());super().startTest(test)
     def addSuccess(self,test):
         self.passed_ids.append(test.id());super().addSuccess(test)
-suite=unittest.defaultTestLoader.loadTestsFromName(sys.argv[1])
+suite=unittest.defaultTestLoader.loadTestsFromNames(json.loads(sys.argv[1]))
 result=unittest.TextTestRunner(stream=sys.stderr,verbosity=2,resultclass=RecordedResult).run(suite)
 body={'tests_run':result.testsRun,'started':result.started_ids,'passed':result.passed_ids,
       'failures':[t.id() for t,_ in result.failures],'errors':[t.id() for t,_ in result.errors],
@@ -119,9 +120,20 @@ function dependencies(root) {
 }
 export async function runRecentHistory({root=rootDefault,id,reportPath}={}) {
   assert.ok(CHIP_RECENT_HISTORY_IDS.includes(id),'unregistered recent history stage');
-  const started=Date.now(),{data,sha256}=recentHistoryInputs({root}),entry=data.entries.find(e=>e.id===id);
+  const {data,sha256}=recentHistoryInputs({root}),entry=data.entries.find(e=>e.id===id);
+  return runHistoricalModules({root,id,reportPath,data,sha256,entry,modules:[entry.module],complete:true,
+    temporaryPrefix:'ngx-chip-recent-history-',implementationSources:['scripts/chip-recent-history.mjs','scripts/run-chip-recent-history.mjs','tests/chip_recent_history.py']});
+}
+export async function runOlderAuditHistory({root=rootDefault,requested=[],reportPath}={}) {
+  const {data,sha256}=olderAuditHistoryInputs({root}),selection=selectOlderAuditModules(data,requested);
+  return runHistoricalModules({root,id:data.id,reportPath,data,sha256,...selection,
+    temporaryPrefix:'ngx-older-audit-history-',implementationSources:['scripts/chip-recent-history.mjs',
+      'scripts/older-audit-history-inputs.mjs','scripts/run-older-audit-history.mjs','tests/older_audit_history.py']});
+}
+async function runHistoricalModules({root,id,reportPath,data,sha256,entry,modules,complete,temporaryPrefix,implementationSources}) {
+  const started=Date.now();
   const current=inspectHistoricalReplayCurrent({root}),members=historicalFrameMembers(root,entry.frame);
-  const parent=mkdtempSync(join(tmpdir(),'ngx-chip-recent-history-')),checkout=join(parent,'checkout');mkdirSync(checkout);
+  const parent=mkdtempSync(join(tmpdir(),temporaryPrefix)),checkout=join(parent,'checkout');mkdirSync(checkout);
   let report;
   try {
     await extract(root,entry.frame,checkout);const historicalBytes=verifyRecentHistoricalGraph(checkout,members);
@@ -131,7 +143,7 @@ export async function runRecentHistory({root=rootDefault,id,reportPath}={}) {
     writeFileSync(join(checkout,'.git/HEAD'),entry.frame.commit+'\n');git(checkout,['read-tree',entry.frame.commit]);
     symlinkSync(dependencies(root),join(checkout,'node_modules'),'dir');writeFileSync(join(checkout,'.git/info/exclude'),'/node_modules/\n');
     assert.equal(git(checkout,['status','--porcelain','--untracked-files=all']).toString(),'');
-    const child=spawn('python3',['-B','-c',pythonProgram,entry.module,join(parent,'cases.json')],
+    const child=spawn('python3',['-B','-c',pythonProgram,JSON.stringify(modules),join(parent,'cases.json')],
       {cwd:checkout,env:env(),detached:process.platform!=='win32',stdio:['ignore','pipe','pipe']});
     let stdout='',stderr='',timedOut=false,overflow=false;
     let escalation;const terminate=()=>{stop(child);escalation??=setTimeout(()=>stop(child,'SIGKILL'),1000);};
@@ -146,13 +158,14 @@ export async function runRecentHistory({root=rootDefault,id,reportPath}={}) {
     assert.equal(verifyRecentHistoricalGraph(checkout,members),historicalBytes);
     const after=verifyHistoricalCurrentSubjects({root,data:current.data,members:current.members});assert.deepEqual(after,current.guard);
     report={schema_version:1,line:data.line,id,inputs_sha256:sha256,entry,
+      selected_modules:modules,complete_registered_module_set:complete,
       historical_members_verified:members.length,historical_bytes_verified:historicalBytes,
       current_guard:current.guard,current_guard_passed_before_and_after:true,
       exit_code:finished.code,signal:finished.signal,timed_out:timedOut,output_overflow:overflow,
       receipt,original_stdout:stdout,original_stderr:stderr,historical_post_execution_clean:clean,
       original_program_unchanged:true,temporary_graph_removed:false,
       elapsed_ms:Date.now()-started,node:process.version,
-      implementation_sources:['scripts/chip-recent-history.mjs','scripts/run-chip-recent-history.mjs','tests/chip_recent_history.py']
+      implementation_sources:implementationSources
         .map(path=>({path,sha256:hash(readFileSync(join(root,path)))})),
       actual_current_source_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};
     assert.equal(timedOut,false,'historical module timed out');assert.equal(overflow,false,'historical output overflow');
