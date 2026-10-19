@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from tests.fixture_lifecycle_requalification import parent_bytes
 import subprocess
 import unittest
 from unittest.mock import patch
@@ -51,7 +52,7 @@ class NgZoneUseIntegration(unittest.TestCase):
 
     def test_exact_row_bytes_and_original_assertions_and_native_methods(self):
         prior = json.loads(gzip.decompress((ROOT / PRIOR).read_bytes()))
-        original = prior['ledger']['text']; current = (ROOT / LEDGER).read_text()
+        original = prior['ledger']['text']; current = parent_bytes(ROOT, LEDGER).decode()
         before, after = rows(original), rows(current)
         self.assertEqual(len(before), 1736); self.assertEqual(len(after), 1736)
         wanted = {(r['file'], r['module'], r['symbol']): r['source_review'] for r in prior['selected']}
@@ -73,7 +74,7 @@ class NgZoneUseIntegration(unittest.TestCase):
             expected = edit['text']
             for start, end in edit['substitutions']:
                 self.assertEqual(expected.count(start), 1); expected = expected.replace(start, end)
-            actual = (ROOT / edit['path']).read_text()
+            actual = parent_bytes(ROOT, edit['path']).decode()
             self.assertEqual(hashlib.sha256(actual.encode()).hexdigest(), edit['after_sha256'])
             self.assertEqual(expected, actual)
             if edit['path'].endswith('.py'):

@@ -11,13 +11,14 @@ import {createHash} from 'node:crypto';
 import {authoredUseReviewEvidence} from '../scripts/authored-use-inventory.mjs';
 import {ngZoneIntegrationPrior, inspectNgZoneUseIntegration, ngZoneIntegrationParentReader,
   historicalRippleAuthoredReader, NG_ZONE_INTEGRATION_PRIOR, RIPPLE_AUTHORED_LEDGER} from '../scripts/ng-zone-use-integration.mjs';
-const read = p => readFileSync(p), hash = b => createHash('sha256').update(b).digest('hex');
+import {fixtureLifecycleParentReader} from '../scripts/fixture-lifecycle-requalification.mjs';
+const read = fixtureLifecycleParentReader(), hash = b => createHash('sha256').update(b).digest('hex');
 const key = row => JSON.stringify([row.file, row.module, row.symbol]);
-const prior = ngZoneIntegrationPrior(), good = inspectNgZoneUseIntegration(), controls = [];
+const prior = ngZoneIntegrationPrior(), good = inspectNgZoneUseIntegration({read}), controls = [];
 const ledger = JSON.parse(read(RIPPLE_AUTHORED_LEDGER));
 const selectedKeys = new Set(prior.selected.map(key));
 const selected = {...ledger, symbol_uses: ledger.symbol_uses.filter(row => selectedKeys.has(key(row)))};
-const parent = ngZoneIntegrationParentReader(), historical = historicalRippleAuthoredReader();
+const parent = ngZoneIntegrationParentReader({read}), historical = historicalRippleAuthoredReader({read});
 assert.equal(parent(RIPPLE_AUTHORED_LEDGER).toString(), prior.ledger.text);
 assert.equal(JSON.parse(historical(RIPPLE_AUTHORED_LEDGER)).reviewed_uses, 1446);
 for (const member of prior.bound_members) assert.equal(parent(member.path).equals(read(member.path)), true, member.path);

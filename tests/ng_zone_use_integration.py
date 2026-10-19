@@ -29,7 +29,7 @@ class _ParentMember:
 class _ParentRoot:
     def __init__(self, root):
         # No receipt cache: the Node checker rehashes actual current bytes on every call.
-        child = subprocess.run(['node', 'scripts/ng-zone-use-integration.mjs', '--validated-parent'],
+        child = subprocess.run(['node', 'scripts/fixture-lifecycle-requalification.mjs', '--validated-parent'],
             cwd=root, capture_output=True, text=True, timeout=60)
         assert child.returncode == 0, (child.stdout + child.stderr)[-10000:]
         data = json.loads(child.stdout)

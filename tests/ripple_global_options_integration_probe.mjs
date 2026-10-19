@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import {readFileSync, writeFileSync} from 'node:fs';
 import {inspectRippleOptionsIntegration, historicalRippleAuthoredReader, rippleIntegrationPrior,
   RIPPLE_AUTHORED_LEDGER, RIPPLE_INTEGRATION_INPUTS, RIPPLE_INTEGRATION_PRIOR} from '../scripts/ripple-global-options-integration.mjs';
-import {ngZoneIntegrationParentReader} from '../scripts/ng-zone-use-integration.mjs';
+import {ngZoneIntegrationParentReader} from '../scripts/fixture-lifecycle-requalification.mjs';
 const read = ngZoneIntegrationParentReader(), prior = rippleIntegrationPrior(), good = inspectRippleOptionsIntegration({read});
 const view = historicalRippleAuthoredReader({read}), controls = [];
 assert.equal(view(RIPPLE_AUTHORED_LEDGER).toString(), prior.ledger.text);
