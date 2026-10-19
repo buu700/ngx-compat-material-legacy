@@ -74,7 +74,7 @@ export async function observePackedValueAccessors() {
       interact:()=>list.selectItems({text:'Two'}),touch:async()=>{const options=await list.getItems({text:'Two'});await options[0].focus();await options[0].blur();},disabled:()=>list.isDisabled()});
     const radioNode=node('radio',MatLegacyRadioGroup),radio=await loader.getHarness(MatLegacyRadioGroupHarness.with({selector:'#cva-radio'}));
     specs.push({family:'radio',owner:MatLegacyRadioGroup,control:host.radio,model:'one',after:'one',harness:radio,read:()=>radio.getCheckedValue(),retained:()=>radioNode.instance.value,
-      interact:()=>radio.checkRadioButton({value:'two'}),touch:async()=>{const buttons=await radio.getRadioButtons({value:'two'});await buttons[0].focus();await buttons[0].blur();},
+      interact:()=>radio.checkRadioButton({label:'Two'}),touch:async()=>{const buttons=await radio.getRadioButtons({label:'Two'});await buttons[0].focus();await buttons[0].blur();},
       disabled:async()=>{const buttons=await radio.getRadioButtons();return buttons.length===2&&(await Promise.all(buttons.map((button:any)=>button.isDisabled()))).every(Boolean);}});
     const toggleNode=node('slide-toggle',MatLegacySlideToggle),toggle=await loader.getHarness(MatLegacySlideToggleHarness.with({selector:'#cva-slide-toggle'}));
     specs.push({family:'slide-toggle',owner:MatLegacySlideToggle,control:host.slideToggle,model:true,after:true,harness:toggle,read:()=>toggle.isChecked(),retained:()=>toggleNode.instance.checked,
