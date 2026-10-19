@@ -411,6 +411,38 @@ class UpstreamAuditDispositionTests(unittest.TestCase):
         self.assertEqual(entry['individual_proof']['diff_sha256'], report['diff_sha256'])
 
     def assert_import_cleanup_history(self, entry, old_report, evidence_path):
+        if entry['prior_entry_preserved_in'] != entry['evidence_report']:
+            # The source-only refresh keeps the original reviewed prior entry
+            # in its original document. Authenticate both documents before
+            # applying the unchanged historical assertions below.
+            self.assertEqual(entry['evidence_report'], 'compatibility/rc/chip-source-scope-requalification-test-import.json')
+            raw = (ROOT / entry['evidence_report']).read_bytes()
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), entry['source_check']['evidence_report_sha256'])
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), 'f356923cce2f46158d6fb2a6ec3a9e066044b6b1e8f0664a392b3f0f6bdbde12')
+            current = json.loads(raw)
+            refresh = current['chip_source_scope_requalification']
+            previous = refresh['prior_review']
+            self.assertEqual(previous['path'], 'compatibility/f10/disposition-ledger/evidence/closeout-thirty-one-test-import-source-review.json')
+            self.assertEqual(entry['prior_entry_preserved_in'], previous['path'])
+            original_bytes = (ROOT / previous['path']).read_bytes()
+            self.assertEqual(hashlib.sha256(original_bytes).hexdigest(), previous['sha256'])
+            original = json.loads(original_bytes)
+            expected = json.loads(original_bytes)
+            expected['ownership_context']['inputs'] = [
+                {**member, 'sha256': hashlib.sha256((ROOT / member['path']).read_bytes()).hexdigest()}
+                for member in original['ownership_context']['inputs']
+            ]
+            expected['chip_source_scope_requalification'] = refresh
+            self.assertEqual(current, expected)
+            self.assertTrue(refresh['source_scope_only'])
+            self.assertTrue(refresh['original_review_and_individual_judgments_preserved'])
+            self.assertFalse(refresh['actual_native_packed_or_floor_qualified'])
+            self.assertEqual(refresh['g11_claim'], 'not-passed')
+            preserved = json.loads(json.dumps(entry))
+            preserved['evidence_report'] = previous['path']
+            preserved['source_check']['evidence_report_sha256'] = previous['sha256']
+            self.assert_import_cleanup_history(preserved, old_report, evidence_path)
+            return
         self.assertEqual(entry['batch_id'], 'closeout-complete31-test-import-cleanup-predicate')
         self.assertEqual(entry['prior_entry_preserved_in'], entry['evidence_report'])
         report_path = ROOT / entry['evidence_report']
