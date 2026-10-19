@@ -17,6 +17,9 @@ import subprocess
 
 PROGRAM=r'''
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {CHIP_LIFECYCLE_NATIVE_SHAS,chipLifecycleScopeEvidenceOk} from './scripts/upstream-chip-lifecycle-admission.mjs';
+const read=p=>readFileSync(p),hash=b=>createHash('sha256').update(b).digest('hex');
 const entries=JSON.parse(readFileSync('compatibility/f10/disposition-ledger/ledger.json')).entries;
 const line=JSON.parse(readFileSync('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';
 const definitions=[
@@ -41,18 +44,31 @@ for(const[name,kind,field,requirements,validator]of definitions){
  for(const entry of entries){const definition=m[requirements](entry.sha,line);if(!definition)continue;
   const noRun=m[validator]({root:process.cwd(),entry,proof:entry.individual_proof});
   assert.equal(noRun.ok,false,entry.sha);assert.equal(noRun.detail,'missing coordinator run',entry.sha+': '+noRun.detail);
-  rows.push({sha:entry.sha,kind:m[kind],field,definition,no_run:noRun});
+  const evidence=read(entry.evidence_report),body=JSON.parse(evidence);
+  const lifecycle=CHIP_LIFECYCLE_NATIVE_SHAS.includes(entry.sha);
+  if(lifecycle)assert.equal(chipLifecycleScopeEvidenceOk(body,entry,read,process.cwd(),line,
+    sha=>m[requirements](sha,line)),true,'current lifecycle source review/proof invalid');
+  rows.push({sha:entry.sha,kind:m[kind],field,definition,no_run:noRun,
+    evidence_report:entry.evidence_report,evidence_report_sha256:hash(evidence),
+    lifecycle_source_review_validated:lifecycle});
  }
 }
-assert.equal(rows.length,line==='main'?31:30);assert.equal(new Set(rows.map(r=>r.sha)).size,rows.length);
-console.log(JSON.stringify({line,rows,actual_native_or_packed_qualified:false}));
+assert.equal(rows.length,line==='main'?34:33);assert.equal(new Set(rows.map(r=>r.sha)).size,rows.length);
+assert.equal(rows.filter(r=>r.lifecycle_source_review_validated).length,3);
+console.log(JSON.stringify({line,rows,registry_modules:definitions.length,actual_native_or_packed_qualified:false}));
 '''
 
 @lru_cache(maxsize=4)
-def native_contracts(root):
+def _native_contract_snapshot(root):
     child=subprocess.run(['node','--input-type=module','-e',PROGRAM],cwd=root,text=True,capture_output=True,timeout=30)
     if child.returncode:raise AssertionError((child.stdout+child.stderr)[-7000:])
-    return json.loads(child.stdout)
+    return child.stdout
+
+
+def native_contracts(root):
+    # Retain an immutable serialized snapshot; callers cannot poison later
+    # checks through a returned dictionary. Live review bytes are checked below.
+    return json.loads(_native_contract_snapshot(root))
 
 
 def read_review(root,entry):
@@ -71,18 +87,32 @@ def assert_native_review(test,root,entry,body=None):
     registered={r['sha']:r for r in native_contracts(root)['rows']}
     test.assertIn(entry['sha'],registered)
     contract=registered[entry['sha']];definition=contract['definition']
+    test.assertEqual(entry['evidence_report'],contract['evidence_report'])
+    raw=member_path(root,entry['evidence_report']).read_bytes()
+    test.assertEqual(hashlib.sha256(raw).hexdigest(),contract['evidence_report_sha256'])
     actual,review=read_review(root,entry)
+    test.assertEqual(actual,json.loads(raw),'selected review differs from its authenticated document')
     if body is not None:test.assertEqual(body,actual)
     proof=entry['individual_proof'];test.assertEqual(proof['proof_kind'],contract['kind'])
     if isinstance(actual.get('reviews'),list):
-        # Exactly the three individually owned classic chip-list rows use this
-        # container. A root-level proof must not compete with the selected row.
-        test.assertEqual(actual['role'],'individual-whole-original-patch-classic-chip-list-focus-and-state-review')
-        test.assertEqual([row['sha'] for row in actual['reviews']],['e69b2b09efaf577cd5fe92b70808479f975913af','2861a306aebc54eafe4a72b4a53860d8612af5d4','8980ad584c7ab7d8a0553528cbff88958e94a22a'])
         test.assertNotIn('individual_proof',actual)
         test.assertEqual(review['status'],'reviewed')
         test.assertEqual(actual['line'],native_contracts(root)['line'])
-        test.assertEqual(review['individual_proof'],proof)
+        if contract['lifecycle_source_review_validated']:
+            # These seven source judgments derive three separate native entry
+            # proofs. The canonical raw guard above authenticates that derivation.
+            test.assertEqual(actual['role'],'C04 individual complete chip lifecycle source decisions')
+            test.assertEqual([row['sha'] for row in actual['reviews']],[
+                '597b822e25693734faf4ffc2fb6a0194abac32f0','20bf71c40f565c59101b63b5a878d2ddb7fe251d',
+                '7c9c898faac8daac1bbb20a0807168a74360760d','4eb06acbd9c30b3f5e8146b949739fe95cfcf6d3',
+                '8e1711216f7d07324e311e0f6ada3d2426c7891e','4bf8ebf5f3b874ae2f512dc684506f017f022f69',
+                'e49f1273c8f7de2deda7ab1d2162b5594d9b04fa'])
+            test.assertTrue(review['native_admission_required'])
+            test.assertNotIn('individual_proof',review)
+        else:
+            test.assertEqual(actual['role'],'individual-whole-original-patch-classic-chip-list-focus-and-state-review')
+            test.assertEqual([row['sha'] for row in actual['reviews']],['e69b2b09efaf577cd5fe92b70808479f975913af','2861a306aebc54eafe4a72b4a53860d8612af5d4','8980ad584c7ab7d8a0553528cbff88958e94a22a'])
+            test.assertEqual(review['individual_proof'],proof)
     else:
         test.assertEqual(actual['individual_proof'],proof)
     test.assertEqual(proof['affected_branches'],[native_contracts(root)['line']])
