@@ -12,7 +12,8 @@ import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {prepareFixtureLifecycleSubjects} from '../scripts/fixture-lifecycle-public-subjects.mjs';
 import {installNgZonePublicSubject} from '../scripts/ng-zone-public-subjects.mjs';
-import {collectFixtureLifecycleExpressions,compileFixtureLifecycleExpressions,inspectFixtureLifecycleDelta,fixtureLifecyclePrior} from '../scripts/fixture-lifecycle-producer-review.mjs';
+import {collectFixtureLifecycleExpressions,compileFixtureLifecycleExpressions,fixtureLifecyclePrior} from '../scripts/fixture-lifecycle-producer-review.mjs';
+import {inspectFixtureLifecycleDelta} from '../scripts/fixture-lifecycle-requalification.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),loaded=prepareFixtureLifecycleSubjects(root),rows=await collectFixtureLifecycleExpressions(root);
 const report={schema_version:1,role:'Actual producer lifecycle expressions with complete public fixture/view declarations and genuine Core component/view lifetimes; renderer and Fixture handles are explicit protocols',type_subjects:[],runtime_subjects:[],source_controls_rejected:[],actual_TestBed_ComponentFixture_or_legacy_control_executed:false,native_browser_or_packed_qualified:false,g11_claim:'not-passed'};
 try{
