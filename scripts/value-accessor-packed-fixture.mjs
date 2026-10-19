@@ -105,11 +105,11 @@ export async function observePackedValueAccessors() {
     for(const [index,spec] of specs.entries()){
       const row=rows[index];if(row.error!==null)continue;
       try {const before=copy(spec.retained());spec.control.setValue(copy(spec.after));await teardownTick();
-        row.destroy={fixture_destroyed:fixture.destroyed,retained_before:before,retained_after:copy(spec.retained()),model:copy(spec.control.value)};
+        row.destroy={fixture_destroyed:fixture.componentRef.hostView.destroyed,retained_before:before,retained_after:copy(spec.retained()),model:copy(spec.control.value)};
       } catch(error){row.error=String(error);}
     }
     return {rows,okay:packedValueAccessorCases(rows).every((row:any)=>row.result==='pass')};
-  } finally {if(!fixture.destroyed)fixture.destroy();for(const subscription of subscriptions)subscription.unsubscribe();}
+  } finally {if(!fixture.componentRef.hostView.destroyed)fixture.destroy();for(const subscription of subscriptions)subscription.unsubscribe();}
 }
 `;
 }

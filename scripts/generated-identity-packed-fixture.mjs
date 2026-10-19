@@ -145,8 +145,8 @@ export async function observePackedGeneratedIdentity(){
    for(let index=0;index<snacks.length;index++){const item=snacks[index],done=once(item.ref.afterDismissed());item.ref.dismiss();await done;await settle();snackState(index===0?'first-dismissed':'both-dismissed');}
   }finally{
    for(const item of snacks)item.ref.dismiss();
-   modalOverlay?.dispose();for(const fixture of fixtures)if(!fixture.destroyed)fixture.destroy();
-   order.cleanup={fixtures_destroyed:fixtures.filter(fixture=>fixture.destroyed).length,modal_disposed:!!modal&&!modal.isConnected,retained_target_count:order.nodes.filter((node:any)=>allWithId(node.id).length>0).length,overlay_target_count:document.querySelectorAll('.cdk-overlay-container [id^="mat-autocomplete-"],.cdk-overlay-container [id^="mat-select-"],.cdk-overlay-container [id^="mat-menu-panel-"],.cdk-overlay-container [id^="mat-snack-bar-container-live-"],.cdk-overlay-container [id^="mat-legacy-snack-bar-container-live-"]').length};
+   modalOverlay?.dispose();for(const fixture of fixtures)if(!fixture.componentRef.hostView.destroyed)fixture.destroy();
+   order.cleanup={fixtures_destroyed:fixtures.filter(fixture=>fixture.componentRef.hostView.destroyed).length,modal_disposed:!!modal&&!modal.isConnected,retained_target_count:order.nodes.filter((node:any)=>allWithId(node.id).length>0).length,overlay_target_count:document.querySelectorAll('.cdk-overlay-container [id^="mat-autocomplete-"],.cdk-overlay-container [id^="mat-select-"],.cdk-overlay-container [id^="mat-menu-panel-"],.cdk-overlay-container [id^="mat-snack-bar-container-live-"],.cdk-overlay-container [id^="mat-legacy-snack-bar-container-live-"]').length};
   }
  }}catch(error){observed.error=String(error);}
  return {observed,okay:packedGeneratedIdentityCase(observed).result==='pass'};

@@ -69,9 +69,9 @@ export async function observePackedRadioIdentity(){
   await click(peer[2],'restored-independent');
   const before=all.map(node=>node.componentInstance.checked);
   fixture.destroy();for(const name of new Set(names))dispatcher.notify('destroyed-radio-probe',name);
-  observed.destroy={fixture_destroyed:fixture.destroyed,notified_distinct_names:new Set(names).size,checked_before:before,checked_after:all.map(node=>node.componentInstance.checked)};
+  observed.destroy={fixture_destroyed:fixture.componentRef.hostView.destroyed,notified_distinct_names:new Set(names).size,checked_before:before,checked_after:all.map(node=>node.componentInstance.checked)};
  }catch(error){observed.error=String(error);}
- finally{if(fixture&&!fixture.destroyed)fixture.destroy();}
+ finally{if(fixture&&!fixture.componentRef.hostView.destroyed)fixture.destroy();}
  return {observed,okay:packedRadioIdentityCase(observed).result==='pass'};
 }
 `;

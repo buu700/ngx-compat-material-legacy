@@ -73,10 +73,10 @@ export async function observePackedTableOnPush() {
     source.data=[];await settle();snapshot('repeated-empty');
     fixture.destroy();const retained=table.innerHTML;
     source.data=[{a:'A3',b:'B3',c:'C3'}];await Promise.resolve();await Promise.resolve();
-    observed.destroy={fixture_destroyed:fixture.destroyed,source_rows_after:source.data.length,
+    observed.destroy={fixture_destroyed:fixture.componentRef.hostView.destroyed,source_rows_after:source.data.length,
       retained_before:retained,retained_after:table.innerHTML};
   } catch(error) {observed.error=String(error);}
-  finally {if(!fixture.destroyed)fixture.destroy();}
+  finally {if(!fixture.componentRef.hostView.destroyed)fixture.destroy();}
   return {observed,okay:packedTableOnPushCase(observed).result==='pass'};
 }
 `;

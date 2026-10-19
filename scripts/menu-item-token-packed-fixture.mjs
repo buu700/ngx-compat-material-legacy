@@ -79,8 +79,8 @@ export async function observePackedMenuItemToken(){
     state.removed={items_destroyed:completed,subjects_closed:currentSubscriptions.every(subscription=>subscription.closed),known_panels_remaining:[...panels].reduce((n,id)=>n+matching(id).length,0),item_nodes_disconnected:items.every((item:any)=>!item._getHostElement().isConnected),remaining_item_tokens:fixture.debugElement.queryAll(By.directive(MatMenuItem)).length,remaining_triggers:fixture.debugElement.queryAll(By.directive(Trigger)).length};
    }
   }finally{
-   if(fixture&&!fixture.destroyed)fixture.destroy();
-   row.cleanup={fixture_destroyed:fixture?.destroyed===true,fixture_host_connected:fixture?.nativeElement?.isConnected??false,known_panels_remaining:[...panels].reduce((n,id)=>n+matching(id).length,0),item_nodes_disconnected:hosts.every(host=>!host.isConnected),own_subscriptions_closed:subscriptions.every(subscription=>subscription.closed)};
+   if(fixture&&!fixture.componentRef.hostView.destroyed)fixture.destroy();
+   row.cleanup={fixture_destroyed:fixture?.componentRef.hostView.destroyed===true,fixture_host_connected:fixture?.nativeElement?.isConnected??false,known_panels_remaining:[...panels].reduce((n,id)=>n+matching(id).length,0),item_nodes_disconnected:hosts.every(host=>!host.isConnected),own_subscriptions_closed:subscriptions.every(subscription=>subscription.closed)};
    for(const subscription of subscriptions)subscription.unsubscribe();
   }
  }}catch(error){observed.error=String(error);}
