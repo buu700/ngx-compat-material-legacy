@@ -8,6 +8,7 @@ import json
 import os
 import subprocess
 from tests import ripple_global_options_integration as parent
+from tests.fixture_lifecycle_requalification import parent_bytes as requalification_parent_bytes
 
 LEDGER = parent.LEDGER
 
@@ -54,6 +55,8 @@ def parent_protected_bytes(root, path):
 
 
 def historical_protected_bytes(root, path):
+    if path == "compatibility/f10/authored-dependency-current-dispositions.json":
+        return requalification_parent_bytes(root, path)
     # Ordinary source assertions already hash their actual bytes. Only finite
     # registered substitutions need a validated historical parent projection.
     context_paths = parent.TEST_PATHS | {'tests/test_ripple_global_options_integration.py',
