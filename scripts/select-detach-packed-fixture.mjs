@@ -66,8 +66,8 @@ export async function observePackedSelectDetach(){
     row.cycles.push({cycle,opened,closed:afterScroll,idle_scroll:closed()});
    }
   }finally{
-   if(fixture&&!fixture.destroyed)fixture.destroy();for(const subscription of subscriptions)subscription.unsubscribe();
-   row.cleanup={fixture_destroyed:fixture?.destroyed===true,host_connected:host?.isConnected??false,panel_resolution_count:panels.reduce((sum,panel)=>sum+matches(panel.id).length,0),any_overlay_attached:refs.some(ref=>ref.hasAttached()),own_subscriptions_closed:subscriptions.every(subscription=>subscription.closed)};
+   if(fixture&&!fixture.componentRef.hostView.destroyed)fixture.destroy();for(const subscription of subscriptions)subscription.unsubscribe();
+   row.cleanup={fixture_destroyed:fixture?.componentRef.hostView.destroyed===true,host_connected:host?.isConnected??false,panel_resolution_count:panels.reduce((sum,panel)=>sum+matches(panel.id).length,0),any_overlay_attached:refs.some(ref=>ref.hasAttached()),own_subscriptions_closed:subscriptions.every(subscription=>subscription.closed)};
   }
  }}catch(error){observed.error=String(error);}
  return {observed,okay:packedSelectDetachCase(observed).result==='pass'};

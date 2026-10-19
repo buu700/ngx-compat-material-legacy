@@ -77,8 +77,8 @@ export async function observePackedSelectFocusClick(){
    const statesBefore=stateChanges,touchBefore=touched,eventsBefore=[...openedEvents],detachBefore=detached;select.close();select.close();await settle();
    row.closed_noop={...state(),state_change_delta:stateChanges-statesBefore,touch_delta:touched-touchBefore,events_unchanged:JSON.stringify(openedEvents)===JSON.stringify(eventsBefore),no_detach:detached===detachBefore};
   }finally{
-   if(fixture&&!fixture.destroyed)fixture.destroy();for(const subscription of subscriptions)subscription.unsubscribe();
-   row.cleanup={fixture_destroyed:fixture?.destroyed===true,host_connected:host?.isConnected??false,known_panels_remaining:[...panelIds].reduce((n,id)=>n+matches(id).length,0),any_overlay_attached:refs.some(ref=>ref.hasAttached()),own_subscriptions_closed:subscriptions.every(subscription=>subscription.closed)};
+   if(fixture&&!fixture.componentRef.hostView.destroyed)fixture.destroy();for(const subscription of subscriptions)subscription.unsubscribe();
+   row.cleanup={fixture_destroyed:fixture?.componentRef.hostView.destroyed===true,host_connected:host?.isConnected??false,known_panels_remaining:[...panelIds].reduce((n,id)=>n+matches(id).length,0),any_overlay_attached:refs.some(ref=>ref.hasAttached()),own_subscriptions_closed:subscriptions.every(subscription=>subscription.closed)};
   }
  }}catch(error){observed.error=String(error);}
  return {observed,okay:packedSelectFocusClickCase(observed).result==='pass'};
