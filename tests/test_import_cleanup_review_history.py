@@ -6,7 +6,7 @@
 """An exact review copy cannot replace or rewrite its authenticated original."""
 import ast,copy,gzip,hashlib,json,sys,unittest
 from pathlib import Path
-from tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff
+from tests.ng_zone_use_integration import historical_protected_bytes, historical_task_diff
 from unittest.mock import patch
 import tests.test_upstream_audit_disposition as audit
 ROOT,LEDGER,MECHANICAL=audit.ROOT,audit.LEDGER,audit.MECHANICAL

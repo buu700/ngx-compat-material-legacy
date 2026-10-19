@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
-from tests.ripple_global_options_integration import integration_state, LEDGER
+from tests.ng_zone_use_integration import integration_state, parent_protected_bytes, LEDGER
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -45,7 +45,7 @@ class RippleGlobalOptionsIntegration(unittest.TestCase):
 
     def test_original_rows_assertions_and_current_native_methods_are_preserved(self):
         prior, inputs = integration_state(ROOT)
-        original = prior['ledger']['text']; current = (ROOT / LEDGER).read_text()
+        original = prior['ledger']['text']; current = parent_protected_bytes(ROOT, LEDGER).decode()
         before, after = rows(original), rows(current)
         self.assertEqual(len(before), 1736); self.assertEqual(len(after), 1736)
         wanted = {(r['file'], r['module'], r['symbol']) for r in prior['selected']}

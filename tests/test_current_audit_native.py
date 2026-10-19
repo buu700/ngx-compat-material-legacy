@@ -6,7 +6,7 @@
 """Current native obligations stay live while earlier test models stay historical."""
 import copy,gzip,hashlib,json,tempfile,unittest
 from pathlib import Path
-from tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff
+from tests.ng_zone_use_integration import historical_protected_bytes, historical_task_diff
 from unittest.mock import patch
 import tests.audit_test_context as context
 ROOT=Path(__file__).resolve().parents[1]

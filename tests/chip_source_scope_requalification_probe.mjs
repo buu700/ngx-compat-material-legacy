@@ -10,7 +10,7 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {inspectSourceScopeRequalification,sourceScopeWrites,sourceScopePrior,
   validateSourceScopes,SOURCE_SCOPE_PREFIX} from '../scripts/chip-source-scope-requalification.mjs';
-import {historicalRippleAuthoredReader} from '../scripts/ripple-global-options-integration.mjs';
+import {historicalRippleAuthoredReader} from '../scripts/ng-zone-use-integration.mjs';
 import {chipFocusNativeDefinitions} from '../scripts/chip-focus-native-requalification.mjs';
 const read=p=>readFileSync(p),hash=b=>createHash('sha256').update(b).digest('hex');
 const qualification=inspectSourceScopeRequalification({read:historicalRippleAuthoredReader()}),prior=sourceScopePrior(read);
