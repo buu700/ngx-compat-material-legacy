@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "id": "chip-blur-original",
+  "inputs_sha256": "41b62dfa9a05755c845ec1c78dcd7115677c0f11a92d11b506e2cbd816cd511e",
+  "entry": {
+    "schema_version": 1,
+    "line": "21.x",
+    "id": "chip-blur-original",
+    "source_parent": "71cd1554c1a2e7c617725f6c26714a9ddfc82224",
+    "module": "tests.test_chip_blur_runtime",
+    "program": "tests/test_chip_blur_runtime.py",
+    "program_sha256": "f51a3b910a559d8f0e04a442ffe4f5ac2da669e9393a3f0e166f8c614a578a07",
+    "wrapper_sha256": "55db53a131d3dc9630411f0737a9650a00e87eb71ac37e59c597d60d7af757bc",
+    "frame": {
+      "commit": "47460a3061f65383d1e0c7e609364c3232ff10f3",
+      "tree": "83403ccb6a36d0d873782a21d9a672c06c5336fa",
+      "tree_listing_sha256": "9440f14f34001a853c8860102a628e2b12e2c5b08666f43f9471d8661938b3a7",
+      "members": 7817
+    },
+    "case_ids": [
+      "tests.test_chip_blur_runtime.ChipBlurRuntimeTests.test_blur_form_state_and_request_lifetimes"
+    ],
+    "timeout_ms": 150000,
+    "prior": {
+      "path": "compatibility/rc/chip-blur-history-prior.json.gz",
+      "sha256": "df105c0f37bd4fd9399f4df6366534890da4ef7eba2325f76f89931d8e85e8e7",
+      "raw_sha256": "d16299f9ba3004f7bd44bcefc75c7bba74978098c70b1cc59dd0ba8f92f34e41"
+    },
+    "shared_engine_edits": [
+      [
+        "import {olderAuditHistoryInputs,selectOlderAuditModules} from './older-audit-history-inputs.mjs';",
+        "import {olderAuditHistoryInputs,selectOlderAuditModules} from './older-audit-history-inputs.mjs';\nimport {chipBlurHistoryInputs} from './chip-blur-history-inputs.mjs';"
+      ],
+      [
+        "async function runHistoricalModules({root,id,reportPath,data,sha256,entry,modules,complete,temporaryPrefix,implementationSources}) {",
+        "export async function runChipBlurHistory({root=rootDefault,reportPath}={}) {\n  const {data,sha256}=chipBlurHistoryInputs({root});\n  return runHistoricalModules({root,id:data.id,reportPath,data,sha256,entry:data,modules:[data.module],complete:true,\n    temporaryPrefix:'ngx-chip-blur-history-',omittedDiagnosticEnv:['CLOSEOUT_CHIP_BLUR_REPORT'],\n    implementationSources:['scripts/chip-recent-history.mjs','scripts/chip-blur-history-inputs.mjs',\n      'scripts/run-chip-blur-history.mjs','tests/chip_blur_history.py']});\n}\nasync function runHistoricalModules({root,id,reportPath,data,sha256,entry,modules,complete,temporaryPrefix,implementationSources,omittedDiagnosticEnv=[]}) {"
+      ],
+      [
+        "    const child=spawn('python3',['-B','-c',pythonProgram,JSON.stringify(modules),join(parent,'cases.json')],\n      {cwd:checkout,env:env(),detached:process.platform!=='win32',stdio:['ignore','pipe','pipe']});",
+        "    const childEnv=env();for(const name of omittedDiagnosticEnv)delete childEnv[name];\n    const child=spawn('python3',['-B','-c',pythonProgram,JSON.stringify(modules),join(parent,'cases.json')],\n      {cwd:checkout,env:childEnv,detached:process.platform!=='win32',stdio:['ignore','pipe','pipe']});"
+      ]
+    ],
+    "shared_engine_after_sha256": "c6b6c962c2908279661d885a3e651aea183ef9b19fb11fca1d64f276b6714bf8",
+    "original_subjects": 10,
+    "original_mutation_rejections": 36,
+    "current_genuine_zone_probe": "tests/chip_zone_use_probe.mjs",
+    "diagnostics": "Use NGX_CHIP_BLUR_HISTORY_REPORT_DIR for the framed execution receipt. The old CLOSEOUT_CHIP_BLUR_REPORT flag is omitted only from this historical child to avoid writing source-era observations into a current diagnostic path.",
+    "actual_current_source_native_packed_or_floor_qualified": false,
+    "g11_claim": "not-passed"
+  },
+  "selected_modules": [
+    "tests.test_chip_blur_runtime"
+  ],
+  "complete_registered_module_set": true,
+  "historical_members_verified": 7817,
+  "historical_bytes_verified": 389777784,
+  "current_guard": {
+    "line": "21.x",
+    "guarded_current_members": 8027,
+    "current_product_members": 1141,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "c6925389b895c2485216ab6684e0cc155606c8a1",
+      "tree": "a6262827388c0f76526d83137da1e21ebf1287fd"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "current_guard_passed_before_and_after": true,
+  "exit_code": 0,
+  "signal": null,
+  "timed_out": false,
+  "output_overflow": false,
+  "receipt": {
+    "tests_run": 1,
+    "started": [
+      "tests.test_chip_blur_runtime.ChipBlurRuntimeTests.test_blur_form_state_and_request_lifetimes"
+    ],
+    "passed": [
+      "tests.test_chip_blur_runtime.ChipBlurRuntimeTests.test_blur_form_state_and_request_lifetimes"
+    ],
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": [],
+    "successful": true
+  },
+  "original_stdout": "",
+  "original_stderr": "test_blur_form_state_and_request_lifetimes (tests.test_chip_blur_runtime.ChipBlurRuntimeTests.test_blur_form_state_and_request_lifetimes) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 37.908s\n\nOK\n",
+  "historical_post_execution_clean": true,
+  "original_program_unchanged": true,
+  "temporary_graph_removed": true,
+  "elapsed_ms": 60809,
+  "node": "v22.23.3",
+  "implementation_sources": [
+    {
+      "path": "scripts/chip-recent-history.mjs",
+      "sha256": "c6b6c962c2908279661d885a3e651aea183ef9b19fb11fca1d64f276b6714bf8"
+    },
+    {
+      "path": "scripts/chip-blur-history-inputs.mjs",
+      "sha256": "f44e9996e8d9a003ba2ca78923be985fd91cdd946a00d975505cefb9f8e8a5c4"
+    },
+    {
+      "path": "scripts/run-chip-blur-history.mjs",
+      "sha256": "125e03eb8c78259f78471b5833af1408cbce7853f1f0c9e27d944db0ee0016ad"
+    },
+    {
+      "path": "tests/chip_blur_history.py",
+      "sha256": "a8ecbd88e7db5813dcc7697ac4cb4c68ec4ae6fd5855e00533b2f5dfc3ab2e6e"
+    }
+  ],
+  "actual_current_source_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
