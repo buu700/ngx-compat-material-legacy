@@ -1,0 +1,47 @@
+FF
+======================================================================
+FAIL: test_all_registered_subjects_still_require_actual_coordinator_execution (tests.test_audit_test_context.AuditTestContext.test_all_registered_subjects_still_require_actual_coordinator_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/test_audit_test_context.py", line 75, in test_all_registered_subjects_still_require_actual_coordinator_execution
+    contracts=native_contracts(ROOT)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/audit_test_context.py", line 54, in native_contracts
+    if child.returncode:raise AssertionError((child.stdout+child.stderr)[-7000:])
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+33 !== 30
+
+    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:30:8 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 33,
+  expected: 30,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.23.3
+
+
+======================================================================
+FAIL: test_Python_unknown_source_stage_and_cache_controls (tests.test_chip_batch_history.ChipBatchHistory.test_Python_unknown_source_stage_and_cache_controls)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/test_chip_batch_history.py", line 31, in test_Python_unknown_source_stage_and_cache_controls
+    read=lambda p:(ROOT/p).read_bytes();data,before,source=validate_batch_history_current(ROOT,read,required=True);history=batch_history_read(ROOT,read)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/chip_batch_history.py", line 47, in validate_batch_history_current
+    data,before,source=_context(root,read);current=_sha(read(data['ledger_path']))==data['ledger_sha256'];assert current or not required
+                                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.717s
+
+FAILED (failures=2)
