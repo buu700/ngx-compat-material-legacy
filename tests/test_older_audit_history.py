@@ -6,7 +6,7 @@
 """Historical source cohorts cannot replace live current native obligations."""
 import ast,copy,hashlib,json,os,subprocess,unittest
 from pathlib import Path
-from tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff
+from tests.ng_zone_use_integration import historical_protected_bytes, historical_task_diff
 from tests.older_audit_history import _inputs,mixed_context_before_history,validate_complete_older_receipt,validate_registered_wrapper_successors
 from tests.chip_recent_history import canonical_recorded_case
 ROOT=Path(__file__).resolve().parents[1]

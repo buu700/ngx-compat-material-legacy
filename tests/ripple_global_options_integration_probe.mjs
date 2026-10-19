@@ -10,8 +10,9 @@ import assert from 'node:assert/strict';
 import {readFileSync, writeFileSync} from 'node:fs';
 import {inspectRippleOptionsIntegration, historicalRippleAuthoredReader, rippleIntegrationPrior,
   RIPPLE_AUTHORED_LEDGER, RIPPLE_INTEGRATION_INPUTS, RIPPLE_INTEGRATION_PRIOR} from '../scripts/ripple-global-options-integration.mjs';
-const read = path => readFileSync(path), prior = rippleIntegrationPrior(), good = inspectRippleOptionsIntegration();
-const view = historicalRippleAuthoredReader(), controls = [];
+import {ngZoneIntegrationParentReader} from '../scripts/ng-zone-use-integration.mjs';
+const read = ngZoneIntegrationParentReader(), prior = rippleIntegrationPrior(), good = inspectRippleOptionsIntegration({read});
+const view = historicalRippleAuthoredReader({read}), controls = [];
 assert.equal(view(RIPPLE_AUTHORED_LEDGER).toString(), prior.ledger.text);
 for (const path of prior.source_members.map(member => member.path)) assert.deepEqual(view(path), read(path));
 const key = row => JSON.stringify([row.file, row.module, row.symbol]);

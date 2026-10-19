@@ -6,7 +6,7 @@
 """Source bindings move without rewriting original judgments or runtime credit."""
 import copy,gzip,hashlib,json,os,subprocess,unittest
 from pathlib import Path
-from tests.ripple_global_options_integration import historical_protected_bytes, historical_task_diff
+from tests.ng_zone_use_integration import historical_protected_bytes, historical_task_diff
 ROOT=Path(__file__).resolve().parents[1]
 PREFIX='compatibility/rc/chip-source-scope-requalification-'
 sha=lambda b:hashlib.sha256(b).hexdigest()
