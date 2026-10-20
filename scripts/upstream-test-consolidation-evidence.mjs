@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import assert from 'node:assert/strict';
+import {qualifyIndependentSnackProductDelta} from './snack-dom-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {analyzeSharedTestMove,bazelProductionCalls} from './upstream-test-consolidation-analysis.mjs';
@@ -121,7 +122,12 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     // The current copy preserves the original review and rebinds its complete
     // product snapshot. Both paths still require the same strict build proof.
     const contextPath=body.candidate_context.path;
-    assert.ok(['compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json',
+    if(contextPath==='compatibility/rc/snack-dom-source-context-build.json'){
+      // A separately qualified successor still passes the same complete build
+      // and historical-suite checks below; this grants no alternate predicate.
+      const qualified=qualifyIndependentSnackProductDelta({read:readRepo});
+      assert.equal(qualified.line,line);
+    }else assert.ok(['compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json',
       'compatibility/rc/chip-source-scope-requalification-build.json',
       'compatibility/rc/tab-adapter-product-inventory-build.json'].includes(contextPath));
     const contextBytes=readRepo(contextPath);assert.equal(hash(contextBytes),body.candidate_context.sha256);

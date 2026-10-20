@@ -10,8 +10,9 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {resolve,dirname,join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
+import {routePreviousTaskReader} from '../scripts/snack-portal-route-context.mjs';
 import {snackDomPrior,reviewSnackDomSource,prepareSnackDomSubjects,compileSnackDomTypes,writeSnackDomRuntime,reviewSnackDomCrossPeer} from '../scripts/snack-dom-public-dispatch.mjs';
-const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),prior=snackDomPrior(root),source=reviewSnackDomSource(root,{allowBefore:true}),loaded=prepareSnackDomSubjects(root);
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),prior=snackDomPrior(root),source=reviewSnackDomSource(root,{read:routePreviousTaskReader({root}),allowBefore:true}),loaded=prepareSnackDomSubjects(root);
 const report={schema_version:1,line:prior.line,source,reference:prior.reference_authority,type_subjects:[],runtime_subjects:[],g11_claim:'not-passed',new_source_or_SHA_closures:0,actual_legacy_component_native_packed_or_floor_qualified:false};
 try {
  for(const model of loaded.models){report.type_subjects.push(compileSnackDomTypes(root,model));const prepared=writeSnackDomRuntime(root,model);
