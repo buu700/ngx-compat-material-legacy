@@ -1,0 +1,418 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "criteria": "Five individually reviewed complete Core type/token callers. Existing EventEmitter evidence reused; finite strict and runtime supplements. Canonical integration remains separate.",
+  "reviews": [
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "ProviderToken",
+      "candidate_source_sha256": "fc96f5570ed4331adf1074fd521a90b99c8ab3419d0c532c1238c7e135d9b9e4",
+      "source_role": {
+        "import_local": "ProviderToken",
+        "occurrences": [
+          {
+            "line": 33,
+            "column": 35,
+            "parent_kind": "TypeReference",
+            "parent_source": "ProviderToken<T>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "token"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 33,
+            "member_sha256": "25da0fd46023bb3b58dece63e8d26e010e471c3c357a019d0cfd5845a7342728",
+            "reasons": [
+              "Core:ProviderToken"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "ambientService",
+          "line": 33,
+          "sha256": "25da0fd46023bb3b58dece63e8d26e010e471c3c357a019d0cfd5845a7342728",
+          "text": "function ambientService<T>(token: ProviderToken<T>): T | null {\n  try {\n    assertInInjectionContext(ambientService);\n  } catch {\n    return null;\n  }\n  return inject(token, {optional: true});\n}"
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete Core type/token caller review",
+      "decision": "The complete ambientService<T> uses public ProviderToken<T> solely to preserve token/result typing across assertInInjectionContext and optional inject. Missing context returns null; present class and InjectionToken values preserve identity; missing optional values return null and provider errors propagate. Strict actual snippets select stable public signatures at the untouched original and both exact minima. The annotation is erased; no token alias or private lookup is introduced. This qualifies the generic token boundary, not every injected service or complete dialog lifecycle.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-token-caller-roles-prior.json.gz",
+          "sha256": "4d182d7e2a1e7b83069335c5a854a835ecdee2c6e136ebcfc22dd1b836738c87"
+        },
+        {
+          "path": "compatibility/rc/core-token-caller-roles-public-main.json",
+          "sha256": "feb97a5ae3ba779a800bd0ee2387e9efb0d621c114fefbec3681b16aac8b3c2e"
+        },
+        {
+          "path": "scripts/core-token-caller-roles.mjs",
+          "sha256": "ced878a41c79e9bbb3443eddf123c7d7ffa64479bbddaa513421528cd50964df"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named public dependency only. No complete component,application,native,packed,AOT,consumer,compiler/Node/RxJS/full-peer-floor or G01-G13 qualification."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "Renderer2",
+      "candidate_source_sha256": "fc96f5570ed4331adf1074fd521a90b99c8ab3419d0c532c1238c7e135d9b9e4",
+      "source_role": {
+        "import_local": "Renderer2",
+        "occurrences": [
+          {
+            "line": 72,
+            "column": 58,
+            "parent_kind": "CallExpression",
+            "parent_source": "ambientService(Renderer2)"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_legacyFocusRenderer"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 72,
+            "member_sha256": "a6bce479c814ed9d9611a07c02688fb491b02c0951b60e92eea90d4345d0513e",
+            "reasons": [
+              "Core:Renderer2"
+            ]
+          },
+          {
+            "line": 179,
+            "member_sha256": "9e998a171fc69827cbc9f8e82476856a50fd0e01b5b665b6f784ad949aef8457",
+            "reasons": [
+              "this._legacyFocusRenderer"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "ambientService",
+          "line": 33,
+          "sha256": "25da0fd46023bb3b58dece63e8d26e010e471c3c357a019d0cfd5845a7342728",
+          "text": "function ambientService<T>(token: ProviderToken<T>): T | null {\n  try {\n    assertInInjectionContext(ambientService);\n  } catch {\n    return null;\n  }\n  return inject(token, {optional: true});\n}"
+        },
+        {
+          "name": "_MatDialogContainerBase._legacyFocusRenderer",
+          "line": 72,
+          "sha256": "a6bce479c814ed9d9611a07c02688fb491b02c0951b60e92eea90d4345d0513e",
+          "text": "private readonly _legacyFocusRenderer = ambientService(Renderer2);"
+        },
+        {
+          "name": "_MatDialogContainerBase._trapFocus",
+          "line": 179,
+          "sha256": "9e998a171fc69827cbc9f8e82476856a50fd0e01b5b665b6f784ad949aef8457",
+          "text": "protected _trapFocus(): void {\n    if (this._legacyFocusDestroyed) {\n      return;\n    }\n    const focus = () => {\n      if (this._legacyFocusDestroyed) {\n        return;\n      }\n      this._legacyFocusCleanup?.();\n      const cleanup = focusLegacyDialogInitially({\n        element: this._elementRef.nativeElement,\n        config: this._config,\n        factory: this._focusTrapFactory,\n        checker: this._legacyFocusChecker,\n        renderer: this._legacyFocusRenderer || {\n          listen: (target: HTMLElement, event: string, callback: EventListener) => {\n            target.addEventListener(event, callback);\n            return () => target.removeEventListener(event, callback);\n          },\n        },\n        ngZone: this._ngZone,\n        isBrowser: this._isBrowser(),\n        isDestroyed: () => this._legacyFocusDestroyed,\n        onFocusSettled: () => {\n          if (!this._legacyFocusDestroyed) {\n            this._legacyFocusNotifications.next();\n          }\n        },\n      });\n      if (this._legacyFocusDestroyed) {\n        cleanup?.();\n      } else {\n        this._legacyFocusCleanup = cleanup;\n      }\n    };\n    if ((this._config.autoFocus === true || this._config.autoFocus === 'first-tabbable')\n        && !this._ngZone.isStable) {\n      this._legacyFocusStableSubscriptions.add(this._ngZone.onStable.pipe(take(1)).subscribe(focus));\n    } else {\n      focus();\n    }\n  }"
+        },
+        {
+          "name": "_MatDialogContainerBase.ngOnDestroy",
+          "line": 222,
+          "sha256": "7354e756245989f8b53633ebdc0d7ca551e276e4e29fcb19e44d30e28add3717",
+          "text": "ngOnDestroy(): void {\n    if (this._legacyFocusDestroyed) {\n      return;\n    }\n    this._legacyFocusDestroyed = true;\n    destroyLegacyDialogContainerState(this);\n    try {\n      this._legacyFocusStableSubscriptions.unsubscribe();\n      this._restoreLegacyFocus();\n    } finally {\n      try {\n        this._legacyBackdropSubscription?.unsubscribe();\n      } finally {\n        this._legacyBackdropSubscription = null;\n        try {\n          this._legacyFocusTrap?.destroy();\n        } finally {\n          this._legacyFocusTrap = null;\n          try {\n            this._legacyFocusCleanup?.();\n          } finally {\n            this._legacyFocusCleanup = null;\n            this._legacyFocusNotifications.complete();\n          }\n        }\n      }\n    }\n  }"
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete Core type/token caller review",
+      "decision": "The owned dialog field optionally resolves the public Renderer2 token through the complete ambient helper. The complete focus caller chooses that instance or its unchanged manual add/removeEventListener fallback and retains the returned cleanup for recapture and destruction. Strict checks cover the actual fallback against public Pick<Renderer2,listen>; genuine public token identity and explicit listener/disposer protocols cover the consumed boundary. No Renderer2 constructor, concrete Angular renderer, application or native behavior is claimed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-token-caller-roles-prior.json.gz",
+          "sha256": "4d182d7e2a1e7b83069335c5a854a835ecdee2c6e136ebcfc22dd1b836738c87"
+        },
+        {
+          "path": "compatibility/rc/core-token-caller-roles-public-main.json",
+          "sha256": "feb97a5ae3ba779a800bd0ee2387e9efb0d621c114fefbec3681b16aac8b3c2e"
+        },
+        {
+          "path": "scripts/core-token-caller-roles.mjs",
+          "sha256": "ced878a41c79e9bbb3443eddf123c7d7ffa64479bbddaa513421528cd50964df"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named public dependency only. No complete component,application,native,packed,AOT,consumer,compiler/Node/RxJS/full-peer-floor or G01-G13 qualification."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-initial-focus.ts",
+      "module": "@angular/core",
+      "symbol": "Renderer2",
+      "candidate_source_sha256": "81ac34fa547b5ecf0607bad40eb0302fc97a98859b360f94164832f3dfb41624",
+      "source_role": {
+        "import_local": "Renderer2",
+        "occurrences": [
+          {
+            "line": 20,
+            "column": 18,
+            "parent_kind": "TypeReference",
+            "parent_source": "Renderer2"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "renderer"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 20,
+            "member_sha256": "3afc5a290db2771ad503dc266ade0f7c220ac31dc7b5180860eaea052de64040",
+            "reasons": [
+              "Core:Renderer2"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "LegacyDialogInitialFocusContext",
+          "line": 15,
+          "sha256": "5ceeecbfffb7a733421c4468ca8c32e8011363409a6e5a9acc5363109dd14ebb",
+          "text": "export interface LegacyDialogInitialFocusContext {\n  element: HTMLElement;\n  config: Pick<MatDialogConfig, 'autoFocus'>;\n  factory: FocusTrapFactory;\n  checker: InteractivityChecker;\n  renderer: Pick<Renderer2, 'listen'>;\n  ngZone: NgZone;\n  isBrowser: boolean;\n  isDestroyed: () => boolean;\n  onFocusSettled: () => void;\n}"
+        },
+        {
+          "name": "focusLegacyDialogInitially",
+          "line": 45,
+          "sha256": "c067683df66993d66dcae561c3a192eec280f9b70faee1c1a906c6d3451da3a0",
+          "text": "export function focusLegacyDialogInitially(context: LegacyDialogInitialFocusContext,\n    options?: FocusOptions): (() => void) | null {\n  if (!context.isBrowser) {\n    context.onFocusSettled();\n    return null;\n  }\n  const {element, config, factory, checker, renderer, ngZone} = context;\n  switch (config.autoFocus) {\n    case false:\n    case 'dialog':\n      if (!legacyDialogContainsFocus(element)) {\n        element.focus(options);\n      }\n      context.onFocusSettled();\n      return null;\n    case true:\n    case 'first-tabbable': {\n      // This temporary selector uses the public initial-element algorithm.\n      // Defer anchors: the enclosing container already owns the real tab trap.\n      const selection = factory.create(element, true);\n      let focused: boolean;\n      try {\n        focused = selection.focusInitialElement(options);\n      } finally {\n        selection.destroy();\n      }\n      if (focused) {\n        context.onFocusSettled();\n        return null;\n      }\n      // The original focusInitialElementWhenReady promise deferred only its fallback.\n      let canceled = false;\n      Promise.resolve().then(() => {\n        if (!canceled && !context.isDestroyed()) {\n          element.focus(options);\n          context.onFocusSettled();\n        }\n      });\n      return () => { canceled = true; };\n    }\n  }\n  const selector = config.autoFocus === 'first-heading'\n    ? 'h1, h2, h3, h4, h5, h6, [role=\"heading\"]'\n    : config.autoFocus as string;\n  const target = element.querySelector<HTMLElement>(selector);\n  let cleanup: (() => void) | null = null;\n  if (target) {\n    if (!checker.isFocusable(target)) {\n      target.tabIndex = -1;\n      ngZone.runOutsideAngular(() => {\n        let restored = false;\n        const restore = () => {\n          if (restored) {\n            return;\n          }\n          restored = true;\n          stopBlur();\n          stopMouseDown();\n          target.removeAttribute('tabindex');\n        };\n        const stopBlur = renderer.listen(target, 'blur', restore);\n        const stopMouseDown = renderer.listen(target, 'mousedown', restore);\n        cleanup = restore;\n      });\n    }\n    target.focus(options);\n  }\n  context.onFocusSettled();\n  return cleanup;\n}"
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete Core type/token caller review",
+      "decision": "The complete context interface consumes only public Renderer2.listen. The complete selector branch registers blur and mousedown outside the zone, focuses with the original options and returns idempotent cleanup removing both listeners and temporary tabindex. Recording protocols exercise exact current code; event cleanup/focus observations compare to the untouched tagged _forceFocus body. Explicit teardown additionally tests the owned cleanup contract and is not relabeled as an original returned disposer. Concrete Angular rendering, browser focus/trap behavior and broader lifecycle stay separately owned.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-token-caller-roles-prior.json.gz",
+          "sha256": "4d182d7e2a1e7b83069335c5a854a835ecdee2c6e136ebcfc22dd1b836738c87"
+        },
+        {
+          "path": "compatibility/rc/core-token-caller-roles-public-main.json",
+          "sha256": "feb97a5ae3ba779a800bd0ee2387e9efb0d621c114fefbec3681b16aac8b3c2e"
+        },
+        {
+          "path": "scripts/core-token-caller-roles.mjs",
+          "sha256": "ced878a41c79e9bbb3443eddf123c7d7ffa64479bbddaa513421528cd50964df"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named public dependency only. No complete component,application,native,packed,AOT,consumer,compiler/Node/RxJS/full-peer-floor or G01-G13 qualification."
+    },
+    {
+      "file": "legacy-table/row.ts",
+      "module": "@angular/core",
+      "symbol": "IterableDiffers",
+      "candidate_source_sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+      "source_role": {
+        "import_local": "IterableDiffers",
+        "occurrences": [
+          {
+            "line": 37,
+            "column": 52,
+            "parent_kind": "TypeReference",
+            "parent_source": "IterableDiffers"
+          },
+          {
+            "line": 41,
+            "column": 17,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: IterableDiffers"
+          },
+          {
+            "line": 66,
+            "column": 52,
+            "parent_kind": "TypeReference",
+            "parent_source": "IterableDiffers"
+          },
+          {
+            "line": 70,
+            "column": 17,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: IterableDiffers"
+          },
+          {
+            "line": 96,
+            "column": 52,
+            "parent_kind": "TypeReference",
+            "parent_source": "IterableDiffers"
+          },
+          {
+            "line": 100,
+            "column": 17,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: IterableDiffers"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "differs"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 37,
+            "member_sha256": "3ff1ed8a28dffc1149b79673cbcd6e5a7a155ddb36fbdb2836901d50f45a2351",
+            "reasons": [
+              "Core:IterableDiffers"
+            ]
+          },
+          {
+            "line": 66,
+            "member_sha256": "fbf137d9cb6a0165cabcc36c57df5abd6e5b7c783f397e512964195aa4ec4741",
+            "reasons": [
+              "Core:IterableDiffers"
+            ]
+          },
+          {
+            "line": 96,
+            "member_sha256": "26f013b1fae71ba681639d25cc46db13ec1597e2ad00cff8b806eaab81fa1b55",
+            "reasons": [
+              "Core:IterableDiffers"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MatLegacyHeaderRowDef.constructor",
+          "line": 37,
+          "sha256": "3ff1ed8a28dffc1149b79673cbcd6e5a7a155ddb36fbdb2836901d50f45a2351",
+          "text": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkHeaderRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition;\n  }"
+        },
+        {
+          "name": "MatLegacyFooterRowDef.constructor",
+          "line": 66,
+          "sha256": "fbf137d9cb6a0165cabcc36c57df5abd6e5b7c783f397e512964195aa4ec4741",
+          "text": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkFooterRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition;\n  }"
+        },
+        {
+          "name": "MatLegacyRowDef.constructor",
+          "line": 96,
+          "sha256": "26f013b1fae71ba681639d25cc46db13ec1597e2ad00cff8b806eaab81fa1b55",
+          "text": "constructor(template: TemplateRef<any>, differs: IterableDiffers,\n      @Optional() @Inject(CdkTable) table?: any) {\n    const definition = constructWithPublicDependencies(CdkRowDef, new.target, [\n      {provide: TemplateRef, useValue: template},\n      {provide: IterableDiffers, useValue: differs},\n    ]);\n    definition._table = table;\n    return definition as MatLegacyRowDef<T>;\n  }"
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete Core type/token caller review",
+      "decision": "All three complete manual row-definition constructors retain the supplied public IterableDiffers annotation and forward that exact object under the same public token into the existing borrowed dependency context. No new differ, default registry, private token or destruction owner is created. Actual constructor bodies and the unchanged complete helper execute with genuine Core namespaces and explicit parent protocols, retaining template/table arguments, prototypes and borrowed lifetimes. Existing real table behavior is historical supporting context under borrowed22, not a current21/native/floor pass. Only the named registry type/token/forwarding boundary is closed.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-token-caller-roles-prior.json.gz",
+          "sha256": "4d182d7e2a1e7b83069335c5a854a835ecdee2c6e136ebcfc22dd1b836738c87"
+        },
+        {
+          "path": "compatibility/rc/core-token-caller-roles-public-main.json",
+          "sha256": "feb97a5ae3ba779a800bd0ee2387e9efb0d621c114fefbec3681b16aac8b3c2e"
+        },
+        {
+          "path": "scripts/core-token-caller-roles.mjs",
+          "sha256": "ced878a41c79e9bbb3443eddf123c7d7ffa64479bbddaa513421528cd50964df"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named public dependency only. No complete component,application,native,packed,AOT,consumer,compiler/Node/RxJS/full-peer-floor or G01-G13 qualification."
+    },
+    {
+      "file": "legacy-menu/internal/menu-panel.ts",
+      "module": "@angular/core",
+      "symbol": "EventEmitter",
+      "candidate_source_sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a",
+      "source_role": {
+        "import_local": "EventEmitter",
+        "occurrences": [
+          {
+            "line": 24,
+            "column": 19,
+            "parent_kind": "TypeReference",
+            "parent_source": "EventEmitter<void | 'click' | 'keydown' | 'tab'>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "close"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 24,
+            "member_sha256": "15ea6d3164639e00678f98a4aa41fa440756e283aaed8fc48d4e9722401215b8",
+            "reasons": [
+              "Core:EventEmitter"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MatMenuPanel",
+          "line": 19,
+          "sha256": "e79e6416258bb5fa24c390ed99094244a0853b6dbc6fc09d441d4a25f37edff7",
+          "text": "export interface MatMenuPanel<T = any> {\n  xPosition: MenuPositionX;\n  yPosition: MenuPositionY;\n  overlapTrigger: boolean;\n  templateRef: TemplateRef<any>;\n  readonly close: EventEmitter<void | 'click' | 'keydown' | 'tab'>;\n  parentMenu?: MatMenuPanel | undefined;\n  direction?: Direction;\n  focusFirstItem: (origin?: FocusOrigin) => void;\n  resetActiveItem: () => void;\n  setPositionClasses?: (x: MenuPositionX, y: MenuPositionY) => void;\n  setElevation?(depth: number): void;\n  lazyContent?: MatMenuContent;\n  backdropClass?: string;\n  overlayPanelClass?: string | string[];\n  hasBackdrop?: boolean;\n  readonly panelId?: string;\n\n  /**\n   * @deprecated To be removed.\n   * @breaking-change 8.0.0\n   */\n  addItem?: (item: T) => void;\n\n  /**\n   * @deprecated To be removed.\n   * @breaking-change 8.0.0\n   */\n  removeItem?: (item: T) => void;\n}"
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete Core type/token caller review",
+      "decision": "The actual menu-panel interface uses a type-only public EventEmitter import for readonly close:EventEmitter<void|click|keydown|tab>. It constructs or emits nothing. The existing exact source-bound EventEmitter review and its genuine original/minimum evidence are reused, including measured signal suppression and optional lifecycle-capture differences. Strict compilation of the exact current close declaration retains readonly and the precise payload union; rejected reassignment, invalid payload and signal-style replacement controls protect that contract. The other menu-panel properties are not qualified by this isolated type contract. Menu producer, trigger, pending-task and native lifecycle receive no additional clearance.",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-token-caller-roles-prior.json.gz",
+          "sha256": "4d182d7e2a1e7b83069335c5a854a835ecdee2c6e136ebcfc22dd1b836738c87"
+        },
+        {
+          "path": "compatibility/rc/core-token-caller-roles-public-main.json",
+          "sha256": "feb97a5ae3ba779a800bd0ee2387e9efb0d621c114fefbec3681b16aac8b3c2e"
+        },
+        {
+          "path": "scripts/core-token-caller-roles.mjs",
+          "sha256": "ced878a41c79e9bbb3443eddf123c7d7ffa64479bbddaa513421528cd50964df"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/public-event-emitter-boundary.json",
+          "sha256": "d8614a627b645540772986858aead5e7ab05b865d2fb2dbf6e6ed3e35eed8e36"
+        },
+        {
+          "path": "compatibility/rc/event-emitter-source-proof.json",
+          "sha256": "0a3f563a9860673fc3f999edc4ab52a459c90fdb0cb62e49b901f83be9ed8396"
+        },
+        {
+          "path": "compatibility/rc/event-emitter-minimum-source-diagnostic.json",
+          "sha256": "95f984f33aa4534cbca46ab37ca56cb4bddad78fa1763ca89f9c38f1d191c50c"
+        },
+        {
+          "path": "scripts/event-emitter-use-review.mjs",
+          "sha256": "ce3aa511f7c02dbf03abb04007a7687315521641c2c7c01ec77ddbd39726ab1f"
+        },
+        {
+          "path": "tests/event_emitter_use_probe.mjs",
+          "sha256": "06f9c703c3e673ae2949ba3003c8eee9cecc8c5f4cf96b57238cb13e70b7c7cc"
+        },
+        {
+          "path": "compatibility/rc/element-ref-public-subjects.json",
+          "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+        }
+      ],
+      "scope_limit": "Named public dependency only. No complete component,application,native,packed,AOT,consumer,compiler/Node/RxJS/full-peer-floor or G01-G13 qualification."
+    }
+  ],
+  "source_closures_prepared": 5,
+  "source_closures_integrated": 0,
+  "actual_native_packed_or_full_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

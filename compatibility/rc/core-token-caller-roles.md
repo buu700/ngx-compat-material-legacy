@@ -1,0 +1,9 @@
+Five public Core callers reviewed on main.
+
+The bounded worksheet authenticates current sources and all three ledgers at 71b06385a47989e206d82b326fe89b5d42eefe1f. ProviderToken is the generic annotation of the complete ambient helper; Renderer2 supplies its optional token and listen/disposer protocol; IterableDiffers is the unchanged public registry token/value forwarded by three constructors. The menu panel constructs no emitter: its exact existing EventEmitter review is reused for the readonly close payload union.
+
+The supplement uses genuine Core16.2.12,22.1.7 and21.2.23 namespaces. Three strict models pass with skipLibCheck:false and nine negative type controls. Six development/production contexts execute72 finite cases, with12 rejected runtime faults. The complete focus selector code and constructor bodies execute with explicit DOM,renderer,zone and parent protocols. Four event observations per context compare directly to the untouched tagged focus method. Returned explicit teardown remains an owned extension.
+
+The evidence guard rejects54 source/evidence corruptions, a late source change and a canonical-row change. All1697 SHA,1736 frozen and315 additional obligations remain; canonical ledger bytes are unchanged. These five reviews join the seven prepared table-coercion/Platform routes for one coherent integration. They grant no new canonical closure yet.
+
+The namespace capsule lacks Material dialog/menu declaration closures. Only the exact selected Core property declarations are strictly compiled; no full-interface or peer-stub claim is made. Existing focus/table reports remain historical context. EventEmitter signal/lifecycle differences remain explicit. Concrete rendering,real table parent/native behavior,packed artifacts,AOT,Node/RxJS/compiler/full consumer floors,G01–G13 and independent audits are unexecuted here. No product,HTML,CSS,SCSS,consumer,credential or reference bytes changed. No installs,pushes or Actions.
