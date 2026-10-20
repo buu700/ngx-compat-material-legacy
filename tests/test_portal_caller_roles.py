@@ -27,7 +27,7 @@ class PortalCallerRoles(unittest.TestCase):
         self.assertEqual(report['complete_enclosing_members'], 47)
         self.assertGreater(report['source_and_evidence_corruptions_rejected'], 20)
         self.assertTrue(report['late_mutation_rejected'])
-        self.assertEqual(report['source_closures_integrated'], 0)
+        self.assertEqual(report['source_closures_integrated'], 25)
         self.assertFalse(report['actual_native_packed_or_floor_qualified'])
 
 

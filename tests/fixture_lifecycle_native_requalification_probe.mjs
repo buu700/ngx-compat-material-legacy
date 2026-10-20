@@ -25,14 +25,17 @@ for(const selected of prior.selected){
  const entry=ledger.entries.find(e=>e.sha===selected.sha),body=JSON.parse(read(entry.evidence_report)),old=JSON.parse(prior.reviews.find(m=>m.path===selected.evidence_report).text);
  for(const key of ['source_conclusion','hunk_reviews','diff_sha256','runtime_admission','runtime_qualification','branch_review','decision','final_disposition'])assert.deepEqual(body[key],old[key],key+' must remain unchanged');
  const api=await import('../scripts/upstream-'+(selected.field==='artifact_behavior'?'artifact-behavior':'generated-identity')+'-evidence.mjs'),validator=api[selected.field==='artifact_behavior'?'validateArtifactBehavior':'validateGeneratedIdentity'];
- assert.deepEqual(validator({root:process.cwd(),entry,proof:entry.individual_proof}),{ok:false,detail:'missing coordinator run'});
+ const rawEntry=JSON.parse(rawRead(prior.ledger.path)).entries.find(e=>e.sha===selected.sha);
+ assert.deepEqual(rawEntry.individual_proof[selected.field].case_ids,entry.individual_proof[selected.field].case_ids);
+ assert.deepEqual(rawEntry.individual_proof[selected.field].source_members.map(m=>m.path),entry.individual_proof[selected.field].source_members.map(m=>m.path));
+ assert.deepEqual(validator({root:process.cwd(),entry:rawEntry,proof:rawEntry.individual_proof}),{ok:false,detail:'missing coordinator run'});
  for(const [id,mutate]of [
   ['stale-producer',p=>p[selected.field].source_members.find(m=>m.path===selected.path).sha256=selected.before_sha256],
   ['wrong-case',p=>p[selected.field].case_ids=['foreign']],
   ['missing-source',p=>p[selected.field].source_members.pop()],
   ['wrong-kind',p=>p[selected.field].kind='foreign'],
   ['wrong-patch',p=>p.diff_sha256='0'.repeat(64)],
- ]){const proof=structuredClone(entry.individual_proof);mutate(proof);const result=validator({root:process.cwd(),entry,proof});assert.equal(result.ok,false);assert.notEqual(result.detail,'missing coordinator run',id);controls.push(selected.sha+':'+id);}
+ ]){const proof=structuredClone(rawEntry.individual_proof);mutate(proof);const result=validator({root:process.cwd(),entry:rawEntry,proof});assert.equal(result.ok,false);assert.notEqual(result.detail,'missing coordinator run',id);controls.push(selected.sha+':'+id);}
  const changed=structuredClone(ledger);changed.entries.find(e=>e.sha===selected.sha).final_disposition='not-applicable';rejected(selected.sha+':changed-disposition',prior.ledger.path,json(changed));
  body.actual_native_packed_or_floor_qualified=true;rejected(selected.sha+':fabricated-execution',entry.evidence_report,json(body));
  rejected(selected.sha+':changed-original-report',selected.evidence_report,Buffer.concat([read(selected.evidence_report),Buffer.from('\n')]));
