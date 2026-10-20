@@ -156,3 +156,82 @@ let changed=false;const path=paths[4],bad=Buffer.concat([read(path),Buffer.from(
 const report={schema_version:1,line:checked.data.line,source_frame:checked.data.current_frame,guard:checked.guard,read_only_source_and_input_corruptions_rejected:paths,late_current_file_mutation_rejected:true,historical_cohorts_executed:0,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};
 writeFileSync('/tmp/ngx-portal-integration-frame-'+(report.line==='main'?'main':'21')+'.json',JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,guarded:report.guard.guarded_current_members,product:1142,tooling:6,mutations_rejected:paths.length+1}));
 ```
+
+
+Twelve-caller integration frame, 2026-10-20T13:27:25.627340+00:00 (21.x).
+
+The frame below binds the committed three-coercion,four Platform and five Core caller reviews and their shared integration. The same6 tooling paths remain; no new exception was added. This bounded source/input guard rejects12 corruptions and two late changes. It does not execute the full97 controls,26/19/50 cohorts,native/packed/floor matrix or independent audits. The main full75 source guard ran before the portable writer repair; final current bounded guards and portable pure replay passed on both lines. Expensive full repeats remain deferred to Actions.
+
+```json
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_frame": {
+    "commit": "d8b8b6dd2cb173000a7b9d5996d808fc8e1f8c96",
+    "tree": "a23a5cb41181bf01ecaba72a68700b7971a1636a",
+    "tree_listing_sha256": "c806014786848be137c0eebd20cec7b9dade63b96d426b163f15c13ae6337dd2",
+    "members": 8443
+  },
+  "guard": {
+    "line": "21.x",
+    "guarded_current_members": 8441,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "ff0980eb0c0053201c29ab6a38fc46902424a7b6",
+      "tree": "f17da201a8749022037b0f1b699d7ebbf523469e"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "scripts/snack-dom-source-context-review.mjs",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "compatibility/rc/coercion-public-subjects.json",
+    "compatibility/rc/core-token-caller-roles-public-21.json",
+    "compatibility/f10/authored-use-reviews/core-token-callers.json",
+    "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+    "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+    "tests/core_token_caller_roles_subject.mjs"
+  ],
+  "late_current_changes_rejected": [
+    "compatibility/rc/core-token-caller-roles-public-21.json",
+    "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts"
+  ],
+  "full97_controls_executed": false,
+  "historical26_19_50_cohorts_executed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
+
+Exact bounded guard program, run from the selected worktree with its diagnostic TypeScript preload and a fresh output path:
+
+```javascript
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const root=process.cwd(),read=p=>readFileSync(join(root,p)),{inspectHistoricalReplayCurrent,HISTORICAL_REPLAY_INPUTS}=await import(pathToFileURL(join(root,'scripts/historical-source-replay.mjs'))),checked=inspectHistoricalReplayCurrent({root});assert.equal(checked.guard.current_tooling_members,6);assert.equal(checked.guard.current_product_members,1142);
+const registry=JSON.parse(read('compatibility/rc/snack-dom-source-context-inputs.json')),packet=registry.additional_caller_public_proofs.at(-1).path,paths=[HISTORICAL_REPLAY_INPUTS,'scripts/historical-source-replay.mjs','scripts/snack-dom-source-context.mjs','scripts/snack-dom-source-context-review.mjs','compatibility/rc/snack-dom-source-context-inputs.json','compatibility/rc/snack-dom-source-context-product-inputs.json','compatibility/rc/coercion-public-subjects.json',packet,'compatibility/f10/authored-use-reviews/core-token-callers.json','projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts','projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts','tests/core_token_caller_roles_subject.mjs'];
+for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\n')]);assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:p=>p===path?bytes:read(p)}),e=>e?.code==='ERR_ASSERTION',path);}
+for(const path of [packet,paths[9]]){let changed=false;const bad=Buffer.concat([read(path),Buffer.from('\n')]),late=p=>changed&&p===path?bad:read(p);inspectHistoricalReplayCurrent({root,readMember:late});changed=true;assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:late}),e=>e?.code==='ERR_ASSERTION');}
+const report={schema_version:1,line:checked.data.line,source_frame:checked.data.current_frame,guard:checked.guard,read_only_source_input_corruptions_rejected:paths,late_current_changes_rejected:[packet,paths[9]],full97_controls_executed:false,historical26_19_50_cohorts_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,frame:report.source_frame.commit,guarded:report.guard.guarded_current_members,product:1142,tooling:6,corruptions:paths.length,late_changes:2,full_cohorts_executed:false}));
+```
