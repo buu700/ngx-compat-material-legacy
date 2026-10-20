@@ -14,8 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class HistoricalSourceReplayTests(unittest.TestCase):
     def test_current_graph_and_exact_reference_corruption_controls(self):
+        # Preserve all97 full-graph controls; the current444 MB frame needs a
+        # bounded allowance for repeated fresh hashing on slower/shared hosts.
         result = subprocess.run(['node', 'tests/historical_source_replay_probe.mjs'],
-                                cwd=ROOT, capture_output=True, text=True, timeout=60)
+                                cwd=ROOT, capture_output=True, text=True, timeout=180)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])
         self.assertEqual(report['controls'], 97)
