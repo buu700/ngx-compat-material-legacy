@@ -1,0 +1,387 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "criteria": "Four individually reviewed complete public Platform token/field routes; eleven complete context members and seven public flag reads. Source preparation only.",
+  "reviews": [
+    {
+      "file": "legacy-core/internal/common-module.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+      "source_role": {
+        "import_local": "Platform",
+        "occurrences": [
+          {
+            "line": 53,
+            "column": 33,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject(Platform, {optional: true})"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 38,
+            "member_sha256": "73837d4c4a2dc914d175cefa9c41072ebeca9445c53940d2c2c6d72c7c5e5904",
+            "reasons": [
+              "Platform:Platform"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MatCommonModule.constructor",
+          "line": 38,
+          "sha256": "73837d4c4a2dc914d175cefa9c41072ebeca9445c53940d2c2c6d72c7c5e5904",
+          "text": "constructor(\n    highContrastModeDetector: HighContrastModeDetector,\n    @Optional() @Inject(MATERIAL_SANITY_CHECKS) private _sanityChecks: SanityChecks,\n    @Inject(DOCUMENT) private _document: Document,\n  ) {\n    // The public A11yModule import initializes high contrast and observes mode\n    // changes. Keep the historical constructor token without importing or\n    // copying the detector's private body-class/lifecycle implementation.\n    void highContrastModeDetector;\n\n    if (!this._hasDoneGlobalChecks) {\n      this._hasDoneGlobalChecks = true;\n\n      if (isDevMode()) {\n        // Inject in here so the reference to `Platform` can be removed in production mode.\n        const platform = inject(Platform, {optional: true});\n\n        if (this._checkIsEnabled('doctype')) {\n          _checkDoctypeIsDefined(this._document);\n        }\n\n        if (this._checkIsEnabled('theme')) {\n          _checkThemeIsPresent(this._document, !!platform?.isBrowser);\n        }\n\n        if (this._checkIsEnabled('version')) {\n          _checkCdkVersionMatch();\n        }\n      }\n    }\n  }"
+        },
+        {
+          "name": "_checkThemeIsPresent",
+          "line": 95,
+          "sha256": "8b719c2d67dd193b15833868cf084f14fe50cbb2d086230562f1f9cf2ac15681",
+          "text": "function _checkThemeIsPresent(doc: Document, isBrowser: boolean): void {\n  // We need to assert that the `body` is defined, because these checks run very early\n  // and the `body` won't be defined if the consumer put their scripts in the `head`.\n  if (!doc.body || !isBrowser) {\n    return;\n  }\n\n  const testElement = doc.createElement('div');\n  testElement.classList.add('mat-theme-loaded-marker');\n  doc.body.appendChild(testElement);\n\n  const computedStyle = getComputedStyle(testElement);\n\n  // In some situations the computed style of the test element can be null. For example in\n  // Firefox, the computed style is null if an application is running inside of a hidden iframe.\n  // See: https://bugzilla.mozilla.org/show_bug.cgi?id=548397\n  if (computedStyle && computedStyle.display !== 'none') {\n    console.warn(\n      'Could not find Angular Material core theme. Most Material ' +\n        'components may not work as expected. For more info refer ' +\n        'to the theming guide: https://material.angular.io/guide/theming',\n    );\n  }\n\n  testElement.remove();\n}"
+        }
+      ],
+      "public_flag_reads": [
+        {
+          "line": 60,
+          "expression": "platform?.isBrowser"
+        }
+      ],
+      "explicit_Platform_constructor_calls": 0,
+      "current_role": "public-service-token-and-browser-flag",
+      "decision": "The complete dev-mode constructor optionally resolves the public Platform service and passes its public isBrowser flag through boolean conversion to the owned theme-check predicate. It reads no browser-family flags or private platform ID and never calls the Platform constructor. Genuine tagged/minimum provider and null-provider cases support the token/field boundary; module creation, high-contrast initialization and rendered theme detection retain separate obligations.",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete public Platform caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-caller-roles-prior.json.gz",
+          "sha256": "f6f74df5b6a014536f95f2e7b3bb255913b8747cea9f4421a48699e86ef148d6"
+        },
+        {
+          "path": "compatibility/rc/platform-caller-roles-public-main.json",
+          "sha256": "c4209a9a66340fc7b94006f4e001b9e53d7359d8788b39d7e309c1d99e66fa17"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "scripts/platform-caller-roles.mjs",
+          "sha256": "937c4b0fd634ffc5533967bae9aab4ad4776c5deba6bd8587b253536b769b7d4"
+        }
+      ],
+      "scope_limit": "Named public token/field dependency only; no broad module,date,viewport,dialog focus,component,native,packed,consumer or floor clearance."
+    },
+    {
+      "file": "legacy-core/internal/datetime/native-date-adapter.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "b69f5c2bbc12deb6ff4c420252733f51742616e016b2a6193de066cf4eecade5",
+      "source_role": {
+        "import_local": "Platform",
+        "occurrences": [
+          {
+            "line": 46,
+            "column": 17,
+            "parent_kind": "TypeReference",
+            "parent_source": "Platform"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_platform"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 40,
+            "member_sha256": "9bcfa523e79bf23c08d8b57538645b2f34402cc0956c19fe035fc5a234c23127",
+            "reasons": [
+              "Platform:Platform"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "LegacyNativeDateAdapter.constructor",
+          "line": 40,
+          "sha256": "9bcfa523e79bf23c08d8b57538645b2f34402cc0956c19fe035fc5a234c23127",
+          "text": "constructor(\n    @Optional() @Inject(MAT_DATE_LOCALE) matDateLocale: string,\n    /**\n     * @deprecated No longer being used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _platform?: Platform,\n  ) {\n    super();\n    super.setLocale(matDateLocale);\n  }"
+        }
+      ],
+      "public_flag_reads": [],
+      "explicit_Platform_constructor_calls": 0,
+      "current_role": "retained-unused-historical-type-and-DI-slot",
+      "decision": "The retained _platform parameter has the current public Platform type and no date-logic reads. The untouched16.2.14 NativeDateAdapter constructor also retains this ignored parameter. Its type can still be used as an Angular DI token; this review does not pretend it is erased from factory metadata. Public class identity and normal provider resolution are supported without invoking the21.x compatibility constructor. Adapter factories, date behavior and historical deprecated adapter APIs remain separately owned.",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete public Platform caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-caller-roles-prior.json.gz",
+          "sha256": "f6f74df5b6a014536f95f2e7b3bb255913b8747cea9f4421a48699e86ef148d6"
+        },
+        {
+          "path": "compatibility/rc/platform-caller-roles-public-main.json",
+          "sha256": "c4209a9a66340fc7b94006f4e001b9e53d7359d8788b39d7e309c1d99e66fa17"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "scripts/platform-caller-roles.mjs",
+          "sha256": "937c4b0fd634ffc5533967bae9aab4ad4776c5deba6bd8587b253536b769b7d4"
+        }
+      ],
+      "scope_limit": "Named public token/field dependency only; no broad module,date,viewport,dialog focus,component,native,packed,consumer or floor clearance."
+    },
+    {
+      "file": "legacy-core/internal/legacy-viewport.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0",
+      "source_role": {
+        "import_local": "Platform",
+        "occurrences": [
+          {
+            "line": 16,
+            "column": 13,
+            "parent_kind": "TypeReference",
+            "parent_source": "Platform"
+          },
+          {
+            "line": 36,
+            "column": 25,
+            "parent_kind": "TypeReference",
+            "parent_source": "Platform"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "platform"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 16,
+            "member_sha256": "69fbf0a3633a2008ef7d1b631e6612f4958a75736ba50b13f01a632e34ae8752",
+            "reasons": [
+              "Platform:Platform"
+            ]
+          },
+          {
+            "line": 36,
+            "member_sha256": "22391ab5ac6e89c9b3e338d3af8fad72ecca58a8908b346d4a3807eed46f0fa0",
+            "reasons": [
+              "Platform:Platform"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "ViewportState",
+          "line": 15,
+          "sha256": "44d8813fc86b9931ee773d5fefab47eab21fba95ba167c42749d8a581b6dfc88",
+          "text": "interface ViewportState {\n  platform: Platform;\n  document: Document;\n  size: {width: number; height: number} | null;\n  changes: Subject<Event>;\n  listener: (event: Event) => void;\n}"
+        },
+        {
+          "name": "_LegacyViewport.constructor",
+          "line": 36,
+          "sha256": "22391ab5ac6e89c9b3e338d3af8fad72ecca58a8908b346d4a3807eed46f0fa0",
+          "text": "constructor(platform: Platform, zone: NgZone, @Optional() @Inject(DOCUMENT) document: any) {\n    const changes = new Subject<Event>();\n    const state: ViewportState = {platform, document, size: null, changes,\n      listener: event => changes.next(event)};\n    states.set(this, state);\n    zone.runOutsideAngular(() => {\n      if (platform.isBrowser) {\n        const target = windowOf(state);\n        target.addEventListener('resize', state.listener);\n        target.addEventListener('orientationchange', state.listener);\n      }\n      // Historical invalidation is audited at 20ms, before later change observers.\n      this.change().subscribe(() => state.size = null);\n    });\n  }"
+        },
+        {
+          "name": "_LegacyViewport.ngOnDestroy",
+          "line": 52,
+          "sha256": "560e30a6a4149a152a4aa1f4ce28b0b48f5581aefb93b1f1791824cea09c3811",
+          "text": "ngOnDestroy(): void {\n    const state = stateOf(this);\n    if (state.platform.isBrowser) {\n      const target = windowOf(state);\n      target.removeEventListener('resize', state.listener);\n      target.removeEventListener('orientationchange', state.listener);\n    }\n    state.changes.complete();\n  }"
+        },
+        {
+          "name": "_LegacyViewport.getViewportSize",
+          "line": 62,
+          "sha256": "17056a7cd4cbda2cdaf41b485279d43701eb74e105129f3f5e2490b5c5cad44e",
+          "text": "getViewportSize(): Readonly<{width: number; height: number}> {\n    const state = stateOf(this);\n    if (!state.size) {\n      const target = windowOf(state);\n      state.size = state.platform.isBrowser\n        ? {width: target.innerWidth, height: target.innerHeight} : {width: 0, height: 0};\n    }\n    const result = {...state.size};\n    if (!state.platform.isBrowser) state.size = null;\n    return result;\n  }"
+        },
+        {
+          "name": "_LegacyViewport.getViewportScrollPosition",
+          "line": 74,
+          "sha256": "d7342ae0ca3ab1f526382e3f9926b8746016e9e3c884c69b58a94aa8dbbfa7f4",
+          "text": "getViewportScrollPosition(): {top: number; left: number} {\n    const state = stateOf(this);\n    if (!state.platform.isBrowser) return {top: 0, left: 0};\n    const document = state.document, target = windowOf(state), element = document.documentElement;\n    const rect = element.getBoundingClientRect();\n    return {\n      top: -rect.top || document.body.scrollTop || target.scrollY || element.scrollTop || 0,\n      left: -rect.left || document.body.scrollLeft || target.scrollX || element.scrollLeft || 0,\n    };\n  }"
+        }
+      ],
+      "public_flag_reads": [
+        {
+          "line": 42,
+          "expression": "platform.isBrowser"
+        },
+        {
+          "line": 54,
+          "expression": "state.platform.isBrowser"
+        },
+        {
+          "line": 66,
+          "expression": "state.platform.isBrowser"
+        },
+        {
+          "line": 70,
+          "expression": "state.platform.isBrowser"
+        },
+        {
+          "line": 76,
+          "expression": "state.platform.isBrowser"
+        }
+      ],
+      "explicit_Platform_constructor_calls": 0,
+      "current_role": "public-service-token-and-browser-flag",
+      "decision": "The complete viewport state interface, constructor, destruction, size and scroll methods consume only public Platform.isBrowser. The flag controls listener registration/removal and nonbrowser values; no Platform constructor or private field is used. Size access resolves its window before testing the flag,matching the untouched16.2.14 helper. The preserved no-window observation therefore remains visible and grants no Angular SSR guarantee. Public flag identity/behavior supports this dependency; viewport geometry,caching,event lifetimes and native roots keep their separate gates.",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete public Platform caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-caller-roles-prior.json.gz",
+          "sha256": "f6f74df5b6a014536f95f2e7b3bb255913b8747cea9f4421a48699e86ef148d6"
+        },
+        {
+          "path": "compatibility/rc/platform-caller-roles-public-main.json",
+          "sha256": "c4209a9a66340fc7b94006f4e001b9e53d7359d8788b39d7e309c1d99e66fa17"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "scripts/platform-caller-roles.mjs",
+          "sha256": "937c4b0fd634ffc5533967bae9aab4ad4776c5deba6bd8587b253536b769b7d4"
+        },
+        {
+          "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+          "sha256": "f9c0a6c9717d731ab263d4c8d39ad2d1292b7b479f666fad00dd7a4abdfcfc44"
+        }
+      ],
+      "scope_limit": "Named public token/field dependency only; no broad module,date,viewport,dialog focus,component,native,packed,consumer or floor clearance."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/cdk/platform",
+      "symbol": "Platform",
+      "candidate_source_sha256": "fc96f5570ed4331adf1074fd521a90b99c8ab3419d0c532c1238c7e135d9b9e4",
+      "source_role": {
+        "import_local": "Platform",
+        "occurrences": [
+          {
+            "line": 71,
+            "column": 58,
+            "parent_kind": "CallExpression",
+            "parent_source": "ambientService(Platform)"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_legacyFocusPlatform"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 71,
+            "member_sha256": "26c046abf498a465a5c5ef9bc54e22ef73ee5d66bab45bd5851fd058972f1245",
+            "reasons": [
+              "Platform:Platform"
+            ]
+          },
+          {
+            "line": 273,
+            "member_sha256": "eb09ad38b34a8bbab54b45630324737deaf4d9fca756dacaf85f0d6715974aa6",
+            "reasons": [
+              "this._legacyFocusPlatform"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "ambientService",
+          "line": 33,
+          "sha256": "25da0fd46023bb3b58dece63e8d26e010e471c3c357a019d0cfd5845a7342728",
+          "text": "function ambientService<T>(token: ProviderToken<T>): T | null {\n  try {\n    assertInInjectionContext(ambientService);\n  } catch {\n    return null;\n  }\n  return inject(token, {optional: true});\n}"
+        },
+        {
+          "name": "_MatDialogContainerBase._legacyFocusPlatform",
+          "line": 71,
+          "sha256": "26c046abf498a465a5c5ef9bc54e22ef73ee5d66bab45bd5851fd058972f1245",
+          "text": "private readonly _legacyFocusPlatform = ambientService(Platform);"
+        },
+        {
+          "name": "_MatDialogContainerBase._isBrowser",
+          "line": 273,
+          "sha256": "eb09ad38b34a8bbab54b45630324737deaf4d9fca756dacaf85f0d6715974aa6",
+          "text": "private _isBrowser(): boolean {\n    return this._legacyFocusPlatform?.isBrowser ??\n      (typeof document !== 'undefined' && !!document\n        && typeof this._elementRef.nativeElement.focus === 'function');\n  }"
+        }
+      ],
+      "public_flag_reads": [
+        {
+          "line": 274,
+          "expression": "this._legacyFocusPlatform?.isBrowser"
+        }
+      ],
+      "explicit_Platform_constructor_calls": 0,
+      "current_role": "public-service-token-and-browser-flag",
+      "decision": "The complete ambient-service function resolves the public Platform token only in an existing injection context. The owned field is consumed by _isBrowser through a nullish fallback,so an explicit false service flag takes precedence over DOM availability. Normal public service identity and boolean/null behavior are supported at both minima without a compatibility constructor call. Manual construction, fallback policy, focus trapping/restoration and component/native behavior retain their separate evidence requirements.",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete public Platform caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/platform-caller-roles-prior.json.gz",
+          "sha256": "f6f74df5b6a014536f95f2e7b3bb255913b8747cea9f4421a48699e86ef148d6"
+        },
+        {
+          "path": "compatibility/rc/platform-caller-roles-public-main.json",
+          "sha256": "c4209a9a66340fc7b94006f4e001b9e53d7359d8788b39d7e309c1d99e66fa17"
+        },
+        {
+          "path": "compatibility/rc/material-public-subjects.json",
+          "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+        },
+        {
+          "path": "scripts/material-public-subjects.mjs",
+          "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "scripts/platform-caller-roles.mjs",
+          "sha256": "937c4b0fd634ffc5533967bae9aab4ad4776c5deba6bd8587b253536b769b7d4"
+        }
+      ],
+      "scope_limit": "Named public token/field dependency only; no broad module,date,viewport,dialog focus,component,native,packed,consumer or floor clearance."
+    }
+  ],
+  "source_closures_prepared": 4,
+  "source_closures_integrated": 0,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
