@@ -8,9 +8,10 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {tabPortalSourceParentReader} from '../scripts/tab-portal-source-context.mjs';
 import {fixtureLifecycleNativePrior,inspectFixtureLifecycleNativeRequalification,
  fixtureLifecycleNativeParentReader,nativeLedgerRows} from '../scripts/fixture-lifecycle-native-requalification.mjs';
-const read=p=>readFileSync(p),hash=b=>createHash('sha256').update(b).digest('hex'),json=b=>Buffer.from(JSON.stringify(b,null,2)+'\n');
+const rawRead=p=>readFileSync(p),read=tabPortalSourceParentReader({read:rawRead}),hash=b=>createHash('sha256').update(b).digest('hex'),json=b=>Buffer.from(JSON.stringify(b,null,2)+'\n');
 const prior=fixtureLifecycleNativePrior(),summary=inspectFixtureLifecycleNativeRequalification(),parent=fixtureLifecycleNativeParentReader(),controls=[];
 for(const m of [prior.ledger,...prior.context_preimages])assert.equal(hash(parent(m.path)),m.sha256);
 for(const m of prior.producer_preimages)assert.equal(parent(m.path).equals(read(m.path)),true,'current producers are never projected');
@@ -18,7 +19,7 @@ const currentText=read(prior.ledger.path).toString();
 const original=nativeLedgerRows(prior.ledger.text),current=nativeLedgerRows(currentText),selected=new Set(prior.selected.map(m=>m.sha));let restored=currentText;
 for(let i=current.length-1;i>=0;i--){const before=original[i],after=current[i];assert.equal(before.value.sha,after.value.sha);if(selected.has(before.value.sha))restored=restored.slice(0,after.start)+prior.ledger.text.slice(before.start,before.end)+restored.slice(after.end);else assert.equal(hash(prior.ledger.text.slice(before.start,before.end)),hash(currentText.slice(after.start,after.end)),'unrelated row bytes changed');}
 assert.equal(hash(restored),prior.ledger.sha256,'all unselected rows and envelope bytes must survive');
-function rejected(id,path,bytes){assert.throws(()=>inspectFixtureLifecycleNativeRequalification({read:p=>p===path?bytes:read(p)}),id);controls.push(id);}
+function rejected(id,path,bytes){assert.throws(()=>inspectFixtureLifecycleNativeRequalification({read:p=>p===path?bytes:rawRead(p)}),id);controls.push(id);}
 const ledger=JSON.parse(read(prior.ledger.path));
 for(const selected of prior.selected){
  const entry=ledger.entries.find(e=>e.sha===selected.sha),body=JSON.parse(read(entry.evidence_report)),old=JSON.parse(prior.reviews.find(m=>m.path===selected.evidence_report).text);

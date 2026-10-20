@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from tests.tab_portal_source_requalification import historical_source_members, historical_member_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -31,13 +32,14 @@ class FixtureLifecycleNativeRequalification(unittest.TestCase):
         self.assertFalse(report['actual_native_packed_or_floor_qualified'])
 
     def test_original_task_assertions_and_exact_context_substitutions_survive(self):
+        parent_members = historical_source_members(ROOT)
         prior = json.loads(gzip.decompress((ROOT/'compatibility/rc/fixture-lifecycle-native-requalification-prior.json.gz').read_bytes()))
         for edit in prior['context_preimages']:
             before = edit['text']; expected = before
             for start, end in edit['substitutions']:
                 self.assertEqual(expected.count(start), 1)
                 expected = expected.replace(start, end)
-            actual = (ROOT/edit['path']).read_text()
+            actual = historical_member_bytes(ROOT, edit['path'], parent_members).decode()
             self.assertEqual(actual, expected)
             def assertions(text):
                 return [n.func.attr for n in ast.walk(ast.parse(text)) if isinstance(n, ast.Call)

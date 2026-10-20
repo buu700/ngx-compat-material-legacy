@@ -13,6 +13,7 @@ import {pathToFileURL} from 'node:url';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
+import {tabPortalSourceParentReader} from './tab-portal-source-context.mjs';
 const PRIOR='compatibility/rc/fixture-lifecycle-native-requalification-prior.json.gz';
 const pins={main:'5c91793c0a2437ae9675adee70e2f31f40ed362b2212e35f6dcb2b71ff6935b3','21.x':'d14a17e6a1054d4d3aeb4db2cb33c8d77c7142b69d1b5d9dbe52f6bf748bc590'};
 const hash=b=>createHash('sha256').update(b).digest('hex'),json=b=>JSON.stringify(b,null,2)+'\n';
@@ -54,6 +55,7 @@ export function nativeLedgerRows(text){
  assert.equal(rows.length,1697);return rows;
 }
 function validate({root=process.cwd(),read=defaultRead(root)}={}){
+ read=tabPortalSourceParentReader({root,read});
  const prior=fixtureLifecycleNativePrior({root,read}),expected=fixtureLifecycleNativeWrites(prior);
  for(const m of prior.reviews)assert.equal(hash(read(m.path)),m.sha256,'original six-proof report changed');
  for(const m of prior.producer_preimages){let count=0;const after=m.before_text.replace(/fixture(\??)\.destroyed/g,(_,optional)=>{count++;return 'fixture'+optional+'.componentRef.hostView.destroyed';});assert.equal(count,2);assert.equal(hash(after),m.sha256);assert.equal(read(m.path).toString(),after,'producer changes beyond public lifecycle state: '+m.path);}
@@ -62,13 +64,13 @@ function validate({root=process.cwd(),read=defaultRead(root)}={}){
  for(const m of prior.context_preimages){let after=m.text;for(const [from,to]of m.substitutions){assert.equal(after.split(from).length,2);after=after.replace(from,to);}assert.equal(hash(after),m.after_sha256);assert.equal(read(m.path).toString(),after,'unknown task-preservation context: '+m.path);}
  const ledger=JSON.parse(expected.ledger);let members=0;
  for(const selected of prior.selected){const entry=ledger.entries.find(e=>e.sha===selected.sha);for(const m of entry.individual_proof[selected.field].source_members){assert.equal(hash(read(m.path)),m.sha256,'stale current native source: '+m.path);members++;}}
- return {prior,summary:{schema_version:1,line:prior.line,source_only_native_proofs_requalified:6,original_reports_preserved:6,unrelated_SHA_rows_preserved:1691,producer_files:4,public_state_path_repairs:8,current_native_source_members_rechecked:members,finite_task_context_edits:2,original_conclusions_dispositions_and_case_requirements_preserved:true,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'}};
+ return {prior,read,summary:{schema_version:1,line:prior.line,source_only_native_proofs_requalified:6,original_reports_preserved:6,unrelated_SHA_rows_preserved:1691,producer_files:4,public_state_path_repairs:8,current_native_source_members_rechecked:members,finite_task_context_edits:2,original_conclusions_dispositions_and_case_requirements_preserved:true,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'}};
 }
 export function inspectFixtureLifecycleNativeRequalification(options={}){return validate(options).summary;}
 /** Validate actual current files first, then expose only registered old task bytes.
  * Current production source/runtime validators never use this projection. */
 export function fixtureLifecycleNativeParentReader({root=process.cwd(),read=defaultRead(root)}={}){
- const {prior}=validate({root,read}),members=new Map([prior.ledger,...prior.context_preimages].map(m=>[m.path,Buffer.from(m.text)]));return p=>members.has(p)?Buffer.from(members.get(p)):read(p);
+ const {prior,read:checkedRead}=validate({root,read}),members=new Map([prior.ledger,...prior.context_preimages].map(m=>[m.path,Buffer.from(m.text)]));return p=>members.has(p)?Buffer.from(members.get(p)):checkedRead(p);
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
  assert.deepEqual(process.argv.slice(2),['--parent']);const {prior}=validate();process.stdout.write(JSON.stringify({ledger:prior.ledger,context_preimages:prior.context_preimages}));

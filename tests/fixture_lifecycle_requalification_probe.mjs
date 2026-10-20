@@ -8,16 +8,17 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {tabPortalSourceParentReader} from '../scripts/tab-portal-source-context.mjs';
 import {authoredUseReviewEvidence} from '../scripts/authored-use-inventory.mjs';
 import {fixtureLifecycleRequalificationPrior,inspectFixtureLifecycleRequalification,fixtureLifecycleParentReader} from '../scripts/fixture-lifecycle-requalification.mjs';
-const read=p=>readFileSync(p),hash=b=>createHash('sha256').update(b).digest('hex'),key=r=>JSON.stringify([r.file,r.module,r.symbol]);
+const rawRead=p=>readFileSync(p),read=tabPortalSourceParentReader({read:rawRead}),hash=b=>createHash('sha256').update(b).digest('hex'),key=r=>JSON.stringify([r.file,r.module,r.symbol]);
 const prior=fixtureLifecycleRequalificationPrior(),good=inspectFixtureLifecycleRequalification(),parent=fixtureLifecycleParentReader(),controls=[];
 const inputs=JSON.parse(read('compatibility/rc/fixture-lifecycle-requalification-inputs.json'));
 for(const m of [...prior.ledger_preimages,...prior.context_preimages])assert.equal(parent(m.path).toString(),m.text);
 for(const m of inputs.producer_deltas)assert.equal(parent(m.path).equals(read(m.path)),true,'runtime producer bytes must stay current');
 const selectedKeys=new Set(prior.selected.map(key)),all=prior.ledger_preimages.flatMap(m=>JSON.parse(read(m.path)).symbol_uses),selected={symbol_uses:all.filter(r=>selectedKeys.has(key(r)))};
 assert.deepEqual(authoredUseReviewEvidence(selected,prior.line,read,hash),{reviewed:167,insufficient:0,insufficient_uses:[]});
-function rejected(id,path,bytes){const altered=p=>p===path?bytes:read(p);assert.throws(()=>inspectFixtureLifecycleRequalification({read:altered}),id);controls.push(id);}
+function rejected(id,path,bytes){const altered=p=>p===path?bytes:rawRead(p);assert.throws(()=>inspectFixtureLifecycleRequalification({read:altered}),id);controls.push(id);}
 const frozen=prior.ledger_preimages[0].path,additional=prior.ledger_preimages[1].path;
 for(const [id,path,mutate]of [
  ['old-frozen-review-pointer',frozen,b=>b.symbol_uses.find(r=>selectedKeys.has(key(r))).source_review={path:prior.review_preimage.path,sha256:prior.review_preimage.sha256}],

@@ -13,6 +13,7 @@ import {existsSync,lstatSync,mkdirSync,mkdtempSync,readFileSync,rmSync,symlinkSy
 import {tmpdir} from 'node:os';
 import {delimiter,join,resolve} from 'node:path';
 import {gunzipSync} from 'node:zlib';
+import {tabPortalSourceParentReader} from './tab-portal-source-context.mjs';
 import {historicalFrameMembers,inspectHistoricalReplayCurrent,verifyHistoricalCurrentSubjects} from './historical-source-replay.mjs';
 import {validateRecentCaseReceipt,verifyRecentHistoricalGraph} from './chip-recent-history.mjs';
 export const PACKED_COLLECTOR_HISTORY_INPUTS='compatibility/rc/packed-collector-history-inputs.json';
@@ -29,6 +30,7 @@ function environment(){
 const args=a=>['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...a];
 const git=(root,a)=>execFileSync('git',args(a),{cwd:root,env:environment(),maxBuffer:16*1024*1024});
 export function packedCollectorHistoryInputs({root=process.cwd(),read=defaultRead(root)}={}){
+ read=tabPortalSourceParentReader({root,read});
  const bytes=read(PACKED_COLLECTOR_HISTORY_INPUTS),data=JSON.parse(bytes);assert.equal(hash(bytes),pins[data.line],'unknown collector history inputs');
  assert.equal(data.schema_version,1);assert.equal(data.id,'packed-collector-history');assert.equal(data.case_count,10);assert.equal(data.timeout_ms,300000);
  assert.deepEqual(data.entries.map(e=>e.family),PACKED_COLLECTOR_FAMILIES);assert.equal(new Set(data.case_ids).size,10);assert.deepEqual(data.case_ids,data.entries.flatMap(e=>e.case_ids));

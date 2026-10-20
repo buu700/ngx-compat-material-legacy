@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "substitutions": {
+    "scripts/core-view-use-review.mjs": [
+      [
+        "import {installNgZonePublicSubject} from './ng-zone-public-subjects.mjs';",
+        "import {installNgZonePublicSubject} from './ng-zone-public-subjects.mjs';\nimport {tabPortalSourceParentReader} from './tab-portal-source-context.mjs';"
+      ],
+      [
+        "export function coreViewPrior(root,{read=p=>readFileSync(join(root,p))}={}){",
+        "export function coreViewPrior(root,{read=p=>readFileSync(join(root,p))}={}){\n read=tabPortalSourceParentReader({root,read});"
+      ],
+      [
+        "return {line:prior.line,rows,selected_uses:35,",
+        "return {line:prior.line,source_epoch:prior.source_parent,authenticated_pre_repair_subject:true,current_source_caller_decisions_qualified:false,rows,selected_uses:35,"
+      ]
+    ],
+    "tests/test_core_view_use_review.py": [
+      [
+        "import unittest\n",
+        "import unittest\nfrom tests.tab_portal_source_requalification import historical_source_members, historical_member_bytes\n"
+      ],
+      [
+        "    def test_selected_rows_and_candidate_sources_remain_unchanged_and_open(self):\n",
+        "    def test_selected_rows_and_candidate_sources_remain_unchanged_and_open(self):\n        parent_members = historical_source_members(ROOT)\n"
+      ],
+      [
+        "(ROOT/member['path']).read_bytes()",
+        "historical_member_bytes(ROOT, member['path'], parent_members)"
+      ],
+      [
+        "(ROOT/selected['ledger']).read_bytes()",
+        "historical_member_bytes(ROOT, selected['ledger'], parent_members)"
+      ]
+    ],
+    "scripts/fixture-lifecycle-native-requalification.mjs": [
+      [
+        "import {gunzipSync} from 'node:zlib';",
+        "import {gunzipSync} from 'node:zlib';\nimport {tabPortalSourceParentReader} from './tab-portal-source-context.mjs';"
+      ],
+      [
+        "function validate({root=process.cwd(),read=defaultRead(root)}={}){",
+        "function validate({root=process.cwd(),read=defaultRead(root)}={}){\n read=tabPortalSourceParentReader({root,read});"
+      ],
+      [
+        "return {prior,summary:{schema_version:1",
+        "return {prior,read,summary:{schema_version:1"
+      ],
+      [
+        "const {prior}=validate({root,read}),members=",
+        "const {prior,read:checkedRead}=validate({root,read}),members="
+      ],
+      [
+        "return p=>members.has(p)?Buffer.from(members.get(p)):read(p);",
+        "return p=>members.has(p)?Buffer.from(members.get(p)):checkedRead(p);"
+      ]
+    ],
+    "scripts/packed-collector-history.mjs": [
+      [
+        "import {gunzipSync} from 'node:zlib';",
+        "import {gunzipSync} from 'node:zlib';\nimport {tabPortalSourceParentReader} from './tab-portal-source-context.mjs';"
+      ],
+      [
+        "export function packedCollectorHistoryInputs({root=process.cwd(),read=defaultRead(root)}={}){",
+        "export function packedCollectorHistoryInputs({root=process.cwd(),read=defaultRead(root)}={}){\n read=tabPortalSourceParentReader({root,read});"
+      ]
+    ],
+    "scripts/tab-portal-explicit-container-review.mjs": [
+      [
+        "import {prepareCoreViewSubjects} from './core-view-use-review.mjs';",
+        "import {prepareCoreViewSubjects} from './core-view-use-review.mjs';\nimport {tabPortalRepairContextReader} from './tab-portal-source-context.mjs';"
+      ],
+      [
+        "export function tabPortalPrior(root,{read=p=>readFileSync(join(root,p))}={}){",
+        "export function tabPortalPrior(root,{read=p=>readFileSync(join(root,p))}={}){\n read=tabPortalRepairContextReader({root,read});"
+      ]
+    ],
+    "tests/packed_collector_history.py": [
+      [
+        "from tests.chip_recent_history import canonical_recorded_case",
+        "from tests.chip_recent_history import canonical_recorded_case\nfrom tests.tab_portal_source_requalification import historical_source_members, historical_member_bytes"
+      ],
+      [
+        "def _inputs(root):\n",
+        "def _inputs(root):\n    parent_members = historical_source_members(root, read_current=lambda member: _raw(root, member))\n"
+      ],
+      [
+        "assert _sha(_raw(root, m['path'])) == m['sha256'], m['path']",
+        "assert _sha(historical_member_bytes(root, m['path'], parent_members, read_current=lambda member: _raw(root, member))) == m['sha256'], m['path']"
+      ]
+    ],
+    "scripts/tab-portal-source-requalification.mjs": [
+      [
+        "import {tabPortalSourceReview,TAB_BODY,TAB_ADAPTER} from './tab-portal-explicit-container-review.mjs';",
+        "import {tabPortalSourceReview,TAB_BODY,TAB_ADAPTER} from './tab-portal-explicit-container-review.mjs';\nimport {tabPortalSourcePreparationReader} from './tab-portal-source-context.mjs';"
+      ],
+      [
+        "export function tabPortalRequalificationPrior({root=process.cwd(),read=p=>readFileSync(join(root,p))}={}){",
+        "export function tabPortalRequalificationPrior({root=process.cwd(),read=p=>readFileSync(join(root,p))}={}){\n read=tabPortalSourcePreparationReader({root,read});"
+      ]
+    ],
+    "tests/tab_portal_source_requalification_probe.mjs": [
+      [
+        "import {TAB_BODY,TAB_ADAPTER} from '../scripts/tab-portal-explicit-container-review.mjs';",
+        "import {TAB_BODY,TAB_ADAPTER} from '../scripts/tab-portal-explicit-container-review.mjs';\nimport {tabPortalSourcePreparationReader} from '../scripts/tab-portal-source-context.mjs';"
+      ],
+      [
+        "for(const member of prior.preimages)assert.equal(hash(read(member.path)),member.sha256);",
+        "const preserved=tabPortalSourcePreparationReader({root,read});\nfor(const member of prior.preimages)assert.equal(hash(preserved(member.path)),member.sha256);"
+      ],
+      [
+        "all17_source_preimages_and_all_live_ledgers_unchanged:true",
+        "all17_authenticated_prior_members_preserved:true"
+      ]
+    ],
+    "scripts/upstream-tab-completion-evidence.mjs": [
+      [
+        "'projects/ngx-material-legacy/legacy-tabs/tab-body.ts',",
+        "'projects/ngx-material-legacy/legacy-tabs/tab-body.ts',\n  'projects/ngx-material-legacy/legacy-tabs/internal/tab-portal-construction-context.ts',"
+      ]
+    ],
+    "tests/fixture_lifecycle_native_requalification_probe.mjs": [
+      [
+        "import {createHash} from 'node:crypto';",
+        "import {createHash} from 'node:crypto';\nimport {tabPortalSourceParentReader} from '../scripts/tab-portal-source-context.mjs';"
+      ],
+      [
+        "const read=p=>readFileSync(p),hash=",
+        "const rawRead=p=>readFileSync(p),read=tabPortalSourceParentReader({read:rawRead}),hash="
+      ],
+      [
+        "read:p=>p===path?bytes:read(p)",
+        "read:p=>p===path?bytes:rawRead(p)"
+      ]
+    ],
+    "tests/fixture_lifecycle_requalification_probe.mjs": [
+      [
+        "import {createHash} from 'node:crypto';",
+        "import {createHash} from 'node:crypto';\nimport {tabPortalSourceParentReader} from '../scripts/tab-portal-source-context.mjs';"
+      ],
+      [
+        "const read=p=>readFileSync(p),hash=",
+        "const rawRead=p=>readFileSync(p),read=tabPortalSourceParentReader({read:rawRead}),hash="
+      ],
+      [
+        "const altered=p=>p===path?bytes:read(p);",
+        "const altered=p=>p===path?bytes:rawRead(p);"
+      ]
+    ],
+    "tests/test_fixture_lifecycle_requalification.py": [
+      [
+        "import unittest\n",
+        "import unittest\nfrom tests.tab_portal_source_requalification import historical_source_members, historical_member_bytes\n"
+      ],
+      [
+        "    def test_only_review_pointers_change_and_old_conclusions_and_assertions_survive(self):\n",
+        "    def test_only_review_pointers_change_and_old_conclusions_and_assertions_survive(self):\n        parent_members = historical_source_members(ROOT)\n"
+      ],
+      [
+        "after = (ROOT / member['path']).read_text();",
+        "after = historical_member_bytes(ROOT, member['path'], parent_members).decode();"
+      ]
+    ],
+    "tests/test_fixture_lifecycle_native_requalification.py": [
+      [
+        "import unittest\n",
+        "import unittest\nfrom tests.tab_portal_source_requalification import historical_source_members, historical_member_bytes\n"
+      ],
+      [
+        "    def test_original_task_assertions_and_exact_context_substitutions_survive(self):\n",
+        "    def test_original_task_assertions_and_exact_context_substitutions_survive(self):\n        parent_members = historical_source_members(ROOT)\n"
+      ],
+      [
+        "actual = (ROOT/edit['path']).read_text()",
+        "actual = historical_member_bytes(ROOT, edit['path'], parent_members).decode()"
+      ]
+    ]
+  }
+}

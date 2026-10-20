@@ -14,6 +14,7 @@ import {join,dirname} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {gunzipSync} from 'node:zlib';
 import {prepareCoreViewSubjects} from './core-view-use-review.mjs';
+import {tabPortalRepairContextReader} from './tab-portal-source-context.mjs';
 const ts=createRequire(import.meta.url)('typescript');
 export const digest=b=>createHash('sha256').update(b).digest('hex');
 export const TAB_BODY='projects/ngx-material-legacy/legacy-tabs/tab-body.ts';
@@ -25,6 +26,7 @@ const repairedBody='bb9cbef0831ea50ebe4577e4bc50b5ea4d0e9b25f332aad6d872a7fdc5ce
 const repairedAdapter='6e2047cb3efe6a8a26db692928c0f9f97d4cbc5fb701ae275ee23ad3850221d2';
 const declarationPin='12015435c1e036f3ecc6511d2cfc253c441a16b02e887b450b27a568719e80af';
 export function tabPortalPrior(root,{read=p=>readFileSync(join(root,p))}={}){
+ read=tabPortalRepairContextReader({root,read});
  const bytes=read(priorPath),line=Object.keys(priorPins).find(k=>priorPins[k]===digest(bytes));assert.ok(line,'changed tab portal preimages');const prior=JSON.parse(gunzipSync(bytes));assert.equal(prior.line,line);assert.equal(prior.preimages.length,6);
  for(const m of prior.preimages){assert.equal(digest(m.text),m.sha256);const original=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',prior.source_parent+':'+m.path],{cwd:root,maxBuffer:1024*1024,env:{...process.env,GIT_NO_LAZY_FETCH:'1'}});assert.equal(digest(original),m.sha256);if(m.path!==TAB_BODY)assert.equal(digest(read(m.path)),m.sha256,'changed protected tab review source: '+m.path);}
  return prior;

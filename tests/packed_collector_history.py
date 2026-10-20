@@ -12,6 +12,7 @@ from pathlib import Path
 import subprocess
 from functools import lru_cache
 from tests.chip_recent_history import canonical_recorded_case
+from tests.tab_portal_source_requalification import historical_source_members, historical_member_bytes
 
 INPUT = 'compatibility/rc/packed-collector-history-inputs.json'
 PINS = {'main': '69e8670d7349e45a273462387b9f1817223fd3367466c2e8a6f69282185f0f25',
@@ -31,6 +32,7 @@ def _raw(root, path):
 
 
 def _inputs(root):
+    parent_members = historical_source_members(root, read_current=lambda member: _raw(root, member))
     raw = _raw(root, INPUT); data = json.loads(raw)
     assert _sha(raw) == PINS[data['line']]
     stored = _raw(root, data['prior']['path'])
@@ -38,7 +40,7 @@ def _inputs(root):
     unpacked = gzip.decompress(stored)
     assert _sha(unpacked) == data['prior']['raw_sha256']
     for m in data['current_identical_subjects'] + data['protected'] + [data['matrix']]:
-        assert _sha(_raw(root, m['path'])) == m['sha256'], m['path']
+        assert _sha(historical_member_bytes(root, m['path'], parent_members, read_current=lambda member: _raw(root, member))) == m['sha256'], m['path']
     for m in data['entries']:
         assert _sha(_raw(root, m['program'])) == m['wrapper_sha256'], m['program']
     return data, json.loads(unpacked), _sha(raw), _sha(stored)

@@ -3,7 +3,7 @@
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.io/license
-"""Preparation only; stale live source/native/history bindings remain failed."""
+"""Authenticated role preparation; current source admission has its own successor gate."""
 import json
 import os
 from pathlib import Path
@@ -25,7 +25,7 @@ class TabPortalSourceRequalification(unittest.TestCase):
         self.assertEqual(report['new_helper_decisions_prepared'], 7)
         self.assertEqual(report['native_case_ids_retained'], 54)
         self.assertEqual(report['corruptions_rejected'], 22)
-        self.assertTrue(report['all17_source_preimages_and_all_live_ledgers_unchanged'])
+        self.assertTrue(report['all17_authenticated_prior_members_preserved'])
         self.assertEqual(report['new_use_closures'], 0)
         self.assertFalse(report['current_source_history_or_native_admission'])
         self.assertFalse(report['actual_native_packed_or_floor_qualified'])

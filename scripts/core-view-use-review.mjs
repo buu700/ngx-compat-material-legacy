@@ -15,11 +15,13 @@ import {execFileSync} from 'node:child_process';
 import {gunzipSync} from 'node:zlib';
 import {prepareRemainingIdentitySubjects} from './remaining-identity-public-subjects.mjs';
 import {installNgZonePublicSubject} from './ng-zone-public-subjects.mjs';
+import {tabPortalSourceParentReader} from './tab-portal-source-context.mjs';
 const ts=createRequire(import.meta.url)('typescript'),hash=b=>createHash('sha256').update(b).digest('hex');
 const priorPath='compatibility/rc/core-view-use-prior.json.gz';
 const pins={main:'6274e3d3df98c4927da387b53d62958665739493188547fd6fbb3462d6e2b2dc','21.x':'de343d2a6451acc82de6c0a67f5f8f27c4efa4d2c3ec3e369ff722685f91935b'};
 export const CORE_VIEW_SYMBOLS=Object.freeze(['ApplicationRef','ComponentRef','EmbeddedViewRef','TemplateRef','Type','ViewContainerRef']);
 export function coreViewPrior(root,{read=p=>readFileSync(join(root,p))}={}){
+ read=tabPortalSourceParentReader({root,read});
  const bytes=read(priorPath),line=Object.keys(pins).find(line=>pins[line]===hash(bytes));assert.ok(line,'changed view-review preimages');const prior=JSON.parse(gunzipSync(bytes));assert.equal(prior.line,line);assert.equal(prior.selected.length,35);assert.equal(prior.candidate_preimages.length,22);
  for(const m of [...prior.ledger_preimages,...prior.candidate_preimages]){assert.equal(hash(m.text),m.sha256);assert.equal(hash(read(m.path)),m.sha256,'selected source/ledger changed before view review: '+m.path);const original=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',prior.source_parent+':'+m.path],{cwd:root,maxBuffer:16*1024*1024,env:{...process.env,GIT_NO_LAZY_FETCH:'1'}});assert.equal(hash(original),m.sha256);}
  for(const m of prior.protected)assert.equal(hash(read(m.path)),m.sha256,'changed protected view-review source: '+m.path);
@@ -35,7 +37,7 @@ export function coreViewSourceInventory(root,options={}){
    occurrences.push({line:location.line+1,column:location.character+1,role:isType?'type-reference':'value-reference',parent_kind:ts.SyntaxKind[node.parent.kind],parent_source:node.parent.getText(source),owner:owner?.name?.text??null});
   }ts.forEachChild(node,visit);}visit(source);assert.ok(occurrences.length,'unused selected Core view import');rows.push({...selected,candidate_source_sha256:member.sha256,import_local:local,occurrences});
  }
- assert.equal(rows.filter(r=>r.ledger.includes('current-dispositions')).length,9);return {line:prior.line,rows,selected_uses:35,candidate_files:22,source_conclusions_qualified:0,new_use_closures:0,actual_packed_native_or_floor_qualified:false};
+ assert.equal(rows.filter(r=>r.ledger.includes('current-dispositions')).length,9);return {line:prior.line,source_epoch:prior.source_parent,authenticated_pre_repair_subject:true,current_source_caller_decisions_qualified:false,rows,selected_uses:35,candidate_files:22,source_conclusions_qualified:0,new_use_closures:0,actual_packed_native_or_floor_qualified:false};
 }
 export function prepareCoreViewSubjects(root){
  const loaded=prepareRemainingIdentitySubjects(root);

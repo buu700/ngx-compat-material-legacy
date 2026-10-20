@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from tests.tab_portal_source_requalification import historical_source_members, historical_member_bytes
 from tests.test_ripple_global_options_integration import rows
 from tests.fixture_lifecycle_native_requalification import parent_bytes as native_parent_bytes
 
@@ -32,11 +33,12 @@ class FixtureLifecycleRequalification(unittest.TestCase):
         self.assertFalse(report['actual_legacy_packed_native_or_floor_qualified'])
 
     def test_only_review_pointers_change_and_old_conclusions_and_assertions_survive(self):
+        parent_members = historical_source_members(ROOT)
         prior = json.loads(gzip.decompress((ROOT / 'compatibility/rc/fixture-lifecycle-requalification-prior.json.gz').read_bytes()))
         inputs = json.loads((ROOT / 'compatibility/rc/fixture-lifecycle-requalification-inputs.json').read_bytes())
         selected = {(r['file'],r['module'],r['symbol']) for r in prior['selected']}
         for member in prior['ledger_preimages']:
-            after = (ROOT / member['path']).read_text(); restored = after; count = 0
+            after = historical_member_bytes(ROOT, member['path'], parent_members).decode(); restored = after; count = 0
             for (a, old), (b, new) in zip(rows(member['text']), rows(after)):
                 identity = (a['file'], a['module'], a['symbol'])
                 self.assertEqual(identity, (b['file'], b['module'], b['symbol']))
