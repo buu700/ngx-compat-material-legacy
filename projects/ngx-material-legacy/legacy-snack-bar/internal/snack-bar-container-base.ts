@@ -129,7 +129,19 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
    */
   override attachDomPortal = (portal: DomPortal) => {
     this._assertNotAttached();
-    const result = this._portalOutlet.attachDomPortal(portal);
+    let result: void;
+    try {
+      result = this._portalOutlet.attach(portal) as void;
+    } catch (error) {
+      // Generic dispatch records the portal before entering the DOM hook.
+      // Keep the historical hook's observable flags when the hook throws.
+      const portalAttached = portal.isAttached;
+      this._portalOutlet.detach();
+      if (portalAttached) {
+        portal.setAttachedHost(this._portalOutlet);
+      }
+      throw error;
+    }
     this._afterPortalAttached();
     return result;
   };
