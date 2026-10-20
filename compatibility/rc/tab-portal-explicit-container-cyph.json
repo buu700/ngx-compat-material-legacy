@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "role": "Read-only Cyph source sanity check for a constructor-context repair; no consumer build or native/packed qualification",
+  "root": "/home/parallels/cyph",
+  "snapshot_files": [
+    {
+      "path": "shared/css/cyph.base.scss",
+      "sha256": "44db9a3820a38154df9c2fa68163f5df91510f1f343214703068663eaf003267"
+    },
+    {
+      "path": "shared/css/mixins.scss",
+      "sha256": "cc248f0e8b86175c9f6edab6e0193300ad5e13f2d37f5575b556d246584baf2b"
+    },
+    {
+      "path": "shared/js/cyph/components/account-base-file-list/account-base-file-list.component.html",
+      "sha256": "359ca646d1039ae152f36da6c3db4ef6555359622cc95d94d412d9e3d80160a8"
+    },
+    {
+      "path": "shared/js/cyph/components/account-contacts/account-contacts.component.html",
+      "sha256": "907c84cca8361acef721edb542ad391d0e2c1382cce77b1079422c44fa9f6157"
+    },
+    {
+      "path": "shared/js/cyph/components/account-contacts/account-contacts.component.scss",
+      "sha256": "2daf19b04ed2706167bae5de78282a5727da658b561c89cbfc9a5d033c3f6d61"
+    },
+    {
+      "path": "shared/js/cyph/components/account-pgp/account-pgp.component.html",
+      "sha256": "860b6cc45402ba7fce67532b9805c59e2f3a321e6f5dfb4e12ad8918645fd73e"
+    },
+    {
+      "path": "shared/js/cyph/components/account-pgp/account-pgp.component.scss",
+      "sha256": "97ee46fbff6b5dee11f93f48b98d919234164a68486b233f3a6b76f6bf81b1c5"
+    },
+    {
+      "path": "shared/js/cyph/components/account-register/account-register.component.html",
+      "sha256": "29fcf4bb13a0dbfe91292455ca3e4adec64b7c6cb88a543a9bf14e111b444b12"
+    },
+    {
+      "path": "shared/js/cyph/components/account-register/account-register.component.scss",
+      "sha256": "7d362de4da851e92e86e2ac4f57b1f463267e8cc51053acb54fbf885e37282b6"
+    },
+    {
+      "path": "shared/js/cyph/components/account-wallets/account-wallets.component.html",
+      "sha256": "398cc6533da794348a623a24ede839a16cda6f3eb85a2494e6a079e2e53959c8"
+    },
+    {
+      "path": "shared/js/cyph/components/account-wallets/account-wallets.component.scss",
+      "sha256": "61aabe39e3ede3650e5ea0f4f1da88a63a7ec347724cb247094d23c03a0d162f"
+    },
+    {
+      "path": "shared/js/cyph/components/help/help.component.html",
+      "sha256": "651b60ee6134abfb482184dd5e855150933bcf15e5ce1cb89b92ce342343b603"
+    },
+    {
+      "path": "shared/js/cyph/modules/cyph-web.module.ts",
+      "sha256": "4b50f3b89c32ac00cff95891891e5e2284682afade511861fb0852bbc04d1a36"
+    }
+  ],
+  "direct_internal_portal_constructor_or_selector_uses": 0,
+  "observations": [
+    "Cyph imports MatLegacyTabsModule as MatTabsModule from @angular/material/legacy-tabs in shared/js/cyph/modules/cyph-web.module.ts. The corrected owned portal retains its three-argument constructor, selector, public CDK parent and host/lifecycle methods.",
+    "Cyph shared CSS and account component styles address mat-tab-body, mat-tab-header, .mat-tab-label-content and related legacy selectors. The repair changes only two TypeScript files and leaves tab-body.html/tab-body.scss byte-identical to the authenticated preimages.",
+    "Shared mixins invoke mat.legacy-tabs-theme; neither the Sass facade nor any consumer call or module namespace is modified.",
+    "No direct MatLegacyTabBodyPortal or matTabBodyHost usage occurs in scanned TS/HTML/SCSS sources. Manual construction is nevertheless exercised against genuine reference/current public Core/CDK dependencies."
+  ],
+  "consumer_changes_required_by_this_repair": false,
+  "consumer_build_executed": false,
+  "actual_native_packed_or_floor_qualified": false
+}

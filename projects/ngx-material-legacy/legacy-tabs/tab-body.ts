@@ -21,6 +21,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import {CdkPortalOutlet} from '@angular/cdk/portal';
+import {constructLegacyTabBodyPortal} from './internal/tab-portal-construction-context';
 import {Directionality} from '@angular/cdk/bidi';
 import {DOCUMENT} from '@angular/common';
 import {Subscription} from 'rxjs';
@@ -38,15 +39,25 @@ import {
   selector: '[matTabBodyHost]',
 })
 export class MatLegacyTabBodyPortal extends CdkPortalOutlet {
-  private _centeringSub = Subscription.EMPTY;
-  private _leavingSub = Subscription.EMPTY;
+  // The public parent is constructed with the original caller's dependencies.
+  // Initialize every own field explicitly on that returned derived object.
+  declare private _centeringSub: Subscription;
+  declare private _leavingSub: Subscription;
+  declare private _host: MatLegacyTabBody;
 
+  // @ts-expect-error TS2377: derived constructor deliberately returns its object.
   constructor(
-    viewContainerRef: ViewContainerRef,
-    @Inject(forwardRef(() => MatLegacyTabBody)) private _host: MatLegacyTabBody,
+    @Inject(ViewContainerRef) viewContainerRef: ViewContainerRef,
+    @Inject(forwardRef(() => MatLegacyTabBody)) _host: MatLegacyTabBody,
     @Inject(DOCUMENT) _document: any,
   ) {
-    super();
+    const outlet = constructLegacyTabBodyPortal(
+      new.target, viewContainerRef, _document,
+    ) as MatLegacyTabBodyPortal;
+    outlet._host = _host;
+    outlet._centeringSub = Subscription.EMPTY;
+    outlet._leavingSub = Subscription.EMPTY;
+    return outlet;
   }
 
   override ngOnInit(): void {
