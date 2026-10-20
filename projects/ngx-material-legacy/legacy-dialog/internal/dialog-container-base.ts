@@ -100,14 +100,14 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
 
   override attachComponentPortal<T>(portal: ComponentPortal<T>): ComponentRef<T> {
     this._assertContentAvailable();
-    const result = this._portalOutlet.attach(portal);
+    const result = this._portalOutlet.attachComponentPortal(portal);
     this._contentAttached();
     return result;
   }
 
   override attachTemplatePortal<T>(portal: TemplatePortal<T>): EmbeddedViewRef<T> {
     this._assertContentAvailable();
-    const result = this._portalOutlet.attach(portal);
+    const result = this._portalOutlet.attachTemplatePortal(portal);
     this._contentAttached();
     return result;
   }
@@ -115,7 +115,19 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
   /** Historical DOM-portal entry, delegated through the public generic protocol. */
   override attachDomPortal: (portal: DomPortal) => void = portal => {
     this._assertContentAvailable();
-    this._portalOutlet.attach(portal);
+    // Match the historical host before and after the child's ownership handoff.
+    const preserveContainerHost =
+      (typeof ngDevMode === 'undefined' || ngDevMode) && !portal.element.parentNode;
+    try {
+      this._portalOutlet.attach(portal);
+    } catch (error) {
+      const portalAttached = portal.isAttached;
+      this._portalOutlet.detach();
+      if (portalAttached) {
+        portal.setAttachedHost(preserveContainerHost ? this : this._portalOutlet);
+      }
+      throw error;
+    }
     this._contentAttached();
   };
 
