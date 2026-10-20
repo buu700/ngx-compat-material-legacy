@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "criteria": "Three complete additional caller routes and six exact setter members, with genuine public tagged/minimum declaration and normalization evidence. Canonical integration is separate.",
+  "reviews": [
+    {
+      "file": "legacy-table/cell.ts",
+      "module": "@angular/cdk/coercion",
+      "symbol": "coerceBooleanProperty",
+      "current_role": "single-argument-public-boolean-normalization",
+      "decision": "The two complete MatLegacyColumnDef sticky setters reset the existing sticky-change marker, call the public coerceBooleanProperty exactly once with the supplied value, then forward its boolean result to the corresponding parent property. This retains historical normalization for direct writes, including empty strings and numeric zero. The reset and parent sticky-state contracts remain separately owned; this decision qualifies the named pure public helper boundary only.",
+      "candidate_source_sha256": "28359f7f5b9f4145e809340e8b0b441507d7c08323cea13cde6dea86b3dd1dbb",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete table coercion caller review",
+      "source_role": {
+        "import_local": "coerceBooleanProperty",
+        "occurrences": [
+          {
+            "line": 105,
+            "column": 20,
+            "parent_kind": "CallExpression",
+            "parent_source": "coerceBooleanProperty(value)"
+          },
+          {
+            "line": 111,
+            "column": 23,
+            "parent_kind": "CallExpression",
+            "parent_source": "coerceBooleanProperty(value)"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 103,
+            "member_sha256": "dffef7b7b54d8611b695817d1ee18181cddbdfc7579fb184d52d71df2139e34e",
+            "reasons": [
+              "Coercion:coerceBooleanProperty"
+            ]
+          },
+          {
+            "line": 109,
+            "member_sha256": "518fadb40ef72de3a9274f9baabb99fa26dc08c967e77c1a23f5c06ed1c95b3c",
+            "reasons": [
+              "Coercion:coerceBooleanProperty"
+            ]
+          }
+        ]
+      },
+      "complete_setters": [
+        {
+          "class_name": "MatLegacyColumnDef",
+          "name": "sticky",
+          "reset_before_conversion": true,
+          "line": 103,
+          "member_sha256": "dffef7b7b54d8611b695817d1ee18181cddbdfc7579fb184d52d71df2139e34e",
+          "text": "override set sticky(value: boolean) {\n    this.resetStickyChanged();\n    super.sticky = coerceBooleanProperty(value);\n  }"
+        },
+        {
+          "class_name": "MatLegacyColumnDef",
+          "name": "stickyEnd",
+          "reset_before_conversion": true,
+          "line": 109,
+          "member_sha256": "518fadb40ef72de3a9274f9baabb99fa26dc08c967e77c1a23f5c06ed1c95b3c",
+          "text": "override set stickyEnd(value: BooleanInput) {\n    this.resetStickyChanged();\n    super.stickyEnd = coerceBooleanProperty(value);\n  }"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-coercion-caller-roles-prior.json.gz",
+          "sha256": "f903cfc7f1c7197262cef1eeea73566988810f98de1715f0cb58ec71cb8506b6"
+        },
+        {
+          "path": "compatibility/rc/coercion-public-subjects.json",
+          "sha256": "be5c12b5d9829221410bb9b1ce490f247cf1992059fcd1893a1a5b7f90b86d86"
+        },
+        {
+          "path": "compatibility/rc/coercion-pure-use-review.json",
+          "sha256": "61ba4ba62c845c8ec389339da353493cc35121e67b99b293cacd5b673629f9f3"
+        },
+        {
+          "path": "scripts/coercion-pure-use-review.mjs",
+          "sha256": "88a151273d8aeefec7de5dc22b5b864725575bc5cbae3c134290188e51993ba8"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "scripts/table-coercion-caller-roles.mjs",
+          "sha256": "eb8cd55e61493f0313a299faf44f34089b1551ff1e368e64c524881765600b0b"
+        }
+      ],
+      "scope_limit": "Named pure helper dependency only. Parent setter/state, table construction, component/native/packed/consumer/floor and G01-G13 obligations remain separate."
+    },
+    {
+      "file": "legacy-table/row.ts",
+      "module": "@angular/cdk/coercion",
+      "symbol": "coerceBooleanProperty",
+      "current_role": "single-argument-public-boolean-normalization",
+      "decision": "The complete header and footer row-definition sticky setters each reset the existing change marker, normalize one supplied value with public coerceBooleanProperty, and forward the resulting boolean. There are no helper aliases, spread arguments, alternate arities or escaped references. Genuine tagged/minimum public helper behavior supports these normalization calls; row construction, differ handling and parent sticky-state behavior retain their separate obligations.",
+      "candidate_source_sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete table coercion caller review",
+      "source_role": {
+        "import_local": "coerceBooleanProperty",
+        "occurrences": [
+          {
+            "line": 50,
+            "column": 20,
+            "parent_kind": "CallExpression",
+            "parent_source": "coerceBooleanProperty(value)"
+          },
+          {
+            "line": 79,
+            "column": 20,
+            "parent_kind": "CallExpression",
+            "parent_source": "coerceBooleanProperty(value)"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 48,
+            "member_sha256": "dffef7b7b54d8611b695817d1ee18181cddbdfc7579fb184d52d71df2139e34e",
+            "reasons": [
+              "Coercion:coerceBooleanProperty"
+            ]
+          },
+          {
+            "line": 77,
+            "member_sha256": "dffef7b7b54d8611b695817d1ee18181cddbdfc7579fb184d52d71df2139e34e",
+            "reasons": [
+              "Coercion:coerceBooleanProperty"
+            ]
+          }
+        ]
+      },
+      "complete_setters": [
+        {
+          "class_name": "MatLegacyHeaderRowDef",
+          "name": "sticky",
+          "reset_before_conversion": true,
+          "line": 48,
+          "member_sha256": "dffef7b7b54d8611b695817d1ee18181cddbdfc7579fb184d52d71df2139e34e",
+          "text": "override set sticky(value: boolean) {\n    this.resetStickyChanged();\n    super.sticky = coerceBooleanProperty(value);\n  }"
+        },
+        {
+          "class_name": "MatLegacyFooterRowDef",
+          "name": "sticky",
+          "reset_before_conversion": true,
+          "line": 77,
+          "member_sha256": "dffef7b7b54d8611b695817d1ee18181cddbdfc7579fb184d52d71df2139e34e",
+          "text": "override set sticky(value: boolean) {\n    this.resetStickyChanged();\n    super.sticky = coerceBooleanProperty(value);\n  }"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-coercion-caller-roles-prior.json.gz",
+          "sha256": "f903cfc7f1c7197262cef1eeea73566988810f98de1715f0cb58ec71cb8506b6"
+        },
+        {
+          "path": "compatibility/rc/coercion-public-subjects.json",
+          "sha256": "be5c12b5d9829221410bb9b1ce490f247cf1992059fcd1893a1a5b7f90b86d86"
+        },
+        {
+          "path": "compatibility/rc/coercion-pure-use-review.json",
+          "sha256": "61ba4ba62c845c8ec389339da353493cc35121e67b99b293cacd5b673629f9f3"
+        },
+        {
+          "path": "scripts/coercion-pure-use-review.mjs",
+          "sha256": "88a151273d8aeefec7de5dc22b5b864725575bc5cbae3c134290188e51993ba8"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "scripts/table-coercion-caller-roles.mjs",
+          "sha256": "eb8cd55e61493f0313a299faf44f34089b1551ff1e368e64c524881765600b0b"
+        }
+      ],
+      "scope_limit": "Named pure helper dependency only. Parent setter/state, table construction, component/native/packed/consumer/floor and G01-G13 obligations remain separate."
+    },
+    {
+      "file": "legacy-table/table.ts",
+      "module": "@angular/cdk/coercion",
+      "symbol": "coerceBooleanProperty",
+      "current_role": "single-argument-public-boolean-normalization",
+      "decision": "The complete fixedLayout and multiTemplateDataRows setters normalize the single supplied value through public coerceBooleanProperty and immediately forward that boolean to the corresponding parent property. This keeps historical normalization for direct assignments as well as template bindings, without changing selectors or resources. The public helper boundary is stable at both minima; CdkTable layout, rendering, DI and lifecycle behavior receive no additional clearance from this decision.",
+      "candidate_source_sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual complete table coercion caller review",
+      "source_role": {
+        "import_local": "coerceBooleanProperty",
+        "occurrences": [
+          {
+            "line": 97,
+            "column": 25,
+            "parent_kind": "CallExpression",
+            "parent_source": "coerceBooleanProperty(value)"
+          },
+          {
+            "line": 102,
+            "column": 35,
+            "parent_kind": "CallExpression",
+            "parent_source": "coerceBooleanProperty(value)"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 96,
+            "member_sha256": "a900353f69b4c058cb8f7255d0b3586c612187914dd952c9ce404137131f02e0",
+            "reasons": [
+              "Coercion:coerceBooleanProperty"
+            ]
+          },
+          {
+            "line": 101,
+            "member_sha256": "07c8f829dc74e94529c243ff5ee3942bf347096d0db67274bad331c9b47abd2f",
+            "reasons": [
+              "Coercion:coerceBooleanProperty"
+            ]
+          }
+        ]
+      },
+      "complete_setters": [
+        {
+          "class_name": "MatLegacyTable",
+          "name": "fixedLayout",
+          "reset_before_conversion": false,
+          "line": 96,
+          "member_sha256": "a900353f69b4c058cb8f7255d0b3586c612187914dd952c9ce404137131f02e0",
+          "text": "override set fixedLayout(value: BooleanInput) {\n    super.fixedLayout = coerceBooleanProperty(value);\n  }"
+        },
+        {
+          "class_name": "MatLegacyTable",
+          "name": "multiTemplateDataRows",
+          "reset_before_conversion": false,
+          "line": 101,
+          "member_sha256": "07c8f829dc74e94529c243ff5ee3942bf347096d0db67274bad331c9b47abd2f",
+          "text": "override set multiTemplateDataRows(value: BooleanInput) {\n    super.multiTemplateDataRows = coerceBooleanProperty(value);\n  }"
+        }
+      ],
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/table-coercion-caller-roles-prior.json.gz",
+          "sha256": "f903cfc7f1c7197262cef1eeea73566988810f98de1715f0cb58ec71cb8506b6"
+        },
+        {
+          "path": "compatibility/rc/coercion-public-subjects.json",
+          "sha256": "be5c12b5d9829221410bb9b1ce490f247cf1992059fcd1893a1a5b7f90b86d86"
+        },
+        {
+          "path": "compatibility/rc/coercion-pure-use-review.json",
+          "sha256": "61ba4ba62c845c8ec389339da353493cc35121e67b99b293cacd5b673629f9f3"
+        },
+        {
+          "path": "scripts/coercion-pure-use-review.mjs",
+          "sha256": "88a151273d8aeefec7de5dc22b5b864725575bc5cbae3c134290188e51993ba8"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "scripts/table-coercion-caller-roles.mjs",
+          "sha256": "eb8cd55e61493f0313a299faf44f34089b1551ff1e368e64c524881765600b0b"
+        }
+      ],
+      "scope_limit": "Named pure helper dependency only. Parent setter/state, table construction, component/native/packed/consumer/floor and G01-G13 obligations remain separate."
+    }
+  ],
+  "public_subjects": [
+    {
+      "line": "original",
+      "version": "16.2.14",
+      "archive_sha256": "a499ba0fee46784441b92587e43b17ec72d9bd383f78ea14954eaa62c781bad7",
+      "declaration_sha256": "4a427a38cb22e52a409cd4e704181884b978ab30fcfdf3a96886b8ec69e4f581",
+      "signature": "(value: any): boolean",
+      "stable_public_export": true
+    },
+    {
+      "line": "main",
+      "version": "22.1.7",
+      "archive_sha256": "225d82389797aefbbb2684461576ef950465546a9d28326483e0b816c8a5a558",
+      "declaration_sha256": "12db87a773ba393c8b88fbd67d3d774bb6b860a0f3c63af65a822499a7f5bd70",
+      "signature": "(value: any): boolean",
+      "stable_public_export": true
+    },
+    {
+      "line": "21.x",
+      "version": "21.2.14",
+      "archive_sha256": "b54868a0f7aefa471203a0fe419370e156cdf0218db9b625aca3ae6e8de25c63",
+      "declaration_sha256": "12db87a773ba393c8b88fbd67d3d774bb6b860a0f3c63af65a822499a7f5bd70",
+      "signature": "(value: any): boolean",
+      "stable_public_export": true
+    }
+  ],
+  "public_behavior": [
+    {
+      "line": "main",
+      "boolean_cases": 42,
+      "number_cases": 378,
+      "observable_receipt_sha256": "09204f48b0ea971e6ed9db3ed84d5fb0898a7445663e1f0b3291e09ebe819047",
+      "supported_argument_counts_only": true
+    },
+    {
+      "line": "21.x",
+      "boolean_cases": 42,
+      "number_cases": 378,
+      "observable_receipt_sha256": "09204f48b0ea971e6ed9db3ed84d5fb0898a7445663e1f0b3291e09ebe819047",
+      "supported_argument_counts_only": true
+    }
+  ],
+  "source_closures_prepared": 3,
+  "source_closures_integrated": 0,
+  "public_declaration_identity_checked": true,
+  "strict_consumer_AOT_executed": false,
+  "borrowed_Core_for_unrelated_public_module_path": true,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
