@@ -1,0 +1,307 @@
+{
+  "schema_version": 1,
+  "decisions": [
+    {
+      "file": "legacy-dialog/dialog-module.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "PortalModule",
+      "current_role": "NgModule-template-directive-scope",
+      "decision": "The complete legacy dialog NgModule imports the public PortalModule for its existing cdkPortalOutlet templates. It retains its own legacy declarations and exports; it neither re-exports a current Material component nor constructs a portal service or changes providers. The stable public module/directive identity and actual public outlet construction/lifetimes support this dependency; full consumer AOT and native module qualification remain separate.",
+      "evidence_kinds": [
+        "types",
+        "tab",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/snack-bar-module.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "PortalModule",
+      "current_role": "NgModule-template-directive-scope",
+      "decision": "The complete legacy snack bar NgModule imports the public PortalModule for its existing cdkPortalOutlet templates. It retains its own legacy declarations and exports; it neither re-exports a current Material component nor constructs a portal service or changes providers. The stable public module/directive identity and actual public outlet construction/lifetimes support this dependency; full consumer AOT and native module qualification remain separate.",
+      "evidence_kinds": [
+        "types",
+        "tab",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-tabs/tabs-module.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "PortalModule",
+      "current_role": "NgModule-template-directive-scope",
+      "decision": "The complete legacy tabs NgModule imports the public PortalModule for its existing cdkPortalOutlet templates. It retains its own legacy declarations and exports; it neither re-exports a current Material component nor constructs a portal service or changes providers. The stable public module/directive identity and actual public outlet construction/lifetimes support this dependency; full consumer AOT and native module qualification remain separate.",
+      "evidence_kinds": [
+        "types",
+        "tab",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-tabs/tab-body.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "CdkPortalOutlet",
+      "current_role": "actual-public-outlet-parent-and-lifetime",
+      "decision": "MatLegacyTabBodyPortal keeps the actual public CdkPortalOutlet superclass. Its finite owned constructor adapter supplies exactly the caller's ViewContainerRef and document through a public Injector/runInInjectionContext and Reflect.construct, preserving new.target and factory identity. ngOnInit calls the actual parent before subscribing to centering; it attaches the host TemplatePortal only while centering and unattached, detaches on leaving unless preserveContent, and destroys the parent before releasing its own subscriptions. The independently authenticated 78-case/80-fault parent proof qualifies this exact two-member implementation; no copied CDK directive or provider ownership is introduced.",
+      "evidence_kinds": [
+        "types",
+        "tab",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "ComponentPortal",
+      "current_role": "cached-component-portal-and-overlay-result",
+      "decision": "The complete show path detaches prior content, caches a ComponentPortal for the selected tooltip component and the supplied ViewContainerRef, and consumes the public overlay attachment result's actual instance. The portal constructor stores the same component/VCR identities and does not become a second owner of the borrowed declaration container. The generic public component portal/view injector and disposal evidence supports those operations; overlay positioning, complete tooltip/browser focus and motion behavior stay separate.",
+      "evidence_kinds": [
+        "types",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "ComponentType",
+      "current_role": "erased-tooltip-constructor-contract",
+      "decision": "The abstract _tooltipComponent field is a public ComponentType<T> constructor type. Its sole construction route passes the exact selected constructor into ComponentPortal with the existing VCR. It is neither used as a DI token nor reflected into a new runtime value. Complete public declarations and component constructor/instance identity and declaration-injector lifecycle cases support the role; the surrounding tooltip rendering is not granted a new native qualification.",
+      "evidence_kinds": [
+        "types",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/tab-body-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "CdkPortalOutlet",
+      "current_role": "abstract-portal-host-annotation",
+      "decision": "The complete base class declares its abstract _portalHost as the public CdkPortalOutlet contract. It does not instantiate an outlet or access a current private implementation field through this type. The concrete legacy body supplies MatLegacyTabBodyPortal, which is the genuine public subtype with independently proven construction and lifetime. The base's existing position/event/motion implementation is unchanged and receives no new motion or native pass from this annotation.",
+      "evidence_kinds": [
+        "types",
+        "tab"
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/tab-body-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "TemplatePortal",
+      "current_role": "tab-content-input-type",
+      "decision": "The content input is a TemplatePortal reference forwarded unchanged to the concrete body host. The actual tab creates that portal from its explicit-or-implicit TemplateRef and declaration VCR, and the portal directive attaches it on centering. No new view is allocated by this type annotation, context is not copied, and borrowed owner lifetime remains with Angular. Public template/outlet and actual tab-parent evidence support the selected role; transition qualification remains separate.",
+      "evidence_kinds": [
+        "types",
+        "tab",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-tabs/internal/tab-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "TemplatePortal",
+      "current_role": "declaration-template-portal-and-identity-getter",
+      "decision": "ngOnInit constructs exactly one TemplatePortal from the explicit legacy content template when supplied, otherwise the implicit template, with the same declaration VCR. The private cache and content getter preserve its object identity for the body host; the constructor itself creates no Angular view and does not destroy the declaration owner. Genuine public template portal context, detach/recreation and borrowed-owner cases cover the public protocol; label queries and tab motion are separate.",
+      "evidence_kinds": [
+        "types",
+        "core",
+        "tab"
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "ComponentPortal",
+      "current_role": "container-and-content-component-portals",
+      "decision": "_attachSnackBarContainer constructs a ComponentPortal with the selected legacy container type, optional caller VCR and the exact scoped config injector, then uses the actual returned ComponentRef instance. The component-content branch constructs another portal with the selected content type, undefined VCR and the explicit content injector and consumes its actual instance. Public constructor signatures, VCR-versus-application ownership and injector/instance identity cases support both paths; no constructor is replaced by a current Material component and no borrowed owner is destroyed.",
+      "evidence_kinds": [
+        "types",
+        "core",
+        "snack"
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "TemplatePortal",
+      "current_role": "null-container-template-to-owned-outlet",
+      "decision": "The TemplateRef branch constructs TemplatePortal with its exact template, intentionally null! VCR and the historical context carrying data/snackBarRef. It sends that portal to the owned container's concrete CdkPortalOutlet template method, which uses its own VCR. This is not a DomPortalOutlet null-VCR path. The separate actual null-container tagged/minimum proof has 20 cases/20 faults; the existing context and returned EmbeddedViewRef remain exact. Whole snack service/provider/native qualification is separate.",
+      "evidence_kinds": [
+        "types",
+        "null",
+        "snack",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "BasePortalOutlet",
+      "current_role": "actual-public-common-superclass",
+      "decision": "The already owned removed Material16 snack helper extends the actual public BasePortalOutlet and supplies the three historical attachment callbacks. Current component/template calls use stable concrete CdkPortalOutlet methods; DOM uses stable generic dispatch with independently proved failure-host recovery. The actual common base/portal dispatch, manual callback and detach/retry flags are exercised against the untouched tag at both minima. This source binding does not claim whole modern CDK equivalence, full snack construction or motion/native completeness.",
+      "evidence_kinds": [
+        "types",
+        "snack",
+        "core",
+        "null"
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "CdkPortalOutlet",
+      "current_role": "view-query-child-and-concrete-delegation",
+      "decision": "The ViewChild field is the actual public CdkPortalOutlet declared by the existing template/PortalModule. Complete component/template callbacks check availability, delegate to the stable public concrete method, run the existing post-attachment hook and return the same handle. DOM generic failure cleanup uses public detach and Portal.setAttachedHost; no current private member or deprecated direct DOM hook is called. Genuine typed/outlet/callback proofs support exactly those paths and preserve all consumer resources.",
+      "evidence_kinds": [
+        "types",
+        "snack",
+        "core",
+        "null"
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "ComponentPortal",
+      "current_role": "component-callback-parameter-and-result",
+      "decision": "The generic ComponentPortal<T> parameter is passed unchanged to the child's stable concrete attachComponentPortal. The actual ComponentRef<T> is returned only after the same existing post-attachment hook. The portal is not cloned, its injector or declaration VCR is not changed, and the callback takes no second ownership of the returned view. Public component construction/injector/disposal evidence and the complete strict selected caller bodies support this role.",
+      "evidence_kinds": [
+        "types",
+        "snack",
+        "core",
+        "null"
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "DomPortal",
+      "current_role": "owned-historical-DOM-callback-and-error-host",
+      "decision": "The legacy arrow callback keeps its historical DomPortal parameter/void shape. It uses public generic dispatch instead of the deprecated child hook and preserves both development validation before child ownership and later child-owned failures using public detach/setAttachedHost. The actual immediate prior repair is a negative control in the applicable development runs. The 115-case/40-fault proof compares the enumerated return/error/DOM/host/hook/modal and borrowed-lifetime observations to actual tagged peers; no complete component or floor pass follows.",
+      "evidence_kinds": [
+        "types",
+        "snack",
+        "core",
+        "null"
+      ]
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "TemplatePortal",
+      "current_role": "template-callback-parameter-and-result",
+      "decision": "The TemplatePortal<C> parameter is passed unchanged to stable concrete attachTemplatePortal and returns the actual EmbeddedViewRef<C> after the historical hook. The service's null! VCR form reaches this outlet's own VCR and has a separate genuine tagged/minimum lifecycle proof. Context identity, recreation and borrowed owner survival remain explicit; neither an empty view nor a compatibility facade replaces rendering.",
+      "evidence_kinds": [
+        "types",
+        "snack",
+        "core",
+        "null"
+      ]
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "TemplatePortal",
+      "current_role": "cached-autocomplete-overlay-template",
+      "decision": "The complete overlay setup creates TemplatePortal from the actual autocomplete template, the same trigger VCR and its existing label-id context when the overlay is first created. The public OverlayRef then attaches the cached portal and the trigger preserves the returned view/panel lifecycle through its existing close/disposal path. The template constructor, declaration scope and context are not rewritten; genuine public template attachment/lifetime evidence supports the portal role while overlay sizing, form state and browser interactions remain separate.",
+      "evidence_kinds": [
+        "types",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-trigger-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "TemplatePortal",
+      "current_role": "menu-template-cache-and-overlay-transfer",
+      "decision": "_getPortal reuses its existing TemplatePortal only while its templateRef is the exact menu template, otherwise constructs one with that template and the trigger VCR. openMenu attaches it through the public overlay, then attaches lazy content with the existing menuData; generation/menu-owner checks remain unchanged. Template identity, borrowed declaration scope and public detach/disposal support this finite cache/transfer protocol; no new required MatMenuPanel member, selector or current Material menu implementation is introduced.",
+      "evidence_kinds": [
+        "types",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-content-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "DomPortalOutlet",
+      "current_role": "explicit-borrowed-application-DOM-outlet",
+      "decision": "The complete attach path creates the public DomPortalOutlet with its owned div and the exact borrowed ApplicationRef/Injector, retaining the six-argument historical helper constructor after the earlier obsolete CFR removal. It reinserts the div at the declaration template anchor on each attach, marks the existing detector for check, then attaches the cached template with exact context. detach uses portal state and ngOnDestroy disposes the outlet; supplied app/injector/VCR/detector are not destroyed. Complete minimum constructor declarations and genuine DomPortalOutlet/template lifetimes support the role; full menu/browser qualification stays separate.",
+      "evidence_kinds": [
+        "types",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-menu/internal/menu-content-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "TemplatePortal",
+      "current_role": "lazy-menu-context-and-recreation",
+      "decision": "The helper lazily creates one TemplatePortal from its supplied TemplateRef and VCR, detaches any existing view before reusing it, supplies the exact new context through portal.attach and emits _attached only afterward. Public template attach/detach clears the owned outlet view while preserving the declaration owner; the div is separately owned by the public DomPortalOutlet. No consumer map, panel template, insertion selector or borrowed service ownership is changed.",
+      "evidence_kinds": [
+        "types",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "BasePortalOutlet",
+      "current_role": "public-parent-and-explicit-owned-interop",
+      "decision": "The already owned removed legacy dialog helper uses actual public BasePortalOutlet for common dispatch and provides its legacy callbacks. The repaired callback results/errors, common base state, child state, portal state, hooks and lifetimes match actual tagged peer execution. Its pre-existing hasAttached aggregate and explicit child detach/dispose are byte-identical and their actual values are separately asserted/recorded; this binding approves the named stable superclass use, not a new whole inherited-API equivalence or the remaining current dialog-service interoperability surfaces.",
+      "evidence_kinds": [
+        "types",
+        "dialog",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "CdkPortalOutlet",
+      "current_role": "actual-template-child-and-failure-safe-delegation",
+      "decision": "The existing ViewChild is the actual public CdkPortalOutlet. Component/template delegation now uses its stable concrete methods, preserving historical state when creation throws; DOM uses supported generic attach with exact error-host recovery. Current private fields, deprecated direct DOM hook and a copied CDK implementation are absent. Strict actual minimum signatures and 160-case/65-fault genuine outlet proof cover these callbacks, with constructor/focus/native qualification explicitly separate.",
+      "evidence_kinds": [
+        "types",
+        "dialog",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "ComponentPortal",
+      "current_role": "dialog-component-callback-identity-and-retry",
+      "decision": "The complete generic callback checks the existing owned availability/destroy guard, passes its exact ComponentPortal<T> to the stable public concrete method, runs the unchanged content hook and returns the same ComponentRef<T>. Real creation failure/retry, parent dispatch/detach, hook failure retaining content, returned handle/constructor scope and view lifetime match the tag. Restoring the concrete call removes the speculative generic flag that blocked retry; no signature, provider, constructor or CSS change is introduced.",
+      "evidence_kinds": [
+        "types",
+        "dialog",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "DomPortal",
+      "current_role": "dialog-owned-DOM-dispatch-and-failure-recovery",
+      "decision": "The historical DomPortal arrow/void entry keeps the owned availability guard and unchanged content hook. Current upstream work uses stable generic attach, detach and setAttachedHost. Development validation before ownership restores the container; failures after the child takes ownership retain that child-host contract, including production observations. The tagged/minimum proof covers DOM validation/insertion error, direct retry, portal failure/detach/retry, hook failure retaining content and cleanup without claiming complete focus/constructor/native or inherited-API equivalence.",
+      "evidence_kinds": [
+        "types",
+        "dialog",
+        "core"
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/cdk/portal",
+      "symbol": "TemplatePortal",
+      "current_role": "dialog-template-callback-context-and-retry",
+      "decision": "The complete callback passes the exact TemplatePortal<T> to the stable concrete child method, retains declaration/context and the actual EmbeddedViewRef<T>, and invokes the same content hook after attachment. Genuine creation failure/retry, dispatch cleanup, hook failure and detach/recreation/borrowed lifetimes are compared to actual tagged peers. The repair removes only the speculative generic dispatch state; it neither clones context nor destroys the borrowed declaration owner.",
+      "evidence_kinds": [
+        "types",
+        "dialog",
+        "core"
+      ]
+    }
+  ],
+  "source_scope_only": true,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
