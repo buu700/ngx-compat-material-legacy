@@ -129,6 +129,9 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
    */
   override attachDomPortal = (portal: DomPortal) => {
     this._assertNotAttached();
+    // Development validation can fail before the child takes portal ownership.
+    const preserveContainerHost =
+      (typeof ngDevMode === 'undefined' || ngDevMode) && !portal.element.parentNode;
     let result: void;
     try {
       result = this._portalOutlet.attach(portal) as void;
@@ -138,7 +141,7 @@ export abstract class _MatSnackBarContainerBase extends BasePortalOutlet impleme
       const portalAttached = portal.isAttached;
       this._portalOutlet.detach();
       if (portalAttached) {
-        portal.setAttachedHost(this._portalOutlet);
+        portal.setAttachedHost(preserveContainerHost ? this : this._portalOutlet);
       }
       throw error;
     }
