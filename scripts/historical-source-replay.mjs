@@ -40,7 +40,19 @@ function environment(){
  return env;
 }
 const gitArgs=args=>['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args];
-const git=(root,args,options={})=>execFileSync('git',gitArgs(args),{cwd:root,env:environment(),maxBuffer:16*1024*1024,...options});
+// Cache only reads named by a full immutable commit ID. HEAD/ref resolution and
+// every current-file read/hash remain fresh; callers receive independent bytes.
+const immutableGitReads=new Map();
+const git=(root,args,options={})=>{
+ const immutable=Object.keys(options).length===0&&(
+  args.length===2&&args[0]==='show'&&/^[0-9a-f]{40}:[^\0]+$/.test(args[1])||
+  args.length===3&&args[0]==='ls-tree'&&args[1]==='-rz'&&/^[0-9a-f]{40}$/.test(args[2]));
+ const key=immutable?JSON.stringify([root,args]):null;
+ if(key&&immutableGitReads.has(key))return Buffer.from(immutableGitReads.get(key));
+ const bytes=execFileSync('git',gitArgs(args),{cwd:root,env:environment(),maxBuffer:16*1024*1024,...options});
+ if(key)immutableGitReads.set(key,Buffer.from(bytes));
+ return bytes;
+};
 function relativePath(path){assert.equal(typeof path,'string');assert.ok(!path.includes('\\')&&!path.startsWith('/')&&path.split('/').every(part=>part&&part!=='.'&&part!=='..'&&part!=='.git'),'unsafe historical member path');return path;}
 export function historicalReplayInputs({root=rootDefault,readMember}={}){
  const read=readMember||((path)=>readFileSync(resolve(root,path))),bytes=read(HISTORICAL_REPLAY_INPUTS),data=JSON.parse(bytes);
