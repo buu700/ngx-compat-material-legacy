@@ -1,0 +1,773 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "criteria": "Thirteen individually reviewed layout/media/scroll and ignored optional Location routes across7 unchanged sources and15 complete contexts. Two unused imports receive no runtime credit. Canonical rows remain open until shared integration.",
+  "reviews": [
+    {
+      "file": "legacy-dialog/dialog.ts",
+      "module": "@angular/common",
+      "symbol": "Location",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "7f7250274cdd11c1e71474553fc7387843262265f8b44c49339b2467abd68f5d",
+      "binding": {
+        "local_name": "Location",
+        "type_only": false,
+        "line": 11,
+        "text": "Location"
+      },
+      "occurrences": [
+        {
+          "line": 77,
+          "parent_kind": "TypeReference",
+          "expression": "Location"
+        }
+      ],
+      "bound_receivers": [
+        "_location"
+      ],
+      "complete_context_members": [
+        {
+          "line": 70,
+          "kind": "Constructor",
+          "sha256": "d9f62d58cc0d68d834d68ac9155d3ea964aaff995783a9d6a4b12e0f86c0ddd4",
+          "text": "constructor(\n    overlay: Overlay,\n    injector: Injector,\n    /**\n     * @deprecated `_location` parameter to be removed.\n     * @breaking-change 10.0.0\n     */\n    @Optional() _location: Location,\n    @Optional() @Inject(MAT_LEGACY_DIALOG_DEFAULT_OPTIONS) defaultOptions: MatLegacyDialogConfig,\n    @Inject(MAT_LEGACY_DIALOG_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() @SkipSelf() parentDialog: MatLegacyDialog,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    overlayContainer: OverlayContainer,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    @Optional()\n    @Inject(ANIMATION_MODULE_TYPE)\n    animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    super(\n      overlay,\n      injector,\n      defaultOptions,\n      parentDialog,\n      overlayContainer,\n      scrollStrategy,\n      MatLegacyDialogRef,\n      MatLegacyDialogContainer,\n      MAT_LEGACY_DIALOG_DATA,\n      animationMode,\n    );\n  }"
+        }
+      ],
+      "ignored_location_parameter": {
+        "name": "_location",
+        "body_reference_count": 0,
+        "public_Core_Optional_binding": true
+      },
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete owned dialog constructor retains the historical @Optional() _location:Location slot,including its owned deprecation annotation,but never reads or forwards the parameter. Checker binding proves the decorator is public Core Optional and the parameter has zero body references. The actual public Common Location class/type exists without upstream deprecation at the tagged reference and both minima. Exact parameter compilation and genuine Core lookup preserve explicit token-value identity and optional absence using a disclosed value protocol. No Location service factory,navigation subscription,whole dialog constructor or default application-root behavior is consumed or credited.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-snack-bar/snack-bar.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "BreakpointObserver",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "12354cb1619f2dfb9bf62fb65c25cf18cba2206fe960603867743b694311f2cf",
+      "binding": {
+        "local_name": "BreakpointObserver",
+        "type_only": false,
+        "line": 11,
+        "text": "BreakpointObserver"
+      },
+      "occurrences": [
+        {
+          "line": 35,
+          "parent_kind": "TypeReference",
+          "expression": "BreakpointObserver"
+        }
+      ],
+      "bound_receivers": [
+        "breakpointObserver"
+      ],
+      "complete_context_members": [
+        {
+          "line": 31,
+          "kind": "Constructor",
+          "sha256": "532396bac05920e0325acaca102f172783ec40a2d8db85f2ccd33916801ac858",
+          "text": "constructor(\n    overlay: Overlay,\n    live: LiveAnnouncer,\n    injector: Injector,\n    breakpointObserver: BreakpointObserver,\n    @Optional() @SkipSelf() parentSnackBar: MatLegacySnackBar,\n    @Inject(MAT_SNACK_BAR_DEFAULT_OPTIONS) defaultConfig: MatSnackBarConfig,\n  ) {\n    super(overlay, live, injector, breakpointObserver, parentSnackBar, defaultConfig);\n  }"
+        }
+      ],
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete public snack-bar constructor forwards its supplied public BreakpointObserver to the owned base. It does not call a compatibility constructor or instantiate the peer service manually. The owned base consumer is independently bound below; genuine public factories,observe results and subscription disposal support the shared service boundary. Full snack-bar injection graph,overlay/announcement/DOM lifecycle and native behavior remain separate.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-tooltip/tooltip.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "BreakpointObserver",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+      "binding": {
+        "local_name": "BreakpointObserver",
+        "type_only": false,
+        "line": 11,
+        "text": "BreakpointObserver"
+      },
+      "occurrences": [
+        {
+          "line": 125,
+          "parent_kind": "TypeReference",
+          "expression": "BreakpointObserver"
+        }
+      ],
+      "bound_receivers": [
+        "breakpointObserver"
+      ],
+      "complete_context_members": [
+        {
+          "line": 123,
+          "kind": "Constructor",
+          "sha256": "3b3382b69ea91f6829871fe0a5bd087c9131bddb2d4212cbd53e2afef097011c",
+          "text": "constructor(\n    changeDetectorRef: ChangeDetectorRef,\n    breakpointObserver: BreakpointObserver,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(changeDetectorRef, animationMode);\n    this._isHandset = breakpointObserver.observe(Breakpoints.Handset);\n  }"
+        }
+      ],
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete tooltip component constructor assigns breakpointObserver.observe(Breakpoints.Handset) to the existing _isHandset observable. The exact call strictly selects a stable public overload against the tagged reference and both minima. Genuine published observer instances emit matching individual Handset and aggregate query states in original/minimum zoneful and supported zoneless contexts. Actual async template binding,tooltip layout,motion and complete component lifecycle remain unqualified.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-tooltip/tooltip.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "Breakpoints",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+      "binding": {
+        "local_name": "Breakpoints",
+        "type_only": false,
+        "line": 11,
+        "text": "Breakpoints"
+      },
+      "occurrences": [
+        {
+          "line": 129,
+          "parent_kind": "PropertyAccessExpression",
+          "expression": "Breakpoints.Handset"
+        }
+      ],
+      "bound_receivers": [],
+      "complete_context_members": [
+        {
+          "line": 123,
+          "kind": "Constructor",
+          "sha256": "3b3382b69ea91f6829871fe0a5bd087c9131bddb2d4212cbd53e2afef097011c",
+          "text": "constructor(\n    changeDetectorRef: ChangeDetectorRef,\n    breakpointObserver: BreakpointObserver,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode?: string,\n  ) {\n    super(changeDetectorRef, animationMode);\n    this._isHandset = breakpointObserver.observe(Breakpoints.Handset);\n  }"
+        }
+      ],
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete tooltip component constructor consumes only public Breakpoints.Handset. The actual query string equals the untouched tagged constant at both minima; genuine single-query observe results match the tagged state transitions. No consumer map mutation or changed CSS query is introduced. This row does not qualify device/browser media preferences or tooltip CSS/geometry.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-tooltip/tooltip.ts",
+      "module": "@angular/cdk/scrolling",
+      "symbol": "ScrollDispatcher",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+      "binding": {
+        "local_name": "ScrollDispatcher",
+        "type_only": false,
+        "line": 14,
+        "text": "ScrollDispatcher"
+      },
+      "occurrences": [
+        {
+          "line": 60,
+          "parent_kind": "TypeReference",
+          "expression": "ScrollDispatcher"
+        }
+      ],
+      "bound_receivers": [
+        "scrollDispatcher"
+      ],
+      "complete_context_members": [
+        {
+          "line": 57,
+          "kind": "Constructor",
+          "sha256": "21d57bba8632c0c3bf0b498f351925ee728f4710f3b82ef6e6ac6a85a047387e",
+          "text": "constructor(\n    overlay: Overlay,\n    elementRef: ElementRef<HTMLElement>,\n    scrollDispatcher: ScrollDispatcher,\n    viewContainerRef: ViewContainerRef,\n    ngZone: NgZone,\n    platform: Platform,\n    ariaDescriber: AriaDescriber,\n    focusMonitor: FocusMonitor,\n    @Inject(MAT_TOOLTIP_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() dir: Directionality,\n    @Optional() @Inject(MAT_TOOLTIP_DEFAULT_OPTIONS) defaultOptions: MatTooltipDefaultOptions,\n    @Inject(DOCUMENT) _document: any,\n  ) {\n    super(\n      overlay,\n      elementRef,\n      scrollDispatcher,\n      viewContainerRef,\n      ngZone,\n      platform,\n      ariaDescriber,\n      focusMonitor,\n      scrollStrategy,\n      dir,\n      defaultOptions,\n      _document,\n    );\n  }"
+        }
+      ],
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete public tooltip constructor forwards its supplied ScrollDispatcher to the owned tooltip base. No upstream constructor is invoked explicitly. Exact public service/type availability and genuine peer factory/ancestor-lookup behavior support that forwarded dependency. The owned base consumer is separately reviewed; full tooltip/overlay/focus/native lifecycles are not inferred.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "BreakpointObserver",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+      "binding": {
+        "local_name": "BreakpointObserver",
+        "type_only": false,
+        "line": 19,
+        "text": "BreakpointObserver"
+      },
+      "occurrences": [],
+      "bound_receivers": [],
+      "complete_context_members": [],
+      "unused_import": true,
+      "conclusion": "stable-public-peer",
+      "decision": "The checker-bound public BreakpointObserver import has no identifier references outside its import specifier. The original and both genuine minimum declarations expose a stable nondeprecated class. The unused import is preserved and receives no factory,observation,tooltip or native behavior credit.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "Breakpoints",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+      "binding": {
+        "local_name": "Breakpoints",
+        "type_only": false,
+        "line": 19,
+        "text": "Breakpoints"
+      },
+      "occurrences": [],
+      "bound_receivers": [],
+      "complete_context_members": [],
+      "unused_import": true,
+      "conclusion": "stable-public-peer",
+      "decision": "The checker-bound Breakpoints import is unused. Public constant availability is verified on the original and both minima; no query value or runtime operation is consumed at this route. The import is retained and no tooltip/media behavior is credited to it.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/cdk/scrolling",
+      "symbol": "ScrollDispatcher",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+      "binding": {
+        "local_name": "ScrollDispatcher",
+        "type_only": false,
+        "line": 36,
+        "text": "ScrollDispatcher"
+      },
+      "occurrences": [
+        {
+          "line": 283,
+          "parent_kind": "TypeReference",
+          "expression": "ScrollDispatcher"
+        }
+      ],
+      "bound_receivers": [
+        "_scrollDispatcher"
+      ],
+      "complete_context_members": [
+        {
+          "line": 280,
+          "kind": "Constructor",
+          "sha256": "bfbfebf5b60c93082b1916a6dd85b28c52acac73d4b8cf06a9a4630a28652b4f",
+          "text": "constructor(\n    private _overlay: Overlay,\n    private _elementRef: ElementRef<HTMLElement>,\n    private _scrollDispatcher: ScrollDispatcher,\n    private _viewContainerRef: ViewContainerRef,\n    private _ngZone: NgZone,\n    private _platform: Platform,\n    private _ariaDescriber: AriaDescriber,\n    private _focusMonitor: FocusMonitor,\n    scrollStrategy: any,\n    protected _dir: Directionality,\n    private _defaultOptions: MatTooltipDefaultOptions,\n    @Inject(DOCUMENT) _document: any,\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._document = _document;\n\n    if (_defaultOptions) {\n      this._showDelay = _defaultOptions.showDelay;\n      this._hideDelay = _defaultOptions.hideDelay;\n\n      if (_defaultOptions.position) {\n        this.position = _defaultOptions.position;\n      }\n\n      if (_defaultOptions.positionAtOrigin) {\n        this.positionAtOrigin = _defaultOptions.positionAtOrigin;\n      }\n\n      if (_defaultOptions.touchGestures) {\n        this.touchGestures = _defaultOptions.touchGestures;\n      }\n    }\n\n    _dir.change.pipe(takeUntil(this._destroyed)).subscribe(() => {\n      if (this._overlayRef) {\n        this._updatePosition(this._overlayRef);\n      }\n    });\n  }"
+        },
+        {
+          "line": 414,
+          "kind": "MethodDeclaration",
+          "sha256": "fd44a28699932bfeecc41d78447e9cdc7b80fb87732d9948d368301f558848d1",
+          "text": "private _createOverlay(origin?: {x: number; y: number}): OverlayRef {\n    if (this._overlayRef) {\n      const existingStrategy = this._overlayRef.getConfig()\n        .positionStrategy as FlexibleConnectedPositionStrategy;\n\n      if ((!this.positionAtOrigin || !origin) && existingStrategy._origin instanceof ElementRef) {\n        return this._overlayRef;\n      }\n\n      this._detach();\n    }\n\n    const scrollableAncestors = this._scrollDispatcher.getAncestorScrollContainers(\n      this._elementRef,\n    );\n\n    // Create connected position strategy that listens for scroll events to reposition.\n    const strategy = this._overlay\n      .position()\n      .flexibleConnectedTo(this.positionAtOrigin ? origin || this._elementRef : this._elementRef)\n      .withTransformOriginOn(`.${this._cssClassPrefix}-tooltip`)\n      .withFlexibleDimensions(false)\n      .withViewportMargin(this._viewportMargin)\n      .withScrollableContainers(scrollableAncestors);\n\n    strategy.positionChanges.pipe(takeUntil(this._destroyed)).subscribe((change: ConnectedOverlayPositionChange) => {\n      this._updateCurrentPositionClass(change.connectionPair);\n\n      if (this._tooltipInstance) {\n        if (change.scrollableViewProperties.isOverlayClipped && this._tooltipInstance.isVisible()) {\n          // After position changes occur and the overlay is clipped by\n          // a parent scrollable then close the tooltip.\n          this._ngZone.run(() => this.hide(0));\n        }\n      }\n    });\n\n    this._overlayRef = this._overlay.create({\n      direction: this._dir,\n      positionStrategy: strategy,\n      panelClass: `${this._cssClassPrefix}-${PANEL_CLASS}`,\n      scrollStrategy: this._scrollStrategy(),\n    });\n\n    this._updatePosition(this._overlayRef);\n\n    this._overlayRef\n      .detachments()\n      .pipe(takeUntil(this._destroyed))\n      .subscribe(() => this._detach());\n\n    this._overlayRef\n      .outsidePointerEvents()\n      .pipe(takeUntil(this._destroyed))\n      .subscribe(() => this._tooltipInstance?._handleBodyInteraction());\n\n    this._overlayRef\n      .keydownEvents()\n      .pipe(takeUntil(this._destroyed))\n      .subscribe((event: KeyboardEvent) => {\n        if (this._isTooltipVisible() && event.keyCode === ESCAPE && !hasModifierKey(event)) {\n          event.preventDefault();\n          event.stopPropagation();\n          this._ngZone.run(() => this.hide(0));\n        }\n      });\n\n    if (this._defaultOptions?.disableTooltipInteractivity) {\n      this._overlayRef.addPanelClass(`${this._cssClassPrefix}-tooltip-panel-non-interactive`);\n    }\n\n    return this._overlayRef;\n  }"
+        }
+      ],
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete constructor stores the public ScrollDispatcher and the complete _createOverlay method calls getAncestorScrollContainers(this._elementRef),then passes that returned list to the owned connected-position setup. The exact call compiles against stable public signatures at all three subjects. Actual Angular CdkScrollable directive instances register in the genuine dispatcher; ancestor lookup includes both actual ancestors,excludes the sibling,and returns empty after real directive destruction. Document/renderer/element topology are explicit protocols. No native clipping/scroll geometry,private strategy-origin access,whole overlay or tooltip behavior is admitted by this named dependency.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-core/internal/legacy-animations.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "MediaMatcher",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+      "binding": {
+        "local_name": "MediaMatcher",
+        "type_only": false,
+        "line": 14,
+        "text": "MediaMatcher"
+      },
+      "occurrences": [
+        {
+          "line": 53,
+          "parent_kind": "CallExpression",
+          "expression": "inject(MediaMatcher)"
+        }
+      ],
+      "bound_receivers": [],
+      "complete_context_members": [
+        {
+          "line": 37,
+          "kind": "FunctionDeclaration",
+          "sha256": "0272bdace11d5f5300636749b584146c5d1c541510bbaeba3fb1707dca864857",
+          "text": "export function getLegacyAnimationsState(): LegacyAnimationsState {\n  const testOverride = inject(LEGACY_ANIMATIONS_TEST_OVERRIDE, {optional: true});\n  if (testOverride) {\n    return testOverride;\n  }\n\n  const materialConfig = inject(MATERIAL_ANIMATIONS, {optional: true});\n  if (materialConfig?.animationsDisabled) {\n    return 'di-disabled';\n  }\n\n  if (inject(ANIMATION_MODULE_TYPE, {optional: true}) === 'NoopAnimations') {\n    return 'di-disabled';\n  }\n\n  try {\n    const reduced = inject(MediaMatcher).matchMedia('(prefers-reduced-motion)').matches;\n    return reduced ? 'reduced-motion' : 'enabled';\n  } catch {\n    // SSR / missing MediaMatcher — treat as enabled rather than guessing reduced.\n    return 'enabled';\n  }\n}"
+        }
+      ],
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete owned policy function resolves public MediaMatcher only in its existing enabled/reduced-motion fallback and consumes matchMedia on the exact constant (prefers-reduced-motion),then reads matches. The exact public call and nondeprecated signatures compile on the original/minimum namespaces; genuine MediaMatcher factories preserve window receiver binding and live MQL match values through explicit window/MQL/Platform protocols. WEBKIT/BLINK style insertion and the main22 brace-filter/native/security/coordinator requirement are not exercised or cleared. Actual browser preferences,CSP/default nonce,motion policy as a whole and all native gates retain their separate obligations.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        },
+        {
+          "path": "compatibility/rc/media-matcher-admission-contract.json",
+          "sha256": "c097f400d929ad8609d42144acd0aa63f688b3932c04ec0b9addc5e498353eba"
+        },
+        {
+          "path": "scripts/media-matcher-peer-identity.mjs",
+          "sha256": "d1b524d251e7df16f94bea95f927a385f57b558387ebb800116753b1586ebced"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "BreakpointObserver",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+      "binding": {
+        "local_name": "BreakpointObserver",
+        "type_only": false,
+        "line": 12,
+        "text": "BreakpointObserver"
+      },
+      "occurrences": [
+        {
+          "line": 76,
+          "parent_kind": "TypeReference",
+          "expression": "BreakpointObserver"
+        }
+      ],
+      "bound_receivers": [
+        "_breakpointObserver"
+      ],
+      "complete_context_members": [
+        {
+          "line": 72,
+          "kind": "Constructor",
+          "sha256": "6241f8496c1822762daa31dc232306dd704ecb544d28b66c388363cafb9a76d1",
+          "text": "constructor(\n    private _overlay: Overlay,\n    private _live: LiveAnnouncer,\n    private _injector: Injector,\n    private _breakpointObserver: BreakpointObserver,\n    @Optional() @SkipSelf() private _parentSnackBar: _MatSnackBarBase,\n    @Inject(MAT_SNACK_BAR_DEFAULT_OPTIONS) private _defaultConfig: MatSnackBarConfig,\n  ) {}"
+        },
+        {
+          "line": 178,
+          "kind": "MethodDeclaration",
+          "sha256": "a5a400a923d3ec84b66c81d27d78b30f6363efa5ac5222d92c6a0dd9a5da93be",
+          "text": "private _attach<T>(\n    content: ComponentType<T> | TemplateRef<T>,\n    userConfig?: MatSnackBarConfig,\n  ): MatSnackBarRef<T | EmbeddedViewRef<any>> {\n    const config = {...new MatLegacySnackBarConfig(), ...this._defaultConfig, ...userConfig};\n    const overlayRef = this._createOverlay(config);\n    const container = this._attachSnackBarContainer(overlayRef, config);\n    const snackBarRef = new MatSnackBarRef<T | EmbeddedViewRef<any>>(container, overlayRef);\n\n    if (content instanceof TemplateRef) {\n      const portal = new TemplatePortal(content, null!, {\n        $implicit: config.data,\n        snackBarRef,\n      } as any);\n\n      snackBarRef.instance = container.attachTemplatePortal(portal);\n    } else {\n      const injector = this._createInjector(config, snackBarRef);\n      const portal = new ComponentPortal(content, undefined, injector);\n      const contentRef = container.attachComponentPortal<T>(portal);\n\n      // We can't pass this via the injector, because the injector is created earlier.\n      snackBarRef.instance = contentRef.instance;\n    }\n\n    // Subscribe to the breakpoint observer and attach the mat-snack-bar-handset class as\n    // appropriate. This class is applied to the overlay element because the overlay must expand to\n    // fill the width of the screen for full width snackbars.\n    this._breakpointObserver\n      .observe(Breakpoints.HandsetPortrait)\n      .pipe(takeUntil(overlayRef.detachments()))\n      .subscribe((state: BreakpointState) => {\n        overlayRef.overlayElement.classList.toggle(this.handsetCssClass, state.matches);\n      });\n\n    if (config.announcementMessage) {\n      // Wait until the snack bar contents have been announced then deliver this message.\n      container._onAnnounce.subscribe(() => {\n        this._live.announce(config.announcementMessage!, config.politeness);\n      });\n    }\n\n    this._animateSnackBar(snackBarRef, config);\n    this._openedSnackBarRef = snackBarRef;\n    return this._openedSnackBarRef;\n  }"
+        }
+      ],
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete owned base constructor stores the public observer. Its complete _attach method observes HandsetPortrait,pipes takeUntil(overlayRef.detachments()),and toggles the existing handset class from state.matches. The exact consumed observe call compiles against all genuine subjects. Real observer single/combined streams,matching tagged payloads and unsubscribe/listener cleanup support the public observable boundary. Overlay detachments/classList/component lifetimes and native handset rendering retain their separate requirements.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "Breakpoints",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+      "binding": {
+        "local_name": "Breakpoints",
+        "type_only": false,
+        "line": 12,
+        "text": "Breakpoints"
+      },
+      "occurrences": [
+        {
+          "line": 207,
+          "parent_kind": "PropertyAccessExpression",
+          "expression": "Breakpoints.HandsetPortrait"
+        }
+      ],
+      "bound_receivers": [],
+      "complete_context_members": [
+        {
+          "line": 178,
+          "kind": "MethodDeclaration",
+          "sha256": "a5a400a923d3ec84b66c81d27d78b30f6363efa5ac5222d92c6a0dd9a5da93be",
+          "text": "private _attach<T>(\n    content: ComponentType<T> | TemplateRef<T>,\n    userConfig?: MatSnackBarConfig,\n  ): MatSnackBarRef<T | EmbeddedViewRef<any>> {\n    const config = {...new MatLegacySnackBarConfig(), ...this._defaultConfig, ...userConfig};\n    const overlayRef = this._createOverlay(config);\n    const container = this._attachSnackBarContainer(overlayRef, config);\n    const snackBarRef = new MatSnackBarRef<T | EmbeddedViewRef<any>>(container, overlayRef);\n\n    if (content instanceof TemplateRef) {\n      const portal = new TemplatePortal(content, null!, {\n        $implicit: config.data,\n        snackBarRef,\n      } as any);\n\n      snackBarRef.instance = container.attachTemplatePortal(portal);\n    } else {\n      const injector = this._createInjector(config, snackBarRef);\n      const portal = new ComponentPortal(content, undefined, injector);\n      const contentRef = container.attachComponentPortal<T>(portal);\n\n      // We can't pass this via the injector, because the injector is created earlier.\n      snackBarRef.instance = contentRef.instance;\n    }\n\n    // Subscribe to the breakpoint observer and attach the mat-snack-bar-handset class as\n    // appropriate. This class is applied to the overlay element because the overlay must expand to\n    // fill the width of the screen for full width snackbars.\n    this._breakpointObserver\n      .observe(Breakpoints.HandsetPortrait)\n      .pipe(takeUntil(overlayRef.detachments()))\n      .subscribe((state: BreakpointState) => {\n        overlayRef.overlayElement.classList.toggle(this.handsetCssClass, state.matches);\n      });\n\n    if (config.announcementMessage) {\n      // Wait until the snack bar contents have been announced then deliver this message.\n      container._onAnnounce.subscribe(() => {\n        this._live.announce(config.announcementMessage!, config.politeness);\n      });\n    }\n\n    this._animateSnackBar(snackBarRef, config);\n    this._openedSnackBarRef = snackBarRef;\n    return this._openedSnackBarRef;\n  }"
+        }
+      ],
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete _attach method consumes only public Breakpoints.HandsetPortrait. That exact string is unchanged from the untouched tagged reference at both minima and its genuine individual stream preserves the observed boolean states. No new breakpoint,selector or consumer map change occurs. Full overlay subscriptions and handset CSS/geometry remain separate.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "BreakpointObserver",
+      "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "candidate_source_sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "binding": {
+        "local_name": "BreakpointObserver",
+        "type_only": false,
+        "line": 38,
+        "text": "BreakpointObserver"
+      },
+      "occurrences": [
+        {
+          "line": 115,
+          "parent_kind": "TypeReference",
+          "expression": "BreakpointObserver"
+        },
+        {
+          "line": 213,
+          "parent_kind": "CallExpression",
+          "expression": "this._viewContainerRef.injector.get(BreakpointObserver)"
+        }
+      ],
+      "bound_receivers": [
+        "_breakpointObserver"
+      ],
+      "complete_context_members": [
+        {
+          "line": 115,
+          "kind": "PropertyDeclaration",
+          "sha256": "e0135223054ecdb8b4cd28095657c2406f61a9fc0ce2c011c80aa0294d65666f",
+          "text": "private _breakpointObserver: BreakpointObserver;"
+        },
+        {
+          "line": 195,
+          "kind": "Constructor",
+          "sha256": "0aa0c6d8eb4235ad923b0f0bfbc1db029853bdb11d4926b3ec3c1ec3516fd730",
+          "text": "constructor(\n    private _element: ElementRef<HTMLInputElement>,\n    private _overlay: Overlay,\n    private _viewContainerRef: ViewContainerRef,\n    private _zone: NgZone,\n    private _changeDetectorRef: ChangeDetectorRef,\n    @Inject(MAT_AUTOCOMPLETE_SCROLL_STRATEGY) scrollStrategy: any,\n    @Optional() private _dir: Directionality | null,\n    @Optional() @Inject(MAT_FORM_FIELD) @Host() private _formField: MatFormField | null,\n    @Optional() @Inject(DOCUMENT) private _document: any,\n    private _viewportRuler: ViewportRuler,\n    @Optional()\n    @Inject(MAT_AUTOCOMPLETE_DEFAULT_OPTIONS)\n    private _defaults?: MatAutocompleteDefaultOptions | null,\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    // The supplied public view injector also works for the historical manual\n    // constructor, which has no ambient Angular injection context.\n    this._breakpointObserver = this._viewContainerRef.injector.get(BreakpointObserver);\n  }"
+        },
+        {
+          "line": 733,
+          "kind": "MethodDeclaration",
+          "sha256": "311564106257ae16ce1a6b7e43300bd73a120a3e2d2ffa11dfea4b440fad9da2",
+          "text": "private _attachOverlay(valueOnAttach: string): void {\n    if (!this.autocomplete && (typeof ngDevMode === 'undefined' || ngDevMode)) {\n      throw getMatAutocompleteMissingPanelError();\n    }\n\n    let overlayRef = this._overlayRef;\n\n    if (!overlayRef) {\n      this._portal = new TemplatePortal(this.autocomplete.template, this._viewContainerRef, {\n        id: this._formField?.getLabelId(),\n      });\n      overlayRef = this._overlay.create(this._getOverlayConfig());\n      this._overlayRef = overlayRef;\n      this._viewportSubscription = this._viewportRuler.change().subscribe(() => {\n        if (this.panelOpen && overlayRef) {\n          overlayRef.updateSize({width: this._getPanelWidth()});\n        }\n      });\n      // Grow the panel into the viewport in handset landscape to avoid clipping.\n      this._handsetLandscapeSubscription = this._breakpointObserver\n        .observe(Breakpoints.HandsetLandscape)\n        .subscribe(result => {\n          const isHandsetLandscape = result.matches;\n          if (isHandsetLandscape) {\n            this._positionStrategy\n              .withFlexibleDimensions(true)\n              .withGrowAfterOpen(true)\n              .withViewportMargin(8);\n          } else {\n            this._positionStrategy\n              .withFlexibleDimensions(false)\n              .withGrowAfterOpen(false)\n              .withViewportMargin(0);\n          }\n        });\n    } else {\n      // Update the trigger, panel width and direction, in case anything has changed.\n      this._positionStrategy.setOrigin(this._getConnectedElement());\n      overlayRef.updateSize({width: this._getPanelWidth()});\n    }\n\n    if (overlayRef && !overlayRef.hasAttached()) {\n      overlayRef.attach(this._portal);\n      this._valueOnAttach = valueOnAttach;\n      this._valueOnLastKeydown = null;\n      this._closingActionsSubscription = this._subscribeToClosingActions();\n    }\n\n    const wasOpen = this.panelOpen;\n\n    this.autocomplete._isOpen = this._overlayAttached = true;\n    this.autocomplete._latestOpeningTrigger = this;\n    this.autocomplete._setColor(this._formField?.color);\n    this._updatePanelState();\n    this._applyModalPanelOwnership();\n\n    // We need to do an extra `panelOpen` check in here, because the\n    // autocomplete won't be shown if there are no options.\n    if (this.panelOpen && wasOpen !== this.panelOpen) {\n      this._emitOpened();\n    }\n  }"
+        }
+      ],
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete constructor obtains the real public class through this._viewContainerRef.injector.get(BreakpointObserver); the complete _attachOverlay observes HandsetLandscape and uses result.matches for the existing flexible/grow/margin policy. Both exact calls compile with stable public signatures and genuine service/provider identity and observed single/combined states match the tagged reference. View-container/overlay/position strategy,subscription teardown of the full trigger and native viewport padding/geometry are not qualified by this API dependency.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/cdk/layout",
+      "symbol": "Breakpoints",
+      "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "candidate_source_sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "binding": {
+        "local_name": "Breakpoints",
+        "type_only": false,
+        "line": 38,
+        "text": "Breakpoints"
+      },
+      "occurrences": [
+        {
+          "line": 753,
+          "parent_kind": "PropertyAccessExpression",
+          "expression": "Breakpoints.HandsetLandscape"
+        }
+      ],
+      "bound_receivers": [],
+      "complete_context_members": [
+        {
+          "line": 733,
+          "kind": "MethodDeclaration",
+          "sha256": "311564106257ae16ce1a6b7e43300bd73a120a3e2d2ffa11dfea4b440fad9da2",
+          "text": "private _attachOverlay(valueOnAttach: string): void {\n    if (!this.autocomplete && (typeof ngDevMode === 'undefined' || ngDevMode)) {\n      throw getMatAutocompleteMissingPanelError();\n    }\n\n    let overlayRef = this._overlayRef;\n\n    if (!overlayRef) {\n      this._portal = new TemplatePortal(this.autocomplete.template, this._viewContainerRef, {\n        id: this._formField?.getLabelId(),\n      });\n      overlayRef = this._overlay.create(this._getOverlayConfig());\n      this._overlayRef = overlayRef;\n      this._viewportSubscription = this._viewportRuler.change().subscribe(() => {\n        if (this.panelOpen && overlayRef) {\n          overlayRef.updateSize({width: this._getPanelWidth()});\n        }\n      });\n      // Grow the panel into the viewport in handset landscape to avoid clipping.\n      this._handsetLandscapeSubscription = this._breakpointObserver\n        .observe(Breakpoints.HandsetLandscape)\n        .subscribe(result => {\n          const isHandsetLandscape = result.matches;\n          if (isHandsetLandscape) {\n            this._positionStrategy\n              .withFlexibleDimensions(true)\n              .withGrowAfterOpen(true)\n              .withViewportMargin(8);\n          } else {\n            this._positionStrategy\n              .withFlexibleDimensions(false)\n              .withGrowAfterOpen(false)\n              .withViewportMargin(0);\n          }\n        });\n    } else {\n      // Update the trigger, panel width and direction, in case anything has changed.\n      this._positionStrategy.setOrigin(this._getConnectedElement());\n      overlayRef.updateSize({width: this._getPanelWidth()});\n    }\n\n    if (overlayRef && !overlayRef.hasAttached()) {\n      overlayRef.attach(this._portal);\n      this._valueOnAttach = valueOnAttach;\n      this._valueOnLastKeydown = null;\n      this._closingActionsSubscription = this._subscribeToClosingActions();\n    }\n\n    const wasOpen = this.panelOpen;\n\n    this.autocomplete._isOpen = this._overlayAttached = true;\n    this.autocomplete._latestOpeningTrigger = this;\n    this.autocomplete._setColor(this._formField?.color);\n    this._updatePanelState();\n    this._applyModalPanelOwnership();\n\n    // We need to do an extra `panelOpen` check in here, because the\n    // autocomplete won't be shown if there are no options.\n    if (this.panelOpen && wasOpen !== this.panelOpen) {\n      this._emitOpened();\n    }\n  }"
+        }
+      ],
+      "unused_import": false,
+      "conclusion": "stable-public-peer",
+      "decision": "The complete _attachOverlay method consumes public Breakpoints.HandsetLandscape. The exact minimum query value equals the untouched tagged constant; real single-query delivery preserves matching/cleared states across zoneful and supported zoneless contexts. Existing margin8/0 and flexible/grow operations are retained as complete current source context,not restamped as a native layout pass. No required HTML/CSS/SCSS or consumer-map changes are introduced.",
+      "reviewer": "Codex primary implementer; individual complete public-service caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-prior.json.gz",
+          "sha256": "457392802cbe864e04afa34807fff849f7928382c5a5da83de58382b57263d99"
+        },
+        {
+          "path": "compatibility/rc/layout-service-caller-roles-public-21.json",
+          "sha256": "e03b1b365cd7592c497e880b1b7fa32bc845ee78f83452d1b0710e26dfa1bc6e"
+        },
+        {
+          "path": "scripts/layout-service-caller-roles.mjs",
+          "sha256": "c60edac52869164537bb9fcb256a96cbae1d4a902c176391a677ff69a7f60363"
+        },
+        {
+          "path": "scripts/cdk-module-type-public-subjects.mjs",
+          "sha256": "8b02593f03efd0d4be8ccc714b6a5f65cfb2e8a95b880db715e9c54f8b5d0397"
+        },
+        {
+          "path": "compatibility/rc/cdk-module-type-public-subjects.json",
+          "sha256": "687a9cc652a3e3cdf9edf0c988efade4ad491e3e41d2e4a74df6874869201f56"
+        }
+      ],
+      "scope_limit": "Named consumed stable public API/type/token boundary only. Explicit window/MQL/Platform/document/Renderer2/Location protocols; no complete legacy components,actual media preference/browser geometry,WEBKIT/BLINK style-rule or brace-security/default-root/CSP,native,packed/CVA/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    }
+  ],
+  "source_closures_prepared": 13,
+  "frozen_prepared": 11,
+  "additional_prepared": 2,
+  "source_closures_integrated": 0,
+  "new_SHA_or_native_semantic_closures": 0,
+  "actual_native_packed_or_full_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
