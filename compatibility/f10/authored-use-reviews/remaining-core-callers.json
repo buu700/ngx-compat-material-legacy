@@ -1,0 +1,1269 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "criteria": "Sixteen individually reviewed remaining Core caller routes across14 exact source files and28 complete context members. Preparation only; nine frozen and seven additional rows remain canonically open until shared integration.",
+  "reviews": [
+    {
+      "file": "legacy-input/input.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550",
+      "source_role": {
+        "import_local": "inject",
+        "occurrences": [
+          {
+            "line": 47,
+            "column": 30,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject<MatLegacyFormField>(MAT_LEGACY_FORM_FIELD, {optional: true})"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_legacyFormField"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 47,
+            "member_sha256": "02d152c674b5a993cf0770e7b648c53440eeb3780099b0a3121c00b273b9f352",
+            "reasons": [
+              "Core:inject"
+            ]
+          },
+          {
+            "line": 57,
+            "member_sha256": "793adef51d7ebd7ce0e98cf7ac9162f2f4683e0b7283f39d1bf52f78a4db8e0a",
+            "reasons": [
+              "this._legacyFormField"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MatLegacyInput._legacyFormField",
+          "line": 47,
+          "sha256": "02d152c674b5a993cf0770e7b648c53440eeb3780099b0a3121c00b273b9f352",
+          "text": "private _legacyFormField = inject<MatLegacyFormField>(MAT_LEGACY_FORM_FIELD, {optional: true});"
+        },
+        {
+          "name": "MatLegacyInput._getPlaceholder",
+          "line": 57,
+          "sha256": "793adef51d7ebd7ce0e98cf7ac9162f2f4683e0b7283f39d1bf52f78a4db8e0a",
+          "text": "protected override _getPlaceholder() {\n    // If we're hiding the native placeholder, it should also be cleared from the DOM, otherwise\n    // screen readers will read it out twice: once from the label and once from the attribute.\n    // TODO: can be removed once we get rid of the `legacy` style for the form field, because it's\n    // the only one that supports promoting the placeholder to a label.\n    const formField = this._legacyFormField;\n    return formField && formField.appearance === 'legacy' && !formField._hasLabel?.()\n      ? null\n      : this.placeholder;\n  }"
+        }
+      ],
+      "calls": [
+        {
+          "line": 47,
+          "text": "inject<MatLegacyFormField>(MAT_LEGACY_FORM_FIELD, {optional: true})",
+          "arguments": [
+            "MAT_LEGACY_FORM_FIELD",
+            "{optional: true}"
+          ],
+          "type_arguments": [
+            "MatLegacyFormField"
+          ]
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete _legacyFormField initializer calls public inject<MatLegacyFormField> with the distinct owned MAT_LEGACY_FORM_FIELD token and optional:true. The complete _getPlaceholder consumer treats absence as null and reads the supplied legacy form-field value. Exact expression typing selects the stable options overload at the original and both minima; genuine Core protocol values preserve identity and optional absence. The fixture token/value is explicit and does not qualify the real form-field/node graph,modern MatInput parent,manual-constructor rejection,placeholder rendering or consumer builds.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-progress-spinner/progress-spinner.ts",
+      "module": "@angular/core",
+      "symbol": "CSP_NONCE",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+      "source_role": {
+        "import_local": "CSP_NONCE",
+        "occurrences": [
+          {
+            "line": 197,
+            "column": 13,
+            "parent_kind": "CallExpression",
+            "parent_source": "Inject(CSP_NONCE)"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_nonce"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 182,
+            "member_sha256": "2b1a32e13f069860495114ff329c9ff234b4edc24e9e008c543e731c8b538e66",
+            "reasons": [
+              "Core:CSP_NONCE"
+            ]
+          },
+          {
+            "line": 304,
+            "member_sha256": "21fb26e5d65039b695a5691f7ec5248a577e35b4d096cd67eb45024949000cd8",
+            "reasons": [
+              "this._nonce"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MatLegacyProgressSpinner.constructor",
+          "line": 182,
+          "sha256": "2b1a32e13f069860495114ff329c9ff234b4edc24e9e008c543e731c8b538e66",
+          "text": "constructor(\n    elementRef: ElementRef<HTMLElement>,\n    _platform: Platform,\n    @Optional() @Inject(DOCUMENT) private _document: any,\n    @Optional() @Inject(ANIMATION_MODULE_TYPE) animationMode: string,\n    @Inject(MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS)\n    defaults?: MatProgressSpinnerDefaultOptions,\n    /**\n     * @deprecated `changeDetectorRef`, `viewportRuler` and `ngZone`\n     * parameters to become required.\n     * @breaking-change 14.0.0\n     */\n    changeDetectorRef?: ChangeDetectorRef,\n    viewportRuler?: ViewportRuler,\n    ngZone?: NgZone,\n    @Inject(CSP_NONCE) @Optional() private _nonce?: string | null,\n  ) {\n    super(elementRef);\n\n    const trackedDiameters = MatLegacyProgressSpinner._diameters;\n    this._spinnerAnimationLabel = this._getSpinnerAnimationLabel();\n\n    // The base size is already inserted via the component's structural styles. We still\n    // need to track it so we don't end up adding the same styles again.\n    if (!trackedDiameters.has(_document.head)) {\n      trackedDiameters.set(_document.head, new Set<number>([BASE_SIZE]));\n    }\n\n    this._noopAnimations =\n      animationMode === 'NoopAnimations' && !!defaults && !defaults._forceAnimations;\n\n    if (elementRef.nativeElement.nodeName.toLowerCase() === 'mat-spinner') {\n      this.mode = 'indeterminate';\n    }\n\n    if (defaults) {\n      if (defaults.color) {\n        this.color = this.defaultColor = defaults.color;\n      }\n\n      if (defaults.diameter) {\n        this.diameter = defaults.diameter;\n      }\n\n      if (defaults.strokeWidth) {\n        this.strokeWidth = defaults.strokeWidth;\n      }\n    }\n\n    // Safari has an issue where the circle isn't positioned correctly when the page has a\n    // different zoom level from the default. This handler triggers a recalculation of the\n    // `transform-origin` when the page zoom level changes.\n    // See `_getCircleTransformOrigin` for more info.\n    // @breaking-change 14.0.0 Remove null checks for `_changeDetectorRef`,\n    // `viewportRuler` and `ngZone`.\n    if (_platform.isBrowser && _platform.SAFARI && viewportRuler && changeDetectorRef && ngZone) {\n      this._resizeSubscription = viewportRuler.change(150).subscribe(() => {\n        // When the window is resize while the spinner is in `indeterminate` mode, we\n        // have to mark for check so the transform origin of the circle can be recomputed.\n        if (this.mode === 'indeterminate') {\n          ngZone.run(() => changeDetectorRef.markForCheck());\n        }\n      });\n    }\n  }"
+        },
+        {
+          "name": "MatLegacyProgressSpinner._attachStyleNode",
+          "line": 304,
+          "sha256": "21fb26e5d65039b695a5691f7ec5248a577e35b4d096cd67eb45024949000cd8",
+          "text": "private _attachStyleNode(): void {\n    const styleRoot = this._styleRoot;\n    const currentDiameter = this._diameter;\n    const diameters = MatLegacyProgressSpinner._diameters;\n    let diametersForElement = diameters.get(styleRoot);\n\n    if (!diametersForElement || !diametersForElement.has(currentDiameter)) {\n      const styleTag: HTMLStyleElement = this._document.createElement('style');\n\n      if (this._nonce) {\n        styleTag.nonce = this._nonce;\n      }\n\n      styleTag.setAttribute('mat-spinner-animation', this._spinnerAnimationLabel);\n      styleTag.textContent = this._getAnimationText();\n      styleRoot.appendChild(styleTag);\n\n      if (!diametersForElement) {\n        diametersForElement = new Set<number>();\n        diameters.set(styleRoot, diametersForElement);\n      }\n\n      diametersForElement.add(currentDiameter);\n    }\n  }"
+        }
+      ],
+      "calls": [],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete constructor retains @Inject(CSP_NONCE),@Optional and the nullable optional string parameter. The complete style attachment method copies a truthy supplied nonce through HTMLStyleElement.nonce before appending its style. Genuine public Core token declarations,exact constructor parameter compilation and explicit provider/null cases support this token/optional-value boundary. The default root nonce factory,document/shadow-root lookup,style allocation/cache,actual nonce propagation,CSP enforcement and pending security/native reviews retain their separate requirements. This source decision is not a security or CSP browser pass.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-tabs/internal/tab-body-base.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "9133c2404db7ef40b39819969e310a71caf660c9d9c05ecfd16a8a4fe6ea0154",
+      "source_role": {
+        "import_local": "inject",
+        "occurrences": [
+          {
+            "line": 41,
+            "column": 10,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject(NgZone, {optional: true})"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 35,
+            "member_sha256": "fe9d317792c24621d946279dd400c2e8db3ec226337e382d967936d94cc4189d",
+            "reasons": [
+              "Core:inject"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "tabBodyNgZone",
+          "line": 35,
+          "sha256": "fe9d317792c24621d946279dd400c2e8db3ec226337e382d967936d94cc4189d",
+          "text": "function tabBodyNgZone(): NgZone | null {\n  try {\n    assertInInjectionContext(tabBodyNgZone);\n  } catch {\n    return null;\n  }\n  return inject(NgZone, {optional: true});\n}"
+        }
+      ],
+      "calls": [
+        {
+          "line": 41,
+          "text": "inject(NgZone, {optional: true})",
+          "arguments": [
+            "NgZone",
+            "{optional: true}"
+          ],
+          "type_arguments": []
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete tabBodyNgZone function first checks its existing injection context,returns null for original manual construction outside DI,and otherwise calls public inject(NgZone,{optional:true}). Its exact scope matches the prior authenticated guard proof. Fresh strict calls select the stable overload; genuine Core manual-null and supplied-zone cases preserve identity. This qualifies only the context/token lookup,not tab centering,transition scheduling,subscriptions,parent/portal or full node/native lifecycle.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-core/internal/legacy-animations.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+      "source_role": {
+        "import_local": "inject",
+        "occurrences": [
+          {
+            "line": 38,
+            "column": 24,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject(LEGACY_ANIMATIONS_TEST_OVERRIDE, {optional: true})"
+          },
+          {
+            "line": 43,
+            "column": 26,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject(MATERIAL_ANIMATIONS, {optional: true})"
+          },
+          {
+            "line": 48,
+            "column": 7,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject(ANIMATION_MODULE_TYPE, {optional: true})"
+          },
+          {
+            "line": 53,
+            "column": 21,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject(MediaMatcher)"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 37,
+            "member_sha256": "0272bdace11d5f5300636749b584146c5d1c541510bbaeba3fb1707dca864857",
+            "reasons": [
+              "Core:inject"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "getLegacyAnimationsState",
+          "line": 37,
+          "sha256": "0272bdace11d5f5300636749b584146c5d1c541510bbaeba3fb1707dca864857",
+          "text": "export function getLegacyAnimationsState(): LegacyAnimationsState {\n  const testOverride = inject(LEGACY_ANIMATIONS_TEST_OVERRIDE, {optional: true});\n  if (testOverride) {\n    return testOverride;\n  }\n\n  const materialConfig = inject(MATERIAL_ANIMATIONS, {optional: true});\n  if (materialConfig?.animationsDisabled) {\n    return 'di-disabled';\n  }\n\n  if (inject(ANIMATION_MODULE_TYPE, {optional: true}) === 'NoopAnimations') {\n    return 'di-disabled';\n  }\n\n  try {\n    const reduced = inject(MediaMatcher).matchMedia('(prefers-reduced-motion)').matches;\n    return reduced ? 'reduced-motion' : 'enabled';\n  } catch {\n    // SSR / missing MediaMatcher — treat as enabled rather than guessing reduced.\n    return 'enabled';\n  }\n}"
+        },
+        {
+          "name": "legacyAnimationsDisabled",
+          "line": 66,
+          "sha256": "dd4551ec3fd62cd061644ff75ff9b6aab69e47d325fc31d43089187baf28adeb",
+          "text": "export function legacyAnimationsDisabled(): boolean {\n  try {\n    assertInInjectionContext(legacyAnimationsDisabled);\n  } catch {\n    return false;\n  }\n  return getLegacyAnimationsState() !== 'enabled';\n}"
+        }
+      ],
+      "calls": [
+        {
+          "line": 38,
+          "text": "inject(LEGACY_ANIMATIONS_TEST_OVERRIDE, {optional: true})",
+          "arguments": [
+            "LEGACY_ANIMATIONS_TEST_OVERRIDE",
+            "{optional: true}"
+          ],
+          "type_arguments": []
+        },
+        {
+          "line": 43,
+          "text": "inject(MATERIAL_ANIMATIONS, {optional: true})",
+          "arguments": [
+            "MATERIAL_ANIMATIONS",
+            "{optional: true}"
+          ],
+          "type_arguments": []
+        },
+        {
+          "line": 48,
+          "text": "inject(ANIMATION_MODULE_TYPE, {optional: true})",
+          "arguments": [
+            "ANIMATION_MODULE_TYPE",
+            "{optional: true}"
+          ],
+          "type_arguments": []
+        },
+        {
+          "line": 53,
+          "text": "inject(MediaMatcher)",
+          "arguments": [
+            "MediaMatcher"
+          ],
+          "type_arguments": []
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete getLegacyAnimationsState and legacyAnimationsDisabled scopes contain four exact public inject calls. Three optional lookups retain override/material/module-policy ordering; the required MediaMatcher lookup and media query remain inside their explicit enabled fallback catch. Genuine Core with explicitly named non-Core token/service protocols exercises every policy branch and distinguishes propagated earlier provider errors from the deliberate media fallback. Actual selected public overloads are nondeprecated at all three Core subjects. Material/CDK token/provider policy,real reduced-motion/default engine graphs,all motion states and native/AOT/packed/floors receive no additional clearance.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/current-injection-context-source-proof.json",
+          "sha256": "9f3e6acaf49441cbd9f376e6e07cfb8d3ecef0f2d569c5537206c58eddf536a4"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+      "module": "@angular/core",
+      "symbol": "booleanAttribute",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "7c6cbffc3f95b6f30b0f599f781d2fcb882b75c308f5cadbffa8107a9fd20758",
+      "source_role": {
+        "import_local": "booleanAttribute",
+        "occurrences": [
+          {
+            "line": 54,
+            "column": 22,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "transform: booleanAttribute"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "disabled"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 54,
+            "member_sha256": "28da4fe66484e228594cdc610cddce9b76319f1f24a7b851afef7dd18abb3711",
+            "reasons": [
+              "Core:booleanAttribute"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MatLegacyPseudoCheckbox.disabled",
+          "line": 54,
+          "sha256": "28da4fe66484e228594cdc610cddce9b76319f1f24a7b851afef7dd18abb3711",
+          "text": "@Input({transform: booleanAttribute}) disabled: boolean = false;"
+        }
+      ],
+      "calls": [],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete disabled field passes the stable public booleanAttribute function as its @Input transform and retains its false initializer. Strict exact decorated-field compilation and21 observed values per genuine original/minimum Core namespace support that transform reference,including boxed values and symbols. It does not claim that direct JavaScript property assignments invoke Angular transforms. Real template binding,node compilation,disabled styling and complete pseudo-checkbox motion retain their separate gates.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-core/internal/datetime/date-locale.ts",
+      "module": "@angular/core",
+      "symbol": "LOCALE_ID",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "82e40a57157919c44fe1bdc46bbe45758565a8c889fd256c87079ec70d99d837",
+      "source_role": {
+        "import_local": "LOCALE_ID",
+        "occurrences": [
+          {
+            "line": 16,
+            "column": 17,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject(LOCALE_ID)"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 15,
+            "member_sha256": "6f458558b172c786221b4646db529775041d01bcf808243f9161fce9a86ec3e4",
+            "reasons": [
+              "Core:LOCALE_ID"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MAT_LEGACY_DATE_LOCALE_FACTORY",
+          "line": 15,
+          "sha256": "6f458558b172c786221b4646db529775041d01bcf808243f9161fce9a86ec3e4",
+          "text": "export function MAT_LEGACY_DATE_LOCALE_FACTORY(): unknown {\n  return inject(LOCALE_ID);\n}"
+        }
+      ],
+      "calls": [],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete named MAT_LEGACY_DATE_LOCALE_FACTORY forwards public inject(LOCALE_ID) unchanged. Seven explicit locale values match the untouched tagged16 MAT_DATE_LOCALE_FACTORY body in genuine Core contexts; no normalization or consumer-map mutation is introduced. Public token identity/type,missing-context errors and supplied-provider failure behavior support this locale dependency. Root default locale selection,DateAdapter construction,date formats and full consumer/packed floors remain separately owned.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-core/internal/datetime/date-locale.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "82e40a57157919c44fe1bdc46bbe45758565a8c889fd256c87079ec70d99d837",
+      "source_role": {
+        "import_local": "inject",
+        "occurrences": [
+          {
+            "line": 16,
+            "column": 10,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject(LOCALE_ID)"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 15,
+            "member_sha256": "6f458558b172c786221b4646db529775041d01bcf808243f9161fce9a86ec3e4",
+            "reasons": [
+              "Core:inject"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MAT_LEGACY_DATE_LOCALE_FACTORY",
+          "line": 15,
+          "sha256": "6f458558b172c786221b4646db529775041d01bcf808243f9161fce9a86ec3e4",
+          "text": "export function MAT_LEGACY_DATE_LOCALE_FACTORY(): unknown {\n  return inject(LOCALE_ID);\n}"
+        }
+      ],
+      "calls": [
+        {
+          "line": 16,
+          "text": "inject(LOCALE_ID)",
+          "arguments": [
+            "LOCALE_ID"
+          ],
+          "type_arguments": []
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete locale factory makes one public inject(LOCALE_ID) call with no flags or private lookup. The stable one-token overload is selected against all three genuine Core declaration trees; exact supplied locale strings flow through the authenticated original and current factory bodies. Missing context and provider errors retain their behavior. The existing unknown return annotation is unchanged; no broader legacy factory API,date service or application-root qualification follows.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "1b673f43bacbcf47ea0e504ff3f191d84289e7c7337b20b93e8b5b98e833eb08",
+      "source_role": {
+        "import_local": "inject",
+        "occurrences": [
+          {
+            "line": 35,
+            "column": 23,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject(DOCUMENT)"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_document"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 35,
+            "member_sha256": "95c667190e88becf7f4940c7c0661ebc455cffe579da276f6c975d0b57b6085c",
+            "reasons": [
+              "Core:inject"
+            ]
+          },
+          {
+            "line": 315,
+            "member_sha256": "3483ec0636b78d2429d3cbaa504d66615b62d7344fd49e1bc3213f45fa973c6e",
+            "reasons": [
+              "this._document"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "_MatSnackBarContainerBase._document",
+          "line": 35,
+          "sha256": "95c667190e88becf7f4940c7c0661ebc455cffe579da276f6c975d0b57b6085c",
+          "text": "private _document = inject(DOCUMENT);"
+        },
+        {
+          "name": "_MatSnackBarContainerBase._exposeToModals",
+          "line": 315,
+          "sha256": "3483ec0636b78d2429d3cbaa504d66615b62d7344fd49e1bc3213f45fa973c6e",
+          "text": "private _exposeToModals() {\n    // TODO(http://github.com/angular/components/issues/26853): consider de-duplicating this with the\n    // `LiveAnnouncer` and any other usages.\n    //\n    // Note that the selector here is limited to CDK overlays at the moment in order to reduce the\n    // section of the DOM we need to look through. This should cover all the cases we support, but\n    // the selector can be expanded if it turns out to be too narrow.\n    const id = this._liveElementId;\n    const modals = this._document.querySelectorAll(\n      'body > .cdk-overlay-container [aria-modal=\"true\"]',\n    );\n\n    for (let i = 0; i < modals.length; i++) {\n      const modal = modals[i];\n      const ariaOwns = modal.getAttribute('aria-owns');\n      this._trackedModals.add(modal);\n\n      if (!ariaOwns) {\n        modal.setAttribute('aria-owns', id);\n      } else if (ariaOwns.indexOf(id) === -1) {\n        modal.setAttribute('aria-owns', ariaOwns + ' ' + id);\n      }\n    }\n  }"
+        }
+      ],
+      "calls": [
+        {
+          "line": 35,
+          "text": "inject(DOCUMENT)",
+          "arguments": [
+            "DOCUMENT"
+          ],
+          "type_arguments": []
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete _document field uses the stable one-token inject overload with the existing public DOCUMENT binding; its complete document consumer remains source-bound. Genuine Core explicit document protocols retain the exact supplied object and required-context behavior. No new document token,root fallback,private injector or optional semantics is introduced. The existing modal/ARIA ownership,real document queries,portal/motion/component/native and packed/floor contracts retain their separate evidence.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-menu/internal/menu-trigger-base.ts",
+      "module": "@angular/core",
+      "symbol": "inject",
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "candidate_source_sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8",
+      "source_role": {
+        "import_local": "inject",
+        "occurrences": [
+          {
+            "line": 113,
+            "column": 32,
+            "parent_kind": "CallExpression",
+            "parent_source": "inject(ChangeDetectorRef)"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_changeDetectorRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 113,
+            "member_sha256": "bfef63600ef9bfa3c0a48bb11a9a7e7724c59041893705142f5f06f024bc285b",
+            "reasons": [
+              "Core:inject"
+            ]
+          },
+          {
+            "line": 551,
+            "member_sha256": "3b8ee654c741bfb47a6f294f3e5387364059c34e9d417875020ca2bd1541b7bf",
+            "reasons": [
+              "this._changeDetectorRef"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "_MatMenuTriggerBase._changeDetectorRef",
+          "line": 113,
+          "sha256": "bfef63600ef9bfa3c0a48bb11a9a7e7724c59041893705142f5f06f024bc285b",
+          "text": "private _changeDetectorRef = inject(ChangeDetectorRef);"
+        },
+        {
+          "name": "_MatMenuTriggerBase._setIsMenuOpen",
+          "line": 551,
+          "sha256": "3b8ee654c741bfb47a6f294f3e5387364059c34e9d417875020ca2bd1541b7bf",
+          "text": "private _setIsMenuOpen(isOpen: boolean): void {\n    if (isOpen !== this._menuOpen) {\n      this._menuOpen = isOpen;\n      this._menuOpen ? this.menuOpened.emit() : this.menuClosed.emit();\n\n      if (this._destroyed || this._menuOpen !== isOpen) {\n        return;\n      }\n\n      if (this.triggersSubmenu()) {\n        this._menuItemInstance._setHighlighted(isOpen);\n      }\n\n      this._changeDetectorRef.markForCheck();\n    }\n  }"
+        }
+      ],
+      "calls": [
+        {
+          "line": 113,
+          "text": "inject(ChangeDetectorRef)",
+          "arguments": [
+            "ChangeDetectorRef"
+          ],
+          "type_arguments": []
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete _changeDetectorRef initializer requests public ChangeDetectorRef through the stable required one-token inject overload. The complete owned consumer invokes markForCheck on that supplied detector. Genuine Core protocol identity,missing-provider and outside-context errors support the public lookup. A protocol detector does not establish real view-scoped detector identity,menu lifecycle,node DI,rendering or full parent/native/packed behavior; those obligations remain separate.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "internal/testing/owned-test-events.ts",
+      "module": "@angular/core",
+      "symbol": "EventEmitter",
+      "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "candidate_source_sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212",
+      "source_role": {
+        "import_local": "EventEmitter",
+        "occurrences": [
+          {
+            "line": 33,
+            "column": 23,
+            "parent_kind": "TypeReference",
+            "parent_source": "EventEmitter<any>"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 32,
+            "member_sha256": "e2470a8dfaf3ab4380fa53cfec6082360502182e2a36e5bc35f0d1ce49f1d8ad",
+            "reasons": [
+              "Core:EventEmitter"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MockNgZone.simulateZoneExit",
+          "line": 32,
+          "sha256": "e2470a8dfaf3ab4380fa53cfec6082360502182e2a36e5bc35f0d1ce49f1d8ad",
+          "text": "simulateZoneExit(): void {\n    (this.onStable as EventEmitter<any>).emit(null);\n  }"
+        },
+        {
+          "name": "MockNgZone",
+          "line": 19,
+          "sha256": "19ac1fe5319abb471c73ae63cfa9b6bdad716684dece889e68bd9e04779b9351",
+          "text": "export class MockNgZone extends NgZone {\n  constructor() {\n    super({enableLongStackTrace: false});\n  }\n\n  override run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T {\n    return fn.apply(applyThis, applyArgs ?? []);\n  }\n\n  override runOutsideAngular<T>(fn: (...args: any[]) => T): T {\n    return fn();\n  }\n\n  simulateZoneExit(): void {\n    (this.onStable as EventEmitter<any>).emit(null);\n  }\n}"
+        }
+      ],
+      "calls": [],
+      "conclusion": "test-only",
+      "decision": "The full test-only MockNgZone class casts its public onStable emitter to EventEmitter<any> solely to emit the simulated null exit event. The exact existing test-only EventEmitter review is reused with all original evidence and its explicit current signal/lifecycle differences. The actual complete subclass executes with genuine original/minimum Core and authenticated Node Zone entries; synchronous simulated events and unsubscription are checked. No producer construction occurs at this import and no production component,event-loop/browser or consumer-floor contract is admitted.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/f10/authored-use-reviews/public-event-emitter-boundary.json",
+          "sha256": "3901aa0beb82870f33987a05f0190f4030f58f934e2ca24b946b94d4339860ab"
+        },
+        {
+          "path": "compatibility/rc/event-emitter-source-proof.json",
+          "sha256": "bc975ba8e7667841f9cdb25a8fd5da9d0598759d5ca89e0219785b4cc150fabd"
+        },
+        {
+          "path": "compatibility/rc/event-emitter-minimum-source-diagnostic.json",
+          "sha256": "05cce31a3a73aea8f5dcbc19cb4c64f62b3c4b419e4b3f2fb9f7c1198da18073"
+        },
+        {
+          "path": "scripts/event-emitter-use-review.mjs",
+          "sha256": "ce3aa511f7c02dbf03abb04007a7687315521641c2c7c01ec77ddbd39726ab1f"
+        },
+        {
+          "path": "tests/event_emitter_use_probe.mjs",
+          "sha256": "06f9c703c3e673ae2949ba3003c8eee9cecc8c5f4cf96b57238cb13e70b7c7cc"
+        },
+        {
+          "path": "compatibility/rc/element-ref-public-subjects.json",
+          "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "internal/testing/owned-test-events.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "candidate_source_sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212",
+      "source_role": {
+        "import_local": "NgZone",
+        "occurrences": [
+          {
+            "line": 19,
+            "column": 33,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_source": "NgZone"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 19,
+            "member_sha256": "2b6cace01d2977240df6e718b16f260b38b06862e0a41c48483cc89e4580be6b",
+            "reasons": [
+              "Core:NgZone"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MockNgZone.heritage.ExtendsKeyword",
+          "line": 19,
+          "sha256": "2b6cace01d2977240df6e718b16f260b38b06862e0a41c48483cc89e4580be6b",
+          "text": "extends NgZone"
+        },
+        {
+          "name": "MockNgZone",
+          "line": 19,
+          "sha256": "19ac1fe5319abb471c73ae63cfa9b6bdad716684dece889e68bd9e04779b9351",
+          "text": "export class MockNgZone extends NgZone {\n  constructor() {\n    super({enableLongStackTrace: false});\n  }\n\n  override run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T {\n    return fn.apply(applyThis, applyArgs ?? []);\n  }\n\n  override runOutsideAngular<T>(fn: (...args: any[]) => T): T {\n    return fn();\n  }\n\n  simulateZoneExit(): void {\n    (this.onStable as EventEmitter<any>).emit(null);\n  }\n}"
+        }
+      ],
+      "calls": [],
+      "conclusion": "test-only",
+      "decision": "The full test-only MockNgZone class extends genuine public NgZone with enableLongStackTrace:false,overrides run to apply the supplied receiver/arguments,and intentionally makes runOutsideAngular a direct synchronous callback. Strict declarations verify its public nondeprecated constructor/option/override contracts. Six genuine Core/Node Zone contexts exercise parent identity,return/error/arguments,the intentional retained-zone fixture behavior,and simulated stable events. This is a test helper,not a production replacement for NgZone or an application/browser scheduling qualification.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-remaining-source-diagnostic.json",
+          "sha256": "a870c1ae0915e19df38399d582e8248f1a68ba02743b0914591cc23ced56985b"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-owner-source-proof.json",
+          "sha256": "0e4f057f78ddecdbe570a5ea3c8e676902e2105fb8ee380000b546751797fc99"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-checkbox/internal/checkbox-base.ts",
+      "module": "@angular/core",
+      "symbol": "booleanAttribute",
+      "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "candidate_source_sha256": "e4e3aaa653750e7d9ce901e76c3ee0b9fe3f242439bbf0850ad1594503dd1437",
+      "source_role": {
+        "import_local": "booleanAttribute",
+        "occurrences": [
+          {
+            "line": 121,
+            "column": 46,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "transform: booleanAttribute"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "ariaExpanded"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 121,
+            "member_sha256": "9979a4ffcf855cb51efe9c3beeb34a7cac6ecbfffb1d4134b3b29632a5c85cef",
+            "reasons": [
+              "Core:booleanAttribute"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "_MatCheckboxBase.ariaExpanded",
+          "line": 121,
+          "sha256": "9979a4ffcf855cb51efe9c3beeb34a7cac6ecbfffb1d4134b3b29632a5c85cef",
+          "text": "@Input({alias: 'aria-expanded', transform: booleanAttribute})\n  ariaExpanded: boolean | null = null;"
+        }
+      ],
+      "calls": [],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete ariaExpanded field retains the aria-expanded alias,public booleanAttribute Input transform,and null initializer. Exact decorated-field compilation selects the stable Core transform contract at the original and both minima;21 genuine function observations per subject agree with the untouched original. Angular template application,ARIA rendering,checkbox forms/interaction,motion and complete component/native/floor behavior remain separately required. No attribute,selector,HTML,CSS or SCSS changes are made.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-core/internal/common-module.ts",
+      "module": "@angular/core",
+      "symbol": "isDevMode",
+      "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "candidate_source_sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+      "source_role": {
+        "import_local": "isDevMode",
+        "occurrences": [
+          {
+            "line": 51,
+            "column": 11,
+            "parent_kind": "CallExpression",
+            "parent_source": "isDevMode()"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 38,
+            "member_sha256": "73837d4c4a2dc914d175cefa9c41072ebeca9445c53940d2c2c6d72c7c5e5904",
+            "reasons": [
+              "Core:isDevMode"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MatCommonModule.constructor",
+          "line": 38,
+          "sha256": "73837d4c4a2dc914d175cefa9c41072ebeca9445c53940d2c2c6d72c7c5e5904",
+          "text": "constructor(\n    highContrastModeDetector: HighContrastModeDetector,\n    @Optional() @Inject(MATERIAL_SANITY_CHECKS) private _sanityChecks: SanityChecks,\n    @Inject(DOCUMENT) private _document: Document,\n  ) {\n    // The public A11yModule import initializes high contrast and observes mode\n    // changes. Keep the historical constructor token without importing or\n    // copying the detector's private body-class/lifecycle implementation.\n    void highContrastModeDetector;\n\n    if (!this._hasDoneGlobalChecks) {\n      this._hasDoneGlobalChecks = true;\n\n      if (isDevMode()) {\n        // Inject in here so the reference to `Platform` can be removed in production mode.\n        const platform = inject(Platform, {optional: true});\n\n        if (this._checkIsEnabled('doctype')) {\n          _checkDoctypeIsDefined(this._document);\n        }\n\n        if (this._checkIsEnabled('theme')) {\n          _checkThemeIsPresent(this._document, !!platform?.isBrowser);\n        }\n\n        if (this._checkIsEnabled('version')) {\n          _checkCdkVersionMatch();\n        }\n      }\n    }\n  }"
+        }
+      ],
+      "calls": [
+        {
+          "line": 51,
+          "text": "isDevMode()",
+          "arguments": [],
+          "type_arguments": []
+        }
+      ],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete common-module constructor calls stable public isDevMode before its optional Platform lookup and existing doctype/theme/version checks. Genuine original/minimum Core modules return the observed development/production state,with public enableProdMode used only by the test process. The current complete caller remains bound to the same guard position. This qualifies the public mode predicate only; full module creation,high-contrast setup,theme/doctype/version effects and rendering retain their separate obligations.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-dialog/dialog-container.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "candidate_source_sha256": "0495cc891e7e1578d05d9679fe61acf155c9bdb47b31032d53c324bc201616ac",
+      "source_role": {
+        "import_local": "NgZone",
+        "occurrences": [
+          {
+            "line": 140,
+            "column": 13,
+            "parent_kind": "TypeReference",
+            "parent_source": "NgZone"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "ngZone"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 134,
+            "member_sha256": "1d98dc265ac3c1082f6ea2b82bc2a5b5d88362d44846f870ead2366a5253c5d3",
+            "reasons": [
+              "Core:NgZone"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "MatLegacyDialogContainer.constructor",
+          "line": 134,
+          "sha256": "1d98dc265ac3c1082f6ea2b82bc2a5b5d88362d44846f870ead2366a5253c5d3",
+          "text": "constructor(\n    elementRef: ElementRef,\n    focusTrapFactory: FocusTrapFactory,\n    @Optional() @Inject(DOCUMENT) document: any,\n    dialogConfig: MatLegacyDialogConfig,\n    checker: InteractivityChecker,\n    ngZone: NgZone,\n    overlayRef: OverlayRef,\n    private _changeDetectorRef: ChangeDetectorRef,\n    focusMonitor?: FocusMonitor,\n  ) {\n    super(elementRef, focusTrapFactory, document, dialogConfig, checker, ngZone,\n      overlayRef, focusMonitor);\n  }"
+        },
+        {
+          "name": "MatLegacyDialogContainer._requestAnimationFrame",
+          "line": 259,
+          "sha256": "2edd96203e4e603242d8bd26e5ef06da6cb3b02c7a6f1278c8bef5495f748c9f",
+          "text": "private _requestAnimationFrame(callback: () => void): void {\n    const revision = this._animationRevision;\n    this._ngZone.runOutsideAngular(() => {\n      if (typeof requestAnimationFrame === 'function') {\n        this._animationFrame = requestAnimationFrame(() => {\n          if (!this._animationDestroyed && revision === this._animationRevision) {\n            this._animationFrame = null;\n            callback();\n          }\n        });\n      } else if (!this._animationDestroyed && revision === this._animationRevision) {\n        callback();\n      }\n    });\n  }"
+        }
+      ],
+      "calls": [],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete constructor forwards its NgZone argument to the owned dialog base. The complete _requestAnimationFrame member registers work through public runOutsideAngular and retains its revision/destroy guards and synchronous no-RAF fallback. Exact source compilation and six genuine Core/Node Zone contexts exercise that complete method with an explicit frame protocol,including outside registration,callback order,stale/destroy suppression and fallback. Real browser frames,full constructor/focus/motion/lifecycle,node/native/packed and floors remain separately required.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-remaining-source-diagnostic.json",
+          "sha256": "a870c1ae0915e19df38399d582e8248f1a68ba02743b0914591cc23ced56985b"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-owner-source-proof.json",
+          "sha256": "0e4f057f78ddecdbe570a5ea3c8e676902e2105fb8ee380000b546751797fc99"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "candidate_source_sha256": "fc96f5570ed4331adf1074fd521a90b99c8ab3419d0c532c1238c7e135d9b9e4",
+      "source_role": {
+        "import_local": "NgZone",
+        "occurrences": [
+          {
+            "line": 85,
+            "column": 24,
+            "parent_kind": "TypeReference",
+            "parent_source": "NgZone"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_ngZone"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 79,
+            "member_sha256": "a7857509b035ee8c72f9349398d95dfe7213f3a94c5dbf59f2c3abe415ee7f52",
+            "reasons": [
+              "Core:NgZone"
+            ]
+          },
+          {
+            "line": 179,
+            "member_sha256": "9e998a171fc69827cbc9f8e82476856a50fd0e01b5b665b6f784ad949aef8457",
+            "reasons": [
+              "this._ngZone"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "_MatDialogContainerBase.constructor",
+          "line": 79,
+          "sha256": "a7857509b035ee8c72f9349398d95dfe7213f3a94c5dbf59f2c3abe415ee7f52",
+          "text": "constructor(\n    protected _elementRef: ElementRef,\n    protected _focusTrapFactory: FocusTrapFactory,\n    @Optional() @Inject(DOCUMENT) _document: any,\n    public readonly _config: MatDialogConfig,\n    private _legacyFocusChecker: InteractivityChecker,\n    protected _ngZone: NgZone,\n    private _legacyOverlayRef: OverlayRef,\n    private _legacyFocusMonitor?: FocusMonitor,\n  ) {\n    super();\n    registerLegacyDialogContainerState(\n      this, this._legacyFocusNotifications.asObservable(), this._legacyChangeDetector);\n    this._document = _document;\n    if (_config.ariaLabelledBy) {\n      this._ariaLabelledByQueue.push(_config.ariaLabelledBy);\n    }\n  }"
+        },
+        {
+          "name": "_MatDialogContainerBase._trapFocus",
+          "line": 179,
+          "sha256": "9e998a171fc69827cbc9f8e82476856a50fd0e01b5b665b6f784ad949aef8457",
+          "text": "protected _trapFocus(): void {\n    if (this._legacyFocusDestroyed) {\n      return;\n    }\n    const focus = () => {\n      if (this._legacyFocusDestroyed) {\n        return;\n      }\n      this._legacyFocusCleanup?.();\n      const cleanup = focusLegacyDialogInitially({\n        element: this._elementRef.nativeElement,\n        config: this._config,\n        factory: this._focusTrapFactory,\n        checker: this._legacyFocusChecker,\n        renderer: this._legacyFocusRenderer || {\n          listen: (target: HTMLElement, event: string, callback: EventListener) => {\n            target.addEventListener(event, callback);\n            return () => target.removeEventListener(event, callback);\n          },\n        },\n        ngZone: this._ngZone,\n        isBrowser: this._isBrowser(),\n        isDestroyed: () => this._legacyFocusDestroyed,\n        onFocusSettled: () => {\n          if (!this._legacyFocusDestroyed) {\n            this._legacyFocusNotifications.next();\n          }\n        },\n      });\n      if (this._legacyFocusDestroyed) {\n        cleanup?.();\n      } else {\n        this._legacyFocusCleanup = cleanup;\n      }\n    };\n    if ((this._config.autoFocus === true || this._config.autoFocus === 'first-tabbable')\n        && !this._ngZone.isStable) {\n      this._legacyFocusStableSubscriptions.add(this._ngZone.onStable.pipe(take(1)).subscribe(focus));\n    } else {\n      focus();\n    }\n  }"
+        },
+        {
+          "name": "_MatDialogContainerBase.ngOnDestroy",
+          "line": 222,
+          "sha256": "7354e756245989f8b53633ebdc0d7ca551e276e4e29fcb19e44d30e28add3717",
+          "text": "ngOnDestroy(): void {\n    if (this._legacyFocusDestroyed) {\n      return;\n    }\n    this._legacyFocusDestroyed = true;\n    destroyLegacyDialogContainerState(this);\n    try {\n      this._legacyFocusStableSubscriptions.unsubscribe();\n      this._restoreLegacyFocus();\n    } finally {\n      try {\n        this._legacyBackdropSubscription?.unsubscribe();\n      } finally {\n        this._legacyBackdropSubscription = null;\n        try {\n          this._legacyFocusTrap?.destroy();\n        } finally {\n          this._legacyFocusTrap = null;\n          try {\n            this._legacyFocusCleanup?.();\n          } finally {\n            this._legacyFocusCleanup = null;\n            this._legacyFocusNotifications.complete();\n          }\n        }\n      }\n    }\n  }"
+        }
+      ],
+      "calls": [],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete constructor stores the supplied public NgZone. The complete _trapFocus member reads public isStable and subscribes to onStable with take(1) only for delayed tabbable modes;the complete ngOnDestroy member disposes the owned stable subscriptions. Genuine tagged/minimum method/event declarations and prior public zoneful/zoneless runtime evidence support those consumed APIs; fresh strict calls retain event/return typing. Full focus selection,cancellation,timing,application/node/native and component lifetimes keep their separate gates. No historical whole-inventory counts are restamped as current.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-remaining-source-diagnostic.json",
+          "sha256": "a870c1ae0915e19df38399d582e8248f1a68ba02743b0914591cc23ced56985b"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-owner-source-proof.json",
+          "sha256": "0e4f057f78ddecdbe570a5ea3c8e676902e2105fb8ee380000b546751797fc99"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-initial-focus.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone",
+      "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "candidate_source_sha256": "81ac34fa547b5ecf0607bad40eb0302fc97a98859b360f94164832f3dfb41624",
+      "source_role": {
+        "import_local": "NgZone",
+        "occurrences": [
+          {
+            "line": 21,
+            "column": 11,
+            "parent_kind": "TypeReference",
+            "parent_source": "NgZone"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "ngZone"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 21,
+            "member_sha256": "72b071c323b5f96520825d09997ecb467928452beca0c13ed509c557d3fc76db",
+            "reasons": [
+              "Core:NgZone"
+            ]
+          }
+        ]
+      },
+      "complete_context_members": [
+        {
+          "name": "LegacyDialogInitialFocusContext.ngZone",
+          "line": 21,
+          "sha256": "72b071c323b5f96520825d09997ecb467928452beca0c13ed509c557d3fc76db",
+          "text": "ngZone: NgZone;"
+        },
+        {
+          "name": "LegacyDialogInitialFocusContext",
+          "line": 15,
+          "sha256": "5ceeecbfffb7a733421c4468ca8c32e8011363409a6e5a9acc5363109dd14ebb",
+          "text": "export interface LegacyDialogInitialFocusContext {\n  element: HTMLElement;\n  config: Pick<MatDialogConfig, 'autoFocus'>;\n  factory: FocusTrapFactory;\n  checker: InteractivityChecker;\n  renderer: Pick<Renderer2, 'listen'>;\n  ngZone: NgZone;\n  isBrowser: boolean;\n  isDestroyed: () => boolean;\n  onFocusSettled: () => void;\n}"
+        },
+        {
+          "name": "focusLegacyDialogInitially",
+          "line": 45,
+          "sha256": "c067683df66993d66dcae561c3a192eec280f9b70faee1c1a906c6d3451da3a0",
+          "text": "export function focusLegacyDialogInitially(context: LegacyDialogInitialFocusContext,\n    options?: FocusOptions): (() => void) | null {\n  if (!context.isBrowser) {\n    context.onFocusSettled();\n    return null;\n  }\n  const {element, config, factory, checker, renderer, ngZone} = context;\n  switch (config.autoFocus) {\n    case false:\n    case 'dialog':\n      if (!legacyDialogContainsFocus(element)) {\n        element.focus(options);\n      }\n      context.onFocusSettled();\n      return null;\n    case true:\n    case 'first-tabbable': {\n      // This temporary selector uses the public initial-element algorithm.\n      // Defer anchors: the enclosing container already owns the real tab trap.\n      const selection = factory.create(element, true);\n      let focused: boolean;\n      try {\n        focused = selection.focusInitialElement(options);\n      } finally {\n        selection.destroy();\n      }\n      if (focused) {\n        context.onFocusSettled();\n        return null;\n      }\n      // The original focusInitialElementWhenReady promise deferred only its fallback.\n      let canceled = false;\n      Promise.resolve().then(() => {\n        if (!canceled && !context.isDestroyed()) {\n          element.focus(options);\n          context.onFocusSettled();\n        }\n      });\n      return () => { canceled = true; };\n    }\n  }\n  const selector = config.autoFocus === 'first-heading'\n    ? 'h1, h2, h3, h4, h5, h6, [role=\"heading\"]'\n    : config.autoFocus as string;\n  const target = element.querySelector<HTMLElement>(selector);\n  let cleanup: (() => void) | null = null;\n  if (target) {\n    if (!checker.isFocusable(target)) {\n      target.tabIndex = -1;\n      ngZone.runOutsideAngular(() => {\n        let restored = false;\n        const restore = () => {\n          if (restored) {\n            return;\n          }\n          restored = true;\n          stopBlur();\n          stopMouseDown();\n          target.removeAttribute('tabindex');\n        };\n        const stopBlur = renderer.listen(target, 'blur', restore);\n        const stopMouseDown = renderer.listen(target, 'mousedown', restore);\n        cleanup = restore;\n      });\n    }\n    target.focus(options);\n  }\n  context.onFocusSettled();\n  return cleanup;\n}"
+        }
+      ],
+      "calls": [],
+      "conclusion": "stable-public-peer",
+      "decision": "The complete context interface supplies public NgZone and the complete focus function calls runOutsideAngular only while registering temporary selector listeners and their cleanup. The public generic callback contract and actual original/minimum zone behavior support this dependency; exact current complete caller code is recorded. Renderer listener/teardown semantics retain their separate prepared/integrated proof. This does not qualify a concrete Angular renderer,real focus traps,browser/application timing or full component/native/packed/floor execution.",
+      "reviewer": "Codex primary implementer; individual complete remaining Core caller review",
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-prior.json.gz",
+          "sha256": "02b9b9182538e1147a1af4fb9a9ce6970eba11e04f2444c843af870d5af894bb"
+        },
+        {
+          "path": "compatibility/rc/remaining-core-caller-roles-public-21.json",
+          "sha256": "ce2cd1fc65bf6a8de5f9d49ed0d1eec27bbde60a3af39051fbfde4db733147d9"
+        },
+        {
+          "path": "scripts/remaining-core-caller-roles.mjs",
+          "sha256": "315fec678ffad45b1ff5c7c4faa0c8e41ac33afa04ab0ffc1b75bba7ec72defe"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-remaining-source-diagnostic.json",
+          "sha256": "a870c1ae0915e19df38399d582e8248f1a68ba02743b0914591cc23ced56985b"
+        },
+        {
+          "path": "compatibility/rc/ng-zone-owner-source-proof.json",
+          "sha256": "0e4f057f78ddecdbe570a5ea3c8e676902e2105fb8ee380000b546751797fc99"
+        }
+      ],
+      "scope_limit": "Named Core dependency only. No complete component,node/application/default-provider,security/CSP/native/packed/AOT or full compiler/Node/RxJS/consumer/peer-floor admission."
+    }
+  ],
+  "historical_public_runtime_inventory_provenance": [
+    {
+      "path": "scripts/ng-zone-use-inventory.mjs",
+      "original_sha256": "7c1a40e22e64413ecfb9e62132f26914fc846fc414ef69fc30b7e0fe555333e7",
+      "original_source_parent": "7b93eddbb9e2c013604a63387d7b3a2579403973",
+      "current_sha256": "60b5c8e2683fdbdd2208963b94a815bcf4ee698848ff5a0cd4b756f78f8fefc8",
+      "current_source_parent": "c277ef27b7c9925688bfc7b49bb576e18e79da00",
+      "historical_inventory_counts_admitted": false,
+      "reason": "Later inventory adds constructor forwarding and ripple contexts. Only unchanged public-runtime worker,resize and viewport code from this old report are reused; the16 current callers are freshly bound."
+    }
+  ],
+  "source_closures_prepared": 16,
+  "frozen_prepared": 9,
+  "additional_prepared": 7,
+  "source_closures_integrated": 0,
+  "new_SHA_or_native_semantic_closures": 0,
+  "actual_native_packed_or_full_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
