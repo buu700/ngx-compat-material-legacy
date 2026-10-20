@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-20T03:01:31.733151+00:00",
+  "scope": "Read-only ~/cyph source sanity check for the existing snack-bar API and internal DOM-portal delegation change",
+  "reviewed_files": [
+    {
+      "path": "/home/parallels/cyph/shared/js/cyph/modules/cyph-web.module.ts",
+      "sha256": "4b50f3b89c32ac00cff95891891e5e2284682afade511861fb0852bbc04d1a36"
+    },
+    {
+      "path": "/home/parallels/cyph/shared/js/cyph/services/material-dialog.service.ts",
+      "sha256": "45607f3bd9d68f21e98b38cbda7d091d4a176c49bb14374f05c9d744642fb214"
+    }
+  ],
+  "observations": [
+    "The web module imports and reexports MatLegacySnackBarModule under its MatSnackBarModule alias.",
+    "The dialog service injects MatLegacySnackBar under MatSnackBar and uses open(content,action,{duration}), dismiss, dismissWithAction and onAction. Those service APIs are outside the selected internal callback change.",
+    "No attachDomPortal or MatLegacySnackBarContainer use was found in the scanned TS/HTML/SCSS/CSS source. No snack-specific SCSS/CSS use was found by the separate snack text search."
+  ],
+  "consumer_files_modified": false,
+  "consumer_build_executed": false,
+  "required_consumer_HTML_CSS_SCSS_changes_found": false,
+  "required_consumer_TS_edits_found": false,
+  "limits": "Source scan and reviewed caller bodies only; no consumer compilation, runtime, browser or packed qualification."
+}
