@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import subprocess
 import unittest
+from tests.tab_portal_source_requalification import historical_source_members, historical_member_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -32,13 +33,14 @@ class CoreViewUseReview(unittest.TestCase):
         self.assertFalse(report['actual_legacy_component_TestBed_browser_packed_or_floor_qualified'])
 
     def test_selected_rows_and_candidate_sources_remain_unchanged_and_open(self):
+        parent_members = historical_source_members(ROOT)
         prior = json.loads(gzip.decompress((ROOT/'compatibility/rc/core-view-use-prior.json.gz').read_bytes()))
         self.assertEqual(len(prior['selected']), 35)
         self.assertEqual(len({(m['ledger'], m['file'], m['module'], m['symbol']) for m in prior['selected']}), 35)
         for member in prior['ledger_preimages'] + prior['candidate_preimages']:
-            self.assertEqual(hashlib.sha256((ROOT/member['path']).read_bytes()).hexdigest(), member['sha256'])
+            self.assertEqual(hashlib.sha256(historical_member_bytes(ROOT, member['path'], parent_members)).hexdigest(), member['sha256'])
         for selected in prior['selected']:
-            rows = json.loads((ROOT/selected['ledger']).read_bytes())['symbol_uses']
+            rows = json.loads(historical_member_bytes(ROOT, selected['ledger'], parent_members))['symbol_uses']
             found = [r for r in rows if all(r[k] == selected[k] for k in ['file', 'module', 'symbol'])]
             self.assertEqual(len(found), 1)
             self.assertEqual(found[0]['disposition'], 'open')

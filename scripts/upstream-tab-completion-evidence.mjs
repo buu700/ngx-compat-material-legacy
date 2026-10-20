@@ -26,6 +26,7 @@ const members = [
   'scripts/native-motion-run.mjs', 'scripts/native-motion-page.mjs', 'scripts/native-motion-consumer.ts', 'scripts/browser-matrix-roster.mjs',
   'compatibility/rc/matrices/full-verify.json', 'compatibility/rc/matrices/library-exports.json', 'projects/ngx-material-legacy/package.json',
   'projects/ngx-material-legacy/legacy-tabs/internal/tab-body-base.ts', 'projects/ngx-material-legacy/legacy-tabs/tab-body.ts',
+  'projects/ngx-material-legacy/legacy-tabs/internal/tab-portal-construction-context.ts',
   'projects/ngx-material-legacy/legacy-tabs/internal/tab-group-base.ts', 'projects/ngx-material-legacy/legacy-tabs/tab-group.html',
   'projects/ngx-material-legacy/legacy-tabs/tab-body.html', 'projects/ngx-material-legacy/legacy-tabs/tab-body.scss',
   'reference/material-16.2.14/component-motion-sources/tabs/tab-body.ts',

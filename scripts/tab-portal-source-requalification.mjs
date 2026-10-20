@@ -15,6 +15,7 @@ import {pathToFileURL} from 'node:url';
 import {execFileSync} from 'node:child_process';
 import {gunzipSync} from 'node:zlib';
 import {tabPortalSourceReview,TAB_BODY,TAB_ADAPTER} from './tab-portal-explicit-container-review.mjs';
+import {tabPortalSourcePreparationReader} from './tab-portal-source-context.mjs';
 const ts=createRequire(import.meta.url)('typescript'),hash=b=>createHash('sha256').update(b).digest('hex');
 const path='compatibility/rc/tab-portal-source-requalification-prior.json.gz';
 const pins={main:'588cc93c987318b5cdfc07ba5cf89d84fa2c16c592f90882246d58a235ab2928','21.x':'796b590336bdca8dd2be7b71b7aeae5db51adfd1b8640981d1cb2984a7c1b04e'};
@@ -42,6 +43,7 @@ const adapterDecisions={
  ProviderToken:'This is a public type-only import for the adapter token parameter. Strict complete minimum declarations accept the actual Injector override. The only token comparisons are public ViewContainerRef and DOCUMENT; every other token is opaque and forwarded to the caller injector. No private upstream token identity is copied or manufactured.',
 };
 export function tabPortalRequalificationPrior({root=process.cwd(),read=p=>readFileSync(join(root,p))}={}){
+ read=tabPortalSourcePreparationReader({root,read});
  const raw=read(path),line=Object.keys(pins).find(k=>pins[k]===hash(raw));assert.ok(line,'changed tab requalification preimages');const prior=JSON.parse(gunzipSync(raw));assert.equal(prior.line,line);assert.equal(prior.selected.length,12);assert.equal(prior.preimages.length,17);assert.equal(new Set(prior.selected.map(r=>r.symbol)).size,12);
  for(const member of prior.preimages){assert.equal(hash(member.text),member.sha256);assert.equal(hash(read(member.path)),member.sha256,'requalification preparation requires exact prior state: '+member.path);}
  for(const member of prior.preimages){const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',prior.source_parent+':'+member.path],{cwd:root,maxBuffer:16*1024*1024,env:{...process.env,GIT_NO_LAZY_FETCH:'1'}});assert.equal(hash(before),member.sha256);}
