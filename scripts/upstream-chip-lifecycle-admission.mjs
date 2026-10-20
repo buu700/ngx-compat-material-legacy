@@ -14,6 +14,7 @@ import {inspectChipFocusRepair} from './chip-focus-contract.mjs';
 import {validateBrowserMatrixRun} from './upstream-browser-run-evidence.mjs';
 import {chipFocusLifecycleNativeOkay} from './chip-focus-lifecycle-native-contract.mjs';
 import {legacyChipBlurNativeOkay} from './legacy-chip-blur-native-contract.mjs';
+import {readCurrentChipFocusInputs,TAB_ADAPTER_INVENTORY_INPUTS,CURRENT_CHIP_FOCUS_INPUTS} from './tab-adapter-product-inventory-context.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex'),json=d=>JSON.stringify(d,null,2)+'\n';
 const foundationPath='compatibility/rc/chip-lifecycle-scope-source-review.json';
 const foundationPins={main:'d9d949b47c3a0365cdc9a54fe667af0a9cec3538b2b88821d2d0e7ce8d7527dc','21.x':'827179d966d3c982ff0c825056f090224e2b6e7a1c179644bbf6901d0ed264b8'};
@@ -25,6 +26,8 @@ export const CHIP_LIFECYCLE_NATIVE_SHAS=Object.freeze([CHIP_LIFECYCLE_SHAS[1],CH
 const nativeKind='historical-required-individual-behavior';
 const extraMembers=[
  'scripts/upstream-chip-lifecycle-admission.mjs','scripts/upstream-chip-lifecycle-scope.mjs',
+ 'scripts/tab-adapter-product-inventory-context.mjs',TAB_ADAPTER_INVENTORY_INPUTS,CURRENT_CHIP_FOCUS_INPUTS,
+ 'projects/ngx-material-legacy/legacy-tabs/tab-body.ts','projects/ngx-material-legacy/legacy-tabs/internal/tab-portal-construction-context.ts',
  'scripts/chip-focus-contract.mjs','scripts/chip-focus-repair.mjs','scripts/chip-list-focus-contract.mjs',
  'scripts/upstream-browser-run-evidence.mjs','scripts/upstream-packed-run-evidence.mjs',
  'scripts/browser-matrix-acceptance.mjs','scripts/browser-matrix-roster.mjs','scripts/browser-required-cells.mjs','scripts/browser-required-probe.js',
@@ -59,8 +62,7 @@ function foundation(read,line){const bytes=read(foundationPath);assert.equal(has
 /** Raw current source only. The archived foundation is a historical review,
  * never a replacement reader for current native/product/spec admission. */
 export function inspectChipLifecycleCurrentContract({root=process.cwd(),read,line}={}){
- const inputBytes=read('compatibility/rc/chip-focus-repair-inputs.json'),data=JSON.parse(inputBytes);
- assert.equal(hash(inputBytes),{main:'40ef578cc1983d119effd4a99a0dfd2c877489c957be56ae081a961ccfb4dfe4','21.x':'3b34cbb44b4989236de3cf61b3ea882877957ad6002162cf9735fd15cb74d3ba'}[line]);assert.equal(data.line,line);
+ const currentInputs=readCurrentChipFocusInputs({root,read}),data=currentInputs.data;assert.equal(data.line,line);
  assert.equal(hash(read(data.current_raw_contract_source.path)),data.current_raw_contract_source.sha256);
  const focus=inspectChipFocusRepair({root,readMember:read});assert.equal(focus.line,line);
  // The complete source/spec/matrix bytes were independently reviewed in the
@@ -69,7 +71,7 @@ export function inspectChipLifecycleCurrentContract({root=process.cwd(),read,lin
  assert.equal(data.current_full_historical_case_count,2236);assert.equal(data.current_positive_case_count,2231);assert.equal(data.old_positive_cases_preserved,2227);assert.equal(data.discovery_negatives_preserved,5);
  const keyManagers=chipLifecycleMinimumKeyManagerSources(read);
  const review=foundation(read,line);assert.equal(review.consumer_HTML_CSS_SCSS_changes,0);
- return {line,current_raw_focus_contract:focus,raw_spec_and_matrix_members:data.current_members.filter(m=>m.path!=='scripts/upstream-historical-behavior-evidence.mjs'),full_historical_case_count:2236,
+ return {line,current_focus_inputs:currentInputs.ref,current_raw_focus_contract:focus,raw_spec_and_matrix_members:data.current_members.filter(m=>m.path!=='scripts/upstream-historical-behavior-evidence.mjs'),full_historical_case_count:2236,
   historical_foundation_review:{path:foundationPath,sha256:foundationPins[line],candidate_context_sha256:hash(JSON.stringify(review.candidate_context)),original_source_counterexamples_preserved:2},
   current_minimum_key_manager_sources:keyManagers,current_product_read_uses_historical_projection:false,
   only_approved_focus_and_spec_delta_from_foundation:true,required_consumer_HTML_CSS_SCSS_changes:0,source_scope_only:true,actual_native_packed_or_floor_qualified:false};

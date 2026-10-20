@@ -8,6 +8,7 @@
 /** Four individual modern range-input patches; no inherited runtime claim. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {assertQualifiedProductSourcePopulation} from './tab-adapter-product-inventory-context.mjs';
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
 import {analyzeSliderInputSubjects} from './upstream-slider-input-scope.mjs';
@@ -263,7 +264,7 @@ export function reviewSliderRangeScope(read, productPaths, line) {
   assert.equal(baseInitializer(current.file), baseInitializer(oldClass.file));
   const template = 'projects/ngx-material-legacy/legacy-slider/slider.html';
   assert.equal(read(template).toString(), original.find(row => row.path.endsWith('slider.html')).text);
-  const paths = [...productPaths()].sort(); assert.equal(paths.length, 1028); assert.equal(new Set(paths).size, paths.length);
+  const paths = [...productPaths()].sort(); assertQualifiedProductSourcePopulation(paths,{read}); assert.equal(new Set(paths).size, paths.length);
   const excluded = ['MatSliderThumb', 'MatSliderRangeThumb', 'MatSliderVisualThumb', '@angular/material/slider', 'matSliderStartThumb', 'matSliderEndThumb'];
   const sources = paths.map(path => {
     const bytes = read(path); assert.ok(bytes.length);

@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "substitutions": {
+    "scripts/chip-focus-contract.mjs": [
+      [
+        "import {join} from 'node:path';",
+        "import {join} from 'node:path';\nimport {qualifyIndependentTabProductDelta} from './tab-adapter-product-inventory-context.mjs';"
+      ],
+      [
+        "let preserved=0;if(checkProduct){const population=",
+        "let preserved=0,independentProduct;if(checkProduct){independentProduct=qualifyIndependentTabProductDelta({root,read:readMember});const changed=independentProduct.delta[0],added=independentProduct.delta[1];assert.ok(!prior.product_members.some(m=>m.path===added.path));const originalMember=prior.product_members.find(m=>m.path===changed.path);assert.ok(originalMember);assert.equal(originalMember.sha256,changed.before_sha256);const population="
+      ],
+      [
+        "assert.deepEqual(population,prior.product_members.map(m=>m.path).sort());",
+        "assert.deepEqual(population,[...prior.product_members.map(m=>m.path),added.path].sort());"
+      ],
+      [
+        "assert.equal(hash(readMember(m.path)),m.sha256,'unexpected product/style/reference change '+m.path);preserved++;",
+        "const expected=m.path===changed.path?changed.sha256:m.sha256;assert.equal(hash(readMember(m.path)),expected,'unexpected product/style/reference change '+m.path);if(m.path!==changed.path)preserved++;"
+      ],
+      [
+        "all_other_product_reference_fixture_members_preserved:preserved,",
+        "all_other_product_reference_fixture_members_preserved:preserved,...(independentProduct?{independent_product_delta:independentProduct}:{}),"
+      ]
+    ],
+    "scripts/chip-focus-source-epoch.mjs": [
+      [
+        "import {CHIP_FOCUS_SOURCE,readChipFocusRepairPrior,inspectChipFocusRepair} from './chip-focus-contract.mjs';",
+        "import {CHIP_FOCUS_SOURCE,readChipFocusRepairPrior,inspectChipFocusRepair} from './chip-focus-contract.mjs';\nimport {readCurrentChipFocusInputs} from './tab-adapter-product-inventory-context.mjs';"
+      ],
+      [
+        "const bytes=read(inputPath),data=JSON.parse(bytes);assert.equal(hash(bytes),pins[data.line],'changed approved focus inputs');",
+        "const currentInputs=readCurrentChipFocusInputs({root,read}),data=currentInputs.data;"
+      ],
+      [
+        "inputs:{path:inputPath,sha256:pins[data.line]}",
+        "inputs:currentInputs.ref"
+      ],
+      [
+        "const inputPath='compatibility/rc/chip-focus-repair-inputs.json';\nconst pins={main:'40ef578cc1983d119effd4a99a0dfd2c877489c957be56ae081a961ccfb4dfe4','21.x':'3b34cbb44b4989236de3cf61b3ea882877957ad6002162cf9735fd15cb74d3ba'};\n",
+        ""
+      ]
+    ],
+    "scripts/upstream-chip-lifecycle-admission.mjs": [
+      [
+        "import {legacyChipBlurNativeOkay} from './legacy-chip-blur-native-contract.mjs';",
+        "import {legacyChipBlurNativeOkay} from './legacy-chip-blur-native-contract.mjs';\nimport {readCurrentChipFocusInputs,TAB_ADAPTER_INVENTORY_INPUTS,CURRENT_CHIP_FOCUS_INPUTS} from './tab-adapter-product-inventory-context.mjs';"
+      ],
+      [
+        " 'scripts/upstream-chip-lifecycle-admission.mjs','scripts/upstream-chip-lifecycle-scope.mjs',",
+        " 'scripts/upstream-chip-lifecycle-admission.mjs','scripts/upstream-chip-lifecycle-scope.mjs',\n 'scripts/tab-adapter-product-inventory-context.mjs',TAB_ADAPTER_INVENTORY_INPUTS,CURRENT_CHIP_FOCUS_INPUTS,\n 'projects/ngx-material-legacy/legacy-tabs/tab-body.ts','projects/ngx-material-legacy/legacy-tabs/internal/tab-portal-construction-context.ts',"
+      ],
+      [
+        " const inputBytes=read('compatibility/rc/chip-focus-repair-inputs.json'),data=JSON.parse(inputBytes);\n assert.equal(hash(inputBytes),{main:'40ef578cc1983d119effd4a99a0dfd2c877489c957be56ae081a961ccfb4dfe4','21.x':'3b34cbb44b4989236de3cf61b3ea882877957ad6002162cf9735fd15cb74d3ba'}[line]);assert.equal(data.line,line);",
+        " const currentInputs=readCurrentChipFocusInputs({root,read}),data=currentInputs.data;assert.equal(data.line,line);"
+      ],
+      [
+        "return {line,current_raw_focus_contract:focus,",
+        "return {line,current_focus_inputs:currentInputs.ref,current_raw_focus_contract:focus,"
+      ]
+    ],
+    "scripts/upstream-slider-range-followups.mjs": [
+      [
+        "import {createHash} from 'node:crypto';",
+        "import {createHash} from 'node:crypto';\nimport {assertQualifiedProductSourcePopulation} from './tab-adapter-product-inventory-context.mjs';"
+      ],
+      [
+        "const paths = [...productPaths()].sort(); assert.equal(paths.length, 1028); assert.equal(new Set(paths).size, paths.length);",
+        "const paths = [...productPaths()].sort(); assertQualifiedProductSourcePopulation(paths,{read}); assert.equal(new Set(paths).size, paths.length);"
+      ]
+    ],
+    "scripts/upstream-test-consolidation-evidence.mjs": [
+      [
+        "'compatibility/rc/chip-source-scope-requalification-build.json'].includes(contextPath)",
+        "'compatibility/rc/chip-source-scope-requalification-build.json',\n      'compatibility/rc/tab-adapter-product-inventory-build.json'].includes(contextPath)"
+      ]
+    ],
+    "scripts/tab-portal-source-context.mjs": [
+      [
+        "import {pathToFileURL} from 'node:url';",
+        "import {pathToFileURL} from 'node:url';\nimport {tabAdapterSourceContext} from './tab-adapter-product-inventory-history.mjs';"
+      ],
+      [
+        " const input=read(TAB_PORTAL_CONTEXT_INPUTS)",
+        " const inventory=tabAdapterSourceContext({root,read});read=inventory.read;\n const input=read(TAB_PORTAL_CONTEXT_INPUTS)"
+      ],
+      [
+        "const fingerprints=new Map([...metadataPaths.map(path=>[path,writes.get(path).sha256]),...contextMembers.map(m=>[m.path,hash(edited.get(m.path))]),[bodyPath,hash(read(bodyPath))]]);",
+        "const fingerprints=new Map([...metadataPaths,...contextMembers.map(m=>m.path),bodyPath].map(path=>[path,hash(inventory.raw(path))]));"
+      ]
+    ],
+    "scripts/tab-portal-source-successor.mjs": [
+      [
+        "import {gunzipSync} from 'node:zlib';",
+        "import {gunzipSync} from 'node:zlib';\nimport {tabAdapterPreviousSourceReader} from './tab-adapter-product-inventory-history.mjs';"
+      ],
+      [
+        "export function inspectTabPortalSourceSuccessor({root=process.cwd(),read=rawRead(root)}={}){",
+        "export function inspectTabPortalSourceSuccessor({root=process.cwd(),read=rawRead(root)}={}){\n read=tabAdapterPreviousSourceReader({root,read});"
+      ]
+    ],
+    "tests/tab_portal_source_successor_probe.mjs": [
+      [
+        "import {validateTabCompletion} from '../scripts/upstream-tab-completion-evidence.mjs';",
+        "import {validateTabCompletion} from '../scripts/upstream-tab-completion-evidence.mjs';\nimport {tabAdapterPreviousSourceReader} from '../scripts/tab-adapter-product-inventory-history.mjs';"
+      ],
+      [
+        "read=p=>readFileSync(join(root,p)),hash=",
+        "rawRead=p=>readFileSync(join(root,p)),read=tabAdapterPreviousSourceReader({root,read:rawRead}),hash="
+      ],
+      [
+        "inspectTabPortalSourceContext({root,read:p=>p===path?bytes:read(p)})",
+        "inspectTabPortalSourceContext({root,read:p=>p===path?bytes:rawRead(p)})"
+      ],
+      [
+        "inspectTabPortalSourceSuccessor({root,read:p=>p===path?bytes:read(p)})",
+        "inspectTabPortalSourceSuccessor({root,read:p=>p===path?bytes:rawRead(p)})"
+      ],
+      [
+        "const late=p=>changed&&p===changedPath?Buffer.concat([read(p),Buffer.from('\\n')]):read(p);",
+        "const late=p=>changed&&p===changedPath?Buffer.concat([rawRead(p),Buffer.from('\\n')]):rawRead(p);"
+      ]
+    ]
+  }
+}

@@ -14,6 +14,7 @@ import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {execFileSync} from 'node:child_process';
 import {gunzipSync} from 'node:zlib';
+import {tabAdapterPreviousSourceReader} from './tab-adapter-product-inventory-history.mjs';
 import {scanCurrentAuthoredUses,currentAuthoredUseAdmission} from './authored-current-use-inventory.mjs';
 import {authoredUseReviewEvidence} from './authored-use-inventory.mjs';
 import {validateTabCompletion,tabCompletionRequirements} from './upstream-tab-completion-evidence.mjs';
@@ -56,6 +57,7 @@ export function computeTabPortalSourceWrites({root=process.cwd(),read=rawRead(ro
  return {line,prior,context,roles,current,writes};
 }
 export function inspectTabPortalSourceSuccessor({root=process.cwd(),read=rawRead(root)}={}){
+ read=tabAdapterPreviousSourceReader({root,read});
  const expected=computeTabPortalSourceWrites({root,read});for(const[path,bytes]of expected.writes)assert.equal(hash(read(path)),hash(bytes),'changed source successor '+path);const frozen=JSON.parse(read(frozenPath)),added=JSON.parse(read(addedPath));const frozenEvidence=authoredUseReviewEvidence(frozen,expected.line,read,hash),admission=currentAuthoredUseAdmission({current:expected.current,frozen:frozen.symbol_uses,candidate:added,line:expected.line,readMember:read});assert.equal(frozenEvidence.reviewed,1464);assert.equal(frozenEvidence.insufficient,0);assert.equal(admission.source_snapshot_valid,true);assert.equal(admission.review_evidence.reviewed,185);assert.equal(admission.review_evidence.insufficient,0);assert.equal(admission.inventory.open,130);
  const ledger=JSON.parse(read(nativePath)),entry=ledger.entries.find(e=>e.sha===expected.prior.native_selection.sha),proof=entry.individual_proof,requirements=tabCompletionRequirements(entry.sha,expected.line);assert.deepEqual(proof.tab_completion_behavior.case_ids,requirements.case_ids);assert.equal(proof.tab_completion_behavior.source_members.length,requirements.members.length);const native=validateTabCompletion({root,entry,proof,request:{line:expected.line}});assert.equal(native.ok,false);assert.equal(native.detail,'missing coordinator run');
  return {schema_version:1,line:expected.line,existing_source_roles_requalified:12,new_source_routes_qualified:7,unchanged_frozen_rows:1724,unchanged_existing_additional_rows:308,unchanged_SHA_rows:1696,frozen_reviewed:1464,frozen_insufficient:0,additional_reviewed:185,additional_open:130,additional_insufficient:0,current_uses:1965,current_source_files:532,additional_uses:315,native_source_profiles_requalified:1,native_case_ids_retained:54,current_native_gate:native,new_source_closures:7,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};

@@ -13,6 +13,7 @@ import {execFileSync} from 'node:child_process';
 import {gunzipSync} from 'node:zlib';
 import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {tabAdapterSourceContext} from './tab-adapter-product-inventory-history.mjs';
 export const TAB_PORTAL_CONTEXT_INPUTS='compatibility/rc/tab-portal-source-requalification-context-inputs.json';
 const pins={main:'d2a87f6ce9bd202b86df70676c17b8dd6b356f0546898b96f4d739cbe34d717c','21.x':'1d0dce3c92390ec9d68e762500b7209616be144f0fa4d71804ff6df7235ba4c7'},hash=b=>createHash('sha256').update(b).digest('hex'),branded=new WeakMap(),gitAuthenticated=new Set();
 const metadataPaths=['compatibility/f10/authored-dependency-dispositions.json','compatibility/f10/authored-dependency-current-dispositions.json','compatibility/f10/disposition-ledger/ledger.json'];
@@ -22,6 +23,7 @@ function authenticate(root,commit,m){assert.equal(hash(m.text),m.sha256);const i
 function validate({root=process.cwd(),read=rawRead(root)}={}){
  // Only immutable Git preimages are cached. Every live byte is rechecked.
  if(branded.has(read)){const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}
+ const inventory=tabAdapterSourceContext({root,read});read=inventory.read;
  const input=read(TAB_PORTAL_CONTEXT_INPUTS),line=Object.keys(pins).find(k=>pins[k]===hash(input));assert.ok(line,'changed finite tab source context');const data=JSON.parse(input);assert.equal(data.line,line);assert.equal(data.schema_version,1);assert.equal(data.g11_claim,'not-passed');assert.equal(data.current_runtime_native_packed_or_floor_qualified,false);
  const priorRaw=read(data.prior.path),contextRaw=read(data.context_prior.path);assert.equal(hash(priorRaw),data.prior.sha256);assert.equal(hash(contextRaw),data.context_prior.sha256);const prior=JSON.parse(gunzipSync(priorRaw)),context=JSON.parse(gunzipSync(contextRaw));assert.equal(prior.line,line);assert.equal(context.line,line);assert.equal(prior.preimages.length,17);assert.equal(context.members.length,9);
  for(const m of prior.preimages)authenticate(root,prior.source_parent,m);for(const m of context.members)authenticate(root,context.source_parent,m);
@@ -33,7 +35,7 @@ function validate({root=process.cwd(),read=rawRead(root)}={}){
  assert.ok(data.current_members.length>=10);for(const m of [...data.writes,...data.current_members])assert.equal(hash(read(m.path)),m.sha256,'changed live tab source context member '+m.path);
  const repairRaw=read(prior.product_repair_prior.path);assert.equal(hash(repairRaw),prior.product_repair_prior.sha256);const repair=JSON.parse(gunzipSync(repairRaw));const old=prior.original_product_source;assert.equal(old.path,bodyPath);assert.equal(old.sha256,repair.preimages.find(m=>m.path===bodyPath).sha256);authenticate(root,repair.source_parent,old);
  const members=new Map([...prior.preimages.filter(m=>metadataPaths.includes(m.path)),...contextMembers,old].map(m=>[m.path,Buffer.from(m.text)]));assert.equal(members.size,17);
- const fingerprints=new Map([...metadataPaths.map(path=>[path,writes.get(path).sha256]),...contextMembers.map(m=>[m.path,hash(edited.get(m.path))]),[bodyPath,hash(read(bodyPath))]]);
+ const fingerprints=new Map([...metadataPaths,...contextMembers.map(m=>m.path),bodyPath].map(path=>[path,hash(inventory.raw(path))]));
  return {root,raw:read,data,line,members,old,fingerprints};
 }
 function reader(options,kind){const checked=validate(options),keys=kind==='repair'?new Set(['scripts/core-view-use-review.mjs','tests/test_core_view_use_review.py']):kind==='preparation'?new Set([...checked.members.keys()].filter(p=>p!==bodyPath)):new Set(checked.members.keys());const result=path=>keys.has(path)?Buffer.from(checked.members.get(path)):checked.raw(path);branded.set(result,{root:checked.root,raw:checked.raw});return result;}
