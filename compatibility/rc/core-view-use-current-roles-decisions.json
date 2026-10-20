@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "role": "Individual current-caller Core view API decisions; no ledger transition or native qualification",
+  "decisions": [
+    {
+      "file": "legacy-dialog/dialog-ref.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "current_role": "exported-handle-type",
+      "decision": "The readonly nullable componentRef field describes the component handle copied from the public CDK DialogRef. It performs no Core construction or private view access; template dialogs retain null and the historical wrapper API stays intact."
+    },
+    {
+      "file": "legacy-menu/menu-content.ts",
+      "module": "@angular/core",
+      "symbol": "ApplicationRef",
+      "current_role": "constructor-forwarding",
+      "decision": "The concrete menu-content constructor forwards the caller-supplied ApplicationRef unchanged to the owned content base. It neither creates an application nor acquires ownership of it; the base supplies this borrowed reference to public DomPortalOutlet."
+    },
+    {
+      "file": "legacy-menu/menu-content.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "constructor-forwarding",
+      "decision": "The injected template is forwarded unchanged to the owned content base. The base uses its public declaration anchor and TemplatePortal context path; no template internals or modern menu implementation are imported."
+    },
+    {
+      "file": "legacy-menu/menu-content.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "constructor-forwarding",
+      "decision": "The injected view container is forwarded unchanged to the owned menu-content base and then to its TemplatePortal. The declaration container remains the owner of created embedded views; the wrapper adds no view/container replacement."
+    },
+    {
+      "file": "legacy-tabs/tab-body.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "explicit-container-adapter",
+      "decision": "The explicit public injection token and historical constructor parameter feed constructLegacyTabBodyPortal with new.target and the supplied document. The separately reproduced and repaired public CDK parent now uses this supplied container rather than an ambient one. Host state and subscription initialization remain on the returned genuine parent instance."
+    },
+    {
+      "file": "legacy-tabs/tab.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "content-query-read-token",
+      "decision": "The ContentChild query reads the public TemplateRef from the legacy content token and stores it in the historical explicit-content field. This is a runtime query token as well as an annotation; it is not classified as an erased type-only import."
+    },
+    {
+      "file": "legacy-tooltip/tooltip.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "constructor-forwarding",
+      "decision": "The public tooltip wrapper forwards the original injected container unchanged to its owned base constructor. The base uses that container for ComponentPortal ownership and its public injector for render scheduling; the wrapper changes no injection or lifetime contract."
+    },
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "portal-owner-and-injector",
+      "decision": "The stored container supplies ComponentPortal construction and its public injector supplies afterTooltipRender. The code accesses no private view representation and retains the complete show/message/dispose flow. Genuine public container/component-portal behavior supports this Core role; tooltip rendering and scheduling remain separate runtime obligations."
+    },
+    {
+      "file": "legacy-tabs/internal/tab-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "query-and-template-portal",
+      "decision": "The explicit content annotation and implicit ViewChild query produce the two historical TemplateRef choices. ngOnInit chooses explicit content before implicit content and passes it to TemplatePortal with the stored container. Public token identity and context-preserving template portals support this role without changing query timing or markup."
+    },
+    {
+      "file": "legacy-tabs/internal/tab-base.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "template-portal-owner",
+      "decision": "The injected container is stored and supplied as the declaration owner of the TemplatePortal created in ngOnInit. No container is created, destroyed or replaced by this base; its state-change and content selection behavior remains historical."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "current_role": "component-portal-result-type",
+      "decision": "The local component handle is the public ComponentRef returned by overlay attachment of a ComponentPortal. Only its public instance is read to configure the owned container; the container instance is returned and no private component-view state is accessed."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/core",
+      "symbol": "EmbeddedViewRef",
+      "current_role": "template-result-type",
+      "decision": "The public return types retain MatSnackBarRef<EmbeddedViewRef<any>> for template content. The embedded handle returned by the owned container is assigned to the snack reference; this is the historical template-instance API, not a component instance or a new lifetime owner."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "template-discriminator-and-portal",
+      "decision": "openFromTemplate forwards the public template to _attach. The complete attachment method distinguishes the public TemplateRef at runtime and creates TemplatePortal with the historical data/snackBarRef context. Its null declaration-container argument is consumed by the owned CdkPortalOutlet, which creates the embedded view in its own container; it is not sent to DomPortalOutlet."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/core",
+      "symbol": "Type",
+      "current_role": "component-constructor-types",
+      "decision": "The two abstract Type fields describe concrete text-only and container component constructors supplied by subclasses. They are passed to public component-portal creation/openFromComponent. The Core Type interface is an erased constructor contract and introduces no runtime Type token or private factory dependency."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "current_role": "component-outlet-result-type",
+      "decision": "The complete attachComponentPortal method retains the pre-attachment check, delegates to its public CdkPortalOutlet, runs the existing post-attachment hook and returns the actual ComponentRef. It does not wrap, clone or take a second lifetime owner of the handle."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "EmbeddedViewRef",
+      "current_role": "template-outlet-result-type",
+      "decision": "The complete attachTemplatePortal method retains its attachment guard and post-attachment hook around the public outlet call and returns the actual EmbeddedViewRef<C>. Generic context and disposal remain the public view/outlet contract; snack-bar motion and native rendering are not inferred."
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "injector-and-template-portal",
+      "decision": "The constructor stores the supplied container and resolves BreakpointObserver through its public injector. Closing-action render scheduling uses that same injector, and overlay creation supplies the same container to TemplatePortal with the original context. This Core role requires no private view access or new ambient injection requirement; the other peer services and native popup behavior retain their separate obligations."
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "template-view-query",
+      "decision": "The existing static ViewChild query obtains a public TemplateRef for the panel and exposes it to the trigger. Both the runtime query token and field annotation remain public; there is no template cloning, private context extraction or changed selection/overlay structure."
+    },
+    {
+      "file": "legacy-menu/internal/menu-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "template-view-query",
+      "decision": "The existing dynamic ViewChild query exposes the public menu TemplateRef consumed by menu-trigger TemplatePortal creation. Query timing and menu structure remain unchanged; this role uses the public token and does not import a modern menu template or private view field."
+    },
+    {
+      "file": "legacy-menu/internal/menu-trigger-base.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "constructor-and-menu-portal",
+      "decision": "All historical overloads and the implementation retain the supplied ViewContainerRef. _getPortal passes that stored container to TemplatePortal and replaces the portal only when the menu template identity changes. The Core dependency is the public declaration-container owner, not a new container or private outlet token."
+    },
+    {
+      "file": "legacy-menu/internal/menu-content-base.ts",
+      "module": "@angular/core",
+      "symbol": "ApplicationRef",
+      "current_role": "borrowed-application-outlet",
+      "decision": "The constructor stores the caller ApplicationRef and supplies it unchanged to the supported three-argument DomPortalOutlet constructor. The owned class never bootstraps or destroys that application. Template attachment uses the supplied view container; detach/dispose releases the outlet content while preserving borrowed owners."
+    },
+    {
+      "file": "legacy-menu/internal/menu-content-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "template-anchor-and-context",
+      "decision": "The complete attach method creates TemplatePortal from the supplied template/container, uses the public template.elementRef declaration anchor for DOM insertion, marks for check and attaches the caller context. Reattachment and destruction keep the historical detach/dispose path. Public template/portal identity and context behavior support this role; native menu rendering remains separate."
+    },
+    {
+      "file": "legacy-menu/internal/menu-content-base.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "template-declaration-owner",
+      "decision": "The constructor stores the supplied ViewContainerRef and attach uses it as the TemplatePortal declaration owner. Repeated attachment reuses the portal but detaches the previous view before attaching a fresh context. The parent container is borrowed and is never cleared or destroyed as an application owner."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "current_role": "public-dialog-handle-type",
+      "decision": "The complete open method copies the public nullable CDK DialogRef componentRef into the historical wrapper through its existing writable local structural cast. This does not write Core ComponentRef internals or change its host-view ownership. Public minimum dialog declarations retain ComponentRef<C> | null."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "dialog-overload-and-context",
+      "decision": "The historical template/component overloads forward the same public TemplateRef to CDK Dialog.open with the existing container/providers/templateContext configuration. No template is instantiated manually or replaced with a modern component contract. The public generic handle/template API remains distinct from dialog rendering and motion qualification."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "Type",
+      "current_role": "wrapper-and-container-constructor-types",
+      "decision": "The constructor retains Type fields for the owned dialog-reference wrapper and container. The wrapper is constructed with its historical three arguments and the container type is passed to the public CDK dialog configuration. Type is an erased public constructor interface; no runtime Type injection or private component factory is introduced."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "current_role": "public-component-outlet-result",
+      "decision": "The override checks content availability, attaches the ComponentPortal through the public outlet, invokes the existing content-attached hook and returns the unchanged ComponentRef<T>. The Core type is a public handle, with no private view access or new lifetime behavior."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "EmbeddedViewRef",
+      "current_role": "public-template-outlet-result",
+      "decision": "The override checks content availability, delegates TemplatePortal attachment to the public outlet, invokes the existing hook and returns the unchanged EmbeddedViewRef<T>. Context typing and disposal stay with the public outlet/view contract; whole dialog lifecycle qualification remains separate."
+    },
+    {
+      "file": "legacy-menu/internal/menu-panel.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "public-interface-type",
+      "decision": "The interface field requires a public TemplateRef<any> for trigger-created template portals. It emits no runtime import use or Angular injection metadata and changes no implementation or provider; this is the historical panel interoperability type."
+    },
+    {
+      "file": "legacy-table/cell.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "public-token-constructor-adapter",
+      "decision": "All three original cell-definition constructors supply the exact passed public TemplateRef token/value to constructWithPublicDependencies for genuine public CDK cell definitions. The bounded borrowed injector preserves supplied object identity and new.target without destroying the template. Existing table constructor/token evidence remains explicitly limited to its recorded runtime scope."
+    },
+    {
+      "file": "legacy-table/internal/table-outlet.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "public-outlet-container-field",
+      "decision": "The owned outlet injects and exposes a readonly public viewContainer for the maintained parent outlet protocol. Registration selects the existing table slot and does not replace, create or destroy this container. This Core role preserves the public container object; the separate table-parent protocol and native row behavior retain their own evidence and gates."
+    },
+    {
+      "file": "legacy-table/row.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "public-token-row-adapters",
+      "decision": "The three row-definition constructors and no-data-row constructor provide the supplied public TemplateRef to the bounded public-parent constructor context. Existing differs/table forwarding, new.target and historical no-data classes remain unchanged. This role does not classify removed private table tokens as public or grant an unexecuted21 runtime/floor pass."
+    },
+    {
+      "file": "legacy-tabs/tab-content.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "public-token-content-adapter",
+      "decision": "The public template property and constructor preserve the caller TemplateRef by providing that exact token/value to the genuine public current MatTabContent parent through the borrowed constructor helper. No template is created or destroyed, and the original constructor shape remains available outside ambient DI."
+    },
+    {
+      "file": "legacy-tabs/tab-label.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "public-token-label-adapter",
+      "decision": "The explicit Inject(TemplateRef) parameter supplies the same public template token/value to genuine current MatTabLabel construction. The helper preserves new.target, while the owned wrapper retains closest-tab assignment. The role is runtime injection/forwarding as well as annotation, with no private view or new template lifetime."
+    },
+    {
+      "file": "legacy-tabs/tab-label.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "public-token-label-container-adapter",
+      "decision": "The explicit Inject(ViewContainerRef) parameter supplies the original caller container to genuine current MatTabLabel construction through the bounded borrowed injector. It preserves the parent portal declaration owner and manual-constructor contract; it neither replaces that container nor registers destruction of the borrowed owner."
+    }
+  ],
+  "new_closures": 0,
+  "g11_claim": "not-passed"
+}

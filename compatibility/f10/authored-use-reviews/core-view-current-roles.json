@@ -1,0 +1,2443 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "criteria": "All35 actual current callers and identifier roles reviewed individually;22 full sources authenticated. Public type identity alone is insufficient. One null-container CdkPortalOutlet path has a separate genuine tagged/minimum public lifecycle proof.",
+  "reviews": [
+    {
+      "file": "legacy-dialog/dialog-ref.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "current_role": "exported-handle-type",
+      "decision": "The readonly nullable componentRef field describes the component handle copied from the public CDK DialogRef. It performs no Core construction or private view access; template dialogs retain null and the historical wrapper API stays intact.",
+      "candidate_source_sha256": "93cf4e88a9971a01b2572c0491142351c4598a4b325760733111266b4a10a071",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ComponentRef",
+        "occurrences": [
+          {
+            "line": 38,
+            "column": 26,
+            "parent_kind": "TypeReference",
+            "parent_source": "ComponentRef<T>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "componentRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 38,
+            "member_sha256": "a7124231513a03aac8b27176c4a952344313a7e26976917721269a787cb873b0",
+            "reasons": [
+              "Core:ComponentRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-source-proof.json",
+          "sha256": "43289806c97b20277388d6473a69cec6fc32301ec1a45d787977c9ffdfd219d7"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-menu/menu-content.ts",
+      "module": "@angular/core",
+      "symbol": "ApplicationRef",
+      "current_role": "constructor-forwarding",
+      "decision": "The concrete menu-content constructor forwards the caller-supplied ApplicationRef unchanged to the owned content base. It neither creates an application nor acquires ownership of it; the base supplies this borrowed reference to public DomPortalOutlet.",
+      "candidate_source_sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ApplicationRef",
+        "occurrences": [
+          {
+            "line": 34,
+            "column": 13,
+            "parent_kind": "TypeReference",
+            "parent_source": "ApplicationRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "appRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 32,
+            "member_sha256": "84deafd0fa1d14cdcb34441050981f926c6ba6e6ccbb69d887e5e30fdb0cc335",
+            "reasons": [
+              "Core:ApplicationRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-menu/menu-content.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "constructor-forwarding",
+      "decision": "The injected template is forwarded unchanged to the owned content base. The base uses its public declaration anchor and TemplatePortal context path; no template internals or modern menu implementation are imported.",
+      "candidate_source_sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 33,
+            "column": 15,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "template"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 32,
+            "member_sha256": "84deafd0fa1d14cdcb34441050981f926c6ba6e6ccbb69d887e5e30fdb0cc335",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-menu/menu-content.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "constructor-forwarding",
+      "decision": "The injected view container is forwarded unchanged to the owned menu-content base and then to its TemplatePortal. The declaration container remains the owner of created embedded views; the wrapper adds no view/container replacement.",
+      "candidate_source_sha256": "f682059286b3dd21faf6676cfe5e6c36d4f9ab08e515f1c76f7f31e6b2b506af",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ViewContainerRef",
+        "occurrences": [
+          {
+            "line": 36,
+            "column": 23,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "viewContainerRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 32,
+            "member_sha256": "84deafd0fa1d14cdcb34441050981f926c6ba6e6ccbb69d887e5e30fdb0cc335",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-tabs/tab-body.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "explicit-container-adapter",
+      "decision": "The explicit public injection token and historical constructor parameter feed constructLegacyTabBodyPortal with new.target and the supplied document. The separately reproduced and repaired public CDK parent now uses this supplied container rather than an ambient one. Host state and subscription initialization remain on the returned genuine parent instance.",
+      "candidate_source_sha256": "bb9cbef0831ea50ebe4577e4bc50b5ea4d0e9b25f332aad6d872a7fdc5cec004",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ViewContainerRef",
+        "occurrences": [
+          {
+            "line": 50,
+            "column": 13,
+            "parent_kind": "CallExpression",
+            "parent_source": "Inject(ViewContainerRef)"
+          },
+          {
+            "line": 50,
+            "column": 49,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "viewContainerRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 49,
+            "member_sha256": "59c0a9d68c0054ee514450538fd8100ecabc9e67a47d1e2ba340e55035890bc0",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/tab-portal-explicit-container-public-main.json",
+          "sha256": "360985f36546be93cc4b1d16a5586611131115d0a5ff751db4af768717d2cbb8"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tabs/internal/tab-portal-construction-context.ts",
+          "sha256": "6e2047cb3efe6a8a26db692928c0f9f97d4cbc5fb701ae275ee23ad3850221d2"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-tabs/tab.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "content-query-read-token",
+      "decision": "The ContentChild query reads the public TemplateRef from the legacy content token and stores it in the historical explicit-content field. This is a runtime query token as well as an annotation; it is not classified as an erased type-only import.",
+      "candidate_source_sha256": "e58220c6f0e19f4f6395bd13756926d6cd140ad9c1bcc38877c011a353b61fae",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 50,
+            "column": 41,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "read: TemplateRef"
+          },
+          {
+            "line": 52,
+            "column": 30,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_explicitContent"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 50,
+            "member_sha256": "885260955682772ef5b996b9628b0c962a062b0a0d4f6312a4f8340bf1f14792",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-tooltip/tooltip.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "constructor-forwarding",
+      "decision": "The public tooltip wrapper forwards the original injected container unchanged to its owned base constructor. The base uses that container for ComponentPortal ownership and its public injector for render scheduling; the wrapper changes no injection or lifetime contract.",
+      "candidate_source_sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ViewContainerRef",
+        "occurrences": [
+          {
+            "line": 61,
+            "column": 23,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "viewContainerRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 57,
+            "member_sha256": "21d57bba8632c0c3bf0b498f351925ee728f4710f3b82ef6e6ac6a85a047387e",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-tooltip/internal/tooltip-base.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "portal-owner-and-injector",
+      "decision": "The stored container supplies ComponentPortal construction and its public injector supplies afterTooltipRender. The code accesses no private view representation and retains the complete show/message/dispose flow. Genuine public container/component-portal behavior supports this Core role; tooltip rendering and scheduling remain separate runtime obligations.",
+      "candidate_source_sha256": "948fd1d57f52e617eca301b693261127e42b3e4d23d0db8b2a3e2f012db0a85d",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ViewContainerRef",
+        "occurrences": [
+          {
+            "line": 284,
+            "column": 32,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_viewContainerRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 280,
+            "member_sha256": "bfbfebf5b60c93082b1916a6dd85b28c52acac73d4b8cf06a9a4630a28652b4f",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          },
+          {
+            "line": 367,
+            "member_sha256": "7426643ffcd1ff556bc7111b2ee7cc9c5984373d087384ad0cb346ca4f24924f",
+            "reasons": [
+              "this._viewContainerRef"
+            ]
+          },
+          {
+            "line": 584,
+            "member_sha256": "5ede2b33e353177c7baec285e4d85104ddd2648a89839f895fb71190f670ac4c",
+            "reasons": [
+              "this._viewContainerRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-tabs/internal/tab-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "query-and-template-portal",
+      "decision": "The explicit content annotation and implicit ViewChild query produce the two historical TemplateRef choices. ngOnInit chooses explicit content before implicit content and passes it to TemplatePortal with the stored container. Public token identity and context-preserving template portals support this role without changing query timing or markup.",
+      "candidate_source_sha256": "c2c5c4a69762261f8e8241e1325f381d6ad2c431a2734d354c85c84244d3291a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 71,
+            "column": 21,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 74,
+            "column": 14,
+            "parent_kind": "CallExpression",
+            "parent_source": "ViewChild(TemplateRef, {static: true})"
+          },
+          {
+            "line": 74,
+            "column": 61,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_explicitContent",
+          "_implicitContent"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 71,
+            "member_sha256": "e5d8c13dabce24cdf0d699696316a8e9b0e103974f1ec661b0f5c7264f9ae414",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 74,
+            "member_sha256": "67e15ce8ad6964c8958db9c994ff75e4e3ad1c0874602796be83fdf912e7d61f",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 145,
+            "member_sha256": "9adecd016a0e4f99d543e2e0f0f50593a81c60c564c4c02baf4a918dba9d9966",
+            "reasons": [
+              "this._explicitContent",
+              "this._implicitContent"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-tabs/internal/tab-base.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "template-portal-owner",
+      "decision": "The injected container is stored and supplied as the declaration owner of the TemplatePortal created in ngOnInit. No container is created, destroyed or replaced by this base; its state-change and content selection behavior remains historical.",
+      "candidate_source_sha256": "c2c5c4a69762261f8e8241e1325f381d6ad2c431a2734d354c85c84244d3291a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ViewContainerRef",
+        "occurrences": [
+          {
+            "line": 129,
+            "column": 32,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_viewContainerRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 128,
+            "member_sha256": "3de037e4e0291ffe9e48770b490bf032ccac47531e96e8b85ff4b610c00f7ed8",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          },
+          {
+            "line": 145,
+            "member_sha256": "9adecd016a0e4f99d543e2e0f0f50593a81c60c564c4c02baf4a918dba9d9966",
+            "reasons": [
+              "this._viewContainerRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "current_role": "component-portal-result-type",
+      "decision": "The local component handle is the public ComponentRef returned by overlay attachment of a ComponentPortal. Only its public instance is read to configure the owned container; the container instance is returned and no private component-view state is accessed.",
+      "candidate_source_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ComponentRef",
+        "occurrences": [
+          {
+            "line": 169,
+            "column": 25,
+            "parent_kind": "TypeReference",
+            "parent_source": "ComponentRef<_MatSnackBarContainerBase>"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 154,
+            "member_sha256": "f0f8e195b7f0b47d8806954255c58c2bfbca81d3a169f58b8d2f03ce614b3573",
+            "reasons": [
+              "Core:ComponentRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/core",
+      "symbol": "EmbeddedViewRef",
+      "current_role": "template-result-type",
+      "decision": "The public return types retain MatSnackBarRef<EmbeddedViewRef<any>> for template content. The embedded handle returned by the owned container is assigned to the snack reference; this is the historical template-instance API, not a component instance or a new lifetime owner.",
+      "candidate_source_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "EmbeddedViewRef",
+        "occurrences": [
+          {
+            "line": 105,
+            "column": 21,
+            "parent_kind": "TypeReference",
+            "parent_source": "EmbeddedViewRef<any>"
+          },
+          {
+            "line": 181,
+            "column": 25,
+            "parent_kind": "TypeReference",
+            "parent_source": "EmbeddedViewRef<any>"
+          },
+          {
+            "line": 185,
+            "column": 48,
+            "parent_kind": "TypeReference",
+            "parent_source": "EmbeddedViewRef<any>"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 102,
+            "member_sha256": "adc39992ebe65904fcdc1a2c983b29f99fad23bff0d10819ba9fea33b270d7d3",
+            "reasons": [
+              "Core:EmbeddedViewRef"
+            ]
+          },
+          {
+            "line": 178,
+            "member_sha256": "a5a400a923d3ec84b66c81d27d78b30f6363efa5ac5222d92c6a0dd9a5da93be",
+            "reasons": [
+              "Core:EmbeddedViewRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "template-discriminator-and-portal",
+      "decision": "openFromTemplate forwards the public template to _attach. The complete attachment method distinguishes the public TemplateRef at runtime and creates TemplatePortal with the historical data/snackBarRef context. Its null declaration-container argument is consumed by the owned CdkPortalOutlet, which creates the embedded view in its own container; it is not sent to DomPortalOutlet.",
+      "candidate_source_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 103,
+            "column": 15,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 179,
+            "column": 33,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<T>"
+          },
+          {
+            "line": 187,
+            "column": 28,
+            "parent_kind": "BinaryExpression",
+            "parent_source": "content instanceof TemplateRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "template",
+          "content"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 102,
+            "member_sha256": "adc39992ebe65904fcdc1a2c983b29f99fad23bff0d10819ba9fea33b270d7d3",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 178,
+            "member_sha256": "a5a400a923d3ec84b66c81d27d78b30f6363efa5ac5222d92c6a0dd9a5da93be",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-base.ts",
+      "module": "@angular/core",
+      "symbol": "Type",
+      "current_role": "component-constructor-types",
+      "decision": "The two abstract Type fields describe concrete text-only and container component constructors supplied by subclasses. They are passed to public component-portal creation/openFromComponent. The Core Type interface is an erased constructor contract and introduces no runtime Type token or private factory dependency.",
+      "candidate_source_sha256": "1faece639aa44d426b249e15a3a3cca82ae6291371102ce88d8e3ef02baef38c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "Type",
+        "occurrences": [
+          {
+            "line": 50,
+            "column": 47,
+            "parent_kind": "TypeReference",
+            "parent_source": "Type<LegacyTextOnlySnackBar>"
+          },
+          {
+            "line": 53,
+            "column": 50,
+            "parent_kind": "TypeReference",
+            "parent_source": "Type<_MatSnackBarContainerBase>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "simpleSnackBarComponent",
+          "snackBarContainerComponent"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 50,
+            "member_sha256": "7d2636e04bf9a87de4c61047defe3be177c43eca6780dbed2712a58aba9b60be",
+            "reasons": [
+              "Core:Type"
+            ]
+          },
+          {
+            "line": 53,
+            "member_sha256": "6c6f0989493099392378d51857f90f7f7ae75765a51b7ce440a9dff5fec46870",
+            "reasons": [
+              "Core:Type"
+            ]
+          },
+          {
+            "line": 115,
+            "member_sha256": "9be07b2017572f546b7ec902f598920fffb8a8930a5b89f9dd7cff5ce303165f",
+            "reasons": [
+              "this.simpleSnackBarComponent"
+            ]
+          },
+          {
+            "line": 154,
+            "member_sha256": "f0f8e195b7f0b47d8806954255c58c2bfbca81d3a169f58b8d2f03ce614b3573",
+            "reasons": [
+              "this.snackBarContainerComponent"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "current_role": "component-outlet-result-type",
+      "decision": "The complete attachComponentPortal method retains the pre-attachment check, delegates to its public CdkPortalOutlet, runs the existing post-attachment hook and returns the actual ComponentRef. It does not wrap, clone or take a second lifetime owner of the handle.",
+      "candidate_source_sha256": "d9ddfcf0a2f5a27a17670b9c4f382b2739c9a4f9ff5baffaef542cd866ecddab",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ComponentRef",
+        "occurrences": [
+          {
+            "line": 110,
+            "column": 57,
+            "parent_kind": "TypeReference",
+            "parent_source": "ComponentRef<T>"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 110,
+            "member_sha256": "a18fa22282464c60c1a136f86b116be1f16c4cc226965371a8f97ab14409d7da",
+            "reasons": [
+              "Core:ComponentRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-snack-bar/internal/snack-bar-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "EmbeddedViewRef",
+      "current_role": "template-outlet-result-type",
+      "decision": "The complete attachTemplatePortal method retains its attachment guard and post-attachment hook around the public outlet call and returns the actual EmbeddedViewRef<C>. Generic context and disposal remain the public view/outlet contract; snack-bar motion and native rendering are not inferred.",
+      "candidate_source_sha256": "d9ddfcf0a2f5a27a17670b9c4f382b2739c9a4f9ff5baffaef542cd866ecddab",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "EmbeddedViewRef",
+        "occurrences": [
+          {
+            "line": 118,
+            "column": 55,
+            "parent_kind": "TypeReference",
+            "parent_source": "EmbeddedViewRef<C>"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 118,
+            "member_sha256": "9d4d25afba27be73d29095a722d23c3190249165dd47b6745d774e03e14642b4",
+            "reasons": [
+              "Core:EmbeddedViewRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "injector-and-template-portal",
+      "decision": "The constructor stores the supplied container and resolves BreakpointObserver through its public injector. Closing-action render scheduling uses that same injector, and overlay creation supplies the same container to TemplatePortal with the original context. This Core role requires no private view access or new ambient injection requirement; the other peer services and native popup behavior retain their separate obligations.",
+      "candidate_source_sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ViewContainerRef",
+        "occurrences": [
+          {
+            "line": 198,
+            "column": 32,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_viewContainerRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 195,
+            "member_sha256": "0aa0c6d8eb4235ad923b0f0bfbc1db029853bdb11d4926b3ec3c1ec3516fd730",
+            "reasons": [
+              "Core:ViewContainerRef",
+              "this._viewContainerRef"
+            ]
+          },
+          {
+            "line": 573,
+            "member_sha256": "907890e8b7946f656a7d42c7a1f43a54bdd99958ec19d3bd4a27c57c7acb6158",
+            "reasons": [
+              "this._viewContainerRef"
+            ]
+          },
+          {
+            "line": 733,
+            "member_sha256": "311564106257ae16ce1a6b7e43300bd73a120a3e2d2ffa11dfea4b440fad9da2",
+            "reasons": [
+              "this._viewContainerRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-autocomplete/internal/autocomplete-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "template-view-query",
+      "decision": "The existing static ViewChild query obtains a public TemplateRef for the panel and exposes it to the trigger. Both the runtime query token and field annotation remain public; there is no template cloning, private context extraction or changed selection/overlay structure.",
+      "candidate_source_sha256": "a35c9828093141136e677671aefb92409813dc313e9e247d431841aafc36045d",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 127,
+            "column": 14,
+            "parent_kind": "CallExpression",
+            "parent_source": "ViewChild(TemplateRef, {static: true})"
+          },
+          {
+            "line": 127,
+            "column": 53,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "template"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 127,
+            "member_sha256": "d93b71f91f368c4bec10284a7ad7cc6f3e372fff591eba7b6920e025f2685b23",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-menu/internal/menu-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "template-view-query",
+      "decision": "The existing dynamic ViewChild query exposes the public menu TemplateRef consumed by menu-trigger TemplatePortal creation. Query timing and menu structure remain unchanged; this role uses the public token and does not import a modern menu template or private view field.",
+      "candidate_source_sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 173,
+            "column": 14,
+            "parent_kind": "CallExpression",
+            "parent_source": "ViewChild(TemplateRef)"
+          },
+          {
+            "line": 173,
+            "column": 40,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "templateRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 173,
+            "member_sha256": "28a1389972888f7646141244799ca5f72f9e4bed807986f3091a5e01e6d32874",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-menu/internal/menu-trigger-base.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "constructor-and-menu-portal",
+      "decision": "All historical overloads and the implementation retain the supplied ViewContainerRef. _getPortal passes that stored container to TemplatePortal and replaces the portal only when the menu template identity changes. The Core dependency is the public declaration-container owner, not a new container or private outlet token.",
+      "candidate_source_sha256": "f1e499dae58e12e8333ef81e480d069d93599cadda29ed2df32262e44d6c45a8",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ViewContainerRef",
+        "occurrences": [
+          {
+            "line": 233,
+            "column": 23,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          },
+          {
+            "line": 249,
+            "column": 23,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          },
+          {
+            "line": 264,
+            "column": 23,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          },
+          {
+            "line": 275,
+            "column": 32,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "viewContainerRef",
+          "_viewContainerRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 230,
+            "member_sha256": "130c88144510aa7ee86f39203d37d1a1ba4363519dd7348531e9e17277c9b42a",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          },
+          {
+            "line": 246,
+            "member_sha256": "8db4a2a6ae8746750940fe41c1ac75611f05317ecd5e8c590cd50c1a10a9fa32",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          },
+          {
+            "line": 261,
+            "member_sha256": "b6d27985cd416d9dadac3d9b3b84efed4af717eb777a14545c7b52be7eefb94f",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          },
+          {
+            "line": 272,
+            "member_sha256": "f98910d507182a8d315b570885059907169282d2b51567b8c5298452b9a42751",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          },
+          {
+            "line": 778,
+            "member_sha256": "071ff9d7fb769c00fc28bda866d038c5c7e1c37cc50199142bfc8ccfe0a21d83",
+            "reasons": [
+              "this._viewContainerRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-menu/internal/menu-content-base.ts",
+      "module": "@angular/core",
+      "symbol": "ApplicationRef",
+      "current_role": "borrowed-application-outlet",
+      "decision": "The constructor stores the caller ApplicationRef and supplies it unchanged to the supported three-argument DomPortalOutlet constructor. The owned class never bootstraps or destroys that application. Template attachment uses the supplied view container; detach/dispose releases the outlet content while preserving borrowed owners.",
+      "candidate_source_sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ApplicationRef",
+        "occurrences": [
+          {
+            "line": 36,
+            "column": 22,
+            "parent_kind": "TypeReference",
+            "parent_source": "ApplicationRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_appRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 34,
+            "member_sha256": "0876a8eae42d8557b950652ba9116be636fa777adb208a2b5ae1ba3c2e662d8e",
+            "reasons": [
+              "Core:ApplicationRef"
+            ]
+          },
+          {
+            "line": 47,
+            "member_sha256": "c956055c8deadbeff5396ff41c7aab9b55d6ce0a07e1bb1b5e5290ae9be7f7eb",
+            "reasons": [
+              "this._appRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-menu/internal/menu-content-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "template-anchor-and-context",
+      "decision": "The complete attach method creates TemplatePortal from the supplied template/container, uses the public template.elementRef declaration anchor for DOM insertion, marks for check and attaches the caller context. Reattachment and destruction keep the historical detach/dispose path. Public template/portal identity and context behavior support this role; native menu rendering remains separate.",
+      "candidate_source_sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 35,
+            "column": 24,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_template"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 34,
+            "member_sha256": "0876a8eae42d8557b950652ba9116be636fa777adb208a2b5ae1ba3c2e662d8e",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 47,
+            "member_sha256": "c956055c8deadbeff5396ff41c7aab9b55d6ce0a07e1bb1b5e5290ae9be7f7eb",
+            "reasons": [
+              "this._template"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-menu/internal/menu-content-base.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "template-declaration-owner",
+      "decision": "The constructor stores the supplied ViewContainerRef and attach uses it as the TemplatePortal declaration owner. Repeated attachment reuses the portal but detaches the previous view before attaching a fresh context. The parent container is borrowed and is never cleared or destroyed as an application owner.",
+      "candidate_source_sha256": "b0118e2200c6cf629bf5ca181277fb4e08d381c595aacc528d6f5724f416503f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ViewContainerRef",
+        "occurrences": [
+          {
+            "line": 38,
+            "column": 32,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_viewContainerRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 34,
+            "member_sha256": "0876a8eae42d8557b950652ba9116be636fa777adb208a2b5ae1ba3c2e662d8e",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          },
+          {
+            "line": 47,
+            "member_sha256": "c956055c8deadbeff5396ff41c7aab9b55d6ce0a07e1bb1b5e5290ae9be7f7eb",
+            "reasons": [
+              "this._viewContainerRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "current_role": "public-dialog-handle-type",
+      "decision": "The complete open method copies the public nullable CDK DialogRef componentRef into the historical wrapper through its existing writable local structural cast. This does not write Core ComponentRef internals or change its host-view ownership. Public minimum dialog declarations retain ComponentRef<C> | null.",
+      "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ComponentRef",
+        "occurrences": [
+          {
+            "line": 154,
+            "column": 35,
+            "parent_kind": "TypeReference",
+            "parent_source": "ComponentRef<T>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "componentRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 113,
+            "member_sha256": "303a4cc2447a1870781ee17ac88225b07abe4a0700dea4db76a7ff8f925d85b9",
+            "reasons": [
+              "Core:ComponentRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-source-proof.json",
+          "sha256": "43289806c97b20277388d6473a69cec6fc32301ec1a45d787977c9ffdfd219d7"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "dialog-overload-and-context",
+      "decision": "The historical template/component overloads forward the same public TemplateRef to CDK Dialog.open with the existing container/providers/templateContext configuration. No template is instantiated manually or replaced with a modern component contract. The public generic handle/template API remains distinct from dialog rendering and motion qualification.",
+      "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 104,
+            "column": 15,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<T>"
+          },
+          {
+            "line": 109,
+            "column": 34,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<T>"
+          },
+          {
+            "line": 114,
+            "column": 48,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<T>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "template",
+          "componentOrTemplateRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 103,
+            "member_sha256": "4ce9c84d2b6b8714c3717c09e640fb695617c8530d20e73db36686afc3d88f16",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 108,
+            "member_sha256": "bd39924911609d6526cffcd7924350a781f18dcb4c0352bce9a8981dbc6b5aed",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 113,
+            "member_sha256": "303a4cc2447a1870781ee17ac88225b07abe4a0700dea4db76a7ff8f925d85b9",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-source-proof.json",
+          "sha256": "43289806c97b20277388d6473a69cec6fc32301ec1a45d787977c9ffdfd219d7"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "Type",
+      "current_role": "wrapper-and-container-constructor-types",
+      "decision": "The constructor retains Type fields for the owned dialog-reference wrapper and container. The wrapper is constructed with its historical three arguments and the container type is passed to the public CDK dialog configuration. Type is an erased public constructor interface; no runtime Type injection or private component factory is introduced.",
+      "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "Type",
+        "occurrences": [
+          {
+            "line": 85,
+            "column": 36,
+            "parent_kind": "TypeReference",
+            "parent_source": "Type<MatLegacyDialogRef<any>>"
+          },
+          {
+            "line": 86,
+            "column": 35,
+            "parent_kind": "TypeReference",
+            "parent_source": "Type<C>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_dialogRefConstructor",
+          "_dialogContainerType"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 74,
+            "member_sha256": "d28f98d5b6f0753e76527b7e5c1088dbd6881065403c192c326e1e6ad917ffd0",
+            "reasons": [
+              "Core:Type"
+            ]
+          },
+          {
+            "line": 113,
+            "member_sha256": "303a4cc2447a1870781ee17ac88225b07abe4a0700dea4db76a7ff8f925d85b9",
+            "reasons": [
+              "this._dialogContainerType",
+              "this._dialogRefConstructor"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-source-proof.json",
+          "sha256": "43289806c97b20277388d6473a69cec6fc32301ec1a45d787977c9ffdfd219d7"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "current_role": "public-component-outlet-result",
+      "decision": "The override checks content availability, attaches the ComponentPortal through the public outlet, invokes the existing content-attached hook and returns the unchanged ComponentRef<T>. The Core type is a public handle, with no private view access or new lifetime behavior.",
+      "candidate_source_sha256": "752582e2bf49bc2f11431fa7bf35941f381a830dc5d837e14246a40ef010c01c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ComponentRef",
+        "occurrences": [
+          {
+            "line": 101,
+            "column": 66,
+            "parent_kind": "TypeReference",
+            "parent_source": "ComponentRef<T>"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 101,
+            "member_sha256": "1da4a1fdbd7f05d921e3d0fb6ffe04c8c89710d1cb6b26f6290ad7b26157022f",
+            "reasons": [
+              "Core:ComponentRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-source-proof.json",
+          "sha256": "43289806c97b20277388d6473a69cec6fc32301ec1a45d787977c9ffdfd219d7"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-container-base.ts",
+      "module": "@angular/core",
+      "symbol": "EmbeddedViewRef",
+      "current_role": "public-template-outlet-result",
+      "decision": "The override checks content availability, delegates TemplatePortal attachment to the public outlet, invokes the existing hook and returns the unchanged EmbeddedViewRef<T>. Context typing and disposal stay with the public outlet/view contract; whole dialog lifecycle qualification remains separate.",
+      "candidate_source_sha256": "752582e2bf49bc2f11431fa7bf35941f381a830dc5d837e14246a40ef010c01c",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "EmbeddedViewRef",
+        "occurrences": [
+          {
+            "line": 108,
+            "column": 64,
+            "parent_kind": "TypeReference",
+            "parent_source": "EmbeddedViewRef<T>"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 108,
+            "member_sha256": "b5be68cf3628da799d19de3d5a7999e1e3fec4b94ad58ea58b7e6bcf2f356890",
+            "reasons": [
+              "Core:EmbeddedViewRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/dialog-public-container-source-proof.json",
+          "sha256": "43289806c97b20277388d6473a69cec6fc32301ec1a45d787977c9ffdfd219d7"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-menu/internal/menu-panel.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "public-interface-type",
+      "decision": "The interface field requires a public TemplateRef<any> for trigger-created template portals. It emits no runtime import use or Angular injection metadata and changes no implementation or provider; this is the historical panel interoperability type.",
+      "candidate_source_sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 23,
+            "column": 16,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "templateRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 23,
+            "member_sha256": "b9d948e828d2a95670de599d69b7f923a6aa4b8bec6a78adf2e2f3bd6f99efe9",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-table/cell.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "public-token-constructor-adapter",
+      "decision": "All three original cell-definition constructors supply the exact passed public TemplateRef token/value to constructWithPublicDependencies for genuine public CDK cell definitions. The bounded borrowed injector preserves supplied object identity and new.target without destroying the template. Existing table constructor/token evidence remains explicitly limited to its recorded runtime scope.",
+      "candidate_source_sha256": "28359f7f5b9f4145e809340e8b0b441507d7c08323cea13cde6dea86b3dd1dbb",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 39,
+            "column": 25,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 40,
+            "column": 79,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: TemplateRef"
+          },
+          {
+            "line": 57,
+            "column": 25,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 58,
+            "column": 85,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: TemplateRef"
+          },
+          {
+            "line": 75,
+            "column": 25,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 76,
+            "column": 85,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: TemplateRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "template"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 39,
+            "member_sha256": "1632c9f101230449e0a5033f321767eede52946d168f1a9a9913ae2898755467",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 57,
+            "member_sha256": "e9cfd0dfd7397d117c9378a8d5fcfef790be3e073db725e9a9e5d757f19e3282",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 75,
+            "member_sha256": "9c02dcf1381451d1e99dfda49c15aaaa77481ecbb3745a1f3ee628d6613932e7",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/table-definition-public-token-source-proof.json",
+          "sha256": "293be9d2ed0ebf445c2ff00c407ea038cadaf7c1afb56df50f3c8ba6de4a6ae4"
+        },
+        {
+          "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+          "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-table/internal/table-outlet.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "public-outlet-container-field",
+      "decision": "The owned outlet injects and exposes a readonly public viewContainer for the maintained parent outlet protocol. Registration selects the existing table slot and does not replace, create or destroy this container. This Core role preserves the public container object; the separate table-parent protocol and native row behavior retain their own evidence and gates.",
+      "candidate_source_sha256": "522c2133fd03d68e669c521a029e060754d1c2de92cf1a500b33993f7cd31a8e",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ViewContainerRef",
+        "occurrences": [
+          {
+            "line": 19,
+            "column": 36,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "viewContainer"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 17,
+            "member_sha256": "99ac456a63ca2ab1311604819c7585910085f6a33c7af0de07c749f7137dd6f2",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/table-definition-public-token-source-proof.json",
+          "sha256": "293be9d2ed0ebf445c2ff00c407ea038cadaf7c1afb56df50f3c8ba6de4a6ae4"
+        },
+        {
+          "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+          "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-table/row.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "public-token-row-adapters",
+      "decision": "The three row-definition constructors and no-data-row constructor provide the supplied public TemplateRef to the bounded public-parent constructor context. Existing differs/table forwarding, new.target and historical no-data classes remain unchanged. This role does not classify removed private table tokens as public or grant an unexecuted21 runtime/floor pass.",
+      "candidate_source_sha256": "b57c2be6361b4caf802e9e13759f3bdebab413cd0a903f37ebf6e6443cf4f37d",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 37,
+            "column": 25,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 40,
+            "column": 17,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: TemplateRef"
+          },
+          {
+            "line": 66,
+            "column": 25,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 69,
+            "column": 17,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: TemplateRef"
+          },
+          {
+            "line": 96,
+            "column": 25,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 99,
+            "column": 17,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: TemplateRef"
+          },
+          {
+            "line": 183,
+            "column": 28,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 185,
+            "column": 17,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: TemplateRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "template",
+          "templateRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 37,
+            "member_sha256": "3ff1ed8a28dffc1149b79673cbcd6e5a7a155ddb36fbdb2836901d50f45a2351",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 66,
+            "member_sha256": "fbf137d9cb6a0165cabcc36c57df5abd6e5b7c783f397e512964195aa4ec4741",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 96,
+            "member_sha256": "26f013b1fae71ba681639d25cc46db13ec1597e2ad00cff8b806eaab81fa1b55",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 183,
+            "member_sha256": "bb99fe929fef43b7db74ae9333daa0d7e2a5dd190f4a326bb8b3ca2cff0d386c",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        },
+        {
+          "path": "compatibility/rc/table-definition-public-token-source-proof.json",
+          "sha256": "293be9d2ed0ebf445c2ff00c407ea038cadaf7c1afb56df50f3c8ba6de4a6ae4"
+        },
+        {
+          "path": "compatibility/rc/table-outlet-public-protocol-source-proof.json",
+          "sha256": "52eeb034bfe0a20ddaef6d74f6926e502a10fef5f799d545b122c16b0207db3b"
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+          "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-tabs/tab-content.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "public-token-content-adapter",
+      "decision": "The public template property and constructor preserve the caller TemplateRef by providing that exact token/value to the genuine public current MatTabContent parent through the borrowed constructor helper. No template is created or destroyed, and the original constructor shape remains available outside ambient DI.",
+      "candidate_source_sha256": "256886c4891ad0b7e6833e795e0e7586855cd6704b48b658b89490e4aeba0478",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 24,
+            "column": 21,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 27,
+            "column": 25,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 29,
+            "column": 17,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: TemplateRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "template"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 24,
+            "member_sha256": "1f92a8faa944f1c6a287d3d357d8ec8e824463a5fc0c3773f07fd4b5b0e344ee",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          },
+          {
+            "line": 27,
+            "member_sha256": "ff5d2a1e2d88e34b8a203d08eb445b7608abe3a66f67f8ffbb13a4e391a3161e",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-tabs/tab-label.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "current_role": "public-token-label-adapter",
+      "decision": "The explicit Inject(TemplateRef) parameter supplies the same public template token/value to genuine current MatTabLabel construction. The helper preserves new.target, while the owned wrapper retains closest-tab assignment. The role is runtime injection/forwarding as well as annotation, with no private view or new template lifetime.",
+      "candidate_source_sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "TemplateRef",
+        "occurrences": [
+          {
+            "line": 28,
+            "column": 23,
+            "parent_kind": "CallExpression",
+            "parent_source": "Inject(TemplateRef)"
+          },
+          {
+            "line": 28,
+            "column": 49,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<any>"
+          },
+          {
+            "line": 32,
+            "column": 17,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: TemplateRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "templateRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 28,
+            "member_sha256": "dc34a605c53075d505fb0b43ce1661adbfba159fac36421ad0ce9374d95831a9",
+            "reasons": [
+              "Core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    },
+    {
+      "file": "legacy-tabs/tab-label.ts",
+      "module": "@angular/core",
+      "symbol": "ViewContainerRef",
+      "current_role": "public-token-label-container-adapter",
+      "decision": "The explicit Inject(ViewContainerRef) parameter supplies the original caller container to genuine current MatTabLabel construction through the bounded borrowed injector. It preserves the parent portal declaration owner and manual-constructor contract; it neither replaces that container nor registers destruction of the borrowed owner.",
+      "candidate_source_sha256": "5ff08854377bb33070d69ee6fb4f7a346d37bebf4aefb6f0fd7a48f6a98621ff",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer; individual current caller review",
+      "source_role": {
+        "import_local": "ViewContainerRef",
+        "occurrences": [
+          {
+            "line": 29,
+            "column": 15,
+            "parent_kind": "CallExpression",
+            "parent_source": "Inject(ViewContainerRef)"
+          },
+          {
+            "line": 29,
+            "column": 51,
+            "parent_kind": "TypeReference",
+            "parent_source": "ViewContainerRef"
+          },
+          {
+            "line": 33,
+            "column": 17,
+            "parent_kind": "PropertyAssignment",
+            "parent_source": "provide: ViewContainerRef"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "viewContainerRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 28,
+            "member_sha256": "dc34a605c53075d505fb0b43ce1661adbfba159fac36421ad0ce9374d95831a9",
+            "reasons": [
+              "Core:ViewContainerRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+          "sha256": "99b030203510f78c6f479759f65f6881aadc34f09c0ba60a5e78def890c32a6b"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+          "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+          "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+        },
+        {
+          "path": "compatibility/rc/core-view-use-public-main.json",
+          "sha256": "806d10905eaecfb89ed7a9bc01e2692c46b30540947468343035606596ba3225"
+        },
+        {
+          "path": "scripts/core-view-use-current-roles.mjs",
+          "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+        }
+      ],
+      "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+    }
+  ],
+  "new_source_closures_when_integrated": 35,
+  "actual_legacy_component_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

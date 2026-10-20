@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "substitutions": {
+    "scripts/tab-adapter-product-inventory-history.mjs": [
+      [
+        "import {qualifyIndependentTabProductDelta} from './tab-adapter-product-inventory-context.mjs';",
+        "import {qualifyIndependentTabProductDelta} from './tab-adapter-product-inventory-context.mjs';\nimport {coreViewRoleSourceContext} from './core-view-use-current-roles-context.mjs';"
+      ],
+      [
+        " const raw=read(TAB_ADAPTER_HISTORY_INPUTS)",
+        " const current=coreViewRoleSourceContext({root,read});read=current.read;\n const raw=read(TAB_ADAPTER_HISTORY_INPUTS)"
+      ],
+      [
+        "return {root,raw:read,data,line,members};",
+        "return {root,raw:current.raw,priorRead:read,data,line,members};"
+      ],
+      [
+        "Buffer.from(c.members.get(path)):c.raw(path);",
+        "Buffer.from(c.members.get(path)):c.priorRead(path);"
+      ]
+    ],
+    "scripts/tab-adapter-product-inventory-review.mjs": [
+      [
+        "import assert from 'node:assert/strict';",
+        "import assert from 'node:assert/strict';\nimport {coreViewRolePreviousReader} from './core-view-use-current-roles-context.mjs';"
+      ],
+      [
+        " const built=computeTabAdapterInventoryWrites({root,read});for(const[path,bytes]",
+        " read=coreViewRolePreviousReader({root,read});\n const built=computeTabAdapterInventoryWrites({root,read});for(const[path,bytes]"
+      ]
+    ],
+    "tests/tab_adapter_product_inventory_probe.mjs": [
+      [
+        "import assert from 'node:assert/strict';",
+        "import assert from 'node:assert/strict';\nimport {coreViewRolePreviousReader} from '../scripts/core-view-use-current-roles-context.mjs';"
+      ],
+      [
+        "read=p=>readFileSync(join(root,p)),hash=",
+        "rawRead=p=>readFileSync(join(root,p)),read=coreViewRolePreviousReader({root,read:rawRead}),hash="
+      ],
+      [
+        "hash(currentContext.raw(path)),hash(read(path))",
+        "hash(currentContext.raw(path)),hash(rawRead(path))"
+      ],
+      [
+        "for(const path of productPaths){const bytes=Buffer.concat([read(path),Buffer.from('\\n')]);assert.throws(()=>readCurrentChipFocusInputs({root,read:p=>p===path?bytes:read(p)}),error=>error?.code==='ERR_ASSERTION');controls.push('current-product:'+path);}",
+        "for(const path of productPaths){const bytes=Buffer.concat([read(path),Buffer.from('\\n')]);assert.throws(()=>readCurrentChipFocusInputs({root,read:p=>p===path?bytes:rawRead(p)}),error=>error?.code==='ERR_ASSERTION');controls.push('current-product:'+path);}"
+      ],
+      [
+        "for(const path of ['projects/ngx-material-legacy/legacy-slider/slider.ts','projects/ngx-material-legacy/legacy-chips/chips.scss']){const bytes=Buffer.concat([read(path),Buffer.from('\\n')]);assert.throws(()=>inspectChipFocusRepair({root,readMember:p=>p===path?bytes:read(p)}),error=>error?.code==='ERR_ASSERTION');controls.push('unrelated-product-or-style:'+path);}",
+        "for(const path of ['projects/ngx-material-legacy/legacy-slider/slider.ts','projects/ngx-material-legacy/legacy-chips/chips.scss']){const bytes=Buffer.concat([read(path),Buffer.from('\\n')]);assert.throws(()=>inspectChipFocusRepair({root,readMember:p=>p===path?bytes:rawRead(p)}),error=>error?.code==='ERR_ASSERTION');controls.push('unrelated-product-or-style:'+path);}"
+      ],
+      [
+        "for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\\n')]);assert.throws(()=>inspectTabAdapterHistory({root,read:p=>p===path?bytes:read(p)}),error=>error?.code==='ERR_ASSERTION');controls.push('history:'+path);}",
+        "for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\\n')]);assert.throws(()=>inspectTabAdapterHistory({root,read:p=>p===path?bytes:rawRead(p)}),error=>error?.code==='ERR_ASSERTION');controls.push('history:'+path);}"
+      ],
+      [
+        "const late=p=>changed&&p===qualified.delta[1].path?Buffer.concat([read(p),Buffer.from('\\n')]):read(p);",
+        "const late=p=>changed&&p===qualified.delta[1].path?Buffer.concat([rawRead(p),Buffer.from('\\n')]):rawRead(p);"
+      ]
+    ]
+  },
+  "scope": "Finite previous source-task bookkeeping only; current product/native admission stays raw."
+}
