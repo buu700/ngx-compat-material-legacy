@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class RemainingCoreCallerRoles(unittest.TestCase):
     def test_current_callers_and_reused_public_evidence(self):
-        command = ['node', 'tests/remaining_core_caller_roles_probe.mjs']
+        command = ['node', 'tests/remaining_core_caller_roles_probe.mjs', '--integrated']
         if os.environ.get('NGX_REMAINING_CORE_DIAGNOSTIC'):
             command.extend(['--out', os.environ['NGX_REMAINING_CORE_DIAGNOSTIC']])
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=60)
@@ -34,8 +34,8 @@ class RemainingCoreCallerRoles(unittest.TestCase):
         self.assertGreater(report['source_and_evidence_corruptions_rejected'], 35)
         self.assertEqual(report['late_source_and_inventory_changes_rejected'], 2)
         self.assertEqual(report['canonical_row_corruptions_rejected'], 2)
-        self.assertEqual(report['canonical_closures_integrated'], 0)
-        self.assertTrue(report['all_canonical_ledger_bytes_preserved'])
+        self.assertEqual(report['canonical_closures_integrated'], 16)
+        self.assertFalse(report['all_canonical_ledger_bytes_preserved'])
         self.assertFalse(report['default_nonce_root_factory_or_CSP_security_qualified'])
         self.assertFalse(report['actual_native_packed_or_full_floor_qualified'])
 
