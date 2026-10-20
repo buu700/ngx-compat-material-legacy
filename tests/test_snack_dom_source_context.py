@@ -26,9 +26,10 @@ class SnackDomSourceContext(unittest.TestCase):
         self.assertIn(report['raw_native_profiles'], [33, 34])
         self.assertEqual(report['source_insufficient'], 0)
         self.assertGreater(report['negative_controls'], 30)
-        self.assertEqual(report['additional_caller_closures'], 28)
+        self.assertEqual(report['additional_caller_closures'], 65)
         self.assertEqual(report['remaining_Core_closures'], 16)
-        self.assertEqual(report['new_semantic_closures'], 53)
+        self.assertEqual(report['Material_core_closures'], 37)
+        self.assertEqual(report['new_semantic_closures'], 90)
 
 
 if __name__ == '__main__':
