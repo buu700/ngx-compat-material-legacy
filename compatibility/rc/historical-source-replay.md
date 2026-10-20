@@ -75,3 +75,84 @@ The twenty-fifth program retains the unchanged NativeDate source-context model a
 The twenty-sixth program retains the unchanged recorded-execution source-context model at its verified4a8a12e/85c21ce frame. Its original17 source preimages,34 source corruption controls,28 exact projection controls,1697 then-current decisions and28main/27line native requirements remain assertions about that historical graph. The twenty-third Python wrapper changes only the Node invocation, diagnostic option and outer replay timeout. All25 prior programs/frames,22 exact wrapper records and94 controls remain unchanged, with three added guard cases for97 total. The current chip source qualification independently requires31main/30line native guards and preserves the6 subsequent modern/classic decisions; the old model is never current or runtime admission. Python readers and the modern/classic exact stage comparisons still require the separately owned finite source/history union.
 
 The chip focus repair and source87 requalification advance only the current coherence frame. All26 historical programs,23 wrapper records,97 original controls and their immutable historical frames remain exact. The source87 checkpoint separately validates the current source decisions and all34main/33line native profiles,which still require real coordinator execution. The newer chip lifecycle/focus stages need a separate finite historical successor; this frame refresh does not qualify them.
+
+
+## Portal integration frame, 2026-10-20
+
+The full current source frame was rebound to the coherent portal integration
+commit. The read-only positive check and seven input/source mutations plus a
+later current-file mutation through the same reader passed. Product membership
+is 1,142; the existing six tooling paths and two mutable progress paths are
+unchanged. No historical cohort or native/packed/floor qualification follows.
+
+The original 97-control Python test timed out twice at its 60-second limit on
+the shared diagnostic host. A measured snapshot contains 444,615,451 bytes; one
+cached-byte full-graph recheck takes about 1.6 seconds. Git reads named by full
+immutable commit IDs are now cached with defensive copies. HEAD/ref resolution
+and all current-file reads/hashes remain fresh. The bounded test timeout is now
+180 seconds; all original 97 assertions and frozen control vectors remain intact.
+The complete 97-control run under that budget is deferred to Actions and is
+**not recorded as passed**. Full 26/19/50 cohorts remain unexecuted.
+
+Supplemental frame result:
+
+```json
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_frame": {
+    "commit": "b624bb3ece7a597fd12dcc00ab0726020c7f5ead",
+    "tree": "5ac40e410b8806108d5475c916d8cc499d1929a4",
+    "tree_listing_sha256": "5feffafd8f5750530b7eab1c32f2a0667eb0239a201103635758dc2b054307f6",
+    "members": 9763
+  },
+  "guard": {
+    "line": "main",
+    "guarded_current_members": 9761,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "7e66d3901d7185aedaeebca1b545767172654612",
+      "tree": "48f4e2bb1904a6fa42f9610f0c848a3d3180f861"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_and_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+    "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json"
+  ],
+  "late_current_file_mutation_rejected": true,
+  "historical_cohorts_executed": 0,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
+
+Reproducible supplemental control program (run with Node from this worktree):
+
+```javascript
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const root=process.cwd(),read=p=>readFileSync(join(root,p));
+const {inspectHistoricalReplayCurrent,HISTORICAL_REPLAY_INPUTS}=await import(pathToFileURL(join(root,'scripts/historical-source-replay.mjs')));
+const checked=inspectHistoricalReplayCurrent({root});assert.equal(checked.guard.current_tooling_members,6);assert.equal(checked.guard.current_product_members,1142);
+const paths=[HISTORICAL_REPLAY_INPUTS,'scripts/historical-source-replay.mjs','scripts/snack-dom-source-context.mjs','projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts','projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts','compatibility/rc/snack-dom-source-context-inputs.json','compatibility/rc/snack-dom-source-context-product-inputs.json'];
+for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\n')]);assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:p=>p===path?bytes:read(p)}),e=>e?.code==='ERR_ASSERTION',path);}
+let changed=false;const path=paths[4],bad=Buffer.concat([read(path),Buffer.from('\n')]),late=p=>changed&&p===path?bad:read(p);inspectHistoricalReplayCurrent({root,readMember:late});changed=true;assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:late}),e=>e?.code==='ERR_ASSERTION');
+const report={schema_version:1,line:checked.data.line,source_frame:checked.data.current_frame,guard:checked.guard,read_only_source_and_input_corruptions_rejected:paths,late_current_file_mutation_rejected:true,historical_cohorts_executed:0,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};
+writeFileSync('/tmp/ngx-portal-integration-frame-'+(report.line==='main'?'main':'21')+'.json',JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,guarded:report.guard.guarded_current_members,product:1142,tooling:6,mutations_rejected:paths.length+1}));
+```
