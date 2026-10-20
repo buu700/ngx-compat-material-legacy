@@ -7,6 +7,7 @@
  */
 /** Exact source-population successors; original decisions and native gates stay required. */
 import assert from 'node:assert/strict';
+import {coreViewRolePreviousReader} from './core-view-use-current-roles-context.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -109,6 +110,7 @@ export function validateTabAdapterInventoryScopes({root=process.cwd(),read=defau
  }return results;
 }
 export function inspectTabAdapterInventory({root=process.cwd(),read=defaultRead(root),validateAll=true}={}){
+ read=coreViewRolePreviousReader({root,read});
  const built=computeTabAdapterInventoryWrites({root,read});for(const[path,bytes]of built.writes)assert.equal(hash(read(path)),hash(bytes),'changed exact inventory successor '+path);const authored=authoredUseReviewEvidence(JSON.parse(read('compatibility/f10/authored-dependency-dispositions.json')),built.prior.line,read,hash);assert.equal(authored.reviewed,1464);assert.equal(authored.insufficient,0);const results=validateAll?validateTabAdapterInventoryScopes({root,read}):[];assert.ok(results.every(r=>r.ok),'raw current source scope failed: '+results.filter(r=>!r.ok).map(r=>r.sha).join(','));const native=[];const ledger=JSON.parse(read(ledgerPath));for(const sha of built.prior.native_shas){const entry=ledger.entries.find(e=>e.sha===sha),result=validateHistoricalBehavior({root,entry,proof:entry.individual_proof,request:{line:built.prior.line}});assert.deepEqual(result,{ok:false,detail:'missing coordinator run'});native.push({sha,result});}
  return {schema_version:1,line:built.prior.line,source_scoped_SHA_reviews_requalified:75,authored_evidence_bindings_requalified:1,authored_source_insufficient:0,individual_original_judgments_preserved:75,original_reports_preserved:11,unrelated_SHA_rows_preserved:1622,qualified_independent_product_changes:2,qualified_new_source_files:1,raw_scope_results:results,raw_native_profiles:native,new_semantic_closures:0,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};
 }
