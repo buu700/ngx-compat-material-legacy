@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class PlatformCallerRoles(unittest.TestCase):
     def test_current_callers_public_peers_and_evidence_guards(self):
-        command = ['node', 'tests/platform_caller_roles_probe.mjs']
+        command = ['node', 'tests/platform_caller_roles_probe.mjs', '--integrated']
         if os.environ.get('NGX_PLATFORM_CALLERS_DIAGNOSTIC'):
             command.extend(['--out', os.environ['NGX_PLATFORM_CALLERS_DIAGNOSTIC']])
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=60)
@@ -27,13 +27,15 @@ class PlatformCallerRoles(unittest.TestCase):
         self.assertEqual(report['strict_public_namespace_models'], 3)
         self.assertEqual(report['genuine_public_factory_cases'], 39)
         self.assertEqual(report['compatibility_constructor_calls'], 0)
-        self.assertGreater(report['source_and_evidence_corruptions_rejected'], 25)
+        # Integration replaces the three preparation-only whole-ledger byte guards.
+        self.assertEqual(report['source_and_evidence_corruptions_rejected'], 25)
+        self.assertTrue(report['canonical_row_corruption_rejected'])
         self.assertTrue(report['late_source_change_rejected'])
         self.assertEqual(report['selected_owned_predicate_protocol_cases'], 16)
         self.assertEqual(len(report['incorrect_predicate_faults_rejected']), 2)
         self.assertTrue(report['inherited_synthetic_viewport_edge_preserved'])
-        self.assertEqual(report['canonical_closures_integrated'], 0)
-        self.assertTrue(report['all_canonical_ledger_bytes_preserved'])
+        self.assertEqual(report['canonical_closures_integrated'], 4)
+        self.assertFalse(report['all_canonical_ledger_bytes_preserved'])
         self.assertFalse(report['actual_full_viewport_dialog_date_component_native_packed_or_floor_qualified'])
 
 
