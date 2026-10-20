@@ -395,3 +395,86 @@ for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\n')
 for(const path of [packet,paths[9]]){let changed=false;const bad=Buffer.concat([read(path),Buffer.from('\n')]),late=p=>changed&&p===path?bad:read(p);inspectHistoricalReplayCurrent({root,readMember:late});changed=true;assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:late}),e=>e?.code==='ERR_ASSERTION');}
 const report={schema_version:1,line:checked.data.line,source_frame:checked.data.current_frame,guard:checked.guard,read_only_source_input_corruptions_rejected:paths,late_current_changes_rejected:[packet,paths[9]],full97_controls_executed:false,historical26_19_50_cohorts_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,frame:report.source_frame.commit,guarded:report.guard.guarded_current_members,product:1142,tooling:6,corruptions:paths.length,late_changes:2,full_cohorts_executed:false}));
 ```
+
+
+CDK module/type integration frame, 2026-10-20T21:34:54.549030+00:00 (21.x).
+
+This committed frame binds14 CDK module/type and Forms callback decisions and the same shared104-closure reconstruction. The same6 tooling paths remain. The bounded source guard rejects16 input/source/published-member corruptions and two late changes. It does not execute full97/26/19/50 cohorts,full75/all1697/full21 admission,whole controls,native/packed/CVA/AOT/default-root/CSP/full floor gates or independent audits. Current delta guards retain1547 frozen+241 additional source-valid records,zero insufficiencies,263 open,all1697/1736/315 obligations,all six packed-CVA rows and every raw native coordinator requirement. Preparation64-control suites pass on both lines; the integrated61-control repeats remain deferred. No complete-plan or security pass follows.
+
+```json
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_frame": {
+    "commit": "d106799756e821edc39950dedeb84ece451d960a",
+    "tree": "788e4689429c3dbecbb237b13d30c78356c631a2",
+    "tree_listing_sha256": "e37ca5c29d6e725fe75aff41cb4f5e82a85ada0a91383f24924f71e20192df1c",
+    "members": 8516
+  },
+  "guard": {
+    "line": "21.x",
+    "guarded_current_members": 8514,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "1def959a86fac947ef0fec28ae5bf1465865448d",
+      "tree": "fdbd938faa83e2e8e6dd9209b104de9f711d3dfc"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "scripts/snack-dom-source-context-review.mjs",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "compatibility/rc/coercion-public-subjects.json",
+    "compatibility/rc/cdk-module-type-caller-roles-public-21.json",
+    "compatibility/f10/authored-use-reviews/cdk-module-type-callers.json",
+    "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+    "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+    "tests/cdk_module_type_caller_roles_subject.mjs",
+    "scripts/cdk-module-type-caller-roles.mjs",
+    "scripts/cdk-module-type-public-subjects.mjs",
+    "compatibility/rc/cdk-module-type-public-subjects.json",
+    "compatibility/rc/cdk-module-type-public-sources/3f0434a3819d8a3880e4fb1aac7fbcca1c2d7fa7d1ffb7a7e9d174ddb0dbd2d3.gz"
+  ],
+  "late_current_changes_rejected": [
+    "compatibility/rc/cdk-module-type-caller-roles-public-21.json",
+    "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts"
+  ],
+  "full97_controls_executed": false,
+  "historical26_19_50_cohorts_executed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
+
+Exact bounded frame program,run from the selected worktree with its diagnostic TypeScript preload and a fresh output path:
+
+```javascript
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const root=process.cwd(),read=p=>readFileSync(join(root,p)),{inspectHistoricalReplayCurrent,HISTORICAL_REPLAY_INPUTS}=await import(pathToFileURL(join(root,'scripts/historical-source-replay.mjs'))),checked=inspectHistoricalReplayCurrent({root});assert.equal(checked.guard.current_tooling_members,6);assert.equal(checked.guard.current_product_members,1142);
+const registry=JSON.parse(read('compatibility/rc/snack-dom-source-context-inputs.json')),packet=registry.additional_caller_public_proofs.at(-1).path,paths=[HISTORICAL_REPLAY_INPUTS,'scripts/historical-source-replay.mjs','scripts/snack-dom-source-context.mjs','scripts/snack-dom-source-context-review.mjs','compatibility/rc/snack-dom-source-context-inputs.json','compatibility/rc/snack-dom-source-context-product-inputs.json','compatibility/rc/coercion-public-subjects.json',packet,'compatibility/f10/authored-use-reviews/cdk-module-type-callers.json','projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts','projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts','tests/cdk_module_type_caller_roles_subject.mjs','scripts/cdk-module-type-caller-roles.mjs','scripts/cdk-module-type-public-subjects.mjs','compatibility/rc/cdk-module-type-public-subjects.json',JSON.parse(read('compatibility/rc/cdk-module-type-public-subjects.json')).subjects[0].additions[0].path];
+for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\n')]);assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:p=>p===path?bytes:read(p)}),e=>e?.code==='ERR_ASSERTION',path);}
+for(const path of [packet,paths[9]]){let changed=false;const bad=Buffer.concat([read(path),Buffer.from('\n')]),late=p=>changed&&p===path?bad:read(p);inspectHistoricalReplayCurrent({root,readMember:late});changed=true;assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:late}),e=>e?.code==='ERR_ASSERTION');}
+const report={schema_version:1,line:checked.data.line,source_frame:checked.data.current_frame,guard:checked.guard,read_only_source_input_corruptions_rejected:paths,late_current_changes_rejected:[packet,paths[9]],full97_controls_executed:false,historical26_19_50_cohorts_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,frame:report.source_frame.commit,guarded:report.guard.guarded_current_members,product:1142,tooling:6,corruptions:paths.length,late_changes:2,full_cohorts_executed:false}));
+```
