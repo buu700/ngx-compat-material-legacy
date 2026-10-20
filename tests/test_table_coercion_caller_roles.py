@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class TableCoercionCallerRoles(unittest.TestCase):
     def test_public_minimum_behavior_and_complete_current_callers(self):
-        result = subprocess.run(['node', 'tests/table_coercion_caller_roles_probe.mjs'],
+        result = subprocess.run(['node', 'tests/table_coercion_caller_roles_probe.mjs', '--integrated'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout)
@@ -25,8 +25,8 @@ class TableCoercionCallerRoles(unittest.TestCase):
         self.assertGreater(report['source_and_evidence_corruptions_rejected'], 25)
         self.assertTrue(report['late_source_change_rejected'])
         self.assertEqual(len(report['boolean_behavior_faults_rejected']), 3)
-        self.assertEqual(report['canonical_closures_integrated'], 0)
-        self.assertTrue(report['all_canonical_ledger_bytes_preserved'])
+        self.assertEqual(report['canonical_closures_integrated'], 3)
+        self.assertFalse(report['all_canonical_ledger_bytes_preserved'])
         self.assertFalse(report['actual_native_packed_or_floor_qualified'])
 
 
