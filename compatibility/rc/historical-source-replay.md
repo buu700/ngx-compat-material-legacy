@@ -478,3 +478,86 @@ for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\n')
 for(const path of [packet,paths[9]]){let changed=false;const bad=Buffer.concat([read(path),Buffer.from('\n')]),late=p=>changed&&p===path?bad:read(p);inspectHistoricalReplayCurrent({root,readMember:late});changed=true;assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:late}),e=>e?.code==='ERR_ASSERTION');}
 const report={schema_version:1,line:checked.data.line,source_frame:checked.data.current_frame,guard:checked.guard,read_only_source_input_corruptions_rejected:paths,late_current_changes_rejected:[packet,paths[9]],full97_controls_executed:false,historical26_19_50_cohorts_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,frame:report.source_frame.commit,guarded:report.guard.guarded_current_members,product:1142,tooling:6,corruptions:paths.length,late_changes:2,full_cohorts_executed:false}));
 ```
+
+
+Layout/media/scroll integration frame, 2026-10-20T22:05:11.813876+00:00 (21.x).
+
+This committed frame binds13 public-service/ignored-Location source decisions and the same shared117-closure reconstruction. The same6 tooling paths remain. The bounded guard rejects16 input/source/published-member corruptions and two late changes. Current deltas retain1558 frozen+243 additional source-valid records,zero insufficiencies,250 open,all1697/1736/315 obligations,all six packed-CVA rows and every raw native coordinator requirement. Preparation56-control suites pass on both lines; integrated53-control repeats remain deferred. Full97/26/19/50,full75/all1697/full21,whole controls,native/packed/CVA/AOT/brace-style/default-root/CSP/full floors and independent audits are unexecuted. No complete-plan or security pass follows.
+
+```json
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_frame": {
+    "commit": "41d1873ef9172734252492a5cc56a4d0f2d1deb9",
+    "tree": "5d6205365b837772e0912e01043c6bfac05f2d96",
+    "tree_listing_sha256": "ca9c67e9efcb58838c1800265d8cb25d7375f69503e48c1867bfc42fb1dc9118",
+    "members": 8530
+  },
+  "guard": {
+    "line": "21.x",
+    "guarded_current_members": 8528,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "c2cb7b80489d2abbc8684e4fe5c9ac21d2949888",
+      "tree": "eee93f4bd2e8bf1fe0c14bb0b8c2556b64f67a48"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "scripts/snack-dom-source-context-review.mjs",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "compatibility/rc/coercion-public-subjects.json",
+    "compatibility/rc/layout-service-caller-roles-public-21.json",
+    "compatibility/f10/authored-use-reviews/layout-service-callers.json",
+    "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+    "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
+    "tests/layout_service_caller_roles_subject.mjs",
+    "scripts/layout-service-caller-roles.mjs",
+    "scripts/cdk-module-type-public-subjects.mjs",
+    "compatibility/rc/cdk-module-type-public-subjects.json",
+    "compatibility/rc/cdk-module-type-public-sources/3f0434a3819d8a3880e4fb1aac7fbcca1c2d7fa7d1ffb7a7e9d174ddb0dbd2d3.gz"
+  ],
+  "late_current_changes_rejected": [
+    "compatibility/rc/layout-service-caller-roles-public-21.json",
+    "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts"
+  ],
+  "full97_controls_executed": false,
+  "historical26_19_50_cohorts_executed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
+
+Exact bounded program,run from the selected worktree with its diagnostic TypeScript preload and a fresh output path:
+
+```javascript
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const root=process.cwd(),read=p=>readFileSync(join(root,p)),{inspectHistoricalReplayCurrent,HISTORICAL_REPLAY_INPUTS}=await import(pathToFileURL(join(root,'scripts/historical-source-replay.mjs'))),checked=inspectHistoricalReplayCurrent({root});assert.equal(checked.guard.current_tooling_members,6);assert.equal(checked.guard.current_product_members,1142);
+const registry=JSON.parse(read('compatibility/rc/snack-dom-source-context-inputs.json')),packet=registry.additional_caller_public_proofs.at(-1).path,paths=[HISTORICAL_REPLAY_INPUTS,'scripts/historical-source-replay.mjs','scripts/snack-dom-source-context.mjs','scripts/snack-dom-source-context-review.mjs','compatibility/rc/snack-dom-source-context-inputs.json','compatibility/rc/snack-dom-source-context-product-inputs.json','compatibility/rc/coercion-public-subjects.json',packet,'compatibility/f10/authored-use-reviews/layout-service-callers.json','projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts','projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts','tests/layout_service_caller_roles_subject.mjs','scripts/layout-service-caller-roles.mjs','scripts/cdk-module-type-public-subjects.mjs','compatibility/rc/cdk-module-type-public-subjects.json',JSON.parse(read('compatibility/rc/cdk-module-type-public-subjects.json')).subjects[0].additions[0].path];
+for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\n')]);assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:p=>p===path?bytes:read(p)}),e=>e?.code==='ERR_ASSERTION',path);}
+for(const path of [packet,paths[9]]){let changed=false;const bad=Buffer.concat([read(path),Buffer.from('\n')]),late=p=>changed&&p===path?bad:read(p);inspectHistoricalReplayCurrent({root,readMember:late});changed=true;assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:late}),e=>e?.code==='ERR_ASSERTION');}
+const report={schema_version:1,line:checked.data.line,source_frame:checked.data.current_frame,guard:checked.guard,read_only_source_input_corruptions_rejected:paths,late_current_changes_rejected:[packet,paths[9]],full97_controls_executed:false,historical26_19_50_cohorts_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,frame:report.source_frame.commit,guarded:report.guard.guarded_current_members,product:1142,tooling:6,corruptions:paths.length,late_changes:2,full_cohorts_executed:false}));
+```
