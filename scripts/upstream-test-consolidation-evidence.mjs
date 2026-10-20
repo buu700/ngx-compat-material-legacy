@@ -122,7 +122,8 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     // product snapshot. Both paths still require the same strict build proof.
     const contextPath=body.candidate_context.path;
     assert.ok(['compatibility/f10/disposition-ledger/evidence/closeout-fourteen-build-scope-review.json',
-      'compatibility/rc/chip-source-scope-requalification-build.json'].includes(contextPath));
+      'compatibility/rc/chip-source-scope-requalification-build.json',
+      'compatibility/rc/tab-adapter-product-inventory-build.json'].includes(contextPath));
     const contextBytes=readRepo(contextPath);assert.equal(hash(contextBytes),body.candidate_context.sha256);
     const context=JSON.parse(contextBytes),ledger=JSON.parse(readRepo('compatibility/f10/disposition-ledger/ledger.json'));
     const contextEntry=ledger.entries.find(e=>e.sha===context.scope_sha_ids[0]);assert.ok(contextEntry);
