@@ -5,6 +5,7 @@
 # found in the LICENSE file at https://angular.io/license
 """Exact overlay row integration preserves unrelated judgments and native gates."""
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -16,18 +17,20 @@ ROOT = Path(__file__).resolve().parents[1]
 class OverlayCallerIntegration(unittest.TestCase):
     def test_exact_delta_and_current_owner_guards(self):
         with tempfile.TemporaryDirectory(prefix='overlay-integration-') as directory:
-            out = Path(directory) / 'report.json'
+            out = Path(os.environ.get('NGX_OVERLAY_INTEGRATION_DIAGNOSTIC', str(Path(directory) / 'report.json')))
             child = subprocess.run(['node', 'compatibility/rc/overlay-caller-integration-check.mjs', str(out)],
                                    cwd=ROOT, capture_output=True, text=True, timeout=180)
             self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-8000:])
             report = json.loads(out.read_text())
         self.assertEqual(report['overlay_source_closures'], 48)
-        self.assertEqual(report['cumulative_source_closures'], 191)
-        self.assertEqual(report['frozen_valid'], 1619)
-        self.assertEqual(report['additional_valid'], 256)
+        self.assertEqual(report['cumulative_source_closures'], 212)
+        self.assertEqual(report['frozen_valid'], 1636)
+        self.assertEqual(report['additional_valid'], 260)
         self.assertEqual(report['source_insufficient'], 0)
-        self.assertEqual(report['total_open'], 176)
+        self.assertEqual(report['total_open'], 155)
         self.assertEqual([r['changed'] for r in report['restorations']], [46, 2])
+        self.assertEqual(report['subsequent_tabs_source_closures'], 21)
+        self.assertEqual([r['subsequent_tabs'] for r in report['restorations']], [17, 4])
         self.assertTrue(report['all1697_SHA_ledger_bytes_preserved'])
         self.assertTrue(report['prior143_closures_preserved'])
         self.assertTrue(report['prior63_rebindings_byte_preserved'])
