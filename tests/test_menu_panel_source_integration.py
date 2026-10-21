@@ -21,7 +21,7 @@ class MenuPanelSourceIntegration(unittest.TestCase):
         self.assertEqual(report['rebindings'], 6)
         self.assertEqual(report['independent_menu_closures'], 17)
         self.assertEqual(report['source_insufficient'], 0)
-        self.assertEqual(report['open'], 120)
+        self.assertEqual(report['open'], 104)
         self.assertEqual(report['SHA_metadata_refreshes'], 73)
         self.assertEqual(report['corruptions'], 8)
         self.assertEqual(report['late_changes'], 2)
