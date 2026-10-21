@@ -981,3 +981,68 @@ The unchanged16+2 bounded current-frame program passed at the committed frame be
   "g11_claim": "not-passed"
 }
 ```
+
+## Integrated tabs caller frame
+
+The21 individual tabs decisions are canonically integrated:17 frozen and4 additional rows. Both exact-delta Python guards passed11 owner-input corruptions and2 late changes;every unselected row and its complete byte envelope is preserved. The entire1697-SHA ledger,prior191 closure catalogue,63 source rebindings and previous source successor files retain their exact bytes or original catalogue prefix. Current totals are1636 sufficient frozen reviews and260 sufficient additional reviews,zero source-evidence insufficiencies,and155 open obligations. All1697/1736/315 denominators and6 packed-CVA rows remain. The existing source owner still provides exactly14 historical subjects;no historical source reader or exception was added.
+
+Genuine untouched Material16 and exact current minimum SDK proofs cover three declaration models,four development/production constructor contexts,68 constructor/configuration cases,nine invalid-type controls and four actual source mutants on each supported line. Both integrated contract guards passed24 input corruptions,2 late changes and3 review-row corruptions. The earlier overlay integration Python guard now admits exactly the independently qualified21 tab closures and restores them alongside its original48 rows before byte-envelope comparison;all other prior decisions remain unchanged. All34 main/33 branch raw native requirements still report missing coordinator run. Product TypeScript,HTML,CSS,SCSS,consumer maps and the finite alias allowlist did not change.
+
+The unchanged16+2 bounded current-frame program passed for the committed subject below,preserving the exact six tooling and two mutable progress paths. Full75/1697/21 source walks,the broad shared-source wrapper,full97 and26/19/50 cohorts,whole builds,packed/AOT/native/coordinator/floor gates,Actions and fresh independent audits remain unexecuted at this checkpoint. The diagnostics use host Node22 and the line-specific TypeScript6.0.3/5.9.2 loaders;they do not qualify the pinned private Node24 toolchain or consumer floors.
+
+```json
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_frame": {
+    "commit": "16c30d701e3171057ad533df70305384737a6505",
+    "tree": "36ba979162c99ce0c89a6082d8943f53c232afc8",
+    "tree_listing_sha256": "ebd6d29d77a8c10003bff2449378d1a37fa41db7c02775b9dc3050f15aed6dcf",
+    "members": 10068
+  },
+  "guard": {
+    "line": "main",
+    "guarded_current_members": 10066,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "e711e93dfea1fad65b14bee1fb826182001b046d",
+      "tree": "f5eae10c24badfaab4d25b14d9070dabb9df105b"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "scripts/snack-dom-source-context-review.mjs",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "compatibility/rc/snack-dom-source-context-focus-inputs.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+    "scripts/tooltip-scroll-clipping-evidence.mjs",
+    "scripts/tooltip-scroll-clipping.mjs",
+    "compatibility/rc/tooltip-scroll-context-prior.json.gz",
+    "compatibility/rc/overlay-caller-public-subjects.json",
+    "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+    "compatibility/rc/snack-dom-source-context-native-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
+    "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
+  ],
+  "late_current_changes_rejected": [
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
+  ],
+  "full97_controls_executed": false,
+  "historical26_19_50_cohorts_executed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
