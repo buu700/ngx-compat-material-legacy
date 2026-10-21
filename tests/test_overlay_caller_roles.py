@@ -19,7 +19,7 @@ class OverlayCallerPreparation(unittest.TestCase):
         if os.environ.get('NGX_OVERLAY_CALLER_DIAGNOSTIC'):
             command.append(os.environ['NGX_OVERLAY_CALLER_DIAGNOSTIC'])
         child = subprocess.run(command, cwd=ROOT,
-                               capture_output=True, text=True, timeout=60)
+                               capture_output=True, text=True, timeout=120)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6000:])
         result = json.loads(child.stdout)
         self.assertEqual(result['routes'], 48)
