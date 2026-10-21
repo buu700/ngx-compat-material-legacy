@@ -1046,3 +1046,68 @@ The unchanged16+2 bounded current-frame program passed for the committed subject
   "g11_claim": "not-passed"
 }
 ```
+
+## Integrated form-field caller frame
+
+The18 individual form-field decisions are canonically integrated:13 frozen and5 additional rows. Both exact-delta Python guards passed11 owner-input corruptions and2 late changes;every unselected row and its whole byte envelope is unchanged. The complete1697-SHA ledger,prior212 closure catalogue,63 source rebindings and previous source successor files retain their exact bytes or original catalogue prefix. Current totals are1649 sufficient frozen reviews and265 sufficient additional reviews,zero source-evidence insufficiencies,and137 open obligations. All1697/1736/315 populations and6 packed-CVA rows remain. The existing owner retains exactly14 historical subjects with true raw reads and no new source-reader layer.
+
+The genuine SDK evidence covers three complete declaration models,four development/production runtime contexts,128 token/attribute/manual-construction cases,nine invalid-type controls and three real source mutants per line. Both integrated contract guards passed25 input corruptions,2 late changes and3 review-row corruptions. The older tabs and overlay Python guard regressions passed on main,restoring exactly the independently qualified18 form-field closures alongside their original scopes. Their tooling is byte-identical on21.x;those two older branch wrapper copies were not rerun. The separate branch delta guard independently authenticates its own preimage,preserves every prior row/catalogue/source successor,qualifies current branch inputs and checks all33 raw native requirements. All34 main/33 branch requirements still report missing coordinator run. Product TypeScript,HTML,CSS,SCSS,consumer maps and the finite alias allowlist did not change.
+
+The unchanged16+2 bounded current-frame program passed at the committed subject below,preserving the exact six tooling and two mutable progress paths. Full75/1697/21 source walks,the broad shared-source wrapper,full97 and26/19/50 cohorts,whole builds,packed/AOT/native/coordinator/floor gates,Actions and fresh independent audits remain unexecuted. Host Node22 and TypeScript6.0.3/5.9.2 diagnostics do not qualify the pinned private toolchain or consumer floors.
+
+```json
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_frame": {
+    "commit": "f478d2982157e90c9d86cb8d7ff2bf687a68e200",
+    "tree": "83a70a24497ed99fb0909707e18e00974a1143c9",
+    "tree_listing_sha256": "289884994346b0483355a3103e3306745a50a5ab04eb6a77d7e02e9b2367640a",
+    "members": 8742
+  },
+  "guard": {
+    "line": "21.x",
+    "guarded_current_members": 8740,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "6b69fd7d8bc1adcc09af24e9fce5bcae5fad9704",
+      "tree": "c0b6ba7df7c35adc809ff6849393f4d56e91c6e8"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "scripts/snack-dom-source-context-review.mjs",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "compatibility/rc/snack-dom-source-context-focus-inputs.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+    "scripts/tooltip-scroll-clipping-evidence.mjs",
+    "scripts/tooltip-scroll-clipping.mjs",
+    "compatibility/rc/tooltip-scroll-context-prior.json.gz",
+    "compatibility/rc/overlay-caller-public-subjects.json",
+    "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+    "compatibility/rc/snack-dom-source-context-native-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
+    "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
+  ],
+  "late_current_changes_rejected": [
+    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
+  ],
+  "full97_controls_executed": false,
+  "historical26_19_50_cohorts_executed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
