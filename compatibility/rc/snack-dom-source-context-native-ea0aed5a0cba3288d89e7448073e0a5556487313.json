@@ -1509,9 +1509,53 @@
         "source_scope_only": true,
         "actual_native_packed_or_floor_qualified": false
       },
+      "menu": {
+        "line": "21.x",
+        "delta": {
+          "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+          "before_sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a",
+          "sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+          "bytes": 1504
+        },
+        "qualification": {
+          "path": "compatibility/rc/menu-panel-content-boundary-21.json",
+          "sha256": "973c7ab55233689184aaeb5ca08b62ca51c214b272d559c4e07ae8ebd1c2881f"
+        },
+        "before": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport type {EventEmitter, TemplateRef} from '@angular/core';\nimport type {Direction} from '@angular/cdk/bidi';\nimport type {FocusOrigin} from '@angular/cdk/a11y';\nimport type {MatMenuContent, MenuPositionX, MenuPositionY} from '@angular/material/menu';\n\n/**\n * Interface for a custom menu panel that can be used with `matMenuTriggerFor`.\n * @docs-private\n */\nexport interface MatMenuPanel<T = any> {\n  xPosition: MenuPositionX;\n  yPosition: MenuPositionY;\n  overlapTrigger: boolean;\n  templateRef: TemplateRef<any>;\n  readonly close: EventEmitter<void | 'click' | 'keydown' | 'tab'>;\n  parentMenu?: MatMenuPanel | undefined;\n  direction?: Direction;\n  focusFirstItem: (origin?: FocusOrigin) => void;\n  resetActiveItem: () => void;\n  setPositionClasses?: (x: MenuPositionX, y: MenuPositionY) => void;\n  setElevation?(depth: number): void;\n  lazyContent?: MatMenuContent;\n  backdropClass?: string;\n  overlayPanelClass?: string | string[];\n  hasBackdrop?: boolean;\n  readonly panelId?: string;\n\n  /**\n   * @deprecated To be removed.\n   * @breaking-change 8.0.0\n   */\n  addItem?: (item: T) => void;\n\n  /**\n   * @deprecated To be removed.\n   * @breaking-change 8.0.0\n   */\n  removeItem?: (item: T) => void;\n}\n",
+        "bridge": {
+          "prior_capture": {
+            "path": "compatibility/rc/overlay-caller-contract-inputs.json",
+            "sha256": "ada5a4f44c60dad85f4fe54bfd74c985db1eaa0a974dd70a7ce6ad188e2fb037"
+          },
+          "current_type_qualification": {
+            "path": "compatibility/rc/menu-panel-content-boundary-21.json",
+            "sha256": "973c7ab55233689184aaeb5ca08b62ca51c214b272d559c4e07ae8ebd1c2881f"
+          },
+          "prior_overlay_source_files": 145,
+          "current_overlay_source_files": 145,
+          "new_owned_type_dependencies": [],
+          "affected_current_sources": [
+            "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+            "projects/ngx-material-legacy/legacy-menu/internal/menu-item-base.ts",
+            "projects/ngx-material-legacy/legacy-menu/internal/menu-panel-token.ts",
+            "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+            "projects/ngx-material-legacy/legacy-menu/internal/menu-trigger-base.ts",
+            "projects/ngx-material-legacy/legacy-menu/menu-item.ts",
+            "projects/ngx-material-legacy/legacy-menu/menu-module.ts",
+            "projects/ngx-material-legacy/legacy-menu/menu-trigger.ts",
+            "projects/ngx-material-legacy/legacy-menu/menu.ts"
+          ],
+          "all_affected_sources_in_fresh_semantic_program": true,
+          "unaffected_original_sources_byte_identical": true,
+          "new_runtime_dependencies": 0,
+          "actual_native_packed_or_floor_qualified": false
+        },
+        "source_scope_only": true,
+        "actual_native_packed_or_floor_qualified": false
+      },
       "inputs": {
         "path": "compatibility/rc/snack-dom-source-context-product-inputs.json",
-        "sha256": "e3d75e55ee2a6380eeadc2f630dfaafe1bf70d69cdcc36efbb631694dfe45699"
+        "sha256": "bbce98aad671061abbbebf90d1516adaf5d3fc722793f3f5456420a0d0f85cf1"
       },
       "qualification": {
         "path": "compatibility/rc/snack-portal-route-recovery-public-21.json",

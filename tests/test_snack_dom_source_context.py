@@ -22,7 +22,7 @@ class SnackDomSourceContext(unittest.TestCase):
         self.assertEqual(child.returncode, 0, (child.stdout+child.stderr)[-14000:])
         report = json.loads(child.stdout)
         self.assertEqual(report['source_scopes'], 75)
-        self.assertEqual(report['authored_bindings'], 63)
+        self.assertEqual(report['authored_bindings'], 69)
         self.assertIn(report['raw_native_profiles'], [33, 34])
         self.assertEqual(report['source_insufficient'], 0)
         self.assertGreater(report['negative_controls'], 30)
