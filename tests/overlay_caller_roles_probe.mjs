@@ -28,7 +28,7 @@ function inspect(read = raw) {
   const proof = JSON.parse(bytes); assert.equal(proof.line, line);
   // This packet recorded the preliminary owner's exact historical bytes.
   // It never substitutes them for current product/native/source admission.
-  const current = snackDomSourceContext({root, read}); assert.equal(current.members, 14);
+  const current = snackDomSourceContext({root, read}); assert.equal(current.members, 15);
   for (const member of proof.inputs) {
     if (!ownerInputs.has(member.path)) assert.equal(hash(read(member.path)), member.sha256, 'changed overlay evidence input ' + member.path);
     else {
