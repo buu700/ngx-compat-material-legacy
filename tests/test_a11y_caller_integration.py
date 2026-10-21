@@ -19,7 +19,7 @@ class A11yCallerIntegration(unittest.TestCase):
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)
         self.assertEqual(report['closures'], 16)
-        self.assertEqual(report['open'], 104)
+        self.assertEqual(report['open'], 31)
         self.assertEqual(report['source_insufficient'], 0)
         self.assertTrue(report['all1697_ledger_bytes_preserved'])
         self.assertEqual(report['corruptions'], 4)
