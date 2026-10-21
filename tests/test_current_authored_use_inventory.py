@@ -48,7 +48,8 @@ class CurrentAuthoredUseInventoryTests(unittest.TestCase):
                 live = observed['current_authored_use_inventory']
                 self.assertEqual(live['inventory']['missing'], 1 if omitted else 0)
                 self.assertEqual(live['inventory']['complete'], not omitted)
-                self.assertEqual(live['additional_uses'], ledger['symbol_use_count'])
+                self.assertEqual(live['additional_uses'], ledger.get('live_symbol_use_count', ledger['symbol_use_count']))
+                self.assertEqual(live['additional_obligations'], ledger['symbol_use_count'])
                 self.assertEqual(observed['authored_use_inventory']['expected'], 1736)
                 self.assertEqual(observed['authored_use_inventory']['observed'], 1736)
                 self.assertEqual(observed['g11_claim'], 'not-passed')
