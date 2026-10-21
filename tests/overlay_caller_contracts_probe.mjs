@@ -13,9 +13,13 @@ import {execFileSync} from 'node:child_process';
 import {join} from 'node:path';
 import {qualifiedOverlayContracts, inspectOverlayContractReview, OVERLAY_CONTRACT_REVIEW} from '../scripts/overlay-caller-contract-reviews.mjs';
 
+import {tooltipPriorCallerRead,qualifyIndependentMenuContentTypeDelta} from '../scripts/snack-dom-source-context.mjs';
 const root = process.cwd(), raw = path => readFileSync(join(root, path));
+// Revalidate raw current source before reading this immutable pre-type-change SDK packet.
+const epoch = (read = raw) => tooltipPriorCallerRead({root,read,currentTooltip:true});
+const currentMenuType = qualifyIndependentMenuContentTypeDelta({root});
 const hash = value => createHash('sha256').update(value).digest('hex');
-const qualified = qualifiedOverlayContracts({root}), review = inspectOverlayContractReview({root});
+const qualified = qualifiedOverlayContracts({root,read:epoch()}), review = inspectOverlayContractReview({root,read:epoch()});
 assert.equal(review.reviews.length, 48); assert.equal(review.source_closures_prepared, 48);
 assert.equal(review.frozen_prepared, 46); assert.equal(review.additional_prepared, 2);
 assert.equal(review.reviews.filter(r => r.unused_import).length, 1);
@@ -35,18 +39,18 @@ const controls = [...new Set([OVERLAY_CONTRACT_REVIEW, 'compatibility/rc/overlay
   qualified.clipping.ref.path])];
 for (const target of controls) {
   assert.throws(() => inspectOverlayContractReview({root,
-    read: path => path === target ? Buffer.concat([raw(path), Buffer.from('\ncorrupt')]) : raw(path)}), /AssertionError/, target);
+    read: epoch(path => path === target ? Buffer.concat([raw(path), Buffer.from('\ncorrupt')]) : raw(path))}), /AssertionError/, target);
 }
 let target = null;
 const late = path => path === target ? Buffer.concat([raw(path), Buffer.from('\nlate')]) : raw(path);
-inspectOverlayContractReview({root, read: late});
+inspectOverlayContractReview({root, read: epoch(late)});
 for (target of ['projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts', qualified.ref.path]) {
-  assert.throws(() => inspectOverlayContractReview({root, read: late}), /AssertionError/);
+  assert.throws(() => inspectOverlayContractReview({root, read: epoch(late)}), /AssertionError/);
 }
 for (const field of ['conclusion', 'candidate_source_sha256', 'decision']) {
   const changed = structuredClone(review); changed.reviews[0][field] = 'invalid';
   const bytes = Buffer.from(JSON.stringify(changed, null, 2) + '\n');
-  assert.throws(() => inspectOverlayContractReview({root, read: path => path === OVERLAY_CONTRACT_REVIEW ? bytes : raw(path)}), /changed prepared individual overlay review/);
+  assert.throws(() => inspectOverlayContractReview({root, read: epoch(path => path === OVERLAY_CONTRACT_REVIEW ? bytes : raw(path))}), /changed prepared individual overlay review/);
 }
 const ledgers = new Map(source.prior.ledgers.map(m => [m.path, JSON.parse(raw(m.path))]));
 let integrated = 0;
@@ -68,7 +72,9 @@ assert.equal(frozen.symbol_uses.length, 1736);
 assert.equal(frozen.symbol_uses.filter(r => r.module === '@angular/forms' && r.symbol === 'NG_VALUE_ACCESSOR' && r.disposition === 'open').length, 6);
 assert.equal(ledgers.get('compatibility/f10/authored-dependency-current-dispositions.json').symbol_uses.length, 315);
 assert.equal(ledgers.get('compatibility/f10/disposition-ledger/ledger.json').entries.length, 1697);
-const report = {line: review.line, reviewed_routes: 48, frozen: 46, additional: 2, current_source_files: 145,
+const report = {line: review.line, reviewed_routes: 48, frozen: 46, additional: 2, historical_overlay_packet_source_files: 145, current_source_files: 145,
+  current_type_boundary_affected_sources: currentMenuType.bridge.affected_current_sources.length,
+  immutable_pre_type_change_packet_preserved: true, raw_current_type_boundary_requalified: true,
   selected_minimum_resolved_calls: 104, selected_minimum_member_accesses: 142, justified_strategy_casts: 5,
   actual_source_faults_rejected: 3, public_type_subjects: 3, negative_type_controls: 9,
   runtime_contexts: 10, runtime_protocol_cases: 160, runtime_source_mutants_rejected: 6,
