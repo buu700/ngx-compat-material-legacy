@@ -15,9 +15,9 @@ import {currentOverlayCallerFacts} from '../scripts/snack-dom-source-context-rev
 
 const root = process.cwd(), raw = path => readFileSync(join(root, path));
 const hash = value => createHash('sha256').update(value).digest('hex');
-const pins = {main: 'cdbb99719b4d69075f3e8b7f74145a9cb546e6b570c50d13ef5cde45f421e765', '21.x': '2794497a9aa9387da128d3c14c79ab9ed1c084d4cbbaf84a7731eb5247162508'};
+const pins = {main: 'c2153a44a1514c7ab1969b93247e8d79fbc9b0bfe4a753324262e5e2e899ece5', '21.x': '8c7dd372a283b22a57df52ba404980c3fc390ee20cf85dfa428099acfe097eed'};
 const line = JSON.parse(raw('compatibility/rc/overlay-caller-roles-worksheet.json')).line;
-const path = 'compatibility/rc/overlay-caller-roles-public-' + (line === 'main' ? 'main' : '21') + '.json';
+const path = 'compatibility/rc/overlay-caller-roles-public-' + (line === 'main' ? 'main' : '21') + '-v2.json';
 const versions = {original: ['16.2.12', '16.2.14'], main: ['22.1.7', '22.1.7'], '21.x': ['21.2.23', '21.2.14']};
 function inspect(read = raw) {
   const bytes = read(path); assert.equal(hash(bytes), pins[line], 'overlay preparation evidence changed');
@@ -36,6 +36,8 @@ function inspect(read = raw) {
     assert.equal(subject.factory_declarations_compiled, 10); assert.equal(subject.negative_type_controls.length, 3);
     assert.ok(subject.members.length >= 89); assert.deepEqual(subject.gaps, []);
     assert.ok([...subject.symbols, ...subject.members].every(m => m.tags.every(t => !['deprecated', 'docs-private', 'experimental', 'developerPreview', 'breaking-change'].includes(t))));
+    assert.equal(subject.fixture_uses_configuration_sizing, true);
+    assert.equal(subject.deprecated_fixture_sizing_mutant_rejected, true);
     assert.equal(subject.argument_dependent_overloads_qualified, false);
     assert.equal(subject.whole_current_caller_source_compiled, false);
   }
@@ -83,7 +85,7 @@ for (const ledger of prior.ledgers) {
   assert.equal(hash(raw(ledger.path)), hash(committed), 'preparation changed canonical ledger ' + ledger.path);
 }
 const summary = {line, routes: 48, tooltip_current_routes: 8, public_type_models: 3,
-  traced_members_per_model: proof.type_subjects.map(s => s.members.length), negative_type_controls: 9,
+  traced_members_per_model: proof.type_subjects.map(s => s.members.length), negative_type_controls: 9, deprecated_fixture_sizing_mutants_rejected: 3,
   complete_factories: 5, genuine_runtime_contexts: 10, bounded_runtime_cases: 160,
   runtime_source_mutants_rejected: 6, evidence_corruptions_rejected: controls.length, late_changes_rejected: 2,
   canonical_ledgers_preserved: true, canonical_source_closures_integrated: 0,

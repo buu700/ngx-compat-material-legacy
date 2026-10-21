@@ -58,8 +58,8 @@ try {
   let destroyed = 0;
   class Content {value = 'content'; ngOnDestroy() {destroyed++;}}
   core.Component({standalone: true, selector: 'overlay-content-protocol', template: '<span>content</span>'})(Content);
-  const position = service.position().global().width('100px').height('50px').centerHorizontally().top('10px');
-  const config = new peer.OverlayConfig({positionStrategy: position, hasBackdrop: false,
+  const position = service.position().global().centerHorizontally().top('10px');
+  const config = new peer.OverlayConfig({width: '100px', height: '50px', positionStrategy: position, hasBackdrop: false,
     panelClass: ['legacy-pane'], scrollStrategy: service.scrollStrategies.noop()});
   ref = service.create(config);
   assert.ok(ref instanceof peer.OverlayRef);

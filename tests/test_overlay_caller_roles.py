@@ -26,6 +26,7 @@ class OverlayCallerPreparation(unittest.TestCase):
         self.assertEqual(result['tooltip_current_routes'], 8)
         self.assertEqual(result['public_type_models'], 3)
         self.assertEqual(result['negative_type_controls'], 9)
+        self.assertEqual(result['deprecated_fixture_sizing_mutants_rejected'], 3)
         self.assertEqual(result['complete_factories'], 5)
         self.assertEqual(result['genuine_runtime_contexts'], 10)
         self.assertEqual(result['bounded_runtime_cases'], 160)
