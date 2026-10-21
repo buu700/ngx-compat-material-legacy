@@ -17,6 +17,7 @@ import {gunzipSync} from 'node:zlib';
 import {historicalFrameMembers,inspectHistoricalReplayCurrent,verifyHistoricalCurrentSubjects} from './historical-source-replay.mjs';
 import {olderAuditHistoryInputs,selectOlderAuditModules} from './older-audit-history-inputs.mjs';
 import {chipBlurHistoryInputs} from './chip-blur-history-inputs.mjs';
+import {dialogCallerHistoryInputs,selectDialogCallerHistory} from './dialog-caller-history-inputs.mjs';
 
 export const CHIP_RECENT_HISTORY_INPUTS='compatibility/rc/chip-recent-history-inputs.json';
 export const CHIP_RECENT_HISTORY_IDS=Object.freeze(['lifecycle-scope','focus-repair','focus-browser',
@@ -137,6 +138,12 @@ export async function runChipBlurHistory({root=rootDefault,reportPath}={}) {
     temporaryPrefix:'ngx-chip-blur-history-',omittedDiagnosticEnv:['CLOSEOUT_CHIP_BLUR_REPORT'],
     implementationSources:['scripts/chip-recent-history.mjs','scripts/chip-blur-history-inputs.mjs',
       'scripts/run-chip-blur-history.mjs','tests/chip_blur_history.py']});
+}
+export async function runDialogCallerHistory({root=rootDefault,requested=[],reportPath}={}) {
+  const {data,sha256}=dialogCallerHistoryInputs({root}),selection=selectDialogCallerHistory(data,requested);
+  return runHistoricalModules({root,id:data.id,reportPath,data,sha256,...selection,
+    temporaryPrefix:'ngx-dialog-caller-history-',implementationSources:['scripts/chip-recent-history.mjs',
+      'scripts/dialog-caller-history-inputs.mjs','scripts/run-dialog-caller-history.mjs','tests/dialog_caller_history.py']});
 }
 async function runHistoricalModules({root,id,reportPath,data,sha256,entry,modules,complete,temporaryPrefix,implementationSources,omittedDiagnosticEnv=[]}) {
   const started=Date.now();
