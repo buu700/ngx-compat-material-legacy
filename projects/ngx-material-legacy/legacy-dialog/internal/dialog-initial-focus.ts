@@ -9,7 +9,7 @@
 
 import {FocusTrapFactory, InteractivityChecker} from '@angular/cdk/a11y';
 import {NgZone, Renderer2} from '@angular/core';
-import {MatDialogConfig} from '@angular/material/dialog';
+import type {LegacyDialogRuntimeConfig as MatDialogConfig} from '../dialog-config';
 
 /** Owned initial-focus selection. The owned container holds the persistent public focus trap. */
 export interface LegacyDialogInitialFocusContext {
