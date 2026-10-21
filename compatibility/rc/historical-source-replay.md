@@ -916,3 +916,68 @@ Canonical integration remains pending:1573 frozen and254 additional source revie
   "g11_claim": "not-passed"
 }
 ```
+
+## Integrated overlay caller frame
+
+The48 individual overlay decisions are canonically integrated:46 frozen and2 additional rows. Exact restoration verifies every unselected row and its complete byte envelope;the entire1697-SHA ledger is byte-identical to the pre-integration checkpoint. The prior143 closure catalogue,63 source rebindings and previous source successor files are unchanged. Current totals are1619 sufficient frozen reviews and256 sufficient additional reviews,zero source-evidence insufficiencies,and176 open obligations. All1697/1736/315 denominators and all6 packed-CVA rows remain. The shared source owner still exposes exactly14 historical subjects with true raw reads and adds no historical source-reader layer.
+
+Both bounded integration guards passed10 owner-dependency corruptions and2 late changes. All34 main/33 branch raw native requirements still return missing coordinator run. The complete contract guards still pass22 input corruptions,2 late changes and3 review-row corruptions,and recognize48 integrated rows. The preliminary preparation guard first qualifies the full current owner,then authenticates only four historical owner inputs against its exact committed epoch;its17 input and2 late-change controls passed on both lines. Its historical zero-closure field remains an epoch fact,not current ledger state. No recorded public packet,golden or old report was rewritten.
+
+The unchanged16+2 bounded current-frame program passed at the committed frame below. Exact six tooling and two mutable progress paths are preserved. Full75/1697/21 walks,the broad shared-source wrapper,the new Python integration wrapper,full97 and26/19/50 cohorts,build/packed/AOT/native/coordinator/floor gates,Actions and fresh independent audits were not run for this checkpoint. Product HTML/CSS/SCSS and consumer maps did not change.
+
+```json
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_frame": {
+    "commit": "517ce86e03d32ed62f29a0058f525e031b40bd79",
+    "tree": "9f5be4f6ec0ff1786a9e21c4c56e72c702daf469",
+    "tree_listing_sha256": "df42495cde0b9bb61caec62aae1a4095b5cb833bd2ced96bcab65122aa85532b",
+    "members": 10038
+  },
+  "guard": {
+    "line": "main",
+    "guarded_current_members": 10036,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "164d202b4f607d5405b36e10f72010b38324af4c",
+      "tree": "84874c44bd220f9381ce9890571ab6ba8b758e90"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "scripts/snack-dom-source-context-review.mjs",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "compatibility/rc/snack-dom-source-context-focus-inputs.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+    "scripts/tooltip-scroll-clipping-evidence.mjs",
+    "scripts/tooltip-scroll-clipping.mjs",
+    "compatibility/rc/tooltip-scroll-context-prior.json.gz",
+    "compatibility/rc/overlay-caller-public-subjects.json",
+    "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+    "compatibility/rc/snack-dom-source-context-native-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
+    "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
+  ],
+  "late_current_changes_rejected": [
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
+  ],
+  "full97_controls_executed": false,
+  "historical26_19_50_cohorts_executed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
