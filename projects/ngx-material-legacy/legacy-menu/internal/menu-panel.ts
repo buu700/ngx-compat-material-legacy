@@ -10,7 +10,8 @@
 import type {EventEmitter, TemplateRef} from '@angular/core';
 import type {Direction} from '@angular/cdk/bidi';
 import type {FocusOrigin} from '@angular/cdk/a11y';
-import type {MatMenuContent, MenuPositionX, MenuPositionY} from '@angular/material/menu';
+import type {MenuPositionX, MenuPositionY} from '@angular/material/menu';
+import type {MatLegacyMenuContent as MatMenuContent} from '../menu-content';
 
 /**
  * Interface for a custom menu panel that can be used with `matMenuTriggerFor`.
