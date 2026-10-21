@@ -790,3 +790,66 @@ Full97 controls and26/19/50 cohorts,full75/1697/21 walks,packed/AOT/native/consu
   "g11_claim": "not-passed"
 }
 ```
+
+## Corrected overlay fixture frame
+
+The overlay fixture now sets dimensions through public OverlayConfig rather than deprecated GlobalPositionStrategy.width/height calls. Both corrected v2 evidence packets and their guards passed;all original packets and tagged reference bytes are retained. Each compiler still records3 SDK subjects,104 traced members per subject,160 runtime cases,6 factory mutants,16 input corruptions and2 late changes. Three additional fixture-sizing controls reject the deprecated call. The unchanged16+2 bounded current-frame program passed at the new committed frame below. Exact six tooling and two mutable progress paths remain unchanged.
+
+Separate unsealed source prototypes compiled145 unchanged source files with zero diagnostics and resolved104 overlay calls on each line,using authenticated cached declarations and actual ng-package entry files. They are diagnostic progress,not canonical source closures,packed/AOT/native validation or peer-floor qualification. All48 overlay decisions and224 open source obligations remain pending. Full walks/cohorts,Actions and independent audits were not run.
+
+```json
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_frame": {
+    "commit": "ce9f09ddcad7168b6e45e97776b5668f9c21a01a",
+    "tree": "e8a5c869481d41033a9fa3929496a88242cb0252",
+    "tree_listing_sha256": "e0ce367e93d632fd39fae2933f969718d633db6233c844f6a55a4aa61f4cb8c0",
+    "members": 8633
+  },
+  "guard": {
+    "line": "21.x",
+    "guarded_current_members": 8631,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "c84e2e58179fc0d513757152dafba2740b6c138c",
+      "tree": "ef64a9f1ef93ac9aba14881aedb41767db1702fe"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "scripts/snack-dom-source-context-review.mjs",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "compatibility/rc/snack-dom-source-context-focus-inputs.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+    "scripts/tooltip-scroll-clipping-evidence.mjs",
+    "scripts/tooltip-scroll-clipping.mjs",
+    "compatibility/rc/tooltip-scroll-context-prior.json.gz",
+    "compatibility/rc/overlay-caller-public-subjects.json",
+    "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+    "compatibility/rc/snack-dom-source-context-native-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
+    "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
+  ],
+  "late_current_changes_rejected": [
+    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
+  ],
+  "full97_controls_executed": false,
+  "historical26_19_50_cohorts_executed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
