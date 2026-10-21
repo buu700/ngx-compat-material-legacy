@@ -75,7 +75,7 @@ try {
     ["} else add('<computed-module>', '<unresolved>', node, 'computed-dynamic-import');", '}'],
   ];
   for (const [index, [before, after]] of edits.entries()) {
-    const changed = producer.replace(before, after); assert.notEqual(changed, producer);
+    const changed = producer.replace(before, after).replace("from './authored-additional-use-baseline.mjs'", 'from '+JSON.stringify(pathToFileURL(join(root,'scripts/authored-additional-use-baseline.mjs')).href)); assert.notEqual(changed, producer);
     const path = join(temporary, `mutant-${index}.mjs`); writeFileSync(path, changed);
     const mutated = await import(pathToFileURL(path).href);
     assert.throws(() => checkDiscovery(mutated.scanCurrentAuthoredUses), /AssertionError/);
@@ -104,7 +104,7 @@ const candidate = {schema_version: 1, line: 'main', status: 'closed',
   symbol_uses: [{...current.symbol_uses[0], status: 'reviewed', disposition: 'closed',
     source_review: {path: reviewPath, sha256: hash(reviewBytes)}}]};
 const admit = (body = candidate, members = memberBytes, source = current) => currentAuthoredUseAdmission({
-  current: source, frozen, candidate: body, line: 'main', readMember: path => members[path]});
+  current: source, frozen, candidate: body, line: 'main', readMember: path => members[path], additionalBaseline: current.symbol_uses});
 const good = admit(); assert.equal(good.ready, true); assert.equal(good.removed_seed_uses, 1);
 assert.equal(good.additional_uses, 1); assert.equal(good.review_evidence.reviewed, 1);
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -138,6 +138,7 @@ const declaration = name => checker.statements.filter(ts.isVariableStatement)
   .flatMap(statement => [...statement.declarationList.declarations]).find(node => node.name.getText(checker) === name);
 const disposition = declaration('dispositionOk').initializer.getText(checker);
 const cases = declaration('CASE_RESULTS').initializer.getText(checker);
+const actualCall=declaration('currentSymbolAdmission').initializer;assert.ok(ts.isCallExpression(actualCall));assert.equal(actualCall.arguments[0].properties.some(p=>p.name?.getText(checker)==='additionalBaseline'),false,'shipped admission must use repository baseline,not a caller-provided fixture roster');
 const context = {structuralOk: true, missing: [], conflicts: [], outside: [], unresolved: [], unknown: [],
   forgedClearance: false, missingEvidence: [], circularEvidence: [], insufficientSensitive: [],
   insufficientInherited: [], insufficientBehavior: [], missingBranch: [], symbolInventory: {complete: true},

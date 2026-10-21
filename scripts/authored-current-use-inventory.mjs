@@ -14,6 +14,7 @@ import {lstatSync, readFileSync} from 'node:fs';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {authoredUseInventory, authoredUseReviewEvidence} from './authored-use-inventory.mjs';
+import {additionalUseBaseline} from './authored-additional-use-baseline.mjs';
 
 const ts = createRequire(import.meta.url)('typescript');
 const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -113,24 +114,32 @@ export function scanCurrentAuthoredUses({root = defaultRoot, files, readSource} 
 /** Review new routes with the same per-caller evidence rules as frozen routes.
  * Removed seed uses remain obligations of the frozen ledger, never automatic passes.
  */
-export function currentAuthoredUseAdmission({current, frozen, candidate, line, readMember}) {
+export function currentAuthoredUseAdmission({current, frozen, candidate, line, readMember, additionalBaseline}) {
   const frozenKeys = new Set(frozen.map(key));
   const currentKeys = new Set(current.symbol_uses.map(key));
   const additions = current.symbol_uses.filter(row => !frozenKeys.has(key(row)));
   const removed = frozen.filter(row => !currentKeys.has(key(row)));
-  const scopeValid = candidate?.schema_version === 1 && candidate?.line === line &&
+  const baseline = additionalUseBaseline({current, additions, candidate, line, readMember, provided: additionalBaseline});
+  const obligations = new Map(baseline.entries.map(row => [key(row), row]));
+  for (const row of additions) obligations.set(key(row), row);
+  const baselineOverlapsFrozen = baseline.entries.some(row => frozenKeys.has(key(row)));
+  const scopeValid = baseline.valid && !baselineOverlapsFrozen && candidate?.schema_version === 1 && candidate?.line === line &&
     ['in-progress', 'closed'].includes(candidate?.status);
   const wanted = new Map(additions.map(row => [key(row), row]));
-  const snapshotValid = candidate?.current_source_population_sha256 === current.source_population_sha256 &&
+  const retired = new Map(baseline.retired.map(row => [key(row), row]));
+  const liveCountValid = baseline.retired.length
+    ? candidate?.live_symbol_use_count === additions.length
+    : candidate?.live_symbol_use_count === undefined || candidate.live_symbol_use_count === additions.length;
+  const snapshotValid = scopeValid && candidate?.current_source_population_sha256 === current.source_population_sha256 &&
     candidate?.current_uses === current.symbol_uses.length &&
-    candidate?.current_source_files === current.source_files.length &&
-    candidate?.symbol_use_count === additions.length && Array.isArray(candidate?.symbol_uses) &&
+    candidate?.current_source_files === current.source_files.length && liveCountValid &&
+    candidate?.symbol_use_count === obligations.size && Array.isArray(candidate?.symbol_uses) &&
     candidate.symbol_uses.every(row => {
-      const actual = wanted.get(key(row));
+      const actual = wanted.get(key(row)) ?? retired.get(key(row));
       return actual && row.candidate_source_sha256 === actual.candidate_source_sha256 &&
         JSON.stringify(row.occurrences) === JSON.stringify(actual.occurrences);
     });
-  const inventory = authoredUseInventory(additions, candidate);
+  const inventory = authoredUseInventory([...obligations.values()], candidate);
   const reviews = inventory.invalid ? {reviewed: 0, insufficient: inventory.invalid, insufficient_uses: []}
     : authoredUseReviewEvidence(candidate, line, readMember, hash);
   const ready = scopeValid && snapshotValid && inventory.complete && inventory.open === 0 &&
@@ -139,6 +148,10 @@ export function currentAuthoredUseAdmission({current, frozen, candidate, line, r
     current_uses: current.symbol_uses.length,
     current_source_files: current.source_files.length,
     current_source_population_sha256: current.source_population_sha256,
-    additional_uses: additions.length, removed_seed_uses: removed.length,
-    inventory, review_evidence: reviews};
+    additional_uses: additions.length, additional_obligations: obligations.size,
+    retained_removed_additional_obligations: baseline.retired.length,
+    additional_baseline: {valid: baseline.valid && !baselineOverlapsFrozen, mode: baseline.mode,
+      original_obligations: baseline.entries.length, qualification: baseline.qualification,
+      error: baselineOverlapsFrozen ? 'additional baseline overlaps frozen roster' : baseline.error},
+    removed_seed_uses: removed.length, inventory, review_evidence: reviews};
 }
