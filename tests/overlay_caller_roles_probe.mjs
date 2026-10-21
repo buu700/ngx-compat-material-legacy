@@ -1,0 +1,93 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/** Rehash bounded preparation evidence; this never closes a canonical row. */
+import assert from 'node:assert/strict';
+import {readFileSync, writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {join} from 'node:path';
+import {currentOverlayCallerFacts} from '../scripts/snack-dom-source-context-review.mjs';
+
+const root = process.cwd(), raw = path => readFileSync(join(root, path));
+const hash = value => createHash('sha256').update(value).digest('hex');
+const pins = {main: 'cdbb99719b4d69075f3e8b7f74145a9cb546e6b570c50d13ef5cde45f421e765', '21.x': '2794497a9aa9387da128d3c14c79ab9ed1c084d4cbbaf84a7731eb5247162508'};
+const line = JSON.parse(raw('compatibility/rc/overlay-caller-roles-worksheet.json')).line;
+const path = 'compatibility/rc/overlay-caller-roles-public-' + (line === 'main' ? 'main' : '21') + '.json';
+const versions = {original: ['16.2.12', '16.2.14'], main: ['22.1.7', '22.1.7'], '21.x': ['21.2.23', '21.2.14']};
+function inspect(read = raw) {
+  const bytes = read(path); assert.equal(hash(bytes), pins[line], 'overlay preparation evidence changed');
+  const proof = JSON.parse(bytes); assert.equal(proof.line, line);
+  for (const member of proof.inputs) assert.equal(hash(read(member.path)), member.sha256, 'changed overlay evidence input ' + member.path);
+  const {prior, facts} = currentOverlayCallerFacts({root, read});
+  assert.deepEqual(facts.map(f => ({file: f.file, symbol: f.symbol, source_sha256: f.candidate_source_sha256,
+    unused: f.unused_import, tooltip_current_source: !!f.tooltip_product_qualification})), proof.facts);
+  assert.equal(facts.length, 48); assert.equal(facts.filter(f => f.tooltip_product_qualification).length, 8);
+  assert.equal(facts.filter(f => f.unused_import).length, 1);
+  assert.equal(proof.factory_sources.length, 5); assert.ok(proof.factory_sources.every(f => f.bodies_identical));
+  assert.equal(proof.type_subjects.length, 3);
+  for (const subject of proof.type_subjects) {
+    assert.deepEqual([subject.Core, subject.CDK], versions[subject.line]);
+    assert.ok(subject.strict); assert.equal(subject.skipLibCheck, false); assert.equal(subject.diagnostics, 0);
+    assert.equal(subject.factory_declarations_compiled, 10); assert.equal(subject.negative_type_controls.length, 3);
+    assert.ok(subject.members.length >= 89); assert.deepEqual(subject.gaps, []);
+    assert.ok([...subject.symbols, ...subject.members].every(m => m.tags.every(t => !['deprecated', 'docs-private', 'experimental', 'developerPreview', 'breaking-change'].includes(t))));
+    assert.equal(subject.argument_dependent_overloads_qualified, false);
+    assert.equal(subject.whole_current_caller_source_compiled, false);
+  }
+  assert.equal(proof.runtime_subjects.length, 10);
+  const contexts = new Set();
+  for (const subject of proof.runtime_subjects) {
+    assert.deepEqual([subject.Core, subject.CDK], versions[subject.line]);
+    contexts.add([subject.line, subject.zoneMode, subject.mode].join(':'));
+    assert.equal(subject.cases.length, 16); assert.ok(subject.synthetic_server_renderer_and_location_protocol);
+    assert.equal(subject.actual_native_packed_AOT_or_full_floor_qualified, false);
+    assert.deepEqual(subject.observations, proof.runtime_subjects[0].observations);
+    assert.equal(subject.server_block_scroll_is_not_native_browser_equivalence, true);
+    assert.equal(subject.server_block_scroll_observations.length, 2);
+    assert.ok(subject.server_block_scroll_observations.every(r => r.enabled && r.family === 'dialog'));
+  }
+  assert.equal(contexts.size, 10);
+  for (const sdkLine of ['original', 'main', '21.x']) for (const zoneMode of sdkLine === 'original' ? ['zoneful'] : ['zoneful', 'zoneless']) {
+    for (const mode of ['development', 'production']) assert.ok(contexts.has([sdkLine, zoneMode, mode].join(':')));
+  }
+  assert.equal(proof.runtime_fault_controls.length, 6); assert.ok(proof.runtime_fault_controls.every(c => c.rejected));
+  assert.equal(proof.canonical_source_closures_integrated, 0);
+  assert.equal(proof.whole_current_caller_source_compiled, false);
+  assert.equal(proof.actual_native_packed_AOT_or_full_floor_qualified, false); assert.equal(proof.g11_claim, 'not-passed');
+  return {prior, proof};
+}
+const {prior, proof} = inspect();
+const controls = [path, 'scripts/overlay-caller-public-evidence.mjs', 'scripts/snack-dom-source-context-review.mjs',
+  'scripts/overlay-caller-roles.mjs', 'tests/overlay_caller_roles_subject.mjs',
+  'compatibility/rc/overlay-caller-factory-reference.json', 'compatibility/rc/overlay-caller-public-subjects.json',
+  'compatibility/rc/snack-dom-source-context-inputs.json',
+  'projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts',
+  'projects/ngx-material-legacy/legacy-select/internal/select-base.ts',
+  ...proof.inputs.filter(m => m.path.startsWith('compatibility/rc/overlay-caller-factory-reference/')).map(m => m.path),
+  proof.inputs.find(m => m.path.startsWith('compatibility/rc/overlay-caller-public-sources/')).path];
+for (const target of controls) {
+  assert.throws(() => inspect(member => member === target ? Buffer.concat([raw(member), Buffer.from('\nchanged')]) : raw(member)), /AssertionError/);
+}
+let target = null;
+const lateRead = member => member === target ? Buffer.concat([raw(member), Buffer.from('\nlate')]) : raw(member);
+inspect(lateRead);
+for (target of [controls[8], controls.at(-1)]) assert.throws(() => inspect(lateRead), /AssertionError/);
+for (const ledger of prior.ledgers) {
+  const committed = execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', 'show', 'HEAD:' + ledger.path],
+    {cwd: root, maxBuffer: 24 * 1024 * 1024, env: {...process.env, GIT_NO_LAZY_FETCH: '1'}});
+  assert.equal(hash(raw(ledger.path)), hash(committed), 'preparation changed canonical ledger ' + ledger.path);
+}
+const summary = {line, routes: 48, tooltip_current_routes: 8, public_type_models: 3,
+  traced_members_per_model: proof.type_subjects.map(s => s.members.length), negative_type_controls: 9,
+  complete_factories: 5, genuine_runtime_contexts: 10, bounded_runtime_cases: 160,
+  runtime_source_mutants_rejected: 6, evidence_corruptions_rejected: controls.length, late_changes_rejected: 2,
+  canonical_ledgers_preserved: true, canonical_source_closures_integrated: 0,
+  actual_native_packed_AOT_or_full_floor_qualified: false};
+const output = JSON.stringify(summary);
+if (process.argv[2]) writeFileSync(process.argv[2], output + '\n', {flag: 'wx'});
+console.log(output);

@@ -27,6 +27,7 @@ import {materialCorePrior,inspectMaterialCoreReview,MATERIAL_CORE_REVIEW} from '
 import {cdkModuleTypePrior,inspectCdkModuleTypeReview,CDK_MODULE_TYPE_REVIEW} from './cdk-module-type-caller-roles.mjs';
 import {layoutServicePrior,inspectLayoutServiceReview,LAYOUT_SERVICE_REVIEW} from './layout-service-caller-roles.mjs';
 import {tableCallerPrior,inspectTableCallerReview,TABLE_CALLER_REVIEW} from './table-caller-roles.mjs';
+import {overlayCallerFacts} from './overlay-caller-roles.mjs';
 import {snackDomContextPrior,qualifyIndependentSnackProductDelta,tooltipPriorCallerRead,tooltipSourceContextPrior,TOOLTIP_SOURCE,SNACK_SOURCE,SNACK_SOURCE_CONTEXT_INPUTS} from './snack-dom-source-context.mjs';
 import {candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
 import {reviewSliderInputScope} from './upstream-slider-input-scope.mjs';
@@ -72,6 +73,13 @@ function tooltipRoleProgram(text){
   assert.ok(declaration,'missing current tooltip binding '+row.symbol);const symbol=checker.getSymbolAtLocation(declaration.name);assert.ok(symbol);const references=[];function visit(n){if(ts.isIdentifier(n)&&n!==declaration.name&&n!==declaration.propertyName&&checker.getSymbolAtLocation(n)===symbol)references.push({line:source.getLineAndCharacterOfPosition(n.getStart(source)).line+1,kind:ts.SyntaxKind[n.parent.kind],text:n.parent.getText(source)});ts.forEachChild(n,visit);}visit(source);return {binding:{kind:ts.SyntaxKind[declaration.kind],actual_module:actualModule??null,text:declaration.getText(source)},references,complete_current_class_contexts:classes.map(c=>({name:c.name,sha256:c.sha256})),unused_binding:references.length===0};
  }
  return {role,classes};
+}
+/** Current overlay facts reuse the one qualified source owner for the tooltip delta. */
+export function currentOverlayCallerFacts({root=process.cwd(),read=rawRead(root)}={}){
+ const qualified=qualifyIndependentSnackProductDelta({root,read}),historical=tooltipPriorCallerRead({root,read}),before=overlayCallerFacts({root,read:historical}),text=read(TOOLTIP_SOURCE).toString(),program=tooltipRoleProgram(text),facts=before.facts.map(f=>{
+  if('projects/ngx-material-legacy/'+f.file!==TOOLTIP_SOURCE)return f;
+  const role=program.role(f);return {...f,candidate_source_sha256:hash(text),occurrences:role.references.map(r=>({line:r.line,parent_kind:r.kind,expression:r.text})),complete_context_members:[{line:1,kind:'SourceFile',sha256:hash(text),text}],prior_complete_context_members:f.complete_context_members,current_source_role:role,tooltip_product_qualification:qualified.tooltip};
+ });assert.equal(facts.length,48);assert.equal(facts.filter(f=>f.tooltip_product_qualification).length,8);return {...before,facts};
 }
 export async function computeSnackContextWrites({root=process.cwd(),read=rawRead(root),acceptRecipe=false}={}){
  const prior=snackDomContextPrior({root,read}),qualification=qualifyIndependentSnackProductDelta({root,read}),callerRead=tooltipPriorCallerRead({root,read}),tooltipPrior=tooltipSourceContextPrior({root,read}),writes=new Map(),entries=new Map(),recipe=[],reports=new Map(prior.reports.map(m=>[m.path,m]));
