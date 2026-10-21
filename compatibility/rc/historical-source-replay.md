@@ -644,3 +644,86 @@ for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\n')
 for(const path of [packet,paths[9]]){let changed=false;const bad=Buffer.concat([read(path),Buffer.from('\n')]),late=p=>changed&&p===path?bad:read(p);inspectHistoricalReplayCurrent({root,readMember:late});changed=true;assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:late}),e=>e?.code==='ERR_ASSERTION');}
 const report={schema_version:1,line:checked.data.line,source_frame:checked.data.current_frame,guard:checked.guard,read_only_source_input_corruptions_rejected:paths,late_current_changes_rejected:[packet,paths[9]],full97_controls_executed:false,historical26_19_50_cohorts_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,frame:report.source_frame.commit,guarded:report.guard.guarded_current_members,product:1142,tooling:6,corruptions:paths.length,late_changes:2,full_cohorts_executed:false}));
 ```
+
+
+Public tooltip clipping integration frame, 2026-10-21T01:13:26.025683+00:00 (21.x).
+
+The exact one-file clipping repair is applied and the same source owner now qualifies three product deltas,63 source bindings and143 preserved semantic closures. The original13 historical members remain plus one exact authenticated tooltip before-image; no reader layer was added and current/native raw paths receive repaired bytes. Imports/exported signatures and33 family resources remain unchanged. Applied guards reject43 corruptions/two late changes; current delta guards reject12/two and retain1573 frozen+254 additional valid,zero insufficiencies and224 open. The eager-container native profile has one source-fingerprint successor with unchanged case IDs,hunks,disposition and runtime requirement. All34 main/33 branch native profiles still lack coordinator runs. The current frame guard rejects16 corruptions/two late changes with the same6 tooling paths. Full source/historical cohorts,whole directive/native geometry,packed/AOT/consumer/full floors and independent audits remain unexecuted. No G01-G13,security or full-plan pass is claimed.
+
+```json
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_frame": {
+    "commit": "7c05d3dbcc8dd756c359ac26831bcaaf6840f1a9",
+    "tree": "bc4259187d5908ea4cab54cc17487c9b192b9315",
+    "tree_listing_sha256": "cbdc6a51b02d80a7346d2d6624daa3c030f6848a8a76045cd25d93db80bdb558",
+    "members": 8616
+  },
+  "guard": {
+    "line": "21.x",
+    "guarded_current_members": 8614,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "980f5da31d5f28957d7c86c0339644b1f105cbd7",
+      "tree": "8a0fed6ca953906ab1ad2fbcb021f9938edac81f"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "scripts/snack-dom-source-context-review.mjs",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "compatibility/rc/snack-dom-source-context-focus-inputs.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+    "scripts/tooltip-scroll-clipping-evidence.mjs",
+    "scripts/tooltip-scroll-clipping.mjs",
+    "compatibility/rc/tooltip-scroll-context-prior.json.gz",
+    "compatibility/rc/overlay-caller-public-subjects.json",
+    "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+    "compatibility/rc/snack-dom-source-context-native-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
+    "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
+  ],
+  "late_current_changes_rejected": [
+    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
+  ],
+  "full97_controls_executed": false,
+  "historical26_19_50_cohorts_executed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
+
+Exact bounded program:
+
+```javascript
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const root=process.cwd(),read=p=>readFileSync(join(root,p)),{inspectHistoricalReplayCurrent,HISTORICAL_REPLAY_INPUTS}=await import(pathToFileURL(join(root,'scripts/historical-source-replay.mjs'))),checked=inspectHistoricalReplayCurrent({root});assert.equal(checked.guard.current_tooling_members,6);assert.equal(checked.guard.current_product_members,1142);
+const registry=JSON.parse(read('compatibility/rc/snack-dom-source-context-inputs.json')),packet=registry.tooltip.qualification.path,tooltip='projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts',sdk=JSON.parse(read('compatibility/rc/overlay-caller-public-subjects.json')),paths=[HISTORICAL_REPLAY_INPUTS,'scripts/historical-source-replay.mjs','scripts/snack-dom-source-context.mjs','scripts/snack-dom-source-context-review.mjs','compatibility/rc/snack-dom-source-context-inputs.json','compatibility/rc/snack-dom-source-context-product-inputs.json','compatibility/rc/snack-dom-source-context-focus-inputs.json',packet,tooltip,'scripts/tooltip-scroll-clipping-evidence.mjs','scripts/tooltip-scroll-clipping.mjs','compatibility/rc/tooltip-scroll-context-prior.json.gz','compatibility/rc/overlay-caller-public-subjects.json','projects/ngx-material-legacy/legacy-tooltip/tooltip.scss','compatibility/rc/snack-dom-source-context-native-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json',sdk.subjects[0].additions[0].path];
+for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\n')]);assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:p=>p===path?bytes:read(p)}),e=>e?.code==='ERR_ASSERTION',path);}
+for(const path of [packet,tooltip]){let changed=false;const bad=Buffer.concat([read(path),Buffer.from('\n')]),late=p=>changed&&p===path?bad:read(p);inspectHistoricalReplayCurrent({root,readMember:late});changed=true;assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:late}),e=>e?.code==='ERR_ASSERTION');}
+const report={schema_version:1,line:checked.data.line,source_frame:checked.data.current_frame,guard:checked.guard,read_only_source_input_corruptions_rejected:paths,late_current_changes_rejected:[packet,tooltip],full97_controls_executed:false,historical26_19_50_cohorts_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,frame:report.source_frame.commit,guarded:report.guard.guarded_current_members,product:1142,tooling:6,corruptions:paths.length,late_changes:2,full_cohorts_executed:false}));
+```
