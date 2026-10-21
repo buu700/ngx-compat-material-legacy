@@ -853,3 +853,66 @@ Separate unsealed source prototypes compiled145 unchanged source files with zero
   "g11_claim": "not-passed"
 }
 ```
+
+## Complete overlay contract preparation frame
+
+Forty-eight individual current import decisions are prepared across21 selected files and145 complete owned source files. Only20 additional untouched declaration files per minimum supplement the existing SDK capsule. Each selected-minimum compile reports zero diagnostics,104 resolved overlay calls,142 actual member accesses and five strategy casts with owned-construction provenance. Wrong width,the private visibility field and a type-correct wrong strategy all reject in actual-source controls. The independent public SDK/factory/module packet retains3 subjects,10 contexts,160 protocol cases and6 runtime source mutants per compiler. Both prepared-review guards reject22 distinct input corruptions,2 late changes and3 review-row corruptions. No mutable source-owner registry is an input to the new contract proof.
+
+Canonical integration remains pending:1573 frozen and254 additional source reviews remain sufficient,with224 open obligations. The prior143 closures,63 source rebindings,14 historical subjects,all1697/1736/315 denominators and all6 packed-CVA rows remain unchanged. No product HTML/CSS/SCSS or consumer maps changed. No full walks/cohorts,build,packed/AOT/native/floor gates,Actions or fresh independent audits ran for this checkpoint. The unchanged16+2 bounded frame program passed below;the exact six tooling and two mutable progress paths remain unchanged.
+
+```json
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_frame": {
+    "commit": "be3751952aeb992505eab0849f3cee3b4e2e6baf",
+    "tree": "f6e5533d79e433e59068e47a24620a6ff7139670",
+    "tree_listing_sha256": "d2a7f83071b724474721491c86e5bad4fe541dcebe0eeac163fdbc881c6a2c08",
+    "members": 8677
+  },
+  "guard": {
+    "line": "21.x",
+    "guarded_current_members": 8675,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "d557e1a301eb717d6236d80f4d6e9ddafc29b545",
+      "tree": "1de3454b6a4e7ad3c35a83e27b12ac24d1411388"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "scripts/snack-dom-source-context-review.mjs",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "compatibility/rc/snack-dom-source-context-focus-inputs.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+    "scripts/tooltip-scroll-clipping-evidence.mjs",
+    "scripts/tooltip-scroll-clipping.mjs",
+    "compatibility/rc/tooltip-scroll-context-prior.json.gz",
+    "compatibility/rc/overlay-caller-public-subjects.json",
+    "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+    "compatibility/rc/snack-dom-source-context-native-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
+    "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
+  ],
+  "late_current_changes_rejected": [
+    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
+  ],
+  "full97_controls_executed": false,
+  "historical26_19_50_cohorts_executed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
