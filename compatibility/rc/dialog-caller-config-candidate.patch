@@ -1,0 +1,61 @@
+--- a/projects/ngx-material-legacy/legacy-dialog/dialog-config.ts
++++ b/projects/ngx-material-legacy/legacy-dialog/dialog-config.ts
+@@ -11,6 +11,18 @@
+ import {_defaultParams} from './dialog-animation-params';
+ 
+ 
++/**
++ * Historical focus and animation values are interpreted by the owned legacy
++ * container. Keep their contract independent of upstream removal annotations.
++ * All other configuration fields retain the public peer contract.
++ */
++export type LegacyDialogRuntimeConfig<D = any> = Omit<DialogConfigBase<D>,
++  'autoFocus' | 'enterAnimationDuration' | 'exitAnimationDuration'> & {
++  autoFocus?: string | boolean;
++  enterAnimationDuration?: string | number;
++  exitAnimationDuration?: string | number;
++};
++
+ export class MatLegacyDialogConfig<D = any> extends DialogConfigBase<D> {
+   /**
+    * Whether the dialog should set `aria-modal`. Current Material defaults this
+@@ -21,6 +33,9 @@
+   /** Max-width of the dialog. Current Material leaves this unset; legacy defaults to 80vw. */
+   override maxWidth?: number | string = '80vw';
+ 
++  /** Historical autofocus policy, including boolean values handled by the owned container. */
++  override autoFocus?: string | boolean = 'first-tabbable';
++
+   /** Duration of the enter animation. Has to be a valid CSS value (e.g. 100ms). */
+   override enterAnimationDuration?: string = _defaultParams.params.enterAnimationDuration;
+ 
+--- a/projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts
++++ b/projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts
+@@ -22,6 +22,7 @@
+   Optional, ProviderToken, Renderer2, ViewChild,
+ } from '@angular/core';
+ import {MatDialogConfig} from '@angular/material/dialog';
++import type {LegacyDialogRuntimeConfig} from '../dialog-config';
+ import {Subject, Subscription} from 'rxjs';
+ import {take} from 'rxjs/operators';
+ import {focusLegacyDialogInitially, legacyDialogActiveElement, legacyDialogContainsFocus}
+@@ -80,7 +81,7 @@
+     protected _elementRef: ElementRef,
+     protected _focusTrapFactory: FocusTrapFactory,
+     @Optional() @Inject(DOCUMENT) _document: any,
+-    public readonly _config: MatDialogConfig,
++    @Inject(MatDialogConfig) public readonly _config: LegacyDialogRuntimeConfig,
+     private _legacyFocusChecker: InteractivityChecker,
+     protected _ngZone: NgZone,
+     private _legacyOverlayRef: OverlayRef,
+--- a/projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts
++++ b/projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts
+@@ -9,7 +9,7 @@
+ 
+ import {FocusTrapFactory, InteractivityChecker} from '@angular/cdk/a11y';
+ import {NgZone, Renderer2} from '@angular/core';
+-import {MatDialogConfig} from '@angular/material/dialog';
++import type {LegacyDialogRuntimeConfig as MatDialogConfig} from '../dialog-config';
+ 
+ /** Owned initial-focus selection. The owned container holds the persistent public focus trap. */
+ export interface LegacyDialogInitialFocusContext {
