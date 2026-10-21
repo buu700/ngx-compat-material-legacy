@@ -437,10 +437,18 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase>
       .withScrollableContainers(scrollableAncestors);
 
     strategy.positionChanges.pipe(takeUntil(this._destroyed)).subscribe((change: ConnectedOverlayPositionChange) => {
+      // Capture the same fresh pane/ancestor rectangles used by the tagged strategy,
+      // before position classes can change a consumer's styles.
+      const overlayElement = this._overlayRef?.overlayElement;
+      const isClipped = !!overlayElement && isTooltipOverlayClipped(
+        overlayElement.getBoundingClientRect(),
+        scrollableAncestors.map(scrollable =>
+          scrollable.getElementRef().nativeElement.getBoundingClientRect()),
+      );
       this._updateCurrentPositionClass(change.connectionPair);
 
       if (this._tooltipInstance) {
-        if (change.scrollableViewProperties.isOverlayClipped && this._tooltipInstance.isVisible()) {
+        if (isClipped && this._tooltipInstance.isVisible()) {
           // After position changes occur and the overlay is clipped by
           // a parent scrollable then close the tooltip.
           this._ngZone.run(() => this.hide(0));
@@ -1019,4 +1027,18 @@ export abstract class _TooltipComponentBase implements OnDestroy {
       this._finalizeAnimation(isVisible);
     }
   }
+}
+
+/** Owned tagged16 clipping predicate; current CDK event visibility is docs-private. */
+function isTooltipOverlayClipped(
+  element: Pick<DOMRect, 'top' | 'bottom' | 'left' | 'right'>,
+  scrollContainers: ReadonlyArray<Pick<DOMRect, 'top' | 'bottom' | 'left' | 'right'>>,
+): boolean {
+  return scrollContainers.some(scrollContainerRect => {
+    const clippedAbove = element.top < scrollContainerRect.top;
+    const clippedBelow = element.bottom > scrollContainerRect.bottom;
+    const clippedLeft = element.left < scrollContainerRect.left;
+    const clippedRight = element.right > scrollContainerRect.right;
+    return clippedAbove || clippedBelow || clippedLeft || clippedRight;
+  });
 }
