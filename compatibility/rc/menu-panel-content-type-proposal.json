@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "source_parent": "a989ea8aae414c7d370a2c00139555a9c9c959f3",
+  "diagnostic": {
+    "line": "main",
+    "typescript": "6.0.3",
+    "node": "v22.23.3",
+    "proposal_only": true,
+    "product_changes_applied": 0,
+    "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts",
+    "before_sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a",
+    "after_sha256": "3598e6ccf4761bd9777dafaca271cd896dc8f694ec39e9e46c37f593a8c307af",
+    "before": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport type {EventEmitter, TemplateRef} from '@angular/core';\nimport type {Direction} from '@angular/cdk/bidi';\nimport type {FocusOrigin} from '@angular/cdk/a11y';\nimport type {MatMenuContent, MenuPositionX, MenuPositionY} from '@angular/material/menu';\n\n/**\n * Interface for a custom menu panel that can be used with `matMenuTriggerFor`.\n * @docs-private\n */\nexport interface MatMenuPanel<T = any> {\n  xPosition: MenuPositionX;\n  yPosition: MenuPositionY;\n  overlapTrigger: boolean;\n  templateRef: TemplateRef<any>;\n  readonly close: EventEmitter<void | 'click' | 'keydown' | 'tab'>;\n  parentMenu?: MatMenuPanel | undefined;\n  direction?: Direction;\n  focusFirstItem: (origin?: FocusOrigin) => void;\n  resetActiveItem: () => void;\n  setPositionClasses?: (x: MenuPositionX, y: MenuPositionY) => void;\n  setElevation?(depth: number): void;\n  lazyContent?: MatMenuContent;\n  backdropClass?: string;\n  overlayPanelClass?: string | string[];\n  hasBackdrop?: boolean;\n  readonly panelId?: string;\n\n  /**\n   * @deprecated To be removed.\n   * @breaking-change 8.0.0\n   */\n  addItem?: (item: T) => void;\n\n  /**\n   * @deprecated To be removed.\n   * @breaking-change 8.0.0\n   */\n  removeItem?: (item: T) => void;\n}\n",
+    "after": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport type {EventEmitter, TemplateRef} from '@angular/core';\nimport type {Direction} from '@angular/cdk/bidi';\nimport type {FocusOrigin} from '@angular/cdk/a11y';\nimport type {MenuPositionX, MenuPositionY} from '@angular/material/menu';\nimport type {MatLegacyMenuContent as MatMenuContent} from '../menu-content';\n\n/**\n * Interface for a custom menu panel that can be used with `matMenuTriggerFor`.\n * @docs-private\n */\nexport interface MatMenuPanel<T = any> {\n  xPosition: MenuPositionX;\n  yPosition: MenuPositionY;\n  overlapTrigger: boolean;\n  templateRef: TemplateRef<any>;\n  readonly close: EventEmitter<void | 'click' | 'keydown' | 'tab'>;\n  parentMenu?: MatMenuPanel | undefined;\n  direction?: Direction;\n  focusFirstItem: (origin?: FocusOrigin) => void;\n  resetActiveItem: () => void;\n  setPositionClasses?: (x: MenuPositionX, y: MenuPositionY) => void;\n  setElevation?(depth: number): void;\n  lazyContent?: MatMenuContent;\n  backdropClass?: string;\n  overlayPanelClass?: string | string[];\n  hasBackdrop?: boolean;\n  readonly panelId?: string;\n\n  /**\n   * @deprecated To be removed.\n   * @breaking-change 8.0.0\n   */\n  addItem?: (item: T) => void;\n\n  /**\n   * @deprecated To be removed.\n   * @breaking-change 8.0.0\n   */\n  removeItem?: (item: T) => void;\n}\n",
+    "emitted_JS_identical": true,
+    "emitted_JS_sha256": "376909f18c5c36a8ee4b498cb68004587b0fded80853ef8ba14868212ef87fb2",
+    "current_source_files": 532,
+    "current_live_uses": 1965,
+    "proposed_live_uses": 1964,
+    "removed_live_routes": [
+      {
+        "file": "legacy-menu/internal/menu-panel.ts",
+        "module": "@angular/material/menu",
+        "symbol": "MatMenuContent",
+        "candidate_source_sha256": "4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a",
+        "occurrences": [
+          {
+            "kind": "named-import",
+            "local_name": "MatMenuContent",
+            "type_only": true,
+            "line": 13
+          }
+        ]
+      }
+    ],
+    "added_live_routes": [],
+    "retained_additional_obligations": 315,
+    "proposed_live_additional_uses": 314,
+    "affected_additional_rows": [
+      {
+        "file": "legacy-menu/internal/menu-panel.ts",
+        "module": "@angular/cdk/a11y",
+        "symbol": "FocusOrigin",
+        "disposition": "closed",
+        "source_review": {
+          "path": "compatibility/f10/authored-use-reviews/current-focus-position-types.json",
+          "sha256": "662a0768fd9a1530ee2a8b615b42afc31392c428f1b93ed017685fae76c74d4c"
+        }
+      },
+      {
+        "file": "legacy-menu/internal/menu-panel.ts",
+        "module": "@angular/cdk/bidi",
+        "symbol": "Direction",
+        "disposition": "closed",
+        "source_review": {
+          "path": "compatibility/f10/authored-use-reviews/current-focus-position-types.json",
+          "sha256": "662a0768fd9a1530ee2a8b615b42afc31392c428f1b93ed017685fae76c74d4c"
+        }
+      },
+      {
+        "file": "legacy-menu/internal/menu-panel.ts",
+        "module": "@angular/core",
+        "symbol": "EventEmitter",
+        "disposition": "closed",
+        "source_review": {
+          "path": "compatibility/f10/authored-use-reviews/core-token-callers.json",
+          "sha256": "b2d9d7a105a402960102b82cd08998998b656ebef61e6b6a5bcc8b31477474d7"
+        }
+      },
+      {
+        "file": "legacy-menu/internal/menu-panel.ts",
+        "module": "@angular/core",
+        "symbol": "TemplateRef",
+        "disposition": "closed",
+        "source_review": {
+          "path": "compatibility/f10/authored-use-reviews/core-view-current-roles.json",
+          "sha256": "b8398a57f2c8ebc60931a107fa6d6fcdc845889375bf286ebe7c358f612ba277"
+        }
+      },
+      {
+        "file": "legacy-menu/internal/menu-panel.ts",
+        "module": "@angular/material/menu",
+        "symbol": "MatMenuContent",
+        "disposition": "open"
+      },
+      {
+        "file": "legacy-menu/internal/menu-panel.ts",
+        "module": "@angular/material/menu",
+        "symbol": "MenuPositionX",
+        "disposition": "closed",
+        "source_review": {
+          "path": "compatibility/f10/authored-use-reviews/current-focus-position-types.json",
+          "sha256": "662a0768fd9a1530ee2a8b615b42afc31392c428f1b93ed017685fae76c74d4c"
+        }
+      },
+      {
+        "file": "legacy-menu/internal/menu-panel.ts",
+        "module": "@angular/material/menu",
+        "symbol": "MenuPositionY",
+        "disposition": "closed",
+        "source_review": {
+          "path": "compatibility/f10/authored-use-reviews/current-focus-position-types.json",
+          "sha256": "662a0768fd9a1530ee2a8b615b42afc31392c428f1b93ed017685fae76c74d4c"
+        }
+      }
+    ],
+    "unmodified_admission_correctly_rejects_proposal": {
+      "source_snapshot_valid": false,
+      "inventory": {
+        "complete": false,
+        "expected": 314,
+        "observed": 315,
+        "missing": 0,
+        "duplicates": 0,
+        "outside": 1,
+        "invalid": 0,
+        "open": 50
+      },
+      "source_insufficient": 6
+    },
+    "semantic_type_proof_runtime_native_packed_or_floor_qualified": false
+  }
+}
