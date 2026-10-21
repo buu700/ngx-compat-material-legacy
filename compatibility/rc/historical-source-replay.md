@@ -727,3 +727,66 @@ for(const path of paths){const bytes=Buffer.concat([read(path),Buffer.from('\n')
 for(const path of [packet,tooltip]){let changed=false;const bad=Buffer.concat([read(path),Buffer.from('\n')]),late=p=>changed&&p===path?bad:read(p);inspectHistoricalReplayCurrent({root,readMember:late});changed=true;assert.throws(()=>inspectHistoricalReplayCurrent({root,readMember:late}),e=>e?.code==='ERR_ASSERTION');}
 const report={schema_version:1,line:checked.data.line,source_frame:checked.data.current_frame,guard:checked.guard,read_only_source_input_corruptions_rejected:paths,late_current_changes_rejected:[packet,tooltip],full97_controls_executed:false,historical26_19_50_cohorts_executed:false,actual_native_packed_or_floor_qualified:false,g11_claim:'not-passed'};writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line:report.line,frame:report.source_frame.commit,guarded:report.guard.guarded_current_members,product:1142,tooling:6,corruptions:paths.length,late_changes:2,full_cohorts_executed:false}));
 ```
+
+## Current overlay public-evidence frame
+
+The unchanged bounded program in the preceding tooltip frame receipt was rerun after committing the public overlay preparation and pinning its tree. Its SHA256 is `e83754a43aaa7df6a2475bea2d50ee64080b075b44e2208f4941b2ae315e85ce`. Both original26 probes and23 wrappers,all case vectors,the exact six tooling paths,and the two mutable progress paths remain unchanged. This batch adds zero product changes and zero canonical source closures. The public preparation has104 traced members at each of three SDK subjects,five complete tagged/current factory pairs,160 bounded runtime cases and6 source-mutant rejections per compiler. Its own16 input-corruption and2 late-change controls also passed. The48 individual overlay decisions and all224 open source obligations remain pending.
+
+Full97 controls and26/19/50 cohorts,full75/1697/21 walks,packed/AOT/native/consumer-floor gates,Actions and independent audits were not run for this checkpoint. The source/native qualification flags below deliberately remain false.
+
+```json
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_frame": {
+    "commit": "b989a2ca6772fff62a7038c2f187f43d44281e52",
+    "tree": "057deefc1e47d55d98b180c37825d9b5436c540d",
+    "tree_listing_sha256": "97fdf9d2f5b49a07738de2b0dc6d99b0dfd10919b59da1071cce2ffc2179edf7",
+    "members": 9987
+  },
+  "guard": {
+    "line": "main",
+    "guarded_current_members": 9985,
+    "current_product_members": 1142,
+    "current_tooling_members": 6,
+    "tooling_reference": {
+      "commit": "00ad529227275a01960eb3fb8c2e38248919a239",
+      "tree": "cfc3b6ef2de764d053d555cad409ea6453ad9d8a"
+    },
+    "exact_wrapper_edits_only": true,
+    "authenticated_current_wrapper_successors": 2,
+    "mutable_progress_paths": [
+      "compatibility/rc/remaining-native-admission-worksheet.json",
+      "compatibility/rc/session-handoff.json"
+    ],
+    "current_source_qualification": false,
+    "current_native_or_packed_qualification": false
+  },
+  "read_only_source_input_corruptions_rejected": [
+    "compatibility/rc/historical-source-replay-inputs.json",
+    "scripts/historical-source-replay.mjs",
+    "scripts/snack-dom-source-context.mjs",
+    "scripts/snack-dom-source-context-review.mjs",
+    "compatibility/rc/snack-dom-source-context-inputs.json",
+    "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "compatibility/rc/snack-dom-source-context-focus-inputs.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
+    "scripts/tooltip-scroll-clipping-evidence.mjs",
+    "scripts/tooltip-scroll-clipping.mjs",
+    "compatibility/rc/tooltip-scroll-context-prior.json.gz",
+    "compatibility/rc/overlay-caller-public-subjects.json",
+    "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+    "compatibility/rc/snack-dom-source-context-native-68b267dd59f3addf92a3b9f8ce9e8baa479df7f4.json",
+    "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
+  ],
+  "late_current_changes_rejected": [
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
+    "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
+  ],
+  "full97_controls_executed": false,
+  "historical26_19_50_cohorts_executed": false,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
+```
