@@ -5,24 +5,38 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/** Rehash bounded preparation evidence; this never closes a canonical row. */
+/** Authenticate the historical preparation epoch after fully qualifying the current owner. */
 import assert from 'node:assert/strict';
 import {readFileSync, writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {join} from 'node:path';
 import {currentOverlayCallerFacts} from '../scripts/snack-dom-source-context-review.mjs';
+import {snackDomSourceContext} from '../scripts/snack-dom-source-context.mjs';
 
 const root = process.cwd(), raw = path => readFileSync(join(root, path));
 const hash = value => createHash('sha256').update(value).digest('hex');
 const pins = {main: 'c2153a44a1514c7ab1969b93247e8d79fbc9b0bfe4a753324262e5e2e899ece5', '21.x': '8c7dd372a283b22a57df52ba404980c3fc390ee20cf85dfa428099acfe097eed'};
 const line = JSON.parse(raw('compatibility/rc/overlay-caller-roles-worksheet.json')).line;
 const path = 'compatibility/rc/overlay-caller-roles-public-' + (line === 'main' ? 'main' : '21') + '-v2.json';
+const ownerEpoch = {main: '1b8bddffeb5e4b0524b185ce4b6e2031e4accf88', '21.x': 'ce9f09ddcad7168b6e45e97776b5668f9c21a01a'};
+const ownerInputs = new Set(['scripts/snack-dom-source-context-review.mjs', 'scripts/snack-dom-source-context.mjs', 'compatibility/rc/snack-dom-source-context-inputs.json', 'compatibility/rc/snack-dom-source-context-product-inputs.json']);
+const epochInputs = new Map();
 const versions = {original: ['16.2.12', '16.2.14'], main: ['22.1.7', '22.1.7'], '21.x': ['21.2.23', '21.2.14']};
 function inspect(read = raw) {
   const bytes = read(path); assert.equal(hash(bytes), pins[line], 'overlay preparation evidence changed');
   const proof = JSON.parse(bytes); assert.equal(proof.line, line);
-  for (const member of proof.inputs) assert.equal(hash(read(member.path)), member.sha256, 'changed overlay evidence input ' + member.path);
+  // This packet recorded the preliminary owner's exact historical bytes.
+  // It never substitutes them for current product/native/source admission.
+  const current = snackDomSourceContext({root, read}); assert.equal(current.members, 14);
+  for (const member of proof.inputs) {
+    if (!ownerInputs.has(member.path)) assert.equal(hash(read(member.path)), member.sha256, 'changed overlay evidence input ' + member.path);
+    else {
+      if (member.path === 'scripts/snack-dom-source-context.mjs') assert.equal(hash(read(member.path)), hash(raw(member.path)), 'changed current reader input');
+      if (!epochInputs.has(member.path)) epochInputs.set(member.path, execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', 'show', ownerEpoch[line] + ':' + member.path], {cwd: root, maxBuffer: 4 * 1024 * 1024, env: {...process.env, GIT_NO_LAZY_FETCH: '1'}}));
+      assert.equal(hash(epochInputs.get(member.path)), member.sha256, 'unauthenticated historical owner input');
+    }
+  }
   const {prior, facts} = currentOverlayCallerFacts({root, read});
   assert.deepEqual(facts.map(f => ({file: f.file, symbol: f.symbol, source_sha256: f.candidate_source_sha256,
     unused: f.unused_import, tooltip_current_source: !!f.tooltip_product_qualification})), proof.facts);
@@ -65,7 +79,7 @@ function inspect(read = raw) {
 }
 const {prior, proof} = inspect();
 const controls = [path, 'scripts/overlay-caller-public-evidence.mjs', 'scripts/snack-dom-source-context-review.mjs',
-  'scripts/overlay-caller-roles.mjs', 'tests/overlay_caller_roles_subject.mjs',
+  'scripts/overlay-caller-roles.mjs', 'scripts/snack-dom-source-context.mjs', 'tests/overlay_caller_roles_subject.mjs',
   'compatibility/rc/overlay-caller-factory-reference.json', 'compatibility/rc/overlay-caller-public-subjects.json',
   'compatibility/rc/snack-dom-source-context-inputs.json',
   'projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts',
@@ -78,7 +92,7 @@ for (const target of controls) {
 let target = null;
 const lateRead = member => member === target ? Buffer.concat([raw(member), Buffer.from('\nlate')]) : raw(member);
 inspect(lateRead);
-for (target of [controls[8], controls.at(-1)]) assert.throws(() => inspect(lateRead), /AssertionError/);
+for (target of ['projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts', controls.at(-1)]) assert.throws(() => inspect(lateRead), /AssertionError/);
 for (const ledger of prior.ledgers) {
   const committed = execFileSync('git', ['--no-replace-objects', '-c', 'gc.auto=0', 'show', 'HEAD:' + ledger.path],
     {cwd: root, maxBuffer: 24 * 1024 * 1024, env: {...process.env, GIT_NO_LAZY_FETCH: '1'}});
@@ -88,7 +102,7 @@ const summary = {line, routes: 48, tooltip_current_routes: 8, public_type_models
   traced_members_per_model: proof.type_subjects.map(s => s.members.length), negative_type_controls: 9, deprecated_fixture_sizing_mutants_rejected: 3,
   complete_factories: 5, genuine_runtime_contexts: 10, bounded_runtime_cases: 160,
   runtime_source_mutants_rejected: 6, evidence_corruptions_rejected: controls.length, late_changes_rejected: 2,
-  canonical_ledgers_preserved: true, canonical_source_closures_integrated: 0,
+  canonical_ledgers_preserved: true, canonical_source_closures_integrated: 0, historical_preparation_epoch_authenticated: true, current_source_owner_fully_qualified: true,
   actual_native_packed_AOT_or_full_floor_qualified: false};
 const output = JSON.stringify(summary);
 if (process.argv[2]) writeFileSync(process.argv[2], output + '\n', {flag: 'wx'});
