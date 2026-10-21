@@ -22,6 +22,7 @@ import {
   Optional, ProviderToken, Renderer2, ViewChild,
 } from '@angular/core';
 import {MatDialogConfig} from '@angular/material/dialog';
+import type {LegacyDialogRuntimeConfig} from '../dialog-config';
 import {Subject, Subscription} from 'rxjs';
 import {take} from 'rxjs/operators';
 import {focusLegacyDialogInitially, legacyDialogActiveElement, legacyDialogContainsFocus}
@@ -80,7 +81,7 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
     protected _elementRef: ElementRef,
     protected _focusTrapFactory: FocusTrapFactory,
     @Optional() @Inject(DOCUMENT) _document: any,
-    public readonly _config: MatDialogConfig,
+    @Inject(MatDialogConfig) public readonly _config: LegacyDialogRuntimeConfig,
     private _legacyFocusChecker: InteractivityChecker,
     protected _ngZone: NgZone,
     private _legacyOverlayRef: OverlayRef,

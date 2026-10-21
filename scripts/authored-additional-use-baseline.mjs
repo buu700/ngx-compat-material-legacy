@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {isDeepStrictEqual} from 'node:util';
+import {inspectDialogConfigBoundary,DIALOG_CONFIG_RETIRED_ROLE} from './dialog-caller-config-boundary.mjs';
 import {qualifiedMenuContentTypeBoundary,MENU_CONTENT_PANEL_SOURCE,MENU_CONTENT_PANEL_BEFORE,MENU_CONTENT_PANEL_AFTER} from './menu-panel-content-boundary.mjs';
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex'),key=r=>JSON.stringify([r?.file,r?.module,r?.symbol]);
 const originPath='compatibility/rc/menu-caller-prior.json.gz',pins={main:'a6cf639de2151c32bc80b82be63ae4390453dc8c92a309801c1c153de9a82a00','21.x':'2da547a58102ec0a5715ebfdc91a86085d9728a6b6f747e35bf15cf8d0f8fe8e'};
@@ -26,12 +27,13 @@ export function additionalUseBaseline({current,additions,candidate,line,readMemb
   assert.equal(digest,MENU_CONTENT_PANEL_AFTER,'unqualified menu panel source');assert.ok(pins[line]);
   const captured=readMember(originPath);assert.equal(hash(captured),pins[line],'changed original additional obligation capsule');const prior=JSON.parse(gunzipSync(captured));assert.equal(prior.line,line);
   const ledger=prior.ledgers.find(m=>m.path==='compatibility/f10/authored-dependency-current-dispositions.json');assert.ok(ledger);assert.equal(hash(ledger.text),ledger.sha256);const rows=JSON.parse(ledger.text).symbol_uses;assert.equal(rows.length,315);assert.equal(new Set(rows.map(key)).size,315);result.entries=rows;result.mode='owned-menu-content-type-removal';
-  const live=new Set(additions.map(key)),missing=rows.filter(r=>!live.has(key(r)));assert.deepEqual(missing.map(key),[key(target)],'unqualified removed additional route');
+  const live=new Set(additions.map(key)),missing=rows.filter(r=>!live.has(key(r)));const dialogRemoved=missing.some(row=>key(row)===key(DIALOG_CONFIG_RETIRED_ROLE));assert.deepEqual(missing.map(key).sort(),[key(target),...(dialogRemoved?[key(DIALOG_CONFIG_RETIRED_ROLE)]:[])].sort(),'unqualified removed additional route');
   // Keep this expected snapshot even if the qualification/metadata is invalid:
   // the original315 keys must remain in the expected inventory either way.
   result.retired=[{...target,candidate_source_sha256:MENU_CONTENT_PANEL_AFTER,occurrences:[]}];
   const qualification=qualifiedMenuContentTypeBoundary({line,readMember});result.qualification=qualification.ref;
-  const expected=[{...target,qualification:qualification.ref}];assert.ok(isDeepStrictEqual(candidate?.retained_removed_additional_uses,expected),'missing or changed retained-removed obligation qualification');
+  const expected=[{...target,qualification:qualification.ref}];
+  if(dialogRemoved){result.retired.push({...DIALOG_CONFIG_RETIRED_ROLE,candidate_source_sha256:'994576f436b45a1d3d1f132db793a2b3668e581637f06279e2200065cea319a5',occurrences:[]});const boundary=inspectDialogConfigBoundary({read:readMember,requireApplied:true});assert.equal(boundary.line,line);const path='projects/ngx-material-legacy/'+DIALOG_CONFIG_RETIRED_ROLE.file,member=boundary.targets.find(m=>m.path===path);assert.equal(member.sha256,result.retired.at(-1).candidate_source_sha256);assert.equal(current.source_files.find(m=>m.path===path)?.sha256,member.sha256,'mixed dialog source graph and historical reader');expected.push({...DIALOG_CONFIG_RETIRED_ROLE,qualification:boundary.qualification});result.mode='owned-menu-and-dialog-config-type-removals';result.qualification=[qualification.ref,boundary.qualification];}assert.ok(isDeepStrictEqual(candidate?.retained_removed_additional_uses,expected),'missing or changed retained-removed obligation qualification');
   return {...result,valid:true};
  }catch(error){return {...result,error:String(error?.message??error).split('\n')[0]};}
 }
