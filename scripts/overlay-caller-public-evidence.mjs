@@ -16,6 +16,17 @@ const ts = createRequire(import.meta.url)('typescript');
 const hash = value => createHash('sha256').update(value).digest('hex');
 const unstable = new Set(['deprecated', 'docs-private', 'experimental', 'developerPreview', 'breaking-change']);
 
+function assertStableFixtureSizing(text) {
+  const source = ts.createSourceFile('overlay-fixture.mjs', text, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  function visit(n) {
+    if (ts.isCallExpression(n) && ts.isPropertyAccessExpression(n.expression)) {
+      assert.ok(!['width', 'height'].includes(n.expression.name.text), 'deprecated sizing call in bounded overlay fixture');
+    }
+    ts.forEachChild(n, visit);
+  }
+  visit(source);
+}
+
 export const overlayFactorySubjects = [
   ['dialog', 'legacy-dialog/dialog.ts', 'MAT_LEGACY_DIALOG_SCROLL_STRATEGY_PROVIDER_FACTORY', 'MAT_DIALOG_SCROLL_STRATEGY_PROVIDER_FACTORY'],
   ['autocomplete', 'legacy-autocomplete/internal/autocomplete-trigger-base.ts', 'MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY', 'MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY'],
@@ -78,6 +89,15 @@ export function inspectOverlayCallerPublicMembers({root, model, facts, factorySo
     if (symbol.flags & ts.SymbolFlags.Alias) symbol = checker.getAliasedSymbol(symbol);
     symbols.push({name, ...stable(symbol, name)});
   }
+  let globalSymbol = exports.get('GlobalPositionStrategy');
+  if (globalSymbol.flags & ts.SymbolFlags.Alias) globalSymbol = checker.getAliasedSymbol(globalSymbol);
+  const globalType = checker.getDeclaredTypeOfSymbol(globalSymbol);
+  for (const name of ['width', 'height']) assert.ok(globalType.getProperty(name).getJsDocTags(checker).some(t => t.name === 'deprecated'));
+  const fixture = readFileSync(join(root, 'tests/overlay_caller_roles_subject.mjs'), 'utf8');
+  assertStableFixtureSizing(fixture);
+  const marker = '.global().centerHorizontally()';
+  assert.ok(fixture.includes(marker));
+  assert.throws(() => assertStableFixtureSizing(fixture.replace(marker, ".global().width('100px').centerHorizontally()")), /deprecated sizing call/);
   for (const fact of facts) {
     let symbol = exports.get(fact.symbol);
     if (symbol.flags & ts.SymbolFlags.Alias) symbol = checker.getAliasedSymbol(symbol);
@@ -177,6 +197,7 @@ export function inspectOverlayCallerPublicMembers({root, model, facts, factorySo
   return {line: model.line, Core: model.packages.get('@angular/core').version,
     CDK: model.packages.get('@angular/cdk').version, strict: true, skipLibCheck: false, diagnostics: 0,
     factory_declarations_compiled: 10, negative_type_controls: bad.map(d => d.code), symbols, members, gaps,
+    fixture_uses_configuration_sizing: true, deprecated_fixture_sizing_mutant_rejected: true,
     argument_dependent_overloads_qualified: false, whole_current_caller_source_compiled: false,
     scope: 'Export declarations, checker-bound annotated receivers,explicit public-overlay casts and finite lexical variable aliases only. Single-signature returns are followed. Cast correctness,calls and overload arguments outside the five complete factories,implicit method returns,template bindings and wider owned classes remain unqualified.'};
 }
