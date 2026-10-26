@@ -107,7 +107,11 @@ async function observe(source = raw.trigger, only = null) {
     finally { try { f.cleanup(); } catch (error) { const row = result.at(-1); row.result = 'fail'; row.cleanup_error = error.message; } }
   }
   await check('owned-exit-retains-overlay-and-lazy-until-void', f => {
-    const t = f.owner.instance, m = f.panel.instance; t.openMenu(); t.closeMenu();
+    const t = f.owner.instance, m = f.panel.instance;
+    assert.equal(m._isAnimating, false, 'new menu must start in a stable idle state');
+    assert.equal(m._panelAnimationState, 'void');
+    assert.deepEqual(f.events, [], 'construction must not emit animation or trigger events');
+    t.openMenu(); t.closeMenu();
     assert.equal(t.menuOpen, false); assert.equal(f.owner.overlay.hasAttached(), true, 'overlay detached before CSS exit');
     assert.equal(f.panel.state.destroyed, 0); assert.equal(m._panelAnimationState, 'void');
     m._onCssAnimationDone('mat-legacy-menu-enter'); assert.equal(f.owner.overlay.hasAttached(), true);
