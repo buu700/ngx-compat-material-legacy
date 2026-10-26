@@ -11,7 +11,7 @@ import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {isDeepStrictEqual} from 'node:util';
 import {DIALOG_CONFIG_RETIRED_ROLE} from './dialog-caller-config-boundary.mjs';
-import {inspectDialogServiceDefaults} from './dialog-caller-service-default-boundary.mjs';
+import {inspectDialogOwnedContracts} from './dialog-caller-owned-contract-boundary.mjs';
 import {qualifiedMenuContentTypeBoundary,MENU_CONTENT_PANEL_SOURCE,MENU_CONTENT_PANEL_BEFORE,MENU_CONTENT_PANEL_AFTER} from './menu-panel-content-boundary.mjs';
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex'),key=r=>JSON.stringify([r?.file,r?.module,r?.symbol]);
 const originPath='compatibility/rc/menu-caller-prior.json.gz',pins={main:'a6cf639de2151c32bc80b82be63ae4390453dc8c92a309801c1c153de9a82a00','21.x':'2da547a58102ec0a5715ebfdc91a86085d9728a6b6f747e35bf15cf8d0f8fe8e'};
@@ -34,7 +34,7 @@ export function additionalUseBaseline({current,additions,candidate,line,readMemb
   result.retired=[{...target,candidate_source_sha256:MENU_CONTENT_PANEL_AFTER,occurrences:[]}];
   const qualification=qualifiedMenuContentTypeBoundary({line,readMember});result.qualification=qualification.ref;
   const expected=[{...target,qualification:qualification.ref}];
-  if(dialogRemoved){result.retired.push({...DIALOG_CONFIG_RETIRED_ROLE,candidate_source_sha256:'994576f436b45a1d3d1f132db793a2b3668e581637f06279e2200065cea319a5',occurrences:[]});const boundary=inspectDialogServiceDefaults({read:readMember,requireApplied:true}).configuration;assert.equal(boundary.line,line);const path='projects/ngx-material-legacy/'+DIALOG_CONFIG_RETIRED_ROLE.file,member=boundary.targets.find(m=>m.path===path);assert.equal(member.sha256,result.retired.at(-1).candidate_source_sha256);assert.equal(current.source_files.find(m=>m.path===path)?.sha256,member.sha256,'mixed dialog source graph and historical reader');expected.push({...DIALOG_CONFIG_RETIRED_ROLE,qualification:boundary.qualification});result.mode='owned-menu-and-dialog-config-type-removals';result.qualification=[qualification.ref,boundary.qualification];}assert.ok(isDeepStrictEqual(candidate?.retained_removed_additional_uses,expected),'missing or changed retained-removed obligation qualification');
+  if(dialogRemoved){result.retired.push({...DIALOG_CONFIG_RETIRED_ROLE,candidate_source_sha256:'994576f436b45a1d3d1f132db793a2b3668e581637f06279e2200065cea319a5',occurrences:[]});const boundary=inspectDialogOwnedContracts({read:readMember,requireApplied:true}).defaults.configuration;assert.equal(boundary.line,line);const path='projects/ngx-material-legacy/'+DIALOG_CONFIG_RETIRED_ROLE.file,member=boundary.targets.find(m=>m.path===path);assert.equal(member.sha256,result.retired.at(-1).candidate_source_sha256);assert.equal(current.source_files.find(m=>m.path===path)?.sha256,member.sha256,'mixed dialog source graph and historical reader');expected.push({...DIALOG_CONFIG_RETIRED_ROLE,qualification:boundary.qualification});result.mode='owned-menu-and-dialog-config-type-removals';result.qualification=[qualification.ref,boundary.qualification];}assert.ok(isDeepStrictEqual(candidate?.retained_removed_additional_uses,expected),'missing or changed retained-removed obligation qualification');
   return {...result,valid:true};
  }catch(error){return {...result,error:String(error?.message??error).split('\n')[0]};}
 }
