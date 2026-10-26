@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import {readFileSync, writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
-import {join} from 'node:path';
+import {join, posix} from 'node:path';
 import {cdkModuleTypePublicRoute} from '../scripts/cdk-module-type-public-subjects.mjs';
 import {prepareMaterialRemainingPublicSubjects, MATERIAL_REMAINING_SUBJECTS} from '../scripts/material-remaining-caller-public-subjects.mjs';
 const ts = createRequire(import.meta.url)('typescript'), root = process.cwd();
@@ -24,33 +24,83 @@ const ledgers = ['compatibility/f10/authored-dependency-dispositions.json',
 const before = ledgers.map(path => hash(read(path))), loaded = prepareMaterialRemainingPublicSubjects(root), subjects = [];
 try {
   for (const model of loaded.models) {
-    const paths = new Map([...new Set([...selected.map(([module]) => module),
-      ...(model.line === 'original' ? ['@angular/material/legacy-input'] : [])])].map(module =>
-      [module, join(model.root, 'node_modules', cdkModuleTypePublicRoute(model, module, 'types').key)]));
-    const options = {target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
-      types: [], noEmit: true, strict: true, skipLibCheck: false};
-    const program = ts.createProgram([...paths.values()], options), checker = program.getTypeChecker();
+    // Namespace discovery needs exact public exports, not generic type
+    // instantiation. The separate91-source test performs semantic checking.
+    const parsed = new Map(), resolved = new Map(), active = new Set();
+    function parse(key) {
+      if (!parsed.has(key)) {
+        const text = model.sources.get(key); assert.equal(typeof text, 'string');
+        const file = ts.createSourceFile(key, text, ts.ScriptTarget.Latest, true);
+        assert.equal(file.parseDiagnostics.length, 0); parsed.set(key, file);
+      }
+      return parsed.get(key);
+    }
+    function reference(key, spec) {
+      if (!spec.startsWith('.')) return cdkModuleTypePublicRoute(model, spec, 'types').key;
+      const base = posix.normalize(posix.join(posix.dirname(key), spec.replace(/\.js$/, '.d.ts')));
+      assert.ok(!base.split('/').includes('..'));
+      const matches = [base, base + '.d.ts', base + '/index.d.ts'].filter(path => model.sources.has(path));
+      assert.equal(matches.length, 1); return matches[0];
+    }
+    function declared(file, name, exportedOnly) {
+      const matches = [];
+      for (const statement of file.statements) {
+        if (exportedOnly && !statement.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)) continue;
+        const nodes = ts.isVariableStatement(statement) ? statement.declarationList.declarations : [statement];
+        for (const node of nodes) if (node.name?.text === name &&
+          (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node) ||
+            ts.isEnumDeclaration(node) || ts.isFunctionDeclaration(node) || ts.isVariableDeclaration(node)))
+          matches.push({key: file.fileName, node, statement, tags: [...new Set([...ts.getJSDocTags(node), ...ts.getJSDocTags(statement)].map(tag => tag.tagName.text))]});
+      }
+      assert.ok(matches.length <= 1, 'ambiguous selected SDK declaration'); return matches[0] ?? null;
+    }
+    function resolve(key, name, local = false) {
+      const identity = JSON.stringify([key, name, local]);
+      if (resolved.has(identity)) return resolved.get(identity);
+      if (active.has(identity)) return null;
+      active.add(identity);
+      try {
+        const file = parse(key), candidates = [], direct = declared(file, name, !local);
+        if (direct) candidates.push(direct);
+        for (const statement of file.statements) {
+          if (local && ts.isImportDeclaration(statement) && statement.importClause?.namedBindings && ts.isNamedImports(statement.importClause.namedBindings)) {
+            for (const spec of statement.importClause.namedBindings.elements) if (spec.name.text === name) {
+              const target = resolve(reference(key, statement.moduleSpecifier.text), (spec.propertyName ?? spec.name).text);
+              if (target) candidates.push(target);
+            }
+          } else if (!local && ts.isExportDeclaration(statement)) {
+            if (statement.exportClause && ts.isNamedExports(statement.exportClause)) {
+              for (const spec of statement.exportClause.elements) if (spec.name.text === name) {
+                const target = statement.moduleSpecifier ? resolve(reference(key, statement.moduleSpecifier.text), (spec.propertyName ?? spec.name).text) :
+                  resolve(key, (spec.propertyName ?? spec.name).text, true);
+                if (target) candidates.push({...target, tags: [...new Set([...target.tags, ...ts.getJSDocTags(spec).map(tag => tag.tagName.text)])]});
+              }
+            } else if (!statement.exportClause && statement.moduleSpecifier) {
+              const target = resolve(reference(key, statement.moduleSpecifier.text), name); if (target) candidates.push(target);
+            }
+          }
+        }
+        const unique = new Map(candidates.map(target => [target.key + ':' + target.node.pos, target]));
+        assert.ok(unique.size <= 1, 'ambiguous public SDK export');
+        const result = [...unique.values()][0] ?? null; resolved.set(identity, result); return result;
+      } finally {active.delete(identity);}
+    }
     function exported(module, name) {
-      const source = program.getSourceFile(paths.get(module)); assert.ok(source);
-      const owner = checker.getSymbolAtLocation(source); assert.ok(owner);
-      const symbol = checker.getExportsOfModule(owner).find(symbol => symbol.name === name); assert.ok(symbol, 'missing public SDK export ' + module + ':' + name);
-      const target = symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol;
-      assert.ok(target.declarations?.length, 'unresolved public SDK alias'); return target;
+      const result = resolve(cdkModuleTypePublicRoute(model, module, 'types').key, name);
+      assert.ok(result, 'missing exact public SDK export ' + module + ':' + name); return result;
     }
     const symbols = selected.map(([module, name]) => {
-      const symbol = exported(module, name), tags = symbol.getJsDocTags(checker).map(tag => tag.name);
+      const target = exported(module, name), tags = target.tags;
       if (model.line !== 'original') assert.ok(tags.every(tag => !['deprecated', 'docs-private', 'breaking-change', 'experimental', 'developerPreview'].includes(tag)), 'unstable current SDK export ' + name);
-      const declarations = symbol.declarations.map(node => {
-        const source = node.getSourceFile(), key = source.fileName.slice(join(model.root, 'node_modules').length + 1);
-        assert.equal(hash(source.text), hash(model.sources.get(key)), 'declaration outside authenticated SDK');
-        return {key, sha256: hash(source.text), kind: ts.SyntaxKind[node.kind]};
-      });
+      const source = target.node.getSourceFile(), key = target.key;
+      assert.equal(hash(source.text), hash(model.sources.get(key)), 'declaration outside authenticated SDK');
+      const declarations = [{key, sha256: hash(source.text), kind: ts.SyntaxKind[target.node.kind]}];
       return {module, name, tags, declarations};
     });
     let originalLegacyTokenAlias = null;
     if (model.line === 'original') {
-      assert.equal(exported('@angular/material/legacy-input', 'MAT_LEGACY_INPUT_VALUE_ACCESSOR'),
-        exported('@angular/material/input', 'MAT_INPUT_VALUE_ACCESSOR'));
+      const legacy = exported('@angular/material/legacy-input', 'MAT_LEGACY_INPUT_VALUE_ACCESSOR'), shared = exported('@angular/material/input', 'MAT_INPUT_VALUE_ACCESSOR');
+      assert.equal(legacy.key, shared.key); assert.equal(legacy.node, shared.node);
       originalLegacyTokenAlias = true;
     }
     subjects.push({line: model.line, public_type_exports_found: symbols.length, symbols,
@@ -75,7 +125,7 @@ const report = {schema_version: 1, invocation_line: JSON.parse(read('compatibili
   capsule: {path: MATERIAL_REMAINING_SUBJECTS, sha256: hash(read(MATERIAL_REMAINING_SUBJECTS))},
   compiler: ts.version, subjects, current_stable_public_exports: 14, archive_identities_and_SRI_verified: true,
   changed_input_controls_rejected_and_restored: controls.length, canonical_ledgers_unchanged: true,
-  namespace_declaration_analysis_only: true, actual_owned_caller_compilation_or_runtime_executed: false,
+  namespace_declaration_analysis_only: true, declaration_lookup: 'exact static public exports and aliases;semantic checks live in the91-source probe', actual_owned_caller_compilation_or_runtime_executed: false,
   source_closures: 0, actual_native_packed_AOT_or_full_floor_qualified: false, g11_claim: 'not-passed'};
 if (process.argv[2]) writeFileSync(process.argv[2], JSON.stringify(report, null, 2) + '\n', {flag: 'wx'});
 console.log(JSON.stringify({line: report.invocation_line, SDK_worlds: subjects.length, public_exports: subjects.reduce((count, s) => count + s.public_type_exports_found, 0),
