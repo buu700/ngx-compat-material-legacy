@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "authority": "99ca1a4e7f068a18c69e6d8500b17a0b8b2e848e",
+  "path": "scripts/chip-focus-contract.mjs",
+  "before_sha256": "24874ee0cee938314bb0ec3bb6bd60fe9f776c37d4499436ac06f1c0c40e60e0",
+  "sha256": "1a0be3ead213828fd659082aa72d474814b9ce89862567f78f494116dd650ad7",
+  "edits": [
+    {
+      "before": "qualifyIndependentSnackProductDelta,snackDomRawCurrentRead}",
+      "after": "qualifyIndependentSnackProductDelta,snackDomRawCurrentRead,inspectSnackCurrentDialogContracts,inspectPackedProductSourceRepairs}"
+    },
+    {
+      "before": "const changed=independentProduct.delta[0],added=independentProduct.delta[1];",
+      "after": "const changed=independentProduct.delta[0],added=independentProduct.delta[1],packed=inspectPackedProductSourceRepairs({root,read:readMember});for(const target of packed.targets)assert.equal(prior.product_members.find(m=>m.path===target.path)?.sha256,target.before_sha256);"
+    },
+    {
+      "before": "const owned=inspectDialogOwnedContracts({root,read:readMember,requireApplied:true})",
+      "after": "const owned=inspectSnackCurrentDialogContracts({root,read:readMember})"
+    },
+    {
+      "before": "const expected=dialogConfig?.targets.find(t=>t.path===m.path)?.sha256??",
+      "after": "const expected=packed.targets.find(t=>t.path===m.path)?.sha256??dialogConfig?.targets.find(t=>t.path===m.path)?.sha256??"
+    },
+    {
+      "before": "if(!dialogConfig?.targets.some(t=>t.path===m.path)&&",
+      "after": "if(!packed.targets.some(t=>t.path===m.path)&&!dialogConfig?.targets.some(t=>t.path===m.path)&&"
+    },
+    {
+      "before": "import {inspectDialogOwnedContracts} from './dialog-caller-owned-contract-boundary.mjs';\n",
+      "after": ""
+    }
+  ],
+  "product_registry": {
+    "path": "compatibility/rc/snack-dom-source-context-product-inputs.json",
+    "sha256": "a2e404199af63e54b81a0c2218c12c01a3932be65304c3a7af194dd8ab04da57"
+  },
+  "source_role_metadata": {
+    "source_parent": "a26534ff57016b77a329a26eb4a0489529878645",
+    "frozen_ledger": {
+      "path": "compatibility/f10/authored-dependency-dispositions.json",
+      "sha256": "53be9dcef9596c2054021eb1a1d49c1ec794148a6eabf7e21df6f18d9f768c76"
+    },
+    "prior_review": {
+      "path": "compatibility/f10/authored-use-reviews/dialog-config-inherited-source-context.json",
+      "sha256": "cd481f4d57213bda5c9413dfc9d3f0c0a269194681194fd8934e143857df306b"
+    },
+    "review": {
+      "path": "compatibility/f10/authored-use-reviews/packed-upstream-focus-source-context.json",
+      "sha256": "e835ee9de3c693e703f41d0bc569eb45a8edd412bc12e771ed86255dce70761a"
+    },
+    "use": {
+      "file": "legacy-chips/chip.ts",
+      "module": "@angular/core",
+      "symbol": "NgZone"
+    },
+    "history_reason": "Unchanged chip NgZone source judgment; exact current focus inspector successor retains the original focus assertions and qualifies four independently reviewed packed source repairs. No new semantic or native/floor closure."
+  }
+}
