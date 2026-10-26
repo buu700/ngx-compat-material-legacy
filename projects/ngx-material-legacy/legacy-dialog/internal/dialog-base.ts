@@ -157,8 +157,8 @@ export abstract class _MatDialogBase<C extends _MatDialogContainerBase> implemen
       },
     });
 
-    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;
-    dialogRef!.componentInstance = cdkRef.componentInstance!;
+    (dialogRef! as {componentRef: ComponentRef<T> | undefined}).componentRef = cdkRef.componentRef ?? undefined;
+    dialogRef!.componentInstance = (cdkRef.componentInstance ?? undefined)!;
 
     this.openDialogs.push(dialogRef!);
     this.afterOpened.next(dialogRef!);

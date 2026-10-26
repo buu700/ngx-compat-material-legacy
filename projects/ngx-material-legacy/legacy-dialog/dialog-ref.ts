@@ -20,9 +20,9 @@ import {
   MatDialogConfig,
   MatDialogState,
 } from '@angular/material/dialog';
-import {Observable, ReplaySubject, Subscription, merge} from 'rxjs';
+import {Observable, Subject, Subscription, merge} from 'rxjs';
 import {filter, take} from 'rxjs/operators';
-import {_MatDialogContainerBase} from './internal/dialog-container-base';
+import {_MatDialogContainerBase, registerLegacyDialogContainerPeer} from './internal/dialog-container-base';
 
 /**
  * Reference to a dialog opened via the MatDialog service.
@@ -33,9 +33,9 @@ export class MatLegacyDialogRef<T, R = any> {
 
   /**
    * `ComponentRef` of the component opened into the dialog. Will be
-   * null when the dialog is opened using a `TemplateRef`.
+   * undefined when the dialog is opened using a `TemplateRef`.
    */
-  readonly componentRef: ComponentRef<T> | null;
+  readonly componentRef: ComponentRef<T> | null | undefined;
 
   /** Whether the user is allowed to close the dialog. */
   disableClose: boolean | undefined;
@@ -44,10 +44,10 @@ export class MatLegacyDialogRef<T, R = any> {
   id: string;
 
   /** Subject for notifying the user that the dialog has finished opening. */
-  private readonly _afterOpened = new ReplaySubject<void>(1);
+  private readonly _afterOpened = new Subject<void>();
 
   /** Subject for notifying the user that the dialog has started closing. */
-  private readonly _beforeClosed = new ReplaySubject<R | undefined>(1);
+  private readonly _beforeClosed = new Subject<R | undefined>();
 
   /** Result to be passed to afterClosed. */
   private _result: R | undefined;
@@ -72,6 +72,7 @@ export class MatLegacyDialogRef<T, R = any> {
     config: MatDialogConfig,
     public _containerInstance: _MatDialogContainerBase,
   ) {
+    registerLegacyDialogContainerPeer(_containerInstance, _ref);
     this.disableClose = config.disableClose;
     this.id = _ref.id;
 
