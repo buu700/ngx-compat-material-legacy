@@ -1,0 +1,1160 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "criteria": "Seven individual original Material caller roles against authenticated unchanged91-source graph,genuine minimum public SDKs,strict types,tagged harness/input protocols and explicit prior Angular22-only runtime limits.",
+  "reviews": [
+    {
+      "file": "legacy-input/input.ts",
+      "module": "@angular/material/input",
+      "symbol": "MatInput",
+      "candidate_source_sha256": "bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;individual remaining Material dependency review",
+      "decision": "The existing owned directive extends the exact public MatInput constructor. Its three consumed inherited extension points have unmarked accessible declarations at both minima;the readonly placeholder read is independently public through MatFormFieldControl<any> and Angular input metadata without deleting the implementation docs-private annotation. Actual tagged/current placeholder promotion and native inline-select receiver protocols match. The approved explicit zero-argument Angular constructor remains a finite intentional API difference;its historical ten-argument signature is not claimed equivalent. Earlier real Angular22 node,forms,field and lifetime execution is retained within that epoch;actual21 node execution is unqualified. Only this finite dependency/type/consumed public protocol boundary is closed. Actual compiled leaf factories,HTML/CSS rendering,SSR,native geometry,AOT,packed consumers and complete Node/compiler/peer/RxJS floors remain required. All SHA and packed CVA obligations remain separate;G11 is not passed.",
+      "original_obligation": {
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "row": {
+          "module": "@angular/material/input",
+          "symbol": "MatInput",
+          "file": "legacy-input/input.ts",
+          "status": "inventory-seed",
+          "disposition": "open"
+        }
+      },
+      "current_source_role": {
+        "file": "legacy-input/input.ts",
+        "module": "@angular/material/input",
+        "symbol": "MatInput",
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "candidate_source_sha256": "bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550",
+        "binding": {
+          "kind": "ImportSpecifier",
+          "local_name": "BaseMatInput",
+          "module": "@angular/material/input",
+          "text": "import {MatInput as BaseMatInput} from '@angular/material/input';"
+        },
+        "occurrences": [
+          {
+            "line": 46,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "expression": "BaseMatInput"
+          }
+        ],
+        "public_reexport": false,
+        "complete_context_members": [
+          {
+            "kind": "SourceFile",
+            "line": 1,
+            "sha256": "bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550",
+            "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {Directive, inject} from '@angular/core';\nimport {MatInput as BaseMatInput} from '@angular/material/input';\nimport {\n  MatLegacyFormFieldControl,\n  MatLegacyFormField,\n  MAT_LEGACY_FORM_FIELD,\n} from '@ngx-compat/material-legacy/legacy-form-field';\n\n/**\n * Directive that allows a native input to work inside a `MatFormField`.\n */\n@Directive({\n  standalone: false,\n  selector: `input[matInput], textarea[matInput], select[matNativeControl],\n      input[matNativeControl], textarea[matNativeControl]`,\n  exportAs: 'matInput',\n  host: {\n    /**\n     * @breaking-change 8.0.0 remove .mat-form-field-autofill-control in favor of AutofillMonitor.\n     */\n    'class': 'mat-input-element mat-form-field-autofill-control',\n    '[class.mat-input-server]': '_isServer',\n    // These classes are inherited from the base input class and need to be cleared.\n    '[class.mat-mdc-input-element]': 'false',\n    '[class.mat-mdc-form-field-textarea-control]': 'false',\n    '[class.mat-mdc-form-field-input-control]': 'false',\n    '[class.mdc-text-field__input]': 'false',\n    '[class.mat-mdc-native-select-inline]': 'false',\n    // At the time of writing, we have a lot of customer tests that look up the input based on its\n    // placeholder. Since we sometimes omit the placeholder attribute from the DOM to prevent screen\n    // readers from reading it twice, we have to keep it somewhere in the DOM for the lookup.\n    '[attr.data-placeholder]': 'placeholder',\n    '[class.mat-native-select-inline]': '_isInlineSelect()',\n  },\n  providers: [{provide: MatLegacyFormFieldControl, useExisting: MatLegacyInput}],\n})\nexport class MatLegacyInput extends BaseMatInput {\n  private _legacyFormField = inject<MatLegacyFormField>(MAT_LEGACY_FORM_FIELD, {optional: true});\n\n  /** Construct through Angular node DI; retired dependency arguments must not be ignored. */\n  constructor() {\n    if (arguments.length) {\n      throw new Error('MatLegacyInput manual dependency arguments are not supported.');\n    }\n    super();\n  }\n\n  protected override _getPlaceholder() {\n    // If we're hiding the native placeholder, it should also be cleared from the DOM, otherwise\n    // screen readers will read it out twice: once from the label and once from the attribute.\n    // TODO: can be removed once we get rid of the `legacy` style for the form field, because it's\n    // the only one that supports promoting the placeholder to a label.\n    const formField = this._legacyFormField;\n    return formField && formField.appearance === 'legacy' && !formField._hasLabel?.()\n      ? null\n      : this.placeholder;\n  }\n}\n"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/material-remaining-caller-source-verification.json",
+          "sha256": "7a87cfd4bba7c8796f5d925a8b66e5a76c22cd37a643fe48816e2e433ae53c57"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-type-verification.json",
+          "sha256": "a765eee8fecee950f2d32f2cd90653a1bae086e3b349d9fcf6a0fd61452b89cf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-verification.json",
+          "sha256": "7a25750b19f0e634844f75b82f07c4635818e0d6402ff6563845bc34db9e30cb"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-verification.json",
+          "sha256": "db7e4e806238850c6d39adb41329b7eb09384141f442ef1de6150375b4200392"
+        },
+        {
+          "path": "compatibility/rc/input-public-parent-source-proof.json",
+          "sha256": "dc2aafa4ea36ccd63b2b65ad2154e04601f357f8a17f835709c5103a09b4b45a"
+        },
+        {
+          "path": "compatibility/rc/api/input-construction-consumer-decision.json",
+          "sha256": "040a15b9c0b1b6c60c0350f6590b35ff225c068538dd0145a1197c1e25e0eea4"
+        },
+        {
+          "path": "scripts/material-remaining-caller-contracts.mjs",
+          "sha256": "0ddadcb829838478339ff9a4967c5d6c6d374c01dfcf29520fa5efa82a1631e5"
+        },
+        {
+          "path": "tests/material_remaining_caller_source_probe.mjs",
+          "sha256": "6a2e4d4adece3e4823af46d871cadce65d786129bb0d9c8e23244bf164e7c043"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_source.py",
+          "sha256": "e8eb5da2c75e2bb22e0acfdeb92f5aeb306d8c5970b557c69f2ec66a5c310805"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-types-21.json",
+          "sha256": "6cf4de4d3b435d38eda8ba26a01ef56771a850af1a543e06a37361773949f1d0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-sdk-context-verification.json",
+          "sha256": "d2ea4ed76f3ae10a34a605378fe75cc91fe9a7e1a5fef6ae53fad6d4b8a3469e"
+        },
+        {
+          "path": "tests/material_remaining_caller_type_probe.mjs",
+          "sha256": "45d07e626fb9c5bdf7403196a62edb4053173a3853207386b4e9ce46239304dd"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_types.py",
+          "sha256": "a53b837c29e53c5f1c922872b2da36d100256f6ac4179b3c00d7a6102467b9f0"
+        },
+        {
+          "path": "tests/material_remaining_caller_harness_probe.mjs",
+          "sha256": "93fbf3f36fda740de6e4a82026a25524e2180a11213a2bc9cdd3f1b0efd26bb5"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_harness.py",
+          "sha256": "0e502c8b256eeade310ff3329a27d793d50aadf6ee23f4da92b5db2658b262ec"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16.json",
+          "sha256": "5e8a144f0f1eeca23b6a5363353ccd2eb7127397ba729f3022b7a12718c185bf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-public-subjects.json",
+          "sha256": "676a0091788c4f133875d1b1c556a7cd0a150e31a7f8df0928d398ca1eed35c5"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-21.json",
+          "sha256": "91a942a598e73925901faca10827b145eaad15da4b895a83c8fbe56f0b093a7c"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16-execution.json",
+          "sha256": "fc06406bb8a52bf0c1887fca1bf4ae3606296ee17ded5dd012d190963c67ca6e"
+        },
+        {
+          "path": "tests/material_remaining_caller_input_probe.mjs",
+          "sha256": "350afdff956789dfb73444c10aceb963d6a1dc76d0c60f5b067cabb64b93cb4f"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_input.py",
+          "sha256": "9dba81f31b552da90abc1793ae9f2ecbd02a9b1e784716853d03f605edaa9873"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16.json",
+          "sha256": "b5501ac15cc06b1b85c19db6ef97cf2b88e551ca5e2db9fa3e95e219a407e92b"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-21.json",
+          "sha256": "be0f961e3cbaa3028aba38ce924a3da46773a092559e1ab31f621976f0e055ba"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16-execution.json",
+          "sha256": "42649cb6906f70f9f658a2774cbf4f96c1ea59a138f48f0a08fb2241951186a0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-cyph-sanity.json",
+          "sha256": "c75de9ee0f13f99c1fa695d450dbead0f1ca7844002b376f786543f3befeba0a"
+        },
+        {
+          "path": "scripts/material-remaining-caller-reviews.mjs",
+          "sha256": "496c2bf9aa87592cf9b16ce3aea8363f11b6b5ae2d3cf58bdd57eaace1959441"
+        }
+      ],
+      "actual_native_packed_AOT_or_full_floor_qualified": false
+    },
+    {
+      "file": "legacy-list/list-module.ts",
+      "module": "@angular/material/divider",
+      "symbol": "MatDividerModule",
+      "candidate_source_sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;individual remaining Material dependency review",
+      "decision": "The unchanged legacy NgModule exports the exact stable public MatDividerModule imported from the public divider namespace. The checker-bound occurrence is the exports array and the complete91-source strict program retains its public Type contract. This is a finite upstream module forwarding role with no owned divider implementation or modern export enumeration. Packed NgModule scope and actual DOM/style coexistence remain independent requirements. Only this finite dependency/type/consumed public protocol boundary is closed. Actual compiled leaf factories,HTML/CSS rendering,SSR,native geometry,AOT,packed consumers and complete Node/compiler/peer/RxJS floors remain required. All SHA and packed CVA obligations remain separate;G11 is not passed.",
+      "original_obligation": {
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "row": {
+          "module": "@angular/material/divider",
+          "symbol": "MatDividerModule",
+          "file": "legacy-list/list-module.ts",
+          "status": "inventory-seed",
+          "disposition": "open"
+        }
+      },
+      "current_source_role": {
+        "file": "legacy-list/list-module.ts",
+        "module": "@angular/material/divider",
+        "symbol": "MatDividerModule",
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "candidate_source_sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0",
+        "binding": {
+          "kind": "ImportSpecifier",
+          "local_name": "MatDividerModule",
+          "module": "@angular/material/divider",
+          "text": "import {MatDividerModule} from '@angular/material/divider';"
+        },
+        "occurrences": [
+          {
+            "line": 41,
+            "parent_kind": "ArrayLiteralExpression",
+            "expression": "[\n    MatLegacyList,\n    MatLegacyNavList,\n    MatLegacyListItem,\n    MatLegacyListAvatarCssMatStyler,\n    MatLineModule,\n    MatCommonModule,\n    MatLegacyListIconCssMatStyler,\n    MatLegacyListSubheaderCssMatStyler,\n    MatPseudoCheckboxModule,\n    MatLegacySelectionList,\n    MatLegacyListOption,\n    MatDividerModule,\n  ]"
+          }
+        ],
+        "public_reexport": false,
+        "complete_context_members": [
+          {
+            "kind": "SourceFile",
+            "line": 1,
+            "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0",
+            "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {CommonModule} from '@angular/common';\nimport {NgModule} from '@angular/core';\nimport {MatRippleModule, MatLineModule} from '@angular/material/core';\nimport {MatLegacyPseudoCheckboxModule as MatPseudoCheckboxModule} from '@ngx-compat/material-legacy/legacy-core';\nimport {MatCommonModule} from './internal/common-module';\nimport {\n  MatLegacyList,\n  MatLegacyNavList,\n  MatLegacyListAvatarCssMatStyler,\n  MatLegacyListIconCssMatStyler,\n  MatLegacyListItem,\n  MatLegacyListSubheaderCssMatStyler,\n} from './list';\nimport {MatLegacyListOption, MatLegacySelectionList} from './selection-list';\nimport {MatDividerModule} from '@angular/material/divider';\n\n\n@NgModule({\n  imports: [MatLineModule, MatRippleModule, MatCommonModule, MatPseudoCheckboxModule, CommonModule],\n  exports: [\n    MatLegacyList,\n    MatLegacyNavList,\n    MatLegacyListItem,\n    MatLegacyListAvatarCssMatStyler,\n    MatLineModule,\n    MatCommonModule,\n    MatLegacyListIconCssMatStyler,\n    MatLegacyListSubheaderCssMatStyler,\n    MatPseudoCheckboxModule,\n    MatLegacySelectionList,\n    MatLegacyListOption,\n    MatDividerModule,\n  ],\n  declarations: [\n    MatLegacyList,\n    MatLegacyNavList,\n    MatLegacyListItem,\n    MatLegacyListAvatarCssMatStyler,\n    MatLegacyListIconCssMatStyler,\n    MatLegacyListSubheaderCssMatStyler,\n    MatLegacySelectionList,\n    MatLegacyListOption,\n  ],\n})\nexport class MatLegacyListModule {}\n"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/material-remaining-caller-source-verification.json",
+          "sha256": "7a87cfd4bba7c8796f5d925a8b66e5a76c22cd37a643fe48816e2e433ae53c57"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-type-verification.json",
+          "sha256": "a765eee8fecee950f2d32f2cd90653a1bae086e3b349d9fcf6a0fd61452b89cf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-verification.json",
+          "sha256": "7a25750b19f0e634844f75b82f07c4635818e0d6402ff6563845bc34db9e30cb"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-verification.json",
+          "sha256": "db7e4e806238850c6d39adb41329b7eb09384141f442ef1de6150375b4200392"
+        },
+        {
+          "path": "compatibility/rc/input-public-parent-source-proof.json",
+          "sha256": "dc2aafa4ea36ccd63b2b65ad2154e04601f357f8a17f835709c5103a09b4b45a"
+        },
+        {
+          "path": "compatibility/rc/api/input-construction-consumer-decision.json",
+          "sha256": "040a15b9c0b1b6c60c0350f6590b35ff225c068538dd0145a1197c1e25e0eea4"
+        },
+        {
+          "path": "scripts/material-remaining-caller-contracts.mjs",
+          "sha256": "0ddadcb829838478339ff9a4967c5d6c6d374c01dfcf29520fa5efa82a1631e5"
+        },
+        {
+          "path": "tests/material_remaining_caller_source_probe.mjs",
+          "sha256": "6a2e4d4adece3e4823af46d871cadce65d786129bb0d9c8e23244bf164e7c043"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_source.py",
+          "sha256": "e8eb5da2c75e2bb22e0acfdeb92f5aeb306d8c5970b557c69f2ec66a5c310805"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-types-21.json",
+          "sha256": "6cf4de4d3b435d38eda8ba26a01ef56771a850af1a543e06a37361773949f1d0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-sdk-context-verification.json",
+          "sha256": "d2ea4ed76f3ae10a34a605378fe75cc91fe9a7e1a5fef6ae53fad6d4b8a3469e"
+        },
+        {
+          "path": "tests/material_remaining_caller_type_probe.mjs",
+          "sha256": "45d07e626fb9c5bdf7403196a62edb4053173a3853207386b4e9ce46239304dd"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_types.py",
+          "sha256": "a53b837c29e53c5f1c922872b2da36d100256f6ac4179b3c00d7a6102467b9f0"
+        },
+        {
+          "path": "tests/material_remaining_caller_harness_probe.mjs",
+          "sha256": "93fbf3f36fda740de6e4a82026a25524e2180a11213a2bc9cdd3f1b0efd26bb5"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_harness.py",
+          "sha256": "0e502c8b256eeade310ff3329a27d793d50aadf6ee23f4da92b5db2658b262ec"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16.json",
+          "sha256": "5e8a144f0f1eeca23b6a5363353ccd2eb7127397ba729f3022b7a12718c185bf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-public-subjects.json",
+          "sha256": "676a0091788c4f133875d1b1c556a7cd0a150e31a7f8df0928d398ca1eed35c5"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-21.json",
+          "sha256": "91a942a598e73925901faca10827b145eaad15da4b895a83c8fbe56f0b093a7c"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16-execution.json",
+          "sha256": "fc06406bb8a52bf0c1887fca1bf4ae3606296ee17ded5dd012d190963c67ca6e"
+        },
+        {
+          "path": "tests/material_remaining_caller_input_probe.mjs",
+          "sha256": "350afdff956789dfb73444c10aceb963d6a1dc76d0c60f5b067cabb64b93cb4f"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_input.py",
+          "sha256": "9dba81f31b552da90abc1793ae9f2ecbd02a9b1e784716853d03f605edaa9873"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16.json",
+          "sha256": "b5501ac15cc06b1b85c19db6ef97cf2b88e551ca5e2db9fa3e95e219a407e92b"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-21.json",
+          "sha256": "be0f961e3cbaa3028aba38ce924a3da46773a092559e1ab31f621976f0e055ba"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16-execution.json",
+          "sha256": "42649cb6906f70f9f658a2774cbf4f96c1ea59a138f48f0a08fb2241951186a0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-cyph-sanity.json",
+          "sha256": "c75de9ee0f13f99c1fa695d450dbead0f1ca7844002b376f786543f3befeba0a"
+        },
+        {
+          "path": "scripts/material-remaining-caller-reviews.mjs",
+          "sha256": "496c2bf9aa87592cf9b16ce3aea8363f11b6b5ae2d3cf58bdd57eaace1959441"
+        }
+      ],
+      "actual_native_packed_AOT_or_full_floor_qualified": false
+    },
+    {
+      "file": "legacy-list/testing/list-harness-base.ts",
+      "module": "@angular/material/divider/testing",
+      "symbol": "DividerHarnessFilters",
+      "candidate_source_sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;individual remaining Material dependency review",
+      "decision": "The real public filter type remains the argument domain of the divider branch and its overloads. The full actual-SDK program preserves positive selector queries and rejects invalid selector values. A real public divider predicate applies a selected selector and omits unrelated dividers in actual generic list algorithms. The generic item and TestElement/LocatorFactory are explicit fixtures;concrete list item DOM behavior is not inferred. Only this finite dependency/type/consumed public protocol boundary is closed. Actual compiled leaf factories,HTML/CSS rendering,SSR,native geometry,AOT,packed consumers and complete Node/compiler/peer/RxJS floors remain required. All SHA and packed CVA obligations remain separate;G11 is not passed.",
+      "original_obligation": {
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "row": {
+          "module": "@angular/material/divider/testing",
+          "symbol": "DividerHarnessFilters",
+          "file": "legacy-list/testing/list-harness-base.ts",
+          "status": "inventory-seed",
+          "disposition": "open"
+        }
+      },
+      "current_source_role": {
+        "file": "legacy-list/testing/list-harness-base.ts",
+        "module": "@angular/material/divider/testing",
+        "symbol": "DividerHarnessFilters",
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "candidate_source_sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f",
+        "binding": {
+          "kind": "ImportSpecifier",
+          "local_name": "DividerHarnessFilters",
+          "module": "@angular/material/divider/testing",
+          "text": "import {DividerHarnessFilters, MatDividerHarness} from '@angular/material/divider/testing';"
+        },
+        "occurrences": [
+          {
+            "line": 145,
+            "parent_kind": "TypeReference",
+            "expression": "DividerHarnessFilters"
+          },
+          {
+            "line": 155,
+            "parent_kind": "TypeReference",
+            "expression": "DividerHarnessFilters"
+          },
+          {
+            "line": 160,
+            "parent_kind": "TypeReference",
+            "expression": "DividerHarnessFilters"
+          },
+          {
+            "line": 165,
+            "parent_kind": "TypeReference",
+            "expression": "DividerHarnessFilters"
+          },
+          {
+            "line": 171,
+            "parent_kind": "TypeReference",
+            "expression": "DividerHarnessFilters"
+          }
+        ],
+        "public_reexport": false,
+        "complete_context_members": [
+          {
+            "kind": "SourceFile",
+            "line": 1,
+            "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f",
+            "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {\n  ComponentHarness,\n  ComponentHarnessConstructor,\n  HarnessPredicate,\n  parallel,\n} from '@angular/cdk/testing';\nimport {DividerHarnessFilters, MatDividerHarness} from '@angular/material/divider/testing';\nimport {\n  LegacyBaseListItemHarnessFilters,\n  LegacySubheaderHarnessFilters,\n} from './list-harness-filters';\nimport {MatLegacySubheaderHarness} from './list-item-harness-base';\n\n/**\n * Represents a section of a list falling under a specific header.\n */\nexport interface ListSection<I> {\n  /** The heading for this list section. `undefined` if there is no heading. */\n  heading?: string;\n\n  /** The items in this list section. */\n  items: I[];\n}\n\n/**\n * Shared behavior among the harnesses for the various `MatList` flavors.\n * @template T A constructor type for a list item harness type used by this list harness.\n * @template C The list item harness type that `T` constructs.\n * @template F The filter type used filter list item harness of type `C`.\n * @docs-private\n */\nexport abstract class MatLegacyListHarnessBase<\n  T extends ComponentHarnessConstructor<C> & {with: (options?: F) => HarnessPredicate<C>},\n  C extends ComponentHarness,\n  F extends LegacyBaseListItemHarnessFilters,\n> extends ComponentHarness {\n  protected _itemHarness: T;\n\n  /**\n   * Gets a list of harnesses representing the items in this list.\n   * @param filters Optional filters used to narrow which harnesses are included\n   * @return The list of items matching the given filters.\n   */\n  async getItems(filters?: F): Promise<C[]> {\n    return this.locatorForAll(this._itemHarness.with(filters))();\n  }\n\n  /**\n   * Gets a list of `ListSection` representing the list items grouped by subheaders. If the list has\n   * no subheaders it is represented as a single `ListSection` with an undefined `heading` property.\n   * @param filters Optional filters used to narrow which list item harnesses are included\n   * @return The list of items matching the given filters, grouped into sections by subheader.\n   */\n  async getItemsGroupedBySubheader(filters?: F): Promise<ListSection<C>[]> {\n    type Section = {items: C[]; heading?: Promise<string>};\n    const listSections: Section[] = [];\n    let currentSection: Section = {items: []};\n    const itemsAndSubheaders = await this.getItemsWithSubheadersAndDividers({\n      item: filters,\n      divider: false,\n    });\n    for (const itemOrSubheader of itemsAndSubheaders) {\n      if (itemOrSubheader instanceof MatLegacySubheaderHarness) {\n        if (currentSection.heading !== undefined || currentSection.items.length) {\n          listSections.push(currentSection);\n        }\n        currentSection = {heading: itemOrSubheader.getText(), items: []};\n      } else {\n        currentSection.items.push(itemOrSubheader);\n      }\n    }\n    if (\n      currentSection.heading !== undefined ||\n      currentSection.items.length ||\n      !listSections.length\n    ) {\n      listSections.push(currentSection);\n    }\n\n    // Concurrently wait for all sections to resolve their heading if present.\n    return parallel(() =>\n      listSections.map(async s => ({items: s.items, heading: await s.heading})),\n    );\n  }\n\n  /**\n   * Gets a list of sub-lists representing the list items grouped by dividers. If the list has no\n   * dividers it is represented as a list with a single sub-list.\n   * @param filters Optional filters used to narrow which list item harnesses are included\n   * @return The list of items matching the given filters, grouped into sub-lists by divider.\n   */\n  async getItemsGroupedByDividers(filters?: F): Promise<C[][]> {\n    const listSections: C[][] = [[]];\n    const itemsAndDividers = await this.getItemsWithSubheadersAndDividers({\n      item: filters,\n      subheader: false,\n    });\n    for (const itemOrDivider of itemsAndDividers) {\n      if (itemOrDivider instanceof MatDividerHarness) {\n        listSections.push([]);\n      } else {\n        listSections[listSections.length - 1].push(itemOrDivider);\n      }\n    }\n    return listSections;\n  }\n\n  /**\n   * Gets a list of harnesses representing all of the items, subheaders, and dividers\n   * (in the order they appear in the list). Use `instanceof` to check which type of harness a given\n   * item is.\n   * @param filters Optional filters used to narrow which list items, subheaders, and dividers are\n   *     included. A value of `false` for the `item`, `subheader`, or `divider` properties indicates\n   *     that the respective harness type should be omitted completely.\n   * @return The list of harnesses representing the items, subheaders, and dividers matching the\n   *     given filters.\n   */\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader: false;\n    divider: false;\n  }): Promise<[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item?: F | false;\n    subheader: false;\n    divider: false;\n  }): Promise<C[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader?: LegacySubheaderHarnessFilters | false;\n    divider: false;\n  }): Promise<MatLegacySubheaderHarness[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader: false;\n    divider?: DividerHarnessFilters | false;\n  }): Promise<MatDividerHarness[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item?: F | false;\n    subheader?: LegacySubheaderHarnessFilters | false;\n    divider: false;\n  }): Promise<(C | MatLegacySubheaderHarness)[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item?: F | false;\n    subheader: false;\n    divider?: false | DividerHarnessFilters;\n  }): Promise<(C | MatDividerHarness)[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader?: false | LegacySubheaderHarnessFilters;\n    divider?: false | DividerHarnessFilters;\n  }): Promise<(MatLegacySubheaderHarness | MatDividerHarness)[]>;\n  getItemsWithSubheadersAndDividers(filters?: {\n    item?: F | false;\n    subheader?: LegacySubheaderHarnessFilters | false;\n    divider?: DividerHarnessFilters | false;\n  }): Promise<(C | MatLegacySubheaderHarness | MatDividerHarness)[]>;\n  async getItemsWithSubheadersAndDividers(\n    filters: {\n      item?: F | false;\n      subheader?: LegacySubheaderHarnessFilters | false;\n      divider?: DividerHarnessFilters | false;\n    } = {},\n  ): Promise<(C | MatLegacySubheaderHarness | MatDividerHarness)[]> {\n    const query = [];\n    if (filters.item !== false) {\n      query.push(this._itemHarness.with(filters.item || ({} as F)));\n    }\n    if (filters.subheader !== false) {\n      query.push(MatLegacySubheaderHarness.with(filters.subheader));\n    }\n    if (filters.divider !== false) {\n      query.push(MatDividerHarness.with(filters.divider));\n    }\n    return this.locatorForAll(...query)();\n  }\n}\n"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/material-remaining-caller-source-verification.json",
+          "sha256": "7a87cfd4bba7c8796f5d925a8b66e5a76c22cd37a643fe48816e2e433ae53c57"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-type-verification.json",
+          "sha256": "a765eee8fecee950f2d32f2cd90653a1bae086e3b349d9fcf6a0fd61452b89cf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-verification.json",
+          "sha256": "7a25750b19f0e634844f75b82f07c4635818e0d6402ff6563845bc34db9e30cb"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-verification.json",
+          "sha256": "db7e4e806238850c6d39adb41329b7eb09384141f442ef1de6150375b4200392"
+        },
+        {
+          "path": "compatibility/rc/input-public-parent-source-proof.json",
+          "sha256": "dc2aafa4ea36ccd63b2b65ad2154e04601f357f8a17f835709c5103a09b4b45a"
+        },
+        {
+          "path": "compatibility/rc/api/input-construction-consumer-decision.json",
+          "sha256": "040a15b9c0b1b6c60c0350f6590b35ff225c068538dd0145a1197c1e25e0eea4"
+        },
+        {
+          "path": "scripts/material-remaining-caller-contracts.mjs",
+          "sha256": "0ddadcb829838478339ff9a4967c5d6c6d374c01dfcf29520fa5efa82a1631e5"
+        },
+        {
+          "path": "tests/material_remaining_caller_source_probe.mjs",
+          "sha256": "6a2e4d4adece3e4823af46d871cadce65d786129bb0d9c8e23244bf164e7c043"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_source.py",
+          "sha256": "e8eb5da2c75e2bb22e0acfdeb92f5aeb306d8c5970b557c69f2ec66a5c310805"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-types-21.json",
+          "sha256": "6cf4de4d3b435d38eda8ba26a01ef56771a850af1a543e06a37361773949f1d0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-sdk-context-verification.json",
+          "sha256": "d2ea4ed76f3ae10a34a605378fe75cc91fe9a7e1a5fef6ae53fad6d4b8a3469e"
+        },
+        {
+          "path": "tests/material_remaining_caller_type_probe.mjs",
+          "sha256": "45d07e626fb9c5bdf7403196a62edb4053173a3853207386b4e9ce46239304dd"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_types.py",
+          "sha256": "a53b837c29e53c5f1c922872b2da36d100256f6ac4179b3c00d7a6102467b9f0"
+        },
+        {
+          "path": "tests/material_remaining_caller_harness_probe.mjs",
+          "sha256": "93fbf3f36fda740de6e4a82026a25524e2180a11213a2bc9cdd3f1b0efd26bb5"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_harness.py",
+          "sha256": "0e502c8b256eeade310ff3329a27d793d50aadf6ee23f4da92b5db2658b262ec"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16.json",
+          "sha256": "5e8a144f0f1eeca23b6a5363353ccd2eb7127397ba729f3022b7a12718c185bf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-public-subjects.json",
+          "sha256": "676a0091788c4f133875d1b1c556a7cd0a150e31a7f8df0928d398ca1eed35c5"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-21.json",
+          "sha256": "91a942a598e73925901faca10827b145eaad15da4b895a83c8fbe56f0b093a7c"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16-execution.json",
+          "sha256": "fc06406bb8a52bf0c1887fca1bf4ae3606296ee17ded5dd012d190963c67ca6e"
+        },
+        {
+          "path": "tests/material_remaining_caller_input_probe.mjs",
+          "sha256": "350afdff956789dfb73444c10aceb963d6a1dc76d0c60f5b067cabb64b93cb4f"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_input.py",
+          "sha256": "9dba81f31b552da90abc1793ae9f2ecbd02a9b1e784716853d03f605edaa9873"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16.json",
+          "sha256": "b5501ac15cc06b1b85c19db6ef97cf2b88e551ca5e2db9fa3e95e219a407e92b"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-21.json",
+          "sha256": "be0f961e3cbaa3028aba38ce924a3da46773a092559e1ab31f621976f0e055ba"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16-execution.json",
+          "sha256": "42649cb6906f70f9f658a2774cbf4f96c1ea59a138f48f0a08fb2241951186a0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-cyph-sanity.json",
+          "sha256": "c75de9ee0f13f99c1fa695d450dbead0f1ca7844002b376f786543f3befeba0a"
+        },
+        {
+          "path": "scripts/material-remaining-caller-reviews.mjs",
+          "sha256": "496c2bf9aa87592cf9b16ce3aea8363f11b6b5ae2d3cf58bdd57eaace1959441"
+        }
+      ],
+      "actual_native_packed_AOT_or_full_floor_qualified": false
+    },
+    {
+      "file": "legacy-list/testing/list-harness-base.ts",
+      "module": "@angular/material/divider/testing",
+      "symbol": "MatDividerHarness",
+      "candidate_source_sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;individual remaining Material dependency review",
+      "decision": "The actual public class is the predicate constructor and instanceof discriminator in the unchanged generic list harness. Tagged/current protocols preserve ordered mixed rows,empty/edge/adjacent divider groups,subheader grouping and selector filtering with genuine divider instances. Six emitted control/grouping faults are rejected by the combined harness comparison. No private harness fields,substitute divider class or native geometry assumption is used. Only this finite dependency/type/consumed public protocol boundary is closed. Actual compiled leaf factories,HTML/CSS rendering,SSR,native geometry,AOT,packed consumers and complete Node/compiler/peer/RxJS floors remain required. All SHA and packed CVA obligations remain separate;G11 is not passed.",
+      "original_obligation": {
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "row": {
+          "module": "@angular/material/divider/testing",
+          "symbol": "MatDividerHarness",
+          "file": "legacy-list/testing/list-harness-base.ts",
+          "status": "inventory-seed",
+          "disposition": "open"
+        }
+      },
+      "current_source_role": {
+        "file": "legacy-list/testing/list-harness-base.ts",
+        "module": "@angular/material/divider/testing",
+        "symbol": "MatDividerHarness",
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "candidate_source_sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f",
+        "binding": {
+          "kind": "ImportSpecifier",
+          "local_name": "MatDividerHarness",
+          "module": "@angular/material/divider/testing",
+          "text": "import {DividerHarnessFilters, MatDividerHarness} from '@angular/material/divider/testing';"
+        },
+        "occurrences": [
+          {
+            "line": 108,
+            "parent_kind": "BinaryExpression",
+            "expression": "itemOrDivider instanceof MatDividerHarness"
+          },
+          {
+            "line": 146,
+            "parent_kind": "TypeReference",
+            "expression": "MatDividerHarness"
+          },
+          {
+            "line": 156,
+            "parent_kind": "TypeReference",
+            "expression": "MatDividerHarness"
+          },
+          {
+            "line": 161,
+            "parent_kind": "TypeReference",
+            "expression": "MatDividerHarness"
+          },
+          {
+            "line": 166,
+            "parent_kind": "TypeReference",
+            "expression": "MatDividerHarness"
+          },
+          {
+            "line": 173,
+            "parent_kind": "TypeReference",
+            "expression": "MatDividerHarness"
+          },
+          {
+            "line": 182,
+            "parent_kind": "PropertyAccessExpression",
+            "expression": "MatDividerHarness.with"
+          }
+        ],
+        "public_reexport": false,
+        "complete_context_members": [
+          {
+            "kind": "SourceFile",
+            "line": 1,
+            "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f",
+            "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {\n  ComponentHarness,\n  ComponentHarnessConstructor,\n  HarnessPredicate,\n  parallel,\n} from '@angular/cdk/testing';\nimport {DividerHarnessFilters, MatDividerHarness} from '@angular/material/divider/testing';\nimport {\n  LegacyBaseListItemHarnessFilters,\n  LegacySubheaderHarnessFilters,\n} from './list-harness-filters';\nimport {MatLegacySubheaderHarness} from './list-item-harness-base';\n\n/**\n * Represents a section of a list falling under a specific header.\n */\nexport interface ListSection<I> {\n  /** The heading for this list section. `undefined` if there is no heading. */\n  heading?: string;\n\n  /** The items in this list section. */\n  items: I[];\n}\n\n/**\n * Shared behavior among the harnesses for the various `MatList` flavors.\n * @template T A constructor type for a list item harness type used by this list harness.\n * @template C The list item harness type that `T` constructs.\n * @template F The filter type used filter list item harness of type `C`.\n * @docs-private\n */\nexport abstract class MatLegacyListHarnessBase<\n  T extends ComponentHarnessConstructor<C> & {with: (options?: F) => HarnessPredicate<C>},\n  C extends ComponentHarness,\n  F extends LegacyBaseListItemHarnessFilters,\n> extends ComponentHarness {\n  protected _itemHarness: T;\n\n  /**\n   * Gets a list of harnesses representing the items in this list.\n   * @param filters Optional filters used to narrow which harnesses are included\n   * @return The list of items matching the given filters.\n   */\n  async getItems(filters?: F): Promise<C[]> {\n    return this.locatorForAll(this._itemHarness.with(filters))();\n  }\n\n  /**\n   * Gets a list of `ListSection` representing the list items grouped by subheaders. If the list has\n   * no subheaders it is represented as a single `ListSection` with an undefined `heading` property.\n   * @param filters Optional filters used to narrow which list item harnesses are included\n   * @return The list of items matching the given filters, grouped into sections by subheader.\n   */\n  async getItemsGroupedBySubheader(filters?: F): Promise<ListSection<C>[]> {\n    type Section = {items: C[]; heading?: Promise<string>};\n    const listSections: Section[] = [];\n    let currentSection: Section = {items: []};\n    const itemsAndSubheaders = await this.getItemsWithSubheadersAndDividers({\n      item: filters,\n      divider: false,\n    });\n    for (const itemOrSubheader of itemsAndSubheaders) {\n      if (itemOrSubheader instanceof MatLegacySubheaderHarness) {\n        if (currentSection.heading !== undefined || currentSection.items.length) {\n          listSections.push(currentSection);\n        }\n        currentSection = {heading: itemOrSubheader.getText(), items: []};\n      } else {\n        currentSection.items.push(itemOrSubheader);\n      }\n    }\n    if (\n      currentSection.heading !== undefined ||\n      currentSection.items.length ||\n      !listSections.length\n    ) {\n      listSections.push(currentSection);\n    }\n\n    // Concurrently wait for all sections to resolve their heading if present.\n    return parallel(() =>\n      listSections.map(async s => ({items: s.items, heading: await s.heading})),\n    );\n  }\n\n  /**\n   * Gets a list of sub-lists representing the list items grouped by dividers. If the list has no\n   * dividers it is represented as a list with a single sub-list.\n   * @param filters Optional filters used to narrow which list item harnesses are included\n   * @return The list of items matching the given filters, grouped into sub-lists by divider.\n   */\n  async getItemsGroupedByDividers(filters?: F): Promise<C[][]> {\n    const listSections: C[][] = [[]];\n    const itemsAndDividers = await this.getItemsWithSubheadersAndDividers({\n      item: filters,\n      subheader: false,\n    });\n    for (const itemOrDivider of itemsAndDividers) {\n      if (itemOrDivider instanceof MatDividerHarness) {\n        listSections.push([]);\n      } else {\n        listSections[listSections.length - 1].push(itemOrDivider);\n      }\n    }\n    return listSections;\n  }\n\n  /**\n   * Gets a list of harnesses representing all of the items, subheaders, and dividers\n   * (in the order they appear in the list). Use `instanceof` to check which type of harness a given\n   * item is.\n   * @param filters Optional filters used to narrow which list items, subheaders, and dividers are\n   *     included. A value of `false` for the `item`, `subheader`, or `divider` properties indicates\n   *     that the respective harness type should be omitted completely.\n   * @return The list of harnesses representing the items, subheaders, and dividers matching the\n   *     given filters.\n   */\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader: false;\n    divider: false;\n  }): Promise<[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item?: F | false;\n    subheader: false;\n    divider: false;\n  }): Promise<C[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader?: LegacySubheaderHarnessFilters | false;\n    divider: false;\n  }): Promise<MatLegacySubheaderHarness[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader: false;\n    divider?: DividerHarnessFilters | false;\n  }): Promise<MatDividerHarness[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item?: F | false;\n    subheader?: LegacySubheaderHarnessFilters | false;\n    divider: false;\n  }): Promise<(C | MatLegacySubheaderHarness)[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item?: F | false;\n    subheader: false;\n    divider?: false | DividerHarnessFilters;\n  }): Promise<(C | MatDividerHarness)[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader?: false | LegacySubheaderHarnessFilters;\n    divider?: false | DividerHarnessFilters;\n  }): Promise<(MatLegacySubheaderHarness | MatDividerHarness)[]>;\n  getItemsWithSubheadersAndDividers(filters?: {\n    item?: F | false;\n    subheader?: LegacySubheaderHarnessFilters | false;\n    divider?: DividerHarnessFilters | false;\n  }): Promise<(C | MatLegacySubheaderHarness | MatDividerHarness)[]>;\n  async getItemsWithSubheadersAndDividers(\n    filters: {\n      item?: F | false;\n      subheader?: LegacySubheaderHarnessFilters | false;\n      divider?: DividerHarnessFilters | false;\n    } = {},\n  ): Promise<(C | MatLegacySubheaderHarness | MatDividerHarness)[]> {\n    const query = [];\n    if (filters.item !== false) {\n      query.push(this._itemHarness.with(filters.item || ({} as F)));\n    }\n    if (filters.subheader !== false) {\n      query.push(MatLegacySubheaderHarness.with(filters.subheader));\n    }\n    if (filters.divider !== false) {\n      query.push(MatDividerHarness.with(filters.divider));\n    }\n    return this.locatorForAll(...query)();\n  }\n}\n"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/material-remaining-caller-source-verification.json",
+          "sha256": "7a87cfd4bba7c8796f5d925a8b66e5a76c22cd37a643fe48816e2e433ae53c57"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-type-verification.json",
+          "sha256": "a765eee8fecee950f2d32f2cd90653a1bae086e3b349d9fcf6a0fd61452b89cf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-verification.json",
+          "sha256": "7a25750b19f0e634844f75b82f07c4635818e0d6402ff6563845bc34db9e30cb"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-verification.json",
+          "sha256": "db7e4e806238850c6d39adb41329b7eb09384141f442ef1de6150375b4200392"
+        },
+        {
+          "path": "compatibility/rc/input-public-parent-source-proof.json",
+          "sha256": "dc2aafa4ea36ccd63b2b65ad2154e04601f357f8a17f835709c5103a09b4b45a"
+        },
+        {
+          "path": "compatibility/rc/api/input-construction-consumer-decision.json",
+          "sha256": "040a15b9c0b1b6c60c0350f6590b35ff225c068538dd0145a1197c1e25e0eea4"
+        },
+        {
+          "path": "scripts/material-remaining-caller-contracts.mjs",
+          "sha256": "0ddadcb829838478339ff9a4967c5d6c6d374c01dfcf29520fa5efa82a1631e5"
+        },
+        {
+          "path": "tests/material_remaining_caller_source_probe.mjs",
+          "sha256": "6a2e4d4adece3e4823af46d871cadce65d786129bb0d9c8e23244bf164e7c043"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_source.py",
+          "sha256": "e8eb5da2c75e2bb22e0acfdeb92f5aeb306d8c5970b557c69f2ec66a5c310805"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-types-21.json",
+          "sha256": "6cf4de4d3b435d38eda8ba26a01ef56771a850af1a543e06a37361773949f1d0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-sdk-context-verification.json",
+          "sha256": "d2ea4ed76f3ae10a34a605378fe75cc91fe9a7e1a5fef6ae53fad6d4b8a3469e"
+        },
+        {
+          "path": "tests/material_remaining_caller_type_probe.mjs",
+          "sha256": "45d07e626fb9c5bdf7403196a62edb4053173a3853207386b4e9ce46239304dd"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_types.py",
+          "sha256": "a53b837c29e53c5f1c922872b2da36d100256f6ac4179b3c00d7a6102467b9f0"
+        },
+        {
+          "path": "tests/material_remaining_caller_harness_probe.mjs",
+          "sha256": "93fbf3f36fda740de6e4a82026a25524e2180a11213a2bc9cdd3f1b0efd26bb5"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_harness.py",
+          "sha256": "0e502c8b256eeade310ff3329a27d793d50aadf6ee23f4da92b5db2658b262ec"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16.json",
+          "sha256": "5e8a144f0f1eeca23b6a5363353ccd2eb7127397ba729f3022b7a12718c185bf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-public-subjects.json",
+          "sha256": "676a0091788c4f133875d1b1c556a7cd0a150e31a7f8df0928d398ca1eed35c5"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-21.json",
+          "sha256": "91a942a598e73925901faca10827b145eaad15da4b895a83c8fbe56f0b093a7c"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16-execution.json",
+          "sha256": "fc06406bb8a52bf0c1887fca1bf4ae3606296ee17ded5dd012d190963c67ca6e"
+        },
+        {
+          "path": "tests/material_remaining_caller_input_probe.mjs",
+          "sha256": "350afdff956789dfb73444c10aceb963d6a1dc76d0c60f5b067cabb64b93cb4f"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_input.py",
+          "sha256": "9dba81f31b552da90abc1793ae9f2ecbd02a9b1e784716853d03f605edaa9873"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16.json",
+          "sha256": "b5501ac15cc06b1b85c19db6ef97cf2b88e551ca5e2db9fa3e95e219a407e92b"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-21.json",
+          "sha256": "be0f961e3cbaa3028aba38ce924a3da46773a092559e1ab31f621976f0e055ba"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16-execution.json",
+          "sha256": "42649cb6906f70f9f658a2774cbf4f96c1ea59a138f48f0a08fb2241951186a0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-cyph-sanity.json",
+          "sha256": "c75de9ee0f13f99c1fa695d450dbead0f1ca7844002b376f786543f3befeba0a"
+        },
+        {
+          "path": "scripts/material-remaining-caller-reviews.mjs",
+          "sha256": "496c2bf9aa87592cf9b16ce3aea8363f11b6b5ae2d3cf58bdd57eaace1959441"
+        }
+      ],
+      "actual_native_packed_AOT_or_full_floor_qualified": false
+    },
+    {
+      "file": "legacy-form-field/testing/form-field-harness.ts",
+      "module": "@angular/material/datepicker/testing",
+      "symbol": "MatDatepickerInputHarness",
+      "candidate_source_sha256": "cf3c8465eb017702809eaa5fa33af7636dd81f395912fb2fe3f64fcaddad2cb9",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;individual remaining Material dependency review",
+      "decision": "The unchanged composed legacy form-field harness returns the genuine public datepicker class with its historical selector. Explicit constructor and predicate queries,value/selector misses,date-range priority and absence match tagged16. Five disabled cases still read the native property,including disabled=false and ARIA-only state;the general input harness attribute-policy change does not apply to this actual class. Complete strict source-entry types preserve nullable query results. Only this finite dependency/type/consumed public protocol boundary is closed. Actual compiled leaf factories,HTML/CSS rendering,SSR,native geometry,AOT,packed consumers and complete Node/compiler/peer/RxJS floors remain required. All SHA and packed CVA obligations remain separate;G11 is not passed.",
+      "original_obligation": {
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "row": {
+          "module": "@angular/material/datepicker/testing",
+          "symbol": "MatDatepickerInputHarness",
+          "file": "legacy-form-field/testing/form-field-harness.ts",
+          "status": "inventory-seed",
+          "disposition": "open"
+        }
+      },
+      "current_source_role": {
+        "file": "legacy-form-field/testing/form-field-harness.ts",
+        "module": "@angular/material/datepicker/testing",
+        "symbol": "MatDatepickerInputHarness",
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "candidate_source_sha256": "cf3c8465eb017702809eaa5fa33af7636dd81f395912fb2fe3f64fcaddad2cb9",
+        "binding": {
+          "kind": "ImportSpecifier",
+          "local_name": "MatDatepickerInputHarness",
+          "module": "@angular/material/datepicker/testing",
+          "text": "import {\n  MatDatepickerInputHarness,\n  MatDateRangeInputHarness,\n} from '@angular/material/datepicker/testing';"
+        },
+        "occurrences": [
+          {
+            "line": 27,
+            "parent_kind": "TypeReference",
+            "expression": "MatDatepickerInputHarness"
+          },
+          {
+            "line": 63,
+            "parent_kind": "CallExpression",
+            "expression": "this.locatorForOptional(MatDatepickerInputHarness)"
+          }
+        ],
+        "public_reexport": false,
+        "complete_context_members": [
+          {
+            "kind": "SourceFile",
+            "line": 1,
+            "sha256": "cf3c8465eb017702809eaa5fa33af7636dd81f395912fb2fe3f64fcaddad2cb9",
+            "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {HarnessPredicate, parallel} from '@angular/cdk/testing';\nimport {\n  MatDatepickerInputHarness,\n  MatDateRangeInputHarness,\n} from '@angular/material/datepicker/testing';\nimport {FormFieldHarnessFilters} from '@angular/material/form-field/testing';\nimport {MatLegacyInputHarness} from '@ngx-compat/material-legacy/legacy-input/testing';\nimport {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';\nimport {MatLegacyErrorHarness} from './error-harness';\nimport {_MatFormFieldHarnessBase} from './form-field-harness-base';\n\n/**\n * Possible harnesses of controls which can be bound to a form-field.\n */\nexport type LegacyFormFieldControlHarness =\n  | MatLegacyInputHarness\n  | MatLegacySelectHarness\n  | MatDatepickerInputHarness\n  | MatDateRangeInputHarness;\n\n/**\n * Harness for interacting with a standard Material form-field's in tests.\n */\nexport class MatLegacyFormFieldHarness extends _MatFormFieldHarnessBase<\n  LegacyFormFieldControlHarness,\n  typeof MatLegacyErrorHarness\n> {\n  static hostSelector = '.mat-form-field';\n\n  static with(options: FormFieldHarnessFilters = {}): HarnessPredicate<MatLegacyFormFieldHarness> {\n    return new HarnessPredicate(MatLegacyFormFieldHarness, options)\n      .addOption('floatingLabelText', options.floatingLabelText, async (harness, text) =>\n        HarnessPredicate.stringMatches(await harness.getLabel(), text),\n      )\n      .addOption(\n        'hasErrors',\n        options.hasErrors,\n        async (harness, hasErrors) => (await harness.hasErrors()) === hasErrors,\n      )\n      .addOption(\n        'isValid',\n        options.isValid,\n        async (harness, isValid) => (await harness.isControlValid()) === isValid,\n      );\n  }\n\n  protected _prefixContainer = this.locatorForOptional('.mat-form-field-prefix');\n  protected _suffixContainer = this.locatorForOptional('.mat-form-field-suffix');\n  protected _label = this.locatorForOptional('.mat-form-field-label');\n  protected _errors = this.locatorForAll('.mat-error');\n  protected _hints = this.locatorForAll('mat-hint, .mat-hint');\n  protected _inputControl = this.locatorForOptional(MatLegacyInputHarness);\n  protected _selectControl = this.locatorForOptional(MatLegacySelectHarness);\n  protected _datepickerInputControl = this.locatorForOptional(MatDatepickerInputHarness);\n  protected _dateRangeInputControl = this.locatorForOptional(MatDateRangeInputHarness);\n  protected _errorHarness = MatLegacyErrorHarness;\n\n  async getAppearance(): Promise<'legacy' | 'standard' | 'fill' | 'outline'> {\n    const hostClasses = await (await this.host()).getAttribute('class');\n    if (hostClasses !== null) {\n      const appearanceMatch = hostClasses.match(\n        /mat-form-field-appearance-(legacy|standard|fill|outline)(?:$| )/,\n      );\n      if (appearanceMatch) {\n        return appearanceMatch[1] as 'legacy' | 'standard' | 'fill' | 'outline';\n      }\n    }\n    throw Error('Could not determine appearance of form-field.');\n  }\n\n  async hasLabel(): Promise<boolean> {\n    return (await this.host()).hasClass('mat-form-field-has-label');\n  }\n\n  async isLabelFloating(): Promise<boolean> {\n    const host = await this.host();\n    const [hasLabel, shouldFloat] = await parallel(() => [\n      this.hasLabel(),\n      host.hasClass('mat-form-field-should-float'),\n    ]);\n    return hasLabel && shouldFloat;\n  }\n}\n"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/material-remaining-caller-source-verification.json",
+          "sha256": "7a87cfd4bba7c8796f5d925a8b66e5a76c22cd37a643fe48816e2e433ae53c57"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-type-verification.json",
+          "sha256": "a765eee8fecee950f2d32f2cd90653a1bae086e3b349d9fcf6a0fd61452b89cf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-verification.json",
+          "sha256": "7a25750b19f0e634844f75b82f07c4635818e0d6402ff6563845bc34db9e30cb"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-verification.json",
+          "sha256": "db7e4e806238850c6d39adb41329b7eb09384141f442ef1de6150375b4200392"
+        },
+        {
+          "path": "compatibility/rc/input-public-parent-source-proof.json",
+          "sha256": "dc2aafa4ea36ccd63b2b65ad2154e04601f357f8a17f835709c5103a09b4b45a"
+        },
+        {
+          "path": "compatibility/rc/api/input-construction-consumer-decision.json",
+          "sha256": "040a15b9c0b1b6c60c0350f6590b35ff225c068538dd0145a1197c1e25e0eea4"
+        },
+        {
+          "path": "scripts/material-remaining-caller-contracts.mjs",
+          "sha256": "0ddadcb829838478339ff9a4967c5d6c6d374c01dfcf29520fa5efa82a1631e5"
+        },
+        {
+          "path": "tests/material_remaining_caller_source_probe.mjs",
+          "sha256": "6a2e4d4adece3e4823af46d871cadce65d786129bb0d9c8e23244bf164e7c043"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_source.py",
+          "sha256": "e8eb5da2c75e2bb22e0acfdeb92f5aeb306d8c5970b557c69f2ec66a5c310805"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-types-21.json",
+          "sha256": "6cf4de4d3b435d38eda8ba26a01ef56771a850af1a543e06a37361773949f1d0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-sdk-context-verification.json",
+          "sha256": "d2ea4ed76f3ae10a34a605378fe75cc91fe9a7e1a5fef6ae53fad6d4b8a3469e"
+        },
+        {
+          "path": "tests/material_remaining_caller_type_probe.mjs",
+          "sha256": "45d07e626fb9c5bdf7403196a62edb4053173a3853207386b4e9ce46239304dd"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_types.py",
+          "sha256": "a53b837c29e53c5f1c922872b2da36d100256f6ac4179b3c00d7a6102467b9f0"
+        },
+        {
+          "path": "tests/material_remaining_caller_harness_probe.mjs",
+          "sha256": "93fbf3f36fda740de6e4a82026a25524e2180a11213a2bc9cdd3f1b0efd26bb5"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_harness.py",
+          "sha256": "0e502c8b256eeade310ff3329a27d793d50aadf6ee23f4da92b5db2658b262ec"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16.json",
+          "sha256": "5e8a144f0f1eeca23b6a5363353ccd2eb7127397ba729f3022b7a12718c185bf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-public-subjects.json",
+          "sha256": "676a0091788c4f133875d1b1c556a7cd0a150e31a7f8df0928d398ca1eed35c5"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-21.json",
+          "sha256": "91a942a598e73925901faca10827b145eaad15da4b895a83c8fbe56f0b093a7c"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16-execution.json",
+          "sha256": "fc06406bb8a52bf0c1887fca1bf4ae3606296ee17ded5dd012d190963c67ca6e"
+        },
+        {
+          "path": "tests/material_remaining_caller_input_probe.mjs",
+          "sha256": "350afdff956789dfb73444c10aceb963d6a1dc76d0c60f5b067cabb64b93cb4f"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_input.py",
+          "sha256": "9dba81f31b552da90abc1793ae9f2ecbd02a9b1e784716853d03f605edaa9873"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16.json",
+          "sha256": "b5501ac15cc06b1b85c19db6ef97cf2b88e551ca5e2db9fa3e95e219a407e92b"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-21.json",
+          "sha256": "be0f961e3cbaa3028aba38ce924a3da46773a092559e1ab31f621976f0e055ba"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16-execution.json",
+          "sha256": "42649cb6906f70f9f658a2774cbf4f96c1ea59a138f48f0a08fb2241951186a0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-cyph-sanity.json",
+          "sha256": "c75de9ee0f13f99c1fa695d450dbead0f1ca7844002b376f786543f3befeba0a"
+        },
+        {
+          "path": "scripts/material-remaining-caller-reviews.mjs",
+          "sha256": "496c2bf9aa87592cf9b16ce3aea8363f11b6b5ae2d3cf58bdd57eaace1959441"
+        }
+      ],
+      "actual_native_packed_AOT_or_full_floor_qualified": false
+    },
+    {
+      "file": "legacy-form-field/testing/form-field-harness.ts",
+      "module": "@angular/material/datepicker/testing",
+      "symbol": "MatDateRangeInputHarness",
+      "candidate_source_sha256": "cf3c8465eb017702809eaa5fa33af7636dd81f395912fb2fe3f64fcaddad2cb9",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;individual remaining Material dependency review",
+      "decision": "The unchanged composed legacy form-field harness returns the genuine public range class and actual start/end harnesses. Tagged/current selectors,constructor/predicate queries,all four disabled combinations,combined values with empty endpoints,separator,required and calendar-open flags match. Both real child harnesses read native disabled properties. Public query types and nullable results retain positive/negative strict controls;calendar browser geometry and native input binding remain separate. Only this finite dependency/type/consumed public protocol boundary is closed. Actual compiled leaf factories,HTML/CSS rendering,SSR,native geometry,AOT,packed consumers and complete Node/compiler/peer/RxJS floors remain required. All SHA and packed CVA obligations remain separate;G11 is not passed.",
+      "original_obligation": {
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "row": {
+          "module": "@angular/material/datepicker/testing",
+          "symbol": "MatDateRangeInputHarness",
+          "file": "legacy-form-field/testing/form-field-harness.ts",
+          "status": "inventory-seed",
+          "disposition": "open"
+        }
+      },
+      "current_source_role": {
+        "file": "legacy-form-field/testing/form-field-harness.ts",
+        "module": "@angular/material/datepicker/testing",
+        "symbol": "MatDateRangeInputHarness",
+        "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+        "candidate_source_sha256": "cf3c8465eb017702809eaa5fa33af7636dd81f395912fb2fe3f64fcaddad2cb9",
+        "binding": {
+          "kind": "ImportSpecifier",
+          "local_name": "MatDateRangeInputHarness",
+          "module": "@angular/material/datepicker/testing",
+          "text": "import {\n  MatDatepickerInputHarness,\n  MatDateRangeInputHarness,\n} from '@angular/material/datepicker/testing';"
+        },
+        "occurrences": [
+          {
+            "line": 28,
+            "parent_kind": "TypeReference",
+            "expression": "MatDateRangeInputHarness"
+          },
+          {
+            "line": 64,
+            "parent_kind": "CallExpression",
+            "expression": "this.locatorForOptional(MatDateRangeInputHarness)"
+          }
+        ],
+        "public_reexport": false,
+        "complete_context_members": [
+          {
+            "kind": "SourceFile",
+            "line": 1,
+            "sha256": "cf3c8465eb017702809eaa5fa33af7636dd81f395912fb2fe3f64fcaddad2cb9",
+            "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {HarnessPredicate, parallel} from '@angular/cdk/testing';\nimport {\n  MatDatepickerInputHarness,\n  MatDateRangeInputHarness,\n} from '@angular/material/datepicker/testing';\nimport {FormFieldHarnessFilters} from '@angular/material/form-field/testing';\nimport {MatLegacyInputHarness} from '@ngx-compat/material-legacy/legacy-input/testing';\nimport {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';\nimport {MatLegacyErrorHarness} from './error-harness';\nimport {_MatFormFieldHarnessBase} from './form-field-harness-base';\n\n/**\n * Possible harnesses of controls which can be bound to a form-field.\n */\nexport type LegacyFormFieldControlHarness =\n  | MatLegacyInputHarness\n  | MatLegacySelectHarness\n  | MatDatepickerInputHarness\n  | MatDateRangeInputHarness;\n\n/**\n * Harness for interacting with a standard Material form-field's in tests.\n */\nexport class MatLegacyFormFieldHarness extends _MatFormFieldHarnessBase<\n  LegacyFormFieldControlHarness,\n  typeof MatLegacyErrorHarness\n> {\n  static hostSelector = '.mat-form-field';\n\n  static with(options: FormFieldHarnessFilters = {}): HarnessPredicate<MatLegacyFormFieldHarness> {\n    return new HarnessPredicate(MatLegacyFormFieldHarness, options)\n      .addOption('floatingLabelText', options.floatingLabelText, async (harness, text) =>\n        HarnessPredicate.stringMatches(await harness.getLabel(), text),\n      )\n      .addOption(\n        'hasErrors',\n        options.hasErrors,\n        async (harness, hasErrors) => (await harness.hasErrors()) === hasErrors,\n      )\n      .addOption(\n        'isValid',\n        options.isValid,\n        async (harness, isValid) => (await harness.isControlValid()) === isValid,\n      );\n  }\n\n  protected _prefixContainer = this.locatorForOptional('.mat-form-field-prefix');\n  protected _suffixContainer = this.locatorForOptional('.mat-form-field-suffix');\n  protected _label = this.locatorForOptional('.mat-form-field-label');\n  protected _errors = this.locatorForAll('.mat-error');\n  protected _hints = this.locatorForAll('mat-hint, .mat-hint');\n  protected _inputControl = this.locatorForOptional(MatLegacyInputHarness);\n  protected _selectControl = this.locatorForOptional(MatLegacySelectHarness);\n  protected _datepickerInputControl = this.locatorForOptional(MatDatepickerInputHarness);\n  protected _dateRangeInputControl = this.locatorForOptional(MatDateRangeInputHarness);\n  protected _errorHarness = MatLegacyErrorHarness;\n\n  async getAppearance(): Promise<'legacy' | 'standard' | 'fill' | 'outline'> {\n    const hostClasses = await (await this.host()).getAttribute('class');\n    if (hostClasses !== null) {\n      const appearanceMatch = hostClasses.match(\n        /mat-form-field-appearance-(legacy|standard|fill|outline)(?:$| )/,\n      );\n      if (appearanceMatch) {\n        return appearanceMatch[1] as 'legacy' | 'standard' | 'fill' | 'outline';\n      }\n    }\n    throw Error('Could not determine appearance of form-field.');\n  }\n\n  async hasLabel(): Promise<boolean> {\n    return (await this.host()).hasClass('mat-form-field-has-label');\n  }\n\n  async isLabelFloating(): Promise<boolean> {\n    const host = await this.host();\n    const [hasLabel, shouldFloat] = await parallel(() => [\n      this.hasLabel(),\n      host.hasClass('mat-form-field-should-float'),\n    ]);\n    return hasLabel && shouldFloat;\n  }\n}\n"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/material-remaining-caller-source-verification.json",
+          "sha256": "7a87cfd4bba7c8796f5d925a8b66e5a76c22cd37a643fe48816e2e433ae53c57"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-type-verification.json",
+          "sha256": "a765eee8fecee950f2d32f2cd90653a1bae086e3b349d9fcf6a0fd61452b89cf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-verification.json",
+          "sha256": "7a25750b19f0e634844f75b82f07c4635818e0d6402ff6563845bc34db9e30cb"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-verification.json",
+          "sha256": "db7e4e806238850c6d39adb41329b7eb09384141f442ef1de6150375b4200392"
+        },
+        {
+          "path": "compatibility/rc/input-public-parent-source-proof.json",
+          "sha256": "dc2aafa4ea36ccd63b2b65ad2154e04601f357f8a17f835709c5103a09b4b45a"
+        },
+        {
+          "path": "compatibility/rc/api/input-construction-consumer-decision.json",
+          "sha256": "040a15b9c0b1b6c60c0350f6590b35ff225c068538dd0145a1197c1e25e0eea4"
+        },
+        {
+          "path": "scripts/material-remaining-caller-contracts.mjs",
+          "sha256": "0ddadcb829838478339ff9a4967c5d6c6d374c01dfcf29520fa5efa82a1631e5"
+        },
+        {
+          "path": "tests/material_remaining_caller_source_probe.mjs",
+          "sha256": "6a2e4d4adece3e4823af46d871cadce65d786129bb0d9c8e23244bf164e7c043"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_source.py",
+          "sha256": "e8eb5da2c75e2bb22e0acfdeb92f5aeb306d8c5970b557c69f2ec66a5c310805"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-types-21.json",
+          "sha256": "6cf4de4d3b435d38eda8ba26a01ef56771a850af1a543e06a37361773949f1d0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-sdk-context-verification.json",
+          "sha256": "d2ea4ed76f3ae10a34a605378fe75cc91fe9a7e1a5fef6ae53fad6d4b8a3469e"
+        },
+        {
+          "path": "tests/material_remaining_caller_type_probe.mjs",
+          "sha256": "45d07e626fb9c5bdf7403196a62edb4053173a3853207386b4e9ce46239304dd"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_types.py",
+          "sha256": "a53b837c29e53c5f1c922872b2da36d100256f6ac4179b3c00d7a6102467b9f0"
+        },
+        {
+          "path": "tests/material_remaining_caller_harness_probe.mjs",
+          "sha256": "93fbf3f36fda740de6e4a82026a25524e2180a11213a2bc9cdd3f1b0efd26bb5"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_harness.py",
+          "sha256": "0e502c8b256eeade310ff3329a27d793d50aadf6ee23f4da92b5db2658b262ec"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16.json",
+          "sha256": "5e8a144f0f1eeca23b6a5363353ccd2eb7127397ba729f3022b7a12718c185bf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-public-subjects.json",
+          "sha256": "676a0091788c4f133875d1b1c556a7cd0a150e31a7f8df0928d398ca1eed35c5"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-21.json",
+          "sha256": "91a942a598e73925901faca10827b145eaad15da4b895a83c8fbe56f0b093a7c"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16-execution.json",
+          "sha256": "fc06406bb8a52bf0c1887fca1bf4ae3606296ee17ded5dd012d190963c67ca6e"
+        },
+        {
+          "path": "tests/material_remaining_caller_input_probe.mjs",
+          "sha256": "350afdff956789dfb73444c10aceb963d6a1dc76d0c60f5b067cabb64b93cb4f"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_input.py",
+          "sha256": "9dba81f31b552da90abc1793ae9f2ecbd02a9b1e784716853d03f605edaa9873"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16.json",
+          "sha256": "b5501ac15cc06b1b85c19db6ef97cf2b88e551ca5e2db9fa3e95e219a407e92b"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-21.json",
+          "sha256": "be0f961e3cbaa3028aba38ce924a3da46773a092559e1ab31f621976f0e055ba"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16-execution.json",
+          "sha256": "42649cb6906f70f9f658a2774cbf4f96c1ea59a138f48f0a08fb2241951186a0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-cyph-sanity.json",
+          "sha256": "c75de9ee0f13f99c1fa695d450dbead0f1ca7844002b376f786543f3befeba0a"
+        },
+        {
+          "path": "scripts/material-remaining-caller-reviews.mjs",
+          "sha256": "496c2bf9aa87592cf9b16ce3aea8363f11b6b5ae2d3cf58bdd57eaace1959441"
+        }
+      ],
+      "actual_native_packed_AOT_or_full_floor_qualified": false
+    },
+    {
+      "file": "legacy-input/public-api.ts",
+      "module": "@angular/material/input",
+      "symbol": "MAT_INPUT_VALUE_ACCESSOR",
+      "candidate_source_sha256": "bf381a98b409411fd5a28de33f821a5aed87acb9113d136ca03ebb455e881d62",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;individual remaining Material dependency review",
+      "decision": "The finite historical MAT_LEGACY_INPUT_VALUE_ACCESSOR export is already an alias of the shared public MAT_INPUT_VALUE_ACCESSOR in the untouched16 package. Both genuine current SDKs preserve exact object identity and InjectionToken identity through the owned source entry. No distinct historical token is collapsed or invented;this does not authorize aliasing unrelated legacy form-field or control tokens. Only this finite dependency/type/consumed public protocol boundary is closed. Actual compiled leaf factories,HTML/CSS rendering,SSR,native geometry,AOT,packed consumers and complete Node/compiler/peer/RxJS floors remain required. All SHA and packed CVA obligations remain separate;G11 is not passed.",
+      "original_obligation": {
+        "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+        "row": {
+          "file": "legacy-input/public-api.ts",
+          "module": "@angular/material/input",
+          "symbol": "MAT_INPUT_VALUE_ACCESSOR",
+          "candidate_source_sha256": "bf381a98b409411fd5a28de33f821a5aed87acb9113d136ca03ebb455e881d62",
+          "occurrences": [
+            {
+              "kind": "named-reexport",
+              "local_name": "MAT_LEGACY_INPUT_VALUE_ACCESSOR",
+              "type_only": false,
+              "line": 14
+            }
+          ],
+          "status": "unreviewed-current-use",
+          "disposition": "open"
+        }
+      },
+      "current_source_role": {
+        "file": "legacy-input/public-api.ts",
+        "module": "@angular/material/input",
+        "symbol": "MAT_INPUT_VALUE_ACCESSOR",
+        "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+        "candidate_source_sha256": "bf381a98b409411fd5a28de33f821a5aed87acb9113d136ca03ebb455e881d62",
+        "binding": {
+          "kind": "ExportSpecifier",
+          "local_name": "MAT_LEGACY_INPUT_VALUE_ACCESSOR",
+          "module": "@angular/material/input",
+          "text": "export {\n\n  MAT_INPUT_VALUE_ACCESSOR as MAT_LEGACY_INPUT_VALUE_ACCESSOR,\n\n} from '@angular/material/input';"
+        },
+        "occurrences": [],
+        "public_reexport": true,
+        "complete_context_members": [
+          {
+            "kind": "SourceFile",
+            "line": 1,
+            "sha256": "bf381a98b409411fd5a28de33f821a5aed87acb9113d136ca03ebb455e881d62",
+            "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nexport {MatLegacyInput} from './input';\nexport {MatLegacyInputModule} from './input-module';\nexport {\n\n  MAT_INPUT_VALUE_ACCESSOR as MAT_LEGACY_INPUT_VALUE_ACCESSOR,\n\n} from '@angular/material/input';\n\nexport {MatCommonModule} from './internal/common-module';\n\nexport {\n\n  getMatInputUnsupportedTypeError as getMatLegacyInputUnsupportedTypeError,\n} from './owned-errors';\n"
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/rc/material-remaining-caller-source-verification.json",
+          "sha256": "7a87cfd4bba7c8796f5d925a8b66e5a76c22cd37a643fe48816e2e433ae53c57"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-type-verification.json",
+          "sha256": "a765eee8fecee950f2d32f2cd90653a1bae086e3b349d9fcf6a0fd61452b89cf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-verification.json",
+          "sha256": "7a25750b19f0e634844f75b82f07c4635818e0d6402ff6563845bc34db9e30cb"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-verification.json",
+          "sha256": "db7e4e806238850c6d39adb41329b7eb09384141f442ef1de6150375b4200392"
+        },
+        {
+          "path": "compatibility/rc/input-public-parent-source-proof.json",
+          "sha256": "dc2aafa4ea36ccd63b2b65ad2154e04601f357f8a17f835709c5103a09b4b45a"
+        },
+        {
+          "path": "compatibility/rc/api/input-construction-consumer-decision.json",
+          "sha256": "040a15b9c0b1b6c60c0350f6590b35ff225c068538dd0145a1197c1e25e0eea4"
+        },
+        {
+          "path": "scripts/material-remaining-caller-contracts.mjs",
+          "sha256": "0ddadcb829838478339ff9a4967c5d6c6d374c01dfcf29520fa5efa82a1631e5"
+        },
+        {
+          "path": "tests/material_remaining_caller_source_probe.mjs",
+          "sha256": "6a2e4d4adece3e4823af46d871cadce65d786129bb0d9c8e23244bf164e7c043"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_source.py",
+          "sha256": "e8eb5da2c75e2bb22e0acfdeb92f5aeb306d8c5970b557c69f2ec66a5c310805"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-types-21.json",
+          "sha256": "6cf4de4d3b435d38eda8ba26a01ef56771a850af1a543e06a37361773949f1d0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-sdk-context-verification.json",
+          "sha256": "d2ea4ed76f3ae10a34a605378fe75cc91fe9a7e1a5fef6ae53fad6d4b8a3469e"
+        },
+        {
+          "path": "tests/material_remaining_caller_type_probe.mjs",
+          "sha256": "45d07e626fb9c5bdf7403196a62edb4053173a3853207386b4e9ce46239304dd"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_types.py",
+          "sha256": "a53b837c29e53c5f1c922872b2da36d100256f6ac4179b3c00d7a6102467b9f0"
+        },
+        {
+          "path": "tests/material_remaining_caller_harness_probe.mjs",
+          "sha256": "93fbf3f36fda740de6e4a82026a25524e2180a11213a2bc9cdd3f1b0efd26bb5"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_harness.py",
+          "sha256": "0e502c8b256eeade310ff3329a27d793d50aadf6ee23f4da92b5db2658b262ec"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16.json",
+          "sha256": "5e8a144f0f1eeca23b6a5363353ccd2eb7127397ba729f3022b7a12718c185bf"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-public-subjects.json",
+          "sha256": "676a0091788c4f133875d1b1c556a7cd0a150e31a7f8df0928d398ca1eed35c5"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-21.json",
+          "sha256": "91a942a598e73925901faca10827b145eaad15da4b895a83c8fbe56f0b093a7c"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-harness-tagged16-execution.json",
+          "sha256": "fc06406bb8a52bf0c1887fca1bf4ae3606296ee17ded5dd012d190963c67ca6e"
+        },
+        {
+          "path": "tests/material_remaining_caller_input_probe.mjs",
+          "sha256": "350afdff956789dfb73444c10aceb963d6a1dc76d0c60f5b067cabb64b93cb4f"
+        },
+        {
+          "path": "tests/test_material_remaining_caller_input.py",
+          "sha256": "9dba81f31b552da90abc1793ae9f2ecbd02a9b1e784716853d03f605edaa9873"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16.json",
+          "sha256": "b5501ac15cc06b1b85c19db6ef97cf2b88e551ca5e2db9fa3e95e219a407e92b"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-21.json",
+          "sha256": "be0f961e3cbaa3028aba38ce924a3da46773a092559e1ab31f621976f0e055ba"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-input-tagged16-execution.json",
+          "sha256": "42649cb6906f70f9f658a2774cbf4f96c1ea59a138f48f0a08fb2241951186a0"
+        },
+        {
+          "path": "compatibility/rc/material-remaining-caller-cyph-sanity.json",
+          "sha256": "c75de9ee0f13f99c1fa695d450dbead0f1ca7844002b376f786543f3befeba0a"
+        },
+        {
+          "path": "scripts/material-remaining-caller-reviews.mjs",
+          "sha256": "496c2bf9aa87592cf9b16ce3aea8363f11b6b5ae2d3cf58bdd57eaace1959441"
+        }
+      ],
+      "actual_native_packed_AOT_or_full_floor_qualified": false
+    }
+  ],
+  "source_closures_prepared": 7,
+  "canonical_writes_performed": 0,
+  "actual_native_packed_AOT_or_full_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
