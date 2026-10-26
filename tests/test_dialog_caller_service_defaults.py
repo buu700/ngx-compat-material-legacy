@@ -26,6 +26,19 @@ class DialogCallerServiceDefaults(unittest.TestCase):
         self.assertEqual(report['source_closures'], 0)
         self.assertFalse(report['actual_native_packed_AOT_or_full_floor_qualified'])
 
+    def test_all_prior_source_cases_and_unchanged_api_are_preserved(self):
+        result = subprocess.run(['node', 'tests/dialog_caller_service_default_source_rebinding_probe.mjs'],
+                                cwd=ROOT, capture_output=True, text=True, timeout=45)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report['source_rebindings_prepared'], 11)
+        self.assertEqual(report['complete_prior_cases_preserved'], 11)
+        self.assertTrue(report['API_signatures_and_other_class_members_unchanged'])
+        self.assertEqual(report['corruptions_rejected'], 3)
+        self.assertEqual(report['late_changes_rejected'], 1)
+        self.assertEqual(report['canonical_writes_performed'], 0)
+        self.assertEqual(report['source_closures'], 0)
+
 
 if __name__ == '__main__':
     unittest.main()

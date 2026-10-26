@@ -31,7 +31,7 @@ function canonical(value) {
 }
 
 /** Checker-bound identifiers and complete enclosing members from the actual proposed program. */
-function sourceRole(source, checker, row) {
+export function sourceRole(source, checker, row) {
   const bindings = source.statements.filter(ts.isImportDeclaration).flatMap(declaration =>
     (declaration.importClause?.namedBindings?.elements ?? []).map(specifier => ({declaration, specifier})))
     .filter(({declaration, specifier}) => declaration.moduleSpecifier.text === row.module &&
