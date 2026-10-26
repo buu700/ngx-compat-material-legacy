@@ -1,0 +1,43 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/** Bounded C02 diagnostic using the existing production compilation/validators. */
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {createRequire} from 'node:module';
+import {readFileSync,writeFileSync,realpathSync} from 'node:fs';
+import {join,resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const root=resolve(process.argv[2]),stage=JSON.parse(readFileSync(process.argv[3])),out=resolve(process.argv[4]);
+const hash=b=>createHash('sha256').update(b).digest('hex'),read=p=>readFileSync(join(root,p));
+const load=path=>import(pathToFileURL(join(root,'scripts',path)));
+const sass=createRequire(join(root,'package.json'))('sass');
+const oracle=JSON.parse(read('compatibility/rc/oracles/material-16.2.14-sass-api.json'));
+const line=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';
+const [{runSassApiCss},{apiCaseIds,compareInventory},{mixinArgumentCaseIds},{ORDERED_CSS_FIXTURE_IDS,rosterProblems}]=await Promise.all(['sass-seal.mjs','sass-api-inventory.mjs','sass-mixin-arguments.mjs','sass-ordered-css.mjs'].map(load));
+const names=['all-component-colors','all-component-densities','all-component-typographies','all-legacy-component-themes','badge-theme','datepicker-density','sort-color','tree-color'];
+const selected={...oracle,members:{variables:{},functions:{},mixins:Object.fromEntries(names.map(name=>[name,oracle.members.mixins[name]]))}};
+assert.equal(apiCaseIds(oracle).length,651);assert.equal(mixinArgumentCaseIds().length,498);assert.equal(ORDERED_CSS_FIXTURE_IDS.length,31);assert.deepEqual(rosterProblems(),[]);
+const argumentModules=[['sass-sort-companion-contract.mjs','SORT_COMPANION_CASES'],['sass-tree-companion-contract.mjs','TREE_COMPANION_CASES'],['sass-companion-addition-contract.mjs','COMPANION_ADDITION_CASES'],['sass-progress-color-alias-contract.mjs','PROGRESS_COLOR_ALIAS_CASES'],['sass-badge-shape-contract.mjs','BADGE_SHAPE_CASES'],['sass-datepicker-controls-contract.mjs','DATEPICKER_CONTROLS_CASES'],['sass-aggregate-density-contract.mjs','AGGREGATE_DENSITY_CASES'],['sass-aggregate-typography-contract.mjs','AGGREGATE_TYPOGRAPHY_CASES'],['sass-aggregate-color-theme-contract.mjs','AGGREGATE_COLOR_THEME_CASES'],['sass-form-field-state-contract.mjs','FORM_FIELD_STATE_ARGUMENT_CASES'],['sass-ripple-color-contract.mjs','RIPPLE_COLOR_ARGUMENT_CASES']];
+const scopes=new Map();for(const [file,key]of argumentModules){const data=(await load(file))[key];assert.ok(data);for(const id of Object.keys(data)){if(!scopes.has(id))scopes.set(id,[]);scopes.get(id).push({file,key});}}
+const baseline=JSON.parse(read('compatibility/rc/sass-closeout-native-checkpoints.json')).branches.find(b=>b.line===line);
+const coverage=baseline.configurable_failures.map(row=>({case_id:row.case_id,current_contracts:scopes.get(row.case_id)||[]}));
+const packageRoot=realpathSync(join(root,'projects/ngx-material-legacy')),peerNodeModules=realpathSync(join(stage.stage,line,'node_modules'));
+const roots=[packageRoot,realpathSync(join(peerNodeModules,'@angular/material')),realpathSync(join(peerNodeModules,'@angular/cdk'))];
+const start=Date.now(),measured=runSassApiCss({oracle:selected,entryFile:join(packageRoot,'_index.scss'),loadPaths:[peerNodeModules],allowedRoots:roots,line});
+const compare=css=>compareInventory(selected,selected.members,css).filter(row=>row.case_id.startsWith('mixin-css/'));
+const results=compare(measured);assert.equal(results.length,names.length);const negatives=[];
+for(const row of results){if(row.result!=='pass')continue;const name=row.case_id.slice('mixin-css/'.length),css=measured[name].css+'\n.unrelated-owned-regression { padding: 0; }\n';
+ const changed=structuredClone(measured);changed[name].css=css;changed[name].sha256=hash(css);
+ if(changed[name].actual_measurement){changed[name].actual_measurement.css=css;changed[name].actual_measurement.css_sha256=hash(css);changed[name].actual_measurement.css_bytes=Buffer.byteLength(css);}
+ assert.equal(compare(changed).find(r=>r.case_id===row.case_id).result,'fail');negatives.push(row.case_id);
+}
+const inputs=['scripts/sass-seal.mjs','scripts/sass-api-inventory.mjs','scripts/sass-mixin-arguments.mjs','scripts/sass-ordered-css.mjs','compatibility/rc/oracles/material-16.2.14-sass-api.json','compatibility/rc/sass-closeout-native-checkpoints.json','compatibility/rc/sass-pending-decisions.json'];
+const report={schema_version:1,line,scope:'Eight current source default mixin compilations only; signatures/variables, packed, native, floors and full651/498/31 execution not qualified',sass:sass.info,node:process.version,inputs:inputs.map(path=>({path,sha256:hash(read(path))})),retained_populations:{api:651,arguments:498,ordered_css:31,ordered_roster_problems:0},baseline:{commit:baseline.commit,configurable_failures:baseline.configurable_failures.length,current_contract_mapping:coverage,mapped:coverage.filter(r=>r.current_contracts.length>0).length,unmapped:coverage.filter(r=>!r.current_contracts.length).map(r=>r.case_id),mapping_is_not_execution:true},peer_archive_staging:stage,results,whole_css_mutations_rejected:negatives,measurements:measured,elapsed_ms:Date.now()-start,source_closures:0,actual_packed_native_or_floor_qualified:false,full_C02_pass:false,g11_claim:'not-passed'};
+writeFileSync(out,JSON.stringify(report,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({line,selected:names.length,passed:results.filter(r=>r.result==='pass').length,failures:results.filter(r=>r.result!=='pass').map(r=>({case_id:r.case_id,reason:r.reason})),negative_css:negatives.length,baseline_argument_failures:coverage.length,mapped:report.baseline.mapped,unmapped:report.baseline.unmapped,elapsed_ms:report.elapsed_ms}));
+process.exitCode=results.every(r=>r.result==='pass')?0:1;
