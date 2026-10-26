@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -83,6 +84,8 @@ export abstract class _MatMenuContentBase implements OnDestroy {
   detach() {
     if (this._portal?.isAttached) {
       this._portal.detach();
+      // Refresh content queries after the embedded view has been destroyed.
+      this._changeDetectorRef.markForCheck();
     }
   }
 
