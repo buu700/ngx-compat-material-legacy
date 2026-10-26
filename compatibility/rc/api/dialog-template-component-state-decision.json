@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "symbol_id": "legacy-dialog/primary/MatLegacyDialogRef",
+  "member": "componentRef",
+  "classification": "intentional-legacy-type-widening-and-historical-runtime-restoration",
+  "authority": "Direct user instruction in this thread delegates conservative TypeScript API decisions,conditioned on no required consumer CSS/SCSS changes and a readonly Cyph sanity check.",
+  "historical_declared_type": "ComponentRef<T> | null",
+  "owned_declared_type": "ComponentRef<T> | null | undefined",
+  "historical_observed_template_value": "undefined",
+  "owned_template_value": "undefined",
+  "reason": "Restore the actual tagged template sentinel and represent it honestly in the type,while retaining null in the type for source compatibility. No constructor,overload,other public member,HTML,CSS or SCSS change is authorized by this record.",
+  "evidence": {
+    "runtime": {
+      "path": "compatibility/rc/dialog-caller-owned-contract-runtime-main.json",
+      "sha256": "46ad2542a518ff4b1960c63b2c5e5b36217395b183eccea1f04ff28d42476ee3"
+    },
+    "candidate": {
+      "path": "compatibility/rc/dialog-caller-owned-contract-candidate.json",
+      "sha256": "8b2549fb509f47ee1731de5afe33304bc0e200e5708d2151429eb916fec3f14e"
+    },
+    "cyph_sanity": {
+      "head": "fea86b9717fa3f7943a7fd8eb6bb03ef09592f6b",
+      "parallel_changes_present": true,
+      "read_only": true,
+      "build_run": false,
+      "members": [
+        {
+          "path": "shared/js/cyph/services/dialog.service.ts",
+          "sha256": "c80e8db9e4121b17c3a30beaf4948a33727688351219dede22e67d27c7120fb2",
+          "componentRef_uses": 0,
+          "afterOpened_mentions": 0,
+          "beforeClosed_mentions": 0
+        },
+        {
+          "path": "shared/js/cyph/services/material-dialog.service.ts",
+          "sha256": "d11742c45d78e36da36fcba72e9869571c28768fe8827208e066f87f98ecb9b1",
+          "componentRef_uses": 0,
+          "afterOpened_mentions": 8,
+          "beforeClosed_mentions": 3
+        },
+        {
+          "path": "shared/js/cyph/components/dialog-alert/dialog-alert.component.ts",
+          "sha256": "217fce3fa56c92a5e4de65e923bbb3183721ed367dd99d49d3576b4a714a1b84",
+          "componentRef_uses": 0,
+          "afterOpened_mentions": 0,
+          "beforeClosed_mentions": 0
+        },
+        {
+          "path": "shared/js/cyph/components/dialog-confirm/dialog-confirm.component.ts",
+          "sha256": "d8deee89a810ab7c3c7a16ca63524faa166db139ecffa22ebd857aed859204ca",
+          "componentRef_uses": 0,
+          "afterOpened_mentions": 0,
+          "beforeClosed_mentions": 0
+        },
+        {
+          "path": "shared/js/cyph/components/dialog-media/dialog-media.component.ts",
+          "sha256": "43a4ff2190fd195ac2d4991a036c09294952f05cb00b20a1532cb22a155c8221",
+          "componentRef_uses": 0,
+          "afterOpened_mentions": 1,
+          "beforeClosed_mentions": 0
+        }
+      ],
+      "finding": "No componentRef usage in the five inspected files. The inspected afterOpened/beforeClosed value consumers handle completion without a value. This is bounded source sanity,not a consumer build."
+    }
+  },
+  "consumer_guidance": "Guard componentRef with a truthiness or nullish check before using it;component dialogs still have their actual ComponentRef.",
+  "consumer_build_run": false,
+  "native_packed_AOT_or_full_floor_qualified": false
+}

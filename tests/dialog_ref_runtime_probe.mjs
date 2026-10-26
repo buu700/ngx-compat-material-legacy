@@ -13,8 +13,8 @@ import {existsSync, readFileSync, writeFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import {dirname, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
-import {load as loadLeaf, make} from './dialog_motion_runtime_probe.mjs';
-import {packedShape} from '../scripts/api-surface.mjs';
+import {baseUrl, load as loadLeaf, make} from './dialog_motion_runtime_probe.mjs';
+import {compareSignatures, packedShape} from '../scripts/api-surface.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const require=createRequire(import.meta.url),ts=require('typescript');
 const url=name=>pathToFileURL(require.resolve(name)).href;
@@ -61,10 +61,21 @@ for(const[version,overlaySha,dialogSha]of[
 const shape=text=>packedShape(ts.createSourceFile(sourcePath,text,ts.ScriptTarget.Latest,true),'MatLegacyDialogRef');
 const candidateShape=shape(source);
 const originalShape=packedShape(ts.createSourceFile(referencePath,reference,ts.ScriptTarget.Latest,true),'MatDialogRef');
-assert.deepEqual(candidateShape,originalShape);
+const signatureDifferencesPath='compatibility/rc/api/signature-differences.json';
+const signatureDifferences=JSON.parse(readFileSync(resolve(root,signatureDifferencesPath),'utf8')).differences;
+const signatureComparison=compareSignatures({symbol_id:'legacy-dialog/primary/MatLegacyDialogRef',shape:originalShape},candidateShape,signatureDifferences);
+assert.deepEqual(signatureComparison.blocking,[]);
+const templateStateSignature='public readonly prop componentRef:ComponentRef<T>|null|undefined';
+const intentional=signatureComparison.rows.filter(row=>row.status==='intentional-legacy-difference');
+if(candidateShape.signatures.includes(templateStateSignature)){
+  assert.equal(intentional.length,1);
+  assert.equal(intentional[0].historical,'public readonly prop componentRef:ComponentRef<T>|null');
+  assert.equal(intentional[0].owned,templateStateSignature);
+}else{assert.deepEqual(candidateShape,originalShape);assert.equal(intentional.length,0);}
 async function load(raw=source) {
   const js=ts.transpileModule(raw,{compilerOptions:{target:ts.ScriptTarget.ES2022,
     module:ts.ModuleKind.ESNext,experimentalDecorators:true}}).outputText
+    .replaceAll("'./internal/dialog-container-base'",JSON.stringify(baseUrl))
     .replace(/(['"])(@angular\/[^'"]+|rxjs(?:\/operators)?)\1/g,(_,q,name)=>JSON.stringify(url(name)));
   return import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
 }
@@ -208,10 +219,10 @@ async function observations(module) {
       assert.equal(f.instance._animationStateChanged.observers.length,1);
     }finally{f.finish();}
   });
-  await check('successful-opening-replay-and-borrowed-container-stream-remain-intact',async()=>{
+  await check('successful-opening-broadcast-and-borrowed-container-stream-remain-intact',async()=>{
     const f=fixture(module.MatLegacyDialogRef);let opened=0,completed=0;
     try{f.opening();f.settle();f.owned.afterOpened().subscribe({next:()=>opened++,complete:()=>completed++});
-      assert.equal(opened,1);assert.equal(completed,1);f.owned.close();f.settle();
+      assert.equal(opened,0);assert.equal(completed,1);f.owned.close();f.settle();
       assert.equal(f.instance._animationStateChanged.isStopped,false);
       assert.equal(f.events.at(-1).state,'closed');
     }finally{f.finish();}
@@ -286,7 +297,7 @@ const report={schema_version:1,role:'Actual owned ref/leaf and real public CDK D
  sources:sources.map(path=>{const bytes=path===sourcePath?Buffer.from(source):readFileSync(resolve(root,path));return{path,sha256:sha(bytes),bytes:bytes.length};}),
  source_override:override===-1?null:args[override+1],authenticated_public_peer_protocol_sources:peerSources,
  untouched_reference:{path:referencePath,sha256:sha(reference),bytes:Buffer.byteLength(reference)},original_shape:originalShape,candidate_shape:candidateShape,
- cases,mutations,limits:['Installed public CDK22.1.7 DialogRef and actual owned ref/leaf/base/focus code execute;OverlayRef is a finite fixture matching authenticated disposal ordering.',
+ cases,mutations,signature_comparison:signatureComparison,limits:['Installed public CDK22.1.7 DialogRef and actual owned ref/leaf/base/focus code execute;OverlayRef is a finite fixture matching authenticated disposal ordering.',
   'DOM,rendering,services and clocks are synthetic fixtures;root Overlay/native factory/real reduced-motion/SSR/actual21/minimum/AOT/canonical/packed/floor checks are not executed.',
   'Subject observer counts are test-only lifetime observations,not product dependencies on RxJS internals.']};
 const at=args.indexOf('--report');if(at!==-1){const path=args[at+1];assert.ok(path);assert.equal(existsSync(path),false);

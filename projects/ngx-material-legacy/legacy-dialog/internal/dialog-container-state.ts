@@ -15,10 +15,17 @@ interface LegacyDialogTitleContainer {
   _ariaLabelledByQueue?: string[];
 }
 
+interface LegacyDialogContainerPeer {
+  readonly overlayRef: object;
+  containerInstance: object | null | undefined;
+  disableClose: boolean | undefined;
+}
+
 interface LegacyDialogContainerState {
   focusTrapped: Observable<void>;
   changeDetector: ChangeDetectorRef | null;
   destroyed: boolean;
+  peer: LegacyDialogContainerPeer | null;
 }
 
 const states = new WeakMap<LegacyDialogTitleContainer, LegacyDialogContainerState>();
@@ -31,7 +38,21 @@ export function registerLegacyDialogContainerState(
   // The public peer hook is optional. Keep its runtime bridge out of the frozen
   // legacy declaration surface, without private fields that narrow assignability.
   Object.defineProperty(container, '_focusTrapped', {value: focusTrapped});
-  states.set(container, {focusTrapped, changeDetector, destroyed: false});
+  states.set(container, {focusTrapped, changeDetector, destroyed: false, peer: null});
+}
+
+/** Bind an actual owned ref without requiring Angular injection during manual construction. */
+export function registerLegacyDialogContainerPeer(
+  container: LegacyDialogTitleContainer, peer: LegacyDialogContainerPeer,
+): void {
+  const state = states.get(container);
+  if (state && !state.destroyed) {
+    state.peer = peer;
+  }
+}
+
+export function legacyDialogContainerPeer(container: LegacyDialogTitleContainer): LegacyDialogContainerPeer | null {
+  return states.get(container)?.peer ?? null;
 }
 
 export function destroyLegacyDialogContainerState(container: LegacyDialogTitleContainer): void {
@@ -39,6 +60,7 @@ export function destroyLegacyDialogContainerState(container: LegacyDialogTitleCo
   if (state) {
     state.destroyed = true;
     state.changeDetector = null;
+    state.peer = null;
   }
 }
 

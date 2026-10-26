@@ -27,8 +27,9 @@ import {Subject, Subscription} from 'rxjs';
 import {take} from 'rxjs/operators';
 import {focusLegacyDialogInitially, legacyDialogActiveElement, legacyDialogContainsFocus}
   from './dialog-initial-focus';
-import {destroyLegacyDialogContainerState, registerLegacyDialogContainerState}
+import {destroyLegacyDialogContainerState, legacyDialogContainerPeer, registerLegacyDialogContainerState}
   from './dialog-container-state';
+export {registerLegacyDialogContainerPeer} from './dialog-container-state';
 
 /** Optional Angular services must not prevent the original manual constructor. */
 function ambientService<T>(token: ProviderToken<T>): T | null {
@@ -158,7 +159,7 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
     }
     // A public CDK DialogRef already recaptures on its own backdrop. A manually
     // constructed container still listens to exactly the supplied OverlayRef.
-    const owner = this._legacyDialogRef;
+    const owner = legacyDialogContainerPeer(this) ?? this._legacyDialogRef;
     if (!this._legacyBackdropSubscription && !(owner instanceof DialogRef
         && owner.overlayRef === this._legacyOverlayRef && owner.containerInstance === this)) {
       this._legacyBackdropSubscription = this._legacyOverlayRef.backdropClick().subscribe(() => {
@@ -171,7 +172,17 @@ export abstract class _MatDialogContainerBase extends BasePortalOutlet implement
   }
 
   _recaptureFocus(): void {
-    if (!this._legacyFocusDestroyed && !legacyDialogContainsFocus(this._elementRef.nativeElement)) {
+    if (this._legacyFocusDestroyed) {
+      return;
+    }
+    const owner = legacyDialogContainerPeer(this) ?? this._legacyDialogRef;
+    // The CDK peer is disabled for deferred closing even when the legacy dialog can close.
+    // Keep that peer hook from adding focus work to an enabled legacy backdrop click.
+    if (!this._config.disableClose && owner instanceof DialogRef && owner.disableClose
+        && owner.overlayRef === this._legacyOverlayRef && owner.containerInstance === this) {
+      return;
+    }
+    if (!legacyDialogContainsFocus(this._elementRef.nativeElement)) {
       this._trapFocus();
     }
   }

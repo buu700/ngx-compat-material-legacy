@@ -794,6 +794,13 @@
       "historical_signature": null,
       "owned_signature": "protected get _animationsDisabled():boolean",
       "rationale": "An owned protected getter computes the existing engine-free motion state from the preserved original optional _animationMode argument and node-DI fallback. It adds no consumer requirement and changes no markup/style contract; only this exact addition is accepted. Existing motion/manual constructor tests remain required."
+    },
+    {
+      "symbol_id": "legacy-dialog/primary/MatLegacyDialogRef",
+      "classification": "intentional-legacy-difference",
+      "historical_signature": "public readonly prop componentRef:ComponentRef<T>|null",
+      "owned_signature": "public readonly prop componentRef:ComponentRef<T>|null|undefined",
+      "rationale": "The user delegates conservative TypeScript API changes with unchanged required CSS/SCSS and Cyph sanity. The untouched tagged16 template runtime returns undefined despite the older nullable declaration. This exact union represents that restored historical state while retaining null for source compatibility. Only this field changes;constructors/overloads/other public members remain checked. The162-case tagged/current/proposal proof and five-source-fault results are retained in dialog-caller-owned-contract-verification.json;the five inspected Cyph files do not use componentRef."
     }
   ]
 }

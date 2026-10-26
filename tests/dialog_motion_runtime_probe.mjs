@@ -38,7 +38,7 @@ export async function loadConfig() {
   const raw = readFileSync(resolve(root, 'projects/ngx-material-legacy/legacy-dialog/dialog-config.ts'), 'utf8');
   return (await import(data(emit(raw).replaceAll("'./dialog-animation-params'", JSON.stringify(paramsUrl))))).MatLegacyDialogConfig;
 }
-const baseUrl = await loadBase(undefined, undefined, true);
+export const baseUrl = await loadBase(undefined, undefined, true);
 export async function load(raw = original) {
   const js = emit(raw).replaceAll("'./internal/dialog-container-base'", JSON.stringify(baseUrl))
     .replaceAll("'./dialog-animation-params'", JSON.stringify(paramsUrl))
