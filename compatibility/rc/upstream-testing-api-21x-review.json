@@ -1,0 +1,2635 @@
+{
+  "schema_version": 1,
+  "role": "Six individual21.xpublic testing API contract reviews",
+  "line": "21.x",
+  "status": "reviewed",
+  "subjects": {
+    "path": "compatibility/rc/upstream-testing-api-21x-subjects.json.gz",
+    "sha256": "dee4da78a6d7fcc0dfd2aeb3fd0c5d062adc7d794c2eed0be8e41fb5ec127560"
+  },
+  "reviews": [
+    {
+      "sha": "4de7c0fb2d033bd81074764a52cc46edd02e6774",
+      "status": "reviewed",
+      "recommended_disposition": "inherited",
+      "decision": "The current21.2.14public CDK supplies the two loader methods, and current public input/native-select/datepicker label lookup accepts legacy label bindings without the initial MDC prefix. The owned input adapter preserves predicate identity/native disabled behavior. The owned legacy select retains its finite disabled-only filter and old parent; modern select label API is not copied. Upstream fixture/doc edits are source review, not execution of those suites.",
+      "diff_sha256": "789e84d9089de9fe4f45a5297d6afc944dd3fadf3fab2de9293e2e0cd50c1879",
+      "complete_original_paths": [
+        "src/cdk/testing/component-harness.ts",
+        "src/cdk/testing/harness-environment.ts",
+        "src/cdk/testing/test-harnesses.md",
+        "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+        "src/material/datepicker/testing/date-range-input-harness.ts",
+        "src/material/datepicker/testing/datepicker-harness-filters.ts",
+        "src/material/datepicker/testing/datepicker-input-harness-base.ts",
+        "src/material/datepicker/testing/datepicker-input-harness.spec.ts",
+        "src/material/form-field/testing/control/form-field-control-harness-filters.ts",
+        "src/material/form-field/testing/control/form-field-control-harness.ts",
+        "src/material/form-field/testing/control/index.ts",
+        "src/material/input/testing/input-harness-filters.ts",
+        "src/material/input/testing/input-harness.spec.ts",
+        "src/material/input/testing/input-harness.ts",
+        "src/material/input/testing/native-select-harness-filters.ts",
+        "src/material/input/testing/native-select-harness.spec.ts",
+        "src/material/input/testing/native-select-harness.ts",
+        "src/material/select/testing/select-harness-filters.ts",
+        "src/material/select/testing/select-harness.spec.ts",
+        "src/material/select/testing/select-harness.ts"
+      ],
+      "source_review_complete": true,
+      "canonical_disposition_applied": false,
+      "executed_case_ids": [
+        "owned-input/legacy-labelledby",
+        "owned-input/legacy-for",
+        "owned-input/modern-labelledby",
+        "owned-input/aria-label-before-for",
+        "owned-input/labelledby-before-aria-label",
+        "owned-input/missing-labelledby-does-not-fall-through",
+        "owned-input/unlabelled-does-not-use-unrelated-label",
+        "native-select-alias/legacy-labelledby",
+        "native-select-alias/legacy-for",
+        "native-select-alias/modern-labelledby",
+        "native-select-alias/aria-label-before-for",
+        "native-select-alias/labelledby-before-aria-label",
+        "native-select-alias/missing-labelledby-does-not-fall-through",
+        "native-select-alias/unlabelled-does-not-use-unrelated-label",
+        "datepicker-input-peer/legacy-labelledby",
+        "datepicker-input-peer/legacy-for",
+        "datepicker-input-peer/modern-labelledby",
+        "datepicker-input-peer/aria-label-before-for",
+        "datepicker-input-peer/labelledby-before-aria-label",
+        "datepicker-input-peer/missing-labelledby-does-not-fall-through",
+        "datepicker-input-peer/unlabelled-does-not-use-unrelated-label",
+        "date-range-peer/legacy-labelledby",
+        "date-range-peer/legacy-for",
+        "date-range-peer/modern-labelledby",
+        "date-range-peer/aria-label-before-for",
+        "date-range-peer/labelledby-before-aria-label",
+        "date-range-peer/missing-labelledby-does-not-fall-through",
+        "date-range-peer/unlabelled-does-not-use-unrelated-label",
+        "native-select-retains-public-peer-identity",
+        "owned-input-retains-current-public-parent",
+        "legacy-select-retains-finite-disabled-filter",
+        "loader-methods-are-genuine-inherited-public-members",
+        "count-content-excludes-document-sibling",
+        "document-root-loader-sees-document-sibling",
+        "content-index-0",
+        "content-index-1",
+        "content-index-2",
+        "count-respects-predicate",
+        "index-applies-to-filtered-results",
+        "empty-count",
+        "negative-index-rejects",
+        "past-end-index-rejects",
+        "empty-index-rejects",
+        "query-rejection-propagates",
+        "fresh-content-state-observed",
+        "original-MDC-prefix-control-works-on-modern-label"
+      ],
+      "file_reviews": [
+        {
+          "path": "src/cdk/testing/component-harness.ts",
+          "before_blob": "4fe49ab6e2208041d4929462541b9688be62b563",
+          "after_blob": "646ac6ef1edca7d423dbb8fdbe4c253388a75466",
+          "scope": "Public loader signatures and content-container forwarders add index/count; genuine current CDK methods execute through the packed legacy button, including filtered order, content scope and error propagation."
+        },
+        {
+          "path": "src/cdk/testing/harness-environment.ts",
+          "before_blob": "e03f479e17d00d4b25e1a1ea453ee0d036e35a54",
+          "after_blob": "a2fdb2228c40b32ec3c76bb23292648ff35ebad2",
+          "scope": "The actual public environment runs query/filter/count/index logic. Negative, empty and past-end offsets reject; count/index mutations and ignored predicates are rejected."
+        },
+        {
+          "path": "src/cdk/testing/test-harnesses.md",
+          "before_blob": "9025d5b0ea8a890669b1e7c02ea9f31ddb2d98fd",
+          "after_blob": "c2710b1eff6e16bf5fa33b207cda54e92fe1fc13",
+          "scope": "The added index/count/hasHarness documentation describes public CDK loader APIs; it adds no legacy component or owned API copy."
+        },
+        {
+          "path": "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+          "before_blob": "5396975fe711bdf714446b73b35a01850ca49fbe",
+          "after_blob": "cb1a9b5356d9cde521fc163924e4ddf9c6f4c462",
+          "scope": "The new third range-input fixture and label filter expectation were read. The original upstream Angular fixture suite was not run; current public label semantics are exercised separately."
+        },
+        {
+          "path": "src/material/datepicker/testing/date-range-input-harness.ts",
+          "before_blob": "c2a12d8dc040efdf582d21362ea667b9f01cd2f3",
+          "after_blob": "037f6f9a598786c3ff62310c3fa69b6b3d3c576c",
+          "scope": "The original MDC-prefixed label method is superseded at the advertised minimum by prefix-free id/for lookup; the actual public range harness passes legacy/modern associations and label filters."
+        },
+        {
+          "path": "src/material/datepicker/testing/datepicker-harness-filters.ts",
+          "before_blob": "4245ad9625efd6974a12844e5d15e9f51c7c484f",
+          "after_blob": "90e750fd7ad27ac21d6d3c32dc013418dddc6c26",
+          "scope": "Datepicker/range filters add the public shared label field. The actual minimum peer accepts the filters; the add-on creates no parallel datepicker API."
+        },
+        {
+          "path": "src/material/datepicker/testing/datepicker-input-harness-base.ts",
+          "before_blob": "6e736928836fd56be8c4e441c6d4b953dad1c559",
+          "after_blob": "e2a41fa70e76efd471b2175803e2a481b9065e88",
+          "scope": "The new public parent and label predicate are inherited in the current public datepicker input; legacy native input-label bindings are exercised without a copied parent."
+        },
+        {
+          "path": "src/material/datepicker/testing/datepicker-input-harness.spec.ts",
+          "before_blob": "8cf8739c62a880f405c53291c781ccdbca6ad793",
+          "after_blob": "72aa47c883533bd597a97d4ceef7859a0d5e6721",
+          "scope": "The labeled wrapper, form-field/input imports and new label predicate test were read. These modern upstream fixtures are not historical legacy goldens and are not claimed executed."
+        },
+        {
+          "path": "src/material/form-field/testing/control/form-field-control-harness-filters.ts",
+          "before_blob": "0000000000000000000000000000000000000000",
+          "after_blob": "2959983406ab430c8a0e13066684cf03dfba2073",
+          "scope": "The added public label filter is supplied by the current peer and its inherited native input/select aliases; no wildcard owned API mirror is introduced."
+        },
+        {
+          "path": "src/material/form-field/testing/control/form-field-control-harness.ts",
+          "before_blob": "518f893a29dd19684004d92bc894b32457007b0c",
+          "after_blob": "05edc1b89fe8eb4d7907010fb1b14f23160feb53",
+          "scope": "The new public base getLabel initially required an MDC class. The actual minimum removes that restriction; original prefix-only source is executed as a rejected reversion, while current binding precedence is exercised."
+        },
+        {
+          "path": "src/material/form-field/testing/control/index.ts",
+          "before_blob": "e289ebb6c6f22f5988ef810bbe5540a5c07f42e9",
+          "after_blob": "4454049bc88ae29dcd6f4812ba480b0033a8f252",
+          "scope": "The public peer barrel exports the new filter. The owned legacy select retains its separate historical interface and empty public control-harness parent."
+        },
+        {
+          "path": "src/material/input/testing/input-harness-filters.ts",
+          "before_blob": "c68b0d626708d83e3864a20c7cab5e8080e83ac7",
+          "after_blob": "1635877e6ae952fd4c218c80f14f5430e05389d6",
+          "scope": "The public input filter gains label. The maintained input adapter already binds this option to its own harness constructor; actual packed predicates and label association are exercised."
+        },
+        {
+          "path": "src/material/input/testing/input-harness.spec.ts",
+          "before_blob": "e4d95ee6f4de6ffcf998447db67e4382008887d0",
+          "after_blob": "3d93514de9fa09bf238a08548010c2cbb1de6c94",
+          "scope": "The countHarnesses call and labeled input fixture were read. The inherited loader behavior and actual packed input label predicates execute separately; the upstream suite is not claimed run."
+        },
+        {
+          "path": "src/material/input/testing/input-harness.ts",
+          "before_blob": "61e087f01cbb1a46b63672d16ecee3899c56b49b",
+          "after_blob": "c88101a32ad9f301a68cc9afe43e52f0a222b7d8",
+          "scope": "The public parent/filter additions are current-peer behavior. The owned adapter keeps its native disabled-property override and own predicate identity instead of copying the modern class."
+        },
+        {
+          "path": "src/material/input/testing/native-select-harness-filters.ts",
+          "before_blob": "438549ff0cb4d1a4db5d4a777502cfb761a0ca3b",
+          "after_blob": "e44566192d32b10955991a69eee05237305b2694",
+          "scope": "The public native-select filter gains label; the add-on retains exact public native-select class identity and its supported current filter contract."
+        },
+        {
+          "path": "src/material/input/testing/native-select-harness.spec.ts",
+          "before_blob": "856b3c2739efbaf25e2e5abdb7f013dfdc490317",
+          "after_blob": "a3492f0e2460daf9a5e4ab84b62a0a789d5e9582",
+          "scope": "The new form-field label and filter assertion were read; the packed alias label contract executes against discriminating legacy/modern label records."
+        },
+        {
+          "path": "src/material/input/testing/native-select-harness.ts",
+          "before_blob": "3641d08b343870f666b335ddea34f98ead8a1573",
+          "after_blob": "7b0b17b175b18edb915da9521da74c34a7e142d0",
+          "scope": "The public native-select parent and label predicate are inherited through the unchanged alias; current minimum prefix-free lookup supports legacy id/for labels."
+        },
+        {
+          "path": "src/material/select/testing/select-harness-filters.ts",
+          "before_blob": "db83564fc513147c6f3f6da6556aa336ec71b863",
+          "after_blob": "34e219a456d070ab6b86e75d6f91ef6d2dbeabc8",
+          "scope": "The modern select filter gains label. The owned legacy select remains a finite disabled-only interface, so this new modern filter is not advertised or mirrored."
+        },
+        {
+          "path": "src/material/select/testing/select-harness.spec.ts",
+          "before_blob": "df198b2eade427a496439b5ae73f95c39fe70e63",
+          "after_blob": "ff4fc2165a3f33b2945987c55c075ed605018fc3",
+          "scope": "The new modern label fixture/filter assertion were read; the add-on retains its separate legacy select and does not replace legacy goldens with these modern expectations."
+        },
+        {
+          "path": "src/material/select/testing/select-harness.ts",
+          "before_blob": "8c577d63cc99882dc2a8eddec41d9102e88b2c42",
+          "after_blob": "36d10d4ed5b0ea27e2ed717a8121af4cba5678dd",
+          "scope": "The modern class changes public import routes, parent and label filtering. The owned legacy class keeps its own option/optgroup types, old control parent and finite disabled filter; the current-source/packed identity check includes those exact members."
+        }
+      ]
+    },
+    {
+      "sha": "54d514df66b9a1ea544df0aacc7069defcd78dcd",
+      "status": "reviewed",
+      "recommended_disposition": "do-not-adopt",
+      "decision": "The four-file change adds modern buttonType/getType API. The packed owned legacy harness preserves raised/flat/stroked variants, its finite historical filter interface and native text predicate. Adding a new modern button API is outside this finite legacy contract.",
+      "diff_sha256": "d257a644e34595668af3a4f4da4c7e2efff1fc4229dcd494456929f527c94ec1",
+      "complete_original_paths": [
+        "goldens/material/button/testing/index.api.md",
+        "src/material/button/testing/button-harness-filters.ts",
+        "src/material/button/testing/button-harness.spec.ts",
+        "src/material/button/testing/button-harness.ts"
+      ],
+      "source_review_complete": true,
+      "canonical_disposition_applied": false,
+      "executed_case_ids": [
+        "legacy-button-variant-remains-raised",
+        "legacy-button-type-and-icon-filters-remain-finite",
+        "legacy-button-text-predicate-remains-owned"
+      ],
+      "file_reviews": [
+        {
+          "path": "goldens/material/button/testing/index.api.md",
+          "before_blob": "582029883cd26f6db52b281881b0193ec032d336",
+          "after_blob": "c6ea75d18022b10edbf26a4db02eb95209e8bf23",
+          "scope": "Whole public API delta read: new buttonType/iconName or no-data harness API is absent from the finite owned historical contract described in this SHA decision."
+        },
+        {
+          "path": "src/material/button/testing/button-harness-filters.ts",
+          "before_blob": "7f053c133ad01adc334ed6f848689a721fe71d0c",
+          "after_blob": "c88e9a122b120082629887b5f433ab09170dcef7",
+          "scope": "Whole original source delta reviewed against the specific current public/owned API boundary described in this SHA decision."
+        },
+        {
+          "path": "src/material/button/testing/button-harness.spec.ts",
+          "before_blob": "0dfa249854d86d9aeacf4f2eff61300cd855f259",
+          "after_blob": "cc0485eea71e04a2cf02592348daa632d39685c3",
+          "scope": "Whole changed upstream test/fixture read with this SHA decision; original upstream suite not executed."
+        },
+        {
+          "path": "src/material/button/testing/button-harness.ts",
+          "before_blob": "65bc7fc0040f9cba04ab24f18f028fd8fcd229f3",
+          "after_blob": "34caf427620d734f8b7a9c4b568dcdf0d39e36a4",
+          "scope": "Whole original source delta reviewed against the specific current public/owned API boundary described in this SHA decision."
+        }
+      ]
+    },
+    {
+      "sha": "3619903fa26910a784f01bee627e30d922b9b525",
+      "status": "reviewed",
+      "recommended_disposition": "do-not-adopt",
+      "decision": "The five-file change adds iconName and a MatIconHarness dependency to modern buttons. The owned historical filter has no iconName promise or icon-harness import. Its text/variant predicates and inherited content-container behavior remain separate. No new icon predicate or Bazel dependency is copied.",
+      "diff_sha256": "313e0b12a7ae53865d2352540c46b389eb4a80a9d98bc1e91f4fedfcf5ad2355",
+      "complete_original_paths": [
+        "goldens/material/button/testing/index.api.md",
+        "src/material/button/testing/BUILD.bazel",
+        "src/material/button/testing/button-harness-filters.ts",
+        "src/material/button/testing/button-harness.spec.ts",
+        "src/material/button/testing/button-harness.ts"
+      ],
+      "source_review_complete": true,
+      "canonical_disposition_applied": false,
+      "executed_case_ids": [
+        "legacy-button-variant-remains-raised",
+        "legacy-button-type-and-icon-filters-remain-finite",
+        "legacy-button-text-predicate-remains-owned"
+      ],
+      "file_reviews": [
+        {
+          "path": "goldens/material/button/testing/index.api.md",
+          "before_blob": "c6ea75d18022b10edbf26a4db02eb95209e8bf23",
+          "after_blob": "c57ebcb1c0d95bc73d254efc66b1fee66aa74143",
+          "scope": "Whole public API delta read: new buttonType/iconName or no-data harness API is absent from the finite owned historical contract described in this SHA decision."
+        },
+        {
+          "path": "src/material/button/testing/BUILD.bazel",
+          "before_blob": "2490bd8565478984e9b1cf6cc16c98583c55fa06",
+          "after_blob": "c71f12a1082e50e4f4232d160ca329eec6556a58",
+          "scope": "The added MatIconHarness Bazel dependency belongs to the new modern iconName filter. No owned production icon/testing edge exists."
+        },
+        {
+          "path": "src/material/button/testing/button-harness-filters.ts",
+          "before_blob": "c88e9a122b120082629887b5f433ab09170dcef7",
+          "after_blob": "eb490a364773d56a8f59ca1c237a3ab54d30593e",
+          "scope": "Whole original source delta reviewed against the specific current public/owned API boundary described in this SHA decision."
+        },
+        {
+          "path": "src/material/button/testing/button-harness.spec.ts",
+          "before_blob": "cc0485eea71e04a2cf02592348daa632d39685c3",
+          "after_blob": "e63fd6bec0f8f2fe5f7e4d1b20454194537f588e",
+          "scope": "Whole changed upstream test/fixture read with this SHA decision; original upstream suite not executed."
+        },
+        {
+          "path": "src/material/button/testing/button-harness.ts",
+          "before_blob": "34caf427620d734f8b7a9c4b568dcdf0d39e36a4",
+          "after_blob": "49edebcb25ce1494440e940a7d90641a893c2c93",
+          "scope": "Whole original source delta reviewed against the specific current public/owned API boundary described in this SHA decision."
+        }
+      ]
+    },
+    {
+      "sha": "85f596b3c32d22541c3825da3479b67832a2f4da",
+      "status": "reviewed",
+      "recommended_disposition": "do-not-adopt",
+      "decision": "The five-file change adds modern no-data row/cell harness classes and getNoDataRow with an MDC row selector. The packed legacy table retains its finite row/cell harnesses and ordered cell-text behavior. This testing-API decision makes no change to the legacy no-data component or its markup.",
+      "diff_sha256": "b3e350158631e54b258becfd29ffedb4e4204766d375542050a72a2351983a48",
+      "complete_original_paths": [
+        "goldens/material/table/testing/index.api.md",
+        "src/material/table/testing/cell-harness.ts",
+        "src/material/table/testing/row-harness.ts",
+        "src/material/table/testing/table-harness.spec.ts",
+        "src/material/table/testing/table-harness.ts"
+      ],
+      "source_review_complete": true,
+      "canonical_disposition_applied": false,
+      "executed_case_ids": [
+        "legacy-table-owned-row-harnesses",
+        "legacy-table-cell-order-and-text",
+        "legacy-table-no-new-no-data-harness-api"
+      ],
+      "file_reviews": [
+        {
+          "path": "goldens/material/table/testing/index.api.md",
+          "before_blob": "80f429d6c34da68ce5e85de6e5bb873b17ed1679",
+          "after_blob": "6ebe4ec17923419a28dabed4b5d0096d99fdc762",
+          "scope": "Whole public API delta read: new buttonType/iconName or no-data harness API is absent from the finite owned historical contract described in this SHA decision."
+        },
+        {
+          "path": "src/material/table/testing/cell-harness.ts",
+          "before_blob": "47fa5ccc92f5b72c36e08e4bee628e4e4ed246fc",
+          "after_blob": "2cae26f526650a50087861dc4a17d85b4c479169",
+          "scope": "Whole original source delta reviewed against the specific current public/owned API boundary described in this SHA decision."
+        },
+        {
+          "path": "src/material/table/testing/row-harness.ts",
+          "before_blob": "5db30792c7ce06f3e61a846bad7631b1cc5d01eb",
+          "after_blob": "605aec6538fbd674db2483715cfc0217adbd1f0a",
+          "scope": "Whole original source delta reviewed against the specific current public/owned API boundary described in this SHA decision."
+        },
+        {
+          "path": "src/material/table/testing/table-harness.spec.ts",
+          "before_blob": "723b39af7a4490a8ef0fb371207c40224a247f09",
+          "after_blob": "e0e3dd46516d4479da6df719f3b2297e446f02c8",
+          "scope": "Whole changed upstream test/fixture read with this SHA decision; original upstream suite not executed."
+        },
+        {
+          "path": "src/material/table/testing/table-harness.ts",
+          "before_blob": "0b8cd7b81a1bd54731c493d766ec6908534b1633",
+          "after_blob": "4ca8a40ac541ec8bae8a18c3f9b7febe734aebaa",
+          "scope": "Whole original source delta reviewed against the specific current public/owned API boundary described in this SHA decision."
+        }
+      ]
+    },
+    {
+      "sha": "9cf15019d9d82bcb7460df5febd898a1b1eec59b",
+      "status": "reviewed",
+      "recommended_disposition": "not-applicable",
+      "decision": "This one-file follow-up changes the newly added modern iconName predicate from hasHarness to locatorForOptional. The owned legacy button implements neither that filter nor that query path; its separately qualified content-container methods are inherited from public CDK.",
+      "diff_sha256": "32277eb9848681e7cdceaf2c6e22a4cb3047c1ad6d8560758b7cf66f0a9bdfd0",
+      "complete_original_paths": [
+        "src/material/button/testing/button-harness.ts"
+      ],
+      "source_review_complete": true,
+      "canonical_disposition_applied": false,
+      "executed_case_ids": [
+        "legacy-button-variant-remains-raised",
+        "legacy-button-type-and-icon-filters-remain-finite",
+        "legacy-button-text-predicate-remains-owned"
+      ],
+      "file_reviews": [
+        {
+          "path": "src/material/button/testing/button-harness.ts",
+          "before_blob": "49edebcb25ce1494440e940a7d90641a893c2c93",
+          "after_blob": "7f3ba9eacff90d701fa5b5d8039f7f1c8982f14a",
+          "scope": "Whole original source delta reviewed against the specific current public/owned API boundary described in this SHA decision."
+        }
+      ]
+    },
+    {
+      "sha": "3ef56a682fa797563d3269f18769ddceda05f760",
+      "status": "reviewed",
+      "recommended_disposition": "do-not-adopt",
+      "decision": "The one-file research-head decorator replacement requires Service, which is absent from the21.xframework public namespace. The actual21.2.14public FakeMatIconRegistry injects and keeps its font-alias behavior using the installed framework. The owned production source graph has no icon/testing delegation to port; no younger peer or Service shim is introduced.",
+      "diff_sha256": "967da3c19a9e8fc4b6f1145e52be6f02f3377d544c60b1559119bb3bf547c9ec",
+      "complete_original_paths": [
+        "src/material/icon/testing/fake-icon-registry.ts"
+      ],
+      "source_review_complete": true,
+      "canonical_disposition_applied": false,
+      "executed_case_ids": [
+        "Service-is-absent-from-advertised-framework",
+        "public-21-icon-registry-injects-without-Service",
+        "no-owned-production-icon-testing-delegation"
+      ],
+      "file_reviews": [
+        {
+          "path": "src/material/icon/testing/fake-icon-registry.ts",
+          "before_blob": "b46617f26c452645db5e1e0c77ae3228f63f24fc",
+          "after_blob": "0551cf77f8538f58f815a80d28eb52db155cace2",
+          "scope": "Whole original source delta reviewed against the specific current public/owned API boundary described in this SHA decision."
+        }
+      ]
+    }
+  ],
+  "cases": [
+    "owned-input/legacy-labelledby",
+    "owned-input/legacy-for",
+    "owned-input/modern-labelledby",
+    "owned-input/aria-label-before-for",
+    "owned-input/labelledby-before-aria-label",
+    "owned-input/missing-labelledby-does-not-fall-through",
+    "owned-input/unlabelled-does-not-use-unrelated-label",
+    "native-select-alias/legacy-labelledby",
+    "native-select-alias/legacy-for",
+    "native-select-alias/modern-labelledby",
+    "native-select-alias/aria-label-before-for",
+    "native-select-alias/labelledby-before-aria-label",
+    "native-select-alias/missing-labelledby-does-not-fall-through",
+    "native-select-alias/unlabelled-does-not-use-unrelated-label",
+    "datepicker-input-peer/legacy-labelledby",
+    "datepicker-input-peer/legacy-for",
+    "datepicker-input-peer/modern-labelledby",
+    "datepicker-input-peer/aria-label-before-for",
+    "datepicker-input-peer/labelledby-before-aria-label",
+    "datepicker-input-peer/missing-labelledby-does-not-fall-through",
+    "datepicker-input-peer/unlabelled-does-not-use-unrelated-label",
+    "date-range-peer/legacy-labelledby",
+    "date-range-peer/legacy-for",
+    "date-range-peer/modern-labelledby",
+    "date-range-peer/aria-label-before-for",
+    "date-range-peer/labelledby-before-aria-label",
+    "date-range-peer/missing-labelledby-does-not-fall-through",
+    "date-range-peer/unlabelled-does-not-use-unrelated-label",
+    "native-select-retains-public-peer-identity",
+    "owned-input-retains-current-public-parent",
+    "legacy-select-retains-finite-disabled-filter",
+    "loader-methods-are-genuine-inherited-public-members",
+    "count-content-excludes-document-sibling",
+    "document-root-loader-sees-document-sibling",
+    "content-index-0",
+    "content-index-1",
+    "content-index-2",
+    "count-respects-predicate",
+    "index-applies-to-filtered-results",
+    "empty-count",
+    "negative-index-rejects",
+    "past-end-index-rejects",
+    "empty-index-rejects",
+    "query-rejection-propagates",
+    "fresh-content-state-observed",
+    "legacy-button-variant-remains-raised",
+    "legacy-button-type-and-icon-filters-remain-finite",
+    "legacy-button-text-predicate-remains-owned",
+    "legacy-table-owned-row-harnesses",
+    "legacy-table-cell-order-and-text",
+    "legacy-table-no-new-no-data-harness-api",
+    "Service-is-absent-from-advertised-framework",
+    "public-21-icon-registry-injects-without-Service",
+    "no-owned-production-icon-testing-delegation",
+    "original-MDC-prefix-control-works-on-modern-label"
+  ],
+  "semantic_reversions_rejected": [
+    "incorrect-count",
+    "ignored-index",
+    "predicate-ignored-before-indexing",
+    "original-MDC-only-legacy-labelledby",
+    "original-MDC-only-legacy-for"
+  ],
+  "result": "pass",
+  "original_MDC_label_reversion_observations": [
+    {
+      "id": "legacy-labelledby",
+      "expected": "Legacy label",
+      "observed": null,
+      "queries": [
+        ".mdc-floating-label[id=\"legacy-label\"]"
+      ]
+    },
+    {
+      "id": "legacy-for",
+      "expected": "Legacy label",
+      "observed": null,
+      "queries": [
+        ".mdc-floating-label[for=\"control\"]"
+      ]
+    }
+  ],
+  "producer": {
+    "path": "tests/upstream_testing_api_21x_probe.mjs",
+    "sha256": "bd28485f30fca0bc1ed474d5f416732e8704308b619f2ce645ce549bb9246ee2"
+  },
+  "source_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/testing/input-harness.ts",
+      "sha256": "4c15c8613506468170e5f9302b1a25245e596a65ca8f3dd593fd9e6fc8bf5bbf"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/testing/public-api.ts",
+      "sha256": "956aad3c92347b7acbbfbb5099c6dc02963079502485c57a3148c62aef39c3f7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-button/testing/button-harness.ts",
+      "sha256": "7203027585f8baec99349e9dff57a2db62872ac6a22d3b3faac497ab8d14f001"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/testing/select-harness.ts",
+      "sha256": "0b8560eee9a4a92681772a34285cd7c1c3a64265866fb8428c6f311d9c70b80c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/testing/select-harness-base.ts",
+      "sha256": "76dd504f9744c34493c32b95311ed92047cc000974361402db7037214adeb6e7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/testing/select-harness-filters.ts",
+      "sha256": "6e511ef54dc399b79724b0be2946c13d7eabf0f475ca898728ed3f0aec4c90b6"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/table-harness.ts",
+      "sha256": "29f2989e2256f19e4652d5eaebb03c7b537cc923ce82d66bed7684555525e303"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/table-harness-base.ts",
+      "sha256": "537d249e950c6e44d4becf3e62df9e31e0c21dba6c5616ac0cb5ce7b66ee960c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/row-harness.ts",
+      "sha256": "9a3a71945411443c023d33f46ee0ee7a228e2c1308be0f5940d9bcc107e17b0f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/testing/cell-harness.ts",
+      "sha256": "5b60ba3ce6a7b814fdf26334bd8791dccaccf9499cb0b206f9fc9a3a3207658f"
+    }
+  ],
+  "actual_library_artifact": {
+    "id": "library",
+    "path": "ngx-compat-material-legacy-21.0.0-rc.0.tgz",
+    "bytes": 1138361,
+    "sha256": "b22cc5742c078ef3e61d6d1817da9f7f8e0872cd06c4190ceef73bdb40c044fc",
+    "source": {
+      "repository": "buu700/ngx-compat-material-legacy",
+      "line": "21.x",
+      "commit": "e22e54eda8c16e70a47a6de581314e1d54931748",
+      "git_tree_sha": "383bf0d1e9d15fe2edc0b456ff730df899d02caa",
+      "content_sha256": "69c727dc6325f38c277ee96fdb3c10856b1fd8b7506bf3f2bb030365c8066abe",
+      "clean": true,
+      "candidate_base_commit": "e22e54eda8c16e70a47a6de581314e1d54931748"
+    },
+    "run": {
+      "path": "/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/artifacts/21.x/cva-20261026-tab-view-v3/run.json",
+      "sha256": "656e536aabc5af0a0fde572896d8460bdf0b4e1cbc6a08d624e39cd097a5ac51"
+    }
+  },
+  "public_sdk_subject": {
+    "path": "compatibility/rc/material-remaining-caller-public-subjects.json",
+    "sha256": "676a0091788c4f133875d1b1c556a7cd0a150e31a7f8df0928d398ca1eed35c5"
+  },
+  "matched_installed_public_members": [
+    {
+      "path": "@angular/cdk/fesm2022/_a11y-module-chunk.mjs",
+      "sha256": "5cba710056d2fd8198a5cdefb19579d2c0dd7daab363867913b65d34913b2a29"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_activedescendant-key-manager-chunk.mjs",
+      "sha256": "0f307044bf6fbc2dd99b2cbbc5f2ccb56e7bc0b570ef9215fa92527e7b0af705"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_array-chunk.mjs",
+      "sha256": "a641d8d02f153d4f5d06afe2ee047e054aa4a24234237101eb60ecbcf930fe8a"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_breakpoints-observer-chunk.mjs",
+      "sha256": "68b5fe349d7bbc533d63e49fe17a05a2b49518eca42a21e00b5658cbbd1453de"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_css-pixel-value-chunk.mjs",
+      "sha256": "a30ca5bb8390b275b9755b0bb0dacc959d67166f8f7e04b050a4d05fcd8aa983"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_directionality-chunk.mjs",
+      "sha256": "eb37160785a209351f725f1e635b9a2a4e7415b02dd7f9813c913b0fca365fba"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_element-chunk.mjs",
+      "sha256": "c6873321426cc9b75d4106149027c34bf0b513da2f262997e9e02aa323ca3027"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_fake-event-detection-chunk.mjs",
+      "sha256": "c0a3ee4354b15e99157782330c2fa18e026943c189b6f3c46496b4dc400e01cf"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_focus-key-manager-chunk.mjs",
+      "sha256": "b3a2c9bfbdf59f114ab30953f388a23c82c422f6d97383e60162707208ddb72b"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_focus-monitor-chunk.mjs",
+      "sha256": "550f59c0c52dbdff92db054a5c8678cacb427aea323c78060d5a7f20b1e089a3"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_id-generator-chunk.mjs",
+      "sha256": "b230dd0785cfb872757bdb9684aebea82deda164912a0b70abf113b48795c1d8"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_keycodes-chunk.mjs",
+      "sha256": "10cf8994eb3d386a63c108ada09be71aed34e66c35fd6efbfa9fbdf2cae6a636"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_list-key-manager-chunk.mjs",
+      "sha256": "63042ad0a8264bfedfaac1c03d2b0eee450bcd7890a09792dc83256195e00057"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_passive-listeners-chunk.mjs",
+      "sha256": "7773842912be5590f727ca1fbbbc349fa71b4fb0d9d5ee125aa0ad88de9e3cbe"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_platform-chunk.mjs",
+      "sha256": "7665177cc8f2da8a68f7aa5cd37b5dfe895d60178544117215f57e0af5be249d"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_scrolling-chunk.mjs",
+      "sha256": "289d7933348deaa4bcef0144b24dff2fff2f564ac301fd4457aee0b4c615380b"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_shadow-dom-chunk.mjs",
+      "sha256": "98455cf5ae4c2fbc66b0b5b2875549e6a453df0587d536ef7b140c48a351f228"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_style-loader-chunk.mjs",
+      "sha256": "423d4039d3a176988e96eac3e909d170f186597842618fc3350d031fa4fcc357"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_test-environment-chunk.mjs",
+      "sha256": "eadc3bea0cdf6e7980d006104e62cfc857f245c3ae9b65f98f128dc8ca26af19"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_tree-key-manager-chunk.mjs",
+      "sha256": "1b5beabef89aae841c5accc47b0b07b74717a47ce8b33cfd11d7587541aaa9c9"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_typeahead-chunk.mjs",
+      "sha256": "c26eed04140a44b175020b75b3a16bf73c2913a064ae61c79dc744d5fa3e4622"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/a11y.mjs",
+      "sha256": "35ad4762a2506389b71e72c299b93f0c15d6a9c0ceb1e7834673107d8e96640d"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/bidi.mjs",
+      "sha256": "1bf07276ce79175190bc952c61a4ad096ed80e2d69e5b193cabc4aeff8784680"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/coercion-private.mjs",
+      "sha256": "0c7bbd4ea0fb0c0350dbabb8ce7a00e42aa7ca21abd9a1b9219ec48466056cd6"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/coercion.mjs",
+      "sha256": "3b338eba41f3081a81b3d2936688be6e86d0bc7456ad494198e5a02aef0cdac4"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/keycodes.mjs",
+      "sha256": "f64ba3991b14005735e51dd63e780d5eccd10ea1ae42542dbd6d24dc0189f13c"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/layout.mjs",
+      "sha256": "7eefe5dc622093ef51a80d72f12a1600867e584fee1dbd9835a3c05411474baf"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/observers.mjs",
+      "sha256": "f709af3e7a617ec0ffa95ed916683c50c777ba14f77ed4bee2e27afe75f88329"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/platform.mjs",
+      "sha256": "9fc9970c29382059a2ba57ba20237affae12202238d186912f567ded71b2ed8f"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/private.mjs",
+      "sha256": "07ab34acdf1f19f7efda77014f1ff1da32712809d54101fb641770f9b967031a"
+    },
+    {
+      "path": "@angular/cdk/package.json",
+      "sha256": "10c398ae1ae4854e4c98b3715f8e0f225e34b7773fa3c582f11d67852a003ea9"
+    },
+    {
+      "path": "@angular/cdk/types/_a11y-module-chunk.d.ts",
+      "sha256": "f3d9fbabc0d75cb1bb95e2424f1b2724fb7fcf63655b10f742d2e752ebf4b21c"
+    },
+    {
+      "path": "@angular/cdk/types/_activedescendant-key-manager-chunk.d.ts",
+      "sha256": "e8e8c7a5e36a47fa23bf5d9cf0779f639428bb4f44c7cea2c4200d5723126f4d"
+    },
+    {
+      "path": "@angular/cdk/types/_bidi-module-chunk.d.ts",
+      "sha256": "3a9323fd680c0d3d8d8fe14f8f951c1e1e1b762fea0a8de48d876f0d435e406d"
+    },
+    {
+      "path": "@angular/cdk/types/_focus-key-manager-chunk.d.ts",
+      "sha256": "9c000ba6e7fb29e1c239b9d0fa9fd1fc4debfb1cb2a4c9f9920b60ad80b040db"
+    },
+    {
+      "path": "@angular/cdk/types/_focus-monitor-chunk.d.ts",
+      "sha256": "2c6d64e38b140134b741efc821f05c10410fcb09098c0e374c93e1db0b64d1e6"
+    },
+    {
+      "path": "@angular/cdk/types/_list-key-manager-chunk.d.ts",
+      "sha256": "bae7d4bb0100dd7aa986242ad0c0d4fccd47ced046d8247619ec5addf1ccac46"
+    },
+    {
+      "path": "@angular/cdk/types/_number-property-chunk.d.ts",
+      "sha256": "dc18d006527854eccef7394cfef826eb78bf2d98952401df0b94da286f7b11c6"
+    },
+    {
+      "path": "@angular/cdk/types/_platform-chunk.d.ts",
+      "sha256": "91d9de4d3888ec1767f406307b333103aeb33469f81a8f8743ece26549f8f856"
+    },
+    {
+      "path": "@angular/cdk/types/_tree-key-manager-strategy-chunk.d.ts",
+      "sha256": "68865626693619204e5c4939bd162e4d83793af5875f2ccaa040fa9d520245f3"
+    },
+    {
+      "path": "@angular/cdk/types/a11y.d.ts",
+      "sha256": "c7cb507235c6a481ec46b581092a0855986e1c817b798221e7da56eb2e25ce16"
+    },
+    {
+      "path": "@angular/cdk/types/bidi.d.ts",
+      "sha256": "769187ce194c8dc07761a9e7d3576475e8ace31b42cbc2e2935e3a74f3e4a9b5"
+    },
+    {
+      "path": "@angular/cdk/types/observers.d.ts",
+      "sha256": "d342fefc7d087e22258016a304daa4f5aa9321d0425d3699665c4c0d3a94bcc3"
+    },
+    {
+      "path": "@angular/cdk/types/platform.d.ts",
+      "sha256": "43070746987eb03aada20e6c9999c0155e4649b7e7a317b318226d0107051496"
+    },
+    {
+      "path": "@angular/common/fesm2022/_common_module-chunk.mjs",
+      "sha256": "eecb1c4f59bf64ee898f0e31840f19ca9d98a1e726ef67e65874a745efb6d7b9"
+    },
+    {
+      "path": "@angular/common/fesm2022/_location-chunk.mjs",
+      "sha256": "84d6db6fda1164bc0a6c12f4ba79e83afe2de5c62ec34332b3ab7544aebcd121"
+    },
+    {
+      "path": "@angular/common/fesm2022/_module-chunk.mjs",
+      "sha256": "b79835574f93983b8b260f3366a17ca973ad048434b2baf17bbb80c4afd1c5d6"
+    },
+    {
+      "path": "@angular/common/fesm2022/_platform_location-chunk.mjs",
+      "sha256": "866fbb5f44197c78bc4f048eb76a4b6c40b08110c071faf75a460bbf1b2fa789"
+    },
+    {
+      "path": "@angular/common/fesm2022/_platform_navigation-chunk.mjs",
+      "sha256": "fc19ea88dbe761f7e4837572ca7f53889020443946579db9bb4793434fdf7b3f"
+    },
+    {
+      "path": "@angular/common/fesm2022/_xhr-chunk.mjs",
+      "sha256": "9b9974e8187de6fa93edf91d2465e510541d821e57bb7bedd33bede829c205a0"
+    },
+    {
+      "path": "@angular/common/fesm2022/common.mjs",
+      "sha256": "35af04be29500a281a1dbc9ebbbb0b4214cc517733b1d266a0e22cd13dadd6dd"
+    },
+    {
+      "path": "@angular/common/fesm2022/http.mjs",
+      "sha256": "d734e5c26a8ae0af4351dbff10a56887fd5b140afe4c3e87777b50fc7cf8fce7"
+    },
+    {
+      "path": "@angular/common/package.json",
+      "sha256": "e6cec5053d020932707947e9053ff83792474583e4e3316bd2a565bda5c95835"
+    },
+    {
+      "path": "@angular/common/types/_common_module-chunk.d.ts",
+      "sha256": "bb0dd2569eddacff22fda2080461539488ba111acfd864ac7b4733873b231067"
+    },
+    {
+      "path": "@angular/common/types/_module-chunk.d.ts",
+      "sha256": "baff2af46f163ecdfce5888b7a120f947c91e5b6c157c4bf9aa116a9cea46e9a"
+    },
+    {
+      "path": "@angular/common/types/_platform_location-chunk.d.ts",
+      "sha256": "9b482c16f4216edc39a6b05da721f0a89ac4ee248f0350c33bd8160bbc6b459e"
+    },
+    {
+      "path": "@angular/common/types/_xhr-chunk.d.ts",
+      "sha256": "eefb5a4dfd331979cb301b9d8908033fa88e05d155b0ffa207ee0071c84091bf"
+    },
+    {
+      "path": "@angular/common/types/common.d.ts",
+      "sha256": "d6680b33c3ca62ac828fae356ba2c16df07f5fac2d6d3a47406fc56bfd9d170c"
+    },
+    {
+      "path": "@angular/common/types/http.d.ts",
+      "sha256": "c86606500cf593fd9dd5e13d2c9b9de44ef7156305e23bd4c0037fc08c43a47a"
+    },
+    {
+      "path": "@angular/compiler/fesm2022/compiler.mjs",
+      "sha256": "8854dfbb775394f1ab188ee7872a6acfc7ecd9efe17bb99b22f0f12d0f451030"
+    },
+    {
+      "path": "@angular/compiler/package.json",
+      "sha256": "c709f61e560072dc56d543a6fd113aa8cd0adc1cada18bd60605722aeb30c8dd"
+    },
+    {
+      "path": "@angular/compiler/types/compiler.d.ts",
+      "sha256": "219dfc2f0b35960385b89c87513a8763a35abb5c8c2fd67cb088e7cb10c66352"
+    },
+    {
+      "path": "@angular/core/fesm2022/_attribute-chunk.mjs",
+      "sha256": "79d3fe049f738d098822ee450f377528282f5117b68f4dcdcd4f3fc8018bdc6a"
+    },
+    {
+      "path": "@angular/core/fesm2022/_debug_node-chunk.mjs",
+      "sha256": "989c2736c705135d8ec0bf60f6ed8be93f769cac8b6c77626bc3685ad4df09f7"
+    },
+    {
+      "path": "@angular/core/fesm2022/_effect-chunk.mjs",
+      "sha256": "69d5e9b5350c6f4ddc334f488189d05a6a8ebed5f1cc138de524a44590f9f901"
+    },
+    {
+      "path": "@angular/core/fesm2022/_effect-chunk2.mjs",
+      "sha256": "7f0451bc3f7cea99de98a6b3635b3d8102b49825f0163faee5568c52330cb8b0"
+    },
+    {
+      "path": "@angular/core/fesm2022/_not_found-chunk.mjs",
+      "sha256": "4fabbb4e70bf6c92512d512f038ca40ebea7277a2a81f0c2b52848649bb2d662"
+    },
+    {
+      "path": "@angular/core/fesm2022/_resource-chunk.mjs",
+      "sha256": "49589143f3b8e24a57737091c8853bc3414a0d8d93ecdcc0a194c0388c92f7f4"
+    },
+    {
+      "path": "@angular/core/fesm2022/_untracked-chunk.mjs",
+      "sha256": "30e004601f5ef9f155c04a98ad7a8383ecb91ded94415e98085aaa805351a134"
+    },
+    {
+      "path": "@angular/core/fesm2022/_weak_ref-chunk.mjs",
+      "sha256": "23889d0c602010fafeaa26a6400a19d41bf6c086deaf2b6ff81171108096ff05"
+    },
+    {
+      "path": "@angular/core/fesm2022/core.mjs",
+      "sha256": "20749b4e23941479caf068878eb3ce7828609ec6c0734b6020b182dd632c2ab7"
+    },
+    {
+      "path": "@angular/core/fesm2022/primitives-di.mjs",
+      "sha256": "02a7953666fdd31408e36a802c91e6557b94763cfccbb10b032664aeda4c272c"
+    },
+    {
+      "path": "@angular/core/fesm2022/primitives-event-dispatch.mjs",
+      "sha256": "f62297aaa9ece59a3a21eea053a937c637a04f1985d4eb5bb0aa05a8c5ebe74e"
+    },
+    {
+      "path": "@angular/core/fesm2022/primitives-signals.mjs",
+      "sha256": "9f5d39db1564a1cc493fa23aae6d66fd702a60085014b5a2e72596cb4ab533c6"
+    },
+    {
+      "path": "@angular/core/package.json",
+      "sha256": "138e466e558dfb07101223dd71e46db11e5ae49c29a8906bd7dae49b9ce34970"
+    },
+    {
+      "path": "@angular/core/types/_api-chunk.d.ts",
+      "sha256": "5b5e6f430f3c30dae2c79590c282037a5d1833c40e7da4e6b872867f2d023c72"
+    },
+    {
+      "path": "@angular/core/types/_chrome_dev_tools_performance-chunk.d.ts",
+      "sha256": "3cb3136229287079f3debe572c0370c9eb734b12a9296d6d34c8f3f1e34d8e5a"
+    },
+    {
+      "path": "@angular/core/types/_discovery-chunk.d.ts",
+      "sha256": "779438592d99f241f4f0c961f3973595d4473883630b81c5b19b5d1b79329211"
+    },
+    {
+      "path": "@angular/core/types/_effect-chunk.d.ts",
+      "sha256": "40c3d843286f49ec0a09f318040f405daa491544393663c805e7effdef43cb8a"
+    },
+    {
+      "path": "@angular/core/types/_event_dispatcher-chunk.d.ts",
+      "sha256": "856f988afc02ef9eca840b4c861deed4215afcd4f3d4db7f38e853383f85faa6"
+    },
+    {
+      "path": "@angular/core/types/_formatter-chunk.d.ts",
+      "sha256": "f78276e340ff759b80eeca703c8585fc07ea449bdd5cb90fb2a367caf176c7b1"
+    },
+    {
+      "path": "@angular/core/types/_weak_ref-chunk.d.ts",
+      "sha256": "f29c704e83c816f2609a1dadb2d3ffb30c1c715851dad5ec6a6124e1a53f6eef"
+    },
+    {
+      "path": "@angular/core/types/core.d.ts",
+      "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+    },
+    {
+      "path": "@angular/core/types/primitives-di.d.ts",
+      "sha256": "14532a95a43809fe2037c732130afed278735e25700a9043a16b614fd5271bf9"
+    },
+    {
+      "path": "@angular/forms/fesm2022/forms.mjs",
+      "sha256": "e84cfa319abb808454db69d0a3640dc9c078c7c362e285b1768c2b828301a9d3"
+    },
+    {
+      "path": "@angular/forms/package.json",
+      "sha256": "89b34a2782ff53f59367e425a103b8f35609e31ac444fb4f74e226325277f7f8"
+    },
+    {
+      "path": "@angular/forms/types/forms.d.ts",
+      "sha256": "70767262291520ecd0981af1b2fca9030af76919507e873be1171614edf175b4"
+    },
+    {
+      "path": "@angular/material/fesm2022/_animation-chunk.mjs",
+      "sha256": "aee503778d1b8828786122a1a322d53115159461ef0a96b09a84d87bdb36b37e"
+    },
+    {
+      "path": "@angular/material/fesm2022/_date-formats-chunk.mjs",
+      "sha256": "972df8ecfd7159f6c070f9cc172dd519ff2a5f90da9917c5391ff7d0eba8b420"
+    },
+    {
+      "path": "@angular/material/fesm2022/_error-options-chunk.mjs",
+      "sha256": "8814eaa2ad882c36ec092474598d396767fbacab8ab58e2db7a9084083b6a465"
+    },
+    {
+      "path": "@angular/material/fesm2022/_error-state-chunk.mjs",
+      "sha256": "e017e9409fdf0075a838affb5f3eaf205c0984c17edc7f250b0bce61dea27397"
+    },
+    {
+      "path": "@angular/material/fesm2022/_internal-form-field-chunk.mjs",
+      "sha256": "7c6b2f92b73a4bdd033852e5f04a9f060fd90615c241418c0f9bf78ea7fa911a"
+    },
+    {
+      "path": "@angular/material/fesm2022/_line-chunk.mjs",
+      "sha256": "148705c4330f4c17146219056f141585fd35125f1b29a9f833477658b89dd428"
+    },
+    {
+      "path": "@angular/material/fesm2022/_option-chunk.mjs",
+      "sha256": "afdf728ee1fc6ee97d2264c81b2d154eb6826784fcd5707c7933e353e7c4223f"
+    },
+    {
+      "path": "@angular/material/fesm2022/_option-module-chunk.mjs",
+      "sha256": "9bbeddfdf66521cde43a84a55286ad23feba44a9a24058275989e86aa17055a6"
+    },
+    {
+      "path": "@angular/material/fesm2022/_pseudo-checkbox-chunk.mjs",
+      "sha256": "fd2d9ad0a8de0278ad3ec0ff572b0ad9c57ed17f494bae3e7428b84750578ccc"
+    },
+    {
+      "path": "@angular/material/fesm2022/_pseudo-checkbox-module-chunk.mjs",
+      "sha256": "fec1a89e767b2b20851d332ea21cecf8a7a4923e080623b2c58acc9fc78a53f8"
+    },
+    {
+      "path": "@angular/material/fesm2022/_ripple-chunk.mjs",
+      "sha256": "37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3"
+    },
+    {
+      "path": "@angular/material/fesm2022/_ripple-loader-chunk.mjs",
+      "sha256": "2900165a8cee721934e2f380703edafedeaa2e8fdd6c1300264688f46f619007"
+    },
+    {
+      "path": "@angular/material/fesm2022/_ripple-module-chunk.mjs",
+      "sha256": "6eca5998352027d3c367f8e22c8cdeeeb32586d6032f46eb62f3a8806859a313"
+    },
+    {
+      "path": "@angular/material/fesm2022/_structural-styles-chunk.mjs",
+      "sha256": "9e2a9a431f7bac193c4622078784b3c7430087bfd255674231494de91eea6f55"
+    },
+    {
+      "path": "@angular/material/fesm2022/core.mjs",
+      "sha256": "af1db9de63ad6c2953f211b34af25568aab1efccad253725621b63a2210488f0"
+    },
+    {
+      "path": "@angular/material/package.json",
+      "sha256": "26af34e77987b55564689c8eb7b5352db661d6a737fdec2160417ae42114f355"
+    },
+    {
+      "path": "@angular/material/types/_date-adapter-chunk.d.ts",
+      "sha256": "c26488d6d035eff810237dce38f59230e1d55b815c8cf93f79a6b7b60fd4f28a"
+    },
+    {
+      "path": "@angular/material/types/_error-options-chunk.d.ts",
+      "sha256": "8b6557cf8ea0e54c5fd8d26cdb909adb0e56e606342e1b3bae08e35b3892d332"
+    },
+    {
+      "path": "@angular/material/types/_line-chunk.d.ts",
+      "sha256": "a6896829051614ef17cc326e25421d58b04db871ed7697d7160961d1066e7b96"
+    },
+    {
+      "path": "@angular/material/types/_option-chunk.d.ts",
+      "sha256": "f040fc03fd40d432eaec6ba8ebdd39594a82543b9be06bf83582f48c3935e656"
+    },
+    {
+      "path": "@angular/material/types/_option-module-chunk.d.ts",
+      "sha256": "3580786d2d08328fbced2b19245df4f0681ade6288d2e9ae3fa3a32194d4cd27"
+    },
+    {
+      "path": "@angular/material/types/_option-parent-chunk.d.ts",
+      "sha256": "2d556a8c6c6207c39898112411a8e33d752ed65a0f61633549a677624f584259"
+    },
+    {
+      "path": "@angular/material/types/_palette-chunk.d.ts",
+      "sha256": "9b81bb792ae111bfe0e15bea0c137743ab5aca49ebb60575690e2dbc8c6142a9"
+    },
+    {
+      "path": "@angular/material/types/_pseudo-checkbox-module-chunk.d.ts",
+      "sha256": "829e6a18c039f147b393ecf7df4175683eb71649dab2d906928522a58d9b18c5"
+    },
+    {
+      "path": "@angular/material/types/_ripple-chunk.d.ts",
+      "sha256": "52a81cf0861109277d49c155326565114a31400764e11085b7a26c130b8cf979"
+    },
+    {
+      "path": "@angular/material/types/_ripple-loader-chunk.d.ts",
+      "sha256": "414cf5a4a3eb68a9de5d25cd65fab2dec3518d002d5e5ed283ab45dbb90213b1"
+    },
+    {
+      "path": "@angular/material/types/_ripple-module-chunk.d.ts",
+      "sha256": "fa7a8705570edce45f7274ba1ed7f4bec8b93389007a8cf923ce9b93443f0210"
+    },
+    {
+      "path": "@angular/material/types/core.d.ts",
+      "sha256": "e69eba12b87eaae09de70629e0637fc9b07751a7fb4493dac9d7e3cf0ed21964"
+    },
+    {
+      "path": "@angular/platform-browser/fesm2022/_browser-chunk.mjs",
+      "sha256": "6ee3c64d6374572242039c454196603de104baf7a41fddfd0058f5f1b405a394"
+    },
+    {
+      "path": "@angular/platform-browser/fesm2022/_dom_renderer-chunk.mjs",
+      "sha256": "361b995fe93ab1b46442e33b691ca0c774d12637f51970275fbeca85b74f22b1"
+    },
+    {
+      "path": "@angular/platform-browser/fesm2022/platform-browser.mjs",
+      "sha256": "4b3a893b8288ddf33d23915730703af6177dc6e4cd9f4a06e2ed276e77ecda4a"
+    },
+    {
+      "path": "@angular/platform-browser/package.json",
+      "sha256": "f6522bf751926d8d029cb27b7ee0d6c74d0ca66ce082dfff72c37a5b959e79ee"
+    },
+    {
+      "path": "@angular/platform-browser/types/_browser-chunk.d.ts",
+      "sha256": "cb4d2b08907e9795c95305a9e8e059bad737e5e19a6f925d84658419e2ceb420"
+    },
+    {
+      "path": "@angular/platform-browser/types/platform-browser.d.ts",
+      "sha256": "62a127264597c37b6cd7e8ceee26c690a05c88c632669f566a18fb3b23eb6ea1"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_data-source-chunk.mjs",
+      "sha256": "31d219c893ebad02623af3fbbd63cb9474de9d165d2936f07f9e9bb91ae4780f"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_recycle-view-repeater-strategy-chunk.mjs",
+      "sha256": "b203e04cedb6c811df181722f22039f8a7cc28faeb6b264b923b0289eb2b88be"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/cdk.mjs",
+      "sha256": "d522461a02401be9aeb866523072c9ad752a62b807a1cb1f4cce9040673bdc3d"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/scrolling.mjs",
+      "sha256": "428a621b7e9478fa285305abfc9902f51c6a6d2af60de2bf6e1dfefe590c9a25"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/text-field.mjs",
+      "sha256": "a82646e804c64a2b4744cb95dcfda2fcab20107dbb59c0c7e37537eb3fd2a013"
+    },
+    {
+      "path": "@angular/cdk/types/_data-source-chunk.d.ts",
+      "sha256": "581228c64dea7a741cd82cc867dbc74aaf333f00a415a542c94f32904ca40737"
+    },
+    {
+      "path": "@angular/cdk/types/_scrolling-module-chunk.d.ts",
+      "sha256": "e4aeb44b011913d186f8ebfe4bdfe20880ae4125d0628991e973d2d6ea29c506"
+    },
+    {
+      "path": "@angular/cdk/types/cdk.d.ts",
+      "sha256": "bbb6af2f0cdd6b2ad93ab0b9f7348eed66deefb1179d8c3502e8af4ac6002731"
+    },
+    {
+      "path": "@angular/cdk/types/layout.d.ts",
+      "sha256": "2892d958f77727422289973e1c66f56cd18b8954dd41ad5c60b5a36553d0b5a6"
+    },
+    {
+      "path": "@angular/cdk/types/scrolling.d.ts",
+      "sha256": "3c1a2af7d34c2d2cd6760d8d4b574fa4ecc40bab8c6e10bc0e804287259ed340"
+    },
+    {
+      "path": "@angular/cdk/types/text-field.d.ts",
+      "sha256": "9ee6332f8bd80db350670c9c51355efe919fc57b831b0dc6bc953203d32cd9a9"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_overlay-module-chunk.mjs",
+      "sha256": "16d7e3baa590f2ed9c355b7cc3e87882ee517716cba3a7ea6a95eb0c88231627"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/overlay.mjs",
+      "sha256": "9d990ad921af8a7652f43a04fa9e521e6ad4f55233a96ae0911c049b09f1513b"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/portal.mjs",
+      "sha256": "37767877fc3b85878dca37759d0205baa672370ea7e89622bfc76df60ea0049a"
+    },
+    {
+      "path": "@angular/cdk/types/_overlay-module-chunk.d.ts",
+      "sha256": "7d89742d60a006d1ccf044a451c774f6baf4f54f41b61c7f309346b9ce84f6cf"
+    },
+    {
+      "path": "@angular/cdk/types/_portal-directives-chunk.d.ts",
+      "sha256": "8bf59f01d49417cba2bb4b8eba6ba9a03f33976950bc369865070d17be684cb7"
+    },
+    {
+      "path": "@angular/cdk/types/_style-loader-chunk.d.ts",
+      "sha256": "184aeb5eaa3d273414cec3371de4bf250e9a0118f7f993a3b7073367d7f04d2b"
+    },
+    {
+      "path": "@angular/cdk/types/overlay.d.ts",
+      "sha256": "e15e46ec3d671453aa3be897938cf04b0c29dbdd20480def6d57ebfae53c2499"
+    },
+    {
+      "path": "@angular/cdk/types/coercion.d.ts",
+      "sha256": "1aa6bcf3982760e6fb605975f64b28374b608256baf9c0730140a3697de1a4c9"
+    },
+    {
+      "path": "@angular/cdk/types/keycodes.d.ts",
+      "sha256": "351a9bd10d8ff460f6dc4b5c459a4c6d8b98d5f0792e4d0b47e9ef123a4be950"
+    },
+    {
+      "path": "@angular/cdk/types/portal.d.ts",
+      "sha256": "17f59b700249a0ee761c3ac50d34415c7118eba48e26b8928e87d530fc4a4a64"
+    },
+    {
+      "path": "@angular/material/types/_form-field-control-chunk.d.ts",
+      "sha256": "2be93d05a1ab4c451e32b558313a34f85b75924bac07ad77bf6858ee251c9a60"
+    },
+    {
+      "path": "@angular/material/types/_form-field-chunk.d.ts",
+      "sha256": "0c3cb3e518cd6e0518ee876d80b25bc16d98c554e0b66cc923c0eebff93eb72f"
+    },
+    {
+      "path": "@angular/material/types/_form-field-module-chunk.d.ts",
+      "sha256": "d29a8ab31478f2d54f5132f5884ababbcc0a52018893c6542ecf0c39e445e735"
+    },
+    {
+      "path": "@angular/material/types/form-field.d.ts",
+      "sha256": "9e043a5eaf125805f291d49fe9dc3e22bb30633ed8282b3149b68b968c1bc068"
+    },
+    {
+      "path": "@angular/material/types/autocomplete.d.ts",
+      "sha256": "c894bd0a34daad8b7c1125c13ee6a1b813c7105a231e820de5743819e559b9ea"
+    },
+    {
+      "path": "@angular/cdk/types/dialog.d.ts",
+      "sha256": "5d9ab0026ebe92d3607fecb58df3721106f8c63534f2601fc3c387c2e2245d97"
+    },
+    {
+      "path": "@angular/material/types/_dialog-chunk.d.ts",
+      "sha256": "5b7d310181e68e89fbdf0d8bfec48151cb5802098c08921fed6e059b406a30e6"
+    },
+    {
+      "path": "@angular/material/types/dialog.d.ts",
+      "sha256": "e20a8e842751f98edc376a94b030dd104788bf56a48eaeaba224250f9cd5ed0f"
+    },
+    {
+      "path": "@angular/material/types/menu.d.ts",
+      "sha256": "7789c2ffbc33fe9e0c656a6808a4e325c6a9c3f597c5348738c877d39a04a6a1"
+    },
+    {
+      "path": "@angular/cdk/types/_view-repeater-chunk.d.ts",
+      "sha256": "e96c88c22a213451ae8c5ad9c283539e2c43f48557092c0cbfe8a019d0890df0"
+    },
+    {
+      "path": "@angular/cdk/types/_selection-model-chunk.d.ts",
+      "sha256": "0e4b16f47b470e8fbfa8d48d3f2edcee1265f892dc6fbf2d1753277a359f22c0"
+    },
+    {
+      "path": "@angular/cdk/types/_unique-selection-dispatcher-chunk.d.ts",
+      "sha256": "25067a844ad4063c1a5dddb8f431102ec63416ccd137a8729dbddf4670409a99"
+    },
+    {
+      "path": "@angular/cdk/types/collections.d.ts",
+      "sha256": "19bbd91064ebe0469f554155572a0b4bb4713ad7cafbc0af9d31cbafdbf223bb"
+    },
+    {
+      "path": "@angular/material/types/select.d.ts",
+      "sha256": "206ca46926d97eb8be9a35dc9071e1d35211aefb434fb909a96d6e9a2ab67816"
+    },
+    {
+      "path": "@angular/material/types/button.d.ts",
+      "sha256": "d34e1c365ca24b628fb9f183d49fe220a41241cd1cf0f5746bf9b44b3327ca67"
+    },
+    {
+      "path": "@angular/material/types/snack-bar.d.ts",
+      "sha256": "7117a2a5ac866f0ee8863f136bddf1ca8715118af410cb108ed4dcc57b3bb6bd"
+    },
+    {
+      "path": "@angular/material/types/tooltip.d.ts",
+      "sha256": "1f65962e27d83fc913b3513d26a6db0696447356428c051348ef6e171153872f"
+    },
+    {
+      "path": "@angular/material/fesm2022/tabs.mjs",
+      "sha256": "5a798a54a86a966501288531be98f12338b28463543324c2b16e9756b64b418d"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/observers-private.mjs",
+      "sha256": "e9d07068ea572e70702c7a910469898c125b5bd4420c20a21a448759eae82e35"
+    },
+    {
+      "path": "@angular/material/types/tabs.d.ts",
+      "sha256": "d63d56688e24118bb38d0f224248c59f0330a60df3fe457a068a9842eb9616fd"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/collections.mjs",
+      "sha256": "6606304e6fdfb161997bb3835f2f01b132cc9d8776c6ab941aa6495629fe5624"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_selection-model-chunk.mjs",
+      "sha256": "36ed728fa1e79dd86575355ad67999670629c4f649fdb3552488f4998de3be44"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_unique-selection-dispatcher-chunk.mjs",
+      "sha256": "899e598f88cbee664aae65cd0a18e64f4f6189651ec754a4cddfa0fc54207925"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/_dispose-view-repeater-strategy-chunk.mjs",
+      "sha256": "abdfe679ed7fc91cb4495428e82a8ad329bceca2766d9f5ecc6c5fb77dab2679"
+    },
+    {
+      "path": "@angular/material/fesm2022/autocomplete.mjs",
+      "sha256": "3e08a3b74dfe3d1b5566e5ccf6071ba508d255ad75826fd16a2e4253794a61c3"
+    },
+    {
+      "path": "@angular/material/fesm2022/_form-field-chunk.mjs",
+      "sha256": "1981af655b978abbf4deab909488ced158784242564d5f3709bf6d3de285bc39"
+    },
+    {
+      "path": "@angular/material/fesm2022/checkbox.mjs",
+      "sha256": "159fb481b1016432c567cc8fce5a2adcdd69bce002f86fb0863a2186c037c9e3"
+    },
+    {
+      "path": "@angular/material/fesm2022/divider.mjs",
+      "sha256": "1ed0838b8db8752bad6ab98c05905e6a39f540a1594b273b2a27fb646780f7ca"
+    },
+    {
+      "path": "@angular/material/fesm2022/form-field.mjs",
+      "sha256": "a0c57f639b60928028f82ae866d3901dae0eadaddfd32fa8ae650813bca5d991"
+    },
+    {
+      "path": "@angular/material/fesm2022/list.mjs",
+      "sha256": "0b3a229ff72913d953af65a4c345c1ff5e1608f04d114b1a9a07308cd76aa42e"
+    },
+    {
+      "path": "@angular/material/fesm2022/paginator.mjs",
+      "sha256": "91d1ff9b2788926721fd3c307244827e5c1ca04084118c3d7244e36cd93a67d3"
+    },
+    {
+      "path": "@angular/material/fesm2022/select.mjs",
+      "sha256": "232446055bcef61e7427e3ed9a0e7f2c25916bdb16fd2ffa59297491767305cf"
+    },
+    {
+      "path": "@angular/material/fesm2022/_icon-button-chunk.mjs",
+      "sha256": "11862a6910148074bec6e8638027e3d884c1a07dacfd1bbae2a62ab4ca1ff39b"
+    },
+    {
+      "path": "@angular/material/fesm2022/_tooltip-chunk.mjs",
+      "sha256": "df3cbb5bd321356ed2ddf1951ff54d9367fd2141b0f941169f43d3564300dd8c"
+    },
+    {
+      "path": "@angular/material/fesm2022/tooltip.mjs",
+      "sha256": "72df56ea58123073b778122564fa0525a45b80dbc5ed3d4b814a5c6829669d20"
+    },
+    {
+      "path": "@angular/material/fesm2022/button.mjs",
+      "sha256": "d01b67ba6511d83765f9b12682b4e709e5289440968b0c6aea02e3d5f1b01a56"
+    },
+    {
+      "path": "@angular/material/fesm2022/progress-bar.mjs",
+      "sha256": "063373f35264b6dd4201878cbf0bfb11b684808ce326d4ad0977d2fc09ac9b08"
+    },
+    {
+      "path": "@angular/material/fesm2022/progress-spinner.mjs",
+      "sha256": "49633d81efc53e5b2e7e21ce9a5e3348c3c38b6609cc699bfa64b28982b25398"
+    },
+    {
+      "path": "@angular/material/fesm2022/radio.mjs",
+      "sha256": "0e2fc87427d9a4e90fb179582892d0bca52b4ad4f8f70620f55ed85fde7df4b1"
+    },
+    {
+      "path": "@angular/material/fesm2022/snack-bar.mjs",
+      "sha256": "2c5d78a32e101a37d3f99592409e436f45fe99a964fd349038be8223a931ee60"
+    },
+    {
+      "path": "@angular/material/types/checkbox.d.ts",
+      "sha256": "b6216cb4611de94b3fccbffff8be4843707812a951a65f25b2e3de330d2e8e85"
+    },
+    {
+      "path": "@angular/material/types/divider.d.ts",
+      "sha256": "defbb557528db59de45c1e5c90fa47e5de5e6b04aab3b478ee88cb45076a6165"
+    },
+    {
+      "path": "@angular/material/types/list.d.ts",
+      "sha256": "7c2477ca5e2145f622a4dd9ac891b66c623ffcd3030be0fe53899fa4e033ac37"
+    },
+    {
+      "path": "@angular/material/types/_list-option-types-chunk.d.ts",
+      "sha256": "fc17b0a42163ea104c2fc6ea4fc8194f8b896879824701b69cee4ec3525e14b3"
+    },
+    {
+      "path": "@angular/material/types/paginator.d.ts",
+      "sha256": "5d5830c9bc41e7585cf17c016a75d1b440815ac25256fc2e2357b5fae1d8c946"
+    },
+    {
+      "path": "@angular/material/types/_paginator-chunk.d.ts",
+      "sha256": "2fa432c09259f65c1980b81facec85a09e6a3e1c4ba7dec054820c4cf28287ea"
+    },
+    {
+      "path": "@angular/material/types/progress-bar.d.ts",
+      "sha256": "d627ae7dcb40a918272ec74b252a04320938102ea1475e962f060c0a3e3a86f8"
+    },
+    {
+      "path": "@angular/material/types/progress-spinner.d.ts",
+      "sha256": "7b2dbb9b9d3c879fb511fac640eeef56a97d1e743d03b664f2280b8007394024"
+    },
+    {
+      "path": "@angular/material/types/_progress-spinner-chunk.d.ts",
+      "sha256": "84512981818e092f0b8c8a9405e227c626828b3856bc5271727f02a6f4626c4f"
+    },
+    {
+      "path": "@angular/material/types/radio.d.ts",
+      "sha256": "3364c7a86ff2c69922e4008b4f470b764a528d2d7161903585049d8028c7aca8"
+    },
+    {
+      "path": "@angular/material/fesm2022/input.mjs",
+      "sha256": "e3f222c4479da02355034e7ca5cfab601591ba11fc2319879bc8358d4bc1572a"
+    },
+    {
+      "path": "@angular/material/fesm2022/_input-value-accessor-chunk.mjs",
+      "sha256": "eb1f063049f0fed33e2a6728ae71dd104d5df5a5eb40c6ff6cfa7f24bedd78b4"
+    },
+    {
+      "path": "@angular/material/fesm2022/divider-testing.mjs",
+      "sha256": "080f18ef891844973e052415920c560f9b397d8beda9bfc286459743c09c86d5"
+    },
+    {
+      "path": "@angular/cdk/fesm2022/testing.mjs",
+      "sha256": "8ca7d8ee9d0cc39d013e496d764976301445e8ab8a37a07ffeb56977d03aae20"
+    },
+    {
+      "path": "@angular/material/fesm2022/datepicker-testing.mjs",
+      "sha256": "6d4de07d961ddd0cc1fe37a5cf12be28a800a929c07c6b2b781468af8f156022"
+    },
+    {
+      "path": "@angular/material/fesm2022/_date-range-input-harness-chunk.mjs",
+      "sha256": "b0fe69a07a00d50a7427d3fcd018ea13f55ebdb27577bc11f7b455f62ab76765"
+    },
+    {
+      "path": "@angular/material/fesm2022/form-field-testing-control.mjs",
+      "sha256": "c802b790585dbc15a111b6e4d87fc303c3a6fd1e03410ce6cde7a302ec735b00"
+    },
+    {
+      "path": "@angular/material/fesm2022/form-field-testing.mjs",
+      "sha256": "569adbba123e55a994c21c17a6b64c1b612967dd771e1b723f20a40ecc0fab02"
+    },
+    {
+      "path": "@angular/material/fesm2022/_input-harness-chunk.mjs",
+      "sha256": "2c448a5c751a6a718bc95e929f2cb22b11afbd4a0b22f5cce0edde4571d58074"
+    },
+    {
+      "path": "@angular/material/fesm2022/select-testing.mjs",
+      "sha256": "83e5d9efb4db0e70f883ea48e5fbea95507389298b6eba74bf70473e433ec415"
+    },
+    {
+      "path": "@angular/material/fesm2022/core-testing.mjs",
+      "sha256": "93ca38b6c9eab024a8a882dc6a4687426d0b793e303be439a2e7658c263d7987"
+    },
+    {
+      "path": "@angular/material/fesm2022/_option-harness-chunk.mjs",
+      "sha256": "03c5f347b85469dd1739ee4031dc97612e74702a2d367cb087a2000d092133a2"
+    },
+    {
+      "path": "@angular/material/fesm2022/input-testing.mjs",
+      "sha256": "480aa46145aedd4578fa5936769675faa6b7037d00908d763558e85582217528"
+    },
+    {
+      "path": "@angular/material/types/input.d.ts",
+      "sha256": "3cec16ce3ea1249bd90f56a5b4dcc035a3e8aa0872ff2ce77915674846a343ff"
+    },
+    {
+      "path": "@angular/material/types/divider-testing.d.ts",
+      "sha256": "a36792709fa8bf35630bdea8a58c311e11a849bed065744054d46f6f04102fd5"
+    },
+    {
+      "path": "@angular/cdk/types/testing.d.ts",
+      "sha256": "9b9743743438ba738b572c9509e3d9ad1a73f5737b8d02df364df7467ba20999"
+    },
+    {
+      "path": "@angular/cdk/types/_harness-environment-chunk.d.ts",
+      "sha256": "172797ca065617b3e72736fd19fcdc386a81a5b3867104ceb64c66e8594fac1d"
+    },
+    {
+      "path": "@angular/material/types/datepicker-testing.d.ts",
+      "sha256": "5869d85346e91bb92734f02e78ae3a8ba4a8525b59b9f6a73290eec166f24c5e"
+    },
+    {
+      "path": "@angular/material/types/_date-range-input-harness-chunk.d.ts",
+      "sha256": "60dec28c236caa9e804314f9a5a84710794e030468888ba35faa9dd9429944a7"
+    },
+    {
+      "path": "@angular/material/types/form-field-testing-control.d.ts",
+      "sha256": "0c8f58a435cc1613c313271ffd749ca2e157d21521e248e355e7ae6f2ab8a725"
+    },
+    {
+      "path": "@angular/material/types/_form-field-control-harness-chunk.d.ts",
+      "sha256": "696d1aecfb8f71a055bb969ddce9432e8dbcb0b0973c7fbd10de6f5d3b00481c"
+    },
+    {
+      "path": "@angular/material/types/form-field-testing.d.ts",
+      "sha256": "a5e98005062b8ef2be2e5c014353f65bbb28ad723512d7d521ef4829cfdd261a"
+    },
+    {
+      "path": "@angular/material/types/_input-harness-chunk.d.ts",
+      "sha256": "9ab8a6b92f3fc3260c536cd30ffa8cfa09ea4d5b110d5e00d39d0433a3534df0"
+    },
+    {
+      "path": "@angular/material/types/select-testing.d.ts",
+      "sha256": "56a7c1661a5b006bc4cf54d97e64a1a9736f48bec32f610b03b16cb8e96a8f5e"
+    },
+    {
+      "path": "@angular/material/types/core-testing.d.ts",
+      "sha256": "6a301dcc2efae3ef53b777875dc0faea34c7e4dd5f0655395c37f24633c7bf5e"
+    },
+    {
+      "path": "@angular/material/types/_option-harness-chunk.d.ts",
+      "sha256": "33238f658fac017b60969d34d911abecbdd9c8b420fbbf0d413a4b2f31ede944"
+    },
+    {
+      "path": "@angular/material/types/input-testing.d.ts",
+      "sha256": "ce4ab625a0b9516a5bff10113b1ae8fe0fccdbd9009385fc273c5bee91372fb5"
+    }
+  ],
+  "public_stable_declarations": [
+    {
+      "name": "HarnessEnvironment",
+      "methods": [
+        "getHarnessAtIndex",
+        "countHarnesses",
+        "getDocumentRoot",
+        "createTestElement",
+        "createEnvironment",
+        "getAllRawElements"
+      ],
+      "path": "@angular/cdk/types/_harness-environment-chunk.d.ts",
+      "sha256": "172797ca065617b3e72736fd19fcdc386a81a5b3867104ceb64c66e8594fac1d",
+      "stable": true
+    },
+    {
+      "name": "ContentContainerComponentHarness",
+      "methods": [
+        "getHarnessAtIndex",
+        "countHarnesses"
+      ],
+      "path": "@angular/cdk/types/_harness-environment-chunk.d.ts",
+      "sha256": "172797ca065617b3e72736fd19fcdc386a81a5b3867104ceb64c66e8594fac1d",
+      "stable": true
+    },
+    {
+      "name": "MatFormFieldControlHarnessBase",
+      "methods": [
+        "getLabel"
+      ],
+      "path": "@angular/material/types/_form-field-control-harness-chunk.d.ts",
+      "sha256": "696d1aecfb8f71a055bb969ddce9432e8dbcb0b0973c7fbd10de6f5d3b00481c",
+      "stable": true
+    },
+    {
+      "name": "FakeMatIconRegistry",
+      "methods": [
+        "registerFontClassAlias",
+        "classNameForFontAlias",
+        "getDefaultFontSetClass"
+      ],
+      "path": "@angular/material/types/icon-testing.d.ts",
+      "sha256": "b3590014efe6d0da8becf62d96d81b306dd5907f88f18ca74d06f18238f2e6f0",
+      "stable": true
+    }
+  ],
+  "complete_minimum_material_archive": {
+    "version": "21.2.14",
+    "sha256": "2f8c0fce7967b8a91a07bc3a184cf5da6023eac3828d15fa23b6c338b340e23c",
+    "integrity": "sha512-fMQca8VRtei93JRRG9qQ+u08DCb0nga59Esoakq5yx3+A1NfdpFeUS1tBns56U04o8KAaIAwZK3NBqXz8ZKNqg==",
+    "bytes": 1447911,
+    "matched_installed_members": [
+      {
+        "path": "package.json",
+        "sha256": "26af34e77987b55564689c8eb7b5352db661d6a737fdec2160417ae42114f355",
+        "bytes": 11422
+      },
+      {
+        "path": "fesm2022/_animation-chunk.mjs",
+        "sha256": "aee503778d1b8828786122a1a322d53115159461ef0a96b09a84d87bdb36b37e",
+        "bytes": 803
+      },
+      {
+        "path": "fesm2022/_date-formats-chunk.mjs",
+        "sha256": "972df8ecfd7159f6c070f9cc172dd519ff2a5f90da9917c5391ff7d0eba8b420",
+        "bytes": 2542
+      },
+      {
+        "path": "fesm2022/_date-range-input-harness-chunk.mjs",
+        "sha256": "b0fe69a07a00d50a7427d3fcd018ea13f55ebdb27577bc11f7b455f62ab76765",
+        "bytes": 11531
+      },
+      {
+        "path": "fesm2022/_error-options-chunk.mjs",
+        "sha256": "8814eaa2ad882c36ec092474598d396767fbacab8ab58e2db7a9084083b6a465",
+        "bytes": 1655
+      },
+      {
+        "path": "fesm2022/_error-state-chunk.mjs",
+        "sha256": "e017e9409fdf0075a838affb5f3eaf205c0984c17edc7f250b0bce61dea27397",
+        "bytes": 947
+      },
+      {
+        "path": "fesm2022/_form-field-chunk.mjs",
+        "sha256": "1981af655b978abbf4deab909488ced158784242564d5f3709bf6d3de285bc39",
+        "bytes": 126438
+      },
+      {
+        "path": "fesm2022/_icon-button-chunk.mjs",
+        "sha256": "11862a6910148074bec6e8638027e3d884c1a07dacfd1bbae2a62ab4ca1ff39b",
+        "bytes": 18758
+      },
+      {
+        "path": "fesm2022/_icon-registry-chunk.mjs",
+        "sha256": "9e9e275486f72746b864cc8def1f2fb9f0643a728c7d2501acf528493fdd5b3c",
+        "bytes": 12471
+      },
+      {
+        "path": "fesm2022/_input-harness-chunk.mjs",
+        "sha256": "2c448a5c751a6a718bc95e929f2cb22b11afbd4a0b22f5cce0edde4571d58074",
+        "bytes": 2402
+      },
+      {
+        "path": "fesm2022/_input-value-accessor-chunk.mjs",
+        "sha256": "eb1f063049f0fed33e2a6728ae71dd104d5df5a5eb40c6ff6cfa7f24bedd78b4",
+        "bytes": 225
+      },
+      {
+        "path": "fesm2022/_internal-form-field-chunk.mjs",
+        "sha256": "7c6b2f92b73a4bdd033852e5f04a9f060fd90615c241418c0f9bf78ea7fa911a",
+        "bytes": 3336
+      },
+      {
+        "path": "fesm2022/_line-chunk.mjs",
+        "sha256": "148705c4330f4c17146219056f141585fd35125f1b29a9f833477658b89dd428",
+        "bytes": 2426
+      },
+      {
+        "path": "fesm2022/_option-chunk.mjs",
+        "sha256": "afdf728ee1fc6ee97d2264c81b2d154eb6826784fcd5707c7933e353e7c4223f",
+        "bytes": 25604
+      },
+      {
+        "path": "fesm2022/_option-harness-chunk.mjs",
+        "sha256": "03c5f347b85469dd1739ee4031dc97612e74702a2d367cb087a2000d092133a2",
+        "bytes": 1169
+      },
+      {
+        "path": "fesm2022/_option-module-chunk.mjs",
+        "sha256": "9bbeddfdf66521cde43a84a55286ad23feba44a9a24058275989e86aa17055a6",
+        "bytes": 1456
+      },
+      {
+        "path": "fesm2022/_pseudo-checkbox-chunk.mjs",
+        "sha256": "fd2d9ad0a8de0278ad3ec0ff572b0ad9c57ed17f494bae3e7428b84750578ccc",
+        "bytes": 10223
+      },
+      {
+        "path": "fesm2022/_pseudo-checkbox-module-chunk.mjs",
+        "sha256": "fec1a89e767b2b20851d332ea21cecf8a7a4923e080623b2c58acc9fc78a53f8",
+        "bytes": 1219
+      },
+      {
+        "path": "fesm2022/_public-api-chunk.mjs",
+        "sha256": "d67a04bdb3c18c6227ec1d0772b5bfcfbfd09094cc88b0274e04562aa9271e26",
+        "bytes": 2599
+      },
+      {
+        "path": "fesm2022/_ripple-chunk.mjs",
+        "sha256": "37a91cadf041513ac559096dbaf6fb708772fee939cc00e1df23aba1f01540f3",
+        "bytes": 18933
+      },
+      {
+        "path": "fesm2022/_ripple-loader-chunk.mjs",
+        "sha256": "2900165a8cee721934e2f380703edafedeaa2e8fdd6c1300264688f46f619007",
+        "bytes": 4981
+      },
+      {
+        "path": "fesm2022/_ripple-module-chunk.mjs",
+        "sha256": "6eca5998352027d3c367f8e22c8cdeeeb32586d6032f46eb62f3a8806859a313",
+        "bytes": 1113
+      },
+      {
+        "path": "fesm2022/_structural-styles-chunk.mjs",
+        "sha256": "9e2a9a431f7bac193c4622078784b3c7430087bfd255674231494de91eea6f55",
+        "bytes": 2583
+      },
+      {
+        "path": "fesm2022/_tooltip-chunk.mjs",
+        "sha256": "df3cbb5bd321356ed2ddf1951ff54d9367fd2141b0f941169f43d3564300dd8c",
+        "bytes": 33104
+      },
+      {
+        "path": "fesm2022/autocomplete-testing.mjs",
+        "sha256": "4ac63c18afb1d5ecb0e9b1a0475533caff6933dcdc6fa88f5760744ff7f4b1d2",
+        "bytes": 2715
+      },
+      {
+        "path": "fesm2022/autocomplete.mjs",
+        "sha256": "3e08a3b74dfe3d1b5566e5ccf6071ba508d255ad75826fd16a2e4253794a61c3",
+        "bytes": 40622
+      },
+      {
+        "path": "fesm2022/badge-testing.mjs",
+        "sha256": "0ea423a04635443abdad4871bc48b78a613bdfeb13a28b0c9adbe328f7db95d2",
+        "bytes": 1514
+      },
+      {
+        "path": "fesm2022/badge.mjs",
+        "sha256": "d954d38cea380943fe83093af5932abed65de77e612f21833011a52a1b8cac44",
+        "bytes": 18525
+      },
+      {
+        "path": "fesm2022/bottom-sheet-testing.mjs",
+        "sha256": "1f2332fbbdf3d3d4da222b231d823630dd475d84d14e72d323532e75654681f0",
+        "bytes": 597
+      },
+      {
+        "path": "fesm2022/bottom-sheet.mjs",
+        "sha256": "96064c65962a9f3801e20c3c0017864b0e9f09d20f1939c926f8584b89b0a2f7",
+        "bytes": 17403
+      },
+      {
+        "path": "fesm2022/button-testing.mjs",
+        "sha256": "0c91c583bc7b9455bed941c9d51bd2ee3718b89e9b4572ba86518ba132e1df23",
+        "bytes": 3266
+      },
+      {
+        "path": "fesm2022/button-toggle-testing.mjs",
+        "sha256": "88b476b0d2292e78e466bf90c1d98624b43a26f6a90fc06f18ca026c9101a667",
+        "bytes": 3298
+      },
+      {
+        "path": "fesm2022/button-toggle.mjs",
+        "sha256": "c127765da8152768b50b3212da3f821d9f167b7fb39a1efeee945fc57f17b25f",
+        "bytes": 48806
+      },
+      {
+        "path": "fesm2022/button.mjs",
+        "sha256": "d01b67ba6511d83765f9b12682b4e709e5289440968b0c6aea02e3d5f1b01a56",
+        "bytes": 107828
+      },
+      {
+        "path": "fesm2022/card-testing.mjs",
+        "sha256": "7026351be8ede6c44057a3bf54b3071c07f181f83f0af4ba793c52c8b31bb313",
+        "bytes": 1381
+      },
+      {
+        "path": "fesm2022/card.mjs",
+        "sha256": "e7593137758c2535c1ae460682e86d9c743514063742161c7838ba408833c0d5",
+        "bytes": 27342
+      },
+      {
+        "path": "fesm2022/checkbox-testing.mjs",
+        "sha256": "634fc55ed56b9819f47b8582beddd0d5ce2b8ca2a91d00b8bad90dc3322f1722",
+        "bytes": 2768
+      },
+      {
+        "path": "fesm2022/checkbox.mjs",
+        "sha256": "159fb481b1016432c567cc8fce5a2adcdd69bce002f86fb0863a2186c037c9e3",
+        "bytes": 60688
+      },
+      {
+        "path": "fesm2022/chips-testing.mjs",
+        "sha256": "f7b28f5892caad8df8bd0c9f87625522d25f6b887a4457c3f2dd260883d30e1a",
+        "bytes": 8070
+      },
+      {
+        "path": "fesm2022/chips.mjs",
+        "sha256": "6b7d609275dc87fa96db0b1a7c5d5cbb6f0c2797a5d3677dc9511ccabcebd335",
+        "bytes": 220914
+      },
+      {
+        "path": "fesm2022/core-testing.mjs",
+        "sha256": "93ca38b6c9eab024a8a882dc6a4687426d0b793e303be439a2e7658c263d7987",
+        "bytes": 885
+      },
+      {
+        "path": "fesm2022/core.mjs",
+        "sha256": "af1db9de63ad6c2953f211b34af25568aab1efccad253725621b63a2210488f0",
+        "bytes": 12014
+      },
+      {
+        "path": "fesm2022/datepicker-testing.mjs",
+        "sha256": "6d4de07d961ddd0cc1fe37a5cf12be28a800a929c07c6b2b781468af8f156022",
+        "bytes": 1990
+      },
+      {
+        "path": "fesm2022/datepicker.mjs",
+        "sha256": "e526b98dc49cfd91374e099d660daa35bf13a95d349d761efa73d0c126a28f8a",
+        "bytes": 233531
+      },
+      {
+        "path": "fesm2022/dialog-testing.mjs",
+        "sha256": "c89629def2ae44b7691bbf046c8eb29f82a0952eca2195365798311eab1f9e02",
+        "bytes": 4182
+      },
+      {
+        "path": "fesm2022/dialog.mjs",
+        "sha256": "0977b2f41c1340af17ac3db8055ce8e250534b7649a9afaadc57451f8f4cbc36",
+        "bytes": 38803
+      },
+      {
+        "path": "fesm2022/divider-testing.mjs",
+        "sha256": "080f18ef891844973e052415920c560f9b397d8beda9bfc286459743c09c86d5",
+        "bytes": 522
+      },
+      {
+        "path": "fesm2022/divider.mjs",
+        "sha256": "1ed0838b8db8752bad6ab98c05905e6a39f540a1594b273b2a27fb646780f7ca",
+        "bytes": 4425
+      },
+      {
+        "path": "fesm2022/expansion-testing.mjs",
+        "sha256": "cd93b9a35f83b5113f968b6d2e251f5d8bf1f7610f3bbfa0ec1172680c3b21a9",
+        "bytes": 3619
+      },
+      {
+        "path": "fesm2022/expansion.mjs",
+        "sha256": "f01eaeb55464a2f0ab631ad4749a05c12dd43b80690d5e846adadf2706480f5c",
+        "bytes": 42574
+      },
+      {
+        "path": "fesm2022/form-field-testing-control.mjs",
+        "sha256": "c802b790585dbc15a111b6e4d87fc303c3a6fd1e03410ce6cde7a302ec735b00",
+        "bytes": 1028
+      },
+      {
+        "path": "fesm2022/form-field-testing.mjs",
+        "sha256": "569adbba123e55a994c21c17a6b64c1b612967dd771e1b723f20a40ecc0fab02",
+        "bytes": 5239
+      },
+      {
+        "path": "fesm2022/form-field.mjs",
+        "sha256": "a0c57f639b60928028f82ae866d3901dae0eadaddfd32fa8ae650813bca5d991",
+        "bytes": 2104
+      },
+      {
+        "path": "fesm2022/grid-list-testing.mjs",
+        "sha256": "bff64d3f42907b74e7cf510e6b178753751fa514ce37e515c992529b57ce434e",
+        "bytes": 3149
+      },
+      {
+        "path": "fesm2022/grid-list.mjs",
+        "sha256": "1967a4edb0e4f1a82c9a0e333c6b18df62e206fce8613af26442e7a7fd7c2c30",
+        "bytes": 27436
+      },
+      {
+        "path": "fesm2022/icon-testing.mjs",
+        "sha256": "c26479ac9ddcfe26f805fe4e0d240682239840041099e588293f01bd5847d639",
+        "bytes": 4596
+      },
+      {
+        "path": "fesm2022/icon.mjs",
+        "sha256": "1945ec95c62f12f61f3660faa8e72d8ab993bd350060c7131c725a8fa50aa5d8",
+        "bytes": 13430
+      },
+      {
+        "path": "fesm2022/input-testing.mjs",
+        "sha256": "480aa46145aedd4578fa5936769675faa6b7037d00908d763558e85582217528",
+        "bytes": 2866
+      },
+      {
+        "path": "fesm2022/input.mjs",
+        "sha256": "e3f222c4479da02355034e7ca5cfab601591ba11fc2319879bc8358d4bc1572a",
+        "bytes": 15542
+      },
+      {
+        "path": "fesm2022/list-testing.mjs",
+        "sha256": "cc7f275072e5faf977dfb52db8f3675ac37449f84057668b7bf4ff6f297761c8",
+        "bytes": 10742
+      },
+      {
+        "path": "fesm2022/list.mjs",
+        "sha256": "0b3a229ff72913d953af65a4c345c1ff5e1608f04d114b1a9a07308cd76aa42e",
+        "bytes": 262706
+      },
+      {
+        "path": "fesm2022/material.mjs",
+        "sha256": "0e0f73230f2494a950f903b0da2afb134c9e7f1cad299b17378831f76c6209f5",
+        "bytes": 153
+      },
+      {
+        "path": "fesm2022/menu-testing.mjs",
+        "sha256": "07e0566d0505be3b2d2727f9d0ca3d2bc02dc0504d23f71f5e1b85c12e7e5e33",
+        "bytes": 5789
+      },
+      {
+        "path": "fesm2022/menu.mjs",
+        "sha256": "fc53d00edd4edc70e57dd5fb0be0e4b6144f414ace0e2336bc8915bce4021105",
+        "bytes": 57794
+      },
+      {
+        "path": "fesm2022/paginator-testing.mjs",
+        "sha256": "fba593975539ae60ec9c69147cbdbe5f01d757d1820b6c07d222788f72f7afc5",
+        "bytes": 2710
+      },
+      {
+        "path": "fesm2022/paginator.mjs",
+        "sha256": "91d1ff9b2788926721fd3c307244827e5c1ca04084118c3d7244e36cd93a67d3",
+        "bytes": 30485
+      },
+      {
+        "path": "fesm2022/progress-bar-testing.mjs",
+        "sha256": "b09118055c1e595dd5a8458d35b8cc7996ceeb810e3c4ae8e34b40c81da3f251",
+        "bytes": 676
+      },
+      {
+        "path": "fesm2022/progress-bar.mjs",
+        "sha256": "063373f35264b6dd4201878cbf0bfb11b684808ce326d4ad0977d2fc09ac9b08",
+        "bytes": 26208
+      },
+      {
+        "path": "fesm2022/progress-spinner-testing.mjs",
+        "sha256": "268a57323b1687d07b23488aa83106db316419e57a649396cf208ab177029d19",
+        "bytes": 729
+      },
+      {
+        "path": "fesm2022/progress-spinner.mjs",
+        "sha256": "49633d81efc53e5b2e7e21ce9a5e3348c3c38b6609cc699bfa64b28982b25398",
+        "bytes": 22333
+      },
+      {
+        "path": "fesm2022/radio-testing.mjs",
+        "sha256": "12c28c98f74f0db3c9ce61878813ccddb54cb7a293c45cc8a36675acbdf883b8",
+        "bytes": 4732
+      },
+      {
+        "path": "fesm2022/radio.mjs",
+        "sha256": "0e2fc87427d9a4e90fb179582892d0bca52b4ad4f8f70620f55ed85fde7df4b1",
+        "bytes": 48691
+      },
+      {
+        "path": "fesm2022/select-testing.mjs",
+        "sha256": "83e5d9efb4db0e70f883ea48e5fbea95507389298b6eba74bf70473e433ec415",
+        "bytes": 3175
+      },
+      {
+        "path": "fesm2022/select.mjs",
+        "sha256": "232446055bcef61e7427e3ed9a0e7f2c25916bdb16fd2ffa59297491767305cf",
+        "bytes": 55122
+      },
+      {
+        "path": "fesm2022/sidenav-testing.mjs",
+        "sha256": "76a49bee7c5a9956545c25a64f87da70562adecec34ba69b45c7e9ed8ce34128",
+        "bytes": 2805
+      },
+      {
+        "path": "fesm2022/sidenav.mjs",
+        "sha256": "88ed5aae310e67ace65fdc90e667e89dd7c178a9f0d4c28116cd2f50950d5486",
+        "bytes": 57504
+      },
+      {
+        "path": "fesm2022/slide-toggle-testing.mjs",
+        "sha256": "e8870f1952218b95b07379045eb4604236f2de62f0f5d24dab280d28dc076e3c",
+        "bytes": 2495
+      },
+      {
+        "path": "fesm2022/slide-toggle.mjs",
+        "sha256": "53f6a95d419eb7ae18f16e0e9f553704763caf65056a5c36126798e6fc928bc9",
+        "bytes": 54131
+      },
+      {
+        "path": "fesm2022/slider-testing.mjs",
+        "sha256": "79c39949dc5008cf8af372b5b85da77ecdf91f09bc556f4c8a68d24cf67e13fd",
+        "bytes": 3689
+      },
+      {
+        "path": "fesm2022/slider.mjs",
+        "sha256": "7777620f4b85544bb714971ac5a60d95a9d389fd3a95d93c976235f9995c5119",
+        "bytes": 77193
+      },
+      {
+        "path": "fesm2022/snack-bar-testing.mjs",
+        "sha256": "a315eb94a4dc97ea4b639a6d2492b30fc31bd85f99991baa2c62874460e15b61",
+        "bytes": 1690
+      },
+      {
+        "path": "fesm2022/snack-bar.mjs",
+        "sha256": "2c5d78a32e101a37d3f99592409e436f45fe99a964fd349038be8223a931ee60",
+        "bytes": 34086
+      },
+      {
+        "path": "fesm2022/sort-testing.mjs",
+        "sha256": "9c216ac9a7fc406abf60955dcf08438858dfdbda664f2ca85171c4078f11ec8e",
+        "bytes": 1802
+      },
+      {
+        "path": "fesm2022/sort.mjs",
+        "sha256": "57c652977c8d0d9b14ca1905e391770f1bc8a581ab7e426e126aeff5605031bc",
+        "bytes": 23313
+      },
+      {
+        "path": "fesm2022/stepper-testing.mjs",
+        "sha256": "37cd217699fe13a44c1d8dcbb725385fae96e6ea0e34a0465aef78318b0bb790",
+        "bytes": 4283
+      },
+      {
+        "path": "fesm2022/stepper.mjs",
+        "sha256": "35af89e0de718e6b1c4c95057e9c38b4ec8ee9056f822d5aa07517ed3af26ac3",
+        "bytes": 63334
+      },
+      {
+        "path": "fesm2022/table-testing.mjs",
+        "sha256": "b38ba531c4a924439efd77d9e2aef4ee81590786058293345a0c8d14702e6fad",
+        "bytes": 5746
+      },
+      {
+        "path": "fesm2022/table.mjs",
+        "sha256": "61f714326c319c5f270259a13034f81e8f8aa1737bb1dd0ceeafb15b3311ecd3",
+        "bytes": 42870
+      },
+      {
+        "path": "fesm2022/tabs-testing.mjs",
+        "sha256": "b4c9d0308eae9a2306fe8ac8ade8ee6b17ba55fef00346e35c8a94d782c5cbc0",
+        "bytes": 4936
+      },
+      {
+        "path": "fesm2022/tabs.mjs",
+        "sha256": "5a798a54a86a966501288531be98f12338b28463543324c2b16e9756b64b418d",
+        "bytes": 134073
+      },
+      {
+        "path": "fesm2022/timepicker-testing.mjs",
+        "sha256": "5f9bc98a1e7f225111b3b376d5db4b955cdf984a700038e19d6f964dc8ebf4b8",
+        "bytes": 4329
+      },
+      {
+        "path": "fesm2022/timepicker.mjs",
+        "sha256": "eee6b2c4952dccb630c5191dd2a439a367792dad667a5d522e5ec11d5a1963ec",
+        "bytes": 44647
+      },
+      {
+        "path": "fesm2022/toolbar-testing.mjs",
+        "sha256": "bb5be4b4771216c7e6640016dc1ce81249d88ded4a24e18271dc25a64a7d7ecb",
+        "bytes": 1043
+      },
+      {
+        "path": "fesm2022/toolbar.mjs",
+        "sha256": "276a929827e9298060dfafb0d8e3231a9c1cd88c9ac4a5ab1d9b878174248892",
+        "bytes": 9933
+      },
+      {
+        "path": "fesm2022/tooltip-testing.mjs",
+        "sha256": "e3a46dc5f7010a54db0cefd94579f5225d656ce58b6751fbd2d0203dc8da7e3e",
+        "bytes": 1560
+      },
+      {
+        "path": "fesm2022/tooltip.mjs",
+        "sha256": "72df56ea58123073b778122564fa0525a45b80dbc5ed3d4b814a5c6829669d20",
+        "bytes": 1942
+      },
+      {
+        "path": "fesm2022/tree-testing.mjs",
+        "sha256": "fc487a0a2555a70de2235b3209fb536bb2353929113fb1a25c7480131840afc3",
+        "bytes": 3650
+      },
+      {
+        "path": "fesm2022/tree.mjs",
+        "sha256": "6b4b2bfe1fc7f62ee4487f441cf98200e16eaf2b41db8b87d663bdc2762f4232",
+        "bytes": 19121
+      },
+      {
+        "path": "types/_badge-chunk.d.ts",
+        "sha256": "ea56c4f5b74763fa403be53da9cf8156891b6f2040fbd65c38f7d9430aea5a4b",
+        "bytes": 4883
+      },
+      {
+        "path": "types/_button-toggle-chunk.d.ts",
+        "sha256": "67456f321a27205f762c7ba5d4db0ab273bab37e654a106112c673778d8d0af7",
+        "bytes": 12871
+      },
+      {
+        "path": "types/_date-adapter-chunk.d.ts",
+        "sha256": "c26488d6d035eff810237dce38f59230e1d55b815c8cf93f79a6b7b60fd4f28a",
+        "bytes": 11483
+      },
+      {
+        "path": "types/_date-range-input-harness-chunk.d.ts",
+        "sha256": "60dec28c236caa9e804314f9a5a84710794e030468888ba35faa9dd9429944a7",
+        "bytes": 13726
+      },
+      {
+        "path": "types/_dialog-chunk.d.ts",
+        "sha256": "5b7d310181e68e89fbdf0d8bfec48151cb5802098c08921fed6e059b406a30e6",
+        "bytes": 14485
+      },
+      {
+        "path": "types/_error-options-chunk.d.ts",
+        "sha256": "8b6557cf8ea0e54c5fd8d26cdb909adb0e56e606342e1b3bae08e35b3892d332",
+        "bytes": 967
+      },
+      {
+        "path": "types/_form-field-chunk.d.ts",
+        "sha256": "0c3cb3e518cd6e0518ee876d80b25bc16d98c554e0b66cc923c0eebff93eb72f",
+        "bytes": 18708
+      },
+      {
+        "path": "types/_form-field-control-chunk.d.ts",
+        "sha256": "2be93d05a1ab4c451e32b558313a34f85b75924bac07ad77bf6858ee251c9a60",
+        "bytes": 2855
+      },
+      {
+        "path": "types/_form-field-control-harness-chunk.d.ts",
+        "sha256": "696d1aecfb8f71a055bb969ddce9432e8dbcb0b0973c7fbd10de6f5d3b00481c",
+        "bytes": 717
+      },
+      {
+        "path": "types/_form-field-module-chunk.d.ts",
+        "sha256": "d29a8ab31478f2d54f5132f5884ababbcc0a52018893c6542ecf0c39e445e735",
+        "bytes": 1030
+      },
+      {
+        "path": "types/_icon-module-chunk.d.ts",
+        "sha256": "810ab8c58ad8b9d278adeb11d3b1d3dbacef70e0cbe784c36e8045e7e38f0144",
+        "bytes": 7701
+      },
+      {
+        "path": "types/_icon-registry-chunk.d.ts",
+        "sha256": "49e8af2a59c604d319fbb7957ddf41ee00c02d3ddb273039a3824f0e3662eb52",
+        "bytes": 12537
+      },
+      {
+        "path": "types/_input-harness-chunk.d.ts",
+        "sha256": "9ab8a6b92f3fc3260c536cd30ffa8cfa09ea4d5b110d5e00d39d0433a3534df0",
+        "bytes": 2373
+      },
+      {
+        "path": "types/_line-chunk.d.ts",
+        "sha256": "a6896829051614ef17cc326e25421d58b04db871ed7697d7160961d1066e7b96",
+        "bytes": 1106
+      },
+      {
+        "path": "types/_list-option-types-chunk.d.ts",
+        "sha256": "fc17b0a42163ea104c2fc6ea4fc8194f8b896879824701b69cee4ec3525e14b3",
+        "bytes": 482
+      },
+      {
+        "path": "types/_option-chunk.d.ts",
+        "sha256": "f040fc03fd40d432eaec6ba8ebdd39594a82543b9be06bf83582f48c3935e656",
+        "bytes": 6901
+      },
+      {
+        "path": "types/_option-harness-chunk.d.ts",
+        "sha256": "33238f658fac017b60969d34d911abecbdd9c8b420fbbf0d413a4b2f31ede944",
+        "bytes": 1512
+      },
+      {
+        "path": "types/_option-module-chunk.d.ts",
+        "sha256": "3580786d2d08328fbced2b19245df4f0681ade6288d2e9ae3fa3a32194d4cd27",
+        "bytes": 702
+      },
+      {
+        "path": "types/_option-parent-chunk.d.ts",
+        "sha256": "2d556a8c6c6207c39898112411a8e33d752ed65a0f61633549a677624f584259",
+        "bytes": 624
+      },
+      {
+        "path": "types/_paginator-chunk.d.ts",
+        "sha256": "2fa432c09259f65c1980b81facec85a09e6a3e1c4ba7dec054820c4cf28287ea",
+        "bytes": 9053
+      },
+      {
+        "path": "types/_palette-chunk.d.ts",
+        "sha256": "9b81bb792ae111bfe0e15bea0c137743ab5aca49ebb60575690e2dbc8c6142a9",
+        "bytes": 132
+      },
+      {
+        "path": "types/_progress-spinner-chunk.d.ts",
+        "sha256": "84512981818e092f0b8c8a9405e227c626828b3856bc5271727f02a6f4626c4f",
+        "bytes": 4388
+      },
+      {
+        "path": "types/_pseudo-checkbox-module-chunk.d.ts",
+        "sha256": "829e6a18c039f147b393ecf7df4175683eb71649dab2d906928522a58d9b18c5",
+        "bytes": 2323
+      },
+      {
+        "path": "types/_ripple-chunk.d.ts",
+        "sha256": "52a81cf0861109277d49c155326565114a31400764e11085b7a26c130b8cf979",
+        "bytes": 11090
+      },
+      {
+        "path": "types/_ripple-loader-chunk.d.ts",
+        "sha256": "414cf5a4a3eb68a9de5d25cd65fab2dec3518d002d5e5ed283ab45dbb90213b1",
+        "bytes": 1669
+      },
+      {
+        "path": "types/_ripple-module-chunk.d.ts",
+        "sha256": "fa7a8705570edce45f7274ba1ed7f4bec8b93389007a8cf923ce9b93443f0210",
+        "bytes": 454
+      },
+      {
+        "path": "types/_sort-chunk.d.ts",
+        "sha256": "430298ec454332cb0ffa2cd0bc20d58e748e47f73017aa202af3fc3233a6ab8a",
+        "bytes": 4240
+      },
+      {
+        "path": "types/_sort-direction-chunk.d.ts",
+        "sha256": "164c476f6c481c2b92e184dc12d5c03bd308b24a58569d68119f39f2dd553cd5",
+        "bytes": 74
+      },
+      {
+        "path": "types/autocomplete-testing.d.ts",
+        "sha256": "28d6377f90a356d327ae26b3d56881c5f3919d5f4243a77cae8be3298344f8ed",
+        "bytes": 2721
+      },
+      {
+        "path": "types/autocomplete.d.ts",
+        "sha256": "c894bd0a34daad8b7c1125c13ee6a1b813c7105a231e820de5743819e559b9ea",
+        "bytes": 21075
+      },
+      {
+        "path": "types/badge-testing.d.ts",
+        "sha256": "92c6f04e19249d6e7f1b95a06e8a7409502f30048ed8191b860745eaf75e4397",
+        "bytes": 1457
+      },
+      {
+        "path": "types/badge.d.ts",
+        "sha256": "28ec8bf2ba9e87685831b534c8e763a45755f99da6bc8d6146a9ed67c746e616",
+        "bytes": 667
+      },
+      {
+        "path": "types/bottom-sheet-testing.d.ts",
+        "sha256": "fdb1c4fd4be95438bc689ad95fe123144ae1a945b9a3f635e7fa9face71a01cb",
+        "bytes": 1117
+      },
+      {
+        "path": "types/bottom-sheet.d.ts",
+        "sha256": "e134818946226927c7d951e82e4f299925810edd05d3eab351b9c39d23eb8083",
+        "bytes": 8881
+      },
+      {
+        "path": "types/button-testing.d.ts",
+        "sha256": "1a88a6b9324c45e3e32b97eb5a22e3d2e9ebdeafb5a92da08abd0a0cba518f9f",
+        "bytes": 3404
+      },
+      {
+        "path": "types/button-toggle-testing.d.ts",
+        "sha256": "d3818eaf504d48e08c799e20ec8e0fad633a4634e9c62cff62187d58de090ef0",
+        "bytes": 4493
+      },
+      {
+        "path": "types/button-toggle.d.ts",
+        "sha256": "5adaff0573f90c2e0b461039458c93925b291130bb35ea9f09adaeb607d0ed43",
+        "bytes": 1036
+      },
+      {
+        "path": "types/button.d.ts",
+        "sha256": "d34e1c365ca24b628fb9f183d49fe220a41241cd1cf0f5746bf9b44b3327ca67",
+        "bytes": 11705
+      },
+      {
+        "path": "types/card-testing.d.ts",
+        "sha256": "8245c5bfef52df8e3dca33e3c7501ea0e129a32b7fd5e0385a24bcb97f35db87",
+        "bytes": 1880
+      },
+      {
+        "path": "types/card.d.ts",
+        "sha256": "b99a7e8e306b966524f298476363f27d25f6cfb3fd3b951d32d232b216326570",
+        "bytes": 9396
+      },
+      {
+        "path": "types/checkbox-testing.d.ts",
+        "sha256": "94292d71edd5551e95ef8395b982c9b3377434d6732010cbec95bd972d97e16e",
+        "bytes": 3890
+      },
+      {
+        "path": "types/checkbox.d.ts",
+        "sha256": "b6216cb4611de94b3fccbffff8be4843707812a951a65f25b2e3de330d2e8e85",
+        "bytes": 11168
+      },
+      {
+        "path": "types/chips-testing.d.ts",
+        "sha256": "5c96bd3dde5a7c0b3b67d961fa896b6c943a9302e9968097f3b456bb96d4dc2a",
+        "bytes": 12780
+      },
+      {
+        "path": "types/chips.d.ts",
+        "sha256": "345231d259da02aac7f708e14ead1229c7ea4f675d455cf887208b8bee95ac4e",
+        "bytes": 44117
+      },
+      {
+        "path": "types/core-testing.d.ts",
+        "sha256": "6a301dcc2efae3ef53b777875dc0faea34c7e4dd5f0655395c37f24633c7bf5e",
+        "bytes": 1472
+      },
+      {
+        "path": "types/core.d.ts",
+        "sha256": "e69eba12b87eaae09de70629e0637fc9b07751a7fb4493dac9d7e3cf0ed21964",
+        "bytes": 8523
+      },
+      {
+        "path": "schematics/ng-add/theming/create-theme.d.ts",
+        "sha256": "508ce9892f08ca86bb3bfac3a25fe98fe6673ea5b4e387d31f38014d06a142c4",
+        "bytes": 336
+      },
+      {
+        "path": "types/datepicker-testing.d.ts",
+        "sha256": "5869d85346e91bb92734f02e78ae3a8ba4a8525b59b9f6a73290eec166f24c5e",
+        "bytes": 2549
+      },
+      {
+        "path": "types/datepicker.d.ts",
+        "sha256": "56e9d9143a80887564bc0e937e6ffe616a3363bb2ad999e84724c050878bb0f9",
+        "bytes": 90441
+      },
+      {
+        "path": "types/dialog-testing.d.ts",
+        "sha256": "b0aa3d275873ddfd9e8b0fcb5cc9ecad58e85b72f1fcfabce177c335c63cabfd",
+        "bytes": 4229
+      },
+      {
+        "path": "types/dialog.d.ts",
+        "sha256": "e20a8e842751f98edc376a94b030dd104788bf56a48eaeaba224250f9cd5ed0f",
+        "bytes": 4539
+      },
+      {
+        "path": "types/divider-testing.d.ts",
+        "sha256": "a36792709fa8bf35630bdea8a58c311e11a849bed065744054d46f6f04102fd5",
+        "bytes": 555
+      },
+      {
+        "path": "types/divider.d.ts",
+        "sha256": "defbb557528db59de45c1e5c90fa47e5de5e6b04aab3b478ee88cb45076a6165",
+        "bytes": 1077
+      },
+      {
+        "path": "types/expansion-testing.d.ts",
+        "sha256": "51b6e3bcb3101f76a26ee062a7b328b3f5c2666dffce34e294de0c0b76ca915e",
+        "bytes": 4428
+      },
+      {
+        "path": "types/expansion.d.ts",
+        "sha256": "6090b2b9fdb0761a33016d49533da0788aaa3fd466b7d2315004a3fa61ea1f4c",
+        "bytes": 12717
+      },
+      {
+        "path": "types/form-field-testing-control.d.ts",
+        "sha256": "0c8f58a435cc1613c313271ffd749ca2e157d21521e248e355e7ae6f2ab8a725",
+        "bytes": 556
+      },
+      {
+        "path": "types/form-field-testing.d.ts",
+        "sha256": "a5e98005062b8ef2be2e5c014353f65bbb28ad723512d7d521ef4829cfdd261a",
+        "bytes": 6042
+      },
+      {
+        "path": "types/form-field.d.ts",
+        "sha256": "9e043a5eaf125805f291d49fe9dc3e22bb30633ed8282b3149b68b968c1bc068",
+        "bytes": 992
+      },
+      {
+        "path": "types/grid-list-testing.d.ts",
+        "sha256": "06154d600026fd09d3e63f77bda1ec2e016116e20461d82ea9aaec3eeab267ee",
+        "bytes": 3716
+      },
+      {
+        "path": "types/grid-list.d.ts",
+        "sha256": "e9c6c2f7c8055a3428ad3d778889da69bfdb6296ac2688d21d106bd3fc0e80e6",
+        "bytes": 9280
+      },
+      {
+        "path": "types/icon-testing.d.ts",
+        "sha256": "b3590014efe6d0da8becf62d96d81b306dd5907f88f18ca74d06f18238f2e6f0",
+        "bytes": 3256
+      },
+      {
+        "path": "types/icon.d.ts",
+        "sha256": "d42e702b0b98e5fbbac4d8a5d07dd9e8795cce7021170911d1d79713e4154b28",
+        "bytes": 571
+      },
+      {
+        "path": "schematics/ng-add/index.d.ts",
+        "sha256": "43253a71d804dd9b3925fc14798cf66369d3cde18b6d88e53801e17293a9004e",
+        "bytes": 699
+      },
+      {
+        "path": "schematics/ng-generate/address-form/index.d.ts",
+        "sha256": "d1b34c4c75ec0181b6ffd89be4e3bb05db0ea6613df3966dc8cf9b3723650f16",
+        "bytes": 439
+      },
+      {
+        "path": "schematics/ng-generate/dashboard/index.d.ts",
+        "sha256": "6c9c3e95448b4d1fbb1f276747e9f5fe2a95abd838529e11dcbaf84b7631e61b",
+        "bytes": 443
+      },
+      {
+        "path": "schematics/ng-generate/navigation/index.d.ts",
+        "sha256": "d0aaea288f36d21e9ab2c603afffc3cb926055fefd08e1fa30bfa042b330cf32",
+        "bytes": 444
+      },
+      {
+        "path": "schematics/ng-generate/table/index.d.ts",
+        "sha256": "d1b34c4c75ec0181b6ffd89be4e3bb05db0ea6613df3966dc8cf9b3723650f16",
+        "bytes": 439
+      },
+      {
+        "path": "schematics/ng-generate/tree/index.d.ts",
+        "sha256": "3ce729d6c6b64479cea07eb1cf7dbdea113f567b1507e66d9f67173dd7a11c90",
+        "bytes": 438
+      },
+      {
+        "path": "types/input-testing.d.ts",
+        "sha256": "ce4ab625a0b9516a5bff10113b1ae8fe0fccdbd9009385fc273c5bee91372fb5",
+        "bytes": 3693
+      },
+      {
+        "path": "types/input.d.ts",
+        "sha256": "3cec16ce3ea1249bd90f56a5b4dcc035a3e8aa0872ff2ce77915674846a343ff",
+        "bytes": 8539
+      },
+      {
+        "path": "types/list-testing.d.ts",
+        "sha256": "3e6ff2178d22c2a6c33b66a8800b839cc30d519e48580f36ba3112b2497766cf",
+        "bytes": 16670
+      },
+      {
+        "path": "types/list.d.ts",
+        "sha256": "7c2477ca5e2145f622a4dd9ac891b66c623ffcd3030be0fe53899fa4e033ac37",
+        "bytes": 26115
+      },
+      {
+        "path": "schematics/ng-add/fonts/material-fonts.d.ts",
+        "sha256": "07ce5494a46772394704fbb92680ed0814d707a6259b699658d105030e69ce9c",
+        "bytes": 416
+      },
+      {
+        "path": "types/material.d.ts",
+        "sha256": "f43a5c4c19f265c4f7b7ee45e4f7843ae369f9dc061dbf5951a0765468c5dbc9",
+        "bytes": 123
+      },
+      {
+        "path": "types/menu-testing.d.ts",
+        "sha256": "1eef4cdf56642dca66956b7b01f6295319b338aa4c6d575ef6fc6e9088df50e8",
+        "bytes": 7216
+      },
+      {
+        "path": "types/menu.d.ts",
+        "sha256": "7789c2ffbc33fe9e0c656a6808a4e325c6a9c3f597c5348738c877d39a04a6a1",
+        "bytes": 24741
+      },
+      {
+        "path": "schematics/ng-add/package-config.d.ts",
+        "sha256": "448e690589007416d95f76606f4bc8fd519ff61e7216b8456a0e2ed6eb1a535b",
+        "bytes": 615
+      },
+      {
+        "path": "types/paginator-testing.d.ts",
+        "sha256": "8743a3227928b9d7feb8eb5eea940210bf71d2fa9272ce3acaf6966e125499bf",
+        "bytes": 2330
+      },
+      {
+        "path": "types/paginator.d.ts",
+        "sha256": "5d5830c9bc41e7585cf17c016a75d1b440815ac25256fc2e2357b5fae1d8c946",
+        "bytes": 1485
+      },
+      {
+        "path": "types/progress-bar-testing.d.ts",
+        "sha256": "fe5d527a64abf8973f865ee8485a4751f6fd4081ec6a89507e0e87cfc6d358b2",
+        "bytes": 1165
+      },
+      {
+        "path": "types/progress-bar.d.ts",
+        "sha256": "d627ae7dcb40a918272ec74b252a04320938102ea1475e962f060c0a3e3a86f8",
+        "bytes": 5048
+      },
+      {
+        "path": "types/progress-spinner-testing.d.ts",
+        "sha256": "f8f6d783f09cf24c5f1fcb3fea4135c32888954b27fc5c85e4146ce880c8ea8d",
+        "bytes": 1403
+      },
+      {
+        "path": "types/progress-spinner.d.ts",
+        "sha256": "7b2dbb9b9d3c879fb511fac640eeef56a97d1e743d03b664f2280b8007394024",
+        "bytes": 792
+      },
+      {
+        "path": "types/radio-testing.d.ts",
+        "sha256": "b7822ca80940676a7e16fe0b21ddb3cba1af53c784b29db4969d85d5757cee92",
+        "bytes": 5244
+      },
+      {
+        "path": "types/radio.d.ts",
+        "sha256": "3364c7a86ff2c69922e4008b4f470b764a528d2d7161903585049d8028c7aca8",
+        "bytes": 14612
+      },
+      {
+        "path": "schematics/ng-add/schema.d.ts",
+        "sha256": "1ec88249889bb0244e11a6e903261bb83831c0a6f4266e552480961bfdd62ede",
+        "bytes": 495
+      },
+      {
+        "path": "schematics/ng-generate/address-form/schema.d.ts",
+        "sha256": "152704262f91901c32283fb672cabc0cd4e877fa81417ae5cf8c37b87633486d",
+        "bytes": 337
+      },
+      {
+        "path": "schematics/ng-generate/dashboard/schema.d.ts",
+        "sha256": "152704262f91901c32283fb672cabc0cd4e877fa81417ae5cf8c37b87633486d",
+        "bytes": 337
+      },
+      {
+        "path": "schematics/ng-generate/navigation/schema.d.ts",
+        "sha256": "152704262f91901c32283fb672cabc0cd4e877fa81417ae5cf8c37b87633486d",
+        "bytes": 337
+      },
+      {
+        "path": "schematics/ng-generate/table/schema.d.ts",
+        "sha256": "152704262f91901c32283fb672cabc0cd4e877fa81417ae5cf8c37b87633486d",
+        "bytes": 337
+      },
+      {
+        "path": "schematics/ng-generate/tree/schema.d.ts",
+        "sha256": "152704262f91901c32283fb672cabc0cd4e877fa81417ae5cf8c37b87633486d",
+        "bytes": 337
+      },
+      {
+        "path": "types/select-testing.d.ts",
+        "sha256": "56a7c1661a5b006bc4cf54d97e64a1a9736f48bec32f610b03b16cb8e96a8f5e",
+        "bytes": 3281
+      },
+      {
+        "path": "types/select.d.ts",
+        "sha256": "206ca46926d97eb8be9a35dc9071e1d35211aefb434fb909a96d6e9a2ab67816",
+        "bytes": 22041
+      },
+      {
+        "path": "schematics/ng-add/setup-project.d.ts",
+        "sha256": "e123dd71b032c9a876b3f52253e7e4772692a27e84cc4f5e47b9e4f38c25377f",
+        "bytes": 497
+      },
+      {
+        "path": "types/sidenav-testing.d.ts",
+        "sha256": "1c4651d35dad58ba048145f3a41f83add2ec7e69cbbc7da1b2814800885b5771",
+        "bytes": 6238
+      },
+      {
+        "path": "types/sidenav.d.ts",
+        "sha256": "f7681e0e324f57d6ad955b109e7a937d22d9cb6e0bd2ecb2508898da0743c3e3",
+        "bytes": 16259
+      },
+      {
+        "path": "types/slide-toggle-testing.d.ts",
+        "sha256": "e28606dac4debb6b1a75017ba1c3dbc66990174cb1183bdc46da40cc45fb1d6e",
+        "bytes": 2960
+      },
+      {
+        "path": "types/slide-toggle.d.ts",
+        "sha256": "3bdbfdd23b6ee11874dfa03065f3f1833db225bb3cac3f197986e6dbea6d8267",
+        "bytes": 8136
+      },
+      {
+        "path": "types/slider-testing.d.ts",
+        "sha256": "03157bf695e63242720435d72e92b1d416d874b8308a9780a274d9bf9b29b497",
+        "bytes": 4036
+      },
+      {
+        "path": "types/slider.d.ts",
+        "sha256": "bd722849c3b434fadb9ec86aca271d1f8d9b0eda1b3c9d017f0c4298f54cad7d",
+        "bytes": 27883
+      },
+      {
+        "path": "types/snack-bar-testing.d.ts",
+        "sha256": "af7b4db13df3a0f7760fad87aa710e04d25ae6483b6c121683e1e5dbe55d7497",
+        "bytes": 2702
+      },
+      {
+        "path": "types/snack-bar.d.ts",
+        "sha256": "7117a2a5ac866f0ee8863f136bddf1ca8715118af410cb108ed4dcc57b3bb6bd",
+        "bytes": 15057
+      },
+      {
+        "path": "types/sort-testing.d.ts",
+        "sha256": "13532228365b85e061a4e86b56bb329b9e9f19b421256fc5f1adae05a5313b5b",
+        "bytes": 2131
+      },
+      {
+        "path": "types/sort.d.ts",
+        "sha256": "5825a39990a359173dd59321af0547e7f810c458a34a259813b5dd8843c6e42b",
+        "bytes": 6076
+      },
+      {
+        "path": "types/stepper-testing.d.ts",
+        "sha256": "40393f03c6a2d849f6bf4d886fd565b58d6e8dab079b88109f7f2b6596838376",
+        "bytes": 6416
+      },
+      {
+        "path": "types/stepper.d.ts",
+        "sha256": "502ee5466aa41600669796bfef8c3ae3760b4f4f5fa4bd7b472ef4199122e400",
+        "bytes": 12491
+      },
+      {
+        "path": "types/table-testing.d.ts",
+        "sha256": "80a95f87616fe177eeffa9f914e9185f568f0884e01e51369776f2053bc5ac3b",
+        "bytes": 9450
+      },
+      {
+        "path": "types/table.d.ts",
+        "sha256": "3a9be400b7440108719c63edd2aee7117f10d92b63c59b0ba691831639ebd96e",
+        "bytes": 16948
+      },
+      {
+        "path": "types/tabs-testing.d.ts",
+        "sha256": "82b5197de7f99a46e6e9ddb684074228b7ffdba49150613f7e0a3eb92599218e",
+        "bytes": 7291
+      },
+      {
+        "path": "types/tabs.d.ts",
+        "sha256": "d63d56688e24118bb38d0f224248c59f0330a60df3fe457a068a9842eb9616fd",
+        "bytes": 43670
+      },
+      {
+        "path": "schematics/ng-add/theming/theming.d.ts",
+        "sha256": "f70e23ce773615ce1f1542ae7d41b60a9c56c25a0c323aac150ff2af345d1cd4",
+        "bytes": 418
+      },
+      {
+        "path": "types/timepicker-testing.d.ts",
+        "sha256": "0d48ebb5b746ff90fa43d0d6e42e3718f9ae8e6ab5d25adcefcfc53c65fd2fcc",
+        "bytes": 5249
+      },
+      {
+        "path": "types/timepicker.d.ts",
+        "sha256": "8a054d196c31ba420f90d6b674dd8381daaec1ceff541088dea874a90874fd0f",
+        "bytes": 15440
+      },
+      {
+        "path": "types/toolbar-testing.d.ts",
+        "sha256": "df3dd90562158f94e9a365ac6d9d1e7e3048fb8182483e90b247e6bf55618876",
+        "bytes": 1468
+      },
+      {
+        "path": "types/toolbar.d.ts",
+        "sha256": "9ba649dd3213b496cc2cb0713be51cd0b9ca63110ffd7f0941876c396f6ccb90",
+        "bytes": 2176
+      },
+      {
+        "path": "types/tooltip-testing.d.ts",
+        "sha256": "c0c330827dfe6d574f7f8ceaf63ccca845d31691c846a35230d66206b4ea4f38",
+        "bytes": 1418
+      },
+      {
+        "path": "types/tooltip.d.ts",
+        "sha256": "1f65962e27d83fc913b3513d26a6db0696447356428c051348ef6e171153872f",
+        "bytes": 16016
+      },
+      {
+        "path": "types/tree-testing.d.ts",
+        "sha256": "107acfbacd332506702cec20e9b65f5ee7c9b41967cd1bc102269eaaafdf3328",
+        "bytes": 4691
+      },
+      {
+        "path": "types/tree.d.ts",
+        "sha256": "7389799c95469033bc7822a2822b97931f5083407b14eef5f470f895ae7d63f4",
+        "bytes": 10714
+      }
+    ]
+  },
+  "retained_packed_evidence": {
+    "qualification": {
+      "path": "compatibility/rc/packed-cva-current-artifact-paired-qualification.json",
+      "sha256": "fbd8166a855f51b5b1e3e0de6849d504a22df498fdf56d3d05a0008f4509cba0"
+    },
+    "run": {
+      "path": "compatibility/rc/packed-cva-current-artifact-paired-21-run.gz",
+      "sha256": "56658a4377160856d3de359eb01113389bdf0997742dc3b35aaee15d76a97fec",
+      "raw_sha256": "656e536aabc5af0a0fde572896d8460bdf0b4e1cbc6a08d624e39cd097a5ac51"
+    }
+  },
+  "current_product_identity": {
+    "packed_source_commit": "e22e54eda8c16e70a47a6de581314e1d54931748",
+    "members": 1142,
+    "git_tree_listing_sha256": "0721e0eb4c47df69204a7dc0e9e596c6b1d20b67508ac4c4dfd04edadb3f37c8",
+    "all_current_file_bytes_equal_actual_packed_source": true,
+    "extra_product_paths": 0
+  },
+  "tagged_label_template": {
+    "path": "reference/material-16.2.14/template-control-flow/legacy-form-field--form-field.html",
+    "sha256": "dc80c869416cb7a75c53c9ef6101a379a13d1aa2b0ec7479e734838ff6dc52d3",
+    "git_blob": "1e69358fe3d91491a70502e3e5881234cc72c7c8"
+  },
+  "current_label_template": {
+    "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+    "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67",
+    "legacy_label_class_id_and_for_binding_preserved": true
+  },
+  "icon_testing_ownership": {
+    "production_ts_members": 532,
+    "direct_edges": [],
+    "unknown_dynamic_imports": []
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "compiler": "5.9.2",
+    "arch": "arm64",
+    "platform": "linux",
+    "angular": "21.2.23",
+    "cdk": "21.2.14",
+    "material": "21.2.14",
+    "package_install_executed": false
+  },
+  "limitations": [
+    "Real packed harnesses, real public CDK HarnessEnvironment/Container/Predicate and real public Angular Injector execute; elements and selector queries are explicit record-backed protocol adapters.",
+    "No browser DOM, Angular component view, original upstream fixture suite, new pack/AOT run, Node/RxJS/x64 floor or full gate matrix was executed.",
+    "The original patch MDC-prefixed label implementation is a rejected historical reversion. Current minimum behavior, not that research snapshot, is the execution subject.",
+    "These individual decisions have no canonical admission credit until the shared current-source/ledger successor is qualified."
+  ],
+  "canonical_dispositions_changed": 0,
+  "g11_claim": "not-passed"
+}
