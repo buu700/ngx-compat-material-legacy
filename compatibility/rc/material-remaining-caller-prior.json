@@ -1,0 +1,1515 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "4cb2733bf1c64f5cc004c337dde5c2b8c72953bf",
+  "scope": "Seven original still-open input/divider/datepicker-harness dependency roles;no source closure or product change. Shared canonical owner retains all ledger writes.",
+  "selected": [
+    {
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "original_row": {
+        "module": "@angular/material/input",
+        "symbol": "MatInput",
+        "file": "legacy-input/input.ts",
+        "status": "inventory-seed",
+        "disposition": "open"
+      }
+    },
+    {
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "original_row": {
+        "module": "@angular/material/divider",
+        "symbol": "MatDividerModule",
+        "file": "legacy-list/list-module.ts",
+        "status": "inventory-seed",
+        "disposition": "open"
+      }
+    },
+    {
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "original_row": {
+        "module": "@angular/material/divider/testing",
+        "symbol": "DividerHarnessFilters",
+        "file": "legacy-list/testing/list-harness-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open"
+      }
+    },
+    {
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "original_row": {
+        "module": "@angular/material/divider/testing",
+        "symbol": "MatDividerHarness",
+        "file": "legacy-list/testing/list-harness-base.ts",
+        "status": "inventory-seed",
+        "disposition": "open"
+      }
+    },
+    {
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "original_row": {
+        "module": "@angular/material/datepicker/testing",
+        "symbol": "MatDatepickerInputHarness",
+        "file": "legacy-form-field/testing/form-field-harness.ts",
+        "status": "inventory-seed",
+        "disposition": "open"
+      }
+    },
+    {
+      "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+      "original_row": {
+        "module": "@angular/material/datepicker/testing",
+        "symbol": "MatDateRangeInputHarness",
+        "file": "legacy-form-field/testing/form-field-harness.ts",
+        "status": "inventory-seed",
+        "disposition": "open"
+      }
+    },
+    {
+      "ledger": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "original_row": {
+        "file": "legacy-input/public-api.ts",
+        "module": "@angular/material/input",
+        "symbol": "MAT_INPUT_VALUE_ACCESSOR",
+        "candidate_source_sha256": "bf381a98b409411fd5a28de33f821a5aed87acb9113d136ca03ebb455e881d62",
+        "occurrences": [
+          {
+            "kind": "named-reexport",
+            "local_name": "MAT_LEGACY_INPUT_VALUE_ACCESSOR",
+            "type_only": false,
+            "line": 14
+          }
+        ],
+        "status": "unreviewed-current-use",
+        "disposition": "open"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.ts",
+      "sha256": "cf3c8465eb017702809eaa5fa33af7636dd81f395912fb2fe3f64fcaddad2cb9",
+      "bytes": 3581,
+      "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {HarnessPredicate, parallel} from '@angular/cdk/testing';\nimport {\n  MatDatepickerInputHarness,\n  MatDateRangeInputHarness,\n} from '@angular/material/datepicker/testing';\nimport {FormFieldHarnessFilters} from '@angular/material/form-field/testing';\nimport {MatLegacyInputHarness} from '@ngx-compat/material-legacy/legacy-input/testing';\nimport {MatLegacySelectHarness} from '@ngx-compat/material-legacy/legacy-select/testing';\nimport {MatLegacyErrorHarness} from './error-harness';\nimport {_MatFormFieldHarnessBase} from './form-field-harness-base';\n\n/**\n * Possible harnesses of controls which can be bound to a form-field.\n */\nexport type LegacyFormFieldControlHarness =\n  | MatLegacyInputHarness\n  | MatLegacySelectHarness\n  | MatDatepickerInputHarness\n  | MatDateRangeInputHarness;\n\n/**\n * Harness for interacting with a standard Material form-field's in tests.\n */\nexport class MatLegacyFormFieldHarness extends _MatFormFieldHarnessBase<\n  LegacyFormFieldControlHarness,\n  typeof MatLegacyErrorHarness\n> {\n  static hostSelector = '.mat-form-field';\n\n  static with(options: FormFieldHarnessFilters = {}): HarnessPredicate<MatLegacyFormFieldHarness> {\n    return new HarnessPredicate(MatLegacyFormFieldHarness, options)\n      .addOption('floatingLabelText', options.floatingLabelText, async (harness, text) =>\n        HarnessPredicate.stringMatches(await harness.getLabel(), text),\n      )\n      .addOption(\n        'hasErrors',\n        options.hasErrors,\n        async (harness, hasErrors) => (await harness.hasErrors()) === hasErrors,\n      )\n      .addOption(\n        'isValid',\n        options.isValid,\n        async (harness, isValid) => (await harness.isControlValid()) === isValid,\n      );\n  }\n\n  protected _prefixContainer = this.locatorForOptional('.mat-form-field-prefix');\n  protected _suffixContainer = this.locatorForOptional('.mat-form-field-suffix');\n  protected _label = this.locatorForOptional('.mat-form-field-label');\n  protected _errors = this.locatorForAll('.mat-error');\n  protected _hints = this.locatorForAll('mat-hint, .mat-hint');\n  protected _inputControl = this.locatorForOptional(MatLegacyInputHarness);\n  protected _selectControl = this.locatorForOptional(MatLegacySelectHarness);\n  protected _datepickerInputControl = this.locatorForOptional(MatDatepickerInputHarness);\n  protected _dateRangeInputControl = this.locatorForOptional(MatDateRangeInputHarness);\n  protected _errorHarness = MatLegacyErrorHarness;\n\n  async getAppearance(): Promise<'legacy' | 'standard' | 'fill' | 'outline'> {\n    const hostClasses = await (await this.host()).getAttribute('class');\n    if (hostClasses !== null) {\n      const appearanceMatch = hostClasses.match(\n        /mat-form-field-appearance-(legacy|standard|fill|outline)(?:$| )/,\n      );\n      if (appearanceMatch) {\n        return appearanceMatch[1] as 'legacy' | 'standard' | 'fill' | 'outline';\n      }\n    }\n    throw Error('Could not determine appearance of form-field.');\n  }\n\n  async hasLabel(): Promise<boolean> {\n    return (await this.host()).hasClass('mat-form-field-has-label');\n  }\n\n  async isLabelFloating(): Promise<boolean> {\n    const host = await this.host();\n    const [hasLabel, shouldFloat] = await parallel(() => [\n      this.hasLabel(),\n      host.hasClass('mat-form-field-should-float'),\n    ]);\n    return hasLabel && shouldFloat;\n  }\n}\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.ts",
+      "sha256": "bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550",
+      "bytes": 2826,
+      "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {Directive, inject} from '@angular/core';\nimport {MatInput as BaseMatInput} from '@angular/material/input';\nimport {\n  MatLegacyFormFieldControl,\n  MatLegacyFormField,\n  MAT_LEGACY_FORM_FIELD,\n} from '@ngx-compat/material-legacy/legacy-form-field';\n\n/**\n * Directive that allows a native input to work inside a `MatFormField`.\n */\n@Directive({\n  standalone: false,\n  selector: `input[matInput], textarea[matInput], select[matNativeControl],\n      input[matNativeControl], textarea[matNativeControl]`,\n  exportAs: 'matInput',\n  host: {\n    /**\n     * @breaking-change 8.0.0 remove .mat-form-field-autofill-control in favor of AutofillMonitor.\n     */\n    'class': 'mat-input-element mat-form-field-autofill-control',\n    '[class.mat-input-server]': '_isServer',\n    // These classes are inherited from the base input class and need to be cleared.\n    '[class.mat-mdc-input-element]': 'false',\n    '[class.mat-mdc-form-field-textarea-control]': 'false',\n    '[class.mat-mdc-form-field-input-control]': 'false',\n    '[class.mdc-text-field__input]': 'false',\n    '[class.mat-mdc-native-select-inline]': 'false',\n    // At the time of writing, we have a lot of customer tests that look up the input based on its\n    // placeholder. Since we sometimes omit the placeholder attribute from the DOM to prevent screen\n    // readers from reading it twice, we have to keep it somewhere in the DOM for the lookup.\n    '[attr.data-placeholder]': 'placeholder',\n    '[class.mat-native-select-inline]': '_isInlineSelect()',\n  },\n  providers: [{provide: MatLegacyFormFieldControl, useExisting: MatLegacyInput}],\n})\nexport class MatLegacyInput extends BaseMatInput {\n  private _legacyFormField = inject<MatLegacyFormField>(MAT_LEGACY_FORM_FIELD, {optional: true});\n\n  /** Construct through Angular node DI; retired dependency arguments must not be ignored. */\n  constructor() {\n    if (arguments.length) {\n      throw new Error('MatLegacyInput manual dependency arguments are not supported.');\n    }\n    super();\n  }\n\n  protected override _getPlaceholder() {\n    // If we're hiding the native placeholder, it should also be cleared from the DOM, otherwise\n    // screen readers will read it out twice: once from the label and once from the attribute.\n    // TODO: can be removed once we get rid of the `legacy` style for the form field, because it's\n    // the only one that supports promoting the placeholder to a label.\n    const formField = this._legacyFormField;\n    return formField && formField.appearance === 'legacy' && !formField._hasLabel?.()\n      ? null\n      : this.placeholder;\n  }\n}\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/public-api.ts",
+      "sha256": "bf381a98b409411fd5a28de33f821a5aed87acb9113d136ca03ebb455e881d62",
+      "bytes": 610,
+      "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nexport {MatLegacyInput} from './input';\nexport {MatLegacyInputModule} from './input-module';\nexport {\n\n  MAT_INPUT_VALUE_ACCESSOR as MAT_LEGACY_INPUT_VALUE_ACCESSOR,\n\n} from '@angular/material/input';\n\nexport {MatCommonModule} from './internal/common-module';\n\nexport {\n\n  getMatInputUnsupportedTypeError as getMatLegacyInputUnsupportedTypeError,\n} from './owned-errors';\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0",
+      "bytes": 1639,
+      "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {CommonModule} from '@angular/common';\nimport {NgModule} from '@angular/core';\nimport {MatRippleModule, MatLineModule} from '@angular/material/core';\nimport {MatLegacyPseudoCheckboxModule as MatPseudoCheckboxModule} from '@ngx-compat/material-legacy/legacy-core';\nimport {MatCommonModule} from './internal/common-module';\nimport {\n  MatLegacyList,\n  MatLegacyNavList,\n  MatLegacyListAvatarCssMatStyler,\n  MatLegacyListIconCssMatStyler,\n  MatLegacyListItem,\n  MatLegacyListSubheaderCssMatStyler,\n} from './list';\nimport {MatLegacyListOption, MatLegacySelectionList} from './selection-list';\nimport {MatDividerModule} from '@angular/material/divider';\n\n\n@NgModule({\n  imports: [MatLineModule, MatRippleModule, MatCommonModule, MatPseudoCheckboxModule, CommonModule],\n  exports: [\n    MatLegacyList,\n    MatLegacyNavList,\n    MatLegacyListItem,\n    MatLegacyListAvatarCssMatStyler,\n    MatLineModule,\n    MatCommonModule,\n    MatLegacyListIconCssMatStyler,\n    MatLegacyListSubheaderCssMatStyler,\n    MatPseudoCheckboxModule,\n    MatLegacySelectionList,\n    MatLegacyListOption,\n    MatDividerModule,\n  ],\n  declarations: [\n    MatLegacyList,\n    MatLegacyNavList,\n    MatLegacyListItem,\n    MatLegacyListAvatarCssMatStyler,\n    MatLegacyListIconCssMatStyler,\n    MatLegacyListSubheaderCssMatStyler,\n    MatLegacySelectionList,\n    MatLegacyListOption,\n  ],\n})\nexport class MatLegacyListModule {}\n"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+      "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f",
+      "bytes": 6954,
+      "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n */\n\nimport {\n  ComponentHarness,\n  ComponentHarnessConstructor,\n  HarnessPredicate,\n  parallel,\n} from '@angular/cdk/testing';\nimport {DividerHarnessFilters, MatDividerHarness} from '@angular/material/divider/testing';\nimport {\n  LegacyBaseListItemHarnessFilters,\n  LegacySubheaderHarnessFilters,\n} from './list-harness-filters';\nimport {MatLegacySubheaderHarness} from './list-item-harness-base';\n\n/**\n * Represents a section of a list falling under a specific header.\n */\nexport interface ListSection<I> {\n  /** The heading for this list section. `undefined` if there is no heading. */\n  heading?: string;\n\n  /** The items in this list section. */\n  items: I[];\n}\n\n/**\n * Shared behavior among the harnesses for the various `MatList` flavors.\n * @template T A constructor type for a list item harness type used by this list harness.\n * @template C The list item harness type that `T` constructs.\n * @template F The filter type used filter list item harness of type `C`.\n * @docs-private\n */\nexport abstract class MatLegacyListHarnessBase<\n  T extends ComponentHarnessConstructor<C> & {with: (options?: F) => HarnessPredicate<C>},\n  C extends ComponentHarness,\n  F extends LegacyBaseListItemHarnessFilters,\n> extends ComponentHarness {\n  protected _itemHarness: T;\n\n  /**\n   * Gets a list of harnesses representing the items in this list.\n   * @param filters Optional filters used to narrow which harnesses are included\n   * @return The list of items matching the given filters.\n   */\n  async getItems(filters?: F): Promise<C[]> {\n    return this.locatorForAll(this._itemHarness.with(filters))();\n  }\n\n  /**\n   * Gets a list of `ListSection` representing the list items grouped by subheaders. If the list has\n   * no subheaders it is represented as a single `ListSection` with an undefined `heading` property.\n   * @param filters Optional filters used to narrow which list item harnesses are included\n   * @return The list of items matching the given filters, grouped into sections by subheader.\n   */\n  async getItemsGroupedBySubheader(filters?: F): Promise<ListSection<C>[]> {\n    type Section = {items: C[]; heading?: Promise<string>};\n    const listSections: Section[] = [];\n    let currentSection: Section = {items: []};\n    const itemsAndSubheaders = await this.getItemsWithSubheadersAndDividers({\n      item: filters,\n      divider: false,\n    });\n    for (const itemOrSubheader of itemsAndSubheaders) {\n      if (itemOrSubheader instanceof MatLegacySubheaderHarness) {\n        if (currentSection.heading !== undefined || currentSection.items.length) {\n          listSections.push(currentSection);\n        }\n        currentSection = {heading: itemOrSubheader.getText(), items: []};\n      } else {\n        currentSection.items.push(itemOrSubheader);\n      }\n    }\n    if (\n      currentSection.heading !== undefined ||\n      currentSection.items.length ||\n      !listSections.length\n    ) {\n      listSections.push(currentSection);\n    }\n\n    // Concurrently wait for all sections to resolve their heading if present.\n    return parallel(() =>\n      listSections.map(async s => ({items: s.items, heading: await s.heading})),\n    );\n  }\n\n  /**\n   * Gets a list of sub-lists representing the list items grouped by dividers. If the list has no\n   * dividers it is represented as a list with a single sub-list.\n   * @param filters Optional filters used to narrow which list item harnesses are included\n   * @return The list of items matching the given filters, grouped into sub-lists by divider.\n   */\n  async getItemsGroupedByDividers(filters?: F): Promise<C[][]> {\n    const listSections: C[][] = [[]];\n    const itemsAndDividers = await this.getItemsWithSubheadersAndDividers({\n      item: filters,\n      subheader: false,\n    });\n    for (const itemOrDivider of itemsAndDividers) {\n      if (itemOrDivider instanceof MatDividerHarness) {\n        listSections.push([]);\n      } else {\n        listSections[listSections.length - 1].push(itemOrDivider);\n      }\n    }\n    return listSections;\n  }\n\n  /**\n   * Gets a list of harnesses representing all of the items, subheaders, and dividers\n   * (in the order they appear in the list). Use `instanceof` to check which type of harness a given\n   * item is.\n   * @param filters Optional filters used to narrow which list items, subheaders, and dividers are\n   *     included. A value of `false` for the `item`, `subheader`, or `divider` properties indicates\n   *     that the respective harness type should be omitted completely.\n   * @return The list of harnesses representing the items, subheaders, and dividers matching the\n   *     given filters.\n   */\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader: false;\n    divider: false;\n  }): Promise<[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item?: F | false;\n    subheader: false;\n    divider: false;\n  }): Promise<C[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader?: LegacySubheaderHarnessFilters | false;\n    divider: false;\n  }): Promise<MatLegacySubheaderHarness[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader: false;\n    divider?: DividerHarnessFilters | false;\n  }): Promise<MatDividerHarness[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item?: F | false;\n    subheader?: LegacySubheaderHarnessFilters | false;\n    divider: false;\n  }): Promise<(C | MatLegacySubheaderHarness)[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item?: F | false;\n    subheader: false;\n    divider?: false | DividerHarnessFilters;\n  }): Promise<(C | MatDividerHarness)[]>;\n  getItemsWithSubheadersAndDividers(filters: {\n    item: false;\n    subheader?: false | LegacySubheaderHarnessFilters;\n    divider?: false | DividerHarnessFilters;\n  }): Promise<(MatLegacySubheaderHarness | MatDividerHarness)[]>;\n  getItemsWithSubheadersAndDividers(filters?: {\n    item?: F | false;\n    subheader?: LegacySubheaderHarnessFilters | false;\n    divider?: DividerHarnessFilters | false;\n  }): Promise<(C | MatLegacySubheaderHarness | MatDividerHarness)[]>;\n  async getItemsWithSubheadersAndDividers(\n    filters: {\n      item?: F | false;\n      subheader?: LegacySubheaderHarnessFilters | false;\n      divider?: DividerHarnessFilters | false;\n    } = {},\n  ): Promise<(C | MatLegacySubheaderHarness | MatDividerHarness)[]> {\n    const query = [];\n    if (filters.item !== false) {\n      query.push(this._itemHarness.with(filters.item || ({} as F)));\n    }\n    if (filters.subheader !== false) {\n      query.push(MatLegacySubheaderHarness.with(filters.subheader));\n    }\n    if (filters.divider !== false) {\n      query.push(MatDividerHarness.with(filters.divider));\n    }\n    return this.locatorForAll(...query)();\n  }\n}\n"
+    }
+  ],
+  "ledgers": [
+    {
+      "path": "compatibility/f10/authored-dependency-dispositions.json",
+      "sha256": "22f81ed49050f2bb1ae958b1b538c1f66eb4b385180134cb487cd5c785bb9615",
+      "bytes": 2222370
+    },
+    {
+      "path": "compatibility/f10/authored-dependency-current-dispositions.json",
+      "sha256": "89ce1541226fef5d5572a30104d93f9e20a2d01165306314944c3f37d922bca7",
+      "bytes": 330124
+    }
+  ],
+  "SHA_ledger": {
+    "path": "compatibility/f10/disposition-ledger/ledger.json",
+    "sha256": "fef61e52408395001b8c4ecf940cdfeb0125e5b3e2fd70cd4e77475f972930d3",
+    "bytes": 4265288
+  },
+  "frozen": 6,
+  "additional": 1,
+  "source_closures": 0,
+  "actual_native_packed_AOT_or_full_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "graph": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input.ts",
+      "sha256": "bfa91322a82df274acedc1eee030f03083470f254cee0e0f49207c11ef4db550",
+      "bytes": 2826
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "sha256": "84a6c7233b5925e9563e03d3f0c3b4b93acb18374d848519eef25ec25d987229",
+      "bytes": 1433
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+      "sha256": "f609d34d2cf9afa9c61ac673cb0c10f561e61bdb5794c07d1068ddfd5bea7132",
+      "bytes": 1224
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/common-module.ts",
+      "sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+      "bytes": 374
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/error.ts",
+      "sha256": "e61d7f50c3656786383cd2b56cbb8be3ee500b5634e3429b22f066e023bda22e",
+      "bytes": 1145
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/owned-tokens.ts",
+      "sha256": "b3b11912c3bc34a535e5fb7307ed50dbd84b5b76307e5d476b2ecaa023810820",
+      "bytes": 791
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+      "bytes": 27236
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/index.ts",
+      "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+      "bytes": 625
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+      "bytes": 450
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+      "bytes": 1888
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+      "bytes": 1073
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+      "bytes": 1211
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/tabindex.ts",
+      "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+      "bytes": 1503
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/error-state.ts",
+      "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+      "bytes": 2623
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/initialized.ts",
+      "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+      "bytes": 3061
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/hint.ts",
+      "sha256": "c129fc51d60d9a7f2c273da3c8ee195719df230c9c7a1925abf1dc969f581b05",
+      "bytes": 1524
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/label.ts",
+      "sha256": "692e91b5be81b2d97067b90b93034a59e819291fd0a02d1d0391fcd62d4c1476",
+      "bytes": 427
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/placeholder.ts",
+      "sha256": "80f69d2dc9b99e792b1f371341c7abf38166ecb7712be7479afe831851df2d81",
+      "bytes": 552
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/prefix.ts",
+      "sha256": "5264de6060bf8c3a4e15cf1e53f4c0aa6f6cd5a6e9b81905e197529bcc5c8c21",
+      "bytes": 567
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/suffix.ts",
+      "sha256": "e6e1dca48a10c5659a64def6a68caa688e1841b3d1db922c53343a59ebc2b014",
+      "bytes": 569
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts",
+      "sha256": "3edca3208021bf71f1b9f8e6c7cdc9832b057b60c10fdd676b69d34d2e3f825a",
+      "bytes": 1201
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/owned-errors.ts",
+      "sha256": "1b5e334abf67a07d38af317254a19368989d6abda1475ef75eddfc618b73a735",
+      "bytes": 734
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "sha256": "6a3f48147d777f9147d72cb2ed2fcf3a887819093a3886549188706c57acbd1d",
+      "bytes": 3459
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "sha256": "8401473eb98adbdbdda06e00a47720894812c29e91f43a2faeccdef702ac5616",
+      "bytes": 1562
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/index.ts",
+      "sha256": "d99fa8684192aefe15472cd683390d9d4677fe84ec03fde4b2d00beaf07d496c",
+      "bytes": 371
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+      "sha256": "7c6cbffc3f95b6f30b0f599f781d2fcb882b75c308f5cadbffa8107a9fd20758",
+      "bytes": 2747
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts",
+      "sha256": "203162d90b57fa53211f6c8d815b3db33d01b3b221a82a8c29170eeb6385c6f3",
+      "bytes": 3438
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts",
+      "sha256": "11512cc4728417252cb1d24b98be7e9e11992d90817e2f9da64cf54f20b2e48b",
+      "bytes": 510
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+      "sha256": "8f8d7dbcf89c151f6bb953f8a0e803b2d64cdb07fbcedfa460415c7f5c22afe6",
+      "bytes": 4603
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/sanity-checks.ts",
+      "sha256": "8756b0495ab4f02518887dff55ab844ff433a267c5e899a9b6abfe005863e9d7",
+      "bytes": 960
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/test-environment.ts",
+      "sha256": "83f0fb37e81c2e5294719bac3b337f1fa7983152ae9693ff8c9d4459e66b0408",
+      "bytes": 985
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+      "sha256": "fc4bb9db4bbfb5ede0680b572cab060ad23b6f91d84791f69c09706dfd57db31",
+      "bytes": 1783
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option-parent.ts",
+      "sha256": "66b28658db553b2acab126ee730e688ef926abb09a74e79364a0cd5f081671e0",
+      "bytes": 756
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option-base.ts",
+      "sha256": "b6aba076348d3059f55abeffaddad3faf1db4f4cdb34ed71eb72d51d03e9fe66",
+      "bytes": 8149
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts",
+      "sha256": "5a4e965749ff544dfa856e9d20569f653ce51082ab3d831fae5f5359ae7d98b9",
+      "bytes": 3120
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts",
+      "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+      "bytes": 625
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+      "bytes": 450
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+      "bytes": 1888
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+      "bytes": 1073
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+      "bytes": 1211
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/tabindex.ts",
+      "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+      "bytes": 1503
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/error-state.ts",
+      "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+      "bytes": 2623
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/initialized.ts",
+      "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+      "bytes": 3061
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/optgroup.ts",
+      "sha256": "f9a203ff1766b9ef0e4f67a68e3cd7c92d55b980066e0aab761d1de590f72727",
+      "bytes": 1125
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/option/option-helpers.ts",
+      "sha256": "3c7a654a4f14e5ec3157efcc4dde4bf94825c14f8c150a6b8b2285c54269e568",
+      "bytes": 1488
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts",
+      "sha256": "8cf84411934f43287f6045dd146a8e42044a2d68d80587c31feeeb707b723667",
+      "bytes": 896
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/animation/animation-constants.ts",
+      "sha256": "9c5b272e2ac9bc44fbe6cfa2d2741e3a11a8d0fe786e54ddfdb9d1dfacb7133e",
+      "bytes": 817
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/line/line.ts",
+      "sha256": "dce137354958eb1710088a405c12816777d6f2f1949c67061929aef29230a115",
+      "bytes": 1460
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/date-locale.ts",
+      "sha256": "82e40a57157919c44fe1bdc46bbe45758565a8c889fd256c87079ec70d99d837",
+      "bytes": 492
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts",
+      "sha256": "39a8a95c574620b4aa4ef50a30b86eba359c793d69d504b53fb98d4962c4119e",
+      "bytes": 2182
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/coercion/number-property.ts",
+      "sha256": "d2aabb3342afa87eeb9a032597404a7009347668f73baca8cd65b66a8d7401ef",
+      "bytes": 689
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+      "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0",
+      "bytes": 3744
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/index.ts",
+      "sha256": "bb1177a1a13bc75224e27d6f41cecb9f82b80db8bcf05c3577eecf9458641e0c",
+      "bytes": 449
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts",
+      "sha256": "4821492afe8b8f13782032fee0e16886fe002d8c79f33bc1332fd4813d91edd2",
+      "bytes": 1391
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+      "sha256": "e6cb6501bc303fbb2fa061fff272d9dce171216a7c58eb8fc6980c50b7c8c08b",
+      "bytes": 12100
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts",
+      "sha256": "2cb38621b0481e8745d306422dca5eba1ad4dce31f3e86931680feaf4f2fe0be",
+      "bytes": 2270
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts",
+      "sha256": "b69f5c2bbc12deb6ff4c420252733f51742616e016b2a6193de066cf4eecade5",
+      "bytes": 8524
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+      "sha256": "ea7b50c1618c5631f6dddb395461a144fb2d9448d2e1cb05222664ade19b23c1",
+      "bytes": 871
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "sha256": "d9fcc264e69075865049a010a7a7bb2f6f5adf46af5a2580f64371fb748590a0",
+      "bytes": 1639
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/internal/common-module.ts",
+      "sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+      "bytes": 374
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/list.ts",
+      "sha256": "6c358d9985e677d5ba8037f3b9aa471d35f657a172ab789f754f41952ebd0d7e",
+      "bytes": 6980
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts",
+      "sha256": "888d6d1fe93953653e3137540115c6c3ed244cbdb8624c3016ced3c057bcd16d",
+      "bytes": 625
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/constructor.ts",
+      "sha256": "41982bb567b216e5e0eae5dc35b813b9a01ae8bdf8551a4d5287903df491e98a",
+      "bytes": 450
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/color.ts",
+      "sha256": "1236aca56df8cf1d6c78e6378650ffffeeffc954033f26811fbc715daea94bfc",
+      "bytes": 1888
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/disabled.ts",
+      "sha256": "15f03d593b40045219a37c37ee5e23c25a262cf2876f705736cec8dd0177abf5",
+      "bytes": 1073
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/disable-ripple.ts",
+      "sha256": "c2aae62682a0aac5ebe46fd0abb02011171049fc9560dd2f3510b1d23537dd53",
+      "bytes": 1211
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/tabindex.ts",
+      "sha256": "694a0680a4065648c832f39e6ad8e517be9b7bf8301abbdfc70fd45f9177d230",
+      "bytes": 1503
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/error-state.ts",
+      "sha256": "f636a5d09ae9367fff294ae0e88e56a566ce72295c023b14901d0438e9d1e6c8",
+      "bytes": 2623
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/initialized.ts",
+      "sha256": "3206a21d7ae191d6ac761c4b52ba7f1485dd18c6c6cc684f294e3f95a5950625",
+      "bytes": 3061
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/selection-list.ts",
+      "sha256": "e408bbc42e122dcb9197d2fb850740a9cf769d650ec70442b595428ce747c206",
+      "bytes": 24059
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+      "sha256": "c511626638a75dc4ef705e01c706765b6eb90975e42291395144de94794d468f",
+      "bytes": 6954
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/testing/list-harness-filters.ts",
+      "sha256": "2261cbe7b8e9a5b0b0cbe362ebbba89476594a49e7c2fbb460720f017be3c9f8",
+      "bytes": 1260
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/testing/list-item-harness-base.ts",
+      "sha256": "b49f36b9a6e12fd0f5681556a7ebc7944bfed652855d114a1cf1111a8fe786c1",
+      "bytes": 3499
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.ts",
+      "sha256": "cf3c8465eb017702809eaa5fa33af7636dd81f395912fb2fe3f64fcaddad2cb9",
+      "bytes": 3581
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/testing/public-api.ts",
+      "sha256": "956aad3c92347b7acbbfbb5099c6dc02963079502485c57a3148c62aef39c3f7",
+      "bytes": 654
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/testing/input-harness.ts",
+      "sha256": "4c15c8613506468170e5f9302b1a25245e596a65ca8f3dd593fd9e6fc8bf5bbf",
+      "bytes": 1444
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/testing/public-api.ts",
+      "sha256": "e1dbc2f83b0d85cff0d3650e117fcdbeafa2ebf0c20075fa99bd1bd5303a2d3b",
+      "bytes": 329
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/testing/select-harness.ts",
+      "sha256": "0b8560eee9a4a92681772a34285cd7c1c3a64265866fb8428c6f311d9c70b80c",
+      "bytes": 1446
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/testing/public-api.ts",
+      "sha256": "c768a9a0ec083b8715bb3ecd8716aff7a21388f4ded4c8b4721ba280a12a7be9",
+      "bytes": 463
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/testing/option-harness.ts",
+      "sha256": "12ea0c5ed0328b21539171999330f7951895462a85e5b95d17466faa539c0a88",
+      "bytes": 1629
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/testing/option-harness-filters.ts",
+      "sha256": "8a80a389f69aa0d3d8ef8f9604e0a14d3e4a52e8de61d568de805a0c75a63d02",
+      "bytes": 422
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/testing/optgroup-harness.ts",
+      "sha256": "5bdb03ffa12a6450dbbc468c78bcca1caa3f736d41fb69c7966541001d6ab0a8",
+      "bytes": 1419
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/testing/optgroup-harness-filters.ts",
+      "sha256": "f9684121a3e6fee150e022fc34c99c04752b9882be55f36298a1e43768ece689",
+      "bytes": 405
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/testing/select-harness-filters.ts",
+      "sha256": "6e511ef54dc399b79724b0be2946c13d7eabf0f475ca898728ed3f0aec4c90b6",
+      "bytes": 556
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/testing/select-harness-base.ts",
+      "sha256": "76dd504f9744c34493c32b95311ed92047cc000974361402db7037214adeb6e7",
+      "bytes": 4052
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts",
+      "sha256": "7d259447752aea972328fcc9f5c3c126893720ffab84bc4ea755b38cd4c0848f",
+      "bytes": 1007
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness-base.ts",
+      "sha256": "e4910d6f5291a880375ac0b9a58f8d9468ad28a5644743a8ef765ec87878cac4",
+      "bytes": 5006
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/public-api.ts",
+      "sha256": "bf381a98b409411fd5a28de33f821a5aed87acb9113d136ca03ebb455e881d62",
+      "bytes": 610
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/input-module.ts",
+      "sha256": "70edcdcd8c5fb0ec33e98efd4500ad6cd469ce728040e5c80448458286f52360",
+      "bytes": 1007
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/internal/common-module.ts",
+      "sha256": "a36d4381d828eccbf40815dcac053048a054b3fa6ce90f6fb41b58b04183c8ee",
+      "bytes": 374
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-input/owned-errors.ts",
+      "sha256": "5afd885f9510f6c0a0cf5e72ebd944b93f80c1d4ce148f71e78901ae3a725ad2",
+      "bytes": 401
+    }
+  ],
+  "metadata": [
+    {
+      "specifier": "@ngx-compat/material-legacy/legacy-form-field",
+      "path": "projects/ngx-material-legacy/legacy-form-field/ng-package.json",
+      "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+      "bytes": 38,
+      "entry": "projects/ngx-material-legacy/legacy-form-field/public-api.ts"
+    },
+    {
+      "specifier": "@ngx-compat/material-legacy/legacy-core",
+      "path": "projects/ngx-material-legacy/legacy-core/ng-package.json",
+      "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+      "bytes": 38,
+      "entry": "projects/ngx-material-legacy/legacy-core/public-api.ts"
+    },
+    {
+      "specifier": "@ngx-compat/material-legacy/legacy-input/testing",
+      "path": "projects/ngx-material-legacy/legacy-input/testing/ng-package.json",
+      "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+      "bytes": 38,
+      "entry": "projects/ngx-material-legacy/legacy-input/testing/public-api.ts"
+    },
+    {
+      "specifier": "@ngx-compat/material-legacy/legacy-select/testing",
+      "path": "projects/ngx-material-legacy/legacy-select/testing/ng-package.json",
+      "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+      "bytes": 38,
+      "entry": "projects/ngx-material-legacy/legacy-select/testing/public-api.ts"
+    },
+    {
+      "specifier": "@ngx-compat/material-legacy/legacy-core/testing",
+      "path": "projects/ngx-material-legacy/legacy-core/testing/ng-package.json",
+      "sha256": "7e9ac727fee783de8aa9c29f31937d13f49465f4a9b7a23a648d8176d29270e7",
+      "bytes": 38,
+      "entry": "projects/ngx-material-legacy/legacy-core/testing/public-api.ts"
+    }
+  ],
+  "edges": [
+    {
+      "from": "projects/ngx-material-legacy/legacy-input/input.ts",
+      "specifier": "@ngx-compat/material-legacy/legacy-form-field",
+      "to": "projects/ngx-material-legacy/legacy-form-field/public-api.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./form-field-module",
+      "to": "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+      "specifier": "./internal/common-module",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+      "specifier": "./error",
+      "to": "projects/ngx-material-legacy/legacy-form-field/error.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/error.ts",
+      "specifier": "./owned-tokens",
+      "to": "projects/ngx-material-legacy/legacy-form-field/owned-tokens.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+      "specifier": "./form-field",
+      "to": "projects/ngx-material-legacy/legacy-form-field/form-field.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "./internal/common-behaviors",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/index.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/index.ts",
+      "specifier": "./color",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/color.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/color.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/index.ts",
+      "specifier": "./disabled",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/disabled.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/disabled.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/index.ts",
+      "specifier": "./disable-ripple",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/disable-ripple.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/disable-ripple.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/index.ts",
+      "specifier": "./tabindex",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/tabindex.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/tabindex.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/tabindex.ts",
+      "specifier": "./disabled",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/disabled.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/index.ts",
+      "specifier": "./error-state",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/error-state.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/error-state.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/index.ts",
+      "specifier": "./initialized",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/initialized.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/initialized.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "./error",
+      "to": "projects/ngx-material-legacy/legacy-form-field/error.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "./hint",
+      "to": "projects/ngx-material-legacy/legacy-form-field/hint.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "./label",
+      "to": "projects/ngx-material-legacy/legacy-form-field/label.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "./placeholder",
+      "to": "projects/ngx-material-legacy/legacy-form-field/placeholder.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "./prefix",
+      "to": "projects/ngx-material-legacy/legacy-form-field/prefix.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/prefix.ts",
+      "specifier": "./owned-tokens",
+      "to": "projects/ngx-material-legacy/legacy-form-field/owned-tokens.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "./suffix",
+      "to": "projects/ngx-material-legacy/legacy-form-field/suffix.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/suffix.ts",
+      "specifier": "./owned-tokens",
+      "to": "projects/ngx-material-legacy/legacy-form-field/owned-tokens.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "./internal/after-form-field-render",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/after-form-field-render.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "./owned-tokens",
+      "to": "projects/ngx-material-legacy/legacy-form-field/owned-tokens.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "./owned-errors",
+      "to": "projects/ngx-material-legacy/legacy-form-field/owned-errors.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+      "specifier": "@ngx-compat/material-legacy/legacy-core",
+      "to": "projects/ngx-material-legacy/legacy-core/public-api.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./option/index",
+      "to": "projects/ngx-material-legacy/legacy-core/option/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "../pseudo-checkbox",
+      "to": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/index.ts",
+      "specifier": "./pseudo-checkbox",
+      "to": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts",
+      "specifier": "../internal/legacy-animations",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/index.ts",
+      "specifier": "./pseudo-checkbox-module",
+      "to": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox-module.ts",
+      "specifier": "./pseudo-checkbox",
+      "to": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/pseudo-checkbox.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "../internal/common-module",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+      "specifier": "./sanity-checks",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/sanity-checks.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts",
+      "specifier": "./test-environment",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/test-environment.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "./option",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+      "specifier": "./option-parent",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option-parent.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+      "specifier": "./option-base",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/option-base.ts",
+      "specifier": "./optgroup-base",
+      "to": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts",
+      "specifier": "../internal/common-behaviors",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts",
+      "specifier": "./color",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/color.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/color.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts",
+      "specifier": "./disabled",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disabled.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disabled.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts",
+      "specifier": "./disable-ripple",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disable-ripple.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disable-ripple.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts",
+      "specifier": "./tabindex",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/tabindex.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/tabindex.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/tabindex.ts",
+      "specifier": "./disabled",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/disabled.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts",
+      "specifier": "./error-state",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/error-state.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/error-state.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts",
+      "specifier": "./initialized",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/initialized.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/initialized.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts",
+      "specifier": "./option-parent",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option-parent.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/option-base.ts",
+      "specifier": "./option-parent",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option-parent.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+      "specifier": "./optgroup-base",
+      "to": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/option.ts",
+      "specifier": "./optgroup",
+      "to": "projects/ngx-material-legacy/legacy-core/option/optgroup.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/optgroup.ts",
+      "specifier": "./optgroup-base",
+      "to": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "./optgroup",
+      "to": "projects/ngx-material-legacy/legacy-core/option/optgroup.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "./option",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "./optgroup",
+      "to": "projects/ngx-material-legacy/legacy-core/option/optgroup.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "./option-base",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "./optgroup-base",
+      "to": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "./option-parent",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option-parent.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "./option-base",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/index.ts",
+      "specifier": "./option-helpers",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option-helpers.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/option-helpers.ts",
+      "specifier": "./option-base",
+      "to": "projects/ngx-material-legacy/legacy-core/option/option-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/option/option-helpers.ts",
+      "specifier": "./optgroup-base",
+      "to": "projects/ngx-material-legacy/legacy-core/option/optgroup-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/common-module",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/legacy-animations",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/legacy-animations",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/legacy-animations.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/motion-event",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/motion-event.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/animation/animation-constants",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/animation/animation-constants.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/common-behaviors",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/sanity-checks",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/sanity-checks.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/sanity-checks",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/sanity-checks.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/common-behaviors/color",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/common-behaviors/color.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/line/line",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/line/line.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/datetime/date-locale",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/datetime/date-locale.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/dom/shadow-dom",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/coercion/number-property",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/coercion/number-property.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/legacy-viewport",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./pseudo-checkbox",
+      "to": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./pseudo-checkbox",
+      "to": "projects/ngx-material-legacy/legacy-core/pseudo-checkbox/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./ripple",
+      "to": "projects/ngx-material-legacy/legacy-core/ripple/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/ripple/index.ts",
+      "specifier": "./ripple-ref",
+      "to": "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/ripple/index.ts",
+      "specifier": "./ripple-renderer",
+      "to": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+      "specifier": "./ripple-ref",
+      "to": "projects/ngx-material-legacy/legacy-core/ripple/ripple-ref.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/ripple/ripple-renderer.ts",
+      "specifier": "./ripple-event-manager",
+      "to": "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/ripple/ripple-event-manager.ts",
+      "specifier": "../internal/dom/shadow-dom",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/dom/shadow-dom.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./ripple",
+      "to": "projects/ngx-material-legacy/legacy-core/ripple/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/datetime/native-date-adapter",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/public-api.ts",
+      "specifier": "./internal/datetime/native-date-module",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-module.ts",
+      "specifier": "./native-date-adapter",
+      "to": "projects/ngx-material-legacy/legacy-core/internal/datetime/native-date-adapter.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+      "specifier": "./hint",
+      "to": "projects/ngx-material-legacy/legacy-form-field/hint.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+      "specifier": "./label",
+      "to": "projects/ngx-material-legacy/legacy-form-field/label.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+      "specifier": "./placeholder",
+      "to": "projects/ngx-material-legacy/legacy-form-field/placeholder.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+      "specifier": "./prefix",
+      "to": "projects/ngx-material-legacy/legacy-form-field/prefix.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/form-field-module.ts",
+      "specifier": "./suffix",
+      "to": "projects/ngx-material-legacy/legacy-form-field/suffix.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./error",
+      "to": "projects/ngx-material-legacy/legacy-form-field/error.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./form-field",
+      "to": "projects/ngx-material-legacy/legacy-form-field/form-field.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./hint",
+      "to": "projects/ngx-material-legacy/legacy-form-field/hint.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./placeholder",
+      "to": "projects/ngx-material-legacy/legacy-form-field/placeholder.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./prefix",
+      "to": "projects/ngx-material-legacy/legacy-form-field/prefix.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./suffix",
+      "to": "projects/ngx-material-legacy/legacy-form-field/suffix.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./label",
+      "to": "projects/ngx-material-legacy/legacy-form-field/label.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./owned-tokens",
+      "to": "projects/ngx-material-legacy/legacy-form-field/owned-tokens.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./internal/common-module",
+      "to": "projects/ngx-material-legacy/legacy-form-field/internal/common-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/public-api.ts",
+      "specifier": "./owned-errors",
+      "to": "projects/ngx-material-legacy/legacy-form-field/owned-errors.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "specifier": "@ngx-compat/material-legacy/legacy-core",
+      "to": "projects/ngx-material-legacy/legacy-core/public-api.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "specifier": "./internal/common-module",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "specifier": "./list",
+      "to": "projects/ngx-material-legacy/legacy-list/list.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/list.ts",
+      "specifier": "@ngx-compat/material-legacy/legacy-core",
+      "to": "projects/ngx-material-legacy/legacy-core/public-api.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/list.ts",
+      "specifier": "./internal/common-behaviors",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts",
+      "specifier": "./color",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/color.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/color.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts",
+      "specifier": "./disabled",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/disabled.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/disabled.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts",
+      "specifier": "./disable-ripple",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/disable-ripple.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/disable-ripple.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts",
+      "specifier": "./tabindex",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/tabindex.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/tabindex.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/tabindex.ts",
+      "specifier": "./disabled",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/disabled.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts",
+      "specifier": "./error-state",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/error-state.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/error-state.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts",
+      "specifier": "./initialized",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/initialized.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/initialized.ts",
+      "specifier": "./constructor",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/constructor.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/list-module.ts",
+      "specifier": "./selection-list",
+      "to": "projects/ngx-material-legacy/legacy-list/selection-list.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/selection-list.ts",
+      "specifier": "@ngx-compat/material-legacy/legacy-core",
+      "to": "projects/ngx-material-legacy/legacy-core/public-api.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/selection-list.ts",
+      "specifier": "./internal/common-behaviors",
+      "to": "projects/ngx-material-legacy/legacy-list/internal/common-behaviors/index.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/selection-list.ts",
+      "specifier": "./list",
+      "to": "projects/ngx-material-legacy/legacy-list/list.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+      "specifier": "./list-harness-filters",
+      "to": "projects/ngx-material-legacy/legacy-list/testing/list-harness-filters.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/testing/list-harness-base.ts",
+      "specifier": "./list-item-harness-base",
+      "to": "projects/ngx-material-legacy/legacy-list/testing/list-item-harness-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-list/testing/list-item-harness-base.ts",
+      "specifier": "./list-harness-filters",
+      "to": "projects/ngx-material-legacy/legacy-list/testing/list-harness-filters.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.ts",
+      "specifier": "@ngx-compat/material-legacy/legacy-input/testing",
+      "to": "projects/ngx-material-legacy/legacy-input/testing/public-api.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-input/testing/public-api.ts",
+      "specifier": "./input-harness",
+      "to": "projects/ngx-material-legacy/legacy-input/testing/input-harness.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.ts",
+      "specifier": "@ngx-compat/material-legacy/legacy-select/testing",
+      "to": "projects/ngx-material-legacy/legacy-select/testing/public-api.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-select/testing/public-api.ts",
+      "specifier": "./select-harness",
+      "to": "projects/ngx-material-legacy/legacy-select/testing/select-harness.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-select/testing/select-harness.ts",
+      "specifier": "@ngx-compat/material-legacy/legacy-core/testing",
+      "to": "projects/ngx-material-legacy/legacy-core/testing/public-api.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/testing/public-api.ts",
+      "specifier": "./option-harness",
+      "to": "projects/ngx-material-legacy/legacy-core/testing/option-harness.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/testing/option-harness.ts",
+      "specifier": "./option-harness-filters",
+      "to": "projects/ngx-material-legacy/legacy-core/testing/option-harness-filters.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/testing/public-api.ts",
+      "specifier": "./option-harness-filters",
+      "to": "projects/ngx-material-legacy/legacy-core/testing/option-harness-filters.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/testing/public-api.ts",
+      "specifier": "./optgroup-harness",
+      "to": "projects/ngx-material-legacy/legacy-core/testing/optgroup-harness.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/testing/optgroup-harness.ts",
+      "specifier": "./optgroup-harness-filters",
+      "to": "projects/ngx-material-legacy/legacy-core/testing/optgroup-harness-filters.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/testing/optgroup-harness.ts",
+      "specifier": "./option-harness",
+      "to": "projects/ngx-material-legacy/legacy-core/testing/option-harness.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/testing/optgroup-harness.ts",
+      "specifier": "./option-harness-filters",
+      "to": "projects/ngx-material-legacy/legacy-core/testing/option-harness-filters.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-core/testing/public-api.ts",
+      "specifier": "./optgroup-harness-filters",
+      "to": "projects/ngx-material-legacy/legacy-core/testing/optgroup-harness-filters.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-select/testing/select-harness.ts",
+      "specifier": "./select-harness-filters",
+      "to": "projects/ngx-material-legacy/legacy-select/testing/select-harness-filters.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-select/testing/select-harness.ts",
+      "specifier": "./select-harness-base",
+      "to": "projects/ngx-material-legacy/legacy-select/testing/select-harness-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-select/testing/public-api.ts",
+      "specifier": "./select-harness-filters",
+      "to": "projects/ngx-material-legacy/legacy-select/testing/select-harness-filters.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.ts",
+      "specifier": "./error-harness",
+      "to": "projects/ngx-material-legacy/legacy-form-field/testing/error-harness.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness.ts",
+      "specifier": "./form-field-harness-base",
+      "to": "projects/ngx-material-legacy/legacy-form-field/testing/form-field-harness-base.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-input/public-api.ts",
+      "specifier": "./input",
+      "to": "projects/ngx-material-legacy/legacy-input/input.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-input/public-api.ts",
+      "specifier": "./input-module",
+      "to": "projects/ngx-material-legacy/legacy-input/input-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-input/input-module.ts",
+      "specifier": "./internal/common-module",
+      "to": "projects/ngx-material-legacy/legacy-input/internal/common-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-input/input-module.ts",
+      "specifier": "@ngx-compat/material-legacy/legacy-form-field",
+      "to": "projects/ngx-material-legacy/legacy-form-field/public-api.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-input/input-module.ts",
+      "specifier": "./input",
+      "to": "projects/ngx-material-legacy/legacy-input/input.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-input/public-api.ts",
+      "specifier": "./internal/common-module",
+      "to": "projects/ngx-material-legacy/legacy-input/internal/common-module.ts"
+    },
+    {
+      "from": "projects/ngx-material-legacy/legacy-input/public-api.ts",
+      "specifier": "./owned-errors",
+      "to": "projects/ngx-material-legacy/legacy-input/owned-errors.ts"
+    }
+  ],
+  "peers": [
+    "@angular/cdk",
+    "@angular/cdk/a11y",
+    "@angular/cdk/bidi",
+    "@angular/cdk/coercion",
+    "@angular/cdk/collections",
+    "@angular/cdk/keycodes",
+    "@angular/cdk/layout",
+    "@angular/cdk/observers",
+    "@angular/cdk/platform",
+    "@angular/cdk/testing",
+    "@angular/cdk/text-field",
+    "@angular/common",
+    "@angular/core",
+    "@angular/forms",
+    "@angular/material/core",
+    "@angular/material/datepicker/testing",
+    "@angular/material/divider",
+    "@angular/material/divider/testing",
+    "@angular/material/form-field",
+    "@angular/material/form-field/testing",
+    "@angular/material/form-field/testing/control",
+    "@angular/material/input",
+    "@angular/material/input/testing",
+    "@angular/material/list",
+    "rxjs",
+    "rxjs/operators"
+  ],
+  "graph_owner": {
+    "path": "scripts/component-config-caller-contracts.mjs",
+    "sha256": "24be3a147f30287364f771f40d3df5b9f2e2f3ba427969cf2c6665bf0b3067d8",
+    "bytes": 10239
+  },
+  "alias_allowlist": {
+    "path": "compatibility/rc/api/export-name-allowlist.json",
+    "sha256": "567bcc35f75dbe80af4061da4204bf3433f68d3b59a878e2836dd2753ed44c14",
+    "bytes": 12935
+  }
+}
