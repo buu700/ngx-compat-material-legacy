@@ -15,7 +15,7 @@ class MenuPanelSourceIntegration(unittest.TestCase):
         command = ['node', 'scripts/run-historical-source-probe.mjs', 'menu-panel-integration']
         if os.environ.get('NGX_MENU_PANEL_INTEGRATION_DIAGNOSTIC'):
             command.extend(['--original-report', os.environ['NGX_MENU_PANEL_INTEGRATION_DIAGNOSTIC']])
-        child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=180)
+        child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=180 + 180)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)
         self.assertEqual(report['rebindings'], 6)

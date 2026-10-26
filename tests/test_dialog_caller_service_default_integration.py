@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class DialogServiceDefaultIntegration(unittest.TestCase):
     def test_applied_source_records_and_all_original_obligations(self):
         result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'dialog-default-integration'],
-                                cwd=ROOT, capture_output=True, text=True, timeout=180)
+                                cwd=ROOT, capture_output=True, text=True, timeout=180 + 180)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-10000:])
         report = json.loads(result.stdout)
         self.assertEqual(report['source_rebindings'], 11)

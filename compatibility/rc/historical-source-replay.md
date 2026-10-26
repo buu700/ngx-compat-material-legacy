@@ -1117,7 +1117,7 @@ current-graph verification and cleanup owner. Their separate pinned registry is
 `compatibility/rc/source-integration-history-inputs.json`; it does not alter the
 original26 entries,23 wrapper records,two wrapper successors or two mutable
 progress paths. The added wrappers are ordinary strictly captured current-frame
-members. Their exact command/report redirects are additionally checked against
+members. Their exact command/report redirects and outer budgets are checked against
 immutable original Python bytes; their assertions and child timeout limits stay
 unchanged.
 
@@ -1144,10 +1144,19 @@ differ; an existing original-report destination is rejected before execution and
 is never overwritten. Standard output remains the original program output.
 
 The dialog candidate-history validator keeps its original recorded program list.
-For its former integration wrapper it accepts only this registered command-only
+For its former integration wrapper it accepts only this registered exact replay
 successor. Its boundary test remains live, and
 `tests/material_remaining_caller_integration_probe.mjs` separately validates the
 current25-row ledger transition and raw/native reader boundary. Historical
 checks retain31 open source obligations at their checkpoints; current source
 admission has six packed CVA roles open. Neither state qualifies packed controls,
 native rendering, consumer floors or the complete release gates.
+
+The eight Python wrappers allow exactly180 seconds for extraction, graph
+verification and cleanup in addition to the original program budget. The shared
+Node runner still enforces each original120/180/360-second child limit. The
+independent AST guard requires every original assertion and exactly this finite
+outer-budget addition. This does not make a timed-out original program pass: the
+recorded main dialog configuration timeout remains failed. Full cohorts remain
+pending; one original menu integration replay passed on each line before this
+outer-budget correction.

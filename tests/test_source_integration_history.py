@@ -2,7 +2,7 @@
 # Copyright Google LLC All Rights Reserved.
 # Copyright (c) 2026 Ryan Lester.
 # Use of this source code is governed by the MIT license in LICENSE.
-"""Exact original source integration programs and their command-only redirects."""
+"""Exact original source integration programs and their exact replay redirects."""
 import json
 from pathlib import Path
 import subprocess
@@ -24,6 +24,8 @@ class SourceIntegrationHistory(unittest.TestCase):
         self.assertEqual(report['invalid_CLI_requests_rejected'], 4)
         self.assertTrue(report['original_programs_and_Python_assertions_unchanged'])
         self.assertTrue(report['original_child_timeouts_unchanged'])
+        self.assertEqual(report['wrapper_orchestration_overhead_seconds'], 180)
+        self.assertEqual(report['exact_Python_orchestration_budgets'], 8)
         self.assertFalse(report['old_programs_executed_by_this_guard'])
 
 
