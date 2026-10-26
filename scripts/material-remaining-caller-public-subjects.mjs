@@ -15,10 +15,10 @@ import {execFileSync} from 'node:child_process';
 import {prepareComponentConfigPublicSubjects, componentConfigPublicClosure} from './component-config-caller-public-subjects.mjs';
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 export const MATERIAL_REMAINING_SUBJECTS = 'compatibility/rc/material-remaining-caller-public-subjects.json';
-const pin = 'b64de22a4423e5f552455b97344ae82fd1f7172d29fde65bd61144500807c7cf';
+const pin = '676a0091788c4f133875d1b1c556a7cd0a150e31a7f8df0928d398ca1eed35c5';
 const roots = ['@angular/material/input', '@angular/material/divider',
   '@angular/material/divider/testing', '@angular/material/datepicker/testing',
-  '@angular/material/form-field/testing'];
+  '@angular/material/form-field/testing', '@angular/material/input/testing'];
 const rootsFor = line => [...roots, ...(line === 'original' ?
   ['@angular/material/legacy-input', '@angular/material/legacy-input/testing',
     '@angular/material/legacy-list/testing', '@angular/material/legacy-form-field/testing'] : [])];
