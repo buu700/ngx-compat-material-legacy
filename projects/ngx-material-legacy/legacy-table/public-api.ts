@@ -9,6 +9,8 @@
 
 export {MatLegacyTableModule} from './table-module';
 export {_LegacyTableDefinitionOwner} from './internal/definition-owner';
+// Angular's partial compiler needs NgModule-exported directives at this entrypoint.
+export {_LegacyTableColumnClasses as ɵLegacyTableColumnClasses} from './internal/column-classes';
 export {
   MatLegacyCellDef,
   MatLegacyHeaderCellDef,
