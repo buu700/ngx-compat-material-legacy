@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "C04 current dialog source/type-metadata primitive and frozen menu declaration replay; full shared source admission remains incomplete",
+  "source_checkpoint": "cb998c04824f6f34bdf374906d707954ace25cb7",
+  "implementation": {
+    "path": "scripts/snack-dom-source-context.mjs",
+    "before_sha256": "e360309b184447658d19123214d89c26a85947497bb72893625d3dff5dda11d0",
+    "sha256": "abe74f7cc8dedfa30e42f9c9da822853642161749a1fd29b08bbaddcdc4ca541",
+    "exact_edits": [
+      {
+        "before": "inspectDialogOwnedContracts({root,read,requireApplied:true})",
+        "after": "inspectSnackCurrentDialogContracts({root,read})",
+        "occurrences": 5
+      },
+      {
+        "before": "/** Independently qualify the exact dialog callbacks against the committed public proof. */",
+        "after": "/** Replay one frozen type-metadata input; every product/graph read remains current. */\nexport function inspectSnackCurrentDialogContracts({root=process.cwd(),read=rawRead(root)}={}){\n read=currentRaw(root,read);\n const typeRead=packedRepairTypeEvidenceRead({root,read});\n const allowance='compatibility/rc/api/export-name-allowlist.json';\n const evidenceRead=path=>path===allowance?typeRead(path):read(path);\n return inspectDialogOwnedContracts({root,read:evidenceRead,requireApplied:true});\n}\n/** Independently qualify the exact dialog callbacks against the committed public proof. */",
+        "occurrences": 1
+      },
+      {
+        "before": "m=data.menu_type,q=qualifiedMenuContentTypeBoundary({line,readMember:read});",
+        "after": "m=data.menu_type,typeRead=packedRepairTypeEvidenceRead({root,read}),q=qualifiedMenuContentTypeBoundary({line,readMember:typeRead});",
+        "occurrences": 1
+      },
+      {
+        "before": "hash(read(member.path)),current?.sha256??member.sha256,'changed menu type qualification '",
+        "after": "hash(typeRead(member.path)),current?.sha256??member.sha256,'changed menu type qualification '",
+        "occurrences": 1
+      }
+    ]
+  },
+  "probe": {
+    "path": "tests/packed_dialog_type_metadata_probe.mjs",
+    "sha256": "fd0a69044fbab1b1b4ad9d743d4e2ed48ccbba027c7b2f9539b2f859fbab6821"
+  },
+  "wrapper": {
+    "path": "tests/test_packed_dialog_type_metadata.py",
+    "sha256": "76acfe95d3ebe78268d21edaf344f1baf48894e7623f337bdf08e31ea4238710"
+  },
+  "primitive_result": "pass",
+  "positive_cases": 5,
+  "rejected_controls": 12,
+  "current_applied_dialog_source_members": 49,
+  "historical_metadata_paths": [
+    "compatibility/rc/api/export-name-allowlist.json"
+  ],
+  "historical_menu_type_source_members": 53,
+  "current_product_reads_projected_by_dialog_adapter": 0,
+  "source_use_regression": {
+    "mode": "same shipped source-use admission functions and extracted actual strict CLI reader;1697SHAtraversal omitted",
+    "original_source_reviews": 1736,
+    "additional_source_obligations": 315,
+    "insufficient": 0,
+    "current_ready": true,
+    "full_ledger_executed_this_step": false,
+    "g11_claim": "not-passed"
+  },
+  "reports": {
+    "probe-current": {
+      "path": "compatibility/rc/packed-dialog-type-metadata-probe-current.gz",
+      "sha256": "43d6bf2d8a90c203e8ff5151b65982b9291ebbc652976a5719ba0a7c2ed18fe8",
+      "raw_sha256": "4b7c249a7afd96a7039a19054fac6a9cfa8b9a97ba6e8f94cd07aad1aeb1c4d4",
+      "raw_bytes": 1222
+    },
+    "unittest-current": {
+      "path": "compatibility/rc/packed-dialog-type-metadata-unittest-current.gz",
+      "sha256": "8e151f8c07bdd5dcc3089b52e287536b1fe7bfc86947de9893325ddb5f2f8f4b",
+      "raw_sha256": "00c2c9aa6ed567b02affc2eff6e2c3f482361fa543d650570bd7c9fa5f08001d",
+      "raw_bytes": 99
+    },
+    "probe-preceding": {
+      "path": "compatibility/rc/packed-dialog-type-metadata-probe-preceding.gz",
+      "sha256": "54d24485c0bbc866d6361a444f0a83e61bffe4db0b95b5f255a805745ab236a6",
+      "raw_sha256": "a657319eb886301a35ef465a05a708edc39de548f0d6fdcef6d747167bbdd26b",
+      "raw_bytes": 1101
+    },
+    "probe-preceding-source": {
+      "path": "compatibility/rc/packed-dialog-type-metadata-probe-preceding-source.gz",
+      "sha256": "6350196d9df5442fa99785df432cd76750fbd9ce80570c04f129e9e42b14be72",
+      "raw_sha256": "7048e4db3f511a79eaabf735c786146fd337caa636d26b2745e92ac814113d18",
+      "raw_bytes": 7198
+    },
+    "source-owner-before": {
+      "path": "compatibility/rc/packed-dialog-type-metadata-source-owner-before.gz",
+      "sha256": "e8774ba31c33a625ae3589688982d8f4ab968651169d438fd0b4bc62a644b61a",
+      "raw_sha256": "e360309b184447658d19123214d89c26a85947497bb72893625d3dff5dda11d0",
+      "raw_bytes": 33316
+    },
+    "source-use": {
+      "path": "compatibility/rc/packed-dialog-type-metadata-source-use.gz",
+      "sha256": "b7ea416ef6ca2907c226f7917834dcfa906ce9c646bbe9d8d0c8feb886f0c437",
+      "raw_sha256": "bef510030f182ab8e835da66e5d187dfb32691031243d40f504fc872e3f96016",
+      "raw_bytes": 1732
+    },
+    "source-use-driver": {
+      "path": "compatibility/rc/packed-dialog-type-metadata-source-use-driver.gz",
+      "sha256": "bd88e377adcc6a5418fcddd290284edbc3d42859022e190d0a2eaa4190046eb7",
+      "raw_sha256": "7da968359a44c60a8a4730e808eb53bd847971339276fb9f0010250220bb0194",
+      "raw_bytes": 2760
+    },
+    "source-use-log": {
+      "path": "compatibility/rc/packed-dialog-type-metadata-source-use-log.gz",
+      "sha256": "95a297241805fd96ee60b83d97270545c45c0b8ba20a02741860800d93f8ec13",
+      "raw_sha256": "132cea81ba6e5b65a11b0c7d0cbfd93fc9031206e5593b2980e93bfc4d8b347c",
+      "raw_bytes": 83
+    }
+  },
+  "shared_source_admission": {
+    "complete": false,
+    "source_scope_SHA_entries_to_requalify": 85,
+    "new_upstream_SHA_decisions": 0,
+    "new_canonical_review_decisions_applied": 0,
+    "next_observed_failure": {
+      "function": "dialogConfigOverlayBridge",
+      "context": "Raw standalone independent menu/snack qualification still reaches a frozen API-allowance expectation in the overlay type bridge. Its raw overlay product scope must also compose the four known packed repairs.",
+      "path": "compatibility/rc/api/export-name-allowlist.json"
+    },
+    "remaining_work": [
+      "Keep frozen declaration/metadata replay distinct from actual current overlay and chip-focus product/spec reads.",
+      "Compose exactly the independently qualified four packed product repairs into the current raw whole-product guards.",
+      "Recompute the85source-scope records with actual current validators; retain original hunk judgments, native requirements and source-use admission.",
+      "Admit the seven separately retained21.xindividual review decisions only after the shared metadata successor is qualified."
+    ]
+  },
+  "unexecuted": [
+    "Full original source-regression cohorts",
+    "New native/browser/AOT/packed or consumer-floor runs",
+    "Full G01-G13 qualification and independent closeout audit"
+  ],
+  "product_HTML_CSS_SCSS_or_peer_changes": 0,
+  "current_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}
