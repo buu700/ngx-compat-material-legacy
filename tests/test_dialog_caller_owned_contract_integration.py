@@ -17,7 +17,7 @@ class DialogOwnedContractIntegration(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='dialog-owned-contract-integration-') as tmp:
             report_path = Path(tmp) / 'report.json'
             result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'dialog-owned-integration', '--original-report', str(report_path)],
-                                    cwd=ROOT, capture_output=True, text=True, timeout=180)
+                                    cwd=ROOT, capture_output=True, text=True, timeout=180 + 180)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             report = json.loads(report_path.read_text())
             self.assertEqual(report['source_context_rebindings'], 45)

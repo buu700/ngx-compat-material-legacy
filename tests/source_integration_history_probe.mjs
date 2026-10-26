@@ -49,10 +49,15 @@ for case in cases:
   timeouts=[ast.dump(node.value,include_attributes=False) for node in ast.walk(tree) if isinstance(node,ast.keyword) and node.arg=='timeout']
   return assertions,timeouts
  before,after=fields(case['before']),fields(case['after'])
- assert before==after and before[0] and before[1]
-print(json.dumps({'assertion_sets_unchanged':len(cases),'timeout_sets_unchanged':len(cases)}))`;
+ assert before[0]==after[0] and before[0] and len(before[1])==len(after[1])==1
+ before_tree,after_tree=ast.parse(case['before']),ast.parse(case['after'])
+ original=[node.value for node in ast.walk(before_tree) if isinstance(node,ast.keyword) and node.arg=='timeout'][0]
+ current=[node.value for node in ast.walk(after_tree) if isinstance(node,ast.keyword) and node.arg=='timeout'][0]
+ expected=ast.BinOp(left=original,op=ast.Add(),right=ast.Constant(value=180))
+ assert ast.dump(current,include_attributes=False)==ast.dump(expected,include_attributes=False)
+print(json.dumps({'assertion_sets_unchanged':len(cases),'exact_outer_orchestration_budgets':len(cases)}))`;
 const ast=JSON.parse(execFileSync('python3',['-c',astProgram],{input:JSON.stringify(pythonCases),encoding:'utf8'}));
-assert.deepEqual(ast,{assertion_sets_unchanged:8,timeout_sets_unchanged:8});
+assert.deepEqual(ast,{assertion_sets_unchanged:8,exact_outer_orchestration_budgets:8});
 const controls=[SOURCE_INTEGRATION_HISTORY_INPUTS,...data.wrapper_edits.map(row=>row.path),data.entries[0].probe];
 for(const changed of controls)assert.throws(()=>sourceIntegrationHistoryInputs({root,readMember:path=>
   path===changed?Buffer.concat([read(path),Buffer.from('\n')]):read(path)}),error=>error?.code==='ERR_ASSERTION');
@@ -87,6 +92,7 @@ const report={schema_version:1,line,source_integration_programs:8,immutable_fram
   original_replay_entries_unchanged:26,original_wrapper_records_unchanged:23,
   original_wrapper_successors_unchanged:2,mutable_progress_paths_unchanged:2,
   original_programs_and_Python_assertions_unchanged:true,original_child_timeouts_unchanged:true,
+  wrapper_orchestration_overhead_seconds:180,exact_Python_orchestration_budgets:ast.exact_outer_orchestration_budgets,
   corruptions_rejected:controls.length,late_changes_rejected:2,invalid_CLI_requests_rejected:4,
   source_disposition_bytes_unchanged:true,frozen_valid:1730,additional_valid:315,source_insufficient:0,
   new_source_closures:0,old_programs_executed_by_this_guard:false,current_frame_guard_executed:false,

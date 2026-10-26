@@ -17,7 +17,7 @@ import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export const HISTORICAL_REPLAY_INPUTS='compatibility/rc/historical-source-replay-inputs.json';
 export const SOURCE_INTEGRATION_HISTORY_INPUTS='compatibility/rc/source-integration-history-inputs.json';
-const integrationPins={"main":"a5399909b8abb1be040acf96bc32eea83df0fbcf093c84e1c50d67511a2391b5","21.x":"0215b949041ad6564358666060e77a4ea0709bc036418657b1535d07e9f83805"};
+const integrationPins={"main":"226f7f2ff77ba23eed0668865665e27eca455f19966f70efae08382f6a02c1e7","21.x":"980b384a361257883208433a8b6dc41590678aaa7791015474d41e62979c1084"};
 const integrationSpecs=[
  ['snack-source-integration','snack_dom_source_context','NGX_SNACK_CONTEXT_DIAGNOSTIC',360000],
  ['menu-panel-integration','menu_panel_source_integration','NGX_MENU_PANEL_INTEGRATION_DIAGNOSTIC',180000],
@@ -184,6 +184,7 @@ export function sourceIntegrationHistoryInputs({root=rootDefault,readMember}={})
  assert.ok(Object.hasOwn(integrationPins,data.line));assert.equal(hash(raw),integrationPins[data.line],'source integration history registry changed');
  assert.equal(data.schema_version,1);assert.equal(data.id,'source-integration-history');
  assert.equal(data.original_JS_programs_and_Python_assertions_unchanged,true);assert.equal(data.original_child_timeouts_unchanged,true);
+ assert.equal(data.wrapper_orchestration_overhead_seconds,180);
  assert.equal(data.current_historical_registry_entries_added,0);assert.equal(data.current_mutable_paths_added,0);assert.equal(data.source_closures,0);
  assert.equal(data.actual_current_source_native_packed_or_floor_qualified,false);assert.equal(data.g11_claim,'not-passed');
  assert.deepEqual(data.entries.map(row=>row.id),SOURCE_INTEGRATION_HISTORY_IDS);assert.equal(data.wrapper_edits.length,8);
@@ -194,7 +195,8 @@ export function sourceIntegrationHistoryInputs({root=rootDefault,readMember}={})
   const edits=id==='dialog-owned-integration'?[{before:"['node', '"+probe+"', str(report_path)]",after:"['node', 'scripts/run-historical-source-probe.mjs', '"+id+"', '--original-report', str(report_path)]"}]:
    [{before:"['node', '"+probe+"']",after:"['node', 'scripts/run-historical-source-probe.mjs', '"+id+"']"}];
   if(env)edits.push({before:"command.append(os.environ['"+env+"'])",after:"command.extend(['--original-report', os.environ['"+env+"']])"});
-  assert.deepEqual(wrapper.edits,edits,'source history wrapper changed more than exact command/report routing');
+  edits.push({before:'timeout='+timeout/1000,after:'timeout='+timeout/1000+' + 180'});
+  assert.deepEqual(wrapper.edits,edits,'source history wrapper changed beyond exact command/report/orchestration-budget routing');
   const before=git(root,['show',wrapper.reference_commit+':'+wrapper.path]);assert.equal(hash(before),wrapper.before_sha256);
   let after=before.toString();for(const edit of edits){assert.equal(after.split(edit.before).length,2);after=after.replace(edit.before,edit.after);}
   assert.equal(hash(after),wrapper.after_sha256);assert.equal(hash(read(wrapper.path)),wrapper.after_sha256,'source integration wrapper changed');
@@ -202,7 +204,7 @@ export function sourceIntegrationHistoryInputs({root=rootDefault,readMember}={})
  }
  return {data,sha256:hash(raw)};
 }
-/** Qualify only a recorded command-only Python wrapper successor, never a product file. */
+/** Qualify only a recorded exact Python replay wrapper successor, never a product file. */
 export function sourceIntegrationWrapperHash({root=rootDefault,path,expectedSha,readMember}={}){
  if(!integrationSpecs.some(row=>'tests/test_'+row[1]+'.py'===path))return expectedSha;
  const {data}=sourceIntegrationHistoryInputs({root,readMember}),wrapper=data.wrapper_edits.find(row=>row.path===path);

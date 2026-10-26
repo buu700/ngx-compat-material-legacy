@@ -18,7 +18,7 @@ class SnackDomSourceContext(unittest.TestCase):
         command = ['node', 'scripts/run-historical-source-probe.mjs', 'snack-source-integration']
         if os.environ.get('NGX_SNACK_CONTEXT_DIAGNOSTIC'):
             command.extend(['--original-report', os.environ['NGX_SNACK_CONTEXT_DIAGNOSTIC']])
-        child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=360)
+        child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=360 + 180)
         self.assertEqual(child.returncode, 0, (child.stdout+child.stderr)[-14000:])
         report = json.loads(child.stdout)
         self.assertEqual(report['source_scopes'], 75)

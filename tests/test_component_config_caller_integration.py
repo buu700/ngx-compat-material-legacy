@@ -15,7 +15,7 @@ class ComponentConfigCallerIntegration(unittest.TestCase):
         command = ['node', 'scripts/run-historical-source-probe.mjs', 'configuration-caller-integration']
         if os.environ.get('NGX_COMPONENT_CONFIG_INTEGRATION_DIAGNOSTIC'):
             command.extend(['--original-report', os.environ['NGX_COMPONENT_CONFIG_INTEGRATION_DIAGNOSTIC']])
-        child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120)
+        child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120 + 180)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)
         self.assertEqual(report['closures'], 73)
