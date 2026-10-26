@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {readFileSync,writeFileSync,readdirSync} from 'node:fs';
+import {join,resolve,dirname} from 'node:path';
+import {createHash} from 'node:crypto';
+const root='/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy',temporary='/tmp/cva-fixture-types-YS5dlG',ts=createRequire(join(root,'package.json'))('typescript');
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const prior=JSON.parse(readFileSync('/tmp/ngx-cva-fixture-main-types-v1.json'));
+const sources=prior.actual_owned_source_files,decls=[];
+for(const row of sources){assert.equal(hash(readFileSync(join(root,row.path))),row.sha256);const p=join(temporary,'types',row.path.slice('projects/ngx-material-legacy/'.length).replace(/\.ts$/,'.d.ts'));decls.push({source:row,path:p,sha256:hash(readFileSync(p))});}
+const fixture=join(temporary,'src/value-accessor-probe.ts');assert.equal(hash(readFileSync(fixture)),prior.generated_fixture_sha256);
+const routes={};function visit(folder){for(const entry of readdirSync(folder,{withFileTypes:true})){const path=join(folder,entry.name);if(entry.isDirectory())visit(path);else if(entry.name==='public-api.d.ts')routes['@ngx-compat/material-legacy/'+dirname(path).slice(join(temporary,'types').length+1)]=[path];}}
+visit(join(temporary,'types'));
+const options={target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,moduleResolution:ts.ModuleResolutionKind.Bundler,experimentalDecorators:true,strict:false,skipLibCheck:false,noEmit:true,types:[],paths:routes};
+const host=ts.createCompilerHost(options);host.resolveModuleNames=(specs,from)=>specs.map(spec=>ts.resolveModuleName(spec,spec.startsWith('@angular/')||spec.startsWith('rxjs')||spec==='tslib'?fixture:from,options,host).resolvedModule);
+const start=Date.now(),program=ts.createProgram([fixture],options,host),diags=ts.getPreEmitDiagnostics(program);
+const report={schema_version:1,role:'Consumer-only fixture diagnostic using complete declaration outputs retained from a timed-out two-stage preflight; no full-library or packed qualification',node:process.version,typescript:ts.version,fixture_sha256:hash(readFileSync(fixture)),declarations:decls,source_matches_current:true,library_diagnostic_report_available:false,prior_full_preflight_exit:124,consumer_diagnostics:diags.map(d=>({file:d.file?.fileName,code:d.code,message:ts.flattenDiagnosticMessageText(d.messageText,'\n')})),elapsed_ms:Date.now()-start,actual_packed_AOT_runtime_or_floor_qualified:false,g11_claim:'not-passed'};
+writeFileSync('/tmp/ngx-cva-consumer-declarations-main-v1.json',JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({source_count:decls.length,diagnostics:report.consumer_diagnostics.slice(0,8),total:diags.length,elapsed_ms:report.elapsed_ms}));process.exitCode=diags.length?1:0;
