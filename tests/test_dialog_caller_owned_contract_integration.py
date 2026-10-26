@@ -16,7 +16,7 @@ class DialogOwnedContractIntegration(unittest.TestCase):
     def test_current_source_and_finite_historical_epochs(self):
         with tempfile.TemporaryDirectory(prefix='dialog-owned-contract-integration-') as tmp:
             report_path = Path(tmp) / 'report.json'
-            result = subprocess.run(['node', 'tests/dialog_caller_owned_contract_integration_probe.mjs', str(report_path)],
+            result = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'dialog-owned-integration', '--original-report', str(report_path)],
                                     cwd=ROOT, capture_output=True, text=True, timeout=180)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             report = json.loads(report_path.read_text())

@@ -16,6 +16,19 @@ import {gunzipSync} from 'node:zlib';
 import {delimiter,dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export const HISTORICAL_REPLAY_INPUTS='compatibility/rc/historical-source-replay-inputs.json';
+export const SOURCE_INTEGRATION_HISTORY_INPUTS='compatibility/rc/source-integration-history-inputs.json';
+const integrationPins={"main":"a5399909b8abb1be040acf96bc32eea83df0fbcf093c84e1c50d67511a2391b5","21.x":"0215b949041ad6564358666060e77a4ea0709bc036418657b1535d07e9f83805"};
+const integrationSpecs=[
+ ['snack-source-integration','snack_dom_source_context','NGX_SNACK_CONTEXT_DIAGNOSTIC',360000],
+ ['menu-panel-integration','menu_panel_source_integration','NGX_MENU_PANEL_INTEGRATION_DIAGNOSTIC',180000],
+ ['menu-caller-integration','menu_caller_integration','NGX_MENU_CALLER_INTEGRATION_DIAGNOSTIC',120000],
+ ['a11y-caller-integration','a11y_caller_integration','NGX_A11Y_CALLER_INTEGRATION_DIAGNOSTIC',120000],
+ ['configuration-caller-integration','component_config_caller_integration','NGX_COMPONENT_CONFIG_INTEGRATION_DIAGNOSTIC',120000],
+ ['dialog-configuration-integration','dialog_caller_config_integration',null,180000],
+ ['dialog-default-integration','dialog_caller_service_default_integration',null,180000],
+ ['dialog-owned-integration','dialog_caller_owned_contract_integration',null,180000],
+];
+export const SOURCE_INTEGRATION_HISTORY_IDS=Object.freeze(integrationSpecs.map(row=>row[0]));
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const pins={main:'3134144f64a2dec7a2e2629e212c7109e57edb118a2feac8aca2d6287d5b9ec6','21.x':'e8287ebac8d608b979f4810419f6ba653a16ca98428642769f052a33185eb2ff'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
@@ -165,10 +178,44 @@ function dependencyRoot(root){
  for(const candidate of candidates)if(existsSync(candidate))return candidate;
  assert.fail('Historical source replay needs the already installed workspace dependencies; no installer is run');
 }
-export async function runHistoricalSourceProbe({root=rootDefault,id,reportPath}={}){
- assert.ok(ids.includes(id),'unregistered historical probe');
+/** Eight later source-model transitions use the same graph execution owner. */
+export function sourceIntegrationHistoryInputs({root=rootDefault,readMember}={}){
+ const read=readMember||((path)=>readFileSync(resolve(root,path))),raw=read(SOURCE_INTEGRATION_HISTORY_INPUTS),data=JSON.parse(raw);
+ assert.ok(Object.hasOwn(integrationPins,data.line));assert.equal(hash(raw),integrationPins[data.line],'source integration history registry changed');
+ assert.equal(data.schema_version,1);assert.equal(data.id,'source-integration-history');
+ assert.equal(data.original_JS_programs_and_Python_assertions_unchanged,true);assert.equal(data.original_child_timeouts_unchanged,true);
+ assert.equal(data.current_historical_registry_entries_added,0);assert.equal(data.current_mutable_paths_added,0);assert.equal(data.source_closures,0);
+ assert.equal(data.actual_current_source_native_packed_or_floor_qualified,false);assert.equal(data.g11_claim,'not-passed');
+ assert.deepEqual(data.entries.map(row=>row.id),SOURCE_INTEGRATION_HISTORY_IDS);assert.equal(data.wrapper_edits.length,8);
+ for(const [index,[id,name,env,timeout]]of integrationSpecs.entries()){
+  const entry=data.entries[index],wrapper=data.wrapper_edits[index],probe='tests/'+name+'_probe.mjs';
+  assert.equal(entry.id,id);assert.equal(entry.probe,probe);assert.equal(entry.timeout_ms,timeout);relativePath(probe);
+  assert.equal(wrapper.path,'tests/test_'+name+'.py');assert.match(wrapper.reference_commit,/^[0-9a-f]{40}$/);
+  const edits=id==='dialog-owned-integration'?[{before:"['node', '"+probe+"', str(report_path)]",after:"['node', 'scripts/run-historical-source-probe.mjs', '"+id+"', '--original-report', str(report_path)]"}]:
+   [{before:"['node', '"+probe+"']",after:"['node', 'scripts/run-historical-source-probe.mjs', '"+id+"']"}];
+  if(env)edits.push({before:"command.append(os.environ['"+env+"'])",after:"command.extend(['--original-report', os.environ['"+env+"']])"});
+  assert.deepEqual(wrapper.edits,edits,'source history wrapper changed more than exact command/report routing');
+  const before=git(root,['show',wrapper.reference_commit+':'+wrapper.path]);assert.equal(hash(before),wrapper.before_sha256);
+  let after=before.toString();for(const edit of edits){assert.equal(after.split(edit.before).length,2);after=after.replace(edit.before,edit.after);}
+  assert.equal(hash(after),wrapper.after_sha256);assert.equal(hash(read(wrapper.path)),wrapper.after_sha256,'source integration wrapper changed');
+  assert.equal(hash(read(probe)),entry.probe_sha256,'original integration program changed');
+ }
+ return {data,sha256:hash(raw)};
+}
+/** Qualify only a recorded command-only Python wrapper successor, never a product file. */
+export function sourceIntegrationWrapperHash({root=rootDefault,path,expectedSha,readMember}={}){
+ if(!integrationSpecs.some(row=>'tests/test_'+row[1]+'.py'===path))return expectedSha;
+ const {data}=sourceIntegrationHistoryInputs({root,readMember}),wrapper=data.wrapper_edits.find(row=>row.path===path);
+ assert.ok(wrapper);assert.ok([wrapper.before_sha256,wrapper.after_sha256].includes(expectedSha),'unknown source integration wrapper reference');
+ return wrapper.after_sha256;
+}
+export async function runHistoricalSourceProbe({root=rootDefault,id,reportPath,originalReportPath}={}){
+ const supplemental=SOURCE_INTEGRATION_HISTORY_IDS.includes(id)?sourceIntegrationHistoryInputs({root}):null;
+ assert.ok(ids.includes(id)||supplemental,'unregistered historical probe');
+ assert.ok(!originalReportPath||supplemental,'original report output is restricted to the eight integration programs');
+ if(originalReportPath)assert.equal(existsSync(originalReportPath),false,'original report destination already exists');
  const started=Date.now(),{data,members:currentMembers,guard}=inspectHistoricalReplayCurrent({root});
- const entry=data.entries.find(row=>row.id===id);assert.ok(entry,'unregistered historical probe');
+ const entry=(supplemental?.data??data).entries.find(row=>row.id===id);assert.ok(entry,'unregistered historical probe');
  const members=historicalFrameMembers(root,entry.frame);assert.equal(hash(git(root,['show',entry.frame.commit+':'+entry.probe])),entry.probe_sha256);
  const parent=mkdtempSync(join(tmpdir(),'ngx-historical-source-')),checkout=join(parent,'checkout');mkdirSync(checkout);
  let report;
@@ -200,6 +247,7 @@ export async function runHistoricalSourceProbe({root=rootDefault,id,reportPath}=
   if(original){assert.equal(original.line,data.line,'historical report line changed');assert.notEqual(original.g11_claim,'passed');for(const flag of ['actual_native_packed_or_floor_qualified','native_or_packed_qualified','packed_or_native_qualified'])assert.notEqual(original[flag],true,'historical probe claimed runtime qualification');}
   // Recheck the caller graph after the original program runs. It was never replaced.
   const after=verifyHistoricalCurrentSubjects({root,data,members:currentMembers});assert.deepEqual(after,guard);
+  if(supplemental)assert.equal(sourceIntegrationHistoryInputs({root}).sha256,supplemental.sha256);
   report={schema_version:1,line:data.line,inputs_sha256:hash(readFileSync(resolve(root,HISTORICAL_REPLAY_INPUTS))),helper_sha256:hash(readFileSync(resolve(root,'scripts/historical-source-replay.mjs'))),cli_sha256:hash(readFileSync(resolve(root,'scripts/run-historical-source-probe.mjs'))),probe_id:id,probe:entry.probe,probe_sha256:entry.probe_sha256,frame:entry.frame,
    historical_members_verified:members.length,historical_bytes_verified:historicalBytes,complete_original_program_unchanged:true,
    current_guard:guard,current_guard_passed_before_and_after:true,exit_code:finished.code,signal:finished.signal,timed_out:timedOut,
@@ -208,6 +256,11 @@ export async function runHistoricalSourceProbe({root=rootDefault,id,reportPath}=
    source_scope:'Historical source model and its original rejection controls only. Current source/runtime, application, compiler, Node/RxJS and peer floors require their own gates.',
    actual_current_source_or_native_or_packed_qualified:false,g11_claim:'not-passed',temporary_graph_removed:false};
   assert.equal(timedOut,false,'historical probe timed out');assert.equal(finished.code,0,'historical probe failed\n'+stderr.slice(-6000));assert.equal(postStatus,'','historical probe changed its source graph');assert.ok(original,'historical probe report missing');
+  if(supplemental){
+   report.supplemental_registry={path:SOURCE_INTEGRATION_HISTORY_INPUTS,sha256:supplemental.sha256};
+   report.original_report_sha256=hash(readFileSync(diagnostic));
+   if(originalReportPath)writeFileSync(originalReportPath,readFileSync(diagnostic),{flag:'wx'});
+  }
  }finally{
   rmSync(parent,{recursive:true,force:true});if(report)report.temporary_graph_removed=true;
   if(reportPath&&report)writeFileSync(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx'});

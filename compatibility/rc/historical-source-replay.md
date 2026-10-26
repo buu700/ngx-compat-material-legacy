@@ -1111,3 +1111,43 @@ The unchanged16+2 bounded current-frame program passed at the committed subject 
   "g11_claim": "not-passed"
 }
 ```
+
+The eight later source-integration checks use the same extraction, execution,
+current-graph verification and cleanup owner. Their separate pinned registry is
+`compatibility/rc/source-integration-history-inputs.json`; it does not alter the
+original26 entries,23 wrapper records,two wrapper successors or two mutable
+progress paths. The added wrappers are ordinary strictly captured current-frame
+members. Their exact command/report redirects are additionally checked against
+immutable original Python bytes; their assertions and child timeout limits stay
+unchanged.
+
+| Additional probe | Historical subjects / successors |
+| --- | --- |
+| `snack-source-integration` | 15 / 22 |
+| `menu-panel-integration` | 15 / 22 |
+| `menu-caller-integration` | 15 / 22 |
+| `a11y-caller-integration` | 15 / 22 |
+| `configuration-caller-integration` | 15 / 22 |
+| `dialog-configuration-integration` | 17 / 23 |
+| `dialog-default-integration` | 18 / 24 |
+| `dialog-owned-integration` | 20 / 25 |
+
+The17-subject checkpoint retains its original stale manifest annotation of15;
+its unchanged original program asserts17. No original metadata, program or
+assertion is corrected to manufacture a historical pass. All selected program
+bytes match the original programs still retained in the current checkout.
+
+For these eight probes only, `--original-report <new-file>` copies the exact
+original child JSON report bytes after successful execution and before cleanup.
+`--report` continues to write the separate replay receipt. The destinations must
+differ; an existing original-report destination is rejected before execution and
+is never overwritten. Standard output remains the original program output.
+
+The dialog candidate-history validator keeps its original recorded program list.
+For its former integration wrapper it accepts only this registered command-only
+successor. Its boundary test remains live, and
+`tests/material_remaining_caller_integration_probe.mjs` separately validates the
+current25-row ledger transition and raw/native reader boundary. Historical
+checks retain31 open source obligations at their checkpoints; current source
+admission has six packed CVA roles open. Neither state qualifies packed controls,
+native rendering, consumer floors or the complete release gates.
