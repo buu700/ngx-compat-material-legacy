@@ -115,7 +115,13 @@ export abstract class _MatDialogBase<C extends _MatDialogContainerBase> implemen
     config?: MatDialogConfig<D>,
   ): MatLegacyDialogRef<T, R> {
     let dialogRef: MatLegacyDialogRef<T, R>;
-    config = {...(this._defaultOptions || new this.dialogConfigClass()), ...config};
+    const defaults = this._defaultOptions || new this.dialogConfigClass();
+    if (!this._defaultOptions && this.dialogConfigClass === MatDialogConfig) {
+      // Keep the historical defaults when using the current peer configuration class.
+      defaults.ariaModal = true;
+      defaults.maxWidth = '80vw';
+    }
+    config = {...defaults, ...config};
     config.id = config.id || `${this._idPrefix}${uniqueId++}`;
     config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();
 
