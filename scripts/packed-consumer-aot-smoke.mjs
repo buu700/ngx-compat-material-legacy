@@ -1095,6 +1095,7 @@ class SmokeDialogContent {}
   providers: [
     {provide: MAT_LEGACY_PROGRESS_BAR_LOCATION, useValue: {getPathname:()=>'/legacy-location(path)?query=1#ignored'}},
     {provide: MAT_LEGACY_PROGRESS_BAR_DEFAULT_OPTIONS, useValue: {color:'warn',mode:'query'}},
+    {provide:LAZY_MENU_LIFETIME,useFactory:()=>({created:0,destroyed:0})},
   ],
   template: \`
     <button mat-button id="h">Go</button>
@@ -1114,11 +1115,11 @@ class SmokeDialogContent {}
       <input id="repeat-input" [matChipInputFor]="repeatChipList" [matChipInputSeparatorKeyCodes]="[188]" (matChipInputTokenEnd)="repeatEnds=repeatEnds+1">
     </mat-chip-list>
     <form>
-      <mat-chip-list id="disabled-template-list" name="disabled-template" [ngModel]="null">
+      <mat-chip-list data-closeout-list="disabled-template" name="disabled-template" [ngModel]="null">
         <mat-chip id="disabled-template-chip" value="one" disabled>Individually disabled</mat-chip>
       </mat-chip-list>
     </form>
-    <mat-chip-list id="disabled-reactive-list" [formControl]="disabledChipControl">
+    <mat-chip-list data-closeout-list="disabled-reactive" [formControl]="disabledChipControl">
       <mat-chip id="disabled-individual-chip" value="one" disabled>Individual</mat-chip>
       <mat-chip id="disabled-inherited-chip" value="two">Inherited</mat-chip>
     </mat-chip-list>
@@ -1215,7 +1216,6 @@ class SmokeDialogContent {}
       <mat-tab label="Two">Tab two</mat-tab>
     </mat-tab-group>
   \`,
-  providers:[{provide:LAZY_MENU_LIFETIME,useFactory:()=>({created:0,destroyed:0})}],
 })
 class HarnessHost {
   readonly lazyMenuLifetime=inject(LAZY_MENU_LIFETIME);
@@ -1235,6 +1235,7 @@ class HarnessHost {
   @ViewChild('manualTabLabel',{read:TemplateRef,static:true}) originalTabLabelTemplate!:TemplateRef<any>;
   @ViewChild('manualTabLabel',{read:ViewContainerRef,static:true}) originalTabLabelContainer!:ViewContainerRef;
   @ViewChild(MatLegacyTab,{static:true}) originalLabelTab!:MatLegacyTab;
+  @ViewChild(MatLegacyTab,{read:MAT_LEGACY_TAB,static:true}) originalLabelTabToken!:MatLegacyTab;
 
   @ViewChild(MatLegacyTextColumn,{static:true}) originalTextColumn!:MatLegacyTextColumn<any>;
   @ViewChild('constructorGridColumn',{read:MatLegacyColumnDef,static:true}) gridColumn!:MatLegacyColumnDef;
@@ -1584,7 +1585,7 @@ async function main() {
     manual_parent:manualLabel instanceof MatLegacyTabLabel&&manualLabel instanceof MatTabLabel&&manualLabel instanceof CdkPortal,
     node_parent:labelHost.originalTabLabel instanceof MatTabLabel&&labelHost.originalTabLabel instanceof CdkPortal,
     node_closest:labelHost.originalTabLabel._closestTab===labelHost.originalLabelTab,
-    node_token:fixture.debugElement.query(By.directive(MatLegacyTab)).injector.get(MAT_LEGACY_TAB)===labelHost.originalLabelTab,
+    node_token:labelHost.originalLabelTabToken===labelHost.originalLabelTab,
     node_label:labelHost.originalLabelTab.templateLabel===labelHost.originalTabLabel,
     embedded_label:labelView.rootNodes.map(node=>node.textContent||'').join('').trim()==='One',
   };
@@ -1690,7 +1691,7 @@ async function main() {
   manualMenuItem.ngOnDestroy();
   const menuItemConstruction=!!normalMenuItem && normalMenuItem instanceof MatLegacyMenuItem
     && !(normalMenuItem instanceof MatMenuItem)
-    && normalMenuNode!.injector.get(MatMenuItem)===normalMenuItem
+    && Object.is(normalMenuNode!.injector.get(MatMenuItem),normalMenuItem)
     && normalMenuNode!.injector.get(MAT_LEGACY_MENU_PANEL)===normalMenuItem._parentMenu
     && normalMenuItem.disabled===false && normalMenuItem.disableRipple===false
     && disabledMenuNode?.injector.get(MatLegacyMenuItem).disabled===true
@@ -1830,11 +1831,11 @@ async function main() {
   const templateChip=fixture.debugElement.query(By.css('#disabled-template-chip')).injector.get(MatLegacyChip);
   const individualChip=fixture.debugElement.query(By.css('#disabled-individual-chip')).injector.get(MatLegacyChip);
   const inheritedChip=fixture.debugElement.query(By.css('#disabled-inherited-chip')).injector.get(MatLegacyChip);
-  const disabledList=fixture.debugElement.query(By.css('#disabled-reactive-list')).injector.get(MatLegacyChipList);
+  const disabledList=fixture.debugElement.query(By.css('[data-closeout-list="disabled-reactive"]')).injector.get(MatLegacyChipList);
   const chipDisabledInitial=templateChip.disabled&&individualChip.disabled&&!inheritedChip.disabled;
   const chipNodes=['#disabled-template-chip','#disabled-individual-chip','#disabled-inherited-chip']
     .map(selector=>fixture.nativeElement.querySelector(selector) as HTMLElement);
-  const templateListNode=fixture.debugElement.query(By.css('#disabled-template-list'));
+  const templateListNode=fixture.debugElement.query(By.css('[data-closeout-list="disabled-template"]'));
   const templateList=templateListNode.injector.get(MatLegacyChipList);
   const chipDisabledObservation={execution:'packed-angular-testbed-dom',phases:[] as any[],
     public_chips:[templateChip,individualChip,inheritedChip].every(chip=>chip instanceof MatLegacyChip),
@@ -2183,6 +2184,8 @@ main().catch(err => {
     const tsconfig = JSON.parse(readFileSync(join(consumer, 'tsconfig.json'), 'utf8'));
     tsconfig.files = ['src/app.module.ts', 'src/main.ts', 'src/harness-runtime.ts'];
     tsconfig.compilerOptions.strict = false;
+    // Emit imported JavaScript assertion modules alongside the generated probes.
+    tsconfig.compilerOptions.allowJs = true;
     tsconfig.compilerOptions.skipLibCheck = false;
     tsconfig.angularCompilerOptions.strictTemplates = false;
     writeFileSync(join(consumer, 'tsconfig.json'), JSON.stringify(tsconfig, null, 2));
