@@ -40,7 +40,7 @@ export async function observePackedSelectFocusClick(){
    const legacy=generation==='legacy',Select=legacy?MatLegacySelect:MatSelect,Other=legacy?MatSelect:MatLegacySelect;
    const Host=legacy?(enclosure==='bare'?LegacyBareFocusClick:LegacyFieldFocusClick):(enclosure==='bare'?CurrentBareFocusClick:CurrentFieldFocusClick);
    fixture=TestBed.createComponent(Host as any);
-   const settle=async()=>{fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();};
+   const settle=async()=>{fixture.changeDetectorRef.markForCheck();fixture.detectChanges();await fixture.whenStable();fixture.changeDetectorRef.markForCheck();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();};
    await settle();const view=fixture.componentInstance,node=fixture.debugElement.query(By.directive(Select)),select=node.componentInstance as any;
    host=node.nativeElement;const trigger=host!.querySelector('.mat-select-trigger,.mat-mdc-select-trigger') as HTMLElement,outside=fixture.nativeElement.querySelector('[data-focus-click-outside]') as HTMLElement;
    const directives=[...new Set(fixture.debugElement.queryAllNodes((element:any)=>!!element.injector.get(CdkConnectedOverlay,null)).map((element:any)=>element.injector.get(CdkConnectedOverlay)))];
@@ -77,7 +77,8 @@ export async function observePackedSelectFocusClick(){
    const statesBefore=stateChanges,touchBefore=touched,eventsBefore=[...openedEvents],detachBefore=detached;select.close();select.close();await settle();
    row.closed_noop={...state(),state_change_delta:stateChanges-statesBefore,touch_delta:touched-touchBefore,events_unchanged:JSON.stringify(openedEvents)===JSON.stringify(eventsBefore),no_detach:detached===detachBefore};
   }finally{
-   if(fixture&&!fixture.componentRef.hostView.destroyed)fixture.destroy();for(const subscription of subscriptions)subscription.unsubscribe();
+   if(fixture&&!fixture.componentRef.hostView.destroyed)fixture.destroy();
+   fixture?.nativeElement.remove();for(const subscription of subscriptions)subscription.unsubscribe();
    row.cleanup={fixture_destroyed:fixture?.componentRef.hostView.destroyed===true,host_connected:host?.isConnected??false,known_panels_remaining:[...panelIds].reduce((n,id)=>n+matches(id).length,0),any_overlay_attached:refs.some(ref=>ref.hasAttached()),own_subscriptions_closed:subscriptions.every(subscription=>subscription.closed)};
   }
  }}catch(error){observed.error=String(error);}
