@@ -30,7 +30,7 @@ const integrationSpecs=[
 ];
 export const SOURCE_INTEGRATION_HISTORY_IDS=Object.freeze(integrationSpecs.map(row=>row[0]));
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'259a767304610de0f9b9c2ff08752c1069e188c066271664f836f39a8efabe66','21.x':'98b38a9aa208ef5fbb637c531fbab01cbccd6a8e05d355783113e4961450bac6'};
+const pins={main:'5516c405e1aaa824daa06c3cd658958b8aaac1c0844c86c8a843986b07e797de','21.x':'2398a158745109731137dbb7e48b18f0c590357cb94478c29321ec74a234ed40'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
  'native-individual-source','native-individual-admission','spec-fixture-context',
  'small-spec-source','followup-spec-source','peer-spec-source','control-case-context',
