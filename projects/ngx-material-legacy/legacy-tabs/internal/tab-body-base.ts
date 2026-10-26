@@ -74,6 +74,7 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
   private _deferredCentering: LegacyTabTransitionEvent | undefined;
   private _originTransition: LegacyTabTransitionEvent | undefined;
   private readonly _ngZone = tabBodyNgZone();
+  private readonly _changeDetectorRef: ChangeDetectorRef;
 
   /** Tab body position state. */
   _position: MatTabBodyPositionState;
@@ -121,6 +122,7 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
     @Optional() private _dir: Directionality,
     changeDetectorRef: ChangeDetectorRef,
   ) {
+    this._changeDetectorRef = changeDetectorRef;
     if (_dir) {
       this._dirChangeSubscription = _dir.change.subscribe((dir: Direction) => {
         this._computePositionAnimationState(dir);
@@ -312,6 +314,7 @@ export abstract class _MatTabBodyBase implements OnInit, OnDestroy {
       this._contentElement?.nativeElement.style.setProperty('visibility', 'hidden');
     }
     this._elementRef.nativeElement.classList.remove('mat-tab-body-animating');
+    this._changeDetectorRef.markForCheck();
     this._translateTabComplete.next(transition);
   }
 
