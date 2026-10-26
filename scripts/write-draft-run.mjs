@@ -57,9 +57,10 @@ function allowedOut(dir) {
 }
 
 function git(args) {
-  const res = spawnSync('git', args, {cwd: root, encoding: 'utf8'});
+  // Retained audit evidence makes the complete index larger than Node's 1 MiB default.
+  const res = spawnSync('git', args, {cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024});
   if (res.status !== 0) {
-    console.error(res.stderr || `git ${args.join(' ')} failed`);
+    console.error(res.stderr || res.error?.message || `git ${args.join(' ')} failed`);
     process.exit(1);
   }
   return res.stdout;
