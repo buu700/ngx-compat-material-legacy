@@ -978,7 +978,7 @@ Object.defineProperty(globalThis, 'navigator', {
 
 import 'zone.js';
 import '@angular/compiler';
-import {Component, Directive, ElementRef, TemplateRef, ViewChild, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector, IterableDiffers, SimpleChange, runInInjectionContext} from '@angular/core';
+import {APP_ID, Component, Directive, ElementRef, getDebugNode, Input, TemplateRef, ViewChild, ViewChildren, QueryList, Injector, ViewContainerRef, EventEmitter, InjectionToken, ANIMATION_MODULE_TYPE, NgZone, inject, isDevMode, createEnvironmentInjector, createNgModule, EnvironmentInjector, IterableDiffers, SimpleChange, runInInjectionContext} from '@angular/core';
 import {Subject} from 'rxjs';
 import {FormControl, FormsModule, ReactiveFormsModule, NgModel, Validators} from '@angular/forms';
 import {observePackedValueAccessors} from './value-accessor-probe';
@@ -1254,7 +1254,9 @@ class HarnessHost {
   repeatRemovals=0;
   repeatEnds=0;
   disabledChipControl=new FormControl<string[] | null>(null);
-  legacyDirection:'ltr'|'rtl'='rtl';
+  @Input() legacyDirection:'ltr'|'rtl'='rtl';
+  @ViewChildren(_LegacyTableDefinitionOwner) rawDefinitionOwners!:QueryList<_LegacyTableDefinitionOwner>;
+  @ViewChildren(_LegacyTableDefinitionOwner,{read:ElementRef}) rawDefinitionHosts!:QueryList<ElementRef<Node>>;
   legacyDirectionChanges=0;
   private readonly _dialog = inject(MatLegacyDialog);
   private readonly _snack = inject(MatLegacySnackBar);
@@ -1320,6 +1322,8 @@ async function main() {
   TestBed.configureTestingModule({
     imports: [HarnessHost, PackedLegacyBidiScope, SmokeDialogContent, LegacyNativeDateModule, MatLegacyNativeDateModule, PackedOnPushTableHost, PackedRadioIdentityHost, ...GENERATED_IDENTITY_IMPORTS, ...SELECT_DETACH_IMPORTS, ...MENU_ITEM_TOKEN_IMPORTS, ...SELECT_FOCUS_CLICK_IMPORTS],
     providers: [
+      // Use the ordinary application's default ID prefix rather than TestBed's app ID.
+      {provide: APP_ID, useValue: 'ng'},
       {provide: MATERIAL_ANIMATIONS, useValue: {animationsDisabled: true}},
       // Preserve historical constructor-mode checks without installing an engine.
       {provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations'},
@@ -1474,7 +1478,7 @@ async function main() {
     }
     tableConstructionObservations.push({
       owned_instance:table instanceof MatLegacyTable,
-      real_parent:table instanceof CdkTable&&Object.getPrototypeOf(MatLegacyTable)===CdkTable,
+      real_parent:table instanceof CdkTable&&Object.getPrototypeOf(MatLegacyTable.prototype)===CdkTable.prototype,
       node_provider:node.injector.get(CdkTable)===table,
       manual_rejects:rejected.length===2&&rejected.every(Boolean),
       data_source_retained:table.dataSource===before,
@@ -1515,11 +1519,11 @@ async function main() {
   const tableDefinitionOriginalConstructors=definitionConstructorObservations.length===4
     &&definitionCallerDestroyed===0
     &&definitionConstructorObservations.every(row=>Object.entries(row).every(([key,value])=>key==='name'||value===true));
-  const rawOwners=fixture.debugElement.queryAll(By.directive(_LegacyTableDefinitionOwner));
-  const rawOwnershipObservation=rawOwners.map(node=>{
+  const rawOwnershipObservation=fixture.componentInstance.rawDefinitionHosts.toArray().map(ref=>{
+    const node=getDebugNode(ref.nativeElement)!;
     const nearest=node.injector.get(CdkTable);
-    const definitions=[node.injector.get(CdkColumnDef,null),node.injector.get(CdkHeaderRowDef,null),
-      node.injector.get(CdkFooterRowDef,null),node.injector.get(CdkRowDef,null)].filter(Boolean);
+    const definitions=[node.injector.get(CdkColumnDef,null,{self:true}),node.injector.get(CdkHeaderRowDef,null,{self:true}),
+      node.injector.get(CdkFooterRowDef,null,{self:true}),node.injector.get(CdkRowDef,null,{self:true})].filter(Boolean);
     return definitions.length===1&&definitions[0]!._table===nearest;
   });
   const rawTable=fixture.nativeElement.querySelector('#raw-owned-table');
@@ -1716,41 +1720,42 @@ async function main() {
     lazyTrigger.menuClosed.subscribe(()=>menuLazyObservation.first_events.push(false)),
     otherLazyTrigger.menuOpened.subscribe(()=>menuLazyObservation.second_events.push(true)),
     otherLazyTrigger.menuClosed.subscribe(()=>menuLazyObservation.second_events.push(false))];
+  const settleLazyMenu=async()=>{fixture.changeDetectorRef.markForCheck();fixture.detectChanges();await fixture.whenStable();fixture.changeDetectorRef.markForCheck();fixture.changeDetectorRef.detectChanges();fixture.detectChanges();};
   const menuSnapshot=(phase:string)=>({phase,items:fixture.componentInstance.lazyMenu.items.length,
     created:lazyState.created,destroyed:lazyState.destroyed,
     connected_items:fixture.componentInstance.lazyMenu.items.filter(item=>item._getHostElement().isConnected).length,
     first_open:lazyTrigger.menuOpen,second_open:otherLazyTrigger.menuOpen,
     panel_connected:document.getElementById(fixture.componentInstance.lazyMenu.panelId)?.isConnected===true});
   menuLazyObservation.phases.push(menuSnapshot('initial'));
-  await lazyMenu.open();fixture.detectChanges();await fixture.whenStable();
+  await lazyMenu.open();await settleLazyMenu();
   const firstLazyItem=fixture.componentInstance.lazyMenu.items.first;
   const lazyFirstOpen=await lazyMenu.isOpen()&&fixture.componentInstance.lazyMenu.items.length===2
     &&lazyState.created===2&&lazyState.destroyed===0;
   menuLazyObservation.phases.push(menuSnapshot('first-open'));
-  await lazyMenu.close();fixture.detectChanges();await fixture.whenStable();
+  await lazyMenu.close();await settleLazyMenu();
   const lazyFirstClose=!(await lazyMenu.isOpen())&&fixture.componentInstance.lazyMenu.items.length===0
     &&lazyState.created===2&&lazyState.destroyed===2;
   menuLazyObservation.phases.push(menuSnapshot('first-close'));
-  await lazyMenu.open();fixture.detectChanges();await fixture.whenStable();
+  await lazyMenu.open();await settleLazyMenu();
   const lazyReopen=await lazyMenu.isOpen()&&fixture.componentInstance.lazyMenu.items.length===2
     &&fixture.componentInstance.lazyMenu.items.first!==firstLazyItem&&lazyState.created===4&&lazyState.destroyed===2;
   menuLazyObservation.recreated_items=fixture.componentInstance.lazyMenu.items.first!==firstLazyItem;
   menuLazyObservation.phases.push(menuSnapshot('reopen'));
-  await lazyMenu.close();fixture.detectChanges();await fixture.whenStable();
+  await lazyMenu.close();await settleLazyMenu();
   const lazySecondClose=!(await lazyMenu.isOpen())&&fixture.componentInstance.lazyMenu.items.length===0
     &&lazyState.created===4&&lazyState.destroyed===4;
   const lazyMenuLifecycle=lazyInitial&&lazyFirstOpen&&lazyFirstClose&&lazyReopen&&lazySecondClose;
   menuLazyObservation.phases.push(menuSnapshot('second-close'));
-  await lazyMenu.open();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();
+  await lazyMenu.open();await settleLazyMenu();
   const beforeTransferItems=fixture.componentInstance.lazyMenu.items.toArray();
   menuLazyObservation.phases.push(menuSnapshot('transfer-before'));
-  otherLazyTrigger.openMenu();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();
+  otherLazyTrigger.openMenu();await settleLazyMenu();
   menuLazyObservation.transferred_items_recreated=fixture.componentInstance.lazyMenu.items.toArray()
     .every(item=>!beforeTransferItems.includes(item));
   menuLazyObservation.phases.push(menuSnapshot('transfer-after'));
   await fixture.whenStable();fixture.detectChanges();
   menuLazyObservation.phases.push(menuSnapshot('transfer-settled'));
-  otherLazyTrigger.closeMenu();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();
+  otherLazyTrigger.closeMenu();await settleLazyMenu();
   menuLazyObservation.phases.push(menuSnapshot('transfer-close'));
   for(const subscription of menuSubscriptions)subscription.unsubscribe();
   menuLazyObservation.subscriptions_closed=menuSubscriptions.every(subscription=>subscription.closed);
@@ -1881,7 +1886,7 @@ async function main() {
   const bidiInitial=scopedDir.value==='rtl'&&bidiNode.nativeElement.getAttribute('dir')==='rtl'
     &&bidiField.injector.get(Directionality)===scopedDir&&bidiInput.injector.get(Directionality)===scopedDir
     &&fixture.componentInstance.legacyDirectionChanges===0;
-  fixture.componentInstance.legacyDirection='ltr';fixture.detectChanges();await fixture.whenStable();
+  fixture.componentRef.setInput('legacyDirection','ltr');fixture.changeDetectorRef.markForCheck();fixture.detectChanges();await fixture.whenStable();
   const bidiUpdated=scopedDir.value==='ltr'&&bidiNode.nativeElement.getAttribute('dir')==='ltr'
     &&bidiField.injector.get(Directionality).value==='ltr'&&bidiInput.injector.get(Directionality).value==='ltr'
     &&fixture.componentInstance.legacyDirectionChanges===1;

@@ -37,7 +37,7 @@ export function generatedIdentityPackedFixture() {
  imports:[${['Option', 'Autocomplete', 'Select', 'Menu', 'Tabs', 'SnackBar'].map(name => type(name) + 'Module').join(',')}],
  template:${JSON.stringify(template)}})
 class Packed${legacy ? 'Legacy' : 'Current'}IdentityScope {
- active=0;
+ @Input() active=0;
  @ViewChild(${type('Autocomplete')}) autocomplete!:${type('Autocomplete')};
  @ViewChild(${type('AutocompleteTrigger')}) trigger!:${type('AutocompleteTrigger')};
  @ViewChildren(${type('Select')}) selects!:QueryList<${type('Select')}>;
@@ -47,7 +47,7 @@ class Packed${legacy ? 'Legacy' : 'Current'}IdentityScope {
 }
 `;
   };
-  return String.raw`import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';
+  return String.raw`import {Component, Input, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {Overlay} from '@angular/cdk/overlay';
@@ -85,7 +85,7 @@ export async function observePackedGeneratedIdentity(){
   observed.orders.push(order);
   const fixtures:any[]=[],models:any[]=[],snacks:any[]=[];let modalOverlay:any,modal:HTMLElement|undefined;
   const duplicates=()=>{const seen=new Set<string>();for(const element of Array.from(document.querySelectorAll('[id]')) as HTMLElement[]){if(seen.has(element.id))order.duplicate_id_snapshots.push(element.id);seen.add(element.id);}};
-  const settle=async()=>{for(const fixture of fixtures)fixture.detectChanges();for(const fixture of fixtures)await fixture.whenStable();for(const fixture of fixtures)fixture.detectChanges();};
+  const settle=async()=>{for(const fixture of fixtures){fixture.changeDetectorRef.markForCheck();fixture.detectChanges();}for(const fixture of fixtures)await fixture.whenStable();for(const fixture of fixtures){fixture.changeDetectorRef.markForCheck();fixture.detectChanges();}};
   const record=(model:any,role:string,index:number,element:Element,ownerMatches:boolean)=>{
    if(!element)throw Error('Missing '+model.generation+' '+role+' '+index);
    order.nodes.push({generation:model.generation,role,index,id:element.id,resolution_count:allWithId(element.id).length,exact_node:document.getElementById(element.id)===element,owner_matches:ownerMatches});
@@ -98,6 +98,8 @@ export async function observePackedGeneratedIdentity(){
   try{
    for(const generation of creationOrder){
     const legacy=generation==='legacy',fixture=TestBed.createComponent(legacy?PackedLegacyIdentityScope as any:PackedCurrentIdentityScope as any);fixtures.push(fixture);
+    // Own the fixture root so a later TestBed insertion cannot remove its sibling.
+    fixture.nativeElement.id='packed-identity-fixture-'+generation;
     await settle();
     const classes=legacy?{option:MatLegacyOption,group:MatLegacyOptgroup,auto:MatLegacyAutocomplete,select:MatLegacySelect,menu:MatLegacyMenu,link:MatLegacyTabLink,panel:MatLegacyTabNavPanel,other:MatSelect}:{option:MatOption,group:MatOptgroup,auto:MatAutocomplete,select:MatSelect,menu:MatMenu,link:MatTabLink,panel:MatTabNavPanel,other:MatLegacySelect};
     const root=fixture.nativeElement as HTMLElement,view=fixture.componentInstance as any;
@@ -130,7 +132,7 @@ export async function observePackedGeneratedIdentity(){
    for(const model of models){const panel=document.getElementById(model.view.menuTrigger.menu.panelId)!;record(model,'menu-panel',0,panel,model.view.menuTrigger.menu instanceof model.classes.menu);edge(order.default_edges,model,'menu-panel',model.fixture.nativeElement.querySelector('[data-packed-kind="menu-trigger"]'),'aria-controls',panel);if(model.legacy)Object.assign(model.state.legacy_structure,{menu_panel:panel.classList.contains('mat-menu-panel'),menu_content:!!panel.querySelector('.mat-menu-content')});}
    duplicates();for(const model of models)model.view.menuTrigger.closeMenu();await settle();
    for(const model of models)(model.fixture.nativeElement.querySelectorAll('[mat-tab-link]')[1] as HTMLElement).click();await settle();tabEdges(order.changed_tab_edges);
-   for(const model of models){const key='packed-'+model.generation+'-';model.view.autocomplete.id=key+'autocomplete-override';model.view.selects.first.id=key+'select-override';model.view.panel.id=key+'tab-panel-override';model.view.links.first.id=key+'tab-link-override';model.view.active=0;}await settle();tabEdges(order.explicit_edges);
+   for(const model of models){const key='packed-'+model.generation+'-';model.view.autocomplete.id=key+'autocomplete-override';model.view.selects.first.id=key+'select-override';model.view.panel.id=key+'tab-panel-override';model.view.links.first.id=key+'tab-link-override';model.fixture.componentRef.setInput('active',0);}await settle();tabEdges(order.explicit_edges);
    for(const model of models)model.view.trigger.openPanel();await settle();
    for(const model of models)edge(order.explicit_edges,model,'autocomplete-panel',model.input,model.legacy?'aria-owns':'aria-controls',model.view.autocomplete.panel.nativeElement);
    duplicates();for(const model of models)model.view.trigger.closePanel();await settle();
@@ -145,7 +147,7 @@ export async function observePackedGeneratedIdentity(){
    for(let index=0;index<snacks.length;index++){const item=snacks[index],done=once(item.ref.afterDismissed());item.ref.dismiss();await done;await settle();snackState(index===0?'first-dismissed':'both-dismissed');}
   }finally{
    for(const item of snacks)item.ref.dismiss();
-   modalOverlay?.dispose();for(const fixture of fixtures)if(!fixture.componentRef.hostView.destroyed)fixture.destroy();
+   modalOverlay?.dispose();for(const fixture of fixtures){if(!fixture.componentRef.hostView.destroyed)fixture.destroy();fixture.nativeElement.remove();}
    order.cleanup={fixtures_destroyed:fixtures.filter(fixture=>fixture.componentRef.hostView.destroyed).length,modal_disposed:!!modal&&!modal.isConnected,retained_target_count:order.nodes.filter((node:any)=>allWithId(node.id).length>0).length,overlay_target_count:document.querySelectorAll('.cdk-overlay-container [id^="mat-autocomplete-"],.cdk-overlay-container [id^="mat-select-"],.cdk-overlay-container [id^="mat-menu-panel-"],.cdk-overlay-container [id^="mat-snack-bar-container-live-"],.cdk-overlay-container [id^="mat-legacy-snack-bar-container-live-"]').length};
   }
  }}catch(error){observed.error=String(error);}

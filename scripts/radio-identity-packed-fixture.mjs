@@ -49,11 +49,12 @@ export async function observePackedRadioIdentity(){
   const all=[...own,...peer],input=(node:any)=>node.nativeElement.querySelector('input[type="radio"]') as HTMLInputElement;
   const selected=(nodes:any[],native:boolean)=>{const values=nodes.filter(node=>native?input(node).checked:node.componentInstance.checked).map(node=>native?input(node).value:node.componentInstance.value);if(values.length>1)throw Error('Multiple checked radios in one generation');return values[0]??null;};
   const selection=()=>({legacy:selected(own,false),peer:selected(peer,false),legacy_native:selected(own,true),peer_native:selected(peer,true)});
-  const names=[ownGroup.componentInstance.name,peerGroup.componentInstance.name];
+  const ownGroupInstance=ownGroup.injector.get(MatLegacyRadioGroup),peerGroupInstance=peerGroup.injector.get(MatRadioGroup);
+  const names=[ownGroupInstance.name,peerGroupInstance.name];
   const dispatcher=TestBed.inject(UniqueSelectionDispatcher);
-  observed.identities={owned_group:ownGroup.componentInstance instanceof MatLegacyRadioGroup,
+  observed.identities={owned_group:ownGroupInstance instanceof MatLegacyRadioGroup,
    owned_buttons:own.length===2&&own.every((node:any)=>node.componentInstance instanceof MatLegacyRadioButton),
-   peer_group:peerGroup.componentInstance instanceof MatRadioGroup,
+   peer_group:peerGroupInstance instanceof MatRadioGroup,
    peer_buttons:peer.length===4&&peer.every((node:any)=>node.componentInstance instanceof MatRadioButton),
    dispatcher_shared:all.every(node=>node.injector.get(UniqueSelectionDispatcher)===dispatcher),
    generations_distinct:MatLegacyRadioGroup!==(MatRadioGroup as any)&&MatLegacyRadioButton!==(MatRadioButton as any)};
@@ -62,10 +63,10 @@ export async function observePackedRadioIdentity(){
    legacy_structure:own.map((node:any)=>({label:!!node.nativeElement.querySelector('.mat-radio-label'),container:!!node.nativeElement.querySelector('.mat-radio-container'),outer_circle:!!node.nativeElement.querySelector('.mat-radio-outer-circle'),inner_circle:!!node.nativeElement.querySelector('.mat-radio-inner-circle'),label_content:!!node.nativeElement.querySelector('.mat-radio-label-content'),input_class:input(node).classList.contains('mat-radio-input')})),selection:selection()};
   const click=async(node:any,stage:string)=>{input(node).click();await settle();observed.transitions.push({stage,...selection()});};
   await click(own[1],'legacy-b');await click(peer[2],'peer-c');await click(own[0],'legacy-a');
-  ownGroup.componentInstance.name='packed-radio-shared';peerGroup.componentInstance.name='packed-radio-shared';await settle();
-  observed.explicit={group_name:ownGroup.componentInstance.name,legacy_names:own.map((node:any)=>input(node).name),peer_names:peer.map((node:any)=>input(node).name),host_id:own[1].nativeElement.id,input_id:input(own[1]).id,label_for:own[1].nativeElement.querySelector('label')?.htmlFor};
+  ownGroupInstance.name='packed-radio-shared';peerGroupInstance.name='packed-radio-shared';await settle();
+  observed.explicit={group_name:ownGroupInstance.name,legacy_names:own.map((node:any)=>input(node).name),peer_names:peer.map((node:any)=>input(node).name),host_id:own[1].nativeElement.id,input_id:input(own[1]).id,label_for:own[1].nativeElement.querySelector('label')?.htmlFor};
   await click(peer[1],'shared-peer-b');await click(own[1],'shared-legacy-b');
-  ownGroup.componentInstance.name=names[0];peerGroup.componentInstance.name=names[1];await settle();
+  ownGroupInstance.name=names[0];peerGroupInstance.name=names[1];await settle();
   await click(peer[2],'restored-independent');
   const before=all.map(node=>node.componentInstance.checked);
   fixture.destroy();for(const name of new Set(names))dispatcher.notify('destroyed-radio-probe',name);

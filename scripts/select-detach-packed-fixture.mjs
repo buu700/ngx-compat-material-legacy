@@ -37,7 +37,7 @@ export async function observePackedSelectDetach(){
   try{
    const legacy=generation==='legacy',Owned=legacy?MatLegacySelect:MatSelect,Other=legacy?MatSelect:MatLegacySelect;
    fixture=TestBed.createComponent(legacy?PackedLegacyScrollSelect as any:PackedCurrentScrollSelect as any);
-   const settle=async()=>{fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();};
+   const settle=async()=>{fixture.changeDetectorRef.markForCheck();fixture.detectChanges();await fixture.whenStable();fixture.changeDetectorRef.markForCheck();fixture.detectChanges();await fixture.whenStable();fixture.detectChanges();};
    await settle();
    const selectNode=fixture.debugElement.query(By.directive(Owned)),select=selectNode.componentInstance as any;
    host=selectNode.nativeElement;row.host_id=host!.id;row.public_select_instance=select instanceof Owned;
@@ -66,7 +66,8 @@ export async function observePackedSelectDetach(){
     row.cycles.push({cycle,opened,closed:afterScroll,idle_scroll:closed()});
    }
   }finally{
-   if(fixture&&!fixture.componentRef.hostView.destroyed)fixture.destroy();for(const subscription of subscriptions)subscription.unsubscribe();
+   if(fixture&&!fixture.componentRef.hostView.destroyed)fixture.destroy();
+   fixture?.nativeElement.remove();for(const subscription of subscriptions)subscription.unsubscribe();
    row.cleanup={fixture_destroyed:fixture?.componentRef.hostView.destroyed===true,host_connected:host?.isConnected??false,panel_resolution_count:panels.reduce((sum,panel)=>sum+matches(panel.id).length,0),any_overlay_attached:refs.some(ref=>ref.hasAttached()),own_subscriptions_closed:subscriptions.every(subscription=>subscription.closed)};
   }
  }}catch(error){observed.error=String(error);}

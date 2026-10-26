@@ -7,7 +7,7 @@
  */
 /** Compiled in the extracted consumer; its component scope has no modern import. */
 export function bidiIsolatedPackedFixture() {
-  return `import {Component} from '@angular/core';
+  return `import {Component,Input} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {Dir, Directionality} from '@angular/cdk/bidi';
@@ -18,7 +18,7 @@ import {packedLegacyBidiScopeCase} from './bidi-isolated-contract.mjs';
  imports:[MatLegacyFormFieldModule,MatLegacyInputModule],
  template:'<section [dir]="direction" (dirChange)="changes.push($event)"><mat-form-field><mat-label>Isolated legacy direction</mat-label><input matInput value="Isolated legacy input"></mat-form-field></section>'})
 export class PackedLegacyBidiScope {
- direction:string='rtl';
+ @Input() direction:string='rtl';
  changes:string[]=[];
 }
 export async function observePackedLegacyBidiScope(){
@@ -45,7 +45,7 @@ export async function observePackedLegacyBidiScope(){
   observed.states.push(snapshot('initial'));
   for(const [stage,value]of [['ltr','ltr'],['repeat-ltr','ltr'],['uppercase-rtl','RTL'],
    ['invalid','invalid-direction'],['empty',''],['rtl','rtl']]){
-   fixture.componentInstance.direction=value;fixture.detectChanges();await fixture.whenStable();
+   fixture.componentRef.setInput('direction',value);fixture.changeDetectorRef.markForCheck();fixture.detectChanges();await fixture.whenStable();
    observed.states.push(snapshot(stage));
   }
  }catch(error){observed.error=String(error);}
