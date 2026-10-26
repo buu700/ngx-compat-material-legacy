@@ -22,7 +22,7 @@ export const SNACK_PRODUCT_INPUTS='compatibility/rc/snack-dom-source-context-pro
 export const SNACK_SOURCE_CONTEXT_INPUTS='compatibility/rc/snack-dom-source-context-inputs.json';
 export const SNACK_SOURCE='projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts';
 export const TOOLTIP_SOURCE='projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts';
-const pins={main:'9d1608db57be1265b1c2f4db0eb555d5afdb9ef957619b2b0f80f1fadcca0afd', '21.x':'1ac3a81d0b7536aebed15d6c1e1b68411edda40a8f64b440845284c43668cb8b'},hash=b=>createHash('sha256').update(b).digest('hex'),authenticated=new Set(),decoded=new Map(),authenticatedPriors=new Set(),branded=new WeakMap();
+const pins={main:'3b7bd9dbda332c7834db04ff935e4cfe33a970b67ae104decc1031997bc01220', '21.x':'689e1138fa8b3f2316b5e836a2fecf012eeb63cd4ab69cf401b144beab699d14'},hash=b=>createHash('sha256').update(b).digest('hex'),authenticated=new Set(),decoded=new Map(),authenticatedPriors=new Set(),branded=new WeakMap();
 const rawRead=root=>p=>{let path=root;for(const part of p.split('/')){assert.ok(part&&part!=='.'&&part!=='..');path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}assert.ok(lstatSync(path).isFile());return readFileSync(path);};
 function currentRaw(root,read){if(!branded.has(read))return read;const previous=branded.get(read);assert.equal(previous.root,root);return previous.raw;}
 export function snackDomRawCurrentRead({root=process.cwd(),read=rawRead(root)}={}){return currentRaw(root,read);}

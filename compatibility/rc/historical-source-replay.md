@@ -99,21 +99,21 @@ Supplemental frame result:
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "32fb8234e5038915486afb216e52671ae013c563",
-    "tree": "61bc4d54b4f9205da37e7ce316dad51d103eb8bb",
-    "tree_listing_sha256": "9a155ef26397dff4eebbadf8979144b41b780a01ce8a4b4f54dd2298e93a6baf",
-    "members": 8407
+    "commit": "b624bb3ece7a597fd12dcc00ab0726020c7f5ead",
+    "tree": "5ac40e410b8806108d5475c916d8cc499d1929a4",
+    "tree_listing_sha256": "5feffafd8f5750530b7eab1c32f2a0667eb0239a201103635758dc2b054307f6",
+    "members": 9763
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8405,
+    "line": "main",
+    "guarded_current_members": 9761,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "a5a4c6ffbdea89ea90b2667c07ef9da32b00d3e4",
-      "tree": "8232cc49a5bc6c925a3169a208ec189742552c4a"
+      "commit": "7e66d3901d7185aedaeebca1b545767172654612",
+      "tree": "48f4e2bb1904a6fa42f9610f0c848a3d3180f861"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -158,28 +158,28 @@ writeFileSync('/tmp/ngx-portal-integration-frame-'+(report.line==='main'?'main':
 ```
 
 
-Twelve-caller integration frame, 2026-10-20T13:27:25.627340+00:00 (21.x).
+Twelve-caller integration frame, 2026-10-20T13:27:25.627340+00:00 (main).
 
 The frame below binds the committed three-coercion,four Platform and five Core caller reviews and their shared integration. The same6 tooling paths remain; no new exception was added. This bounded source/input guard rejects12 corruptions and two late changes. It does not execute the full97 controls,26/19/50 cohorts,native/packed/floor matrix or independent audits. The main full75 source guard ran before the portable writer repair; final current bounded guards and portable pure replay passed on both lines. Expensive full repeats remain deferred to Actions.
 
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "d8b8b6dd2cb173000a7b9d5996d808fc8e1f8c96",
-    "tree": "a23a5cb41181bf01ecaba72a68700b7971a1636a",
-    "tree_listing_sha256": "c806014786848be137c0eebd20cec7b9dade63b96d426b163f15c13ae6337dd2",
-    "members": 8443
+    "commit": "d597215555d3f7d249256a312c118748a72cc520",
+    "tree": "c79e089534a3c3af360f57298d6fd8d4dd8d6103",
+    "tree_listing_sha256": "8299a023b27bcb16ce6c3356ebb6bb5f30cd4e0e99bb270428c458762264d50d",
+    "members": 9800
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8441,
+    "line": "main",
+    "guarded_current_members": 9798,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "ff0980eb0c0053201c29ab6a38fc46902424a7b6",
-      "tree": "f17da201a8749022037b0f1b699d7ebbf523469e"
+      "commit": "f6cb05989d30cfca833e1b7d4d3bccab25d43fc4",
+      "tree": "1eed0c24b7b0ce23ed7a91d63d41f532a1d37414"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -198,14 +198,14 @@ The frame below binds the committed three-coercion,four Platform and five Core c
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/coercion-public-subjects.json",
-    "compatibility/rc/core-token-caller-roles-public-21.json",
+    "compatibility/rc/core-token-caller-roles-public-main.json",
     "compatibility/f10/authored-use-reviews/core-token-callers.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
     "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
     "tests/core_token_caller_roles_subject.mjs"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/core-token-caller-roles-public-21.json",
+    "compatibility/rc/core-token-caller-roles-public-main.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts"
   ],
   "full97_controls_executed": false,
@@ -237,28 +237,28 @@ const report={schema_version:1,line:checked.data.line,source_frame:checked.data.
 ```
 
 
-Remaining-Core integration frame, 2026-10-20T14:22:56.494522+00:00 (21.x).
+Remaining-Core integration frame, 2026-10-20T14:22:56.494522+00:00 (main).
 
 This committed frame binds the16 remaining Core caller decisions and the shared53-closure reconstruction. The same6 tooling paths remain. The bounded source guard rejects13 input/source corruptions and two late changes. It does not execute full97/26/19/50 cohorts,full75/all1697 walks,native/packed/AOT/default-root/CSP/floor gates or independent audits. The current ledger/delta guards independently retain1519 frozen+218 additional source-valid records,zero insufficiencies,all1697/1736/315 obligations and all native coordinator requirements. There are314 other source obligations; no whole-plan or security pass follows.
 
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "a7404834e0cbe5dfca55bd9fd35dbe067c2bec99",
-    "tree": "e90b240967e8ad2ada60a4130ded786fc2ae3dc0",
-    "tree_listing_sha256": "9222caded89ebf0d93edc19f9dc3d4fb6c55f8e2edaba96f6de7d5b02c85e45e",
-    "members": 8458
+    "commit": "b3bcff817dc39f339ff9c243757164b46ef66d8e",
+    "tree": "634071eae07011fe31a2138ddb882d79a75d902a",
+    "tree_listing_sha256": "a4615fb26afd0178a3f283379010cd187ca68ca865a64d4239c17275ad925daa",
+    "members": 9815
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8456,
+    "line": "main",
+    "guarded_current_members": 9813,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "78db12c11a30df233b436206f37f4b683930f260",
-      "tree": "9022324c94d3d655fe30f8f2d5f65fe9a6e7e511"
+      "commit": "cb90820f49d1e60aec45e10633e29bffb6379cef",
+      "tree": "34c7172d372f037cae932e1001b873d1ba9f740c"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -277,7 +277,7 @@ This committed frame binds the16 remaining Core caller decisions and the shared5
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/coercion-public-subjects.json",
-    "compatibility/rc/remaining-core-caller-roles-public-21.json",
+    "compatibility/rc/remaining-core-caller-roles-public-main.json",
     "compatibility/f10/authored-use-reviews/remaining-core-callers.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
     "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
@@ -285,7 +285,7 @@ This committed frame binds the16 remaining Core caller decisions and the shared5
     "scripts/remaining-core-caller-roles.mjs"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/remaining-core-caller-roles-public-21.json",
+    "compatibility/rc/remaining-core-caller-roles-public-main.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts"
   ],
   "full97_controls_executed": false,
@@ -317,28 +317,28 @@ const report={schema_version:1,line:checked.data.line,source_frame:checked.data.
 ```
 
 
-Material-core integration frame, 2026-10-20T15:20:55.394073+00:00 (21.x).
+Material-core integration frame, 2026-10-20T15:20:55.394073+00:00 (main).
 
 This committed frame binds37 Material-core caller decisions and the shared90-closure reconstruction. The same6 tooling paths remain. The bounded source guard rejects13 input/source corruptions and two late changes. The first precommit attempt rejected uncommitted tooling bytes; after committing the two frame bindings,the same guard passed without changing any exception. Full97/26/19/50 cohorts,full75/all1697/full21 walks,native/packed/AOT/default-root/CSP/floor gates and independent audits remain unexecuted. Independent current ledger/delta guards retain1535 frozen+239 additional source-valid records,zero insufficiencies,277 open,all1697/1736/315 obligations and every raw native coordinator requirement. No full-plan or security pass follows.
 
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "64c8658618effc5873262eda492cb4e9bac31e96",
-    "tree": "0bb77b7a7ae64c208ffae9d108e2643d5e0f8e81",
-    "tree_listing_sha256": "1cc6ea0457fa8053c4958c9f21eb0b46f5bdddc6500a6b99530ad4a5d922d91d",
-    "members": 8474
+    "commit": "21a5627dc0ff15b3557d6376b1b1bb8329983f93",
+    "tree": "9f2aea90b8157b7d5360d3864111feebdaae7964",
+    "tree_listing_sha256": "62624dc169d4c1a098931dceae281d80869f4c55c6f5d4943843399fcbab06cf",
+    "members": 9831
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8472,
+    "line": "main",
+    "guarded_current_members": 9829,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "fe8983da00a09de625ad326d68bc5f9ba16e4782",
-      "tree": "8ff9670fe9f1e3453414ad724d17024083871ba7"
+      "commit": "9f4f6caeddc1d49ed9071d208bc93051a6d9cce4",
+      "tree": "fdbe8674c21761542291a192498dc6d0949f3cac"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -357,7 +357,7 @@ This committed frame binds37 Material-core caller decisions and the shared90-clo
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/coercion-public-subjects.json",
-    "compatibility/rc/material-core-caller-roles-public-21.json",
+    "compatibility/rc/material-core-caller-roles-public-main.json",
     "compatibility/f10/authored-use-reviews/material-core-callers.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
     "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
@@ -365,7 +365,7 @@ This committed frame binds37 Material-core caller decisions and the shared90-clo
     "scripts/material-core-caller-roles.mjs"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/material-core-caller-roles-public-21.json",
+    "compatibility/rc/material-core-caller-roles-public-main.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts"
   ],
   "full97_controls_executed": false,
@@ -397,28 +397,28 @@ const report={schema_version:1,line:checked.data.line,source_frame:checked.data.
 ```
 
 
-CDK module/type integration frame, 2026-10-20T21:34:54.549030+00:00 (21.x).
+CDK module/type integration frame, 2026-10-20T21:34:54.549030+00:00 (main).
 
 This committed frame binds14 CDK module/type and Forms callback decisions and the same shared104-closure reconstruction. The same6 tooling paths remain. The bounded source guard rejects16 input/source/published-member corruptions and two late changes. It does not execute full97/26/19/50 cohorts,full75/all1697/full21 admission,whole controls,native/packed/CVA/AOT/default-root/CSP/full floor gates or independent audits. Current delta guards retain1547 frozen+241 additional source-valid records,zero insufficiencies,263 open,all1697/1736/315 obligations,all six packed-CVA rows and every raw native coordinator requirement. Preparation64-control suites pass on both lines; the integrated61-control repeats remain deferred. No complete-plan or security pass follows.
 
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "d106799756e821edc39950dedeb84ece451d960a",
-    "tree": "788e4689429c3dbecbb237b13d30c78356c631a2",
-    "tree_listing_sha256": "e37ca5c29d6e725fe75aff41cb4f5e82a85ada0a91383f24924f71e20192df1c",
-    "members": 8516
+    "commit": "fefac2e68592cb593dbde7494bc9f5a6aa281fd7",
+    "tree": "5a6439cdf1ccec17f5a124e218f218e25968bada",
+    "tree_listing_sha256": "7fa492d38cab43cb6ab2bfe959666124f8445ed01d0bacda6afd02ff25fb5aef",
+    "members": 9873
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8514,
+    "line": "main",
+    "guarded_current_members": 9871,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "1def959a86fac947ef0fec28ae5bf1465865448d",
-      "tree": "fdbd938faa83e2e8e6dd9209b104de9f711d3dfc"
+      "commit": "9082c9a42d4bcaa4a49b53721d7a221f50160e30",
+      "tree": "e25fb4efa088a9c64b1ba927727fe537a5b5eca6"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -437,7 +437,7 @@ This committed frame binds14 CDK module/type and Forms callback decisions and th
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/coercion-public-subjects.json",
-    "compatibility/rc/cdk-module-type-caller-roles-public-21.json",
+    "compatibility/rc/cdk-module-type-caller-roles-public-main.json",
     "compatibility/f10/authored-use-reviews/cdk-module-type-callers.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
     "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
@@ -448,7 +448,7 @@ This committed frame binds14 CDK module/type and Forms callback decisions and th
     "compatibility/rc/cdk-module-type-public-sources/3f0434a3819d8a3880e4fb1aac7fbcca1c2d7fa7d1ffb7a7e9d174ddb0dbd2d3.gz"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/cdk-module-type-caller-roles-public-21.json",
+    "compatibility/rc/cdk-module-type-caller-roles-public-main.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts"
   ],
   "full97_controls_executed": false,
@@ -480,28 +480,28 @@ const report={schema_version:1,line:checked.data.line,source_frame:checked.data.
 ```
 
 
-Layout/media/scroll integration frame, 2026-10-20T22:05:11.813876+00:00 (21.x).
+Layout/media/scroll integration frame, 2026-10-20T22:05:11.813876+00:00 (main).
 
 This committed frame binds13 public-service/ignored-Location source decisions and the same shared117-closure reconstruction. The same6 tooling paths remain. The bounded guard rejects16 input/source/published-member corruptions and two late changes. Current deltas retain1558 frozen+243 additional source-valid records,zero insufficiencies,250 open,all1697/1736/315 obligations,all six packed-CVA rows and every raw native coordinator requirement. Preparation56-control suites pass on both lines; integrated53-control repeats remain deferred. Full97/26/19/50,full75/all1697/full21,whole controls,native/packed/CVA/AOT/brace-style/default-root/CSP/full floors and independent audits are unexecuted. No complete-plan or security pass follows.
 
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "41d1873ef9172734252492a5cc56a4d0f2d1deb9",
-    "tree": "5d6205365b837772e0912e01043c6bfac05f2d96",
-    "tree_listing_sha256": "ca9c67e9efcb58838c1800265d8cb25d7375f69503e48c1867bfc42fb1dc9118",
-    "members": 8530
+    "commit": "6cb1eda8a493b540e9f2262d770dc74939d8c71d",
+    "tree": "6af120ea1f0a9fc973a2a55aff0efb901dee163a",
+    "tree_listing_sha256": "1c3fd6d33462471309f0a6d61b3052b91e8f2bc41e989795d3e1b2dc44b08354",
+    "members": 9887
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8528,
+    "line": "main",
+    "guarded_current_members": 9885,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "c2cb7b80489d2abbc8684e4fe5c9ac21d2949888",
-      "tree": "eee93f4bd2e8bf1fe0c14bb0b8c2556b64f67a48"
+      "commit": "4268d71b30a0275f47580d86013a5318e5accec0",
+      "tree": "d446f18e5bc635ade2baeac5e0714113c707e6ef"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -520,7 +520,7 @@ This committed frame binds13 public-service/ignored-Location source decisions an
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/coercion-public-subjects.json",
-    "compatibility/rc/layout-service-caller-roles-public-21.json",
+    "compatibility/rc/layout-service-caller-roles-public-main.json",
     "compatibility/f10/authored-use-reviews/layout-service-callers.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
     "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
@@ -531,7 +531,7 @@ This committed frame binds13 public-service/ignored-Location source decisions an
     "compatibility/rc/cdk-module-type-public-sources/3f0434a3819d8a3880e4fb1aac7fbcca1c2d7fa7d1ffb7a7e9d174ddb0dbd2d3.gz"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/layout-service-caller-roles-public-21.json",
+    "compatibility/rc/layout-service-caller-roles-public-main.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts"
   ],
   "full97_controls_executed": false,
@@ -563,28 +563,28 @@ const report={schema_version:1,line:checked.data.line,source_frame:checked.data.
 ```
 
 
-Table caller integration frame, 2026-10-21T00:06:47.242962+00:00 (21.x).
+Table caller integration frame, 2026-10-21T00:06:47.242962+00:00 (main).
 
 This committed frame binds26 named table source decisions and the same shared143-closure reconstruction. The same6 tooling paths remain. The bounded guard rejects16 input/source/published-member corruptions and two changes after cached reads. Current deltas retain1573 frozen+254 additional source-valid records,zero insufficiencies,224 open,all1697/1736/315 obligations,six packed-CVA rows and every raw native coordinator requirement. Preparation50-control suites pass on both lines; integrated47-control repeats remain deferred. Nine exact zero-argument parent signatures and31 consumed public members are checked at each minimum;148 runtime cases and12 source mutants pass per line. Full97/26/19/50,full75/all1697/full21,whole owned table-module/template/external stylesheet scope,native/packed/CVA/AOT/default-root/CSP/full floors and independent audits are unexecuted. No complete-plan or security pass follows.
 
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "2d86852233910cea2e5b479105c49e94ed059f1d",
-    "tree": "29a74a8a0b9f89c8b05452dd2d11e706dc122788",
-    "tree_listing_sha256": "8dadbe5069cbcb66ccfec6984ba1bdc2437baf9463cb3f1d7dcb3ca6e2c78c23",
-    "members": 8573
+    "commit": "6d952c6306f055c714d0dcaa00b411580830a6c1",
+    "tree": "7e6aabc12d6cfd3f5fcd949c4861c3725334b392",
+    "tree_listing_sha256": "0a9386bea26416ba0b007880792c154523aedb18b0860e99e3c1979335a0dffa",
+    "members": 9930
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8571,
+    "line": "main",
+    "guarded_current_members": 9928,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "aa251ee6753cec2b30eec280e7d6a9d8c978efe6",
-      "tree": "c34da05ab3a085a41774262b39c0af2dc304975b"
+      "commit": "b3d6ce1e6188b1b461dbec579876653cd9914b8e",
+      "tree": "b3a3998257bfc207ed28ebe6dddfcc5d068adc60"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -603,7 +603,7 @@ This committed frame binds26 named table source decisions and the same shared143
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/coercion-public-subjects.json",
-    "compatibility/rc/table-caller-roles-public-21.json",
+    "compatibility/rc/table-caller-roles-public-main.json",
     "compatibility/f10/authored-use-reviews/table-callers.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
     "projects/ngx-material-legacy/legacy-snack-bar/internal/snack-bar-container-base.ts",
@@ -614,7 +614,7 @@ This committed frame binds26 named table source decisions and the same shared143
     "compatibility/rc/table-caller-public-sources/5970be112e4a2e41c48316120a1695fef3be7ca0c91507ff1d2dec1e724e508e.gz"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/table-caller-roles-public-21.json",
+    "compatibility/rc/table-caller-roles-public-main.json",
     "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts"
   ],
   "full97_controls_executed": false,
@@ -646,28 +646,28 @@ const report={schema_version:1,line:checked.data.line,source_frame:checked.data.
 ```
 
 
-Public tooltip clipping integration frame, 2026-10-21T01:13:26.025683+00:00 (21.x).
+Public tooltip clipping integration frame, 2026-10-21T01:13:26.025683+00:00 (main).
 
 The exact one-file clipping repair is applied and the same source owner now qualifies three product deltas,63 source bindings and143 preserved semantic closures. The original13 historical members remain plus one exact authenticated tooltip before-image; no reader layer was added and current/native raw paths receive repaired bytes. Imports/exported signatures and33 family resources remain unchanged. Applied guards reject43 corruptions/two late changes; current delta guards reject12/two and retain1573 frozen+254 additional valid,zero insufficiencies and224 open. The eager-container native profile has one source-fingerprint successor with unchanged case IDs,hunks,disposition and runtime requirement. All34 main/33 branch native profiles still lack coordinator runs. The current frame guard rejects16 corruptions/two late changes with the same6 tooling paths. Full source/historical cohorts,whole directive/native geometry,packed/AOT/consumer/full floors and independent audits remain unexecuted. No G01-G13,security or full-plan pass is claimed.
 
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "7c05d3dbcc8dd756c359ac26831bcaaf6840f1a9",
-    "tree": "bc4259187d5908ea4cab54cc17487c9b192b9315",
-    "tree_listing_sha256": "cbdc6a51b02d80a7346d2d6624daa3c030f6848a8a76045cd25d93db80bdb558",
-    "members": 8616
+    "commit": "ea976240e4f0fdaaaa76536827cbc26a7253983f",
+    "tree": "ee08944135a3d592096d51cd0f52bd66c8bfc9ee",
+    "tree_listing_sha256": "a740090613f2595f613585f4d5962627af99a4c9c163d1b3086a66ff18bc9bb4",
+    "members": 9973
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8614,
+    "line": "main",
+    "guarded_current_members": 9971,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "980f5da31d5f28957d7c86c0339644b1f105cbd7",
-      "tree": "8a0fed6ca953906ab1ad2fbcb021f9938edac81f"
+      "commit": "daf45123ed5448df452511c60de1dd14bcfc90b4",
+      "tree": "a20eb807c671dc2f4aaa409f90f2eb589cdcdf84"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -686,7 +686,7 @@ The exact one-file clipping repair is applied and the same source owner now qual
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/snack-dom-source-context-focus-inputs.json",
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
     "scripts/tooltip-scroll-clipping-evidence.mjs",
     "scripts/tooltip-scroll-clipping.mjs",
@@ -697,7 +697,7 @@ The exact one-file clipping repair is applied and the same source owner now qual
     "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
   ],
   "full97_controls_executed": false,
@@ -737,21 +737,21 @@ Full97 controls and26/19/50 cohorts,full75/1697/21 walks,packed/AOT/native/consu
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "2d4e8c6ffc101b0c9995cdbf015abb59ab37dd12",
-    "tree": "088d7c488f6ed3a5715ce34d268e21e0b511c326",
-    "tree_listing_sha256": "988f6c6420e968ba845604d6b6e55ebd11521adfde4d05ff9db0b2d33f9d467e",
-    "members": 8630
+    "commit": "b989a2ca6772fff62a7038c2f187f43d44281e52",
+    "tree": "057deefc1e47d55d98b180c37825d9b5436c540d",
+    "tree_listing_sha256": "97fdf9d2f5b49a07738de2b0dc6d99b0dfd10919b59da1071cce2ffc2179edf7",
+    "members": 9987
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8628,
+    "line": "main",
+    "guarded_current_members": 9985,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "5522fe18d0b59ee166963d3287c08162b0282edc",
-      "tree": "3355aa13cde416b112e414e414c759194592648e"
+      "commit": "00ad529227275a01960eb3fb8c2e38248919a239",
+      "tree": "cfc3b6ef2de764d053d555cad409ea6453ad9d8a"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -770,7 +770,7 @@ Full97 controls and26/19/50 cohorts,full75/1697/21 walks,packed/AOT/native/consu
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/snack-dom-source-context-focus-inputs.json",
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
     "scripts/tooltip-scroll-clipping-evidence.mjs",
     "scripts/tooltip-scroll-clipping.mjs",
@@ -781,7 +781,7 @@ Full97 controls and26/19/50 cohorts,full75/1697/21 walks,packed/AOT/native/consu
     "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
   ],
   "full97_controls_executed": false,
@@ -800,21 +800,21 @@ Separate unsealed source prototypes compiled145 unchanged source files with zero
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "ce9f09ddcad7168b6e45e97776b5668f9c21a01a",
-    "tree": "e8a5c869481d41033a9fa3929496a88242cb0252",
-    "tree_listing_sha256": "e0ce367e93d632fd39fae2933f969718d633db6233c844f6a55a4aa61f4cb8c0",
-    "members": 8633
+    "commit": "1b8bddffeb5e4b0524b185ce4b6e2031e4accf88",
+    "tree": "655813bbf9d263a2f007de286f6655d44ecf7399",
+    "tree_listing_sha256": "b8f3bfeb9e832c72bfbabcb7c75a883e6bdc59a43ac53d92eaaa3ec4b566595a",
+    "members": 9990
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8631,
+    "line": "main",
+    "guarded_current_members": 9988,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "c84e2e58179fc0d513757152dafba2740b6c138c",
-      "tree": "ef64a9f1ef93ac9aba14881aedb41767db1702fe"
+      "commit": "59c5e8dff70d845b25d57c3945d4cc2675290118",
+      "tree": "1305a66e48171f6bd5b654e48d57f98bca34d98c"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -833,7 +833,7 @@ Separate unsealed source prototypes compiled145 unchanged source files with zero
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/snack-dom-source-context-focus-inputs.json",
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
     "scripts/tooltip-scroll-clipping-evidence.mjs",
     "scripts/tooltip-scroll-clipping.mjs",
@@ -844,7 +844,7 @@ Separate unsealed source prototypes compiled145 unchanged source files with zero
     "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
   ],
   "full97_controls_executed": false,
@@ -863,21 +863,21 @@ Canonical integration remains pending:1573 frozen and254 additional source revie
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "be3751952aeb992505eab0849f3cee3b4e2e6baf",
-    "tree": "f6e5533d79e433e59068e47a24620a6ff7139670",
-    "tree_listing_sha256": "d2a7f83071b724474721491c86e5bad4fe541dcebe0eeac163fdbc881c6a2c08",
-    "members": 8677
+    "commit": "a6559670669c420ceaabbe98a3bc0881a3afa913",
+    "tree": "016495829704f15a5db2f73d33d6489249359645",
+    "tree_listing_sha256": "fc040130f2be4292b662e9fec0fde274055a5fcdf34b248326a675bab485f168",
+    "members": 10034
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8675,
+    "line": "main",
+    "guarded_current_members": 10032,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "d557e1a301eb717d6236d80f4d6e9ddafc29b545",
-      "tree": "1de3454b6a4e7ad3c35a83e27b12ac24d1411388"
+      "commit": "5985d5833f9f06b6d419f6fa578b6b84951bed73",
+      "tree": "fb873c671027e9ad8b0871639082f31c7cc4d7d4"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -896,7 +896,7 @@ Canonical integration remains pending:1573 frozen and254 additional source revie
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/snack-dom-source-context-focus-inputs.json",
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
     "scripts/tooltip-scroll-clipping-evidence.mjs",
     "scripts/tooltip-scroll-clipping.mjs",
@@ -907,7 +907,7 @@ Canonical integration remains pending:1573 frozen and254 additional source revie
     "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
   ],
   "full97_controls_executed": false,
@@ -928,21 +928,21 @@ The unchanged16+2 bounded current-frame program passed at the committed frame be
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "70116341bf277a5c732ed270044e7a6667e1ccf4",
-    "tree": "7fa48e78a9cd8a91681e5a83081add6783d58b13",
-    "tree_listing_sha256": "046c661e4408892feeeedca36faec751da4b377a3967a42cb7bedaf2827ed08b",
-    "members": 8681
+    "commit": "517ce86e03d32ed62f29a0058f525e031b40bd79",
+    "tree": "9f5be4f6ec0ff1786a9e21c4c56e72c702daf469",
+    "tree_listing_sha256": "df42495cde0b9bb61caec62aae1a4095b5cb833bd2ced96bcab65122aa85532b",
+    "members": 10038
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8679,
+    "line": "main",
+    "guarded_current_members": 10036,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "cb76d118168a4f0216065d7b13160f9611e74973",
-      "tree": "482f0757d3d1754c2f33ed3a305b80377d12cf1e"
+      "commit": "164d202b4f607d5405b36e10f72010b38324af4c",
+      "tree": "84874c44bd220f9381ce9890571ab6ba8b758e90"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -961,7 +961,7 @@ The unchanged16+2 bounded current-frame program passed at the committed frame be
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/snack-dom-source-context-focus-inputs.json",
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
     "scripts/tooltip-scroll-clipping-evidence.mjs",
     "scripts/tooltip-scroll-clipping.mjs",
@@ -972,7 +972,7 @@ The unchanged16+2 bounded current-frame program passed at the committed frame be
     "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
   ],
   "full97_controls_executed": false,
@@ -993,21 +993,21 @@ The unchanged16+2 bounded current-frame program passed for the committed subject
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "3e14f24c3b5f8e7fead8ed521777472fdee4424d",
-    "tree": "ebfa7b44aeb1bdf9ccfe2306e89ba38dfca4faaa",
-    "tree_listing_sha256": "46e415145ade9ad40aec4e96ba56840aee67b87f27adf5749d3f2584cc23bb1e",
-    "members": 8711
+    "commit": "16c30d701e3171057ad533df70305384737a6505",
+    "tree": "36ba979162c99ce0c89a6082d8943f53c232afc8",
+    "tree_listing_sha256": "ebd6d29d77a8c10003bff2449378d1a37fa41db7c02775b9dc3050f15aed6dcf",
+    "members": 10068
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8709,
+    "line": "main",
+    "guarded_current_members": 10066,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "0f14222c170afd05c13f701a8a2c1a9d0b2d55c8",
-      "tree": "25a33667a440cc69a9b7b2489651939003dec5e1"
+      "commit": "e711e93dfea1fad65b14bee1fb826182001b046d",
+      "tree": "f5eae10c24badfaab4d25b14d9070dabb9df105b"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -1026,7 +1026,7 @@ The unchanged16+2 bounded current-frame program passed for the committed subject
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/snack-dom-source-context-focus-inputs.json",
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
     "scripts/tooltip-scroll-clipping-evidence.mjs",
     "scripts/tooltip-scroll-clipping.mjs",
@@ -1037,7 +1037,7 @@ The unchanged16+2 bounded current-frame program passed for the committed subject
     "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
   ],
   "full97_controls_executed": false,
@@ -1058,21 +1058,21 @@ The unchanged16+2 bounded current-frame program passed at the committed subject 
 ```json
 {
   "schema_version": 1,
-  "line": "21.x",
+  "line": "main",
   "source_frame": {
-    "commit": "f478d2982157e90c9d86cb8d7ff2bf687a68e200",
-    "tree": "83a70a24497ed99fb0909707e18e00974a1143c9",
-    "tree_listing_sha256": "289884994346b0483355a3103e3306745a50a5ab04eb6a77d7e02e9b2367640a",
-    "members": 8742
+    "commit": "553d28ba6dda29c4acb42ee4de10633b417bfdbf",
+    "tree": "16ad0b93694b182f7e450b50df5832e31f85e6b7",
+    "tree_listing_sha256": "70ccf208e64542246132a805c1aece0f45c0af7e7847a19aa45830026a8506bd",
+    "members": 10099
   },
   "guard": {
-    "line": "21.x",
-    "guarded_current_members": 8740,
+    "line": "main",
+    "guarded_current_members": 10097,
     "current_product_members": 1142,
     "current_tooling_members": 6,
     "tooling_reference": {
-      "commit": "6b69fd7d8bc1adcc09af24e9fce5bcae5fad9704",
-      "tree": "c0b6ba7df7c35adc809ff6849393f4d56e91c6e8"
+      "commit": "4632320b9c96988a9445c7ac695949f12c8e4b35",
+      "tree": "a1972a172afe3564dce69fc7b28f28b13df73df8"
     },
     "exact_wrapper_edits_only": true,
     "authenticated_current_wrapper_successors": 2,
@@ -1091,7 +1091,7 @@ The unchanged16+2 bounded current-frame program passed at the committed subject 
     "compatibility/rc/snack-dom-source-context-inputs.json",
     "compatibility/rc/snack-dom-source-context-product-inputs.json",
     "compatibility/rc/snack-dom-source-context-focus-inputs.json",
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts",
     "scripts/tooltip-scroll-clipping-evidence.mjs",
     "scripts/tooltip-scroll-clipping.mjs",
@@ -1102,7 +1102,7 @@ The unchanged16+2 bounded current-frame program passed at the committed subject 
     "compatibility/rc/overlay-caller-public-sources/aeb8381b17507cd13b05bfb0503fdf1556b33dfd8c16410ac0c6c6ef241d2f48.gz"
   ],
   "late_current_changes_rejected": [
-    "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+    "compatibility/rc/tooltip-scroll-clipping-public-main.json",
     "projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts"
   ],
   "full97_controls_executed": false,
@@ -1111,3 +1111,43 @@ The unchanged16+2 bounded current-frame program passed at the committed subject 
   "g11_claim": "not-passed"
 }
 ```
+
+The eight later source-integration checks use the same extraction, execution,
+current-graph verification and cleanup owner. Their separate pinned registry is
+`compatibility/rc/source-integration-history-inputs.json`; it does not alter the
+original26 entries,23 wrapper records,two wrapper successors or two mutable
+progress paths. The added wrappers are ordinary strictly captured current-frame
+members. Their exact command/report redirects are additionally checked against
+immutable original Python bytes; their assertions and child timeout limits stay
+unchanged.
+
+| Additional probe | Historical subjects / successors |
+| --- | --- |
+| `snack-source-integration` | 15 / 22 |
+| `menu-panel-integration` | 15 / 22 |
+| `menu-caller-integration` | 15 / 22 |
+| `a11y-caller-integration` | 15 / 22 |
+| `configuration-caller-integration` | 15 / 22 |
+| `dialog-configuration-integration` | 17 / 23 |
+| `dialog-default-integration` | 18 / 24 |
+| `dialog-owned-integration` | 20 / 25 |
+
+The17-subject checkpoint retains its original stale manifest annotation of15;
+its unchanged original program asserts17. No original metadata, program or
+assertion is corrected to manufacture a historical pass. All selected program
+bytes match the original programs still retained in the current checkout.
+
+For these eight probes only, `--original-report <new-file>` copies the exact
+original child JSON report bytes after successful execution and before cleanup.
+`--report` continues to write the separate replay receipt. The destinations must
+differ; an existing original-report destination is rejected before execution and
+is never overwritten. Standard output remains the original program output.
+
+The dialog candidate-history validator keeps its original recorded program list.
+For its former integration wrapper it accepts only this registered command-only
+successor. Its boundary test remains live, and
+`tests/material_remaining_caller_integration_probe.mjs` separately validates the
+current25-row ledger transition and raw/native reader boundary. Historical
+checks retain31 open source obligations at their checkpoints; current source
+admission has six packed CVA roles open. Neither state qualifies packed controls,
+native rendering, consumer floors or the complete release gates.

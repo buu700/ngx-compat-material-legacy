@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class DialogConfigIntegration(unittest.TestCase):
     def test_exact_patch_and_preserved_obligations(self):
-        child = subprocess.run(['node', 'tests/dialog_caller_config_integration_probe.mjs'],
+        child = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'dialog-configuration-integration'],
                                cwd=ROOT, capture_output=True, text=True, timeout=180)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)

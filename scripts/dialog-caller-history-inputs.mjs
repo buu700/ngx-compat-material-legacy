@@ -12,6 +12,7 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {gunzipSync} from 'node:zlib';
 import {join} from 'node:path';
+import {sourceIntegrationWrapperHash} from './historical-source-replay.mjs';
 export const DIALOG_CALLER_HISTORY_INPUTS = 'compatibility/rc/dialog-caller-history-inputs.json';
 export const DIALOG_CALLER_HISTORY_MODULES = Object.freeze([
   'tests.test_dialog_caller_source', 'tests.test_dialog_caller_config_types', 'tests.test_dialog_caller_config_runtime',
@@ -51,8 +52,12 @@ export function dialogCallerHistoryInputs({root = process.cwd(), read = path => 
     assert.equal(hash(read(entry.program)), entry.wrapper_sha256, 'changed candidate history wrapper');
   }
   assert.deepEqual(data.current_applied_test_programs.map(member => member.path), currentTests);
+  // The boundary test remains current. The former integration test now replays
+  // its exact source checkpoint; only its registered command routing may differ.
+  // The live25-row integration independently covers the current source ledger.
   for (const member of data.current_applied_test_programs)
-    assert.equal(hash(read(member.path)), member.sha256, 'changed separate applied-product test ' + member.path);
+    assert.equal(hash(read(member.path)), sourceIntegrationWrapperHash({root,path:member.path,
+      expectedSha:member.sha256,readMember:read}), 'changed separate applied-product test ' + member.path);
   return {data, prior, sha256: hash(bytes)};
 }
 export function selectDialogCallerHistory(data, requested = []) {

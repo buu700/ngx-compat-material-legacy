@@ -15,9 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SnackDomSourceContext(unittest.TestCase):
     def test_exact_bindings_raw_admission_and_historical_subject_guards(self):
-        command = ['node', 'tests/snack_dom_source_context_probe.mjs']
+        command = ['node', 'scripts/run-historical-source-probe.mjs', 'snack-source-integration']
         if os.environ.get('NGX_SNACK_CONTEXT_DIAGNOSTIC'):
-            command.append(os.environ['NGX_SNACK_CONTEXT_DIAGNOSTIC'])
+            command.extend(['--original-report', os.environ['NGX_SNACK_CONTEXT_DIAGNOSTIC']])
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=360)
         self.assertEqual(child.returncode, 0, (child.stdout+child.stderr)[-14000:])
         report = json.loads(child.stdout)

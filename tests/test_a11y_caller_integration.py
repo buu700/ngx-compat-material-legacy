@@ -12,9 +12,9 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 class A11yCallerIntegration(unittest.TestCase):
     def test_exact_closures_original_bytes_and_raw_source_admission(self):
-        command = ['node', 'tests/a11y_caller_integration_probe.mjs']
+        command = ['node', 'scripts/run-historical-source-probe.mjs', 'a11y-caller-integration']
         if os.environ.get('NGX_A11Y_CALLER_INTEGRATION_DIAGNOSTIC'):
-            command.append(os.environ['NGX_A11Y_CALLER_INTEGRATION_DIAGNOSTIC'])
+            command.extend(['--original-report', os.environ['NGX_A11Y_CALLER_INTEGRATION_DIAGNOSTIC']])
         child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
         report = json.loads(child.stdout)
