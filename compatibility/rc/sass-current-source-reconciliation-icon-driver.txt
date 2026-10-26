@@ -1,0 +1,14 @@
+import {readFileSync,writeFileSync,realpathSync} from 'node:fs';import {createRequire} from 'node:module';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';import {join,resolve} from 'node:path';import {pathToFileURL} from 'node:url';
+const root=resolve(process.argv[2]),stage=JSON.parse(readFileSync(process.argv[3])),out=process.argv[4],load=p=>import(pathToFileURL(join(root,'scripts',p))),hash=s=>createHash('sha256').update(s).digest('hex');
+const sass=createRequire(join(root,'package.json'))('sass'),line=JSON.parse(readFileSync(join(root,'projects/ngx-material-legacy/package.json'))).version.startsWith('21.')?'21.x':'main';
+const {mixinArgumentCatalog,measureMixinArgument,firstMixinCssDifference}=await load('sass-mixin-arguments.mjs'),{measureM2PeerProgram}=await load('sass-current-companion-peer.mjs'),{SCENARIOS,themeSass}=await load('companion-bridge-peer-oracle.mjs');
+const cat=mixinArgumentCatalog(),original=JSON.parse(readFileSync(join(root,'fixtures/sass/aggregate-color-theme-contracts.json'))),baseline=JSON.parse(readFileSync(join(root,'compatibility/rc/sass-closeout-native-checkpoints.json'))).branches.find(b=>b.line===line),base=join(stage.stage,line,'node_modules'),roots=[join(root,'projects/ngx-material-legacy'),join(base,'@angular/material'),join(base,'@angular/cdk')].map(p=>realpathSync(p));
+const cases=[];
+for(const probe of cat.cases.filter(p=>/^icon-(color|theme)$/.test(p.mixin))){
+ const profile=probe.case_id.endsWith('/custom-dark-theme')?'themes-2018-dark':'themes-2018-light';const expected=original.profiles[profile].originals.icon;assert.equal(hash(expected.css),expected.css_sha256);assert.equal(expected.css_sha256,baseline.configurable_failures.find(r=>r.case_id===probe.case_id).expected_sha256);
+ const actual=measureMixinArgument(sass,join(roots[0],'_index.scss'),[base],cat,probe,roots),scenario=SCENARIOS.find(s=>s.id==='closeout-custom-2018-'+(probe.case_id.endsWith('/custom-dark-theme')?'dark':'light'));
+ const program="@use '@angular/material' as peer;\n"+themeSass('peer',scenario,{m2Prefix:'m2-'})+`.sass-argument-probe { @include peer.icon-${probe.mixin.split('-').at(-1)}($theme); }\n`;
+ const peer=measureM2PeerProgram({sass,materialRoot:roots[1],cdkRoot:roots[2],program,line});
+ cases.push({case_id:probe.case_id,expected,actual,peer,raw_matches_original:actual.css===expected.css,raw_matches_peer:actual.css===peer.css,first_difference:firstMixinCssDifference(expected,actual)});
+}
+writeFileSync(out,JSON.stringify({schema_version:1,line,cases,packed_native_or_floor_qualified:false},null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line,cases:cases.map(r=>({id:r.case_id,original:r.raw_matches_original,peer:r.raw_matches_peer,actual_sha256:r.actual.css_sha256,first_difference:r.first_difference}))}));

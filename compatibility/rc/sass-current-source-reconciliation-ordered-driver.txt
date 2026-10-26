@@ -1,0 +1,33 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ * Copyright (c) 2026 Ryan Lester.
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import assert from 'node:assert/strict';import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,copyFileSync,symlinkSync,realpathSync} from 'node:fs';import {createRequire} from 'node:module';import {spawnSync} from 'node:child_process';import {join,resolve,dirname} from 'node:path';import {pathToFileURL} from 'node:url';import {createHash} from 'node:crypto';
+const root=resolve(process.argv[2]),stage=JSON.parse(readFileSync(process.argv[3])),out=process.argv[4],hash=b=>createHash('sha256').update(b).digest('hex');
+const line=JSON.parse(readFileSync(join(root,'projects/ngx-material-legacy/package.json'))).version.startsWith('21.')?'21.x':'main';
+const {compareOrderedCss,orderedCssResults,ORDERED_CSS_FIXTURE_IDS}=await import(pathToFileURL(join(root,'scripts/sass-ordered-css.mjs')));
+const ids=['05-custom-map-nested','owned-legacy-button','owned-legacy-select','owned-legacy-snack-bar','02-core','03-legacy-core','06-aggregate-and-companions'];
+const env=mkdtempSync(join(stage.stage,line,'ordered-source-')),work=join(env,'seven-ordered-source'),fixtures=join(work,'fixtures'),reference=join(work,'reference'),candidate=join(work,'candidate');
+mkdirSync(fixtures,{recursive:true});mkdirSync(reference);const manifest=JSON.parse(readFileSync(join(root,'fixtures/sass/manifest.json')));
+const selected=ids.map(id=>{const rows=manifest.cases.filter(r=>r.id===id);assert.equal(rows.length,1);return rows[0];});
+writeFileSync(join(fixtures,'manifest.json'),JSON.stringify({...manifest,cases:selected},null,2)+'\n',{flag:'wx'});
+for(const row of selected){copyFileSync(join(root,'fixtures/sass',row.file),join(fixtures,row.file));copyFileSync(join(root,'reference/material-16.2.14/sass-css',row.id+'.css'),join(reference,row.id+'.css'));}
+writeFileSync(join(env,'package.json'),JSON.stringify({name:'source-sass-reconciliation-diagnostic',private:true,type:'module'})+'\n',{flag:'wx'});
+mkdirSync(join(env,'node_modules'));symlinkSync(join(stage.stage,line,'node_modules/@angular'),join(env,'node_modules/@angular'),'dir');
+mkdirSync(join(env,'node_modules/@ngx-compat'));symlinkSync(join(root,'projects/ngx-material-legacy'),join(env,'node_modules/@ngx-compat/material-legacy'),'dir');
+const sassRoot=realpathSync(dirname(createRequire(join(root,'package.json')).resolve('sass')));symlinkSync(sassRoot,join(env,'node_modules/sass'),'dir');
+const start=Date.now(),child=spawnSync(process.execPath,[join(root,'scripts/run-sass-fixtures.mjs'),'--environment',env,'--module','@ngx-compat/material-legacy','--output',candidate,'--fixtures',fixtures,'--include-bridge','--line',line],{cwd:root,encoding:'utf8',timeout:90000,maxBuffer:2*1024*1024});
+assert.equal(child.status,0,(child.stderr||child.stdout).slice(-3000));
+const compiled=JSON.parse(readFileSync(join(candidate,'compile-report.json')));assert.equal(compiled.fixtures.length,7);
+const comparison=compareOrderedCss(reference,candidate,join(work,'comparison.json'));assert.ok(comparison.report);const results=orderedCssResults(comparison.report,compiled).filter(row=>ids.includes(row.case_id));assert.equal(results.length,7);
+const originals=new Map(ids.map(id=>[id,readFileSync(join(candidate,id+'.css'))]));let negative;
+try{
+ const mutated=structuredClone(compiled);
+ for(const id of ids){const css=originals.get(id).toString()+'\n.unrelated-owned-regression { padding: 0; }\n';writeFileSync(join(candidate,id+'.css'),css);const row=mutated.fixtures.find(row=>row.id===id);row.css_sha256=hash(css);row.css_bytes=Buffer.byteLength(css);if(row.actual_measurement){row.actual_measurement.css=css;row.actual_measurement.css_sha256=hash(css);row.actual_measurement.css_bytes=Buffer.byteLength(css);}}
+ const diff=compareOrderedCss(reference,candidate,join(work,'mutated-comparison.json'));assert.ok(diff.report);negative=orderedCssResults(diff.report,mutated).filter(row=>ids.includes(row.case_id));assert.equal(negative.length,7);assert.ok(negative.every(row=>row.result==='fail'));
+}finally{for(const [id,bytes]of originals)writeFileSync(join(candidate,id+'.css'),bytes);}
+const report={schema_version:1,line,scope:'Original seven C02 blocked ordered fixtures against current workspace Sass sources; no packed/export-resolution/native/floor qualification',selected:ids,declared_ordered_roster:ORDERED_CSS_FIXTURE_IDS,other_ordered_cases_unexecuted:ORDERED_CSS_FIXTURE_IDS.filter(id=>!ids.includes(id)),peer_staging:stage,fixtures:selected.map(row=>({id:row.id,source_sha256:hash(readFileSync(join(fixtures,row.file))),reference_sha256:hash(readFileSync(join(reference,row.id+'.css')))})),compiled,comparison:comparison.report,results,mutated_in_one_batch:true,mutations:negative,elapsed_ms:Date.now()-start,source_closures:0,actual_packed_native_or_floor_qualified:false,full_ordered_roster_pass:false,full_C02_pass:false,g11_claim:'not-passed'};
+writeFileSync(out,JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({line,selected:7,passed:results.filter(r=>r.result==='pass').length,failures:results.filter(r=>r.result!=='pass'),mutations_rejected:negative.length,elapsed_ms:report.elapsed_ms}));process.exitCode=results.every(row=>row.result==='pass')?0:1;

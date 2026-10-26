@@ -1,0 +1,27 @@
+from pathlib import Path,PurePosixPath
+import json,hashlib,tarfile,tempfile,base64
+root=Path('/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy');base=Path('/home/parallels/.cache/ngx-compat-material-legacy-closeout')
+p=root/'compatibility/rc/material-public-subjects.json';raw=p.read_bytes();assert hashlib.sha256(raw).hexdigest()=='f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3'
+cap=json.loads(raw);stage=Path(tempfile.mkdtemp(prefix='ngx-sass-current-reconciliation-'));records=[]
+for line in ['main','21.x']:
+ sub=next(s for s in cap['subjects'] if s['line']==line)
+ for pkg in sub['packages']:
+  if pkg['name'] not in ['@angular/material','@angular/cdk']:continue
+  leaf=pkg['name'].split('/')[-1]+'-'+pkg['version']+'.tgz';candidates=[d/leaf for d in base.iterdir() if d.is_dir() and (d/leaf).is_file()];assert candidates,leaf
+  archive=candidates[0];data=archive.read_bytes();assert len(data)==pkg['archive_bytes'] and hashlib.sha256(data).hexdigest()==pkg['archive_sha256'];assert 'sha512-'+base64.b64encode(hashlib.sha512(data).digest()).decode()==pkg['integrity']
+  target=stage/line/'node_modules'/pkg['name'];count=0
+  with tarfile.open(archive,'r:gz') as tar:
+   for member in tar.getmembers():
+    if not member.isfile() or not member.name.startswith('package/'):continue
+    rel=PurePosixPath(member.name[len('package/'):]);assert not rel.is_absolute() and '..' not in rel.parts
+    if rel.as_posix()!='package.json' and rel.suffix!='.scss':continue
+    dest=target/str(rel);dest.parent.mkdir(parents=True,exist_ok=True)
+    with dest.open('xb') as out:out.write(tar.extractfile(member).read())
+    count+=1
+  assert json.loads((target/'package.json').read_bytes())['version']==pkg['version']
+  records.append({'line':line,'name':pkg['name'],'version':pkg['version'],'archive':str(archive),'archive_sha256':pkg['archive_sha256'],'archive_sri_verified':True,'staged_scss_and_manifest_members':count})
+report={'schema_version':1,'stage':str(stage),'source_capsule':{'path':str(p),'sha256':hashlib.sha256(raw).hexdigest()},'packages':records,'dependency_install_executed':False}
+Path('/tmp/ngx-sass-current-stage.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({'stage':str(stage),'packages':len(records),'members':sum(r['staged_scss_and_manifest_members'] for r in records)}))
+for worktree,line in [(root,'main'),(Path('/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy'),'21.x')]:
+ data={'schema_version':1,'line':line,'owner':'Codex primary; existing Sass API/finite contract producers','task':'Reconcile old C02 failures with current finite Sass contracts and compile eight formerly unexplained default mixins with the genuine exact line peer; preserve the complete651/498/31 populations.','owned_paths':['compatibility/rc/sass-current-source-reconciliation-*','compatibility/rc/session-handoff.json'],'selected_default_mixins':['all-component-colors','all-component-densities','all-component-typographies','all-legacy-component-themes','badge-theme','datepicker-density','sort-color','tree-color'],'constraints':['Use existing runSassApiCss and compareInventory production owners. A reduced diagnostic invocation never supplies full651-case inventory credit.','Preserve untouched original oracles, all six pending-decision families, 498 argument cases and31 ordered CSS fixtures. Do not add hashes or widen exceptions to hide a mismatch.','Peer archives must match authenticated material-public-subjects exact SHA256/SRI/version; stage only safe regular SCSS/package.json members into fresh private temporary roots. No downloads or dependency installs.','Use current line-owned sources and independent genuine line peer programs. Compare complete CSS through existing finite validators and reject changed owned CSS.','No product/API/HTML/CSS/SCSS changes absent a reproduced defect; no consumer or Cyph writes; all source/packed/native/SSR/browser/floor/audit gates remain separate.','Serial low-priority bounded source diagnostics only; full packs/builds/cohorts and Actions remain deferred until a plausibly complete candidate.'],'status':'Exact cached peer Sass archives staged; structural coverage and eight real default compilations per line pending.','source_closures':0,'actual_packed_native_or_floor_qualified':False,'g11_claim':'not-passed'}
+ p=worktree/'compatibility/rc/sass-current-source-reconciliation-worksheet.json';assert not p.exists();p.write_text(json.dumps(data,indent=2)+'\n')
