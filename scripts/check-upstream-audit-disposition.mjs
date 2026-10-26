@@ -268,6 +268,21 @@ function regularRepoMember(rel) {
   } catch { return null; }
 }
 
+// Dependency graph resolvers distinguish an absent candidate (ENOENT) from an
+// unreadable or unsafe source. Preserve that filesystem contract for raw reads.
+function readRegularRepoBytes(rel) {
+  if (typeof rel !== 'string' || rel.includes('\\')) throw new Error('unsafe source member');
+  const parts = rel.split('/');
+  if (parts.some(part => !part || part === '.' || part === '..')) throw new Error('unsafe source member');
+  let file = root, stat;
+  for (const part of parts) {
+    file = join(file, part); stat = lstatSync(file);
+    if (stat.isSymbolicLink()) throw new Error('symlink in source member');
+  }
+  if (!stat.isFile()) throw new Error('source member is not a regular file');
+  return readFileSync(file);
+}
+
 function individualPatchBound(entry, proof) {
   if (!regularRepoMember(entry.evidence_report)) return false;
   if (evidenceClass(entry) !== 'file' || !entry.evidence_report.endsWith('.json')) return false;
@@ -465,7 +480,7 @@ let currentSymbols = null;
 try { currentSymbols = JSON.parse(readFileSync(currentSymbolsPath, 'utf8')); } catch { /* Missing/unreadable is incomplete. */ }
 const currentSymbolAdmission = currentAuthoredUseAdmission({current: currentAuthoredSource,
   frozen: authoredReference.symbol_uses, candidate: currentSymbols, line: reviewLine,
-  readMember: rel => {const file = regularRepoMember(rel); return file ? readFileSync(file) : null;}});
+  readMember: readRegularRepoBytes});
 
 const structuralOk = missing.length === 0 && unresolved.length === 0 && conflicts.length === 0
   && outside.length === 0 && securityDocsOnly.length === 0 && unknown.length === 0
