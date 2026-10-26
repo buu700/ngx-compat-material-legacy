@@ -16,7 +16,13 @@ minimumReleaseAgeIgnoreMissingTime: false
 minimumReleaseAgeExcludePrune: true
 
 # Add only exact version-specific exceptions, with comments explaining the urgent fix.
+# source-map-js@1.2.2 removed 2026-10-13 after its natural seven-day window ended.
 minimumReleaseAgeExclude: []
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true
+
+# Security: @angular/cli 22.1.8 pins @modelcontextprotocol/sdk@1.30.0 (GHSA-6qxp-vccf-f47h).
+# Fixed release 1.31.0 published 2026-09-28; 1.32.1 published 2026-10-05 (past seven-day age).
+overrides:
+  '@modelcontextprotocol/sdk': 1.32.1

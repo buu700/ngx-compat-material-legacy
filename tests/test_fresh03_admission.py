@@ -221,19 +221,17 @@ class MinimumAgeExceptionTests(unittest.TestCase):
         return ELIGIBILITY.assess_age_exceptions(
             records, excludes, now or self.NOW, lambda name, version: (self.PUBLISHED, ""))
 
-    def test_historical_age_claim_requires_original_authority(self):
+    def test_committed_age_excludes_cleared_after_maturity(self):
         records, error = ELIGIBILITY.load_age_exceptions(ROOT)
+        excludes = ELIGIBILITY.pnpm_age_excludes((ROOT / "pnpm-workspace.yaml").read_text())
         self.assertIsNone(error)
-        # Retained history is tested at its historical clock, with its historical
-        # exclusion. Today's workspace no longer needs this matured exception.
-        excludes = ["source-map-js@1.2.2"]
+        self.assertEqual(excludes, [])
+        self.assertEqual(records, [])
         result = self.assess(records, excludes)
         self.assertEqual(result["active"], {})
-        self.assertTrue(any("owner authority pending" in problem for problem in result["problems"]))
-        self.assertEqual(records[0]["classification"], "pending-owner-authority")
-        self.assertEqual(records[0]["granted_by"], "Ryan Lester")
-        # This fixture exercises date/scope mechanics only; it is not human authority.
-        fixture = self.assess([self.record()], excludes)
+        self.assertEqual(result["problems"], [])
+        # Synthetic fixture exercises date/scope mechanics only; it is not human authority.
+        fixture = self.assess([self.record()], ["source-map-js@1.2.2"])
         self.assertEqual(fixture["problems"], [])
         self.assertIn("source-map-js@1.2.2", fixture["active"])
         self.assertIn("chainman/minimum-age-exceptions.toml", (ROOT / "chainman.toml").read_text())
@@ -245,7 +243,9 @@ class MinimumAgeExceptionTests(unittest.TestCase):
         configured = ELIGIBILITY.pnpm_age_excludes((ROOT / "pnpm-workspace.yaml").read_text())
         self.assertIsNone(error)
         self.assertNotIn("source-map-js@1.2.2", configured)
-        result = self.assess(records, [], datetime(2026, 10, 7, 14, 8, 10, tzinfo=timezone.utc))
+        # Preserve the historical expiry behavior with an explicit synthetic record.
+        result = self.assess([self.record(classification="pending-owner-authority")], [],
+                             datetime(2026, 10, 7, 14, 8, 10, tzinfo=timezone.utc))
         self.assertEqual(result["active"], {})
         self.assertEqual(result["problems"], [])
         self.assertEqual(result["expired"], ["source-map-js@1.2.2"])
@@ -255,9 +255,6 @@ class MinimumAgeExceptionTests(unittest.TestCase):
             result=self.assess([self.record(classification=classification)], ["source-map-js@1.2.2"])
             self.assertEqual(result["active"], {})
             self.assertTrue(any("owner authority pending" in problem for problem in result["problems"]))
-        records,_=ELIGIBILITY.load_age_exceptions(ROOT)
-        expired=self.assess(records,["source-map-js@1.2.2"],datetime(2026,10,7,14,8,10,tzinfo=timezone.utc))
-        self.assertTrue(any("expired" in problem and "remove it" in problem for problem in expired["problems"]))
 
     def test_expired_grant_still_configured_blocks(self):
         result = self.assess([self.record()], ["source-map-js@1.2.2"], datetime(2026, 10, 7, 14, 8, 10, tzinfo=timezone.utc))
