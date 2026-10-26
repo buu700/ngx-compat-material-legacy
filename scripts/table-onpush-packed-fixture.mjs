@@ -26,7 +26,7 @@ const tableChangeDetection=ChangeDetectionStrategy.OnPush;
       <tr *matNoDataRow><td [attr.colspan]="columns.length">Empty rows: {{columns.length}}</td></tr>
     </table>
   \`})
-class PackedOnPushTable {
+export class PackedOnPushTable {
   @Input() source!:MatLegacyTableDataSource<Row>;
   columns=['a','b','c'];
   @ViewChild(MatLegacyTable) table!:MatLegacyTable<Row>;
