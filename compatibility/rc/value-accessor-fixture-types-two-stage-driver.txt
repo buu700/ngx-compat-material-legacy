@@ -1,0 +1,39 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,symlinkSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {join,dirname,resolve} from 'node:path';
+import {tmpdir} from 'node:os';
+import {pathToFileURL} from 'node:url';
+const root=resolve(process.argv[2]),out=process.argv[3],ts=createRequire(join(root,'package.json'))('typescript');
+const primary=resolve(process.argv[4]||'/home/parallels/ngx-compat-material-legacy'),hash=b=>createHash('sha256').update(b).digest('hex');
+const {valueAccessorPackedFixture}=await import(pathToFileURL(join(root,'scripts/value-accessor-packed-fixture.mjs')));
+const {componentConfigGraph}=await import(pathToFileURL(join(root,'scripts/component-config-caller-contracts.mjs')));
+const families=['autocomplete','checkbox','list','radio','slide-toggle','slider'];
+const selected=families.flatMap(name=>['legacy-'+name+'/public-api.ts','legacy-'+name+'/testing/public-api.ts']).map(file=>({original_row:{file}}));
+const graph=componentConfigGraph({root,selected}),temporary=mkdtempSync(join(tmpdir(),'cva-fixture-types-'));
+try{
+ mkdirSync(join(temporary,'src'));symlinkSync(join(primary,'node_modules'),join(temporary,'node_modules'),'dir');
+ const fixture=join(temporary,'src/value-accessor-probe.ts'),contract=join(temporary,'src/value-accessor-contract.mjs');
+ writeFileSync(fixture,valueAccessorPackedFixture());writeFileSync(contract,readFileSync(join(root,'scripts/value-accessor-packed-contract.mjs')));
+ const routes=new Map(graph.routes);
+ for(const file of selected){const suffix=file.original_row.file.replace('/public-api.ts','');routes.set('@ngx-compat/material-legacy/'+suffix,'projects/ngx-material-legacy/'+file.original_row.file);}
+ const options={target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,moduleResolution:ts.ModuleResolutionKind.Bundler,experimentalDecorators:true,strict:false,skipLibCheck:false,noEmit:true,types:[],paths:Object.fromEntries([...routes].map(([spec,path])=>[spec,[join(root,path)]]))};
+  const start=Date.now(),types=join(temporary,'types');
+ const libraryOptions={...options,noEmit:false,strict:true,strictPropertyInitialization:false,noImplicitOverride:true,declaration:true,emitDeclarationOnly:true,noEmitOnError:true,rootDir:join(root,'projects/ngx-material-legacy'),outDir:types};
+ const libraryHost=ts.createCompilerHost(libraryOptions);
+ libraryHost.resolveModuleNames=(specs,from)=>specs.map(spec=>ts.resolveModuleName(spec,spec.startsWith('@angular/')||spec.startsWith('rxjs')||spec==='tslib'?fixture:from,libraryOptions,libraryHost).resolvedModule);
+ const library=ts.createProgram(selected.map(row=>join(root,'projects/ngx-material-legacy',row.original_row.file)),libraryOptions,libraryHost);
+ const libraryDiagnostics=ts.getPreEmitDiagnostics(library),libraryEmit=library.emit();
+ const typeRoutes=Object.fromEntries([...routes].map(([spec,path])=>[spec,[join(types,path.slice('projects/ngx-material-legacy/'.length).replace(/\.ts$/,'.d.ts'))]]));
+ const consumerOptions={...options,paths:typeRoutes};
+ const consumerHost=ts.createCompilerHost(consumerOptions);
+ consumerHost.resolveModuleNames=(specs,from)=>specs.map(spec=>ts.resolveModuleName(spec,spec.startsWith('@angular/')||spec.startsWith('rxjs')||spec==='tslib'?fixture:from,consumerOptions,consumerHost).resolvedModule);
+ const program=ts.createProgram([fixture],consumerOptions,consumerHost),consumerDiagnostics=ts.getPreEmitDiagnostics(program);
+ const diagnostics=[...libraryDiagnostics,...libraryEmit.diagnostics,...consumerDiagnostics];
+ const sourceMembers=library.getSourceFiles().filter(s=>s.fileName.startsWith(join(root,'projects/'))).map(s=>({path:s.fileName.slice(root.length+1),sha256:hash(s.text)}));
+ const peerNames=['@angular/core','@angular/common','@angular/compiler','@angular/forms','@angular/platform-browser','@angular/cdk','@angular/material','rxjs','tslib'];
+ const report={schema_version:1,role:'Two-stage exact six-control fixture type preflight: current strict library declarations, consumer settings, borrowed SDK peers; no packed/AOT/runtime credit',node:process.version,typescript:ts.version,source_root:root,generated_fixture_sha256:hash(readFileSync(fixture)),source_graph_members:graph.sources.size,actual_owned_source_files:sourceMembers,peer_packages:peerNames.map(name=>({name,version:JSON.parse(readFileSync(join(primary,'node_modules',name,'package.json'))).version})),library_compiler_options:libraryOptions,consumer_compiler_options:consumerOptions,library_diagnostics:libraryDiagnostics.length,declaration_emit_skipped:libraryEmit.emitSkipped,consumer_diagnostics:consumerDiagnostics.length,diagnostics:diagnostics.map(d=>({file:d.file?.fileName,line:d.file&&d.start!==undefined?d.file.getLineAndCharacterOfPosition(d.start).line+1:null,code:d.code,message:ts.flattenDiagnosticMessageText(d.messageText,'\n')})),elapsed_ms:Date.now()-start,source_closures:0,actual_Angular_node:false,actual_Angular_AOT:false,actual_packed_artifact:false,g11_claim:'not-passed'};
+ writeFileSync(out,JSON.stringify(report,null,2)+'\n',{flag:'wx'});
+ console.log(JSON.stringify({owned:sourceMembers.length,diagnostics:report.diagnostics.slice(0,14),total:diagnostics.length,elapsed_ms:report.elapsed_ms}));
+}finally{rmSync(temporary,{recursive:true,force:true});}
