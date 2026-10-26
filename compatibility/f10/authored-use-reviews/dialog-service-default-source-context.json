@@ -1,0 +1,1612 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "criteria": "Eleven prior closed service-base roles rebound individually to the exact applied generic-default source;complete cases/conclusions and all signatures/other class members preserved.",
+  "reviews": [
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/cdk/overlay",
+      "symbol": "ComponentType",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "The real public portal constructor interface re-export constrains all complete component/template open overloads. Actual owned public entry files and CDK dialog signatures resolve those generic arguments in the145-file check. Real component-portal execution supports the constructor contract;the separate CDK Dialog API,template/native container and packed metadata reviews remain required. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. All component/template overloads and their generic signatures remain identical. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/overlay-callers.json",
+          "sha256": "ce3557b4ed0f6747b4481f4aed6b969ec7dd0366dd4792abcc81b365180ce5e4"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "symbol": "ComponentType",
+          "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "binding": {
+            "local_name": "ComponentType",
+            "type_only": false,
+            "line": 14,
+            "text": "ComponentType"
+          },
+          "occurrences": [
+            {
+              "line": 99,
+              "parent_kind": "TypeReference",
+              "expression": "ComponentType<T>"
+            },
+            {
+              "line": 109,
+              "parent_kind": "TypeReference",
+              "expression": "ComponentType<T>"
+            },
+            {
+              "line": 114,
+              "parent_kind": "TypeReference",
+              "expression": "ComponentType<T>"
+            }
+          ],
+          "bound_receivers": [
+            "component",
+            "template",
+            "componentOrTemplateRef"
+          ],
+          "unused_import": false,
+          "complete_context_members": [
+            {
+              "kind": "SourceFile",
+              "line": 1,
+              "sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+              "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n *\n * Owned Material-16 `_MatDialogBase` (removed from Angular Material 22).\n * Adapted to current CDK Dialog / Overlay peers without private Material 22 APIs.\n */\n\nimport {Dialog, DialogConfig, DialogRef} from '@angular/cdk/dialog';\nimport {ComponentType, Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';\nimport {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';\nimport {MatDialogConfig} from '@angular/material/dialog';\nimport {Observable, Subject, defer} from 'rxjs';\nimport {startWith} from 'rxjs/operators';\nimport {MatLegacyDialogRef} from '../dialog-ref';\nimport {_MatDialogContainerBase} from './dialog-container-base';\n\n/** @docs-private */\nexport function MAT_DIALOG_SCROLL_STRATEGY_FACTORY(overlay: Overlay): () => ScrollStrategy {\n  return () => overlay.scrollStrategies.block();\n}\n\n/**\n * Base class for dialog services. The base dialog service allows\n * for arbitrary dialog refs and dialog container components.\n */\n@Injectable()\nexport abstract class _MatDialogBase<C extends _MatDialogContainerBase> implements OnDestroy {\n  private readonly _openDialogsAtThisLevel: MatLegacyDialogRef<any>[] = [];\n  private readonly _afterAllClosedAtThisLevel = new Subject<void>();\n  private readonly _afterOpenedAtThisLevel = new Subject<MatLegacyDialogRef<any>>();\n  private _scrollStrategy: () => ScrollStrategy;\n  protected _idPrefix = 'mat-dialog-';\n  private _dialog: Dialog;\n  protected dialogConfigClass = MatDialogConfig;\n\n  /** Keeps track of the currently-open dialogs. */\n  get openDialogs(): MatLegacyDialogRef<any>[] {\n    return this._parentDialog ? this._parentDialog.openDialogs : this._openDialogsAtThisLevel;\n  }\n\n  /** Stream that emits when a dialog has been opened. */\n  get afterOpened(): Subject<MatLegacyDialogRef<any>> {\n    return this._parentDialog ? this._parentDialog.afterOpened : this._afterOpenedAtThisLevel;\n  }\n\n  private _getAfterAllClosed(): Subject<void> {\n    const parent = this._parentDialog;\n    return parent ? parent._getAfterAllClosed() : this._afterAllClosedAtThisLevel;\n  }\n\n  /**\n   * Stream that emits when all open dialog have finished closing.\n   * Will emit on subscribe if there are no open dialogs to begin with.\n   */\n  readonly afterAllClosed: Observable<void> = defer(() =>\n    this.openDialogs.length\n      ? this._getAfterAllClosed()\n      : this._getAfterAllClosed().pipe(startWith(undefined)),\n  ) as Observable<any>;\n\n  constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }\n\n  open<T, D = any, R = any>(\n    component: ComponentType<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    template: TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    template: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    config = {...(this._defaultOptions || new this.dialogConfigClass()), ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }\n\n  /** Closes all of the currently-open dialogs. */\n  closeAll(): void {\n    this._closeDialogs(this.openDialogs);\n  }\n\n  /**\n   * Finds an open dialog by its id.\n   * @param id ID to use when looking up the dialog.\n   */\n  getDialogById(id: string): MatLegacyDialogRef<any> | undefined {\n    return this.openDialogs.find(dialog => dialog.id === id);\n  }\n\n  ngOnDestroy() {\n    this._closeDialogs(this._openDialogsAtThisLevel);\n    this._afterAllClosedAtThisLevel.complete();\n    this._afterOpenedAtThisLevel.complete();\n  }\n\n  private _closeDialogs(dialogs: MatLegacyDialogRef<any>[]) {\n    let i = dialogs.length;\n\n    while (i--) {\n      dialogs[i].close();\n    }\n  }\n}\n\n// Counter for unique dialog ids.\nlet uniqueId = 0;\n"
+            }
+          ],
+          "conclusion": "stable-public-peer",
+          "decision": "The real public portal constructor interface re-export constrains all complete component/template open overloads. Actual owned public entry files and CDK dialog signatures resolve those generic arguments in the145-file check. Real component-portal execution supports the constructor contract;the separate CDK Dialog API,template/native container and packed metadata reviews remain required.",
+          "reviewer": "Codex primary implementer; individual complete current overlay caller review",
+          "independent_evidence": [
+            {
+              "path": "compatibility/rc/overlay-caller-contract-inputs.json",
+              "sha256": "ada5a4f44c60dad85f4fe54bfd74c985db1eaa0a974dd70a7ce6ad188e2fb037"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-roles-prior.json.gz",
+              "sha256": "00ecad74d80a3702648c6836800a4ee3e94864d52161d7ddc67124606c0947ac"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-public-21.json",
+              "sha256": "c96f57fc4e95530e7b407a6636196fa8c98f23a7b935c304418c739f6bee0b92"
+            },
+            {
+              "path": "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+              "sha256": "aecd20ed1cf1532803a9b5645b56cabdf0c59d015556d92646625948c6bd6d3d"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-sdk.json",
+              "sha256": "41381d79c5005d63b695e6e487109ca04b3b994362ee43cae835114abfcf1b97"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-decisions.json",
+              "sha256": "6be5b182bde00a94c343cb455e61c9c83f1abcf17341b09894c4e7fa5c8b6dd8"
+            },
+            {
+              "path": "scripts/overlay-caller-contracts.mjs",
+              "sha256": "ed56e770a48865b2cdfb1893ca9a86df1a68c4af4df240406cf09b145ac26419"
+            },
+            {
+              "path": "scripts/overlay-caller-contract-reviews.mjs",
+              "sha256": "f6b58b24dfc7287be7ac57d6defdb717f6260c9b89ec1ffab2c691399f5760b7"
+            }
+          ],
+          "scope_limit": "Named public import/type/token/module/consumed-member and selected-overload boundary. Complete current TypeScript sources compile against the advertised minimum. Owned tooltip/menu/dialog construction establishes five strategy casts;external fabricated refs,subclass overrides and private mutation are excluded. Public SDK runtime uses disclosed renderer,server viewport,Location and throttle protocols. Full legacy component/module/template/native CSS/SCSS geometry,scrolling,motion,CSP,packed/AOT provider metadata,compiler/Node/RxJS/consumer/peer floors and G01-G13 retain separate gates."
+        }
+      },
+      "current_source_role": {
+        "binding": "import {ComponentType, Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';",
+        "import_local": "ComponentType",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 99,
+            "column": 16,
+            "parent_kind": "TypeReference",
+            "parent_source": "ComponentType<T>"
+          },
+          {
+            "line": 109,
+            "column": 15,
+            "parent_kind": "TypeReference",
+            "parent_source": "ComponentType<T>"
+          },
+          {
+            "line": 114,
+            "column": 29,
+            "parent_kind": "TypeReference",
+            "parent_source": "ComponentType<T>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "component",
+          "template",
+          "componentOrTemplateRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 98,
+            "sha256": "4b3e93074e20b9908a933b4fab04a28150800ddcc4a154c2a8adcadadedfee4a",
+            "text": "open<T, D = any, R = any>(\n    component: ComponentType<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;",
+            "reasons": [
+              "@angular/cdk/overlay:ComponentType"
+            ]
+          },
+          {
+            "line": 108,
+            "sha256": "bd39924911609d6526cffcd7924350a781f18dcb4c0352bce9a8981dbc6b5aed",
+            "text": "open<T, D = any, R = any>(\n    template: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;",
+            "reasons": [
+              "@angular/cdk/overlay:ComponentType"
+            ]
+          },
+          {
+            "line": 113,
+            "sha256": "99036cee7c19c399c65a731af6db63bc9cccd29cf1b498408c8e8911a96cb0e2",
+            "text": "open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    const defaults = this._defaultOptions || new this.dialogConfigClass();\n    if (!this._defaultOptions && this.dialogConfigClass === MatDialogConfig) {\n      // Keep the historical defaults when using the current peer configuration class.\n      defaults.ariaModal = true;\n      defaults.maxWidth = '80vw';\n    }\n    config = {...defaults, ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }",
+            "reasons": [
+              "@angular/cdk/overlay:ComponentType"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/overlay-callers.json",
+          "sha256": "ce3557b4ed0f6747b4481f4aed6b969ec7dd0366dd4792abcc81b365180ce5e4"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/cdk/overlay",
+      "symbol": "Overlay",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "The complete base stores the supplied public Overlay and its default factory requests block scrolling. Opening supplies a real global strategy after all config spreads,which supports the legacy ref global-strategy cast. Actual overloads and genuine public service/global/ref execution support this use;CDK dialog lifetime policies and legacy native rendering remain separate. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. Existing overlay/position operations and ownership stay unchanged;the real public Dialog.open protocol executes on both sides. Native geometry remains separate. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/overlay-callers.json",
+          "sha256": "ce3557b4ed0f6747b4481f4aed6b969ec7dd0366dd4792abcc81b365180ce5e4"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "symbol": "Overlay",
+          "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "binding": {
+            "local_name": "Overlay",
+            "type_only": false,
+            "line": 14,
+            "text": "Overlay"
+          },
+          "occurrences": [
+            {
+              "line": 31,
+              "parent_kind": "TypeReference",
+              "expression": "Overlay"
+            },
+            {
+              "line": 75,
+              "parent_kind": "TypeReference",
+              "expression": "Overlay"
+            }
+          ],
+          "bound_receivers": [
+            "overlay",
+            "_overlay"
+          ],
+          "unused_import": false,
+          "complete_context_members": [
+            {
+              "kind": "SourceFile",
+              "line": 1,
+              "sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+              "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n *\n * Owned Material-16 `_MatDialogBase` (removed from Angular Material 22).\n * Adapted to current CDK Dialog / Overlay peers without private Material 22 APIs.\n */\n\nimport {Dialog, DialogConfig, DialogRef} from '@angular/cdk/dialog';\nimport {ComponentType, Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';\nimport {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';\nimport {MatDialogConfig} from '@angular/material/dialog';\nimport {Observable, Subject, defer} from 'rxjs';\nimport {startWith} from 'rxjs/operators';\nimport {MatLegacyDialogRef} from '../dialog-ref';\nimport {_MatDialogContainerBase} from './dialog-container-base';\n\n/** @docs-private */\nexport function MAT_DIALOG_SCROLL_STRATEGY_FACTORY(overlay: Overlay): () => ScrollStrategy {\n  return () => overlay.scrollStrategies.block();\n}\n\n/**\n * Base class for dialog services. The base dialog service allows\n * for arbitrary dialog refs and dialog container components.\n */\n@Injectable()\nexport abstract class _MatDialogBase<C extends _MatDialogContainerBase> implements OnDestroy {\n  private readonly _openDialogsAtThisLevel: MatLegacyDialogRef<any>[] = [];\n  private readonly _afterAllClosedAtThisLevel = new Subject<void>();\n  private readonly _afterOpenedAtThisLevel = new Subject<MatLegacyDialogRef<any>>();\n  private _scrollStrategy: () => ScrollStrategy;\n  protected _idPrefix = 'mat-dialog-';\n  private _dialog: Dialog;\n  protected dialogConfigClass = MatDialogConfig;\n\n  /** Keeps track of the currently-open dialogs. */\n  get openDialogs(): MatLegacyDialogRef<any>[] {\n    return this._parentDialog ? this._parentDialog.openDialogs : this._openDialogsAtThisLevel;\n  }\n\n  /** Stream that emits when a dialog has been opened. */\n  get afterOpened(): Subject<MatLegacyDialogRef<any>> {\n    return this._parentDialog ? this._parentDialog.afterOpened : this._afterOpenedAtThisLevel;\n  }\n\n  private _getAfterAllClosed(): Subject<void> {\n    const parent = this._parentDialog;\n    return parent ? parent._getAfterAllClosed() : this._afterAllClosedAtThisLevel;\n  }\n\n  /**\n   * Stream that emits when all open dialog have finished closing.\n   * Will emit on subscribe if there are no open dialogs to begin with.\n   */\n  readonly afterAllClosed: Observable<void> = defer(() =>\n    this.openDialogs.length\n      ? this._getAfterAllClosed()\n      : this._getAfterAllClosed().pipe(startWith(undefined)),\n  ) as Observable<any>;\n\n  constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }\n\n  open<T, D = any, R = any>(\n    component: ComponentType<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    template: TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    template: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    config = {...(this._defaultOptions || new this.dialogConfigClass()), ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }\n\n  /** Closes all of the currently-open dialogs. */\n  closeAll(): void {\n    this._closeDialogs(this.openDialogs);\n  }\n\n  /**\n   * Finds an open dialog by its id.\n   * @param id ID to use when looking up the dialog.\n   */\n  getDialogById(id: string): MatLegacyDialogRef<any> | undefined {\n    return this.openDialogs.find(dialog => dialog.id === id);\n  }\n\n  ngOnDestroy() {\n    this._closeDialogs(this._openDialogsAtThisLevel);\n    this._afterAllClosedAtThisLevel.complete();\n    this._afterOpenedAtThisLevel.complete();\n  }\n\n  private _closeDialogs(dialogs: MatLegacyDialogRef<any>[]) {\n    let i = dialogs.length;\n\n    while (i--) {\n      dialogs[i].close();\n    }\n  }\n}\n\n// Counter for unique dialog ids.\nlet uniqueId = 0;\n"
+            }
+          ],
+          "conclusion": "stable-public-peer",
+          "decision": "The complete base stores the supplied public Overlay and its default factory requests block scrolling. Opening supplies a real global strategy after all config spreads,which supports the legacy ref global-strategy cast. Actual overloads and genuine public service/global/ref execution support this use;CDK dialog lifetime policies and legacy native rendering remain separate.",
+          "reviewer": "Codex primary implementer; individual complete current overlay caller review",
+          "independent_evidence": [
+            {
+              "path": "compatibility/rc/overlay-caller-contract-inputs.json",
+              "sha256": "ada5a4f44c60dad85f4fe54bfd74c985db1eaa0a974dd70a7ce6ad188e2fb037"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-roles-prior.json.gz",
+              "sha256": "00ecad74d80a3702648c6836800a4ee3e94864d52161d7ddc67124606c0947ac"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-public-21.json",
+              "sha256": "c96f57fc4e95530e7b407a6636196fa8c98f23a7b935c304418c739f6bee0b92"
+            },
+            {
+              "path": "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+              "sha256": "aecd20ed1cf1532803a9b5645b56cabdf0c59d015556d92646625948c6bd6d3d"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-sdk.json",
+              "sha256": "41381d79c5005d63b695e6e487109ca04b3b994362ee43cae835114abfcf1b97"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-decisions.json",
+              "sha256": "6be5b182bde00a94c343cb455e61c9c83f1abcf17341b09894c4e7fa5c8b6dd8"
+            },
+            {
+              "path": "scripts/overlay-caller-contracts.mjs",
+              "sha256": "ed56e770a48865b2cdfb1893ca9a86df1a68c4af4df240406cf09b145ac26419"
+            },
+            {
+              "path": "scripts/overlay-caller-contract-reviews.mjs",
+              "sha256": "f6b58b24dfc7287be7ac57d6defdb717f6260c9b89ec1ffab2c691399f5760b7"
+            }
+          ],
+          "scope_limit": "Named public import/type/token/module/consumed-member and selected-overload boundary. Complete current TypeScript sources compile against the advertised minimum. Owned tooltip/menu/dialog construction establishes five strategy casts;external fabricated refs,subclass overrides and private mutation are excluded. Public SDK runtime uses disclosed renderer,server viewport,Location and throttle protocols. Full legacy component/module/template/native CSS/SCSS geometry,scrolling,motion,CSP,packed/AOT provider metadata,compiler/Node/RxJS/consumer/peer floors and G01-G13 retain separate gates."
+        }
+      },
+      "current_source_role": {
+        "binding": "import {ComponentType, Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';",
+        "import_local": "Overlay",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 31,
+            "column": 61,
+            "parent_kind": "TypeReference",
+            "parent_source": "Overlay"
+          },
+          {
+            "line": 75,
+            "column": 23,
+            "parent_kind": "TypeReference",
+            "parent_source": "Overlay"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "overlay",
+          "_overlay"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 31,
+            "sha256": "20b18e3e892e201eb52f159dfa3477a30273bf7f38c7d30ca4a284bbc6c2ae28",
+            "text": "export function MAT_DIALOG_SCROLL_STRATEGY_FACTORY(overlay: Overlay): () => ScrollStrategy {\n  return () => overlay.scrollStrategies.block();\n}",
+            "reasons": [
+              "@angular/cdk/overlay:Overlay"
+            ]
+          },
+          {
+            "line": 74,
+            "sha256": "d28f98d5b6f0753e76527b7e5c1088dbd6881065403c192c326e1e6ad917ffd0",
+            "text": "constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }",
+            "reasons": [
+              "@angular/cdk/overlay:Overlay"
+            ]
+          },
+          {
+            "line": 113,
+            "sha256": "99036cee7c19c399c65a731af6db63bc9cccd29cf1b498408c8e8911a96cb0e2",
+            "text": "open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    const defaults = this._defaultOptions || new this.dialogConfigClass();\n    if (!this._defaultOptions && this.dialogConfigClass === MatDialogConfig) {\n      // Keep the historical defaults when using the current peer configuration class.\n      defaults.ariaModal = true;\n      defaults.maxWidth = '80vw';\n    }\n    config = {...defaults, ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }",
+            "reasons": [
+              "this._overlay"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/overlay-callers.json",
+          "sha256": "ce3557b4ed0f6747b4481f4aed6b969ec7dd0366dd4792abcc81b365180ce5e4"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/cdk/overlay",
+      "symbol": "OverlayContainer",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "The historical constructor slot is explicitly unused and is not stored or accessed. Its real public class type remains accepted so existing constructor calls need no change. This yields no container runtime or CSS credit and does not introduce private container machinery. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. The compatibility constructor parameter and its existing treatment remain identical. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/overlay-callers.json",
+          "sha256": "ce3557b4ed0f6747b4481f4aed6b969ec7dd0366dd4792abcc81b365180ce5e4"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "symbol": "OverlayContainer",
+          "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "binding": {
+            "local_name": "OverlayContainer",
+            "type_only": false,
+            "line": 14,
+            "text": "OverlayContainer"
+          },
+          "occurrences": [
+            {
+              "line": 83,
+              "parent_kind": "TypeReference",
+              "expression": "OverlayContainer"
+            }
+          ],
+          "bound_receivers": [
+            "_overlayContainer"
+          ],
+          "unused_import": false,
+          "complete_context_members": [
+            {
+              "kind": "SourceFile",
+              "line": 1,
+              "sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+              "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n *\n * Owned Material-16 `_MatDialogBase` (removed from Angular Material 22).\n * Adapted to current CDK Dialog / Overlay peers without private Material 22 APIs.\n */\n\nimport {Dialog, DialogConfig, DialogRef} from '@angular/cdk/dialog';\nimport {ComponentType, Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';\nimport {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';\nimport {MatDialogConfig} from '@angular/material/dialog';\nimport {Observable, Subject, defer} from 'rxjs';\nimport {startWith} from 'rxjs/operators';\nimport {MatLegacyDialogRef} from '../dialog-ref';\nimport {_MatDialogContainerBase} from './dialog-container-base';\n\n/** @docs-private */\nexport function MAT_DIALOG_SCROLL_STRATEGY_FACTORY(overlay: Overlay): () => ScrollStrategy {\n  return () => overlay.scrollStrategies.block();\n}\n\n/**\n * Base class for dialog services. The base dialog service allows\n * for arbitrary dialog refs and dialog container components.\n */\n@Injectable()\nexport abstract class _MatDialogBase<C extends _MatDialogContainerBase> implements OnDestroy {\n  private readonly _openDialogsAtThisLevel: MatLegacyDialogRef<any>[] = [];\n  private readonly _afterAllClosedAtThisLevel = new Subject<void>();\n  private readonly _afterOpenedAtThisLevel = new Subject<MatLegacyDialogRef<any>>();\n  private _scrollStrategy: () => ScrollStrategy;\n  protected _idPrefix = 'mat-dialog-';\n  private _dialog: Dialog;\n  protected dialogConfigClass = MatDialogConfig;\n\n  /** Keeps track of the currently-open dialogs. */\n  get openDialogs(): MatLegacyDialogRef<any>[] {\n    return this._parentDialog ? this._parentDialog.openDialogs : this._openDialogsAtThisLevel;\n  }\n\n  /** Stream that emits when a dialog has been opened. */\n  get afterOpened(): Subject<MatLegacyDialogRef<any>> {\n    return this._parentDialog ? this._parentDialog.afterOpened : this._afterOpenedAtThisLevel;\n  }\n\n  private _getAfterAllClosed(): Subject<void> {\n    const parent = this._parentDialog;\n    return parent ? parent._getAfterAllClosed() : this._afterAllClosedAtThisLevel;\n  }\n\n  /**\n   * Stream that emits when all open dialog have finished closing.\n   * Will emit on subscribe if there are no open dialogs to begin with.\n   */\n  readonly afterAllClosed: Observable<void> = defer(() =>\n    this.openDialogs.length\n      ? this._getAfterAllClosed()\n      : this._getAfterAllClosed().pipe(startWith(undefined)),\n  ) as Observable<any>;\n\n  constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }\n\n  open<T, D = any, R = any>(\n    component: ComponentType<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    template: TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    template: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    config = {...(this._defaultOptions || new this.dialogConfigClass()), ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }\n\n  /** Closes all of the currently-open dialogs. */\n  closeAll(): void {\n    this._closeDialogs(this.openDialogs);\n  }\n\n  /**\n   * Finds an open dialog by its id.\n   * @param id ID to use when looking up the dialog.\n   */\n  getDialogById(id: string): MatLegacyDialogRef<any> | undefined {\n    return this.openDialogs.find(dialog => dialog.id === id);\n  }\n\n  ngOnDestroy() {\n    this._closeDialogs(this._openDialogsAtThisLevel);\n    this._afterAllClosedAtThisLevel.complete();\n    this._afterOpenedAtThisLevel.complete();\n  }\n\n  private _closeDialogs(dialogs: MatLegacyDialogRef<any>[]) {\n    let i = dialogs.length;\n\n    while (i--) {\n      dialogs[i].close();\n    }\n  }\n}\n\n// Counter for unique dialog ids.\nlet uniqueId = 0;\n"
+            }
+          ],
+          "conclusion": "stable-public-peer",
+          "decision": "The historical constructor slot is explicitly unused and is not stored or accessed. Its real public class type remains accepted so existing constructor calls need no change. This yields no container runtime or CSS credit and does not introduce private container machinery.",
+          "reviewer": "Codex primary implementer; individual complete current overlay caller review",
+          "independent_evidence": [
+            {
+              "path": "compatibility/rc/overlay-caller-contract-inputs.json",
+              "sha256": "ada5a4f44c60dad85f4fe54bfd74c985db1eaa0a974dd70a7ce6ad188e2fb037"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-roles-prior.json.gz",
+              "sha256": "00ecad74d80a3702648c6836800a4ee3e94864d52161d7ddc67124606c0947ac"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-public-21.json",
+              "sha256": "c96f57fc4e95530e7b407a6636196fa8c98f23a7b935c304418c739f6bee0b92"
+            },
+            {
+              "path": "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+              "sha256": "aecd20ed1cf1532803a9b5645b56cabdf0c59d015556d92646625948c6bd6d3d"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-sdk.json",
+              "sha256": "41381d79c5005d63b695e6e487109ca04b3b994362ee43cae835114abfcf1b97"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-decisions.json",
+              "sha256": "6be5b182bde00a94c343cb455e61c9c83f1abcf17341b09894c4e7fa5c8b6dd8"
+            },
+            {
+              "path": "scripts/overlay-caller-contracts.mjs",
+              "sha256": "ed56e770a48865b2cdfb1893ca9a86df1a68c4af4df240406cf09b145ac26419"
+            },
+            {
+              "path": "scripts/overlay-caller-contract-reviews.mjs",
+              "sha256": "f6b58b24dfc7287be7ac57d6defdb717f6260c9b89ec1ffab2c691399f5760b7"
+            }
+          ],
+          "scope_limit": "Named public import/type/token/module/consumed-member and selected-overload boundary. Complete current TypeScript sources compile against the advertised minimum. Owned tooltip/menu/dialog construction establishes five strategy casts;external fabricated refs,subclass overrides and private mutation are excluded. Public SDK runtime uses disclosed renderer,server viewport,Location and throttle protocols. Full legacy component/module/template/native CSS/SCSS geometry,scrolling,motion,CSP,packed/AOT provider metadata,compiler/Node/RxJS/consumer/peer floors and G01-G13 retain separate gates."
+        }
+      },
+      "current_source_role": {
+        "binding": "import {ComponentType, Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';",
+        "import_local": "OverlayContainer",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 83,
+            "column": 24,
+            "parent_kind": "TypeReference",
+            "parent_source": "OverlayContainer"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_overlayContainer"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 74,
+            "sha256": "d28f98d5b6f0753e76527b7e5c1088dbd6881065403c192c326e1e6ad917ffd0",
+            "text": "constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }",
+            "reasons": [
+              "@angular/cdk/overlay:OverlayContainer"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/overlay-callers.json",
+          "sha256": "ce3557b4ed0f6747b4481f4aed6b969ec7dd0366dd4792abcc81b365180ce5e4"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/cdk/overlay",
+      "symbol": "ScrollStrategy",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "The complete default factory and stored thunk use the genuine public interface;config chooses an existing supplied strategy or invokes that thunk. The actual global/open configuration compiles,while the independent legacy dialog factory matches tagged block behavior. CDK dialog configuration policy,packed injection and actual page scrolling retain separate requirements. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. The existing scroll factory,option precedence and public strategy type remain identical. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/overlay-callers.json",
+          "sha256": "ce3557b4ed0f6747b4481f4aed6b969ec7dd0366dd4792abcc81b365180ce5e4"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/cdk/overlay",
+          "symbol": "ScrollStrategy",
+          "ledger": "compatibility/f10/authored-dependency-dispositions.json",
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "binding": {
+            "local_name": "ScrollStrategy",
+            "type_only": false,
+            "line": 14,
+            "text": "ScrollStrategy"
+          },
+          "occurrences": [
+            {
+              "line": 31,
+              "parent_kind": "TypeReference",
+              "expression": "ScrollStrategy"
+            },
+            {
+              "line": 44,
+              "parent_kind": "TypeReference",
+              "expression": "ScrollStrategy"
+            }
+          ],
+          "bound_receivers": [
+            "_scrollStrategy"
+          ],
+          "unused_import": false,
+          "complete_context_members": [
+            {
+              "kind": "SourceFile",
+              "line": 1,
+              "sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+              "text": "/**\n * @license\n * Copyright Google LLC All Rights Reserved.\n * Copyright (c) 2026 Ryan Lester.\n *\n * Use of this source code is governed by an MIT-style license that can be\n * found in the LICENSE file at https://angular.io/license\n *\n * Owned Material-16 `_MatDialogBase` (removed from Angular Material 22).\n * Adapted to current CDK Dialog / Overlay peers without private Material 22 APIs.\n */\n\nimport {Dialog, DialogConfig, DialogRef} from '@angular/cdk/dialog';\nimport {ComponentType, Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';\nimport {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';\nimport {MatDialogConfig} from '@angular/material/dialog';\nimport {Observable, Subject, defer} from 'rxjs';\nimport {startWith} from 'rxjs/operators';\nimport {MatLegacyDialogRef} from '../dialog-ref';\nimport {_MatDialogContainerBase} from './dialog-container-base';\n\n/** @docs-private */\nexport function MAT_DIALOG_SCROLL_STRATEGY_FACTORY(overlay: Overlay): () => ScrollStrategy {\n  return () => overlay.scrollStrategies.block();\n}\n\n/**\n * Base class for dialog services. The base dialog service allows\n * for arbitrary dialog refs and dialog container components.\n */\n@Injectable()\nexport abstract class _MatDialogBase<C extends _MatDialogContainerBase> implements OnDestroy {\n  private readonly _openDialogsAtThisLevel: MatLegacyDialogRef<any>[] = [];\n  private readonly _afterAllClosedAtThisLevel = new Subject<void>();\n  private readonly _afterOpenedAtThisLevel = new Subject<MatLegacyDialogRef<any>>();\n  private _scrollStrategy: () => ScrollStrategy;\n  protected _idPrefix = 'mat-dialog-';\n  private _dialog: Dialog;\n  protected dialogConfigClass = MatDialogConfig;\n\n  /** Keeps track of the currently-open dialogs. */\n  get openDialogs(): MatLegacyDialogRef<any>[] {\n    return this._parentDialog ? this._parentDialog.openDialogs : this._openDialogsAtThisLevel;\n  }\n\n  /** Stream that emits when a dialog has been opened. */\n  get afterOpened(): Subject<MatLegacyDialogRef<any>> {\n    return this._parentDialog ? this._parentDialog.afterOpened : this._afterOpenedAtThisLevel;\n  }\n\n  private _getAfterAllClosed(): Subject<void> {\n    const parent = this._parentDialog;\n    return parent ? parent._getAfterAllClosed() : this._afterAllClosedAtThisLevel;\n  }\n\n  /**\n   * Stream that emits when all open dialog have finished closing.\n   * Will emit on subscribe if there are no open dialogs to begin with.\n   */\n  readonly afterAllClosed: Observable<void> = defer(() =>\n    this.openDialogs.length\n      ? this._getAfterAllClosed()\n      : this._getAfterAllClosed().pipe(startWith(undefined)),\n  ) as Observable<any>;\n\n  constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }\n\n  open<T, D = any, R = any>(\n    component: ComponentType<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    template: TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    template: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;\n\n  open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    config = {...(this._defaultOptions || new this.dialogConfigClass()), ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }\n\n  /** Closes all of the currently-open dialogs. */\n  closeAll(): void {\n    this._closeDialogs(this.openDialogs);\n  }\n\n  /**\n   * Finds an open dialog by its id.\n   * @param id ID to use when looking up the dialog.\n   */\n  getDialogById(id: string): MatLegacyDialogRef<any> | undefined {\n    return this.openDialogs.find(dialog => dialog.id === id);\n  }\n\n  ngOnDestroy() {\n    this._closeDialogs(this._openDialogsAtThisLevel);\n    this._afterAllClosedAtThisLevel.complete();\n    this._afterOpenedAtThisLevel.complete();\n  }\n\n  private _closeDialogs(dialogs: MatLegacyDialogRef<any>[]) {\n    let i = dialogs.length;\n\n    while (i--) {\n      dialogs[i].close();\n    }\n  }\n}\n\n// Counter for unique dialog ids.\nlet uniqueId = 0;\n"
+            }
+          ],
+          "conclusion": "stable-public-peer",
+          "decision": "The complete default factory and stored thunk use the genuine public interface;config chooses an existing supplied strategy or invokes that thunk. The actual global/open configuration compiles,while the independent legacy dialog factory matches tagged block behavior. CDK dialog configuration policy,packed injection and actual page scrolling retain separate requirements.",
+          "reviewer": "Codex primary implementer; individual complete current overlay caller review",
+          "independent_evidence": [
+            {
+              "path": "compatibility/rc/overlay-caller-contract-inputs.json",
+              "sha256": "ada5a4f44c60dad85f4fe54bfd74c985db1eaa0a974dd70a7ce6ad188e2fb037"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-roles-prior.json.gz",
+              "sha256": "00ecad74d80a3702648c6836800a4ee3e94864d52161d7ddc67124606c0947ac"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-public-21.json",
+              "sha256": "c96f57fc4e95530e7b407a6636196fa8c98f23a7b935c304418c739f6bee0b92"
+            },
+            {
+              "path": "compatibility/rc/tooltip-scroll-clipping-public-21.json",
+              "sha256": "aecd20ed1cf1532803a9b5645b56cabdf0c59d015556d92646625948c6bd6d3d"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-sdk.json",
+              "sha256": "41381d79c5005d63b695e6e487109ca04b3b994362ee43cae835114abfcf1b97"
+            },
+            {
+              "path": "compatibility/rc/overlay-caller-contract-decisions.json",
+              "sha256": "6be5b182bde00a94c343cb455e61c9c83f1abcf17341b09894c4e7fa5c8b6dd8"
+            },
+            {
+              "path": "scripts/overlay-caller-contracts.mjs",
+              "sha256": "ed56e770a48865b2cdfb1893ca9a86df1a68c4af4df240406cf09b145ac26419"
+            },
+            {
+              "path": "scripts/overlay-caller-contract-reviews.mjs",
+              "sha256": "f6b58b24dfc7287be7ac57d6defdb717f6260c9b89ec1ffab2c691399f5760b7"
+            }
+          ],
+          "scope_limit": "Named public import/type/token/module/consumed-member and selected-overload boundary. Complete current TypeScript sources compile against the advertised minimum. Owned tooltip/menu/dialog construction establishes five strategy casts;external fabricated refs,subclass overrides and private mutation are excluded. Public SDK runtime uses disclosed renderer,server viewport,Location and throttle protocols. Full legacy component/module/template/native CSS/SCSS geometry,scrolling,motion,CSP,packed/AOT provider metadata,compiler/Node/RxJS/consumer/peer floors and G01-G13 retain separate gates."
+        }
+      },
+      "current_source_role": {
+        "binding": "import {ComponentType, Overlay, OverlayContainer, ScrollStrategy} from '@angular/cdk/overlay';",
+        "import_local": "ScrollStrategy",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 31,
+            "column": 77,
+            "parent_kind": "TypeReference",
+            "parent_source": "ScrollStrategy"
+          },
+          {
+            "line": 44,
+            "column": 34,
+            "parent_kind": "TypeReference",
+            "parent_source": "ScrollStrategy"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_scrollStrategy"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 31,
+            "sha256": "20b18e3e892e201eb52f159dfa3477a30273bf7f38c7d30ca4a284bbc6c2ae28",
+            "text": "export function MAT_DIALOG_SCROLL_STRATEGY_FACTORY(overlay: Overlay): () => ScrollStrategy {\n  return () => overlay.scrollStrategies.block();\n}",
+            "reasons": [
+              "@angular/cdk/overlay:ScrollStrategy"
+            ]
+          },
+          {
+            "line": 44,
+            "sha256": "9be8de9f0415ff1454a54f78e3f89f392926ef8546d346a1eb49a8768f3a25c7",
+            "text": "private _scrollStrategy: () => ScrollStrategy;",
+            "reasons": [
+              "@angular/cdk/overlay:ScrollStrategy"
+            ]
+          },
+          {
+            "line": 74,
+            "sha256": "d28f98d5b6f0753e76527b7e5c1088dbd6881065403c192c326e1e6ad917ffd0",
+            "text": "constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }",
+            "reasons": [
+              "this._scrollStrategy"
+            ]
+          },
+          {
+            "line": 113,
+            "sha256": "99036cee7c19c399c65a731af6db63bc9cccd29cf1b498408c8e8911a96cb0e2",
+            "text": "open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    const defaults = this._defaultOptions || new this.dialogConfigClass();\n    if (!this._defaultOptions && this.dialogConfigClass === MatDialogConfig) {\n      // Keep the historical defaults when using the current peer configuration class.\n      defaults.ariaModal = true;\n      defaults.maxWidth = '80vw';\n    }\n    config = {...defaults, ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }",
+            "reasons": [
+              "this._scrollStrategy"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/overlay-callers.json",
+          "sha256": "ce3557b4ed0f6747b4481f4aed6b969ec7dd0366dd4792abcc81b365180ce5e4"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "ComponentRef",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "The complete open method copies the public nullable CDK DialogRef componentRef into the historical wrapper through its existing writable local structural cast. This does not write Core ComponentRef internals or change its host-view ownership. Public minimum dialog declarations retain ComponentRef<C> | null. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. The component-ref type,provider callback assignment and returned ownership remain identical. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/core-view-current-roles.json",
+          "sha256": "317d4756307f1b0df88e6f3bcdbf120e2974556bd61e177808fdbaee2d10b9b2"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "symbol": "ComponentRef",
+          "current_role": "public-dialog-handle-type",
+          "decision": "The complete open method copies the public nullable CDK DialogRef componentRef into the historical wrapper through its existing writable local structural cast. This does not write Core ComponentRef internals or change its host-view ownership. Public minimum dialog declarations retain ComponentRef<C> | null.",
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "conclusion": "stable-public-peer",
+          "reviewer": "Codex primary implementer; individual current caller review",
+          "source_role": {
+            "import_local": "ComponentRef",
+            "occurrences": [
+              {
+                "line": 154,
+                "column": 35,
+                "parent_kind": "TypeReference",
+                "parent_source": "ComponentRef<T>"
+              }
+            ],
+            "bound_parameters_and_fields": [
+              "componentRef"
+            ],
+            "complete_caller_members": [
+              {
+                "line": 113,
+                "member_sha256": "303a4cc2447a1870781ee17ac88225b07abe4a0700dea4db76a7ff8f925d85b9",
+                "reasons": [
+                  "Core:ComponentRef"
+                ]
+              }
+            ]
+          },
+          "independent_evidence": [
+            {
+              "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+              "sha256": "86f8c2039fd0b06e5600360d6c1ef06b34196817afec2f961401b66115ff6c44"
+            },
+            {
+              "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+              "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+            },
+            {
+              "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+              "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+            },
+            {
+              "path": "compatibility/rc/core-view-use-public-21.json",
+              "sha256": "0b3a5e711dea14dca9254a6afa7e7c536f6db39969b7ee26303860532c9d7d3c"
+            },
+            {
+              "path": "scripts/core-view-use-current-roles.mjs",
+              "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+            },
+            {
+              "path": "compatibility/rc/dialog-public-container-source-proof.json",
+              "sha256": "9cad26ba2f6ff7d9a3a0748d15b09cc286667ba08cd1ba13096539e69bd8e991"
+            }
+          ],
+          "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+        }
+      },
+      "current_source_role": {
+        "binding": "import {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';",
+        "import_local": "ComponentRef",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 160,
+            "column": 35,
+            "parent_kind": "TypeReference",
+            "parent_source": "ComponentRef<T>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "componentRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 113,
+            "sha256": "99036cee7c19c399c65a731af6db63bc9cccd29cf1b498408c8e8911a96cb0e2",
+            "text": "open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    const defaults = this._defaultOptions || new this.dialogConfigClass();\n    if (!this._defaultOptions && this.dialogConfigClass === MatDialogConfig) {\n      // Keep the historical defaults when using the current peer configuration class.\n      defaults.ariaModal = true;\n      defaults.maxWidth = '80vw';\n    }\n    config = {...defaults, ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }",
+            "reasons": [
+              "@angular/core:ComponentRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/core-view-current-roles.json",
+          "sha256": "317d4756307f1b0df88e6f3bcdbf120e2974556bd61e177808fdbaee2d10b9b2"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "Injectable",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "The checker binds this single public Injectable import to the exact owned service annotation and no other value/type route. This caller is unchanged from the worksheet parent: dialog and dialog-base remain explicitly provided, the date adapter remains explicitly provided, and the viewport keeps stable root scope. Complete original16 and both minimum public declaration export routes contain nondeprecated Injectable; exact annotation expressions type-check with full peer declarations, strict mode and skipLibCheck:false using borrowed TS6. The module-valued deprecated option is absent from these callers. Public scope protocol executions support only the changed snack-bar ownership contract; they do not substitute for the behavior of this service or its dependencies. Whole component/service factory, AOT, packed, browser and advertised runtime/compiler floor qualification remain separate. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. The Injectable decorator and service construction metadata remain identical. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/public-injectable-service-scope-boundary.json",
+          "sha256": "3657c707aa1915c31869206da977b9879dce41a1c227569eccfabca15fbcf9d7"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "symbol": "Injectable",
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "references": [
+            {
+              "line": 39,
+              "owner": "_MatDialogBase",
+              "expression": "Injectable()"
+            }
+          ],
+          "recorded_case": {
+            "file": "legacy-dialog/internal/dialog-base.ts",
+            "module": "@angular/core",
+            "symbol": "Injectable",
+            "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+            "references": [
+              {
+                "line": 39,
+                "owner": "_MatDialogBase",
+                "expression": "Injectable()"
+              }
+            ]
+          },
+          "conclusion": "stable-public-peer",
+          "reviewer": "Codex primary implementer",
+          "decision": "The checker binds this single public Injectable import to the exact owned service annotation and no other value/type route. This caller is unchanged from the worksheet parent: dialog and dialog-base remain explicitly provided, the date adapter remains explicitly provided, and the viewport keeps stable root scope. Complete original16 and both minimum public declaration export routes contain nondeprecated Injectable; exact annotation expressions type-check with full peer declarations, strict mode and skipLibCheck:false using borrowed TS6. The module-valued deprecated option is absent from these callers. Public scope protocol executions support only the changed snack-bar ownership contract; they do not substitute for the behavior of this service or its dependencies. Whole component/service factory, AOT, packed, browser and advertised runtime/compiler floor qualification remain separate.",
+          "independent_evidence": [
+            {
+              "path": "compatibility/rc/injectable-service-scope-diagnostic.json",
+              "sha256": "4cb9b6f7b13497b24a634d3b5f704f73573ba00b6c9b1b45f1c12de9e8d1b428"
+            },
+            {
+              "path": "compatibility/rc/injectable-service-source-proof.json",
+              "sha256": "842c0f4644d1e9bb16928791a7832ed5300f16071634c0fadaca7dd948987019"
+            },
+            {
+              "path": "compatibility/rc/injectable-service-scope-worksheet.json",
+              "sha256": "edd2e58785095bb85eee517f4b589efcda9bc712efd500970b5114412d864229"
+            },
+            {
+              "path": "tests/injectable_service_scope_probe.mjs",
+              "sha256": "00002918c5c4aa05ac2c3ddc61d27c235489fda4165a6ea7c16462d8b29a6c11"
+            },
+            {
+              "path": "tests/injectable_service_scope_subject.mjs",
+              "sha256": "b2274b725e4860dbc42a91a151e0266ab064bc0286437c7c50ed8e0a4808b29b"
+            },
+            {
+              "path": "scripts/injectable-service-source-proof.mjs",
+              "sha256": "2c37db6f30280bd1dcc3481a79327c3b482b70cd81f2dfff4509265a47ce65cf"
+            }
+          ]
+        }
+      },
+      "current_source_role": {
+        "binding": "import {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';",
+        "import_local": "Injectable",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 39,
+            "column": 2,
+            "parent_kind": "CallExpression",
+            "parent_source": "Injectable()"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 39,
+            "sha256": "c3766e806042008b249812127493a84465101ac74a65faf8d2b0908b6d208e05",
+            "text": "@Injectable()",
+            "reasons": [
+              "@angular/core:Injectable"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/public-injectable-service-scope-boundary.json",
+          "sha256": "3657c707aa1915c31869206da977b9879dce41a1c227569eccfabca15fbcf9d7"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "InjectionToken",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "In legacy-dialog/internal/dialog-base.ts, stable public InjectionToken resolves to local binding InjectionToken at these roles: line 87: token-type: InjectionToken<any>. Ordinary constructors and the four root factory option objects use the stable signature; deprecated any/NgModule and numeric internal paths are not admitted. Complete original/minimum constructor/method/definition-helper source agrees outside measured emitted-field initialization; actual usage has no subclasses or runtime aliases. Genuine public modules preserve distinct token/provider/multi identities and explicit lazy/error behavior; all 27 actual owned token declarations remain separate identities. Nine controls per 3 subjects, 18 mutations and strict minimum declarations support the dependency boundary. Automatic application-root resolution, complete owned factories/callers, native/AOT/packed/full floors and upstream SHA obligations remain separate. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. The existing data-token constructor parameter and provider identity remain identical. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/public-injection-token-boundary.json",
+          "sha256": "670e7057a5419cecd407950c448a957ffcbef7ae4a8c5bd4411e525c47036b90"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "symbol": "InjectionToken",
+          "frozen_use": true,
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "conclusion": "stable-public-peer",
+          "reviewer": "Codex primary implementer",
+          "decision": "In legacy-dialog/internal/dialog-base.ts, stable public InjectionToken resolves to local binding InjectionToken at these roles: line 87: token-type: InjectionToken<any>. Ordinary constructors and the four root factory option objects use the stable signature; deprecated any/NgModule and numeric internal paths are not admitted. Complete original/minimum constructor/method/definition-helper source agrees outside measured emitted-field initialization; actual usage has no subclasses or runtime aliases. Genuine public modules preserve distinct token/provider/multi identities and explicit lazy/error behavior; all 27 actual owned token declarations remain separate identities. Nine controls per 3 subjects, 18 mutations and strict minimum declarations support the dependency boundary. Automatic application-root resolution, complete owned factories/callers, native/AOT/packed/full floors and upstream SHA obligations remain separate.",
+          "independent_evidence": [
+            {
+              "path": "compatibility/rc/injection-token-source-proof.json",
+              "sha256": "0d201e2d642868e194b75c8acf64bd267e3a03e5b2520bf4f017faeab74b4e21"
+            },
+            {
+              "path": "compatibility/rc/injection-token-minimum-source-diagnostic.json",
+              "sha256": "993e8b3290f5c7aaa737661ed909eba4a4db56f1f9e03afb827f0e7eeec85ded"
+            },
+            {
+              "path": "scripts/injection-token-use-review.mjs",
+              "sha256": "a4927256206634527eddcc0969da912dd889711eebd10b3e1210c6c5b162028e"
+            },
+            {
+              "path": "tests/injection_token_use_probe.mjs",
+              "sha256": "a73c2b04a56bb394c279246d2f70dcd664c1ac3e4dfdeb26fe5d6e0a8a44b7ca"
+            },
+            {
+              "path": "compatibility/rc/element-ref-public-subjects.json",
+              "sha256": "e08da48b91457bdf614c290fa67ca1930c71ddcc80f0ac87968b5d81aff65b20"
+            }
+          ]
+        }
+      },
+      "current_source_role": {
+        "binding": "import {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';",
+        "import_local": "InjectionToken",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 87,
+            "column": 31,
+            "parent_kind": "TypeReference",
+            "parent_source": "InjectionToken<any>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_dialogDataToken"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 74,
+            "sha256": "d28f98d5b6f0753e76527b7e5c1088dbd6881065403c192c326e1e6ad917ffd0",
+            "text": "constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }",
+            "reasons": [
+              "@angular/core:InjectionToken"
+            ]
+          },
+          {
+            "line": 113,
+            "sha256": "99036cee7c19c399c65a731af6db63bc9cccd29cf1b498408c8e8911a96cb0e2",
+            "text": "open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    const defaults = this._defaultOptions || new this.dialogConfigClass();\n    if (!this._defaultOptions && this.dialogConfigClass === MatDialogConfig) {\n      // Keep the historical defaults when using the current peer configuration class.\n      defaults.ariaModal = true;\n      defaults.maxWidth = '80vw';\n    }\n    config = {...defaults, ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }",
+            "reasons": [
+              "this._dialogDataToken"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/public-injection-token-boundary.json",
+          "sha256": "670e7057a5419cecd407950c448a957ffcbef7ae4a8c5bd4411e525c47036b90"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "Injector",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "The supplied constructor slot1 is used once in injector.get(Dialog), where Dialog is the actual named public import from @angular/cdk/dialog. Source guards reject numeric flags, extra get arguments, changed token routes or unknown member/ownership operations. Stable generic public get and class/token lookup are proven through the complete original/current minimum declarations and real Core modules; strict valid calls resolve nondeprecated signatures. This use does not create/destroy an injector and caches the resulting peer service in the existing owned _dialog field. CDK Dialog token availability, construction/open behavior, provider composition, focus/overlay teardown and actual legacy dialog integration remain separate pending contracts, rather than being inferred from protocol service values. No product or consumer API/HTML/CSS/SCSS change is required for this public Injector API binding, and all11 newer Injector dependencies remain separately pending. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. The existing injector constructor parameter and public Dialog lookup remain identical. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/public-injector-boundary.json",
+          "sha256": "2729a883e476fa5ba5f7a8fc7c0472c65c373df5eeb900838ee742cc36d80c1f"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "symbol": "Injector",
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "conclusion": "stable-public-peer",
+          "reviewer": "Codex primary implementer",
+          "decision": "The supplied constructor slot1 is used once in injector.get(Dialog), where Dialog is the actual named public import from @angular/cdk/dialog. Source guards reject numeric flags, extra get arguments, changed token routes or unknown member/ownership operations. Stable generic public get and class/token lookup are proven through the complete original/current minimum declarations and real Core modules; strict valid calls resolve nondeprecated signatures. This use does not create/destroy an injector and caches the resulting peer service in the existing owned _dialog field. CDK Dialog token availability, construction/open behavior, provider composition, focus/overlay teardown and actual legacy dialog integration remain separate pending contracts, rather than being inferred from protocol service values. No product or consumer API/HTML/CSS/SCSS change is required for this public Injector API binding, and all11 newer Injector dependencies remain separately pending.",
+          "source_binding": {
+            "module": "@angular/core",
+            "symbol": "Injector",
+            "file": "legacy-dialog/internal/dialog-base.ts",
+            "status": "inventory-seed",
+            "disposition": "open",
+            "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+            "constructor_parameter": {
+              "index": 1,
+              "declaration": "injector: Injector"
+            },
+            "forwards": [],
+            "gets": [
+              {
+                "token": "Dialog",
+                "line": 95
+              }
+            ],
+            "children": [],
+            "contexts": [
+              {
+                "line": 74,
+                "source": "constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }"
+              }
+            ]
+          },
+          "independent_evidence": [
+            {
+              "path": "compatibility/rc/injector-public-source-proof.json",
+              "sha256": "d95264c48b768c54cd5f5ced801986b4ac1de0a7ef9674647e2e147294b2edfc"
+            },
+            {
+              "path": "compatibility/rc/material-public-subjects.json",
+              "sha256": "f4e494ce1f71c068e801d086e4017fc86ea721c842d5e7ac161d3d08d1434ae3"
+            },
+            {
+              "path": "scripts/material-public-subjects.mjs",
+              "sha256": "4e8be10a18695b5543f4a1f22509f0dfeb1a4132f48c9b0a1fefb5410e459074"
+            },
+            {
+              "path": "scripts/injector-use-review.mjs",
+              "sha256": "8cb75a08b70fe1cb5ab6a9e32d73f88744fde4ee0da750358c2c2f5dd5b46e62"
+            },
+            {
+              "path": "tests/injector_public_probe.mjs",
+              "sha256": "e48d9b832ba20fc75d8bd64d3a2a806ff136ef737181222d9949dcdfe2102897"
+            },
+            {
+              "path": "tests/injector_public_subject.mjs",
+              "sha256": "9bb4e1638d10b33f9ce616a75a3f33018fc6be76bd44c5de525a1037d165e92e"
+            },
+            {
+              "path": "tests/test_injector_public.py",
+              "sha256": "f51f71d0b8ad1b61c667342cc4a169acf2cfa5b956d4fc69cc8b546b10481505"
+            },
+            {
+              "path": "compatibility/rc/injector-cyph-source-sanity.json",
+              "sha256": "f54e6c4e20ba1ae122d3cd0e6dc1c8c7eca1616b81db8019d8b22f9c707b0a99"
+            }
+          ]
+        }
+      },
+      "current_source_role": {
+        "binding": "import {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';",
+        "import_local": "Injector",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 76,
+            "column": 15,
+            "parent_kind": "TypeReference",
+            "parent_source": "Injector"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "injector"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 74,
+            "sha256": "d28f98d5b6f0753e76527b7e5c1088dbd6881065403c192c326e1e6ad917ffd0",
+            "text": "constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }",
+            "reasons": [
+              "@angular/core:Injector"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/public-injector-boundary.json",
+          "sha256": "2729a883e476fa5ba5f7a8fc7c0472c65c373df5eeb900838ee742cc36d80c1f"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "OnDestroy",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "The exact OnDestroy import at legacy-dialog/internal/dialog-base.ts:20 binds to the stable public @angular/core root export at this line's actual published minimum. Its 1 current references are unparameterized type-only positions; whole diagnostic emit is unchanged with the selected type imports removed. The original and both minimum peers have the identical OnDestroy hook interface member shape. The full independently authenticated declaration closure passes strict mutual assignment, exact default equality and dynamic dictionary lookup, with semantic/default/private/stale-source mutants rejected. Close this type boundary only; actual hook execution/body, DI/change detection, generic opt-in API, minimum runtime/compiler, native/AOT/packed and other component/security contracts remain separate. Refreshed against the current owned service source after the dialog config-provider repair: the positive declaration/type-only erasure diagnostic passed again. Earlier mutation evidence retains its original subjects; no new type use or runtime closure is inferred. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. The lifecycle interface and complete ngOnDestroy/close-all implementations remain identical. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/framework-lifecycle-types.json",
+          "sha256": "df3208b24750a27e28e0b3af0c13b1d564f131d7fe0a254d757646385b6128fc"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "symbol": "OnDestroy",
+          "conclusion": "stable-public-peer",
+          "reviewer": "Codex primary implementer",
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "independent_evidence": [
+            {
+              "path": "reference/material-16.2.14/environment-package-lock.json",
+              "sha256": "ad2f9d62bf04758f87650cae408f805e667236f992cd6d8e481c5577c939d130"
+            },
+            {
+              "path": "compatibility/rc/framework-lifecycle-declaration-subjects.json",
+              "sha256": "d6178b5e5e757e8f603ec88978db72c8d86ca53b9e30b02f4f630248a0370a2b"
+            },
+            {
+              "path": "reference/material-16.2.14/framework-type-sources/core-16.2.12.d.ts",
+              "sha256": "9fedfcf08d61d0709a96f157bab028ce05c7fe27a0c179e12e19b00922052fab"
+            },
+            {
+              "path": "compatibility/rc/peer-type-sources/core-22.1.7.d.ts",
+              "sha256": "7d9eea93a0ccb308851fe7b50af8b8d894e8f0ae456e339fe8dcd87bf3fcfd84"
+            },
+            {
+              "path": "compatibility/rc/peer-type-sources/core-21.2.23.d.ts",
+              "sha256": "b5bad26c29a5dc40bf2c0fefc94574dc0c5a2e158c47e56040c7bd5c7b3334df"
+            },
+            {
+              "path": "compatibility/rc/framework-lifecycle-type-use-review.json",
+              "sha256": "4417cc68f4ee8633d272101c60c1c4bc1663064f17b5d9b5de6f4ad534151776"
+            },
+            {
+              "path": "compatibility/rc/dialog-lifecycle-type-refresh.json",
+              "sha256": "f30de618a9d078f87eb1983c69d45324ed889579588e87dd967578767eb4ddc3"
+            }
+          ],
+          "decision": "The exact OnDestroy import at legacy-dialog/internal/dialog-base.ts:20 binds to the stable public @angular/core root export at this line's actual published minimum. Its 1 current references are unparameterized type-only positions; whole diagnostic emit is unchanged with the selected type imports removed. The original and both minimum peers have the identical OnDestroy hook interface member shape. The full independently authenticated declaration closure passes strict mutual assignment, exact default equality and dynamic dictionary lookup, with semantic/default/private/stale-source mutants rejected. Close this type boundary only; actual hook execution/body, DI/change detection, generic opt-in API, minimum runtime/compiler, native/AOT/packed and other component/security contracts remain separate. Refreshed against the current owned service source after the dialog config-provider repair: the positive declaration/type-only erasure diagnostic passed again. Earlier mutation evidence retains its original subjects; no new type use or runtime closure is inferred."
+        }
+      },
+      "current_source_role": {
+        "binding": "import {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';",
+        "import_local": "OnDestroy",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 40,
+            "column": 84,
+            "parent_kind": "ExpressionWithTypeArguments",
+            "parent_source": "OnDestroy"
+          }
+        ],
+        "bound_parameters_and_fields": [],
+        "complete_caller_members": [
+          {
+            "line": 40,
+            "sha256": "2f23c6461c0d2fe7f4c2ef14e9016ec726affdd3b39f156d28cd89a9615db141",
+            "text": "implements OnDestroy",
+            "reasons": [
+              "@angular/core:OnDestroy"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/framework-lifecycle-types.json",
+          "sha256": "df3208b24750a27e28e0b3af0c13b1d564f131d7fe0a254d757646385b6128fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "TemplateRef",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "The historical template/component overloads forward the same public TemplateRef to CDK Dialog.open with the existing container/providers/templateContext configuration. No template is instantiated manually or replaced with a modern component contract. The public generic handle/template API remains distinct from dialog rendering and motion qualification. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. All template overloads and their generic signatures remain identical. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/core-view-current-roles.json",
+          "sha256": "317d4756307f1b0df88e6f3bcdbf120e2974556bd61e177808fdbaee2d10b9b2"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "symbol": "TemplateRef",
+          "current_role": "dialog-overload-and-context",
+          "decision": "The historical template/component overloads forward the same public TemplateRef to CDK Dialog.open with the existing container/providers/templateContext configuration. No template is instantiated manually or replaced with a modern component contract. The public generic handle/template API remains distinct from dialog rendering and motion qualification.",
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "conclusion": "stable-public-peer",
+          "reviewer": "Codex primary implementer; individual current caller review",
+          "source_role": {
+            "import_local": "TemplateRef",
+            "occurrences": [
+              {
+                "line": 104,
+                "column": 15,
+                "parent_kind": "TypeReference",
+                "parent_source": "TemplateRef<T>"
+              },
+              {
+                "line": 109,
+                "column": 34,
+                "parent_kind": "TypeReference",
+                "parent_source": "TemplateRef<T>"
+              },
+              {
+                "line": 114,
+                "column": 48,
+                "parent_kind": "TypeReference",
+                "parent_source": "TemplateRef<T>"
+              }
+            ],
+            "bound_parameters_and_fields": [
+              "template",
+              "componentOrTemplateRef"
+            ],
+            "complete_caller_members": [
+              {
+                "line": 103,
+                "member_sha256": "4ce9c84d2b6b8714c3717c09e640fb695617c8530d20e73db36686afc3d88f16",
+                "reasons": [
+                  "Core:TemplateRef"
+                ]
+              },
+              {
+                "line": 108,
+                "member_sha256": "bd39924911609d6526cffcd7924350a781f18dcb4c0352bce9a8981dbc6b5aed",
+                "reasons": [
+                  "Core:TemplateRef"
+                ]
+              },
+              {
+                "line": 113,
+                "member_sha256": "303a4cc2447a1870781ee17ac88225b07abe4a0700dea4db76a7ff8f925d85b9",
+                "reasons": [
+                  "Core:TemplateRef"
+                ]
+              }
+            ]
+          },
+          "independent_evidence": [
+            {
+              "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+              "sha256": "86f8c2039fd0b06e5600360d6c1ef06b34196817afec2f961401b66115ff6c44"
+            },
+            {
+              "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+              "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+            },
+            {
+              "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+              "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+            },
+            {
+              "path": "compatibility/rc/core-view-use-public-21.json",
+              "sha256": "0b3a5e711dea14dca9254a6afa7e7c536f6db39969b7ee26303860532c9d7d3c"
+            },
+            {
+              "path": "scripts/core-view-use-current-roles.mjs",
+              "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+            },
+            {
+              "path": "compatibility/rc/dialog-public-container-source-proof.json",
+              "sha256": "9cad26ba2f6ff7d9a3a0748d15b09cc286667ba08cd1ba13096539e69bd8e991"
+            }
+          ],
+          "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+        }
+      },
+      "current_source_role": {
+        "binding": "import {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';",
+        "import_local": "TemplateRef",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 104,
+            "column": 15,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<T>"
+          },
+          {
+            "line": 109,
+            "column": 34,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<T>"
+          },
+          {
+            "line": 114,
+            "column": 48,
+            "parent_kind": "TypeReference",
+            "parent_source": "TemplateRef<T>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "template",
+          "componentOrTemplateRef"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 103,
+            "sha256": "4ce9c84d2b6b8714c3717c09e640fb695617c8530d20e73db36686afc3d88f16",
+            "text": "open<T, D = any, R = any>(\n    template: TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;",
+            "reasons": [
+              "@angular/core:TemplateRef"
+            ]
+          },
+          {
+            "line": 108,
+            "sha256": "bd39924911609d6526cffcd7924350a781f18dcb4c0352bce9a8981dbc6b5aed",
+            "text": "open<T, D = any, R = any>(\n    template: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R>;",
+            "reasons": [
+              "@angular/core:TemplateRef"
+            ]
+          },
+          {
+            "line": 113,
+            "sha256": "99036cee7c19c399c65a731af6db63bc9cccd29cf1b498408c8e8911a96cb0e2",
+            "text": "open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    const defaults = this._defaultOptions || new this.dialogConfigClass();\n    if (!this._defaultOptions && this.dialogConfigClass === MatDialogConfig) {\n      // Keep the historical defaults when using the current peer configuration class.\n      defaults.ariaModal = true;\n      defaults.maxWidth = '80vw';\n    }\n    config = {...defaults, ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }",
+            "reasons": [
+              "@angular/core:TemplateRef"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/core-view-current-roles.json",
+          "sha256": "317d4756307f1b0df88e6f3bcdbf120e2974556bd61e177808fdbaee2d10b9b2"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    },
+    {
+      "file": "legacy-dialog/internal/dialog-base.ts",
+      "module": "@angular/core",
+      "symbol": "Type",
+      "candidate_source_sha256": "fc8a4bec53ee30c64ec658467224dc0917e9c5f3b664cbc33ddb57c3ebf6c884",
+      "conclusion": "stable-public-peer",
+      "reviewer": "Codex primary implementer;bounded generic dialog default source-context review",
+      "decision": "The constructor retains Type fields for the owned dialog-reference wrapper and container. The wrapper is constructed with its historical three arguments and the container type is passed to the public CDK dialog configuration. Type is an erased public constructor interface; no runtime Type injection or private component factory is introduced. The exact generic fallback repair restores tagged ariaModal=true/maxWidth=80vw only for a fresh exact peer config instance. Supplied defaults,per-open options,explicit undefined and custom configuration classes preserve all before observations. Configuration/ref/container constructor type signatures remain identical. Two complete49-file strict programs and70 actual tagged/before/candidate protocol cases plus two semantically valid rejected source faults qualify this source change. This is no new source closure,native,packed,AOT,SSR or full-floor admission.",
+      "prior_source_context": {
+        "ledger_snapshot_parent": "d9138308ed39f3cf871403a6966fd6b652d1db5b",
+        "review": {
+          "path": "compatibility/f10/authored-use-reviews/core-view-current-roles.json",
+          "sha256": "317d4756307f1b0df88e6f3bcdbf120e2974556bd61e177808fdbaee2d10b9b2"
+        },
+        "case": {
+          "file": "legacy-dialog/internal/dialog-base.ts",
+          "module": "@angular/core",
+          "symbol": "Type",
+          "current_role": "wrapper-and-container-constructor-types",
+          "decision": "The constructor retains Type fields for the owned dialog-reference wrapper and container. The wrapper is constructed with its historical three arguments and the container type is passed to the public CDK dialog configuration. Type is an erased public constructor interface; no runtime Type injection or private component factory is introduced.",
+          "candidate_source_sha256": "93cd62dc0e5b5ea64943632d9f4c64cfe674c178135f0fb609e9d39ec6cff8b0",
+          "conclusion": "stable-public-peer",
+          "reviewer": "Codex primary implementer; individual current caller review",
+          "source_role": {
+            "import_local": "Type",
+            "occurrences": [
+              {
+                "line": 85,
+                "column": 36,
+                "parent_kind": "TypeReference",
+                "parent_source": "Type<MatLegacyDialogRef<any>>"
+              },
+              {
+                "line": 86,
+                "column": 35,
+                "parent_kind": "TypeReference",
+                "parent_source": "Type<C>"
+              }
+            ],
+            "bound_parameters_and_fields": [
+              "_dialogRefConstructor",
+              "_dialogContainerType"
+            ],
+            "complete_caller_members": [
+              {
+                "line": 74,
+                "member_sha256": "d28f98d5b6f0753e76527b7e5c1088dbd6881065403c192c326e1e6ad917ffd0",
+                "reasons": [
+                  "Core:Type"
+                ]
+              },
+              {
+                "line": 113,
+                "member_sha256": "303a4cc2447a1870781ee17ac88225b07abe4a0700dea4db76a7ff8f925d85b9",
+                "reasons": [
+                  "this._dialogContainerType",
+                  "this._dialogRefConstructor"
+                ]
+              }
+            ]
+          },
+          "independent_evidence": [
+            {
+              "path": "compatibility/rc/core-view-use-current-roles-prior.json.gz",
+              "sha256": "86f8c2039fd0b06e5600360d6c1ef06b34196817afec2f961401b66115ff6c44"
+            },
+            {
+              "path": "compatibility/rc/core-view-use-current-roles-decisions.json",
+              "sha256": "df780ba17f9778e4e32d316d1dd5867cf870a21c0398ec9ea303b1917a4101bd"
+            },
+            {
+              "path": "compatibility/rc/core-view-use-current-roles-runtime.json",
+              "sha256": "6b19219426615c5e681da49cf4afa6383a47c98e870e8495d1987faaf2dd12f5"
+            },
+            {
+              "path": "compatibility/rc/core-view-use-public-21.json",
+              "sha256": "0b3a5e711dea14dca9254a6afa7e7c536f6db39969b7ee26303860532c9d7d3c"
+            },
+            {
+              "path": "scripts/core-view-use-current-roles.mjs",
+              "sha256": "15c0fa61e165c2c0ae8079d8941fb15983a62cc98e54f5c4f210dab001470503"
+            },
+            {
+              "path": "compatibility/rc/dialog-public-container-source-proof.json",
+              "sha256": "9cad26ba2f6ff7d9a3a0748d15b09cc286667ba08cd1ba13096539e69bd8e991"
+            }
+          ],
+          "scope_limit": "This source decision qualifies the named stable public Core API role. Genuine public view/outlet cases and complete public declarations support the contract; full legacy-component browser/packed/consumer/Node/RxJS/compiler-floor and G01-G13 qualification remain separate. It is not a fresh independent release audit."
+        }
+      },
+      "current_source_role": {
+        "binding": "import {\n  ComponentRef,\n  Injectable,\n  InjectionToken,\n  Injector,\n  OnDestroy,\n  TemplateRef,\n  Type,\n} from '@angular/core';",
+        "import_local": "Type",
+        "type_only": false,
+        "occurrences": [
+          {
+            "line": 85,
+            "column": 36,
+            "parent_kind": "TypeReference",
+            "parent_source": "Type<MatLegacyDialogRef<any>>"
+          },
+          {
+            "line": 86,
+            "column": 35,
+            "parent_kind": "TypeReference",
+            "parent_source": "Type<C>"
+          }
+        ],
+        "bound_parameters_and_fields": [
+          "_dialogRefConstructor",
+          "_dialogContainerType"
+        ],
+        "complete_caller_members": [
+          {
+            "line": 74,
+            "sha256": "d28f98d5b6f0753e76527b7e5c1088dbd6881065403c192c326e1e6ad917ffd0",
+            "text": "constructor(\n    private _overlay: Overlay,\n    injector: Injector,\n    private _defaultOptions: MatDialogConfig | undefined,\n    private _parentDialog: _MatDialogBase<C> | undefined,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 15.0.0\n     */\n    _overlayContainer: OverlayContainer,\n    scrollStrategy: any,\n    private _dialogRefConstructor: Type<MatLegacyDialogRef<any>>,\n    private _dialogContainerType: Type<C>,\n    private _dialogDataToken: InjectionToken<any>,\n    /**\n     * @deprecated No longer used. To be removed.\n     * @breaking-change 14.0.0\n     */\n    _animationMode?: 'NoopAnimations' | 'BrowserAnimations',\n  ) {\n    this._scrollStrategy = scrollStrategy;\n    this._dialog = injector.get(Dialog);\n  }",
+            "reasons": [
+              "@angular/core:Type"
+            ]
+          },
+          {
+            "line": 113,
+            "sha256": "99036cee7c19c399c65a731af6db63bc9cccd29cf1b498408c8e8911a96cb0e2",
+            "text": "open<T, D = any, R = any>(\n    componentOrTemplateRef: ComponentType<T> | TemplateRef<T>,\n    config?: MatDialogConfig<D>,\n  ): MatLegacyDialogRef<T, R> {\n    let dialogRef: MatLegacyDialogRef<T, R>;\n    const defaults = this._defaultOptions || new this.dialogConfigClass();\n    if (!this._defaultOptions && this.dialogConfigClass === MatDialogConfig) {\n      // Keep the historical defaults when using the current peer configuration class.\n      defaults.ariaModal = true;\n      defaults.maxWidth = '80vw';\n    }\n    config = {...defaults, ...config};\n    config.id = config.id || `${this._idPrefix}${uniqueId++}`;\n    config.scrollStrategy = config.scrollStrategy || this._scrollStrategy();\n\n    const cdkRef = this._dialog.open<R, D, T>(componentOrTemplateRef, {\n      ...config,\n      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),\n      // Disable closing since we need to sync it up to the animation ourselves.\n      disableClose: true,\n      closePredicate: undefined,\n      // Disable closing on destroy, because this service cleans up its open dialogs as well.\n      closeOnDestroy: false,\n      // Disable closing on detachments so that we can sync up the animation.\n      closeOnOverlayDetachments: false,\n      container: {\n        type: this._dialogContainerType,\n        providers: () => [\n          {provide: this.dialogConfigClass, useValue: config},\n          {provide: MatDialogConfig, useValue: config},\n          {provide: DialogConfig, useValue: config},\n        ],\n      },\n      templateContext: () => ({dialogRef}),\n      providers: (ref, cdkConfig, dialogContainer) => {\n        dialogRef = new this._dialogRefConstructor(ref, config!, dialogContainer);\n        dialogRef.updatePosition(config?.position);\n        return [\n          {provide: this._dialogContainerType, useValue: dialogContainer},\n          {provide: this._dialogDataToken, useValue: cdkConfig.data},\n          {provide: this._dialogRefConstructor, useValue: dialogRef},\n          // Prevent content from resolving the CDK DialogRef accidentally.\n          {provide: DialogRef, useValue: null},\n        ];\n      },\n    });\n\n    (dialogRef! as {componentRef: ComponentRef<T>}).componentRef = cdkRef.componentRef!;\n    dialogRef!.componentInstance = cdkRef.componentInstance!;\n\n    this.openDialogs.push(dialogRef!);\n    this.afterOpened.next(dialogRef!);\n\n    dialogRef!.afterClosed().subscribe(() => {\n      const index = this.openDialogs.indexOf(dialogRef);\n\n      if (index > -1) {\n        this.openDialogs.splice(index, 1);\n\n        if (!this.openDialogs.length) {\n          this._getAfterAllClosed().next();\n        }\n      }\n    });\n\n    return dialogRef!;\n  }",
+            "reasons": [
+              "this._dialogContainerType",
+              "this._dialogRefConstructor"
+            ]
+          }
+        ]
+      },
+      "independent_evidence": [
+        {
+          "path": "compatibility/f10/authored-use-reviews/core-view-current-roles.json",
+          "sha256": "317d4756307f1b0df88e6f3bcdbf120e2974556bd61e177808fdbaee2d10b9b2"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-source-impact.json",
+          "sha256": "058d96015969da1c8117b1e38ce6adb84b522c8fea187e09d8e19e7df92677dd"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-runtime-21.json",
+          "sha256": "0e462373a3adc184feeeeef4a51afc79c20a1bf9cd3b4971e68391d6e88696fc"
+        },
+        {
+          "path": "compatibility/rc/dialog-caller-service-default-candidate.json",
+          "sha256": "8d80f4ec1f96c9cf453064dff87eb3dd8b185d3211582b78db6ffa464c73b81e"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-boundary.mjs",
+          "sha256": "6f29fb8f44c45ec26fcd8f2fa5471d7cdb9032543185343f8937622c29cc9061"
+        },
+        {
+          "path": "scripts/dialog-caller-service-default-source-rebinding.mjs",
+          "sha256": "186e9ef1fca97600b761f6753f7b86d1fac61dcbbb25f5ef91b53cde50976063"
+        }
+      ]
+    }
+  ],
+  "new_semantic_closures": 0,
+  "source_rebindings": 11,
+  "API_signatures_and_other_class_members_unchanged": true,
+  "actual_native_packed_AOT_or_full_floor_qualified": false
+}
