@@ -138,6 +138,17 @@ for (const path of paths) {
   withBytes(path, altered(path), () => rejects('late full context: ' + path,
     () => context.read(path)));
 }
+for (const path of [
+  'compatibility/f10/authored-dependency-dispositions.json',
+  'compatibility/f10/authored-dependency-current-dispositions.json',
+  'compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json',
+  'compatibility/rc/packed-cva-current-public-roles.json',
+  'compatibility/rc/packed-cva-current-source-requalification-proof.json',
+  'scripts/authored-additional-use-baseline.mjs',
+]) {
+  withBytes(path, altered(path), () => rejects('late integrated role metadata: ' + path,
+    () => context.read(path)));
+}
 
 async function verifierMutant(path, before, after) {
   const source = disk(path).toString();
@@ -190,6 +201,14 @@ const report = {
     contextApi.SNACK_SOURCE_CONTEXT_INPUTS,
     'tests/packed_product_source_context_probe.mjs',
     'tests/test_packed_product_source_context.py',
+    'scripts/packed-cva-source-requalification.mjs',
+    'compatibility/rc/packed-cva-source-review-inputs.json',
+    'scripts/authored-additional-use-baseline.mjs',
+    'compatibility/rc/packed-cva-current-public-roles.json',
+    'compatibility/rc/packed-cva-current-source-requalification-proof.json',
+    'compatibility/f10/authored-use-reviews/packed-cva-current-source-boundaries.json',
+    'compatibility/f10/authored-dependency-dispositions.json',
+    'compatibility/f10/authored-dependency-current-dispositions.json',
   ].map(path => ({path, sha256: hash(disk(path)), bytes: disk(path).length})),
   seconds: (performance.now() - started) / 1000,
 };

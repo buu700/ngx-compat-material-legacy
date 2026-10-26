@@ -18,6 +18,7 @@ import {qualifiedMenuContentTypeBoundary,MENU_CONTENT_PANEL_SOURCE} from './menu
 import {dialogConfigOverlayBridge} from './dialog-caller-config-boundary.mjs';
 import {inspectDialogOwnedContracts} from './dialog-caller-owned-contract-boundary.mjs';
 import {qualifyPackedProductSourceRepairs} from './packed-product-source-recovery.mjs';
+import {packedCvaRoleHistoricalReader,packedCvaMetadataToolingEpoch} from './packed-cva-source-requalification.mjs';
 export {DIALOG_PORTAL_SOURCE};
 export const SNACK_PRODUCT_INPUTS='compatibility/rc/snack-dom-source-context-product-inputs.json';
 export const SNACK_SOURCE_CONTEXT_INPUTS='compatibility/rc/snack-dom-source-context-inputs.json';
@@ -75,6 +76,15 @@ function packedRepairEpoch(root,read){
  const prior=inputs.data.history_product,history=capsule(read(prior.path),prior.sha256);
  return qualifyPackedProductSourceRepairs({root,read,line:product.line,data:product.data.packed_repairs,history,registry:product.data});
 }
+/** Revalidate current repairs before replaying original finite type-proof inputs. */
+export function packedRepairTypeEvidenceRead({root=process.cwd(),read=rawRead(root)}={}){
+ const actual=currentRaw(root,read),metadata=packedCvaMetadataToolingEpoch({root,read:actual});
+ const product=productRegistry(root,metadata.read),target=product.data.packed_repairs.targets.find(m=>m.path==='projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts');
+ const digest=hash(actual(target.path));
+ if(digest===target.before_sha256)return metadata.read;
+ assert.equal(digest,target.sha256,'unqualified current menu type-proof source');
+ const projected=packedRepairEpoch(root,metadata.read).read;branded.set(projected,{root,raw:actual});return projected;
+}
 export function inspectPackedProductSourceRepairs({root=process.cwd(),read=rawRead(root)}={}){
  const c=packedRepairEpoch(root,currentRaw(root,read));
  return {line:c.line,product_changes:c.product_changes,tooling_changes:c.tooling_changes,source:c.source,artifact:c.artifact,source_scope_only:true,current_coordinator_native_or_floor_qualified:false};
@@ -82,7 +92,7 @@ export function inspectPackedProductSourceRepairs({root=process.cwd(),read=rawRe
 /** Finite old task subjects only, after every current successor is rechecked. */
 export function snackDomSourceContext({root=process.cwd(),read=rawRead(root)}={}){
  if(branded.has(read)){const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}
- const rawCurrent=read,packed=packedRepairEpoch(root,rawCurrent);read=packed.read;
+ const rawCurrent=read,roles=packedCvaRoleHistoricalReader({root,read}),packed=packedRepairEpoch(root,roles.read);read=packed.read;
  const qualified=qualifyIndependentSnackProductDelta({root,read}),callerRead=tooltipPriorCallerRead({root,read}),configEpoch=tooltipPriorCallerRead({root,read,currentTooltip:true,currentMenu:true}),owned=inspectDialogOwnedContracts({root,read,requireApplied:true}),service=owned.defaults,config=service.configuration,{data}=registry(root,read),{data:dataProduct}=productRegistry(root,read),prior=snackDomContextPrior({root,read});tooltipSourceContextPrior({root,read});assert.deepEqual(data.product_inputs,qualified.inputs);assert.equal(data.writes.length,25);for(const m of [...data.writes,...data.history_code_members])assert.equal(hash(read(m.path)),m.sha256,'changed current snack context successor '+m.path);
  for(const m of prior.reports)assert.equal(hash(read(m.path)),m.sha256,'changed immutable original review '+m.path);
  for(const m of data.portal_review_members){assert.equal(hash(read(m.path)),m.sha256,'changed integrated portal review '+m.path);original(root,data.portal_review_source_parent,m);}
@@ -114,6 +124,6 @@ export function snackDomSourceContext({root=process.cwd(),read=rawRead(root)}={}
  const auxBytes=read(data.validator_prior.path);assert.equal(hash(auxBytes),data.validator_prior.sha256);const aux=capsule(auxBytes,data.validator_prior.sha256);assert.equal(aux.line,prior.line);assert.equal(aux.members.length,1);for(const m of aux.members){assert.equal(hash(m.text),m.sha256);original(root,aux.source_parent,m);}
  const taskBytes=read(data.task_prior.path);assert.equal(hash(taskBytes),data.task_prior.sha256);const task=capsule(taskBytes,data.task_prior.sha256);assert.equal(task.line,prior.line);assert.equal(task.members.length,2);for(const m of task.members){assert.equal(hash(m.text),m.sha256);original(root,task.source_parent,m);}
  const fixtureBytes=read(data.fixture_prior.path);const fixture=capsule(fixtureBytes,data.fixture_prior.sha256);assert.equal(fixture.line,prior.line);assert.equal(fixture.members.length,1);for(const m of fixture.members){assert.equal(hash(m.text),m.sha256);original(root,fixture.source_parent,m);}
- const members=new Map([...prior.ledgers,...prior.code_preimages,...aux.members,...task.members,...fixture.members].map(m=>[m.path,Buffer.from(m.text)]));members.set(SNACK_SOURCE,Buffer.from(history.product.text));const dialogPrior=dialogPortalPrior(root,read);assert.equal(dialogPrior.product.sha256,qualified.dialog.delta.before_sha256);members.set(DIALOG_PORTAL_SOURCE,Buffer.from(dialogPrior.product.text));const tooltipBefore=qualifiedTooltipScrollClipping({root,read,allowApplied:true}).candidate.source;assert.equal(hash(tooltipBefore),qualified.tooltip.delta.before_sha256);assert.equal(members.size,13);members.set(TOOLTIP_SOURCE,Buffer.from(tooltipBefore));assert.equal(members.size,14);members.set(MENU_CONTENT_PANEL_SOURCE,Buffer.from(qualified.menu.before));assert.equal(members.size,15);for(const[path,bytes]of config.preimages)if(!members.has(path))members.set(path,Buffer.from(bytes));assert.equal(members.size,17);for(const[path,bytes]of service.preimages){assert.equal(members.has(path),false);members.set(path,Buffer.from(bytes));}assert.equal(members.size,18);for(const[path,bytes]of owned.preimages)if(!members.has(path))members.set(path,Buffer.from(bytes));assert.equal(members.size,20);const reader=p=>{if(members.has(p)){packed.assertCurrent(p);return Buffer.from(members.get(p));}return read(p);};branded.set(reader,{root,raw:rawCurrent});return {read:reader,raw:rawCurrent,line:prior.line,members:members.size,packed_repair_epoch_members:packed.preimages.size,current_successors:data.writes.length};
+ const members=new Map([...prior.ledgers,...prior.code_preimages,...aux.members,...task.members,...fixture.members].map(m=>[m.path,Buffer.from(m.text)]));members.set(SNACK_SOURCE,Buffer.from(history.product.text));const dialogPrior=dialogPortalPrior(root,read);assert.equal(dialogPrior.product.sha256,qualified.dialog.delta.before_sha256);members.set(DIALOG_PORTAL_SOURCE,Buffer.from(dialogPrior.product.text));const tooltipBefore=qualifiedTooltipScrollClipping({root,read,allowApplied:true}).candidate.source;assert.equal(hash(tooltipBefore),qualified.tooltip.delta.before_sha256);assert.equal(members.size,13);members.set(TOOLTIP_SOURCE,Buffer.from(tooltipBefore));assert.equal(members.size,14);members.set(MENU_CONTENT_PANEL_SOURCE,Buffer.from(qualified.menu.before));assert.equal(members.size,15);for(const[path,bytes]of config.preimages)if(!members.has(path))members.set(path,Buffer.from(bytes));assert.equal(members.size,17);for(const[path,bytes]of service.preimages){assert.equal(members.has(path),false);members.set(path,Buffer.from(bytes));}assert.equal(members.size,18);for(const[path,bytes]of owned.preimages)if(!members.has(path))members.set(path,Buffer.from(bytes));assert.equal(members.size,20);const reader=p=>{if(members.has(p)){packed.assertCurrent(p);roles.read(p);return Buffer.from(members.get(p));}return read(p);};branded.set(reader,{root,raw:rawCurrent});return {read:reader,raw:rawCurrent,line:prior.line,members:members.size,packed_repair_epoch_members:packed.preimages.size,current_successors:data.writes.length};
 }
 export function snackDomPreviousTaskReader(options={}){return snackDomSourceContext(options).read;}
