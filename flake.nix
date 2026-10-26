@@ -64,6 +64,7 @@
               pkgs.bash
               pkgs.coreutils
               pkgs.findutils
+              pkgs.ripgrep
               pkgs.gnugrep
               pkgs.gnused
               pkgs.gawk
