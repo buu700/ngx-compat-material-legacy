@@ -14,6 +14,7 @@ import {dirname,join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
+import {gunzipSync} from 'node:zlib';
 import {reviewMetadataComplete,individualReviewScopeOk} from '../scripts/upstream-individual-evidence-scope.mjs';
 import {scanCurrentAuthoredUses} from '../scripts/authored-current-use-inventory.mjs';
 
@@ -62,6 +63,17 @@ try{
   }
  };
  copyModule('scripts/check-upstream-audit-disposition.mjs');
+ // The actual checker requires a known source epoch even in synthetic CLI
+ // fixtures. Restore the authenticated pre-repair panel, whose seven imports
+ // are additional fixture obligations alongside the original synthetic route.
+ const priorBytes=read('compatibility/rc/menu-caller-prior.json.gz');
+ assert.equal(hash(priorBytes),line==='21.x'?'2da547a58102ec0a5715ebfdc91a86085d9728a6b6f747e35bf15cf8d0f8fe8e':'a6cf639de2151c32bc80b82be63ae4390453dc8c92a309801c1c153de9a82a00');
+ const prior=JSON.parse(gunzipSync(priorBytes));assert.equal(prior.line,line);
+ const panel=prior.sources.find(row=>row.path==='projects/ngx-material-legacy/legacy-menu/internal/menu-panel.ts');
+ assert.equal(hash(panel.text),'4212186406b92fc485c050ffae7a8fd7b1f8e7af855bfd0133b018435834018a');
+ put(panel.path,panel.text);
+ put('projects/ngx-material-legacy/package.json',read('projects/ngx-material-legacy/package.json'));
+
  const seedBytes=read('compatibility/f10/authored-dependency-inventory-seed.json'),seed=JSON.parse(seedBytes);
  put('compatibility/f10/authored-dependency-inventory-seed.json',seedBytes);
  const note='Synthetic validator fixture only. These source files, review labels and source hashes do not qualify any real product API, use, upstream fix, runtime or approval.\n';
@@ -70,7 +82,9 @@ try{
  const html='projects/ngx-material-legacy/legacy-select/select.html';put(html,read(html));
  const active=scanCurrentAuthoredUses({root:fixture}),key=row=>JSON.stringify([row.file,row.module,row.symbol]),seedKeys=new Set(seed.symbol_uses.map(key));
  const additional=active.symbol_uses.filter(row=>!seedKeys.has(key(row)));
- assert.equal(seed.symbol_uses.length,1736);assert.equal(active.symbol_uses.length,1);assert.equal(additional.length,1);
+ assert.equal(seed.symbol_uses.length,1736);assert.equal(active.symbol_uses.length,8);assert.equal(additional.length,8);
+ assert.equal(additional.filter(row=>row.file==='legacy-menu/internal/menu-panel.ts').length,7);
+ assert.equal(additional.filter(row=>row.file==='__individual_scope_fixture__.ts').length,1);
  put('compatibility/rc/scope-validator-fixture-note.txt',note);
  const noteRef={path:'compatibility/rc/scope-validator-fixture-note.txt',sha256:hash(note)};
  const reviewFor=new Map(),groups=new Map();
@@ -113,7 +127,9 @@ try{
    '--symbols',join(fixture,'symbols.json'),'--current-symbols',join(fixture,'current.json'),'--report',output,'--admission','--line',line],{cwd:fixture,env:environment,encoding:'utf8',timeout:30000});
   assert.ok([0,1].includes(child.status),child.stderr||String(child.error));const report=JSON.parse(readFileSync(output));
   assert.equal(report.authored_use_inventory.expected,1736);assert.equal(report.authored_use_review_evidence.reviewed,1736);assert.equal(report.authored_use_review_evidence.insufficient,0);
-  assert.equal(report.current_authored_use_inventory.ready,true);assert.equal(report.g11_claim,'not-passed');
+  assert.equal(report.current_authored_use_inventory.ready,true,JSON.stringify(report.current_authored_use_inventory));
+  assert.equal(report.current_authored_use_inventory.additional_uses,8);
+  assert.equal(report.current_authored_use_inventory.additional_baseline.mode,'pre-repair-source-epoch');assert.equal(report.g11_claim,'not-passed');
   assert.equal(child.status===0,expectPass,name+' '+child.stderr);assert.equal(report.disposition_admission,expectPass?'pass':'incomplete',name);
   observations.push({name,fixture_only:true,exit_code:child.status,admission:report.disposition_admission,missing_evidence:report.missing_evidence,behavior:report.insufficient_behavior,inherited:report.insufficient_inherited,sensitive:report.insufficient_sensitive,evidence_failures:report.evidence_failures});
   cliCases++;return report;
@@ -146,7 +162,7 @@ try{
 }finally{rmSync(fixture,{recursive:true,force:true});}
 const output={schema_version:1,line,node:process.version,typescript:ts.version,role:'Completion/scope and actual CLI validator fixtures only; no real API, runtime, native, packed or G11 qualification',
  helper_positives:helperPositive,helper_negatives:helperNegative,actual_CLI_cases:cliCases,checker_mutants_detected:checkerMutants,
- complete_positive_behavior_fixture:true,complete_positive_source_applicability_fixture:true,frozen_fixture_uses:1736,current_fixture_additional_uses:1,observations,
+ complete_positive_behavior_fixture:true,complete_positive_source_applicability_fixture:true,frozen_fixture_uses:1736,current_fixture_additional_uses:8,synthetic_current_fixture_uses:1,authenticated_panel_fixture_uses:7,observations,
  producer_sha256:hash(read('tests/upstream_individual_evidence_scope_probe.mjs')),checker_sha256:hash(read('scripts/check-upstream-audit-disposition.mjs')),
  scope_helper_sha256:hash(read('scripts/upstream-individual-evidence-scope.mjs')),actual_product_or_packed_or_native_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(output,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(output));
