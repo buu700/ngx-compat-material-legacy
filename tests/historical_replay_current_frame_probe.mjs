@@ -16,7 +16,6 @@ const root=process.cwd(),read=path=>readFileSync(join(root,path));
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const {data,members,guard}=inspectHistoricalReplayCurrent({root});
 const inventory=JSON.parse(read('compatibility/rc/historical-replay-current-frame-inventory.json'));
-assert.deepEqual(data.current_frame,inventory.qualified_frame);
 assert.equal(guard.authenticated_current_wrapper_successors,2);
 assert.equal(guard.authenticated_consumer_wrapper_transitions,1);
 assert.equal(guard.current_product_members,1142);
@@ -45,6 +44,9 @@ for(const path of [
 const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
 for(const name of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[name];
 const git=(...args)=>execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:root,env,maxBuffer:16*1024*1024});
+git('merge-base','--is-ancestor',inventory.qualified_frame.commit,data.current_frame.commit);
+assert.equal(git('diff','--name-only',inventory.qualified_frame.commit,data.current_frame.commit,'--',
+  'projects/ngx-material-legacy','compatibility/f10').toString(),'','source-qualified product or ledger changed while sealing replay tooling');
 for(const path of ['compatibility/f10/disposition-ledger/ledger.json',
   'projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts']){
   const before=git('show',inventory.prior_frame.commit+':'+path);assert.notDeepEqual(before,cached(path));
