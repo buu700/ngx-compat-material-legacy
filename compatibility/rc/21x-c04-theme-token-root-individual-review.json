@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "source_review_complete": true,
+  "recorded_at_utc": "2026-10-27T22:26:27.915909+00:00",
+  "role": "Two separate complete original selector/token-root judgments",
+  "originals": {
+    "path": "compatibility/rc/21x-c04-theme-token-root-originals.json.gz",
+    "sha256": "e7343a775e1673e6cf7210cb4a58faafaa1da67f026bf013d1918b4d040340bd",
+    "bytes": 15771
+  },
+  "helper_context": {
+    "path": "compatibility/rc/21x-c04-theme-token-root-helper-context.json",
+    "sha256": "45b5d569b49c782e60dbfa1923b9df70cf9a16306697d42200186b91f2a5babc",
+    "bytes": 13601
+  },
+  "original_file_occurrences": 2,
+  "original_hunks": 8,
+  "original_before_after_blob_identities": 4,
+  "tagged_context_members": 9,
+  "reviews": [
+    {
+      "sha": "408c0b492f5d7edd6571b2287bb06aa89d582758",
+      "family": "card",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/card/_card-theme.scss b/src/material/card/_card-theme.scss\nindex 7dc94612f5f4fd8d3541bf65995c46afda142824..7400acc43bb77df86b42447dd3c5127f3f5df39c 100644\n--- a/src/material/card/_card-theme.scss\n+++ b/src/material/card/_card-theme.scss\n@@ -1,4 +1,5 @@\n @use 'sass:map';\n+@use '../core/style/sass-utils';\n @use '../core/theming/theming';\n @use '../core/typography/typography';\n @use '../core/tokens/token-utils';\n@@ -9,7 +10,7 @@\n @use '@material/card/outlined-card-theme' as mdc-outlined-card-theme;\n \n @mixin base($config-or-theme) {\n-  .mat-mdc-card {\n+  @include sass-utils.current-selector-or-root() {\n     @include mdc-elevated-card-theme.theme(tokens-mdc-elevated-card.get-unthemable-tokens());\n     @include mdc-outlined-card-theme.theme(tokens-mdc-outlined-card.get-unthemable-tokens());\n     @include token-utils.create-token-values(\n@@ -32,7 +33,7 @@\n   $mat-card-color-tokens: tokens-mat-card.get-color-tokens($config);\n \n   // Add values for card tokens.\n-  .mat-mdc-card {\n+  @include sass-utils.current-selector-or-root() {\n     @include mdc-elevated-card-theme.theme($mdc-elevated-card-color-tokens);\n     @include mdc-outlined-card-theme.theme($mdc-outlined-card-color-tokens);\n     @include token-utils.create-token-values(tokens-mat-card.$prefix, $mat-card-color-tokens);\n@@ -47,7 +48,7 @@\n   $mat-card-typography-tokens: tokens-mat-card.get-typography-tokens($config);\n \n   // Add values for card tokens.\n-  .mat-mdc-card {\n+  @include sass-utils.current-selector-or-root() {\n     @include mdc-elevated-card-theme.theme($mdc-elevated-card-typography-tokens);\n     @include mdc-outlined-card-theme.theme($mdc-outlined-card-typography-tokens);\n     @include token-utils.create-token-values(tokens-mat-card.$prefix, $mat-card-typography-tokens);\n@@ -61,7 +62,7 @@\n   $mat-card-density-tokens: tokens-mat-card.get-density-tokens($density-scale);\n \n   // Add values for card tokens.\n-  .mat-mdc-card {\n+  @include sass-utils.current-selector-or-root() {\n     @include mdc-elevated-card-theme.theme($mdc-elevated-card-density-tokens);\n     @include mdc-outlined-card-theme.theme($mdc-outlined-card-density-tokens);\n     @include token-utils.create-token-values(tokens-mat-card.$prefix, $mat-card-density-tokens);\n",
+      "diff_sha256": "8e0c5e9bd21cdcd2381bd2d24919338657d1d24b6ecb7e2107cc974f47466c64",
+      "complete_original_paths": [
+        "src/material/card/_card-theme.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/card/_card-theme.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/card/_card-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,4 +1,5 @@",
+          "hunk_sha256": "011e22ef4414448627cf1bf1dca3b81c23339ec46a5e684c572b385a4a18e2f9",
+          "status": "reviewed",
+          "decision": "Adds the owned-in16 sass-utils helper import to support the four following wrapper replacements. All five original before/after/tagged helper contexts and the actual owned helper have the same verified blob/body. The import alone changes no tokens; importing it is unnecessary without adopting those replacements."
+        },
+        {
+          "path": "src/material/card/_card-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -9,7 +10,7 @@",
+          "hunk_sha256": "739606bb312e0ce2be47eb0992d82ba02185aa77cc5d028c11b4a2b277b6a67e",
+          "status": "reviewed",
+          "decision": "Replaces the explicit .mat-mdc-card wrapper in base with current-selector-or-root. The actual helper emits html at top level or the complete current selector within a scope; it removes the component descendant. Three controlled scope observations retain token values while observing the selector change. This base mixin already exists in the original pre-patch context but is absent from the finite16facade; its introduction/relocation was separately declined. Do not reintroduce it through this subsequent selector patch. The separate legacy-card theme remains exact16and targets .mat-card, with unchanged owned component resources; this modern root-token move does not repair a legacy component."
+        },
+        {
+          "path": "src/material/card/_card-theme.scss",
+          "hunk_index": 2,
+          "header": "@@ -32,7 +33,7 @@",
+          "hunk_sha256": "72f89af8a179ed8353bb978c2dc90e136643e79af93a3a310fae1b7d7f4629a0",
+          "status": "reviewed",
+          "decision": "Replaces the explicit .mat-mdc-card wrapper in color with current-selector-or-root. The actual helper emits html at top level or the complete current selector within a scope; it removes the component descendant. Three controlled scope observations retain token values while observing the selector change. The actual retained16source for this existing modern mixin matches the pre-patch output in all three contexts. Preserve that historical selector scope and public binding. The separate legacy-card theme remains exact16and targets .mat-card, with unchanged owned component resources; this modern root-token move does not repair a legacy component."
+        },
+        {
+          "path": "src/material/card/_card-theme.scss",
+          "hunk_index": 3,
+          "header": "@@ -47,7 +48,7 @@",
+          "hunk_sha256": "1ab694c62f6c1d05731fc744688edc35818913475d71b4d7c9d8e83d9d7de6f3",
+          "status": "reviewed",
+          "decision": "Replaces the explicit .mat-mdc-card wrapper in typography with current-selector-or-root. The actual helper emits html at top level or the complete current selector within a scope; it removes the component descendant. Three controlled scope observations retain token values while observing the selector change. The actual retained16source for this existing modern mixin matches the pre-patch output in all three contexts. Preserve that historical selector scope and public binding. The separate legacy-card theme remains exact16and targets .mat-card, with unchanged owned component resources; this modern root-token move does not repair a legacy component."
+        },
+        {
+          "path": "src/material/card/_card-theme.scss",
+          "hunk_index": 4,
+          "header": "@@ -61,7 +62,7 @@",
+          "hunk_sha256": "ca11e5d2537233e14bc52e5529e0b7b566de183bf0a98b866f9be11f6f7460e9",
+          "status": "reviewed",
+          "decision": "Replaces the explicit .mat-mdc-card wrapper in density with current-selector-or-root. The actual helper emits html at top level or the complete current selector within a scope; it removes the component descendant. Three controlled scope observations retain token values while observing the selector change. The actual default density map emits no CSS in all three contexts, before and after; those zero-byte observations are recorded explicitly and do not supply rendered/argument-matrix credit. The actual retained16source for this existing modern mixin matches the pre-patch output in all three contexts. Preserve that historical selector scope and public binding. The separate legacy-card theme remains exact16and targets .mat-card, with unchanged owned component resources; this modern root-token move does not repair a legacy component."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/styles/card/_card-theme.scss",
+          "sha256": "639fbbeab9868e1ba7f9f2f9ce4ec062496b722844943025bfe18e46418ccd74",
+          "bytes": 4273
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-card/_card-theme.scss",
+          "sha256": "d42a67062c2687ad7d21e9d31b2ab2548e7c2ace4c28494a685cbb1f9e05524c",
+          "bytes": 2518
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-card/card.ts",
+          "sha256": "2e2c16ba865b712214e0d51a739fd01e20af819e65065e2b99b55cc1433208ad",
+          "bytes": 5279
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-card/card.html",
+          "sha256": "777f996dc51ea34779f0632d9685279f5fcebb869a043198109ea1a64d09f9eb",
+          "bytes": 77
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-card/card.scss",
+          "sha256": "418edaffc1bbf45372b948ae5c5845c9cc1e1bd4c1f997276d3ea254dc39ef24",
+          "bytes": 5960
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/style/_sass-utils.scss",
+          "sha256": "43106bb24869ae52100bfebd32dd26717eb6c526e3971a4a45a1841032871f97",
+          "bytes": 2022
+        },
+        {
+          "path": "projects/ngx-material-legacy/_index.scss",
+          "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+          "bytes": 14151
+        }
+      ],
+      "decision": "Do not adopt the post16 card token-root selector relocation. Preserve the finite16modern mixin bindings and their component-scoped CSS, and the separate exact16legacy theme and owned legacy resources. Current peers own modern implementations; no compensating consumer HTML/CSS/SCSS, additional mixin, TypeScript API change or golden update is required. This is an individual source-contract decision; full packed/native/browser/argument/floor/audit qualification remains separate.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    },
+    {
+      "sha": "6cc6cf21f292d78c930cbda79c1f337bd6b82bfe",
+      "family": "tooltip",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/tooltip/_tooltip-theme.scss b/src/material/tooltip/_tooltip-theme.scss\nindex 6d3b8dd662b97970d10447f04c0ab737e2185d7c..af2dcfc525cd01f64d06284bd21a55bb1283833e 100644\n--- a/src/material/tooltip/_tooltip-theme.scss\n+++ b/src/material/tooltip/_tooltip-theme.scss\n@@ -16,7 +16,7 @@\n   $mdc-tooltip-color-tokens: m2-mdc-plain-tooltip.get-color-tokens($config);\n \n   // Add values for MDC tooltip tokens.\n-  .mat-mdc-tooltip {\n+  @include sass-utils.current-selector-or-root() {\n     @include mdc-plain-tooltip-theme.theme($mdc-tooltip-color-tokens);\n   }\n }\n@@ -27,7 +27,7 @@\n   $mdc-tooltip-typography-tokens: m2-mdc-plain-tooltip.get-typography-tokens($config);\n \n   // Add values for MDC tooltip tokens.\n-  .mat-mdc-tooltip {\n+  @include sass-utils.current-selector-or-root() {\n     @include mdc-plain-tooltip-theme.theme($mdc-tooltip-typography-tokens);\n   }\n }\n@@ -37,7 +37,7 @@\n   $mdc-tooltip-density-tokens: m2-mdc-plain-tooltip.get-density-tokens($density-scale);\n \n   // Add values for MDC tooltip tokens.\n-  .mat-mdc-tooltip {\n+  @include sass-utils.current-selector-or-root() {\n     @include mdc-plain-tooltip-theme.theme($mdc-tooltip-density-tokens);\n   }\n }\n",
+      "diff_sha256": "bf1d28e044178d52352071e2ea88d7bfcaeaeaa4407f96ea34570adacdd29d94",
+      "complete_original_paths": [
+        "src/material/tooltip/_tooltip-theme.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/tooltip/_tooltip-theme.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/tooltip/_tooltip-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -16,7 +16,7 @@",
+          "hunk_sha256": "dd16bffbf447a7b571c09375c8b80a01c03da4aacae997f5b4720ac26d2da6ef",
+          "status": "reviewed",
+          "decision": "Replaces .mat-mdc-tooltip in color with the existing current-selector-or-root helper; the preexisting base implementation and theme entry are unchanged. The captured helper is identical before/after and to16. The root and two nested scope observations show the intended component-wrapper removal with the original token values preserved. The retained16modern invocation matches the pre-patch CSS exactly in all three contexts; preserve that selector scope. The distinct legacy-tooltip theme targets .mat-tooltip and historical handset typography. Its existing .mat-tooltip-panel.mat-tooltip-panel-non-interactive specificity adaptation and motion resource are untouched, with their prior assurance limits retained."
+        },
+        {
+          "path": "src/material/tooltip/_tooltip-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -27,7 +27,7 @@",
+          "hunk_sha256": "e99910959513ae7564f12f84293c82a5a37739435bf12624661b64837c4d35b3",
+          "status": "reviewed",
+          "decision": "Replaces .mat-mdc-tooltip in typography with the existing current-selector-or-root helper; the preexisting base implementation and theme entry are unchanged. The captured helper is identical before/after and to16. The root and two nested scope observations show the intended component-wrapper removal with the original token values preserved. The retained16modern invocation matches the pre-patch CSS exactly in all three contexts; preserve that selector scope. The distinct legacy-tooltip theme targets .mat-tooltip and historical handset typography. Its existing .mat-tooltip-panel.mat-tooltip-panel-non-interactive specificity adaptation and motion resource are untouched, with their prior assurance limits retained."
+        },
+        {
+          "path": "src/material/tooltip/_tooltip-theme.scss",
+          "hunk_index": 2,
+          "header": "@@ -37,7 +37,7 @@",
+          "hunk_sha256": "b15a8f2534d91b859078e4476547591640be0741c9290d70f2139d383cbaf66c",
+          "status": "reviewed",
+          "decision": "Replaces .mat-mdc-tooltip in density with the existing current-selector-or-root helper; the preexisting base implementation and theme entry are unchanged. The captured helper is identical before/after and to16. The root and two nested scope observations show the intended component-wrapper removal with the original token values preserved. The default density invocation emits zero bytes before and after in all three contexts; retain this source-contract judgment without claiming an observable default style change. The distinct legacy-tooltip theme targets .mat-tooltip and historical handset typography. Its existing .mat-tooltip-panel.mat-tooltip-panel-non-interactive specificity adaptation and motion resource are untouched, with their prior assurance limits retained."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/styles/tooltip/_tooltip-theme.scss",
+          "sha256": "71de982631421fb0f488cee8a04f475f11e2c54fbc1c689af98fad79476a2733",
+          "bytes": 1788
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-tooltip/_tooltip-theme.scss",
+          "sha256": "54937c2a741816f0c8547b6855b0ab5d3ef05f8aee5188469515d38401079098",
+          "bytes": 2205
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+          "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+          "bytes": 4001
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.html",
+          "sha256": "21364c268982ac1073a6be6b071b81e6d8551a528e07480d00dd66c3fe8c7e92",
+          "bytes": 202
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+          "sha256": "692e27d01ea6a8deb1502c3f6d143f7ca868368655126d4ac8f6958eb6179458",
+          "bytes": 1336
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/style/_sass-utils.scss",
+          "sha256": "43106bb24869ae52100bfebd32dd26717eb6c526e3971a4a45a1841032871f97",
+          "bytes": 2022
+        },
+        {
+          "path": "projects/ngx-material-legacy/_index.scss",
+          "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+          "bytes": 14151
+        }
+      ],
+      "decision": "Do not adopt the post16 tooltip token-root selector relocation. Preserve the finite16modern mixin bindings and their component-scoped CSS, and the separate exact16legacy theme and owned legacy resources. Current peers own modern implementations; no compensating consumer HTML/CSS/SCSS, additional mixin, TypeScript API change or golden update is required. This is an individual source-contract decision; full packed/native/browser/argument/floor/audit qualification remains separate.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    }
+  ],
+  "actual_line_scopes": [
+    {
+      "path": "compatibility/rc/21x-c04-theme-token-root-measurement-21x.json",
+      "sha256": "f1300bc20c01b903708f6ed00afa89f650707d74f5fa6b9871f13024227aa741",
+      "bytes": 150965
+    },
+    {
+      "path": "compatibility/rc/21x-c04-theme-token-root-measurement-main.json",
+      "sha256": "feed2c1fe387e977ff6f8721611a0ab71138d203b5557caaa607a922008543c3",
+      "bytes": 151168
+    }
+  ],
+  "existing_tooltip_context": {
+    "path": "compatibility/rc/21x-c04-unthemable-token-placement-tooltip-context-reconciliation.json",
+    "sha256": "700edd40358724b503ded642c818b7ca2d9500fc8604b47e96678a05d5e91044",
+    "bytes": 4023
+  },
+  "read_only_consumer_sanity": {
+    "consumer": "~/cyph",
+    "scope": "Read-only rg-discoverable shared/css/**/*.scss",
+    "scss_files_scanned": 12,
+    "retained_call_counts": {
+      "all-legacy-component-themes": 3,
+      "legacy-card-theme": 1
+    },
+    "matching_file_subjects": [
+      {
+        "path": "shared/css/mixins.scss",
+        "sha256": "03bcd7b1b907de9e1d829f81ca10053e2494e91ab19e2f5b92c4f4d8947308d9",
+        "bytes": 20525
+      }
+    ],
+    "consumer_files_written": 0,
+    "consumer_build_or_deployment_executed": false
+  },
+  "canonical_decisions_changed": 0,
+  "canonical_guard_or_owner_stage_integrated": false,
+  "pending_dispositions": 1330,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "g13_claim": "not-passed"
+}

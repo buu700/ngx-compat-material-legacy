@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "role": "Cached original helper context only; no review or product qualification",
+  "originals": {
+    "path": "compatibility/rc/21x-c04-theme-token-root-originals.json.gz",
+    "sha256": "e7343a775e1673e6cf7210cb4a58faafaa1da67f026bf013d1918b4d040340bd"
+  },
+  "contexts": [
+    {
+      "review_sha": "408c0b492f5d7edd6571b2287bb06aa89d582758",
+      "role": "before",
+      "commit": "c0b3aa524115e9b2b2b5fabd2e7cec44111b8e0e",
+      "path": "src/material/core/style/_sass-utils.scss",
+      "tree_record": "100644 blob 772cfbec7b3529e02be4fff48fc21d295ec58400\tsrc/material/core/style/_sass-utils.scss\u0000",
+      "blob": "772cfbec7b3529e02be4fff48fc21d295ec58400",
+      "sha256": "43106bb24869ae52100bfebd32dd26717eb6c526e3971a4a45a1841032871f97",
+      "bytes": 2022,
+      "body": "@use 'sass:map';\n@use 'sass:meta';\n\n/// Include content under the current selector (&) or the document root if there is no current\n/// selector.\n/// @param {String} $root [html] The default root selector to use when there is no current selector.\n/// @output The given content under the current selector, or root selector if there is no current\n///     selector.\n/// @content Content to output under the current selector, or root selector if there is no current\n///     selector.\n@mixin current-selector-or-root($root: html) {\n  @at-root #{& or $root} {\n    @content;\n  }\n}\n\n/// A version of the standard `map.merge` function that takes a variable number of arguments.\n/// Each argument is merged into the final result from left to right.\n/// @param {List} $maps The maps to combine with map.merge\n/// @return {Map} The combined result of successively calling map.merge with each parameter.\n@function merge-all($maps...) {\n  $result: ();\n  @each $map in $maps {\n    $result: map.merge($result, $map);\n  }\n  @return $result;\n}\n\n/// A version of the standard `map.deep-merge` function that takes a variable number of arguments.\n/// Each argument is deep-merged into the final result from left to right.\n/// @param {List} $maps The maps to combine with map.deep-merge\n/// @return {Map} The combined result of successively calling map.deep-merge with each parameter.\n@function deep-merge-all($maps...) {\n  $result: ();\n  @each $map in $maps {\n    $result: map.deep-merge($result, $map);\n  }\n  @return $result;\n}\n\n/// Coerces the given value to a list, by converting any non-list value into a single-item list.\n/// This should be used when dealing with user-passed lists of args to avoid confusing errors,\n/// since Sass treats `($x)` as equivalent to `$x`.\n/// @param {Any} $value The value to coerce to a list.\n/// @return {List} The original $value if it was a list, otherwise a single-item list containing\n///     $value.\n@function coerce-to-list($value) {\n  @return if(meta.type-of($value) != 'list', ($value,), $value);\n}\n"
+    },
+    {
+      "review_sha": "408c0b492f5d7edd6571b2287bb06aa89d582758",
+      "role": "after",
+      "commit": "408c0b492f5d7edd6571b2287bb06aa89d582758",
+      "path": "src/material/core/style/_sass-utils.scss",
+      "tree_record": "100644 blob 772cfbec7b3529e02be4fff48fc21d295ec58400\tsrc/material/core/style/_sass-utils.scss\u0000",
+      "blob": "772cfbec7b3529e02be4fff48fc21d295ec58400",
+      "sha256": "43106bb24869ae52100bfebd32dd26717eb6c526e3971a4a45a1841032871f97",
+      "bytes": 2022,
+      "body": "@use 'sass:map';\n@use 'sass:meta';\n\n/// Include content under the current selector (&) or the document root if there is no current\n/// selector.\n/// @param {String} $root [html] The default root selector to use when there is no current selector.\n/// @output The given content under the current selector, or root selector if there is no current\n///     selector.\n/// @content Content to output under the current selector, or root selector if there is no current\n///     selector.\n@mixin current-selector-or-root($root: html) {\n  @at-root #{& or $root} {\n    @content;\n  }\n}\n\n/// A version of the standard `map.merge` function that takes a variable number of arguments.\n/// Each argument is merged into the final result from left to right.\n/// @param {List} $maps The maps to combine with map.merge\n/// @return {Map} The combined result of successively calling map.merge with each parameter.\n@function merge-all($maps...) {\n  $result: ();\n  @each $map in $maps {\n    $result: map.merge($result, $map);\n  }\n  @return $result;\n}\n\n/// A version of the standard `map.deep-merge` function that takes a variable number of arguments.\n/// Each argument is deep-merged into the final result from left to right.\n/// @param {List} $maps The maps to combine with map.deep-merge\n/// @return {Map} The combined result of successively calling map.deep-merge with each parameter.\n@function deep-merge-all($maps...) {\n  $result: ();\n  @each $map in $maps {\n    $result: map.deep-merge($result, $map);\n  }\n  @return $result;\n}\n\n/// Coerces the given value to a list, by converting any non-list value into a single-item list.\n/// This should be used when dealing with user-passed lists of args to avoid confusing errors,\n/// since Sass treats `($x)` as equivalent to `$x`.\n/// @param {Any} $value The value to coerce to a list.\n/// @return {List} The original $value if it was a list, otherwise a single-item list containing\n///     $value.\n@function coerce-to-list($value) {\n  @return if(meta.type-of($value) != 'list', ($value,), $value);\n}\n"
+    },
+    {
+      "review_sha": "6cc6cf21f292d78c930cbda79c1f337bd6b82bfe",
+      "role": "before",
+      "commit": "68096ec9d34aae793a7b3037c39e6ae7d1700933",
+      "path": "src/material/core/style/_sass-utils.scss",
+      "tree_record": "100644 blob 772cfbec7b3529e02be4fff48fc21d295ec58400\tsrc/material/core/style/_sass-utils.scss\u0000",
+      "blob": "772cfbec7b3529e02be4fff48fc21d295ec58400",
+      "sha256": "43106bb24869ae52100bfebd32dd26717eb6c526e3971a4a45a1841032871f97",
+      "bytes": 2022,
+      "body": "@use 'sass:map';\n@use 'sass:meta';\n\n/// Include content under the current selector (&) or the document root if there is no current\n/// selector.\n/// @param {String} $root [html] The default root selector to use when there is no current selector.\n/// @output The given content under the current selector, or root selector if there is no current\n///     selector.\n/// @content Content to output under the current selector, or root selector if there is no current\n///     selector.\n@mixin current-selector-or-root($root: html) {\n  @at-root #{& or $root} {\n    @content;\n  }\n}\n\n/// A version of the standard `map.merge` function that takes a variable number of arguments.\n/// Each argument is merged into the final result from left to right.\n/// @param {List} $maps The maps to combine with map.merge\n/// @return {Map} The combined result of successively calling map.merge with each parameter.\n@function merge-all($maps...) {\n  $result: ();\n  @each $map in $maps {\n    $result: map.merge($result, $map);\n  }\n  @return $result;\n}\n\n/// A version of the standard `map.deep-merge` function that takes a variable number of arguments.\n/// Each argument is deep-merged into the final result from left to right.\n/// @param {List} $maps The maps to combine with map.deep-merge\n/// @return {Map} The combined result of successively calling map.deep-merge with each parameter.\n@function deep-merge-all($maps...) {\n  $result: ();\n  @each $map in $maps {\n    $result: map.deep-merge($result, $map);\n  }\n  @return $result;\n}\n\n/// Coerces the given value to a list, by converting any non-list value into a single-item list.\n/// This should be used when dealing with user-passed lists of args to avoid confusing errors,\n/// since Sass treats `($x)` as equivalent to `$x`.\n/// @param {Any} $value The value to coerce to a list.\n/// @return {List} The original $value if it was a list, otherwise a single-item list containing\n///     $value.\n@function coerce-to-list($value) {\n  @return if(meta.type-of($value) != 'list', ($value,), $value);\n}\n"
+    },
+    {
+      "review_sha": "6cc6cf21f292d78c930cbda79c1f337bd6b82bfe",
+      "role": "after",
+      "commit": "6cc6cf21f292d78c930cbda79c1f337bd6b82bfe",
+      "path": "src/material/core/style/_sass-utils.scss",
+      "tree_record": "100644 blob 772cfbec7b3529e02be4fff48fc21d295ec58400\tsrc/material/core/style/_sass-utils.scss\u0000",
+      "blob": "772cfbec7b3529e02be4fff48fc21d295ec58400",
+      "sha256": "43106bb24869ae52100bfebd32dd26717eb6c526e3971a4a45a1841032871f97",
+      "bytes": 2022,
+      "body": "@use 'sass:map';\n@use 'sass:meta';\n\n/// Include content under the current selector (&) or the document root if there is no current\n/// selector.\n/// @param {String} $root [html] The default root selector to use when there is no current selector.\n/// @output The given content under the current selector, or root selector if there is no current\n///     selector.\n/// @content Content to output under the current selector, or root selector if there is no current\n///     selector.\n@mixin current-selector-or-root($root: html) {\n  @at-root #{& or $root} {\n    @content;\n  }\n}\n\n/// A version of the standard `map.merge` function that takes a variable number of arguments.\n/// Each argument is merged into the final result from left to right.\n/// @param {List} $maps The maps to combine with map.merge\n/// @return {Map} The combined result of successively calling map.merge with each parameter.\n@function merge-all($maps...) {\n  $result: ();\n  @each $map in $maps {\n    $result: map.merge($result, $map);\n  }\n  @return $result;\n}\n\n/// A version of the standard `map.deep-merge` function that takes a variable number of arguments.\n/// Each argument is deep-merged into the final result from left to right.\n/// @param {List} $maps The maps to combine with map.deep-merge\n/// @return {Map} The combined result of successively calling map.deep-merge with each parameter.\n@function deep-merge-all($maps...) {\n  $result: ();\n  @each $map in $maps {\n    $result: map.deep-merge($result, $map);\n  }\n  @return $result;\n}\n\n/// Coerces the given value to a list, by converting any non-list value into a single-item list.\n/// This should be used when dealing with user-passed lists of args to avoid confusing errors,\n/// since Sass treats `($x)` as equivalent to `$x`.\n/// @param {Any} $value The value to coerce to a list.\n/// @return {List} The original $value if it was a list, otherwise a single-item list containing\n///     $value.\n@function coerce-to-list($value) {\n  @return if(meta.type-of($value) != 'list', ($value,), $value);\n}\n"
+    },
+    {
+      "review_sha": null,
+      "role": "tagged16",
+      "commit": "df60e733c60e572ba538f6ad0ceff3e63e527b53",
+      "path": "src/material/core/style/_sass-utils.scss",
+      "tree_record": "100644 blob 772cfbec7b3529e02be4fff48fc21d295ec58400\tsrc/material/core/style/_sass-utils.scss\u0000",
+      "blob": "772cfbec7b3529e02be4fff48fc21d295ec58400",
+      "sha256": "43106bb24869ae52100bfebd32dd26717eb6c526e3971a4a45a1841032871f97",
+      "bytes": 2022,
+      "body": "@use 'sass:map';\n@use 'sass:meta';\n\n/// Include content under the current selector (&) or the document root if there is no current\n/// selector.\n/// @param {String} $root [html] The default root selector to use when there is no current selector.\n/// @output The given content under the current selector, or root selector if there is no current\n///     selector.\n/// @content Content to output under the current selector, or root selector if there is no current\n///     selector.\n@mixin current-selector-or-root($root: html) {\n  @at-root #{& or $root} {\n    @content;\n  }\n}\n\n/// A version of the standard `map.merge` function that takes a variable number of arguments.\n/// Each argument is merged into the final result from left to right.\n/// @param {List} $maps The maps to combine with map.merge\n/// @return {Map} The combined result of successively calling map.merge with each parameter.\n@function merge-all($maps...) {\n  $result: ();\n  @each $map in $maps {\n    $result: map.merge($result, $map);\n  }\n  @return $result;\n}\n\n/// A version of the standard `map.deep-merge` function that takes a variable number of arguments.\n/// Each argument is deep-merged into the final result from left to right.\n/// @param {List} $maps The maps to combine with map.deep-merge\n/// @return {Map} The combined result of successively calling map.deep-merge with each parameter.\n@function deep-merge-all($maps...) {\n  $result: ();\n  @each $map in $maps {\n    $result: map.deep-merge($result, $map);\n  }\n  @return $result;\n}\n\n/// Coerces the given value to a list, by converting any non-list value into a single-item list.\n/// This should be used when dealing with user-passed lists of args to avoid confusing errors,\n/// since Sass treats `($x)` as equivalent to `$x`.\n/// @param {Any} $value The value to coerce to a list.\n/// @return {List} The original $value if it was a list, otherwise a single-item list containing\n///     $value.\n@function coerce-to-list($value) {\n  @return if(meta.type-of($value) != 'list', ($value,), $value);\n}\n"
+    }
+  ],
+  "producer": {
+    "path": "scripts/capture-upstream-review-context.py",
+    "sha256": "47d9931ec456eeb8a370325b9bfeb2b0c15fb6d6ba21dcb35fc39b7f6a905a21"
+  },
+  "project_or_cache_mutations": false,
+  "network_used": false,
+  "upstream_code_executed": false,
+  "artifact_prefix": "compatibility/rc/21x-c04-theme-token-root-",
+  "g11_claim": "not-passed"
+}
