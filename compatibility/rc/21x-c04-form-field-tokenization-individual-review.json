@@ -1,0 +1,654 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "source_review_complete": true,
+  "recorded_at_utc": "2026-10-27T23:02:33.241850+00:00",
+  "role": "Two individual original source/contract judgments with different outcomes; all32hunks include the deleted file and upstream build list",
+  "originals": {
+    "path": "compatibility/rc/21x-c04-form-field-tokenization-originals.json.gz",
+    "sha256": "e33b0311916a938d9752abad9211326bcf0e608426996d7e5ba927e04ca1ea0c",
+    "bytes": 81800
+  },
+  "offline_replay": {
+    "path": "compatibility/rc/21x-c04-form-field-tokenization-originals-offline-replay.json.gz",
+    "sha256": "e9074b52e0ac4c6c0f3b0607f7a871ce404e98fea184e16b1d970e6da082f7ce",
+    "bytes": 81481
+  },
+  "original_file_occurrences": 17,
+  "original_hunks": 32,
+  "original_before_after_blob_identities": 33,
+  "explicit_absent_members": 1,
+  "tagged_context_members": 29,
+  "reviews": [
+    {
+      "sha": "98f610d192015599d8e0ce1a0f2a455c31ced558",
+      "family": "form-field-color-tokenization",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/core/tokens/m2/mat/_form-field.scss b/src/material/core/tokens/m2/mat/_form-field.scss\nindex 4d4619218623da44573d672bd6bef3ebacb31244..3902f10593a6ed17b94dda2dc869ac7ab04d0c58 100644\n--- a/src/material/core/tokens/m2/mat/_form-field.scss\n+++ b/src/material/core/tokens/m2/mat/_form-field.scss\n@@ -1,6 +1,8 @@\n @use 'sass:map';\n @use '../../token-utils';\n @use '../../../style/sass-utils';\n+@use '../../../theming/theming';\n+@use '../../../theming/palette';\n \n // The prefix used to generate the fully qualified name for tokens in this file.\n $prefix: (mat, form-field);\n@@ -13,12 +15,43 @@ $prefix: (mat, form-field);\n \n // Tokens that can be configured through Angular Material's color theming API.\n @function get-color-tokens($config) {\n+  $warn: map.get($config, warn);\n   $is-dark: map.get($config, is-dark);\n   $on-surface: if($is-dark, #fff, #000);\n+  $color-tokens: private-get-color-palette-color-tokens($config, primary);\n \n-  @return (\n+  @return map.merge($color-tokens, (\n     // MDC has a token for the enabled placeholder, but not for the disabled one.\n     disabled-input-text-placeholder-color: rgba($on-surface, 0.38),\n+    state-layer-color: rgba($on-surface, 0.87),\n+    error-text-color: theming.get-color-from-palette($warn),\n+\n+    // On dark themes we set the native `select` color to some shade of white,\n+    // however the color propagates to all of the `option` elements, which are\n+    // always on a white background inside the dropdown, causing them to blend in.\n+    // Since we can't change background of the dropdown, we need to explicitly\n+    // reset the color of the options to something dark.\n+    select-option-text-color: if($is-dark, palette.$dark-primary-text, inherit),\n+    // Note the spelling of the `GrayText` here which is a system color. See:\n+    // https://developer.mozilla.org/en-US/docs/Web/CSS/system-color\n+    select-disabled-option-text-color: if($is-dark, palette.$dark-disabled-text, GrayText),\n+\n+    // These values are taken from the MDC select implementation:\n+    // https://github.com/material-components/material-components-web/blob/master/packages/mdc-select/_select-theme.scss\n+    enabled-select-arrow-color: rgba($on-surface, 0.54),\n+    disabled-select-arrow-color: rgba($on-surface, 0.38),\n+\n+    hover-state-layer-opacity: if($is-dark, 0.08, 0.04),\n+    focus-state-layer-opacity: if($is-dark, 0.24, 0.12),\n+  ));\n+}\n+\n+// Generates the mapping for the properties that change based on the form field color.\n+@function private-get-color-palette-color-tokens($config, $palette-name) {\n+  $palette: map.get($config, $palette-name);\n+\n+  @return (\n+    focus-select-arrow-color: theming.get-color-from-palette($palette, default, 0.87),\n   );\n }\n \ndiff --git a/src/material/core/tokens/m2/mdc/_filled-text-field.scss b/src/material/core/tokens/m2/mdc/_filled-text-field.scss\nindex e12a266ab1233992a0bce44993fee9fea1d3a991..ef2c25b51bf68bc133946e50b5139ff2b45babab 100644\n--- a/src/material/core/tokens/m2/mdc/_filled-text-field.scss\n+++ b/src/material/core/tokens/m2/mdc/_filled-text-field.scss\n@@ -133,7 +133,7 @@ $prefix: (mdc, filled-text-field);\n   @return $first-color;\n }\n \n-// Generates the mapping for the properties that change based on the slide toggle color.\n+// Generates the mapping for the properties that change based on the text field color.\n @function private-get-color-palette-color-tokens($config, $palette-name) {\n   $palette: map.get($config, $palette-name);\n   $palette-color: theming.get-color-from-palette($palette);\ndiff --git a/src/material/core/tokens/m2/mdc/_outlined-text-field.scss b/src/material/core/tokens/m2/mdc/_outlined-text-field.scss\nindex 8229b0856c4008d8bdcdd5fa19a084ad256d459d..588a2c5deb519f764c643d7f15cd06dbfa7a5375 100644\n--- a/src/material/core/tokens/m2/mdc/_outlined-text-field.scss\n+++ b/src/material/core/tokens/m2/mdc/_outlined-text-field.scss\n@@ -116,7 +116,7 @@ $prefix: (mdc, outlined-text-field);\n   ));\n }\n \n-// Generates the mapping for the properties that change based on the slide toggle color.\n+// Generates the mapping for the properties that change based on the text field color.\n @function private-get-color-palette-color-tokens($config, $palette-name) {\n   $palette: map.get($config, $palette-name);\n   $palette-color: theming.get-color-from-palette($palette);\ndiff --git a/src/material/form-field/BUILD.bazel b/src/material/form-field/BUILD.bazel\nindex 13e74ac6dc6b315b176f1c8c314e96aaf84f44ce..9208f937992e5b6c9141e690615ae85392327b19 100644\n--- a/src/material/form-field/BUILD.bazel\n+++ b/src/material/form-field/BUILD.bazel\n@@ -30,7 +30,6 @@ sass_library(\n     name = \"form_field_scss_lib\",\n     srcs = [\n         \"_form-field-theme.scss\",\n-        \"_mdc-text-field-theme-variable-refresh.scss\",\n     ],\n     deps = [\n         \":form_field_partials\",\ndiff --git a/src/material/form-field/_form-field-focus-overlay.scss b/src/material/form-field/_form-field-focus-overlay.scss\nindex a890422c8774dcaa8a9edac010f41631fd5ca888..ade624aaf439d3f3a775471d2ad553c92ad942aa 100644\n--- a/src/material/form-field/_form-field-focus-overlay.scss\n+++ b/src/material/form-field/_form-field-focus-overlay.scss\n@@ -1,5 +1,5 @@\n-@use '@material/ripple/functions' as mdc-ripple-functions;\n-@use '@material/textfield' as mdc-textfield;\n+@use '../core/tokens/m2/mat/form-field' as tokens-mat-form-field;\n+@use '../core/tokens/token-utils';\n @use '../core/style/layout-common';\n \n // MDC text-field uses `@material/ripple` in order to show a focus and hover effect for\n@@ -13,24 +13,19 @@\n   .mat-mdc-form-field-focus-overlay {\n     @include layout-common.fill;\n     opacity: 0;\n-    // Make sure we don't block click on the prefix/suffix.\n-    pointer-events: none;\n-  }\n-}\n-\n-@mixin private-form-field-focus-overlay-color() {\n-  $focus-opacity: mdc-ripple-functions.states-opacity(mdc-textfield.$ink-color, focus);\n-  $hover-opacity: mdc-ripple-functions.states-opacity(mdc-textfield.$ink-color, hover);\n+    pointer-events: none; // Make sure we don't block click on the prefix/suffix.\n \n-  .mat-mdc-form-field-focus-overlay {\n-    background-color: mdc-textfield.$ink-color;\n-  }\n+    @include token-utils.use-tokens(\n+      tokens-mat-form-field.$prefix, tokens-mat-form-field.get-token-slots()) {\n+      @include token-utils.create-token-slot(background-color, state-layer-color);\n \n-  .mat-mdc-form-field:hover .mat-mdc-form-field-focus-overlay {\n-    opacity: $hover-opacity;\n-  }\n+      .mat-mdc-form-field:hover & {\n+        @include token-utils.create-token-slot(opacity, hover-state-layer-opacity);\n+      }\n \n-  .mat-mdc-form-field.mat-focused .mat-mdc-form-field-focus-overlay {\n-    opacity: $focus-opacity;\n+      .mat-mdc-form-field.mat-focused & {\n+        @include token-utils.create-token-slot(opacity, focus-state-layer-opacity);\n+      }\n+    }\n   }\n }\ndiff --git a/src/material/form-field/_form-field-native-select.scss b/src/material/form-field/_form-field-native-select.scss\nindex 32e7eecc089a35b21bdab3e139969849c500505c..0b2cab89d6b2b434f24712155a8f8183e6a69da9 100644\n--- a/src/material/form-field/_form-field-native-select.scss\n+++ b/src/material/form-field/_form-field-native-select.scss\n@@ -1,8 +1,6 @@\n-@use 'sass:map';\n @use 'sass:math';\n-@use '@material/theme/theme-color' as mdc-theme-color;\n-@use '../core/theming/palette';\n-@use '../core/mdc-helpers/mdc-helpers';\n+@use '../core/tokens/m2/mat/form-field' as tokens-mat-form-field;\n+@use '../core/tokens/token-utils';\n \n // Width of the Material Design form-field select arrow.\n $mat-form-field-select-arrow-width: 10px;\n@@ -12,6 +10,8 @@ $mat-form-field-select-arrow-height: 5px;\n // that the absolute positioned arrow does not overlap the select content.\n $mat-form-field-select-horizontal-end-padding: $mat-form-field-select-arrow-width + 5px;\n \n+$_tokens: tokens-mat-form-field.$prefix, tokens-mat-form-field.get-token-slots();\n+\n // Mixin that creates styles for native select controls in a form-field.\n @mixin private-form-field-native-select() {\n   // Remove the native select down arrow and ensure that the native appearance\n@@ -30,6 +30,18 @@ $mat-form-field-select-horizontal-end-padding: $mat-form-field-select-arrow-widt\n     &:not(:disabled) {\n       cursor: pointer;\n     }\n+\n+    &:not(.mat-mdc-native-select-inline) {\n+      @include token-utils.use-tokens($_tokens...) {\n+        option {\n+          @include token-utils.create-token-slot(color, select-option-text-color);\n+        }\n+\n+        option:disabled {\n+          @include token-utils.create-token-slot(color, select-disabled-option-text-color);\n+        }\n+      }\n+    }\n   }\n \n   // Native select elements with the `matInput` directive should have Material Design\n@@ -52,12 +64,26 @@ $mat-form-field-select-horizontal-end-padding: $mat-form-field-select-arrow-widt\n       // Make the arrow non-clickable so the user can click on the form control under it.\n       pointer-events: none;\n \n+      @include token-utils.use-tokens($_tokens...) {\n+        @include token-utils.create-token-slot(color, enabled-select-arrow-color);\n+      }\n+\n       [dir='rtl'] & {\n         right: auto;\n         left: 0;\n       }\n     }\n \n+    @include token-utils.use-tokens($_tokens...) {\n+      &.mat-focused .mat-mdc-form-field-infix::after {\n+        @include token-utils.create-token-slot(color, focus-select-arrow-color);\n+      }\n+\n+      &.mat-form-field-disabled .mat-mdc-form-field-infix::after {\n+        @include token-utils.create-token-slot(color, disabled-select-arrow-color);\n+      }\n+    }\n+\n     // Add padding on the end of the native select so that the content does not\n     // overlap with the Material Design arrow.\n     .mat-mdc-form-field-input-control {\n@@ -69,66 +95,3 @@ $mat-form-field-select-horizontal-end-padding: $mat-form-field-select-arrow-widt\n     }\n   }\n }\n-\n-// Gets the color to use for some text that is highlighted while a select has focus.\n-@function _get-focused-arrow-color($palette) {\n-  @return rgba(mdc-theme-color.prop-value($palette), 0.87);\n-}\n-\n-@mixin private-form-field-native-select-color($config) {\n-  @include mdc-helpers.using-mdc-theme($config) {\n-    // These values are taken from the MDC select implementation:\n-    // https://github.com/material-components/material-components-web/blob/master/packages/mdc-select/_select-theme.scss\n-    $dropdown-icon-color: rgba(mdc-theme-color.prop-value(on-surface), 0.54);\n-    $disabled-dropdown-icon-color: rgba(mdc-theme-color.prop-value(on-surface), 0.38);\n-\n-    select.mat-mdc-form-field-input-control:not(.mat-mdc-native-select-inline) {\n-      // On dark themes we set the native `select` color to some shade of white,\n-      // however the color propagates to all of the `option` elements, which are\n-      // always on a white background inside the dropdown, causing them to blend in.\n-      // Since we can't change background of the dropdown, we need to explicitly\n-      // reset the color of the options to something dark.\n-      @if (map.get($config, is-dark)) {\n-        option {\n-          color: palette.$dark-primary-text;\n-        }\n-\n-        option:disabled {\n-          color: palette.$dark-disabled-text;\n-        }\n-      }\n-    }\n-\n-    .mat-mdc-form-field-type-mat-native-select {\n-      .mat-mdc-form-field-infix::after {\n-        color: $dropdown-icon-color;\n-      }\n-\n-      &.mat-focused {\n-        &.mat-primary {\n-          .mat-mdc-form-field-infix::after {\n-            color: _get-focused-arrow-color(primary);\n-          }\n-        }\n-\n-        &.mat-accent {\n-          .mat-mdc-form-field-infix::after {\n-            color: _get-focused-arrow-color(secondary);\n-          }\n-        }\n-\n-        &.mat-warn {\n-          .mat-mdc-form-field-infix::after {\n-            color: _get-focused-arrow-color(error);\n-          }\n-        }\n-      }\n-\n-      &.mat-form-field-disabled {\n-        .mat-mdc-form-field-infix::after {\n-          color: $disabled-dropdown-icon-color;\n-        }\n-      }\n-    }\n-  }\n-}\ndiff --git a/src/material/form-field/_form-field-subscript.scss b/src/material/form-field/_form-field-subscript.scss\nindex bc11c802e3d6f79073f64b1de918e11399d62856..32cd09cb1aefaf44dbbf4499edee67320e09cb00 100644\n--- a/src/material/form-field/_form-field-subscript.scss\n+++ b/src/material/form-field/_form-field-subscript.scss\n@@ -1,8 +1,8 @@\n-@use '@material/textfield' as mdc-textfield;\n-@use '@material/theme/theme' as mdc-theme;\n @use '@material/typography' as mdc-typography;\n @use '@material/textfield/variables' as mdc-textfield-variables;\n \n+@use '../core/tokens/m2/mat/form-field' as tokens-mat-form-field;\n+@use '../core/tokens/token-utils';\n @use '../core/theming/theming';\n @use '../core/mdc-helpers/mdc-helpers';\n @use './form-field-sizing';\n@@ -58,13 +58,11 @@\n   // Single error message displayed beneath the form field underline.\n   .mat-mdc-form-field-error {\n     display: block;\n-  }\n-}\n \n-@mixin private-form-field-subscript-color() {\n-  // MDC does not have built-in error treatment.\n-  .mat-mdc-form-field-error {\n-    @include mdc-theme.prop(color, mdc-textfield.$error);\n+    @include token-utils.use-tokens(\n+      tokens-mat-form-field.$prefix, tokens-mat-form-field.get-token-slots()) {\n+      @include token-utils.create-token-slot(color, error-text-color);\n+    }\n   }\n }\n \ndiff --git a/src/material/form-field/_form-field-theme.scss b/src/material/form-field/_form-field-theme.scss\nindex 0bb560c13e68799befd36838b6a5152dc54e4d01..18d26c61c011ac94380f0481722f59664ea1a1cb 100644\n--- a/src/material/form-field/_form-field-theme.scss\n+++ b/src/material/form-field/_form-field-theme.scss\n@@ -12,9 +12,6 @@\n @use '../core/tokens/token-utils';\n @use './form-field-density';\n @use './form-field-subscript';\n-@use './form-field-focus-overlay';\n-@use './form-field-native-select';\n-@use './mdc-text-field-theme-variable-refresh';\n \n @mixin color($config-or-theme) {\n   $config: theming.get-color-config($config-or-theme);\n@@ -28,50 +25,22 @@\n       tokens-mat-form-field.get-color-tokens($config));\n   }\n \n-  @include mdc-helpers.using-mdc-theme($config) {\n-    @include mdc-text-field-theme-variable-refresh.private-text-field-refresh-theme-variables() {\n-      @include form-field-subscript.private-form-field-subscript-color();\n-      @include form-field-focus-overlay.private-form-field-focus-overlay-color();\n-      @include form-field-native-select.private-form-field-native-select-color($config);\n-\n-      .mat-mdc-form-field.mat-accent {\n-        @include mdc-filled-text-field-theme.theme(\n-          tokens-mdc-filled-text-field.private-get-color-palette-color-tokens($config, accent));\n-        @include mdc-outlined-text-field-theme.theme(\n-          tokens-mdc-outlined-text-field.private-get-color-palette-color-tokens($config, accent));\n-      }\n-\n-      .mat-mdc-form-field.mat-warn {\n-        @include mdc-filled-text-field-theme.theme(\n-          tokens-mdc-filled-text-field.private-get-color-palette-color-tokens($config, warn));\n-        @include mdc-outlined-text-field-theme.theme(\n-          tokens-mdc-outlined-text-field.private-get-color-palette-color-tokens($config, warn));\n-      }\n-\n-      // This fixes an issue where the notch appears to be thicker than the rest of the outline when\n-      // zoomed in on Chrome. The border inconsistency seems to be some kind of rendering artifact\n-      // that arises from a combination of the fact that the notch contains text, while the leading\n-      // and trailing outline do not, combined with the fact that the border is semi-transparent.\n-      // Experimentally, I discovered that adding a transparent left border fixes the inconsistency.\n-      // Note: class name is repeated to achieve sufficient specificity over the various MDC states.\n-      // (hover, focus, etc.)\n-      // TODO(mmalerba): port this fix into MDC\n-      // TODO(crisbeto): move this into the structural styles\n-      .mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field {\n-        &.mat-mdc-form-field.mat-mdc-form-field .mdc-notched-outline__notch {\n-          border-left: 1px solid transparent;\n-        }\n-      }\n+  .mat-mdc-form-field.mat-accent {\n+    @include mdc-filled-text-field-theme.theme(\n+      tokens-mdc-filled-text-field.private-get-color-palette-color-tokens($config, accent));\n+    @include mdc-outlined-text-field-theme.theme(\n+      tokens-mdc-outlined-text-field.private-get-color-palette-color-tokens($config, accent));\n+    @include token-utils.create-token-values(tokens-mat-form-field.$prefix,\n+      tokens-mat-form-field.private-get-color-palette-color-tokens($config, accent));\n+  }\n \n-      [dir='rtl'] {\n-        .mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field {\n-          &.mat-mdc-form-field.mat-mdc-form-field .mdc-notched-outline__notch {\n-            border-left: none;\n-            border-right: 1px solid transparent;\n-          }\n-        }\n-      }\n-    }\n+  .mat-mdc-form-field.mat-warn {\n+    @include mdc-filled-text-field-theme.theme(\n+      tokens-mdc-filled-text-field.private-get-color-palette-color-tokens($config, warn));\n+    @include mdc-outlined-text-field-theme.theme(\n+      tokens-mdc-outlined-text-field.private-get-color-palette-color-tokens($config, warn));\n+    @include token-utils.create-token-values(tokens-mat-form-field.$prefix,\n+      tokens-mat-form-field.private-get-color-palette-color-tokens($config, warn));\n   }\n }\n \ndiff --git a/src/material/form-field/_mdc-text-field-structure-overrides.scss b/src/material/form-field/_mdc-text-field-structure-overrides.scss\nindex 5c35f0a325634f609ddf41c5208dbb881b1deda3..382c6c6f79d92a7749658daf899a8a32b1f13cac 100644\n--- a/src/material/form-field/_mdc-text-field-structure-overrides.scss\n+++ b/src/material/form-field/_mdc-text-field-structure-overrides.scss\n@@ -154,4 +154,24 @@\n     content: none;\n   }\n \n+  // This fixes an issue where the notch appears to be thicker than the rest of the outline when\n+  // zoomed in on Chrome. The border inconsistency seems to be some kind of rendering artifact\n+  // that arises from a combination of the fact that the notch contains text, while the leading\n+  // and trailing outline do not, combined with the fact that the border is semi-transparent.\n+  // Experimentally, I discovered that adding a transparent left border fixes the inconsistency.\n+  // Note: class name is repeated to achieve sufficient specificity over the various MDC states.\n+  // (hover, focus, etc.)\n+  // TODO(mmalerba): port this fix into MDC\n+  .mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field {\n+    &.mat-mdc-form-field.mat-mdc-form-field .mdc-notched-outline__notch {\n+      border-left: 1px solid transparent;\n+    }\n+  }\n+\n+  [dir='rtl'] .mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field {\n+    &.mat-mdc-form-field.mat-mdc-form-field .mdc-notched-outline__notch {\n+      border-left: none;\n+      border-right: 1px solid transparent;\n+    }\n+  }\n }\ndiff --git a/src/material/form-field/_mdc-text-field-theme-variable-refresh.scss b/src/material/form-field/_mdc-text-field-theme-variable-refresh.scss\ndeleted file mode 100644\nindex bb85e7a9a15abb3d9226d2728ee98aaa96875d6c..0000000000000000000000000000000000000000\n--- a/src/material/form-field/_mdc-text-field-theme-variable-refresh.scss\n+++ /dev/null\n@@ -1,88 +0,0 @@\n-@use '@material/textfield' as mdc-textfield;\n-@use '@material/theme/variables' as mdc-theme-variables;\n-@use 'sass:color';\n-@use 'sass:meta';\n-\n-// Mixin that refreshes the MDC text-field theming variables. This mixin should be used when\n-// the base MDC theming variables have been explicitly updated, but the component specific\n-// theming-based variables are still based on the old MDC base theming variables. The mixin\n-// restores the previous values for the variables to avoid unexpected global side effects.\n-@mixin private-text-field-refresh-theme-variables() {\n-  $_disabled-border: mdc-textfield.$disabled-border;\n-  mdc-textfield.$disabled-border:\n-    _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.06);\n-  $_bottom-line-hover: mdc-textfield.$bottom-line-hover;\n-  mdc-textfield.$bottom-line-hover:\n-    _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.87);\n-  $_bottom-line-idle: mdc-textfield.$bottom-line-idle;\n-  mdc-textfield.$bottom-line-idle:\n-    _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.42);\n-  $_label: mdc-textfield.$label;\n-  mdc-textfield.$label: _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.6);\n-  $_ink-color: mdc-textfield.$ink-color;\n-  mdc-textfield.$ink-color: _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.87);\n-  $_focused-label-color: mdc-textfield.$focused-label-color;\n-  mdc-textfield.$focused-label-color:\n-    _variable-safe-rgba(mdc-theme-variables.prop-value(primary), 0.87);\n-  $_placeholder-ink-color: mdc-textfield.$placeholder-ink-color;\n-  mdc-textfield.$placeholder-ink-color:\n-    _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.6);\n-  $_disabled-label-color: mdc-textfield.$disabled-label-color;\n-  mdc-textfield.$disabled-label-color:\n-    _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.38);\n-  $_disabled-ink-color: mdc-textfield.$disabled-ink-color;\n-  mdc-textfield.$disabled-ink-color:\n-    _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.38);\n-  $_disabled-placeholder-ink-color: mdc-textfield.$disabled-placeholder-ink-color;\n-  mdc-textfield.$disabled-placeholder-ink-color:\n-      _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.38);\n-  $_background: mdc-textfield.$background;\n-  mdc-textfield.$background: _variable-safe-mix(mdc-theme-variables.prop-value(on-surface),\n-    mdc-theme-variables.prop-value(surface), 4%);\n-  $_disabled-background: mdc-textfield.$disabled-background;\n-  mdc-textfield.$disabled-background: _variable-safe-mix(mdc-theme-variables.prop-value(on-surface),\n-    mdc-theme-variables.prop-value(surface), 2%);\n-  $_outlined-idle-border: mdc-textfield.$outlined-idle-border;\n-  mdc-textfield.$outlined-idle-border:\n-    _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.38);\n-  $_outlined-disabled-border: mdc-textfield.$outlined-disabled-border;\n-  mdc-textfield.$outlined-disabled-border:\n-    _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.06);\n-  $_outlined-hover-border: mdc-textfield.$outlined-hover-border;\n-  mdc-textfield.$outlined-hover-border:\n-    _variable-safe-rgba(mdc-theme-variables.prop-value(on-surface), 0.87);\n-\n-  // The content will be generated with the refreshed MDC text-field theming variables.\n-  @content;\n-\n-  // Reset all variables to ensure that this mixin does not cause unexpected side effects.\n-  mdc-textfield.$disabled-border: $_disabled-border;\n-  mdc-textfield.$bottom-line-hover: $_bottom-line-hover;\n-  mdc-textfield.$bottom-line-idle: $_bottom-line-idle;\n-  mdc-textfield.$label: $_label;\n-  mdc-textfield.$ink-color: $_ink-color;\n-  mdc-textfield.$focused-label-color: $_focused-label-color;\n-  mdc-textfield.$placeholder-ink-color: $_placeholder-ink-color;\n-  mdc-textfield.$disabled-label-color: $_disabled-label-color;\n-  mdc-textfield.$disabled-ink-color: $_disabled-ink-color;\n-  mdc-textfield.$disabled-placeholder-ink-color: $_disabled-placeholder-ink-color;\n-  mdc-textfield.$background: $_background;\n-  mdc-textfield.$disabled-background: $_disabled-background;\n-  mdc-textfield.$outlined-idle-border: $_outlined-idle-border;\n-  mdc-textfield.$outlined-disabled-border: $_outlined-disabled-border;\n-  mdc-textfield.$outlined-hover-border: $_outlined-hover-border;\n-}\n-\n-@function _variable-safe-rgba($color, $opacity) {\n-  @if (meta.type-of($color) == color) {\n-    @return rgba($color, $opacity);\n-  }\n-  @return $color;\n-}\n-\n-@function _variable-safe-mix($first-color, $second-color, $amount) {\n-  @if (meta.type-of($first-color) == color and meta.type-of($second-color) == color) {\n-    @return color.mix($first-color, $second-color, $amount);\n-  }\n-  @return $first-color;\n-}\ndiff --git a/src/material/form-field/form-field.scss b/src/material/form-field/form-field.scss\nindex f4240c54cb9d62fdab60013fd6d763d741d4c3af..55f20ee71b0dd6c72b5d2abf6ba743aa15592761 100644\n--- a/src/material/form-field/form-field.scss\n+++ b/src/material/form-field/form-field.scss\n@@ -11,8 +11,10 @@\n @use '../core/tokens/token-utils';\n @use '../core/mdc-helpers/mdc-helpers';\n @use '../core/style/vendor-prefixes';\n+@use '../core/tokens/m2/mat/form-field' as tokens-mat-form-field;\n @use '../core/tokens/m2/mdc/filled-text-field' as tokens-mdc-filled-text-field;\n @use '../core/tokens/m2/mdc/outlined-text-field' as tokens-mdc-outlined-text-field;\n+@use '../core/style/sass-utils';\n @use './form-field-sizing';\n @use './form-field-subscript';\n @use './form-field-focus-overlay';\n@@ -41,6 +43,12 @@\n @include mdc-custom-properties.configure(\n   $emit-fallback-values: false, $emit-fallback-vars: false) {\n \n+  @include sass-utils.current-selector-or-root() {\n+    @include token-utils.create-token-values(\n+      tokens-mat-form-field.$prefix,\n+      tokens-mat-form-field.get-unthemable-tokens());\n+  }\n+\n   .mdc-text-field--filled {\n     @include token-utils.create-token-values(\n       tokens-mdc-filled-text-field.$prefix,\n",
+      "diff_sha256": "d0b01dd4cbde36eecec21df4c17f6ab2c16b815952ed2d0707c33ea87a038084",
+      "complete_original_paths": [
+        "src/material/core/tokens/m2/mat/_form-field.scss",
+        "src/material/core/tokens/m2/mdc/_filled-text-field.scss",
+        "src/material/core/tokens/m2/mdc/_outlined-text-field.scss",
+        "src/material/form-field/BUILD.bazel",
+        "src/material/form-field/_form-field-focus-overlay.scss",
+        "src/material/form-field/_form-field-native-select.scss",
+        "src/material/form-field/_form-field-subscript.scss",
+        "src/material/form-field/_form-field-theme.scss",
+        "src/material/form-field/_mdc-text-field-structure-overrides.scss",
+        "src/material/form-field/_mdc-text-field-theme-variable-refresh.scss",
+        "src/material/form-field/form-field.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/core/tokens/m2/mat/_form-field.scss",
+        "src/material/core/tokens/m2/mdc/_filled-text-field.scss",
+        "src/material/core/tokens/m2/mdc/_outlined-text-field.scss",
+        "src/material/form-field/BUILD.bazel",
+        "src/material/form-field/_form-field-focus-overlay.scss",
+        "src/material/form-field/_form-field-native-select.scss",
+        "src/material/form-field/_form-field-subscript.scss",
+        "src/material/form-field/_form-field-theme.scss",
+        "src/material/form-field/_mdc-text-field-structure-overrides.scss",
+        "src/material/form-field/_mdc-text-field-theme-variable-refresh.scss",
+        "src/material/form-field/form-field.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/core/tokens/m2/mat/_form-field.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,6 +1,8 @@",
+          "hunk_sha256": "44c97cec58441c6b5cc2541d94ca2cac101d4db730d9247d437c097460359186",
+          "status": "reviewed",
+          "decision": "Adds theming and palette dependencies for the new color token map. The untouched16model deliberately keeps the older one-placeholder color map, while its already-present typography dependency serves the independent typography recipe. Retain the original16module imports and the separate current public-state bridge."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mat/_form-field.scss",
+          "hunk_index": 1,
+          "header": "@@ -13,12 +15,43 @@ $prefix: (mat, form-field);",
+          "hunk_sha256": "70582219f890524e20cabd41e6e1c918361f41a83328cab6636231b9c4cd886c",
+          "status": "reviewed",
+          "decision": "Expands the color map to10keys: merges primary focus-arrow color and emits state/error/native-option/arrow/opacity tokens. It replaces concrete style rules with inherited custom properties elsewhere in this patch. The current owned16map remains exact tagged source; its separate public bridge emits exactly3state keys from refreshed historical ink. Six whole-CSS state cases at each actual minimum preserve the original CSS plus that finite insertion. Do not substitute the full tokenized color model."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_filled-text-field.scss",
+          "hunk_index": 0,
+          "header": "@@ -133,7 +133,7 @@ $prefix: (mdc, filled-text-field);",
+          "hunk_sha256": "b8d6d037b125176e35a667f3bd74f5d0ece4c33224f11b4ac18213bb2484a678",
+          "status": "reviewed",
+          "decision": "Comment-only correction from slide-toggle to text-field wording; no token value or runtime behavior changes in this hunk. Review it as part of the full patch; it does not authorize changing the finite historical model."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_outlined-text-field.scss",
+          "hunk_index": 0,
+          "header": "@@ -116,7 +116,7 @@ $prefix: (mdc, outlined-text-field);",
+          "hunk_sha256": "7d6b246b2536d04655e6c25880efbf9961735e05e2948a08b091b19a25b4253a",
+          "status": "reviewed",
+          "decision": "Comment-only correction describing the text-field palette helper. No functional source change; retained owned source remains byte-identical to the tagged model."
+        },
+        {
+          "path": "src/material/form-field/BUILD.bazel",
+          "hunk_index": 0,
+          "header": "@@ -30,7 +30,6 @@ sass_library(",
+          "hunk_sha256": "627f387e3784bf73aeb8f248586e1729aa2b9e46bc01055d8ad49fd9146a96da",
+          "status": "reviewed",
+          "decision": "Drops the deleted refresh helper from an upstream Bazel Sass source list. This add-on does not inherit that build/release graph, and its retained16ordinary form-field theme still calls its locally owned refresh helper. No upstream build automation or source-list deletion is adopted."
+        },
+        {
+          "path": "src/material/form-field/_form-field-focus-overlay.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,5 +1,5 @@",
+          "hunk_sha256": "07097163b1a3408f200fc45dbf38f101b329d05686212b6312b882a7bc64a400",
+          "status": "reviewed",
+          "decision": "Replaces MDC ripple/text-field imports with mat form-field token namespaces. The retained16focus helper still computes historical focus/hover values from the refreshed ink, and remains exact16after vendor-import relocation."
+        },
+        {
+          "path": "src/material/form-field/_form-field-focus-overlay.scss",
+          "hunk_index": 1,
+          "header": "@@ -13,24 +13,19 @@",
+          "hunk_sha256": "340486750625c3bc0b8d508c37c80f0c93f60a3677a801eaba4fa30b67298f91",
+          "status": "reviewed",
+          "decision": "Moves background/hover/focus declarations into the structural focus-overlay mixin using token slots, retaining the pointer-events-none behavior. It removes the old separate color helper. The16facade retains the original host-hover/focus selectors and color allocation; the finite public3-token bridge preserves current public peer consumption. No component structure or styles are changed."
+        },
+        {
+          "path": "src/material/form-field/_form-field-native-select.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,8 +1,6 @@",
+          "hunk_sha256": "e2563cf86ee138ec0027116b277d6029089bbdf7856a634cbc7f999ce67941bd",
+          "status": "reviewed",
+          "decision": "Replaces map, MDC theme-color, palette and MDC-helper imports with token maps/slot utilities. The owned native-select module is the unchanged16implementation after import relocation, so its existing color helper dependencies remain necessary."
+        },
+        {
+          "path": "src/material/form-field/_form-field-native-select.scss",
+          "hunk_index": 1,
+          "header": "@@ -12,6 +10,8 @@ $mat-form-field-select-arrow-height: 5px;",
+          "hunk_sha256": "36db05ab94fb34dc0cf290f0e0f742b27082721890d1a685189f81a639e71b5b",
+          "status": "reviewed",
+          "decision": "Creates a shared token-prefix/slot tuple for the following native-select slot emission. The16native-select API uses the historical concrete-color helper and requires no new consumer token tuple."
+        },
+        {
+          "path": "src/material/form-field/_form-field-native-select.scss",
+          "hunk_index": 2,
+          "header": "@@ -30,6 +30,18 @@ $mat-form-field-select-horizontal-end-padding: $mat-form-field-select-arrow-widt",
+          "hunk_sha256": "0e5760b2680eae3c87103a262d63775347f061cebf140fac89f7f0717b819a2f",
+          "status": "reviewed",
+          "decision": "Moves option and disabled-option colors into structural native-select token slots, including explicit light-theme inherit/GrayText values. The16implementation retains its historically scoped dark-dropdown reset rules. This is a style-allocation change, not a legacy component fix."
+        },
+        {
+          "path": "src/material/form-field/_form-field-native-select.scss",
+          "hunk_index": 3,
+          "header": "@@ -52,12 +64,26 @@ $mat-form-field-select-horizontal-end-padding: $mat-form-field-select-arrow-widt",
+          "hunk_sha256": "57606dbdf91bbf4f0f015507af98a182307c27b4332b26af36bbb167ff4a329e",
+          "status": "reviewed",
+          "decision": "Moves enabled/focused/disabled arrow colors into structural slots while preserving RTL position/padding logic. The original16focused arrow uses palette-specific0.87alpha and old host classes; a compiled arrow-color fault is detected by the source probe. Preserve that historical contract and geometry."
+        },
+        {
+          "path": "src/material/form-field/_form-field-native-select.scss",
+          "hunk_index": 4,
+          "header": "@@ -69,66 +95,3 @@ $mat-form-field-select-horizontal-end-padding: $mat-form-field-select-arrow-widt",
+          "hunk_sha256": "ccabc87ef170bb99415e4973e070ed848d3d9b7a2c2bc2deb0ffcfda271fb6f0",
+          "status": "reviewed",
+          "decision": "Removes the focused-arrow color function and the whole color mixin, including dark option treatment and primary/accent/warn/disabled branches. The retained16caller still invokes this helper under the refreshed theme variables. Removing it would break the historical color facade; no wholesale source replay."
+        },
+        {
+          "path": "src/material/form-field/_form-field-subscript.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,8 +1,8 @@",
+          "hunk_sha256": "fdf7de9e3c215b935ddb2e2f2c866727796695479f6d3c6eeeae4ce8793c4f4a",
+          "status": "reviewed",
+          "decision": "Replaces MDC text-field/theme imports with token namespaces while retaining typography/sizing context. The16tag retains its old color imports and independently incorporated typography token dependencies; preserve that combined baseline."
+        },
+        {
+          "path": "src/material/form-field/_form-field-subscript.scss",
+          "hunk_index": 1,
+          "header": "@@ -58,13 +58,11 @@",
+          "hunk_sha256": "5b03aa9ff0929abab8ee10b06a4b2a43e25dab4772ad8e28f7eb6d202aaf5ad0",
+          "status": "reviewed",
+          "decision": "Moves error-text color from the separate color helper to structural token emission. The16tag keeps the older error color helper and its established allocation of caption token slots. Legacy hint/error DOM and padding remain untouched."
+        },
+        {
+          "path": "src/material/form-field/_form-field-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -12,9 +12,6 @@",
+          "hunk_sha256": "772a2ae59911120842db6322bb7e68086623a69a6c5dede7e60627bb2d424163",
+          "status": "reviewed",
+          "decision": "Removes imports of the focus overlay, native select and refresh helper. All three are still needed by the exact16color recipe and existing bridge. The owned theme equals the tag after only MDC relocation and the exact previously qualified bridge insertion."
+        },
+        {
+          "path": "src/material/form-field/_form-field-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -28,50 +25,22 @@",
+          "hunk_sha256": "91e19aa96c787d70a98981af470dab826c8fd3d0064ba23302c4ce0a1a0b7e27",
+          "status": "reviewed",
+          "decision": "Removes old concrete subscript/focus/native-select color calls and the refresh wrapper, emits new accent/warn arrow tokens, and moves the notch border/RTL workaround out of the theme. The controlled original snapshots show different color CSS allocations before/after; neither is silently substituted for the tagged16oracle. Retain the original16color CSS plus exactly the current public3-token insertion."
+        },
+        {
+          "path": "src/material/form-field/_mdc-text-field-structure-overrides.scss",
+          "hunk_index": 0,
+          "header": "@@ -154,4 +154,24 @@",
+          "hunk_sha256": "307097cec8d3783e8a8054a0ad07a44d3a950f63522c8763977e6c289ab141c7",
+          "status": "reviewed",
+          "decision": "Moves the repeated-specificity notch border workaround and RTL reset into modern structural styles. That modern component resource is not shipped by this add-on; the16theme retains its own historical workaround. This does not authorize a modern component fork or a legacy selector/geometry change."
+        },
+        {
+          "path": "src/material/form-field/_mdc-text-field-theme-variable-refresh.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,88 +0,0 @@",
+          "hunk_sha256": "55a2755776398e7f2e3ffd8d7c6ab9082f7f0c0e263ea88e0dd64597c2c761a2",
+          "status": "reviewed",
+          "decision": "Deletes all88lines of the refresh helper, including cached global values, refreshed16MDC colors, the content call, every restore, and variable-safe color helpers. Its after-tree member is explicitly absent, not an empty Sass module. The owned helper is exact16after MDC import relocation and is still called by the historical color theme; it must remain locally owned. Both identity and actual absent-module failure controls cover this deletion."
+        },
+        {
+          "path": "src/material/form-field/form-field.scss",
+          "hunk_index": 0,
+          "header": "@@ -11,8 +11,10 @@",
+          "hunk_sha256": "9b0436cfbd8da652aa61463177c552c0a8f1a40a36b36255c9645354b63752ab",
+          "status": "reviewed",
+          "decision": "Adds the mat token namespace and selector-or-root utility to the modern component resource. That resource is owned by current peers, while MatLegacyFormField binds its separate historical HTML and appearance styles."
+        },
+        {
+          "path": "src/material/form-field/form-field.scss",
+          "hunk_index": 1,
+          "header": "@@ -41,6 +43,12 @@",
+          "hunk_sha256": "997bc691bc3c0a6051a71f12122c66d0200a0a949d440162f0d8cdca0cb83bd2",
+          "status": "reviewed",
+          "decision": "Adds root emission of unthemable mat form-field values inside MDC custom-property configuration. The source map is empty in this context, but the structural wiring is reviewed. The add-on keeps its finite historical model and does not fork the modern resource."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/_index.scss",
+          "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+          "bytes": 14151
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field-fill.scss",
+          "sha256": "f8ae9a499a7bdcd5b4ec2522b66d2fac6c290630c0b2fa4c47da9c779d5fa15d",
+          "bytes": 2762
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field-input.scss",
+          "sha256": "8dc187ec61b21252220ef168712485166447e1f09f44120151a01da85dfe28fa",
+          "bytes": 7432
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field-legacy.scss",
+          "sha256": "bf174708fa01a9d4cbd6919e0695152818783bb81c38ffa8e15829e6fdc085b2",
+          "bytes": 1802
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field-outline.scss",
+          "sha256": "14ab7d5a327fb1ef1617fd40d529428dc23415060a9528be81cf73b805328e76",
+          "bytes": 4409
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field-standard.scss",
+          "sha256": "09785a086ca278dd9b996ac215cba4d0438e7f2c2e9f731d10da098fe90f5068",
+          "bytes": 1894
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67",
+          "bytes": 4574
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+          "sha256": "d77ca5a115ac70fbd9eb2cc37f73ccb3fe86c16f3318749883f68f9e1182d26b",
+          "bytes": 8698
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+          "bytes": 27236
+        },
+        {
+          "path": "projects/ngx-material-legacy/package.json",
+          "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d",
+          "bytes": 1397
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+          "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+          "bytes": 975
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_form-field.scss",
+          "sha256": "c3fc633a3b4a55ab6bab6f1fbd8e6359717050a49c567d3d2d93da513bf07d4c",
+          "bytes": 3455
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_filled-text-field.scss",
+          "sha256": "353e28f911a61ab7056d782dc486cc5198865e5f76ac79d09a85bcb74d45af40",
+          "bytes": 6783
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_outlined-text-field.scss",
+          "sha256": "0eafbb209b722f228eea5d813367db2a21eb160ab5809425751f2ba3278380cb",
+          "bytes": 5994
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+          "sha256": "f6bd446f5e7931d0349f6b59a11b3c63a4974ef0d4de10a56412936fb796be9e",
+          "bytes": 1518
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_form-field-native-select.scss",
+          "sha256": "0a637a368e2114addf51c6dae477ecce4c989169c92bc3e86745f63c9b560851",
+          "bytes": 4858
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_form-field-subscript.scss",
+          "sha256": "fd03751fd99faf64b49ff6bd615f503574c416006cd8fa4c061d8265ec67c9d9",
+          "bytes": 2635
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+          "sha256": "c9ecd831e3a2f771b82a86626875e0f4638e832c231b672e554b994d1e0dc623",
+          "bytes": 5119
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_mdc-text-field-theme-variable-refresh.scss",
+          "sha256": "8b80fcce844454324123d761f71e7a4c9088d3f52b778d544e2161621d99adf1",
+          "bytes": 4648
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-fill-theme.scss",
+          "sha256": "a0e144cda09659ead66eeaa7193406f08eecf02f0069b94bafc1d048a1f367e1",
+          "bytes": 5311
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-legacy-theme.scss",
+          "sha256": "f0468140a9d22db1095a386da15f3055236d7fa2c80dbb3f738070c4619dce0b",
+          "bytes": 9027
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-outline-theme.scss",
+          "sha256": "8c54240a46f3222cb9279cf7909fe9547d49c25d6c1788ff04ed2b5c44dd81d6",
+          "bytes": 6750
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-standard-theme.scss",
+          "sha256": "6df9f1ee202304ee4d8277024aff5b0a9b1c3972d37fda5ecf984c640952a7ef",
+          "bytes": 2188
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-theme.scss",
+          "sha256": "3d9f82fc2196ccff48a1e0adf21fbf718cf10db117cb9db5431e78af583bc244",
+          "bytes": 10229
+        }
+      ],
+      "decision": "Do not adopt the wholesale modern color-token refactor or delete the locally owned16refresh/helper styles. Preserve exact historical color rules and legacy resources, plus the separately qualified3public current-peer state tokens derived from historical refreshed ink. Native-select/error/notch allocation stays at the tagged16baseline. No consumer HTML/CSS/SCSS or TypeScript API change is needed.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    },
+    {
+      "sha": "c0b3aa524115e9b2b2b5fabd2e7cec44111b8e0e",
+      "family": "form-field-typography-tokenization",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "already-adapted",
+      "diff": "diff --git a/src/material/core/tokens/m2/mat/_form-field.scss b/src/material/core/tokens/m2/mat/_form-field.scss\nindex 3902f10593a6ed17b94dda2dc869ac7ab04d0c58..e17a0bafb0a065375af19e5473fc0feb619bafc8 100644\n--- a/src/material/core/tokens/m2/mat/_form-field.scss\n+++ b/src/material/core/tokens/m2/mat/_form-field.scss\n@@ -3,6 +3,7 @@\n @use '../../../style/sass-utils';\n @use '../../../theming/theming';\n @use '../../../theming/palette';\n+@use '../../../typography/typography-utils';\n \n // The prefix used to generate the fully qualified name for tokens in this file.\n $prefix: (mat, form-field);\n@@ -57,7 +58,34 @@ $prefix: (mat, form-field);\n \n // Tokens that can be configured through Angular Material's typography theming API.\n @function get-typography-tokens($config) {\n-  @return ();\n+  $fallback-font-family: typography-utils.font-family($config);\n+\n+  @return (\n+    // MDC uses `subtitle1` for the input value, placeholder and floating label. The spec\n+    // shows `body1` for text fields though, so we manually override the typography.\n+    // Note: Form controls inherit the typography from the parent form field.\n+    container-text-font: typography-utils.font-family($config, body-1) or $fallback-font-family,\n+    container-text-line-height: typography-utils.line-height($config, body-1),\n+    container-text-size: typography-utils.font-size($config, body-1),\n+    container-text-tracking: typography-utils.letter-spacing($config, body-1),\n+    container-text-weight: typography-utils.font-weight($config, body-1),\n+\n+    // In the container styles, we updated the floating label to use the `body-1` typography level.\n+    // The MDC notched outline overrides this accidentally (only when the label floats) to a\n+    // `rem`-based value. This results in different label widths when floated/docked and ultimately\n+    // breaks the notch width as it has been measured in the docked state (where `body-1` is\n+    // applied). We try to unset these styles set by the `mdc-notched-outline`:\n+    // https://github.com/material-components/material-components-web/blob/master/packages/mdc-notched-outline/_mixins.scss#L272-L292.\n+    // This is why we can't use their `label-text-populated-size` token and we have to declare\n+    // our own version of it.\n+    outlined-label-text-populated-size: typography-utils.font-size($config, body-1),\n+\n+    subscript-text-font: typography-utils.font-family($config, caption) or $fallback-font-family,\n+    subscript-text-line-height: typography-utils.line-height($config, caption),\n+    subscript-text-size: typography-utils.font-size($config, caption),\n+    subscript-text-tracking: typography-utils.letter-spacing($config, caption),\n+    subscript-text-weight: typography-utils.font-weight($config, caption),\n+  );\n }\n \n // Tokens that can be configured through Angular Material's density theming API.\ndiff --git a/src/material/core/tokens/m2/mdc/_filled-text-field.scss b/src/material/core/tokens/m2/mdc/_filled-text-field.scss\nindex ef2c25b51bf68bc133946e50b5139ff2b45babab..effdae253989b5f68e52e13bc10ff46fd3212342 100644\n--- a/src/material/core/tokens/m2/mdc/_filled-text-field.scss\n+++ b/src/material/core/tokens/m2/mdc/_filled-text-field.scss\n@@ -88,6 +88,7 @@ $prefix: (mdc, filled-text-field);\n     error-hover-state-layer-opacity: null,\n     hover-state-layer-color: null,\n     hover-state-layer-opacity: null,\n+    label-text-line-height: null, // We override the line height to `normal` so don't emit a slot.\n   );\n }\n \n@@ -151,7 +152,6 @@ $prefix: (mdc, filled-text-field);\n \n   @return (\n     label-text-font: typography-utils.font-family($config, body-1) or $fallback-font-family,\n-    label-text-line-height: typography-utils.line-height($config, body-1),\n     label-text-size: typography-utils.font-size($config, body-1),\n     label-text-tracking: typography-utils.letter-spacing($config, body-1),\n     label-text-weight: typography-utils.font-weight($config, body-1),\ndiff --git a/src/material/core/tokens/m2/mdc/_outlined-text-field.scss b/src/material/core/tokens/m2/mdc/_outlined-text-field.scss\nindex 588a2c5deb519f764c643d7f15cd06dbfa7a5375..77cc3e71fe464ee36822785f160a942f059652a3 100644\n--- a/src/material/core/tokens/m2/mdc/_outlined-text-field.scss\n+++ b/src/material/core/tokens/m2/mdc/_outlined-text-field.scss\n@@ -82,6 +82,7 @@ $prefix: (mdc, outlined-text-field);\n     error-input-text-color: null,\n     focus-input-text-color: null,\n     hover-input-text-color: null,\n+    label-text-line-height: null, // We override the line height to `normal` so don't emit a slot.\n   );\n }\n \n@@ -134,7 +135,6 @@ $prefix: (mdc, outlined-text-field);\n \n   @return (\n     label-text-font: typography-utils.font-family($config, body-1) or $fallback-font-family,\n-    label-text-line-height: typography-utils.line-height($config, body-1),\n     label-text-size: typography-utils.font-size($config, body-1),\n     label-text-tracking: typography-utils.letter-spacing($config, body-1),\n     label-text-weight: typography-utils.font-weight($config, body-1),\ndiff --git a/src/material/form-field/_form-field-subscript.scss b/src/material/form-field/_form-field-subscript.scss\nindex 32cd09cb1aefaf44dbbf4499edee67320e09cb00..ff0795c929edbfc45aee29b4be7a4116f792d2f3 100644\n--- a/src/material/form-field/_form-field-subscript.scss\n+++ b/src/material/form-field/_form-field-subscript.scss\n@@ -3,8 +3,6 @@\n \n @use '../core/tokens/m2/mat/form-field' as tokens-mat-form-field;\n @use '../core/tokens/token-utils';\n-@use '../core/theming/theming';\n-@use '../core/mdc-helpers/mdc-helpers';\n @use './form-field-sizing';\n \n @mixin private-form-field-subscript() {\n@@ -59,22 +57,24 @@\n   .mat-mdc-form-field-error {\n     display: block;\n \n-    @include token-utils.use-tokens(\n-      tokens-mat-form-field.$prefix, tokens-mat-form-field.get-token-slots()) {\n+    @include token-utils.use-tokens(tokens-mat-form-field.$prefix,\n+      tokens-mat-form-field.get-token-slots()) {\n       @include token-utils.create-token-slot(color, error-text-color);\n     }\n   }\n-}\n-\n-// We need to define our own typography for the subscript because we don't include MDC's\n-// helper text in our MDC based form field\n-@mixin private-form-field-subscript-typography($config-or-theme) {\n-  $config: theming.get-typography-config($config-or-theme);\n \n   // The subscript wrapper has a minimum height to avoid that the form-field\n   // jumps when hints or errors are displayed.\n   .mat-mdc-form-field-subscript-wrapper,\n   .mat-mdc-form-field-bottom-align::before {\n-    @include mdc-typography.typography(caption, $query: mdc-helpers.$mdc-typography-styles-query);\n+    @include token-utils.use-tokens(tokens-mat-form-field.$prefix,\n+      tokens-mat-form-field.get-token-slots()) {\n+      @include mdc-typography.smooth-font();\n+      @include token-utils.create-token-slot(font-family, subscript-text-font);\n+      @include token-utils.create-token-slot(line-height, subscript-text-line-height);\n+      @include token-utils.create-token-slot(font-size, subscript-text-size);\n+      @include token-utils.create-token-slot(letter-spacing, subscript-text-tracking);\n+      @include token-utils.create-token-slot(font-weight, subscript-text-weight);\n+    }\n   }\n }\ndiff --git a/src/material/form-field/_form-field-theme.scss b/src/material/form-field/_form-field-theme.scss\nindex 18d26c61c011ac94380f0481722f59664ea1a1cb..51a3bfd12ad0d4f559e54029b6c328e661d41e3e 100644\n--- a/src/material/form-field/_form-field-theme.scss\n+++ b/src/material/form-field/_form-field-theme.scss\n@@ -1,17 +1,14 @@\n @use '@material/textfield/filled-text-field-theme' as mdc-filled-text-field-theme;\n @use '@material/textfield/outlined-text-field-theme' as mdc-outlined-text-field-theme;\n-@use '@material/typography/typography' as mdc-typography;\n \n @use '../core/tokens/m2/mdc/filled-text-field' as tokens-mdc-filled-text-field;\n @use '../core/tokens/m2/mdc/outlined-text-field' as tokens-mdc-outlined-text-field;\n @use '../core/tokens/m2/mat/form-field' as tokens-mat-form-field;\n @use '../core/theming/theming';\n @use '../core/typography/typography';\n-@use '../core/mdc-helpers/mdc-helpers';\n @use '../core/style/sass-utils';\n @use '../core/tokens/token-utils';\n @use './form-field-density';\n-@use './form-field-subscript';\n \n @mixin color($config-or-theme) {\n   $config: theming.get-color-config($config-or-theme);\n@@ -53,36 +50,8 @@\n       tokens-mdc-filled-text-field.get-typography-tokens($config));\n     @include mdc-outlined-text-field-theme.theme(\n       tokens-mdc-outlined-text-field.get-typography-tokens($config));\n-  }\n-\n-  @include mdc-helpers.using-mdc-typography($config) {\n-    @include form-field-subscript.private-form-field-subscript-typography($config);\n-\n-    // MDC uses `subtitle1` for the input value, placeholder and floating label. The spec\n-    // shows `body1` for text fields though, so we manually override the typography.\n-    // Note: Form controls inherit the typography from the parent form field.\n-    .mat-mdc-form-field {\n-      @include mdc-typography.typography(body1, $query: mdc-helpers.$mdc-typography-styles-query);\n-    }\n-\n-    // TODO(crisbeto): we may be able to set this style with the `label-text-populated-size` token.\n-    // Above, we updated the floating label to use the `body1` typography level. The MDC notched\n-    // outline overrides this accidentally (only when the label floats) to a `rem`-based value.\n-    // This results in different label widths when floated/docked and ultimately breaks the notch\n-    // width as it has been measured in the docked state (where `body1` is applied). We try to\n-    // unset these styles set by the `mdc-notched-outline`:\n-    // https://github.com/material-components/material-components-web/blob/master/packages/mdc-notched-outline/_mixins.scss#L272-L292.\n-    .mat-mdc-form-field .mdc-text-field--outlined {\n-      // For the non-upgraded notch label (i.e. when rendered on the server), also\n-      // use the correct `body1` typography level.\n-      .mdc-floating-label--float-above {\n-        font-size: calc(#{\n-            mdc-typography.get-size(body1)} * var(--mat-mdc-form-field-floating-label-scale, 0.75));\n-      }\n-      .mdc-notched-outline--upgraded .mdc-floating-label--float-above {\n-        font-size: mdc-typography.get-size(body1);\n-      }\n-    }\n+    @include token-utils.create-token-values(tokens-mat-form-field.$prefix,\n+      tokens-mat-form-field.get-typography-tokens($config));\n   }\n }\n \ndiff --git a/src/material/form-field/form-field.scss b/src/material/form-field/form-field.scss\nindex 55f20ee71b0dd6c72b5d2abf6ba743aa15592761..e09cf5c67cc3f047f2530f19558294c5e3948065 100644\n--- a/src/material/form-field/form-field.scss\n+++ b/src/material/form-field/form-field.scss\n@@ -8,6 +8,7 @@\n @use '@material/line-ripple/line-ripple' as mdc-line-ripple;\n @use '@material/line-ripple/line-ripple-theme' as mdc-line-ripple-theme;\n @use '@material/theme/custom-properties' as mdc-custom-properties;\n+@use '@material/typography' as mdc-typography;\n @use '../core/tokens/token-utils';\n @use '../core/mdc-helpers/mdc-helpers';\n @use '../core/style/vendor-prefixes';\n@@ -95,6 +96,30 @@\n   [dir='rtl'] & {\n     text-align: right;\n   }\n+\n+  @include token-utils.use-tokens(tokens-mat-form-field.$prefix,\n+    tokens-mat-form-field.get-token-slots()) {\n+    @include mdc-typography.smooth-font();\n+    @include token-utils.create-token-slot(font-family, container-text-font);\n+    @include token-utils.create-token-slot(line-height, container-text-line-height);\n+    @include token-utils.create-token-slot(font-size, container-text-size);\n+    @include token-utils.create-token-slot(letter-spacing, container-text-tracking);\n+    @include token-utils.create-token-slot(font-weight, container-text-weight);\n+\n+    .mdc-text-field--outlined {\n+      $token-value: var(#{token-utils.get-token-variable(outlined-label-text-populated-size)});\n+\n+      // For the non-upgraded notch label (i.e. when rendered on the server), also\n+      // use the correct typography.\n+      .mdc-floating-label--float-above {\n+        font-size: calc(#{$token-value} * var(--mat-mdc-form-field-floating-label-scale));\n+      }\n+\n+      .mdc-notched-outline--upgraded .mdc-floating-label--float-above {\n+        font-size: $token-value;\n+      }\n+    }\n+  }\n }\n \n // Container that contains the prefixes, infix and suffixes. These elements should\n",
+      "diff_sha256": "9d811eb66577b7bad35de157025c538219b33b0a46d3ba0ee98d81ee72532305",
+      "complete_original_paths": [
+        "src/material/core/tokens/m2/mat/_form-field.scss",
+        "src/material/core/tokens/m2/mdc/_filled-text-field.scss",
+        "src/material/core/tokens/m2/mdc/_outlined-text-field.scss",
+        "src/material/form-field/_form-field-subscript.scss",
+        "src/material/form-field/_form-field-theme.scss",
+        "src/material/form-field/form-field.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/core/tokens/m2/mat/_form-field.scss",
+        "src/material/core/tokens/m2/mdc/_filled-text-field.scss",
+        "src/material/core/tokens/m2/mdc/_outlined-text-field.scss",
+        "src/material/form-field/_form-field-subscript.scss",
+        "src/material/form-field/_form-field-theme.scss",
+        "src/material/form-field/form-field.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/core/tokens/m2/mat/_form-field.scss",
+          "hunk_index": 0,
+          "header": "@@ -3,6 +3,7 @@",
+          "hunk_sha256": "d53983dcf38810126773c4d489c901a81e9e2fdd85354d3ff6940d6f4164fbcb",
+          "status": "reviewed",
+          "decision": "Adds typography-utils for the populated token map. The untouched16tag and actual owned map already contain this import, independently of the declined color expansion."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mat/_form-field.scss",
+          "hunk_index": 1,
+          "header": "@@ -57,7 +58,34 @@ $prefix: (mat, form-field);",
+          "hunk_sha256": "925b896768d7cd08250669a858e1fbb438cf5e02aff376879fa839442932a532",
+          "status": "reviewed",
+          "decision": "Adds11typography keys for body-1 container text, outlined floated-label size and caption text, with per-level font fallback. The entire function body/parameter list is already byte-identical in the untouched16tag and owned model. Actual post-refactor typography output equals the untouched16oracle on both minima; retain it without a new source change."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_filled-text-field.scss",
+          "hunk_index": 0,
+          "header": "@@ -88,6 +88,7 @@ $prefix: (mdc, filled-text-field);",
+          "hunk_sha256": "e7a256e7e7bbb68ab1d9e86648e0db6a0630ff64015064fd65643d6994ae94c2",
+          "status": "reviewed",
+          "decision": "Sets label-text-line-height to null in the unthemable slot map because the structural label overrides it to normal. This exact null slot is already present in the tagged16and owned filled-field model."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_filled-text-field.scss",
+          "hunk_index": 1,
+          "header": "@@ -151,7 +152,6 @@ $prefix: (mdc, filled-text-field);",
+          "hunk_sha256": "44abd848a504af52dc7dfd218b54f2fb0fd80047a79f598ad1ca41b0c750fc9f",
+          "status": "reviewed",
+          "decision": "Removes label-text-line-height from the configurable typography map. The whole resulting typography function is already identical to the tagged16body. Preserve the original16slot suppression and remaining font/size/tracking/weight values."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_outlined-text-field.scss",
+          "hunk_index": 0,
+          "header": "@@ -82,6 +82,7 @@ $prefix: (mdc, outlined-text-field);",
+          "hunk_sha256": "36f2d09fa49bf032ab3a739cb65bc631258e5dfbe324e4b5806de217d3169294",
+          "status": "reviewed",
+          "decision": "Adds the same explicit null line-height slot to the outlined-field model. It is already part of the untouched16and owned model; no new token or layout change is required."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_outlined-text-field.scss",
+          "hunk_index": 1,
+          "header": "@@ -134,7 +135,6 @@ $prefix: (mdc, outlined-text-field);",
+          "hunk_sha256": "5953ad88bf233fe4099fa4a725ad74da1120a99851905e55519b42a15013e63f",
+          "status": "reviewed",
+          "decision": "Removes configurable label line-height, retaining the other typography values. The complete after-function is already identical to the tagged16and owned model; keep it."
+        },
+        {
+          "path": "src/material/form-field/_form-field-subscript.scss",
+          "hunk_index": 0,
+          "header": "@@ -3,8 +3,6 @@",
+          "hunk_sha256": "11aa135d7f2be7884647025096fb8366d1ffba20a53d0612cafb1242e18ed3c0",
+          "status": "reviewed",
+          "decision": "Removes theming and MDC-helper imports used only by the old separate typography mixin. The16tag already omits those imports; it keeps other MDC color imports for its older color contract."
+        },
+        {
+          "path": "src/material/form-field/_form-field-subscript.scss",
+          "hunk_index": 1,
+          "header": "@@ -59,22 +57,24 @@",
+          "hunk_sha256": "8fd239b8acbb2a3a1afdd1579f36cc9fce53e5ffcd09c39751218e2f15285255",
+          "status": "reviewed",
+          "decision": "Replaces the old caption typography helper with token slots and font smoothing in the structural subscript mixin; it also reformats the earlier error-color slot. The16tag already owns the same five caption token bindings but retains their historical allocation inside its color helper alongside concrete error color. Retain this tagged allocation and the legacy subscript resources; the newer modern structural allocation is not an add-on component requirement."
+        },
+        {
+          "path": "src/material/form-field/_form-field-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,17 +1,14 @@",
+          "hunk_sha256": "0371c0d8a9a689d886b0244011d97ec99424fb8b7558c33b94ebe14061a58a71",
+          "status": "reviewed",
+          "decision": "Removes direct MDC typography and old helper dependencies from the modern theme. The16tag already has no direct MDC typography import, while retaining helper/subscript imports for the separate older color recipe. Do not replay the coupled import list over that retained color contract."
+        },
+        {
+          "path": "src/material/form-field/_form-field-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -53,36 +50,8 @@",
+          "hunk_sha256": "25666baf65e2fd8e3275fb7e92a5a6aa8d945406c14715d06152df9855bed6b2",
+          "status": "reviewed",
+          "decision": "Replaces direct caption/body1/notch typography CSS with the11mat typography values under the current selector. The entire typography mixin body and parameters already match the untouched16tag. Controlled post-refactor default CSS and the actual owned typography call both equal the original1055-byte oracle on both minima. Preserve this already incorporated public Sass behavior."
+        },
+        {
+          "path": "src/material/form-field/form-field.scss",
+          "hunk_index": 0,
+          "header": "@@ -8,6 +8,7 @@",
+          "hunk_sha256": "c5244620ce6619b2968c2c6412db36e60e5ecb5c191b00a4acfe737630a7214f",
+          "status": "reviewed",
+          "decision": "Adds MDC typography to the modern structural resource for smoothing. This concerns the modern component implementation, not MatLegacyFormField; no ordinary component fork is introduced."
+        },
+        {
+          "path": "src/material/form-field/form-field.scss",
+          "hunk_index": 1,
+          "header": "@@ -95,6 +96,30 @@",
+          "hunk_sha256": "d9a8d28e5ffd03ea6d8bde694727e95d6ab15d0dab4cb5fda7d90a2aa621c57e",
+          "status": "reviewed",
+          "decision": "Adds container font slots and outlined floated-label sizing to modern structural styles, consuming the new typography map. Those underlying typography recipes are already in the tagged16model. The legacy component continues to bind its original form-field HTML and appearance resources; current peers own their modern structural styles."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/_index.scss",
+          "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+          "bytes": 14151
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field-fill.scss",
+          "sha256": "f8ae9a499a7bdcd5b4ec2522b66d2fac6c290630c0b2fa4c47da9c779d5fa15d",
+          "bytes": 2762
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field-input.scss",
+          "sha256": "8dc187ec61b21252220ef168712485166447e1f09f44120151a01da85dfe28fa",
+          "bytes": 7432
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field-legacy.scss",
+          "sha256": "bf174708fa01a9d4cbd6919e0695152818783bb81c38ffa8e15829e6fdc085b2",
+          "bytes": 1802
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field-outline.scss",
+          "sha256": "14ab7d5a327fb1ef1617fd40d529428dc23415060a9528be81cf73b805328e76",
+          "bytes": 4409
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field-standard.scss",
+          "sha256": "09785a086ca278dd9b996ac215cba4d0438e7f2c2e9f731d10da098fe90f5068",
+          "bytes": 1894
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.html",
+          "sha256": "ba085f6bf41f4fb7f189935f326c2b75d7dfd2abd0717c2688337747766b2e67",
+          "bytes": 4574
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.scss",
+          "sha256": "d77ca5a115ac70fbd9eb2cc37f73ccb3fe86c16f3318749883f68f9e1182d26b",
+          "bytes": 8698
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-form-field/form-field.ts",
+          "sha256": "580387e18e311ed166b078623d3f9889611f459349f1468371f07d9a2e281582",
+          "bytes": 27236
+        },
+        {
+          "path": "projects/ngx-material-legacy/package.json",
+          "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d",
+          "bytes": 1397
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/bridges/_form-field-state-overrides.scss",
+          "sha256": "c953a6c0df04dd73b443548f4872f62fa0704881590ccb508bd7db7741f391fc",
+          "bytes": 975
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_form-field.scss",
+          "sha256": "c3fc633a3b4a55ab6bab6f1fbd8e6359717050a49c567d3d2d93da513bf07d4c",
+          "bytes": 3455
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_filled-text-field.scss",
+          "sha256": "353e28f911a61ab7056d782dc486cc5198865e5f76ac79d09a85bcb74d45af40",
+          "bytes": 6783
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mdc/_outlined-text-field.scss",
+          "sha256": "0eafbb209b722f228eea5d813367db2a21eb160ab5809425751f2ba3278380cb",
+          "bytes": 5994
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_form-field-focus-overlay.scss",
+          "sha256": "f6bd446f5e7931d0349f6b59a11b3c63a4974ef0d4de10a56412936fb796be9e",
+          "bytes": 1518
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_form-field-native-select.scss",
+          "sha256": "0a637a368e2114addf51c6dae477ecce4c989169c92bc3e86745f63c9b560851",
+          "bytes": 4858
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_form-field-subscript.scss",
+          "sha256": "fd03751fd99faf64b49ff6bd615f503574c416006cd8fa4c061d8265ec67c9d9",
+          "bytes": 2635
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_form-field-theme.scss",
+          "sha256": "c9ecd831e3a2f771b82a86626875e0f4638e832c231b672e554b994d1e0dc623",
+          "bytes": 5119
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/form-field/_mdc-text-field-theme-variable-refresh.scss",
+          "sha256": "8b80fcce844454324123d761f71e7a4c9088d3f52b778d544e2161621d99adf1",
+          "bytes": 4648
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-fill-theme.scss",
+          "sha256": "a0e144cda09659ead66eeaa7193406f08eecf02f0069b94bafc1d048a1f367e1",
+          "bytes": 5311
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-legacy-theme.scss",
+          "sha256": "f0468140a9d22db1095a386da15f3055236d7fa2c80dbb3f738070c4619dce0b",
+          "bytes": 9027
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-outline-theme.scss",
+          "sha256": "8c54240a46f3222cb9279cf7909fe9547d49c25d6c1788ff04ed2b5c44dd81d6",
+          "bytes": 6750
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-standard-theme.scss",
+          "sha256": "6df9f1ee202304ee4d8277024aff5b0a9b1c3972d37fda5ecf984c640952a7ef",
+          "bytes": 2188
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-form-field/_form-field-theme.scss",
+          "sha256": "3d9f82fc2196ccff48a1e0adf21fbf718cf10db117cb9db5431e78af583bc244",
+          "bytes": 10229
+        }
+      ],
+      "decision": "The applicable typography token recipes and public Sass behavior are already incorporated in the untouched16baseline and retained owned model. Preserve those exact recipes and the tagged color/subscript allocation. The newer modern component structural placement is owned by current peers and requires no legacy component fork or consumer CSS/SCSS/HTML change. This already-adapted source decision does not claim that every upstream modern resource hunk was copied.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    }
+  ],
+  "actual_line_scopes": [
+    {
+      "path": "compatibility/rc/21x-c04-form-field-tokenization-measurement-21x.json",
+      "sha256": "bbd65ea07625c5217455c2916a059fdf0eee20f5959ca0f4230efaf31d1df892",
+      "bytes": 434990
+    },
+    {
+      "path": "compatibility/rc/21x-c04-form-field-tokenization-measurement-main.json",
+      "sha256": "61dd4b06c224d11162ba2f390bcafc7c190ce2d9ca3db41f35f091162d312c69",
+      "bytes": 436480
+    }
+  ],
+  "prior_existing_state_bridge_evidence": [
+    {
+      "path": "compatibility/rc/form-field-state-token-bridge-source-proof.json",
+      "sha256": "107b155bb529fd14b9be566f04b5a5f758cd71ffe46e8290d3651bae1707b6c9",
+      "bytes": 140220
+    },
+    {
+      "path": "compatibility/rc/form-field-state-sass-contract-source-proof.json",
+      "sha256": "7678b156cc6919c5efd7ab40cdb3e4994083397172a40dda17fdd8dc107e394f",
+      "bytes": 28874
+    },
+    {
+      "path": "compatibility/rc/form-field-state-aggregate-source-proof.json",
+      "sha256": "544b86df25dc220a27eb1b63e03723f012a2a406b18c5fc81726a006c01c0da2",
+      "bytes": 142223
+    }
+  ],
+  "read_only_consumer_sanity": {
+    "consumer": "~/cyph",
+    "scope": "Read-only rg-discoverable shared/css/**/*.scss",
+    "scss_files_scanned": 12,
+    "retained_call_and_selector_counts": {
+      "legacy-form-field-theme": 4,
+      "all-legacy-component-themes": 3
+    },
+    "matching_file_subjects": [
+      {
+        "path": "shared/css/mixins.scss",
+        "sha256": "03bcd7b1b907de9e1d829f81ca10053e2494e91ab19e2f5b92c4f4d8947308d9",
+        "bytes": 20525
+      }
+    ],
+    "consumer_files_written": 0,
+    "consumer_build_or_deployment_executed": false
+  },
+  "canonical_decisions_changed": 0,
+  "canonical_guard_or_owner_stage_integrated": false,
+  "pending_dispositions": 1328,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "g13_claim": "not-passed"
+}
