@@ -28,6 +28,7 @@ import unthemedAdmission from './upstream-unthemable-token-admission.cjs';
 import controlBaseAdmission from './upstream-modern-control-base-admission.cjs';
 import tokenRootAdmission from './upstream-theme-token-root-admission.cjs';
 import fieldTokenAdmission from './upstream-form-field-tokenization-admission.cjs';
+import boundaryAdmission from './upstream-m3-theme-boundary-admission.cjs';
 import {registeredSourceCheckerTransition,refreshRegisteredCheckerReferences} from './registered-source-checker-transition.mjs';
 import {sourceContractDefinitions} from './upstream-source-contract-registry.mjs';
 import {LEGACY_SASS_ENTRYPOINT_SHA,LEGACY_SASS_ENTRYPOINT_REVIEW,legacySassEntrypointProof,
@@ -953,6 +954,35 @@ function prepareFieldTokenStage({root,read,before,bound}){
   source.assertCurrent();return {before,after,individual_decisions:2,unselected_entries_preserved:1695,assertCurrent:source.assertCurrent};
 }
 
+function prepareBoundaryStage({root,read,before,bound}){
+  assert.equal(hash(before),'ad496e9e699918951057987997121de26e0e66a2c92940316658ae01a49df49a');
+  assert.equal(before.equals(gitBytes(root,'6e54c9a1c3dad72f65b048f8f19cb7faa18729dc',ledgerPath)),true);
+  const helper='scripts/upstream-m3-theme-boundary-admission.cjs',digest='0f849a2c0230e7ebeb496fad34cbd9ecd5c4cb6d15ead8cdbff6181223221e27';
+  assert.equal(hash(read(helper)),digest);bound.set(helper,digest);
+  for(const sha of boundaryAdmission.BOUNDARY_SHAS)assert.deepEqual(sourceContractDefinitions.find(row=>row.sha===sha),{
+    sha,proof_kind:'individual-historical-m3-theme-boundary-source-review',scope_key:'m3_theme_boundary_source_scope',module:'upstream-m3-theme-boundary-admission.cjs'});
+  const source=boundaryAdmission.inspectBoundarySource({root,read});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
+  const original=JSON.parse(before),expected=structuredClone(original),replacements=[];
+  assert.equal(original.closed_dispositions,371);assert.equal(original.open_or_deferred,1326);
+  for(const row of source.body.reviews){
+    const index=expected.entries.findIndex(entry=>entry.sha===row.sha);assert.ok(index>=0);const prior=expected.entries[index];
+    assert.equal(prior.final_disposition,'needs-individual-review');assert.equal(prior.evidence_report,null);
+    const entry={...prior,final_disposition:row.proposed_final_disposition,reason:row.decision,review_depth:'individual-compatibility',
+      evidence_report:boundaryAdmission.BOUNDARY_REVIEW,individual_proof:boundaryAdmission.boundaryProof(row)};
+    assert.equal(boundaryAdmission.sourceOk({root,read,entry,body:source.body,review:row,proof:entry.individual_proof}),true);
+    expected.entries[index]=entry;replacements.push({sha:row.sha,after_entry:entry});
+  }
+  assert.equal(replacements.length,5);expected.closed_dispositions=376;expected.open_or_deferred=1321;
+  const text=replaceHistoricalConsumerEntries(before,replacements).toString(),marker='"entries": [',split=text.indexOf(marker);assert.ok(split>=0);
+  let header=text.slice(0,split);
+  for(const [key,from,to]of [['closed_dispositions',371,376],['open_or_deferred',1326,1321]]){
+    const old='  "'+key+'": '+from+',',next='  "'+key+'": '+to+',';assert.equal(header.split(old).length,2);header=header.replace(old,next);
+  }
+  const after=Buffer.from(header+text.slice(split));assert.deepEqual(JSON.parse(after),expected);
+  assert.equal(hash(after),'22f775835030f175795d8865e9b30920b0b7fea5b908cbd6a9dca7775a71d779');
+  source.assertCurrent();return {before,after,individual_decisions:5,unselected_entries_preserved:1692,assertCurrent:source.assertCurrent};
+}
+
 export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {
   read = packedUpstreamLedgerRawRead({root, read});
   const input = read(inputPath), line = Object.keys(subjects).find(name => subjects[name].sha256 === hash(input));
@@ -1058,8 +1088,9 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const controlBase=line==='21.x'?prepareControlBaseStage({root,read:currentRead,before:registeredMetadata.after,bound}):null;
   const tokenRoot=line==='21.x'?prepareTokenRootStage({root,read:currentRead,before:controlBase.after,bound}):null;
   const fieldToken=line==='21.x'?prepareFieldTokenStage({root,read:currentRead,before:tokenRoot.after,bound}):null;
+  const boundary=line==='21.x'?prepareBoundaryStage({root,read:currentRead,before:fieldToken.after,bound}):null;
   specReaders.assertCurrent();
-  return {line, before, after, canonical_after:fieldToken?.after??tokenRoot?.after??controlBase?.after??registeredMetadata?.after??consumerWrapper.after,modern_control_base_stage:controlBase,theme_token_root_stage:tokenRoot,form_field_tokenization_stage:fieldToken,registered_checker_metadata_stage:registeredMetadata,unthemable_stage:unthemed,token_build_stage:tokenBuild,checker_reference_metadata_stage:checkerMetadata,legacy_sass_entrypoint_stage:sassEntrypoint,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
+  return {line, before, after, canonical_after:boundary?.after??fieldToken?.after??tokenRoot?.after??controlBase?.after??registeredMetadata?.after??consumerWrapper.after,modern_control_base_stage:controlBase,theme_token_root_stage:tokenRoot,form_field_tokenization_stage:fieldToken,m3_theme_boundary_stage:boundary,registered_checker_metadata_stage:registeredMetadata,unthemable_stage:unthemed,token_build_stage:tokenBuild,checker_reference_metadata_stage:checkerMetadata,legacy_sass_entrypoint_stage:sassEntrypoint,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
     input_sha256: hash(input),
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
     current_native_packed_or_floor_qualified: false};
@@ -1081,20 +1112,22 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   const registeredMetadataHash=prepared.registered_checker_metadata_stage?hash(prepared.registered_checker_metadata_stage.after):null;
   const controlBaseHash=prepared.modern_control_base_stage?hash(prepared.modern_control_base_stage.after):null;
   const tokenRootHash=prepared.theme_token_root_stage?hash(prepared.theme_token_root_stage.after):null;
-  const fieldApplied=Boolean(prepared.form_field_tokenization_stage)&&current===canonicalHash;
-  const rootApplied=Boolean(prepared.theme_token_root_stage)&&[tokenRootHash,canonicalHash].includes(current);
-  const controlApplied=Boolean(prepared.modern_control_base_stage)&&[controlBaseHash,tokenRootHash,canonicalHash].includes(current);
-  const tokenBuildApplied=Boolean(prepared.token_build_stage)&&[tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current);
-  const unthemedApplied=Boolean(prepared.unthemable_stage)&&[unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current);
-  const sassEntrypointApplied=Boolean(prepared.legacy_sass_entrypoint_stage)&&[sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current);
-  const selectionApplied=[nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current);
+  const fieldHash=prepared.form_field_tokenization_stage?hash(prepared.form_field_tokenization_stage.after):null;
+  const fieldApplied=Boolean(prepared.form_field_tokenization_stage)&&[fieldHash,canonicalHash].includes(current);
+  const boundaryApplied=Boolean(prepared.m3_theme_boundary_stage)&&current===canonicalHash;
+  const rootApplied=Boolean(prepared.theme_token_root_stage)&&[tokenRootHash,fieldHash,canonicalHash].includes(current);
+  const controlApplied=Boolean(prepared.modern_control_base_stage)&&[controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current);
+  const tokenBuildApplied=Boolean(prepared.token_build_stage)&&[tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current);
+  const unthemedApplied=Boolean(prepared.unthemable_stage)&&[unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current);
+  const sassEntrypointApplied=Boolean(prepared.legacy_sass_entrypoint_stage)&&[sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current);
+  const selectionApplied=[nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current);
   const testingHash=prepared.testing_api_stage?hash(prepared.testing_api_stage.after):null;
   const sassHash=hash(prepared.sass_stage.after);
   const rulesHash=hash(prepared.rules_js_stage.after);
   const summaryHash=hash(prepared.summary_stage.after);
   const landscapeHash=hash(prepared.autocomplete_landscape_stage.after);
   const nativeSpecHash=hash(prepared.native_spec_metadata_stage.after);
-  assert.ok([beforeHash,afterHash,testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
+  assert.ok([beforeHash,afterHash,testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
   const applied = current !== beforeHash;
   const assertCurrent = () => {
     prepared.sass_stage.assertExternal();
@@ -1112,6 +1145,7 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
     prepared.modern_control_base_stage?.assertCurrent();
     prepared.theme_token_root_stage?.assertCurrent();
     prepared.form_field_tokenization_stage?.assertCurrent();
+    prepared.m3_theme_boundary_stage?.assertCurrent();
     for (const [path, digest] of prepared.bound)
       assert.equal(hash(read(path)), digest, 'late current upstream subject change ' + path);
     const population = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '--',
@@ -1128,28 +1162,29 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   return {line: prepared.line, read: historical, raw: read, assertCurrent, applied,
     projected_metadata_paths: applied ? [ledgerPath] : [], entries_changed: 85,
     scalar_tokens_changed: 179,
-    testing_api_decisions_applied: [testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0,
-    sass_decisions_applied: [sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?6:0,
-    rules_js_decisions_applied:[rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?3:0,
-    summary_scalar_updates_applied:[summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?2:0,
-    autocomplete_landscape_decisions_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?1:0,
-    autocomplete_landscape_registry_digests_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?10:0,
-    individual_decisions_applied: ([testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0)+([sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?6:0)+([rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?3:0)+([landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?1:0)+(selectionApplied?3:0)+(sassEntrypointApplied?1:0)+(tokenBuildApplied?1:0)+(unthemedApplied?5:0)+(controlApplied?4:0)+(rootApplied?2:0)+(fieldApplied?2:0),
+    testing_api_decisions_applied: [testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0,
+    sass_decisions_applied: [sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?6:0,
+    rules_js_decisions_applied:[rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?3:0,
+    summary_scalar_updates_applied:[summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?2:0,
+    autocomplete_landscape_decisions_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?1:0,
+    autocomplete_landscape_registry_digests_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?10:0,
+    individual_decisions_applied: ([testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0)+([sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?6:0)+([rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?3:0)+([landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?1:0)+(selectionApplied?3:0)+(sassEntrypointApplied?1:0)+(tokenBuildApplied?1:0)+(unthemedApplied?5:0)+(controlApplied?4:0)+(rootApplied?2:0)+(fieldApplied?2:0)+(boundaryApplied?5:0),
     token_build_decisions_applied:tokenBuildApplied?1:0,
     unthemable_source_decisions_applied:unthemedApplied?5:0,
     modern_control_base_decisions_applied:controlApplied?4:0,
     theme_token_root_decisions_applied:rootApplied?2:0,
     form_field_tokenization_decisions_applied:fieldApplied?2:0,
-    registered_checker_metadata_tokens_applied:prepared.registered_checker_metadata_stage&&[registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?14:0,
+    m3_theme_boundary_decisions_applied:boundaryApplied?5:0,
+    registered_checker_metadata_tokens_applied:prepared.registered_checker_metadata_stage&&[registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?14:0,
     legacy_sass_entrypoint_decisions_applied:sassEntrypointApplied?1:0,
-    checker_reference_metadata_tokens_applied:prepared.checker_reference_metadata_stage&&[checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?14:0,
+    checker_reference_metadata_tokens_applied:prepared.checker_reference_metadata_stage&&[checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?14:0,
     selection_native_decisions_applied:selectionApplied?3:0,
     selection_native_registry_digests_applied:selectionApplied?11:0,
-    native_spec_source_digests_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?3:0,
-    native_spec_review_pointers_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?2:0,
-    historical_wrapper_metadata_entries_applied:[historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?4:0,
-    historical_wrapper_metadata_references_applied:[historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?4:0,
-    historical_consumer_wrapper_metadata_entries_applied:[consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?65:0,
-    historical_consumer_wrapper_metadata_references_applied:[consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,canonicalHash].includes(current)?65:0,
+    native_spec_source_digests_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?3:0,
+    native_spec_review_pointers_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?2:0,
+    historical_wrapper_metadata_entries_applied:[historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?4:0,
+    historical_wrapper_metadata_references_applied:[historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?4:0,
+    historical_consumer_wrapper_metadata_entries_applied:[consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?65:0,
+    historical_consumer_wrapper_metadata_references_applied:[consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,registeredMetadataHash,controlBaseHash,tokenRootHash,fieldHash,canonicalHash].includes(current)?65:0,
     current_native_packed_or_floor_or_g11_credit: false};
 }

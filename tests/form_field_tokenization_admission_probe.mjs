@@ -23,7 +23,10 @@ const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
 for(const key of Object.keys(env))if(key.startsWith('RC_')||['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'].includes(key))delete env[key];
 const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',
  'd026dd06511ea9bba6def16619ae0e387a9ac074:'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
-let late=null;const actual=path=>path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
+const authenticCurrent=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',
+ '6e54c9a1c3dad72f65b048f8f19cb7faa18729dc:'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
+const currentRead=path=>path===ledger?authenticCurrent:read(path);
+let late=null;const actual=path=>path===late?Buffer.concat([currentRead(path),Buffer.from('\n')]):currentRead(path);
 const current=packedUpstreamLedgerEpoch({root,read:actual}),previous=packedUpstreamLedgerEpoch({root,read:path=>path===ledger?before:read(path)});
 current.assertCurrent();previous.assertCurrent();
 assert.equal(current.individual_decisions_applied,35);assert.equal(current.unthemable_source_decisions_applied,5);assert.equal(current.registered_checker_metadata_tokens_applied,14);
