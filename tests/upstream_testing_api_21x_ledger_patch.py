@@ -55,16 +55,32 @@ for item in packet['entries']:
  assert new['final_disposition']==row['final_disposition'] and new['reason']==row['decision']
  assert new['individual_proof']['diff_sha256']==row['diff_sha256']
  s,e=spans[('entries',i)];edits.append((s,e,json.dumps(new,indent=2,ensure_ascii=False).replace('\n','\n    ')));changed.append(item['sha'])
+checker_path='scripts/check-upstream-audit-disposition.mjs'
+historical_checker=subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',
+ 'cda185336a04e813b0cfff5d3e51e5d4c91d7148:'+checker_path],cwd=r,env=env)
+assert h(historical_checker)==next(ref['sha256'] for ref in packet['code_subjects'] if ref['path']==checker_path)
 for item in packet['source_digest_updates']:
  i=bysha[item['sha']];path=tuple(item['path']);node=ledger['entries'][i]
  for part in path:node=node[part]
- assert node==item['before'];assert item['after']==h((r/'scripts/check-upstream-audit-disposition.mjs').read_bytes())
+ assert node==item['before'];assert item['after']==h(historical_checker)
  s,e=spans[('entries',i)+path];assert json.loads(text[s:e])==item['before'];edits.append((s,e,json.dumps(item['after'])));changed.append(item['sha'])
 chunks=[];end=0
 for s,e,new in sorted(edits):assert s>=end;chunks.extend([text[end:s],new]);end=e
 chunks.append(text[end:]);after=''.join(chunks).encode()
 assert len(changed)==len(set(changed))==10
-assert after==(r/p).read_bytes()
+current=(r/p).read_bytes()
+if after!=current:
+ # Preserve the exact seven-entry before/after proof while admitting only its
+ # separately authenticated six-Sass-decision successor as current metadata.
+ successor_bytes=(r/'compatibility/rc/upstream-sass-inspection-ledger-transition.json.gz').read_bytes()
+ assert h(successor_bytes)=='98d02b52e86689e4e05f4a750f044ee5c8a22f812ddb92dc9214d5156d298803'
+ successor=json.loads(gzip.decompress(successor_bytes))
+ assert successor['before']['sha256']==h(after)
+ assert successor['before']['source_parent']=='c360c994c814b10ad2432852a0c8a1fa0deeedbb'
+ proof=subprocess.run([sys.executable,'tests/sass_inspection_ledger_patch.py'],cwd=r,capture_output=True,text=True,check=True)
+ assert json.loads(proof.stdout)['canonical_applied'] is True
+else:
+ assert after==current
 assert h(after)==packet['after_sha256']
 afterrows=json.loads(after)['entries'];assert len(afterrows)==len(ledger['entries'])==1697
 assert [e['sha'] for e in afterrows]==[e['sha'] for e in ledger['entries']]

@@ -88,7 +88,17 @@ class SassInspectionScopeTests(unittest.TestCase):
                 self.assertEqual(SHA(row['diff'].encode()), row['diff_sha256'])
                 self.assertEqual(row['complete_original_paths'], [member['path'] for member in subject['members']])
                 entry = next(item for item in ledger['entries'] if item['sha'] == row['sha'])
-                self.assertEqual(SHA((json.dumps(entry, indent=2, ensure_ascii=False) + '\n').encode()), row['prior_entry_sha256'])
+                if SHA((json.dumps(entry, indent=2, ensure_ascii=False) + '\n').encode()) != row['prior_entry_sha256']:
+                    # The source proposal remains immutable after its separately
+                    # pinned canonical transition is applied.
+                    raw = (ROOT / 'compatibility/rc/upstream-sass-inspection-ledger-transition.json.gz').read_bytes()
+                    pins = {'main': '922c6f5ef0f7635db93e694931a9aa7e54762479418ed5b1330b27adf12cebc4',
+                            '21.x': '98d02b52e86689e4e05f4a750f044ee5c8a22f812ddb92dc9214d5156d298803'}
+                    self.assertEqual(SHA(raw), pins[line])
+                    transition = json.loads(gzip.decompress(raw))
+                    change = next(item for item in transition['entries'] if item['sha'] == row['sha'])
+                    self.assertEqual(change['before_entry_sha256'], row['prior_entry_sha256'])
+                    self.assertEqual(change['after_entry'], entry)
                 self.assertEqual(row['affected_branches'], [line])
                 self.assertEqual(row['proposed_final_disposition'], 'do-not-adopt')
                 self.assertFalse(row['canonical_admitted'])

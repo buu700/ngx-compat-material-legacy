@@ -102,7 +102,9 @@ assert.equal(context.current_successors, 25);
 assert.equal(context.raw(ledgerPath).equals(prepared.canonical_after), true);
 assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equals(prepared.canonical_after), true);
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
-assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?7:0);
+assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
+assert.equal(epoch.sass_decisions_applied,6);
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?13:6);
 if(input.line==='21.x'){
  const nextPath='compatibility/rc/upstream-testing-api-21x-ledger-transition.json.gz';
  rejects('changed-seven-individual-transition',path=>path===nextPath?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
@@ -114,6 +116,20 @@ if(input.line==='21.x'){
  rejects('changed-seven-individual-validator',path=>path===validator?Buffer.concat([read(path),Buffer.from('\n// changed\n')]):read(path));
 }
 
+
+const sassTransition='compatibility/rc/upstream-sass-inspection-ledger-transition.json.gz';
+rejects('changed-six-Sass-transition',path=>path===sassTransition?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+const sassValidator='scripts/upstream-sass-inspection-admission.mjs';
+rejects('changed-six-Sass-validator',path=>path===sassValidator?Buffer.concat([read(path),Buffer.from('\n// changed\n')]):read(path));
+const partialSass=JSON.parse(prepared.canonical_after),beforeSass=JSON.parse(prepared.sass_stage.before);
+const sassRow=partialSass.entries.find(row=>row.individual_proof?.sass_inspection);
+partialSass.entries[partialSass.entries.findIndex(row=>row.sha===sassRow.sha)]=beforeSass.entries.find(row=>row.sha===sassRow.sha);
+rejects('partial-six-Sass-admission',path=>path===ledgerPath?bytes(partialSass):read(path));
+let lateSass=false;
+const sassReview='compatibility/rc/upstream-sass-inspection-individual-review.json';
+const liveSass=packedUpstreamLedgerEpoch({root,read:path=>lateSass&&path===sassReview?Buffer.concat([read(path),Buffer.from(' ')]):read(path)});
+lateSass=true;assert.throws(()=>liveSass.read(ledgerPath));rejected.push('late-Sass-review-change');
+cases.push('six-source-decisions-are-qualified-current-epoch');
 
 console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   canonical_entries: 1697, qualified_source_entries: 85, changed_scalar_tokens: 179,
