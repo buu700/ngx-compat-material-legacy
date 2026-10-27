@@ -1,0 +1,465 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "source_review_complete": true,
+  "recorded_at_utc": "2026-10-27T22:00:17.143649+00:00",
+  "role": "Four separate complete original source/contract judgments; shared transport is not batch classification",
+  "originals": {
+    "path": "compatibility/rc/21x-c04-modern-control-base-originals.json.gz",
+    "sha256": "d9460655c30d17096c08123b394dfbb3f886b460fcda8819ab7005ef226fa782",
+    "bytes": 55832
+  },
+  "original_file_occurrences": 12,
+  "original_hunks": 17,
+  "original_before_after_blob_identities": 24,
+  "tagged_context_members": 17,
+  "reviews": [
+    {
+      "sha": "68096ec9d34aae793a7b3037c39e6ae7d1700933",
+      "family": "fab",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex 7b7680990015bbbcaff191fe800330d116b488c2..886aa472fb1fbecf62fafa90cacd2f50e71f26e2 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -88,7 +88,7 @@\n @forward './button/button-theme' as button-* show button-theme, button-color, button-typography,\n   button-density;\n @forward './button/fab-theme' as fab-* show fab-color, fab-typography,\n-  fab-density, fab-theme;\n+  fab-density, fab-theme, fab-base;\n @forward './button/icon-button-theme' as icon-button-* show icon-button-color,\n   icon-button-typography, icon-button-density, icon-button-theme;\n @forward './button-toggle/button-toggle-theme' as button-toggle-* show button-toggle-theme,\ndiff --git a/src/material/button/_fab-theme.scss b/src/material/button/_fab-theme.scss\nindex 9b359f0f7f3694e0e717bdfc4a5c782e9c5534b1..2865653cf25a064e299c8e7cd425fe3ecd1a577b 100644\n--- a/src/material/button/_fab-theme.scss\n+++ b/src/material/button/_fab-theme.scss\n@@ -5,11 +5,22 @@\n \n @use './button-theme-private';\n @use '../core/mdc-helpers/mdc-helpers';\n+@use '../core/style/sass-utils';\n @use '../core/theming/theming';\n @use '../core/tokens/m2/mdc/fab' as tokens-mdc-fab;\n @use '../core/tokens/m2/mdc/extended-fab' as tokens-mdc-extended-fab;\n @use '../core/typography/typography';\n \n+@mixin base($config-or-theme) {\n+  // Add default values for tokens not related to color, typography, or density.\n+  @include sass-utils.current-selector-or-root() {\n+    @include mdc-fab-theme.theme(tokens-mdc-fab.get-unthemable-tokens());\n+    @include mdc-extended-fab-theme.theme(\n+      tokens-mdc-extended-fab.get-unthemable-tokens()\n+    );\n+  }\n+}\n+\n @mixin _fab-variant($config, $foreground, $background) {\n   $color-config: map.merge(\n     $config,\n@@ -105,6 +116,7 @@\n     $density: theming.get-density-config($theme);\n     $typography: theming.get-typography-config($theme);\n \n+    @include base($theme);\n     @if $color != null {\n       @include color($color);\n     }\ndiff --git a/src/material/button/fab.scss b/src/material/button/fab.scss\nindex 2e279323991fb0879465f40a5937a2e622db57e1..581cb7bcb32ebf4655d77c4a3c80f4168bf76ac0 100644\n--- a/src/material/button/fab.scss\n+++ b/src/material/button/fab.scss\n@@ -22,17 +22,11 @@\n   .mat-mdc-fab, .mat-mdc-mini-fab {\n     // Add the official slots for the MDC fab.\n     @include mdc-fab-theme.theme-styles($mdc-fab-token-slots);\n-\n-    // Add default values for tokens that aren't outputted by the theming API.\n-    @include mdc-fab-theme.theme(m2-mdc-fab.get-unthemable-tokens());\n   }\n \n   .mat-mdc-extended-fab {\n     // Add the official slots for the MDC fab.\n     @include mdc-extended-fab-theme.theme-styles($mdc-extended-fab-token-slots);\n-\n-    // Add default values for tokens that aren't outputted by the theming API.\n-    @include mdc-extended-fab-theme.theme(m2-mdc-extended-fab.get-unthemable-tokens());\n   }\n }\n \n",
+      "diff_sha256": "16e3ff75df342311656648326f9e5aa4f9fc19d8391d460c40f9b580d672f642",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/button/_fab-theme.scss",
+        "src/material/button/fab.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/button/_fab-theme.scss",
+        "src/material/button/fab.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 0,
+          "header": "@@ -88,7 +88,7 @@",
+          "hunk_sha256": "1f3264031212b3cabeefc6f31152c4bd7ef9ca47519b34a1560058aa573f3f59",
+          "status": "reviewed",
+          "decision": "This root hunk adds fab-base to the modern forward list. The adjacent historical exports do not acquire an equivalent legacy base call. Both actual owned compiler runs retain all four modern16 names and three legacy-button names and omit the new name. Preserve the finite16 facade; do not add this post16 API."
+        },
+        {
+          "path": "src/material/button/_fab-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -5,11 +5,22 @@",
+          "hunk_sha256": "00891a4db8bd0f1dd999f405b7365ad377e20d462f9d14970f3dfd3b98ee04a5",
+          "status": "reviewed",
+          "decision": "The new base emits both MDC FAB and extended-FAB unthemable maps through current-selector-or-root; theme invokes it unconditionally before the existing optional color/density/typography blocks. The current retained fab theme is the untouched16 source after MDC import relocation only. The owned legacy button theme is a separate exact16 file, and round-button host attributes use the legacy button resource."
+        },
+        {
+          "path": "src/material/button/_fab-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -105,6 +116,7 @@",
+          "hunk_sha256": "1c188eba3611434f4cbaf78c2747f72660113a2d8118e3997c7059303e61291e",
+          "status": "reviewed",
+          "decision": "This separate theme hunk unconditionally invokes base before optional color/density/typography. The new base emits both MDC FAB and extended-FAB unthemable maps through current-selector-or-root; theme invokes it unconditionally before the existing optional color/density/typography blocks. The current retained fab theme is the untouched16 source after MDC import relocation only. The owned legacy button theme is a separate exact16 file, and round-button host attributes use the legacy button resource."
+        },
+        {
+          "path": "src/material/button/fab.scss",
+          "hunk_index": 0,
+          "header": "@@ -22,17 +22,11 @@",
+          "hunk_sha256": "576e4b0d238e48914cca84f8f037c4feb817253f631a5e09a7e23547b5582997",
+          "status": "reviewed",
+          "decision": "The structural hunk removes two default emissions from modern .mat-mdc-fab/.mat-mdc-mini-fab and .mat-mdc-extended-fab while retaining static/theme-slot output. The library owns legacy-button/button.scss, not this modern fab resource; its layout bodies equal the tagged legacy resource after owned import transport. Moving these modern defaults into the historical facade would couple an unowned modern component to a post16 API."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/_index.scss",
+          "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+          "bytes": 14151
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-button/button.html",
+          "sha256": "72ba2baa6286f061743e08da0d43bd3fa3d435587e6b9a653eed7e3295a0d3f9",
+          "bytes": 367
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-button/button.scss",
+          "sha256": "9e25ef35b4bbdbeca4c6514a25b50aeb4658cf33fe2a9a3683537c5bb5baaa02",
+          "bytes": 6546
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-button/button.ts",
+          "sha256": "6d37f01619672b62496d5ffb8bec6df6dfe32214893191644d46012424ff5bb4",
+          "bytes": 6700
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/button/_fab-theme.scss",
+          "sha256": "90e592f3533807ea23509a82a4976d9fa15a1a2fb9d855a3e1cb66eabb2737b1",
+          "bytes": 3606
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/style/_component-high-contrast.scss",
+          "sha256": "0468c17876aaf5a54a48a3f47eb084c83be5ee1a0a4e01ccdbd396ad905fb4cb",
+          "bytes": 1400
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-button/_button-theme.scss",
+          "sha256": "dbeccc67f7538f9e9b7529dd3226a45b0a8b3ad7079970fd553dcb25c067c3d0",
+          "bytes": 7604
+        }
+      ],
+      "legacy_selectors": ".mat-fab, .mat-mini-fab, .mat-button-base",
+      "decision": "Do not adopt the post16 fab-base API or its coupled modern component-default relocation. Preserve the finite16.2.14 facade, the separate original legacy-button color/theme/typography output and the retained legacy component resources. Current peers own their modern controls. No additional consumer include, HTML/CSS/SCSS change, TypeScript API change or golden update is required by this patch. This individual source decision gives no full rendered/native/packed/peer-floor/audit clearance.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    },
+    {
+      "sha": "c572dc4bf4d48448699288aeac2be14db0186a86",
+      "family": "slider",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex a0ebd916aef162cc2de26dd326066487d5e51575..9c2ab104ad1db41715b856f1eee7e1f292062abc 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -165,7 +165,7 @@\n @forward './legacy-slider/slider-theme' as legacy-slider-* show legacy-slider-theme,\n   legacy-slider-color, legacy-slider-typography;\n @forward './slider/slider-theme' as slider-* show slider-theme, slider-color, slider-typography,\n-  slider-density;\n+  slider-density, slider-base;\n @forward './snack-bar/snack-bar-theme' as snack-bar-* show snack-bar-theme, snack-bar-color,\n   snack-bar-typography, snack-bar-density;\n @forward './legacy-snack-bar/snack-bar-theme' as legacy-snack-bar-* show legacy-snack-bar-theme,\ndiff --git a/src/material/slider/_slider-theme.scss b/src/material/slider/_slider-theme.scss\nindex d49f84a61a7beeeea94b41b8b4adab70de0b351e..dda4e6d124db5307e55af6dd36170e8c4f6b30d4 100644\n--- a/src/material/slider/_slider-theme.scss\n+++ b/src/material/slider/_slider-theme.scss\n@@ -3,10 +3,18 @@\n @use '@material/slider/slider-theme' as mdc-slider-theme;\n @use '../core/theming/theming';\n @use '../core/typography/typography';\n+@use '../core/style/sass-utils';\n @use '../core/tokens/token-utils';\n @use '../core/tokens/m2/mat/slider' as m2-mat-slider;\n @use '../core/tokens/m2/mdc/slider' as m2-mdc-slider;\n \n+@mixin base($config-or-theme) {\n+  // Add default values for tokens not related to color, typography, or density.\n+  @include sass-utils.current-selector-or-root() {\n+    @include mdc-slider-theme.theme(m2-mdc-slider.get-unthemable-tokens());\n+  }\n+}\n+\n @mixin color($config-or-theme) {\n   $config: theming.get-color-config($config-or-theme);\n   $is-dark: map.get($config, is-dark);\n@@ -74,6 +82,7 @@\n     $density: theming.get-density-config($theme);\n     $typography: theming.get-typography-config($theme);\n \n+    @include base($theme);\n     @if $color != null {\n       @include color($color);\n     }\ndiff --git a/src/material/slider/slider.scss b/src/material/slider/slider.scss\nindex 4c538e06864d67bd41d7d40dd9604023b2deeace..07d16781a1ef8993f04a4362f8932b46c5a746ea 100644\n--- a/src/material/slider/slider.scss\n+++ b/src/material/slider/slider.scss\n@@ -32,9 +32,6 @@ $mat-slider-horizontal-margin: 8px !default;\n       }\n     }\n \n-    // Add default values for MDC slider tokens that aren't outputted by the theming API.\n-    @include mdc-slider-theme.theme(m2-mdc-slider.get-unthemable-tokens());\n-\n     display: inline-block;\n     box-sizing: border-box;\n     outline: none;\n",
+      "diff_sha256": "813420724a45abd5cc3982d4db07391af9fd558a3cbf7a532db2528a4bf5d86a",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/slider/_slider-theme.scss",
+        "src/material/slider/slider.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/slider/_slider-theme.scss",
+        "src/material/slider/slider.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 0,
+          "header": "@@ -165,7 +165,7 @@",
+          "hunk_sha256": "c09e7f9d0ea87262a28fc12e2e2af5701b7e15da5fb2f0a5d6d2c5b5f8b264c0",
+          "status": "reviewed",
+          "decision": "This root hunk adds slider-base to the modern forward list. The adjacent historical exports do not acquire an equivalent legacy base call. Both actual owned compiler runs retain all four modern16 names and three legacy-slider names and omit the new name. Preserve the finite16 facade; do not add this post16 API."
+        },
+        {
+          "path": "src/material/slider/_slider-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -3,10 +3,18 @@",
+          "hunk_sha256": "a7b8014ca06b4dfd777bc15a75499253740ac674de514274339eb33483a1cd94",
+          "status": "reviewed",
+          "decision": "The new base emits the MDC slider unthemable map at the current selector or root; theme invokes it before optional color/density/typography. The retained modern16 theme has no base and the separate legacy-slider theme is byte-identical to the tag. The owned MatLegacySlider uses slider.html and legacy-slider/slider.scss with the .mat-slider host, not the modern input/track resource."
+        },
+        {
+          "path": "src/material/slider/_slider-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -74,6 +82,7 @@",
+          "hunk_sha256": "bf354a0e459a7b878a443f5d466cbce20361b48bff78813a1c3436b2ec53b18a",
+          "status": "reviewed",
+          "decision": "This separate theme hunk unconditionally invokes base before optional color/density/typography. The new base emits the MDC slider unthemable map at the current selector or root; theme invokes it before optional color/density/typography. The retained modern16 theme has no base and the separate legacy-slider theme is byte-identical to the tag. The owned MatLegacySlider uses slider.html and legacy-slider/slider.scss with the .mat-slider host, not the modern input/track resource."
+        },
+        {
+          "path": "src/material/slider/slider.scss",
+          "hunk_index": 0,
+          "header": "@@ -32,9 +32,6 @@ $mat-slider-horizontal-margin: 8px !default;",
+          "hunk_sha256": "b90094609a876820f8e7ee534554cf89150336a8f5d3ae5a1b6f7d01eb730f12",
+          "status": "reviewed",
+          "decision": "The hunk removes one unthemable-map include inside .mat-mdc-slider. Token slot, thumb elevation and modern pointer/transition rules remain in that original resource. The owned legacy slider has its own track/thumb geometry; its tagged body is preserved with explicit owned import transport and active/off high-contrast call transport. This modern token relocation has no legacy slot to repair."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/_index.scss",
+          "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+          "bytes": 14151
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-slider/slider.html",
+          "sha256": "0fd4bd35f3365e7c3eb57802e1841bd78025629d49d9725bc6bf3aa79455a5c3",
+          "bytes": 741
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-slider/slider.scss",
+          "sha256": "158706d8bd3151ef295b76e0be6e5cdc94f51ec8221b3608eb75188d6514a572",
+          "bytes": 10830
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+          "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d",
+          "bytes": 36131
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/style/_component-high-contrast.scss",
+          "sha256": "0468c17876aaf5a54a48a3f47eb084c83be5ee1a0a4e01ccdbd396ad905fb4cb",
+          "bytes": 1400
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-slider/_slider-theme.scss",
+          "sha256": "1c6f060e1ca9cc1ce42d5a939e6b8f15b46c382d792f805effb4e566d90f4a8c",
+          "bytes": 6743
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/slider/_slider-theme.scss",
+          "sha256": "e3147c5ad0689799c17ed1588c67be87fe4dfaff60dff6c7ab0a10169249f101",
+          "bytes": 3649
+        }
+      ],
+      "legacy_selectors": ".mat-slider and legacy track/thumb/label descendants",
+      "decision": "Do not adopt the post16 slider-base API or its coupled modern component-default relocation. Preserve the finite16.2.14 facade, the separate original legacy-slider color/theme/typography output and the retained legacy component resources. Current peers own their modern controls. No additional consumer include, HTML/CSS/SCSS change, TypeScript API change or golden update is required by this patch. This individual source decision gives no full rendered/native/packed/peer-floor/audit clearance.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    },
+    {
+      "sha": "65c97170d2b3d239fda25bd049ec417e0098fe12",
+      "family": "snack-bar",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex 8aef4a5a4f4b8cf84901cf380e6647f4a33113c2..687ad70fdc1234593ee9e9af5057ba0f7f29f479 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -122,7 +122,7 @@\n @forward './slider/slider-theme' as slider-* show slider-theme, slider-color, slider-typography,\n   slider-density, slider-base;\n @forward './snack-bar/snack-bar-theme' as snack-bar-* show snack-bar-theme, snack-bar-color,\n-  snack-bar-typography, snack-bar-density;\n+  snack-bar-typography, snack-bar-density, snack-bar-base;\n @forward './sort/sort-theme' as sort-* show sort-theme, sort-color, sort-typography, sort-density;\n @forward './stepper/stepper-theme' as stepper-* show stepper-theme, stepper-color,\n   stepper-typography, stepper-density;\ndiff --git a/src/material/snack-bar/_snack-bar-theme.scss b/src/material/snack-bar/_snack-bar-theme.scss\nindex 015b5d87d71d0ca924c32a1e31de097b1e836299..c774ba4ae92e8dadad8cfba1f45186a9ac3c2da9 100644\n--- a/src/material/snack-bar/_snack-bar-theme.scss\n+++ b/src/material/snack-bar/_snack-bar-theme.scss\n@@ -1,10 +1,17 @@\n @use '@material/snackbar/snackbar-theme' as mdc-snackbar-theme;\n @use '../core/theming/theming';\n+@use '../core/style/sass-utils';\n @use '../core/typography/typography';\n @use '../core/tokens/token-utils';\n @use '../core/tokens/m2/mdc/snack-bar' as tokens-mdc-snack-bar;\n @use '../core/tokens/m2/mat/snack-bar' as tokens-mat-snack-bar;\n \n+@mixin base($config-or-theme) {\n+    // Add default values for tokens not related to color, typography, or density.\n+  @include sass-utils.current-selector-or-root() {\n+    @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-unthemable-tokens());\n+  }\n+}\n \n @mixin color($config-or-theme) {\n   $config: theming.get-color-config($config-or-theme);\n@@ -36,6 +43,7 @@\n     $density: theming.get-density-config($theme);\n     $typography: theming.get-typography-config($theme);\n \n+    @include base($theme);\n     @if $color != null {\n       @include color($color);\n     }\ndiff --git a/src/material/snack-bar/snack-bar-container.scss b/src/material/snack-bar/snack-bar-container.scss\nindex befdf6e656c9ccccc8a53f85ecf5dfb5a2cbef81..cadfc349cbc87a5115f2dd353563dc57d7e6bc8d 100644\n--- a/src/material/snack-bar/snack-bar-container.scss\n+++ b/src/material/snack-bar/snack-bar-container.scss\n@@ -47,7 +47,6 @@\n     // surface element.\n     @include mdc-snackbar-theme.elevation(mdc-snackbar-theme.$elevation);\n     @include mdc-snackbar-theme.theme-styles(tokens-mdc-snack-bar.get-token-slots());\n-    @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-unthemable-tokens());\n \n     // MDC sets the position as fixed and sets the container on the bottom center of the page (or\n     // otherwise can be set to be \"leading\"). Our overlay handles a more advanced configuration\n",
+      "diff_sha256": "65d3250f016b9e35873727332da675223792e1899c074472a7d8732c0be5b521",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/snack-bar/_snack-bar-theme.scss",
+        "src/material/snack-bar/snack-bar-container.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/snack-bar/_snack-bar-theme.scss",
+        "src/material/snack-bar/snack-bar-container.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 0,
+          "header": "@@ -122,7 +122,7 @@",
+          "hunk_sha256": "ef4539670180e7cee8e425321397ba1455d83745de3f50b1ab7105ec7c4eb812",
+          "status": "reviewed",
+          "decision": "This root hunk adds snack-bar-base to the modern forward list. The adjacent historical exports do not acquire an equivalent legacy base call. Both actual owned compiler runs retain all four modern16 names and three legacy-snack-bar names and omit the new name. Preserve the finite16 facade; do not add this post16 API."
+        },
+        {
+          "path": "src/material/snack-bar/_snack-bar-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,10 +1,17 @@",
+          "hunk_sha256": "691595683029aee1cdaf816ea6e22a8fe710e7f4598f144e7df508202764ce81",
+          "status": "reviewed",
+          "decision": "The new base emits MDC snack-bar defaults using current-selector-or-root and adds an unconditional theme include. Color, typography and empty historical density are otherwise unchanged. The owned legacy snack-bar theme is a separate exact16 file; MatLegacySnackBarContainer binds the legacy container resource and host class."
+        },
+        {
+          "path": "src/material/snack-bar/_snack-bar-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -36,6 +43,7 @@",
+          "hunk_sha256": "8286c265066ea3e2b48aa9ead5c4bb52d619276e9c27058679dbe2f454ddf6d0",
+          "status": "reviewed",
+          "decision": "This separate theme hunk unconditionally invokes base before optional color/density/typography. The new base emits MDC snack-bar defaults using current-selector-or-root and adds an unconditional theme include. Color, typography and empty historical density are otherwise unchanged. The owned legacy snack-bar theme is a separate exact16 file; MatLegacySnackBarContainer binds the legacy container resource and host class."
+        },
+        {
+          "path": "src/material/snack-bar/snack-bar-container.scss",
+          "hunk_index": 0,
+          "header": "@@ -47,7 +47,6 @@",
+          "hunk_sha256": "764b41be09e7749f68a018dec21c61bd3f61ff6392daa5b8402764fa08a21717",
+          "status": "reviewed",
+          "decision": "The hunk removes the unthemable defaults from .mat-mdc-snack-bar-container while retaining elevation and theme-styles slots. The before/after modern context uses MDC base static styles without animations, surface sizing and MDC action-button rules. The owned legacy resource keeps the tagged geometry with high-contrast transport plus an existing674-byte engine-free motion suffix. That preexisting suffix is explicitly recorded, unchanged, and receives no new lifecycle/browser qualification here."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/_index.scss",
+          "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+          "bytes": 14151
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.html",
+          "sha256": "9b92fdf9e5e74ea73f6f7cd3305dfd79dc832c25f5de1f6d2aa1f63b17ccaee2",
+          "bytes": 373
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.scss",
+          "sha256": "f87776ff2d2a32075eb2794b68cc2a8eb018ec7cedbe494dcdf4c0c586504dfc",
+          "bytes": 1539
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar-container.ts",
+          "sha256": "0024d9887c6f28e9339098f43a40ae84590f26950aa09a8f0e0d8a7494dbeae5",
+          "bytes": 4650
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/style/_component-high-contrast.scss",
+          "sha256": "0468c17876aaf5a54a48a3f47eb084c83be5ee1a0a4e01ccdbd396ad905fb4cb",
+          "bytes": 1400
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-snack-bar/_snack-bar-theme.scss",
+          "sha256": "b9a6613433a84b02035c6252dd226d31cc74eb71c5dcb68ce76e012579a848bf",
+          "bytes": 2506
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/snack-bar/_snack-bar-theme.scss",
+          "sha256": "29ca545098f2b8eb81fbf7f311b5dac5fda4986f641d39ac23ca01eb7a547906",
+          "bytes": 1536
+        }
+      ],
+      "legacy_selectors": ".mat-snack-bar-container, .mat-simple-snackbar-action",
+      "decision": "Do not adopt the post16 snack-bar-base API or its coupled modern component-default relocation. Preserve the finite16.2.14 facade, the separate original legacy-snack-bar color/theme/typography output and the retained legacy component resources. Current peers own their modern controls. No additional consumer include, HTML/CSS/SCSS change, TypeScript API change or golden update is required by this patch. This individual source decision gives no full rendered/native/packed/peer-floor/audit clearance.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    },
+    {
+      "sha": "7c16cc8b659133167f1b875dcfe77ca806bfe876",
+      "family": "list",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex 687ad70fdc1234593ee9e9af5057ba0f7f29f479..f3ce3721c41cf4ce5d762dffe342b1aec22350aa 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -101,7 +101,8 @@\n @forward './icon/icon-theme' as icon-* show icon-theme, icon-color, icon-typography, icon-density;\n @forward './input/input-theme' as input-* show input-theme, input-color, input-typography,\n   input-density;\n-@forward './list/list-theme' as list-* show list-theme, list-color, list-typography, list-density;\n+@forward './list/list-theme' as list-* show list-theme, list-color, list-typography,\n+list-density, list-base;\n @forward './menu/menu-theme' as menu-* show menu-theme, menu-color, menu-typography, menu-density;\n @forward './paginator/paginator-theme' as paginator-* show paginator-theme, paginator-color,\n   paginator-typography, paginator-density;\ndiff --git a/src/material/list/_list-theme.scss b/src/material/list/_list-theme.scss\nindex 15064663a5eeba49ed0bc66ea238ce1ada5543cd..2cc037bca894e94d5c135b5055136cbccf755fa3 100644\n--- a/src/material/list/_list-theme.scss\n+++ b/src/material/list/_list-theme.scss\n@@ -4,6 +4,7 @@\n @use '@material/radio/radio-theme' as mdc-radio-theme;\n @use '@material/list/list-theme' as mdc-list-theme;\n \n+@use '../core/style/sass-utils';\n @use '../core/theming/theming';\n @use '../core/tokens/m2/mdc/checkbox' as tokens-mdc-checkbox;\n @use '../core/tokens/m2/mdc/radio' as tokens-mdc-radio;\n@@ -11,6 +12,13 @@\n @use '../core/typography/typography';\n @use '../core/typography/typography-utils';\n \n+@mixin base($config-or-theme) {\n+  // Add default values for tokens not related to color, typography, or density.\n+  @include sass-utils.current-selector-or-root() {\n+    @include mdc-list-theme.theme(tokens-mdc-list.get-unthemable-tokens());\n+  }\n+}\n+\n @mixin color($config-or-theme) {\n   $config: theming.get-color-config($config-or-theme);\n   $primary: map.get($config, primary);\n@@ -140,6 +148,7 @@\n     $density: theming.get-density-config($theme);\n     $typography: theming.get-typography-config($theme);\n \n+    @include base($theme);\n     @if $color != null {\n       @include color($color);\n     }\ndiff --git a/src/material/list/list.scss b/src/material/list/list.scss\nindex c852822a10c972214e4578036f68db024e8e68b2..11a3587808b83fb49c2448333c09923b39d2850b 100644\n--- a/src/material/list/list.scss\n+++ b/src/material/list/list.scss\n@@ -75,11 +75,6 @@\n       @include token-utils.create-token-slot(background-color, list-item-leading-avatar-color);\n     }\n   }\n-\n-  // Add default values for tokens that aren't outputted by the theming API.\n-  .mat-mdc-list-base {\n-    @include mdc-list-theme.theme(m2-mdc-list.get-unthemable-tokens());\n-  }\n }\n \n a.mdc-list-item--activated {\n",
+      "diff_sha256": "0139f239b65589c13942129a1d46bfc82be32c5ea036732ffb870208051e0ff0",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/list/_list-theme.scss",
+        "src/material/list/list.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/list/_list-theme.scss",
+        "src/material/list/list.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 0,
+          "header": "@@ -101,7 +101,8 @@",
+          "hunk_sha256": "fcd45294e753821fffefa6ff12150cea1e7cda7b77a2f7883d2fbc7bb77fbff8",
+          "status": "reviewed",
+          "decision": "This root hunk adds list-base to the modern forward list. The adjacent historical exports do not acquire an equivalent legacy base call. Both actual owned compiler runs retain all four modern16 names and three legacy-list names and omit the new name. Preserve the finite16 facade; do not add this post16 API."
+        },
+        {
+          "path": "src/material/list/_list-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -4,6 +4,7 @@",
+          "hunk_sha256": "e90b2a6a996193acec97ed96a5ada36c43e2902f64bf7a9536a3774116e8db02",
+          "status": "reviewed",
+          "decision": "This distinct import-only hunk adds sass-utils solely to support the new base mixin in the next hunk. It is reviewed separately from that definition and the later theme invocation. Without adopting the post16 base contract, no corresponding import belongs in the retained16 list theme."
+        },
+        {
+          "path": "src/material/list/_list-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -11,6 +12,13 @@",
+          "hunk_sha256": "9a92a8b29ddf1a547185b1f453ebca236da5eadfd663e17ce1e8ec98312b4631",
+          "status": "reviewed",
+          "decision": "The new base emits the MDC list defaults using current-selector-or-root; a later theme hunk invokes it unconditionally. Existing checkbox/radio color maps, typography, density and historical avatar/state-slot handling remain. The current retained modern16 module has no base; the separate legacy-list theme remains exact16. Owned nav/list components use list.html/list.scss and .mat-list-base."
+        },
+        {
+          "path": "src/material/list/_list-theme.scss",
+          "hunk_index": 2,
+          "header": "@@ -140,6 +148,7 @@",
+          "hunk_sha256": "2e2ccb9020757dbcf70427884b652b65b773aa8b97982136a2f5b18245c67cd4",
+          "status": "reviewed",
+          "decision": "This separate theme hunk unconditionally invokes base before optional color/density/typography. The new base emits the MDC list defaults using current-selector-or-root; a later theme hunk invokes it unconditionally. Existing checkbox/radio color maps, typography, density and historical avatar/state-slot handling remain. The current retained modern16 module has no base; the separate legacy-list theme remains exact16. Owned nav/list components use list.html/list.scss and .mat-list-base."
+        },
+        {
+          "path": "src/material/list/list.scss",
+          "hunk_index": 0,
+          "header": "@@ -75,11 +75,6 @@",
+          "hunk_sha256": "ef2b49bab4c656ad1f8b43b6961232827eb6a1db2f31be55776888fbba9757c6",
+          "status": "reviewed",
+          "decision": "The hunk removes the .mat-mdc-list-base wrapper and its unthemable defaults inside custom-properties configuration. Modern static/theme slots, avatar/high-specificity disabled styles and state layers remain in the untouched surrounding context. The owned legacy list resource preserves the tagged list geometry after owned imports and does not consume these modern MDC defaults."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/_index.scss",
+          "sha256": "c43e47e6572d11e4d044577829c61c8329ca9b5f2417dbb44bb72c77c5443cc2",
+          "bytes": 14151
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-list/list-item.html",
+          "sha256": "2105cd61534fde43eccfd78c8928f322822984b0b8c8c8cc4acce521d05971c1",
+          "bytes": 431
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-list/list-option.html",
+          "sha256": "338ba98c19aa54346cff4efdfa91de0a091b367ac454a5fc8b50d5062a767341",
+          "bytes": 603
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-list/list.html",
+          "sha256": "690d120c9e53da33cc3cdc95af9e6b013fcfb6caf1b99f12d754db045820ff08",
+          "bytes": 27
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-list/list.scss",
+          "sha256": "c3c4e1ee2d36547d323c661dd2737e65d5150d414223e75a620a389a7a0b8168",
+          "bytes": 8834
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-list/list.ts",
+          "sha256": "6c358d9985e677d5ba8037f3b9aa471d35f657a172ab789f754f41952ebd0d7e",
+          "bytes": 6980
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-list/selection-list.ts",
+          "sha256": "e408bbc42e122dcb9197d2fb850740a9cf769d650ec70442b595428ce747c206",
+          "bytes": 24059
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/core/style/_component-high-contrast.scss",
+          "sha256": "0468c17876aaf5a54a48a3f47eb084c83be5ee1a0a4e01ccdbd396ad905fb4cb",
+          "bytes": 1400
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-list/_list-theme.scss",
+          "sha256": "f77bb9e621f938d24bdfdbb70f6a135164e24997acfa729bce4933cbe92f8d93",
+          "bytes": 3792
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/list/_list-theme.scss",
+          "sha256": "d46fdf03a1ad4a374e5b47215dc0dee386078298b198255de4efbea8a627321e",
+          "bytes": 5085
+        }
+      ],
+      "legacy_selectors": ".mat-list-base, .mat-list-item, .mat-list-option",
+      "decision": "Do not adopt the post16 list-base API or its coupled modern component-default relocation. Preserve the finite16.2.14 facade, the separate original legacy-list color/theme/typography output and the retained legacy component resources. Current peers own their modern controls. No additional consumer include, HTML/CSS/SCSS change, TypeScript API change or golden update is required by this patch. This individual source decision gives no full rendered/native/packed/peer-floor/audit clearance.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed",
+      "selection_list_context": "The owned selection list also binds list.scss and .mat-selection-list.mat-list-base; its options use legacy list-item classes and mat-pseudo-checkbox, not the modern MDC checkbox/radio slots."
+    }
+  ],
+  "actual_line_scopes": [
+    {
+      "path": "compatibility/rc/21x-c04-modern-control-base-measurement-21x.json",
+      "sha256": "4e99b606b4bcbf162f00edf8b8dcd7d4ff58a16760ec34d8d674a0b8720c124f",
+      "bytes": 109842
+    },
+    {
+      "path": "compatibility/rc/21x-c04-modern-control-base-measurement-main.json",
+      "sha256": "0e336e8fb2e7dd08864ced13f66aa751e5ead873464050659a5bf4c9473d6cd2",
+      "bytes": 110036
+    }
+  ],
+  "read_only_consumer_sanity": {
+    "consumer": "~/cyph",
+    "scope": "Read-only shared/css/**/*.scss discoverable by rg",
+    "scss_files_scanned": 12,
+    "observed_retained_call_counts": {
+      "legacy-button-theme": 4,
+      "legacy-list-theme": 1
+    },
+    "selected_post16_base_calls_found": 0,
+    "matching_file_subjects": [
+      {
+        "path": "shared/css/mixins.scss",
+        "sha256": "03bcd7b1b907de9e1d829f81ca10053e2494e91ab19e2f5b92c4f4d8947308d9",
+        "bytes": 20525
+      }
+    ],
+    "consumer_files_written": 0,
+    "consumer_build_or_deployment_executed": false
+  },
+  "technical_authority": "AGENTS.md finite historical Sass facade and user requirement of unchanged consumer HTML/CSS/SCSS; no modern API mirror.",
+  "canonical_decisions_changed": 0,
+  "canonical_guard_or_owner_stage_integrated": false,
+  "pending_dispositions": 1334,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "g13_claim": "not-passed"
+}
