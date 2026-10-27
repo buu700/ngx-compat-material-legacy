@@ -49,6 +49,9 @@ def spec_subject(root):
 
 def qualified_reference(root, ref):
     """Return current metadata only after recovering the authenticated original."""
+    if ref['path'] == 'scripts/upstream-historical-behavior-evidence.mjs':
+        from autocomplete_selection_native_refs import qualified_native_reference
+        return qualified_native_reference(root, ref)
     if ref['path'] == SPEC:
         packet = spec_subject(root)
         assert ref['sha256'] in (packet['before']['sha256'], packet['after']['sha256'])

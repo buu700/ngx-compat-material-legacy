@@ -4,8 +4,8 @@
   "g11_claim": "not-passed",
   "seed_rows": 1697,
   "ledger_rows": 1697,
-  "closed_dispositions": 353,
-  "open_or_deferred": 1344,
+  "closed_dispositions": 356,
+  "open_or_deferred": 1341,
   "entries": [
     {
       "sha": "b13c6aa194cf560a304213961ae28725f8d0a4e2",
@@ -128,7 +128,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",
@@ -2876,7 +2876,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",
@@ -5637,7 +5637,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",
@@ -7527,15 +7527,144 @@
         "src/material/autocomplete/autocomplete-trigger.ts",
         "src/material/autocomplete/autocomplete.spec.ts"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
-      "read_note_disposition": "unreviewed-on-21.x",
+      "final_disposition": "already-adapted",
+      "reason": "The complete two-file/two-hunk reactive-reset change is present in the owned legacy trigger. Programmatic null or undefined clears the previous selected option quietly through the owned value-assignment path. The later null-only condition is retained: zero, false, empty string and an empty display result must not be treated as a missing model. The original intermediate falsy-display guard is therefore not copied. The strengthened existing native reset test first selects an actual option, then requires silent selected-state cleanup and exactly one null CVA write. Current whole-method Forms/RxJS diagnostics support this source judgment; actual Angular DI/rendering, packed behavior and runtime/compiler/RxJS/peer floors remain separate mandatory executions.",
+      "read_note_disposition": "individual-source-reviewed-on-21.x",
       "affected_branches": [
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": null
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-selection-d5d468a29a2db4c0676c57d60bc8431ed4fd6e18-individual-source-judgment.json",
+      "source_check": {
+        "kind": "individual-source-reviewed-runtime-required",
+        "diff_sha256": "21cd67ad7117fab8354ea5be9c4deec2026586fa72fceb048ab894af1efdeb1d",
+        "patch_archive": {
+          "path": "compatibility/rc/autocomplete-selection-originals.json.gz",
+          "sha256": "ddb8eeefba441568d46b9107a88889553320ce2e841c3fdc90a29b3f518aeebc",
+          "bytes": 105021
+        },
+        "original_patch_member": "d5d468a29a2db4c0676c57d60bc8431ed4fd6e18",
+        "evidence_report_sha256": "52c6d089a4b82b2e01909f86fdf2b5f34e5c490c59ddc8f5237f7b09d98fb93a"
+      },
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "historical-required-individual-behavior",
+        "review_depth": "individual-compatibility",
+        "diff_sha256": "21cd67ad7117fab8354ea5be9c4deec2026586fa72fceb048ab894af1efdeb1d",
+        "affected_branches": [
+          "21.x"
+        ],
+        "decision": "The complete two-file/two-hunk reactive-reset change is present in the owned legacy trigger. Programmatic null or undefined clears the previous selected option quietly through the owned value-assignment path. The later null-only condition is retained: zero, false, empty string and an empty display result must not be treated as a missing model. The original intermediate falsy-display guard is therefore not copied. The strengthened existing native reset test first selects an actual option, then requires silent selected-state cleanup and exactly one null CVA write. Current whole-method Forms/RxJS diagnostics support this source judgment; actual Angular DI/rendering, packed behavior and runtime/compiler/RxJS/peer floors remain separate mandatory executions.",
+        "historical_behavior": {
+          "kind": "autocomplete-reactive-selection-reset",
+          "case_ids": [
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#46"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/rc-test-legacy-family.mjs",
+              "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+            },
+            {
+              "path": "scripts/historical-case-roster.mjs",
+              "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+            },
+            {
+              "path": "scripts/resolve-run-library.mjs",
+              "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "ee60da89c664c447bf768e9115a4103a911c8eee6c34bd343b66e9f2d42c9c7d"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "4701128a244fa87febeafcbf79d8059cd39657394b9669f501329882fa83c1e6"
+            },
+            {
+              "path": "scripts/upstream-historical-behavior-evidence.mjs",
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
+            },
+            {
+              "path": "testing/legacy-runner/build.mjs",
+              "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+            },
+            {
+              "path": "testing/legacy-runner/adapt-spec.mjs",
+              "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+            },
+            {
+              "path": "testing/legacy-runner/entry.ts",
+              "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+            },
+            {
+              "path": "testing/legacy-runner/init-test-env.ts",
+              "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+            },
+            {
+              "path": "testing/legacy-runner/karma.conf.cjs",
+              "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+            },
+            {
+              "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+              "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "2698f53be977b484aec2aaf3f9f052fc9b0bc4cd28632acc2ef5481b3ca4f724"
+            },
+            {
+              "path": "testing/legacy-runner/historical-specs.json",
+              "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+              "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+              "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "2b8c035d7060943298e2852004f8b084cf33097790e5984b8f40e6517411f2e3"
+            },
+            {
+              "path": "scripts/autocomplete-selection-native-scopes.mjs",
+              "sha256": "f38714dcb7c77e4804e18f9faf51d5ae9bcb87ee437965c234b3bee76807c888"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+              "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+              "sha256": "6b9c00dbf365e6b6ea9b2b65eb7e67911775322c78848b996d3590f8fded3d58"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+              "sha256": "2610d311569c9a6fdb063dc0652b423414622cf1370b2434f13ba86070293236"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.html",
+              "sha256": "8fae4afdffea376599d694a16698ee1a9502097cc9819ec2766a4a5d55b418ae"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+              "sha256": "9fbb5eb60784e41f97296c9fd958871dfa4cee3975f0c4bcd3cfe54f6ec6aae4"
+            }
+          ]
+        }
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "c273c2c7c2afc72b8c4fc431ca29812a38f7580c",
+          "source_entry_sha256": "2aa6ab0260b5807972e6ded55e07cc74ed0577094fd2e31574609b604815c127",
+          "source_line": "21.x",
+          "final_disposition": "needs-individual-review"
+        }
+      ]
     },
     {
       "sha": "d902f8d4a131c974c768d20446718b93c893fa1b",
@@ -7869,17 +7998,150 @@
       "bucket": "behavior-semantic",
       "subject": "fix(material/autocomplete): regression in requireSelection when options are filtered (#28119)",
       "files": [
-        "src/material/autocomplete/autocomplete-trigger.ts"
+        "src/material/autocomplete/autocomplete-trigger.ts",
+        "tools/public_api_guard/material/autocomplete.md"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
-      "read_note_disposition": "unreviewed-on-21.x",
+      "final_disposition": "already-adapted",
+      "reason": "The complete two-file/five-hunk attachment change is present in the owned legacy trigger. The four trigger hunks capture the required-selection value only on a genuine overlay attachment, before subsequent input, and preserve it through repeated open calls and option-list hide/reshow. The fifth hunk corrects an API-guard comment and does not change a public signature. Existing named native tests require retained model/selection while typing, one chosen-value publication, one unmatched-text reset after filtering and safe closure with no options. Current whole-method Forms/RxJS diagnostics support this source judgment; actual Angular DI/rendering, packed behavior and runtime/compiler/RxJS/peer floors remain separate mandatory executions.",
+      "read_note_disposition": "individual-source-reviewed-on-21.x",
       "affected_branches": [
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": null
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-selection-13629b0cd814ccc5fa01cf670b8b3001bc0021ff-individual-source-judgment.json",
+      "source_check": {
+        "kind": "individual-source-reviewed-runtime-required",
+        "diff_sha256": "425bee27fa61de150f47945e20e09faa7d117b0e61578377edabe7832fd6dd07",
+        "patch_archive": {
+          "path": "compatibility/rc/autocomplete-selection-originals.json.gz",
+          "sha256": "ddb8eeefba441568d46b9107a88889553320ce2e841c3fdc90a29b3f518aeebc",
+          "bytes": 105021
+        },
+        "original_patch_member": "13629b0cd814ccc5fa01cf670b8b3001bc0021ff",
+        "evidence_report_sha256": "25fbea5c960d597583885a3104fa38e987359de1797d2957e467a9984ec1facd"
+      },
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "historical-required-individual-behavior",
+        "review_depth": "individual-compatibility",
+        "diff_sha256": "425bee27fa61de150f47945e20e09faa7d117b0e61578377edabe7832fd6dd07",
+        "affected_branches": [
+          "21.x"
+        ],
+        "decision": "The complete two-file/five-hunk attachment change is present in the owned legacy trigger. The four trigger hunks capture the required-selection value only on a genuine overlay attachment, before subsequent input, and preserve it through repeated open calls and option-list hide/reshow. The fifth hunk corrects an API-guard comment and does not change a public signature. Existing named native tests require retained model/selection while typing, one chosen-value publication, one unmatched-text reset after filtering and safe closure with no options. Current whole-method Forms/RxJS diagnostics support this source judgment; actual Angular DI/rendering, packed behavior and runtime/compiler/RxJS/peer floors remain separate mandatory executions.",
+        "historical_behavior": {
+          "kind": "autocomplete-actual-attachment-selection-value",
+          "case_ids": [
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#37",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#38",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#39",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#172"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/rc-test-legacy-family.mjs",
+              "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+            },
+            {
+              "path": "scripts/historical-case-roster.mjs",
+              "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+            },
+            {
+              "path": "scripts/resolve-run-library.mjs",
+              "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "ee60da89c664c447bf768e9115a4103a911c8eee6c34bd343b66e9f2d42c9c7d"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "4701128a244fa87febeafcbf79d8059cd39657394b9669f501329882fa83c1e6"
+            },
+            {
+              "path": "scripts/upstream-historical-behavior-evidence.mjs",
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
+            },
+            {
+              "path": "testing/legacy-runner/build.mjs",
+              "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+            },
+            {
+              "path": "testing/legacy-runner/adapt-spec.mjs",
+              "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+            },
+            {
+              "path": "testing/legacy-runner/entry.ts",
+              "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+            },
+            {
+              "path": "testing/legacy-runner/init-test-env.ts",
+              "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+            },
+            {
+              "path": "testing/legacy-runner/karma.conf.cjs",
+              "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+            },
+            {
+              "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+              "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "2698f53be977b484aec2aaf3f9f052fc9b0bc4cd28632acc2ef5481b3ca4f724"
+            },
+            {
+              "path": "testing/legacy-runner/historical-specs.json",
+              "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+              "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+              "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "2b8c035d7060943298e2852004f8b084cf33097790e5984b8f40e6517411f2e3"
+            },
+            {
+              "path": "scripts/autocomplete-selection-native-scopes.mjs",
+              "sha256": "f38714dcb7c77e4804e18f9faf51d5ae9bcb87ee437965c234b3bee76807c888"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+              "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+              "sha256": "6b9c00dbf365e6b6ea9b2b65eb7e67911775322c78848b996d3590f8fded3d58"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+              "sha256": "2610d311569c9a6fdb063dc0652b423414622cf1370b2434f13ba86070293236"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.html",
+              "sha256": "8fae4afdffea376599d694a16698ee1a9502097cc9819ec2766a4a5d55b418ae"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+              "sha256": "9fbb5eb60784e41f97296c9fd958871dfa4cee3975f0c4bcd3cfe54f6ec6aae4"
+            }
+          ]
+        }
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "c273c2c7c2afc72b8c4fc431ca29812a38f7580c",
+          "source_entry_sha256": "08aacb2f5a4cf534e5f4c9317669b66c531c28c9acc6ec404e2712bbd3f7224e",
+          "source_line": "21.x",
+          "final_disposition": "needs-individual-review"
+        }
+      ]
     },
     {
       "sha": "7a7434a772320f17f082208297f7d19d470ceee3",
@@ -8150,15 +8412,147 @@
         "src/material/autocomplete/autocomplete-trigger.ts",
         "src/material/autocomplete/autocomplete.spec.ts"
       ],
-      "final_disposition": "needs-individual-review",
-      "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
-      "read_note_disposition": "unreviewed-on-21.x",
+      "final_disposition": "already-adapted",
+      "reason": "The complete two-file/three-hunk typing/reset change is present in the owned legacy trigger. Optional nonempty typing quietly deselects a selected option when its displayed value no longer matches; displayWith receives the selected option value, retaining the correction to the original intermediate object argument. Required selection remains selected while typing until choice or dismissal. Programmatic cleanup is keyed to a nullish model, preserving non-null falsy values. The strengthened existing native cases require required-selection retention/reset, direct nonempty typing with display callback identity and quiet deselection, and reactive selected-state cleanup. Current whole-method Forms/RxJS diagnostics support this source judgment; actual Angular DI/rendering, packed behavior and runtime/compiler/RxJS/peer floors remain separate mandatory executions.",
+      "read_note_disposition": "individual-source-reviewed-on-21.x",
       "affected_branches": [
         "21.x"
       ],
       "g11_claim": "not-passed",
       "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
-      "evidence_report": null
+      "evidence_report": "compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-selection-cf868a5089a4c9eaddd4a55fd18b952fb96d5c19-individual-source-judgment.json",
+      "source_check": {
+        "kind": "individual-source-reviewed-runtime-required",
+        "diff_sha256": "3c5ce22fc1cc25cf290cbacd0b1a9a1ddde5eef5d0ce5b1c7183563df30432b3",
+        "patch_archive": {
+          "path": "compatibility/rc/autocomplete-selection-originals.json.gz",
+          "sha256": "ddb8eeefba441568d46b9107a88889553320ce2e841c3fdc90a29b3f518aeebc",
+          "bytes": 105021
+        },
+        "original_patch_member": "cf868a5089a4c9eaddd4a55fd18b952fb96d5c19",
+        "evidence_report_sha256": "e4152a98fa03a4b275cb9c9103dc18bd690642f370e026fade751be2db0af0a7"
+      },
+      "review_depth": "individual-compatibility",
+      "individual_proof": {
+        "proof_kind": "historical-required-individual-behavior",
+        "review_depth": "individual-compatibility",
+        "diff_sha256": "3c5ce22fc1cc25cf290cbacd0b1a9a1ddde5eef5d0ce5b1c7183563df30432b3",
+        "affected_branches": [
+          "21.x"
+        ],
+        "decision": "The complete two-file/three-hunk typing/reset change is present in the owned legacy trigger. Optional nonempty typing quietly deselects a selected option when its displayed value no longer matches; displayWith receives the selected option value, retaining the correction to the original intermediate object argument. Required selection remains selected while typing until choice or dismissal. Programmatic cleanup is keyed to a nullish model, preserving non-null falsy values. The strengthened existing native cases require required-selection retention/reset, direct nonempty typing with display callback identity and quiet deselection, and reactive selected-state cleanup. Current whole-method Forms/RxJS diagnostics support this source judgment; actual Angular DI/rendering, packed behavior and runtime/compiler/RxJS/peer floors remain separate mandatory executions.",
+        "historical_behavior": {
+          "kind": "autocomplete-optional-typing-and-null-only-selection-reset",
+          "case_ids": [
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#37",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#39",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#42",
+            "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#46"
+          ],
+          "source_members": [
+            {
+              "path": "scripts/rc-test-legacy-family.mjs",
+              "sha256": "9b74c408227c3c24307342fb2e4729f09cd685830d58ccc29b4bf1711a2e9642"
+            },
+            {
+              "path": "scripts/historical-case-roster.mjs",
+              "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+            },
+            {
+              "path": "scripts/resolve-run-library.mjs",
+              "sha256": "9a14ee847112104772c5bfc1b85a21698af755150ed36b73660aa113f0ac1b81"
+            },
+            {
+              "path": "scripts/rc-verify.py",
+              "sha256": "ee60da89c664c447bf768e9115a4103a911c8eee6c34bd343b66e9f2d42c9c7d"
+            },
+            {
+              "path": "scripts/check-upstream-audit-disposition.mjs",
+              "sha256": "4701128a244fa87febeafcbf79d8059cd39657394b9669f501329882fa83c1e6"
+            },
+            {
+              "path": "scripts/upstream-historical-behavior-evidence.mjs",
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
+            },
+            {
+              "path": "testing/legacy-runner/build.mjs",
+              "sha256": "4df8cfde83707018a64ffe424b7ab1bbe48340bf509ce19f48e1c85c5b9aa2ba"
+            },
+            {
+              "path": "testing/legacy-runner/adapt-spec.mjs",
+              "sha256": "668f2a08a004a9ba0b97a1738df051dcb9f81eb50a98672155c83c842b0cc6b3"
+            },
+            {
+              "path": "testing/legacy-runner/entry.ts",
+              "sha256": "cade24c6482f39757e1f5f004b2dd48f22dc4426258131a948376bf6b84539a9"
+            },
+            {
+              "path": "testing/legacy-runner/init-test-env.ts",
+              "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+            },
+            {
+              "path": "testing/legacy-runner/karma.conf.cjs",
+              "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+            },
+            {
+              "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+              "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+            },
+            {
+              "path": "testing/legacy-runner/historical-inventory.json",
+              "sha256": "2698f53be977b484aec2aaf3f9f052fc9b0bc4cd28632acc2ef5481b3ca4f724"
+            },
+            {
+              "path": "testing/legacy-runner/historical-specs.json",
+              "sha256": "520d88c578fb20393b45e4ab7d98be0c9b4953707cd84f093a3fae1ce262ed8d"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+              "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+            },
+            {
+              "path": "projects/ngx-material-legacy/internal/testing/owned-animation-modules.ts",
+              "sha256": "dc86cb38212f75fc5e8915d7b39b757da69068b75c8829f91d840a8d89fc0500"
+            },
+            {
+              "path": "compatibility/rc/matrices/full-verify.json",
+              "sha256": "2b8c035d7060943298e2852004f8b084cf33097790e5984b8f40e6517411f2e3"
+            },
+            {
+              "path": "scripts/autocomplete-selection-native-scopes.mjs",
+              "sha256": "f38714dcb7c77e4804e18f9faf51d5ae9bcb87ee437965c234b3bee76807c888"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+              "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+              "sha256": "6b9c00dbf365e6b6ea9b2b65eb7e67911775322c78848b996d3590f8fded3d58"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+              "sha256": "2610d311569c9a6fdb063dc0652b423414622cf1370b2434f13ba86070293236"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.html",
+              "sha256": "8fae4afdffea376599d694a16698ee1a9502097cc9819ec2766a4a5d55b418ae"
+            },
+            {
+              "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+              "sha256": "9fbb5eb60784e41f97296c9fd958871dfa4cee3975f0c4bcd3cfe54f6ec6aae4"
+            }
+          ]
+        }
+      },
+      "prior_dispositions": [
+        {
+          "source_parent": "c273c2c7c2afc72b8c4fc431ca29812a38f7580c",
+          "source_entry_sha256": "b3af932998c7f9e57f2317b1a39a39f0caef2edc1a4ad7eb20eeb7f873324331",
+          "source_line": "21.x",
+          "final_disposition": "needs-individual-review"
+        }
+      ]
     },
     {
       "sha": "f2d5644f62eef429643850f64657585375a03422",
@@ -14341,7 +14735,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",
@@ -20015,7 +20409,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",
@@ -22396,7 +22790,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",
@@ -26608,7 +27002,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",
@@ -26766,7 +27160,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",
@@ -30781,7 +31175,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",
@@ -32841,7 +33235,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",
@@ -33463,7 +33857,7 @@
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
-              "sha256": "a4c571ed96a4da95eecb272ab6cbfa79fc7a59f2e1cd7f04cb31bcd5b7fc9865"
+              "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
             },
             {
               "path": "testing/legacy-runner/build.mjs",

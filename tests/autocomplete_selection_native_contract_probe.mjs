@@ -146,7 +146,9 @@ for(const subject of runtimeSubjects){
     // Its clean-tree binding therefore authenticates these actual candidate bytes.
     f.repoPut(registry,candidate);
     const git=args=>execFileSync('git',['-c','gc.auto=0','-c','maintenance.auto=0',...args],{cwd:f.root,env,encoding:'utf8'}).trim();
-    git(['add','--',registry]);git(['-c','user.name=Validator fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','Synthetic proposed native registry']);
+    git(['add','--',registry]);
+    const changed=git(['diff','--cached','--name-only']);assert.ok(changed===''||changed===registry);
+    if(changed)git(['-c','user.name=Validator fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','Synthetic proposed native registry']);
     const commit=git(['rev-parse','HEAD']),tree=git(['rev-parse','HEAD^{tree}']);
     assert.equal(git(['status','--porcelain']), '');
     Object.assign(f.run.source,{commit,git_tree_sha:tree});Object.assign(f.run.execution_inputs,{commit,tree});

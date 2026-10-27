@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "cf868a5089a4c9eaddd4a55fd18b952fb96d5c19",
+  "status": "reviewed",
+  "final_disposition": "already-adapted",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent complete audit remains separate",
+  "diff": "diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts\nindex e797f9a9f1871c62f817c4a6f4a92cde95756a60..c4f8c972ea2857f7a65c1362ae417ae19d640e33 100644\n--- a/src/material/autocomplete/autocomplete-trigger.ts\n+++ b/src/material/autocomplete/autocomplete-trigger.ts\n@@ -506,6 +506,18 @@ export class MatAutocompleteTrigger\n \n       if (!value) {\n         this._clearPreviousSelectedOption(null, false);\n+      } else if (this.panelOpen && !this.autocomplete.requireSelection) {\n+        // Note that we don't reset this when `requireSelection` is enabled,\n+        // because the option will be reset when the panel is closed.\n+        const selectedOption = this.autocomplete.options?.find(option => option.selected);\n+\n+        if (selectedOption) {\n+          const display = this.autocomplete.displayWith?.(selectedOption) ?? selectedOption.value;\n+\n+          if (value !== display) {\n+            selectedOption.deselect(false);\n+          }\n+        }\n       }\n \n       if (this._canOpen() && this._document.activeElement === event.target) {\n@@ -640,18 +652,16 @@ export class MatAutocompleteTrigger\n         ? this.autocomplete.displayWith(value)\n         : value;\n \n+    if (value == null) {\n+      this._clearPreviousSelectedOption(null, false);\n+    }\n+\n     // Simply falling back to an empty string if the display value is falsy does not work properly.\n     // The display value can also be the number zero and shouldn't fall back to an empty string.\n     this._updateNativeInputValue(toDisplay != null ? toDisplay : '');\n   }\n \n   private _updateNativeInputValue(value: string): void {\n-    // We want to clear the previous selection if our new value is falsy. e.g: reactive form field\n-    // being reset.\n-    if (!value) {\n-      this._clearPreviousSelectedOption(null, false);\n-    }\n-\n     // If it's used within a `MatFormField`, we should set it through the property so it can go\n     // through change detection.\n     if (this._formField) {\ndiff --git a/src/material/autocomplete/autocomplete.spec.ts b/src/material/autocomplete/autocomplete.spec.ts\nindex 95986a4abffcfa3d1a2d3a1d724e4f1655edfa92..c81c549ab7f3d9b8c871a70a40b5915f9518f52f 100644\n--- a/src/material/autocomplete/autocomplete.spec.ts\n+++ b/src/material/autocomplete/autocomplete.spec.ts\n@@ -705,6 +705,65 @@ describe('MDC-based MatAutocomplete', () => {\n     }).not.toThrow();\n   });\n \n+  it('should clear the selected option if it no longer matches the input text while typing', fakeAsync(() => {\n+    const fixture = createComponent(SimpleAutocomplete);\n+    fixture.detectChanges();\n+    tick();\n+\n+    fixture.componentInstance.trigger.openPanel();\n+    fixture.detectChanges();\n+    zone.simulateZoneExit();\n+\n+    // Select an option and reopen the panel.\n+    (overlayContainerElement.querySelector('mat-option') as HTMLElement).click();\n+    fixture.detectChanges();\n+    tick();\n+    fixture.detectChanges();\n+    fixture.componentInstance.trigger.openPanel();\n+    fixture.detectChanges();\n+    zone.simulateZoneExit();\n+\n+    expect(fixture.componentInstance.options.first.selected).toBe(true);\n+\n+    const input = fixture.debugElement.query(By.css('input'))!.nativeElement;\n+    input.value = '';\n+    typeInElement(input, 'Ala');\n+    fixture.detectChanges();\n+    tick();\n+\n+    expect(fixture.componentInstance.options.first.selected).toBe(false);\n+  }));\n+\n+  it('should not clear the selected option if it no longer matches the input text while typing with requireSelection', fakeAsync(() => {\n+    const fixture = createComponent(SimpleAutocomplete);\n+    fixture.componentInstance.requireSelection = true;\n+    fixture.detectChanges();\n+    tick();\n+\n+    fixture.componentInstance.trigger.openPanel();\n+    fixture.detectChanges();\n+    zone.simulateZoneExit();\n+\n+    // Select an option and reopen the panel.\n+    (overlayContainerElement.querySelector('mat-option') as HTMLElement).click();\n+    fixture.detectChanges();\n+    tick();\n+    fixture.detectChanges();\n+    fixture.componentInstance.trigger.openPanel();\n+    fixture.detectChanges();\n+    zone.simulateZoneExit();\n+\n+    expect(fixture.componentInstance.options.first.selected).toBe(true);\n+\n+    const input = fixture.debugElement.query(By.css('input'))!.nativeElement;\n+    input.value = '';\n+    typeInElement(input, 'Ala');\n+    fixture.detectChanges();\n+    tick();\n+\n+    expect(fixture.componentInstance.options.first.selected).toBe(true);\n+  }));\n+\n   describe('forms integration', () => {\n     let fixture: ComponentFixture<SimpleAutocomplete>;\n     let input: HTMLInputElement;\n",
+  "diff_sha256": "3c5ce22fc1cc25cf290cbacd0b1a9a1ddde5eef5d0ce5b1c7183563df30432b3",
+  "original_files": 2,
+  "original_hunks": 3,
+  "hunk_reviews": [
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -506,6 +506,18 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "e081c3568429e4e8b2722c234df70eb992cc6c872eaaf0e9868363f79eb573ec",
+      "source_judgment": "Optional nonempty typing should quietly deselect the old option when its displayed value differs, while requireSelection retains selection until dismissal. The literal original passes the option object to displayWith; the owned _getDisplayValue(selectedOption.value) correctly passes the value and matches both actual minimum source implementations. Diagnostic cases check mismatch, updated matching display, callback argument identity and required-selection retention. Preserve the original clear-then-type native baseline and add direct nonempty typing coverage."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -640,18 +652,16 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "b5ebb3a14ff865de7d0604aa21049da7820b91ceae2d993ffc8819d89c602705",
+      "source_judgment": "Moving programmatic cleanup from the low-level display updater to the nullish actual model assignment avoids clearing valid0, false or empty displayed values. The source before/after variants demonstrate the intermediate falsey defect and its later correction; the owned method and both retained minimum peers pass all fourteen cases without a product change."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -705,6 +705,65 @@ describe('MDC-based MatAutocomplete', () => {",
+      "hunk_sha256": "ad958fc9c6998ed807f54e5f1236e893644c7a19961bd8246f6561d95e6e878c",
+      "source_judgment": "The two added upstream native regressions distinguish optional deselection from required retention after selecting and reopening. The current legacy optional test first clears the input, and the required test prepares only a programmatic model. Strengthen those existing scenarios with a real selection/reopen and direct nonempty typing while retaining every current assertion and named case. Actual native execution is outstanding."
+    }
+  ],
+  "decision": "The complete two-file/three-hunk typing/reset change is present in the owned legacy trigger. Optional nonempty typing quietly deselects a selected option when its displayed value no longer matches; displayWith receives the selected option value, retaining the correction to the original intermediate object argument. Required selection remains selected while typing until choice or dismissal. Programmatic cleanup is keyed to a nullish model, preserving non-null falsy values. The strengthened existing native cases require required-selection retention/reset, direct nonempty typing with display callback identity and quiet deselection, and reactive selected-state cleanup. Current whole-method Forms/RxJS diagnostics support this source judgment; actual Angular DI/rendering, packed behavior and runtime/compiler/RxJS/peer floors remain separate mandatory executions.",
+  "original_source_archive": {
+    "path": "compatibility/rc/autocomplete-selection-originals.json.gz",
+    "sha256": "ddb8eeefba441568d46b9107a88889553320ce2e841c3fdc90a29b3f518aeebc",
+    "bytes": 105021
+  },
+  "original_source_proposals": {
+    "path": "compatibility/rc/autocomplete-selection-individual-source-proposals.json",
+    "sha256": "8fb195f47e9abaa94cc606c10144dbc1ad7217732d184316c9da23b4e2ae6c28",
+    "bytes": 15067
+  },
+  "current_owned_sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "bytes": 40967
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+      "sha256": "6b9c00dbf365e6b6ea9b2b65eb7e67911775322c78848b996d3590f8fded3d58",
+      "bytes": 1975
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "2610d311569c9a6fdb063dc0652b423414622cf1370b2434f13ba86070293236",
+      "bytes": 152212
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.html",
+      "sha256": "8fae4afdffea376599d694a16698ee1a9502097cc9819ec2766a4a5d55b418ae",
+      "bytes": 325
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+      "sha256": "9fbb5eb60784e41f97296c9fd958871dfa4cee3975f0c4bcd3cfe54f6ec6aae4",
+      "bytes": 1171
+    }
+  ],
+  "native_contract_proposal": {
+    "path": "compatibility/rc/autocomplete-selection-native-contract-proposal.json",
+    "sha256": "9807d4a66c303445a1af43a2c4bb66217b7391af9ee62ab33f290c3b9bb066ba",
+    "bytes": 9149
+  },
+  "native_contract_controls": {
+    "path": "compatibility/rc/autocomplete-selection-native-contract-controls.json",
+    "sha256": "399ae70bfc112ae4bed87bc18be517e7ce4814d149b7ade9162276343636eb37",
+    "bytes": 14759
+  },
+  "diagnostic": {
+    "path": "compatibility/rc/autocomplete-selection-source-diagnostics.json.gz",
+    "sha256": "f46ad61249afdc48caa34ff54f30ddb46e60b92e86712c35c1601874e7afb88e",
+    "bytes": 3922
+  },
+  "diagnostic_producer": {
+    "path": "tests/autocomplete_selection_state_probe.mjs",
+    "sha256": "a9646b53b47ea4156394a9f55352c01ce9832c020360ee828e3c5e2fa442cd72",
+    "bytes": 18397
+  },
+  "private_node": "v24.21.0",
+  "private_typescript": "5.9.2",
+  "source_protocol_cases_per_source": 14,
+  "source_protocol_retained_minima": 2,
+  "source_protocol_mutants_rejected": 9,
+  "source_protocol_scope": "Complete patched owned, tagged, both retained minimum peer and original before/after prototype methods. Real FormControl value-accessor callbacks and RxJS closing/option-change streams; explicit synthetic panel/option/overlay receivers and controlled render notifications. Visibility, close teardown, focus/open eligibility, sizing, label, modal ownership and key-manager hooks are substituted. Constructors, field initializers, Angular rendering/DI, real DOM outside-click/geometry, packed artifact, runtime/compiler/RxJS/peer-floor execution are excluded.",
+  "original_before_after_observations": [
+    {
+      "side": "before",
+      "source_sha256": "47435e7a0437861b74b7e0cc1ae1651760b6b01ba3a50fe391d4aebe76aa1801",
+      "failed_case_ids": [
+        "non-null-value-retains-selection/zero",
+        "non-null-value-retains-selection/false",
+        "non-null-value-retains-selection/empty-string",
+        "non-null-value-retains-selection/empty-display",
+        "optional-nonempty-typing-clears-selection-quietly",
+        "optional-updated-display-retains-matching-selected-value"
+      ]
+    },
+    {
+      "side": "after",
+      "source_sha256": "c5d77f4414436a52d1b8225fb778e70b6782df3bfdaeed9be61f812b3aa1c1d8",
+      "failed_case_ids": [
+        "optional-nonempty-typing-clears-selection-quietly",
+        "optional-updated-display-retains-matching-selected-value"
+      ]
+    }
+  ],
+  "required_named_native_cases": [
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#37",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > forms integration > should retain the selected model while typing when selection is required"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#39",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > forms integration > should reset unmatched required-selection text once on outside click"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#42",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > forms integration > should update the control back to a string if user types after an option is selected"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#46",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > forms integration > should clear the text field if value is reset programmatically"
+    }
+  ],
+  "complete_historical_case_count": 2236,
+  "consumer_TS_HTML_CSS_SCSS_changes_required": false,
+  "actual_native_browser_artifact_or_floor_executed": false,
+  "g11_claim": "not-passed"
+}

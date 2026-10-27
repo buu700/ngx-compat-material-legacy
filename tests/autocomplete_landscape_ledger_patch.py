@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from autocomplete_selection_native_refs import native_registry_subject
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA = lambda data: hashlib.sha256(data).hexdigest()
@@ -105,7 +106,8 @@ def verify_landscape_successor(expected_before=None, root=ROOT):
                  diff_sha256=review['diff_sha256'], affected_branches=[line], decision=review['decision'],
                  historical_behavior=dict(kind='autocomplete-landscape-viewport',
                     case_ids=[row['case_id'] for row in review['required_named_native_cases']],
-                    source_members=[dict(path=p, sha256='09a96761ccbb96309989dfc13517170c3600fb2bd57b3fb7e9c9cb02f788d423' if p.endswith('/autocomplete.spec.ts') else SHA((root / p).read_bytes())) for p in paths]))
+                    source_members=[dict(path=p, sha256='09a96761ccbb96309989dfc13517170c3600fb2bd57b3fb7e9c9cb02f788d423' if p.endswith('/autocomplete.spec.ts') else
+                        native_registry_subject(root)['registry']['before_sha256'] if p == REGISTRY else SHA((root / p).read_bytes())) for p in paths]))
     current = dict(old, final_disposition='already-adapted', reason=review['decision'], read_note_disposition='individual-source-reviewed-on-' + line,
                    evidence_report=packet['review']['path'],
                    source_check=dict(kind='individual-source-reviewed-runtime-required', diff_sha256=review['diff_sha256'], patch_path=review['patch_file'], evidence_report_sha256=packet['review']['sha256']),
@@ -125,7 +127,7 @@ def verify_landscape_successor(expected_before=None, root=ROOT):
         assert i != index and parts[:3] == ('individual_proof', 'historical_behavior', 'source_members') and len(parts) == 5 and parts[-1] == 'sha256'
         member = expected['entries'][i]['individual_proof']['historical_behavior']['source_members'][parts[3]]
         assert member['path'] == REGISTRY and member['sha256'] == update['before'] == '7e04af26527d8520bdf3ae4b5ce7bfc861b642877c714708193bc87a8c7948f0'
-        assert update['after'] == SHA((root / REGISTRY).read_bytes())
+        assert update['after'] == native_registry_subject(root)['registry']['before_sha256']
         member['sha256'] = update['after']
         start, end = spans[('entries', i) + parts]
         edits.append((start, end, json.dumps(update['after'])))
