@@ -1,0 +1,725 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "cb820b1d8a8d942965790b75b48c21e345c86219",
+  "subject": "refactor(material/sidenav): switch tests away from fakeAsync (#33121)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "b8c5b8188be90ee6fc04115d65698e858bea7567",
+      "after_blob": "a57f80b294be712dab8e2c2090a4cee7e18ca76e"
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "62eef6caf71d731dce04b1da2c783b2c50816c8b",
+      "after_blob": "4d23fe8f02c2687edf328bf3d8e0359b1a06d4d9"
+    }
+  ],
+  "original_files": 2,
+  "original_hunks": 57,
+  "raw_commit_sha256": "2f47488bfc928403052fcd1e70dc254185779eea9a8748aa1bd93e33cda31821",
+  "original_sources": {
+    "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+    "sha256": "9962cf4a8f2c4daa3b600f2d4323782133f664f850afa1e225d5847a2a06b0ff"
+  },
+  "patch_file": "compatibility/rc/spec-navigation-async-source-cb820b1d8a8d942965790b75b48c21e345c86219.patch",
+  "diff_sha256": "5c2461674edd08ed371b3ee70a262ceeea294fcaae1b4ba842d1df70b55138b9",
+  "hunk_reviews": [
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -14,28 +14,24 @@ import {",
+      "sha256": "3a4fbe4253fd8d1ef66d562255691a801a0915d759ec4477e7132e93cd8ed17a",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -49,16 +45,16 @@ describe('MatDrawer', () => {",
+      "sha256": "6d744f0c65ae0cf5c61cd3c4c6ee7d9cc6332fd4b8d8243ab9f67e6e2e1ddafb",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -67,7 +63,7 @@ describe('MatDrawer', () => {",
+      "sha256": "3851c43415ce46c10a86e211c3e3dcabcf56aa4c9b1fc933311123f13c8d2a94",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -75,18 +71,17 @@ describe('MatDrawer', () => {",
+      "sha256": "757faaeaf36b0c72782422a9fb62fd012ca9c3603b27b306b4bb127a4ef1d51c",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -95,11 +90,11 @@ describe('MatDrawer', () => {",
+      "sha256": "ed03095e5fa73beb06814cad3614ede2f2edd118b763076465b5c650afd83e72",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -107,16 +102,16 @@ describe('MatDrawer', () => {",
+      "sha256": "40e9ad602b74e5240602c236214f4d1f03ca00816d34efe9589e7dd11471c36d",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -127,26 +122,26 @@ describe('MatDrawer', () => {",
+      "sha256": "405910783b7c4fc20befa9a3620bcff7f64ba100ebbfc295447314a5591b181a",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -155,28 +150,28 @@ describe('MatDrawer', () => {",
+      "sha256": "f79645e08bacb1e8a62716791e120fcbe902e664246e08b0c23054a15cfe951d",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -186,7 +181,7 @@ describe('MatDrawer', () => {",
+      "sha256": "fb96e34da370625704668789d4f220de230b9a8d22e87b04d9665bfa991cf625",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -195,14 +190,14 @@ describe('MatDrawer', () => {",
+      "sha256": "99bed1984aa6a155da3fc0f8337bedd1954b3896e1c37bd17956364e19fc5396",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -212,7 +207,7 @@ describe('MatDrawer', () => {",
+      "sha256": "b8c4ff3864e8281b24789f801572a0593d5699da41643f917d638684ac2c8a5a",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -220,25 +215,25 @@ describe('MatDrawer', () => {",
+      "sha256": "98ea68b159ad9b9858e0099e2f186767f6fc961d07f5e448e9c59b08822e891c",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -247,17 +242,17 @@ describe('MatDrawer', () => {",
+      "sha256": "51da28a0f00ee6bc7a752374b556c151f36e482bfdf7cd3bf7c5ece5417d1a3d",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -265,17 +260,17 @@ describe('MatDrawer', () => {",
+      "sha256": "35af2f2f0e3994d13af6bb548781ff8beead9cf62b2df6a08e25fad000f4dd6e",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -285,7 +280,7 @@ describe('MatDrawer', () => {",
+      "sha256": "8ff230674fd25f02890590f7eaf43de777032693007620d56a1f2a5d95351712",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -299,14 +294,14 @@ describe('MatDrawer', () => {",
+      "sha256": "c8e6220185b747c8ac58f62fdbe98cda8e378c181d87237b26bb521b00f357aa",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -318,20 +313,20 @@ describe('MatDrawer', () => {",
+      "sha256": "6d60ef6d3922a140582b85d9236ab871f864e662a58631c7778574e53e74d90c",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -342,20 +337,20 @@ describe('MatDrawer', () => {",
+      "sha256": "a0d6bba2cd6f5f360e7d6838560aaddc67f16c1b7901e8dd01d0af53f6d90a81",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -369,20 +364,20 @@ describe('MatDrawer', () => {",
+      "sha256": "f6af47e6f9fd5262fa73422ef4c2649b0d326a4b53ec21c9e1dda3358fe66df8",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -390,13 +385,13 @@ describe('MatDrawer', () => {",
+      "sha256": "465566286be3bd7c64174a0368196ac1ac3887a1d555119162ff98a4be1d6cf1",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -406,7 +401,7 @@ describe('MatDrawer', () => {",
+      "sha256": "12b67cd406cc1a7df2871b71615c4350c8e393a88a1c05f789ebbc31fcf38957",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -414,12 +409,12 @@ describe('MatDrawer', () => {",
+      "sha256": "849fc118e83f595f87175807f4e12d04ef9283d795a985df63c9141c0f08125f",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -453,7 +448,7 @@ describe('MatDrawer', () => {",
+      "sha256": "89297ec0b3ae432eba9bf740321e71eb205471be3914da6ea4188ec1f27285b9",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -467,17 +462,17 @@ describe('MatDrawer', () => {",
+      "sha256": "6f0f0654052aaffb23bbb2f66df4fb0c4bb088214f9cfdde673ef9db561624bd",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -491,7 +486,7 @@ describe('MatDrawer', () => {",
+      "sha256": "bbdb7428e17498d1aaedf2af97c24ef89e46ecc639478e1e8d3be5101de8fe1d",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -501,12 +496,12 @@ describe('MatDrawer', () => {",
+      "sha256": "27801ad9a94134b8ee1cfdd265c4e6ade5b5c622e544375226474aeb5c67264e",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -514,22 +509,16 @@ describe('MatDrawer', () => {",
+      "sha256": "9f678064aaca9e99614a112f6a88d5c9fda35f98662c0ec5e83fe284b505a375",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -549,7 +538,7 @@ describe('MatDrawer', () => {",
+      "sha256": "69f797f2251ebd6f0943ae46d3809c75c7dbf26b0542a54570b60613bc2e7fb5",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -557,13 +546,13 @@ describe('MatDrawer', () => {",
+      "sha256": "e186c76b051908d134e064f041bb7780f90dc61c6ddaf9e077ad0fcfce4d30d8",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -571,13 +560,13 @@ describe('MatDrawer', () => {",
+      "sha256": "40460cb5f76d0068f0eb238090fc00ad0f122cf7cb75e1feedda630bb6ef6851",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -586,13 +575,13 @@ describe('MatDrawer', () => {",
+      "sha256": "9c04fb460adb741dac85d25b6c0de89bf53678d55d2bbd4d17f023398a62027f",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -600,50 +589,42 @@ describe('MatDrawer', () => {",
+      "sha256": "13bf5a14accdd591bfbdf04db00266ca60269ba10e1401c75a96dd44b185d1fe",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -652,13 +633,13 @@ describe('MatDrawer', () => {",
+      "sha256": "1a74276ee5c294e4a242611f6a11e1fd7a2c0876733af22019ca14b1c5879a41",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -667,19 +648,19 @@ describe('MatDrawer', () => {",
+      "sha256": "c795a65333030275da133020db58676af9bf79e3b534adfff66190a080046264",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -696,13 +677,13 @@ describe('MatDrawer', () => {",
+      "sha256": "c4d08ce5b51d5eb386ba131858f7c4b9f9978acffb500a0d6663bfdd9056a712",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -711,22 +692,22 @@ describe('MatDrawer', () => {",
+      "sha256": "57ad121af42b8ccecf204ae6f0ff9a131168c45ea21e5a8906d3e25c6befdd02",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -735,7 +716,7 @@ describe('MatDrawer', () => {",
+      "sha256": "fae052494aab0b7c4335ef7d4f8e543b33a22a746e215421c9a9454d36634cdc",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -795,99 +776,88 @@ describe('MatDrawer', () => {",
+      "sha256": "6fed1d69c641c02605d0f2435824b7110894ac1cb480dbc03f79dd64c27c09b0",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -896,7 +866,7 @@ describe('MatDrawer', () => {",
+      "sha256": "44b1ec902036dd0d5ddd1ce53921c6b3c7a18003dc9269dd37822da0b13d4192",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -908,18 +878,18 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "c8b80aed7e12ce9b23a636668e9d0f8ea1eea672d2872bebf7d1bfaf30502928",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -934,19 +904,19 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "e1b4a5bd6e2700ce82a5a1b5a2c9dc8fcd33f1e6be59c0467a575921fc2f2b02",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -957,18 +927,18 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "b0bdafbe793e155a2d19a95b373d76bf0f4972ce243934b597e823df915e195c",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -981,15 +951,15 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "e689788284220a84a04cce9eb44fa5d19b0890bc8982019998bd68a6af9edf4e",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1003,9 +973,9 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "0831830663bc618c0c96cd3d4cb4310ca42747b996965709a78261d44080dde8",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1013,14 +983,14 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "2725c93c64eb1ba5116c314dcff359e6f668bd3e94edfcee9282f4d83eff30ca",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1028,7 +998,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "d0fb814bc84b8985ea1e896d4a6ecb160db2cda7d6ea901a042bd70d91da615e",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1039,14 +1009,13 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "74355e5a75f248edc5f012adf4aed557d0593503f6decc8818e6f9f032c9cb13",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1058,7 +1027,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "9ee05666b5ab7c9dbd7318751d7135289ba6d4ae7cb0b501ec9d4c2d16b6ccd1",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1066,15 +1035,13 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "e10578ef09646e87190b31da74d2fcd25197edee037a8bba4c239d784ef44f07",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1089,7 +1056,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "a83956b30eb239870c3fc09c22871efaea4f597f62c0a1b8a19632d1c0a0077b",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1099,7 +1066,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "dfb4be42666a400414913eb9df9fc4807c2970a74fa68b2cead1d7aaaeec68da",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1116,10 +1083,10 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "af4935ef12cb11632c0924c981d5323a85bc54cc00eb51e2814e53f330e4e5ed",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "header": "@@ -1,5 +1,5 @@",
+      "sha256": "ae37025161a0ba3d9c971a371d90de5b13bf34fa2e934c59a4074e5aa6f31807",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "header": "@@ -34,7 +34,7 @@ describe('MatSidenav', () => {",
+      "sha256": "3cb52f2be9225f72cf2ad89e9709ae409ae654152daa0003fe56aa84f205be27",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "header": "@@ -42,13 +42,13 @@ describe('MatSidenav', () => {",
+      "sha256": "0e8500ff7336b965b34ec1babc717711d81d76ba63b2573789a25306620027f6",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "header": "@@ -58,7 +58,7 @@ describe('MatSidenav', () => {",
+      "sha256": "b8ae3ca1b0eb386cecca387c2e6144fe64b8a8a0ef490513032dc96c00b04757",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "header": "@@ -66,12 +66,12 @@ describe('MatSidenav', () => {",
+      "sha256": "6908a5d5abd50470fdc0e87a37e50540c84e8b13ba28cb7a4c1e92aa71464d9e",
+      "judgment": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "cb820b1d8a8d942965790b75b48c21e345c86219",
+    "complete_original_files": 2,
+    "complete_original_hunks": 57,
+    "removed": [],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 59,
+    "hooks": 2,
+    "fixture_classes": 18,
+    "template_style_properties": 18
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+    "sha256": "e34fca8f2290bf0a1eb54434a7a3556f62c2910c3ebdc399bdb9541b4b9e074e"
+  },
+  "decision": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+  "prior_entry": {
+    "sha": "cb820b1d8a8d942965790b75b48c21e345c86219",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/sidenav): switch tests away from fakeAsync (#33121)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=1811659edf806aaf8e7421d1fdb8c07dddea5332299d5533244a019147cb15bf, bytes=44696). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/sidenav/drawer.spec.ts, src/material/sidenav/sidenav.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/sidenav/drawer.spec.ts",
+      "src/material/sidenav/sidenav.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/cb820b1d8a8d942965790b75b48c21e345c86219.json",
+    "batch_id": "test-only-refactor-wave2-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:47:11Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "1811659edf806aaf8e7421d1fdb8c07dddea5332299d5533244a019147cb15bf"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+    "sha256": "868b398b5c936d9bb40aa0b18ca33906c73e4874af0b3f7a8f16b228e8b56833"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "5c2461674edd08ed371b3ee70a262ceeea294fcaae1b4ba842d1df70b55138b9",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Decline this private sidenav/drawer scheduler migration after reviewing all57 hunks in both complete files. Pair59 cases with four finite label mappings: two insert a missing space in modewhen and two replace literal concatenation.16 complete callbacks retain semantics and43 change. Account for both hooks,18 raw-identical fixture classes and18 template/style properties. The close case removes its open-container class assertion and relaxes three event-count checks from exactly1 to >=1; the quick two-way-binding test replaces nested1ms timers/ticks with two native1ms waits. Other complete nonboundary operations and predicates are equal after enumerated timing changes, without proving focus trapping, event counts, backdrop, DOM position or teardown equivalence. Preserve owned historical M2 sidenav Sass and public peer integration. Cyph imports and re-exports MatSidenavModule; a bounded shared-source search found no direct sidenav/drawer tag beyond that module reference, which is not absence-based runtime exclusion or inheritance proof. No owned component fork, required consumer HTML/CSS/SCSS edit or API change follows from these private fixture preferences. Actual packed/public-peer/mixed integration and both supported floors remain open.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-navigation-async-source-review.mjs",
+        "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+      },
+      {
+        "path": "tests/spec_navigation_async_source_probe.mjs",
+        "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+      },
+      {
+        "path": "tests/test_spec_navigation_async_source.py",
+        "sha256": "49d5071cdd479516603bd7ac529d9448622eb0e31493a493a5070218c834d75f"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+        "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+        "sha256": "9962cf4a8f2c4daa3b600f2d4323782133f664f850afa1e225d5847a2a06b0ff"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+        "sha256": "3be4b312c1ba731dd1e696d30a48511271acde6a680cc003a8850af1cc9dac1a"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+        "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+        "sha256": "868b398b5c936d9bb40aa0b18ca33906c73e4874af0b3f7a8f16b228e8b56833"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+        "sha256": "e34fca8f2290bf0a1eb54434a7a3556f62c2910c3ebdc399bdb9541b4b9e074e"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+        "sha256": "377fec91d1625c53025bbd05a5dae5826ca2e94417e67d87ec307074aecaa3a7"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+        "sha256": "ba407fd2f1ded164d5f79322b229ff21ce2da1f610860f221751cee58e5c9be5"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+        "sha256": "97a6bad999248a20b633437a9874cb300f93815db9880cc6367394bebacc8085"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+        "sha256": "e5abcf5f338482ecdd8d40c72b4c20bdb06397bf0d3a78a23449fb0bc6571d70"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+        "sha256": "24f6341c4d34990447b421b72d0d4e8a3f997d945c340833ebac7cb9e424151c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+        "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+        "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+        "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+        "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+        "sha256": "1fe76bf969a400b9cd6f5be7e58e1bf997f496a8d5beaa755882b9a6340e58f8"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "silent_Sass_notice_source_successor": {
+      "role": "Exact silent-comment source metadata only; inherited review fields describe the original review epoch.",
+      "source_parent": "a9976c96ba09af54754f1e3ec4cb4a98cd5ba49b",
+      "prior_entry_sha256": "377517fd766be5d7063f9c8872ad3ec3f7b1458f2c6313608231dc321a9ea7c6",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-navigation-async-cb820b1d8a8d942965790b75b48c21e345c86219.json",
+        "sha256": "0c6bf9763c4b4808801ecb9951217af2973af2fe1c38eedc773c097ad4d713da",
+        "bytes": 119325
+      },
+      "source_delta": {
+        "path": "compatibility/rc/sass-wrapper-notice-successor.json",
+        "sha256": "5be99f3d9441057f9007868ffc7f1c9efe7d7b766b56fa0e640ba80e4cff7493",
+        "bytes": 3761
+      },
+      "source_reader_delta": {
+        "path": "compatibility/rc/sass-wrapper-notice-reader-successors.json",
+        "sha256": "9ca055d63bd19e5ef82d3c0894683190522aadb60d3bc959ef0565f788395919",
+        "bytes": 11846
+      },
+      "source_evidence_references_updated": 1,
+      "original_hunks_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_Angular_native_artifact_rendered_or_floor_executed": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-navigation-async-source-review.mjs",
+      "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+    },
+    {
+      "path": "tests/spec_navigation_async_source_probe.mjs",
+      "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+    },
+    {
+      "path": "tests/test_spec_navigation_async_source.py",
+      "sha256": "49d5071cdd479516603bd7ac529d9448622eb0e31493a493a5070218c834d75f"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+      "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+      "sha256": "9962cf4a8f2c4daa3b600f2d4323782133f664f850afa1e225d5847a2a06b0ff"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+      "sha256": "3be4b312c1ba731dd1e696d30a48511271acde6a680cc003a8850af1cc9dac1a"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+      "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+      "sha256": "868b398b5c936d9bb40aa0b18ca33906c73e4874af0b3f7a8f16b228e8b56833"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+      "sha256": "e34fca8f2290bf0a1eb54434a7a3556f62c2910c3ebdc399bdb9541b4b9e074e"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+      "sha256": "377fec91d1625c53025bbd05a5dae5826ca2e94417e67d87ec307074aecaa3a7"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+      "sha256": "ba407fd2f1ded164d5f79322b229ff21ce2da1f610860f221751cee58e5c9be5"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+      "sha256": "97a6bad999248a20b633437a9874cb300f93815db9880cc6367394bebacc8085"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+      "sha256": "e5abcf5f338482ecdd8d40c72b4c20bdb06397bf0d3a78a23449fb0bc6571d70"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+      "sha256": "24f6341c4d34990447b421b72d0d4e8a3f997d945c340833ebac7cb9e424151c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+      "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+      "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+      "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+      "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+      "sha256": "1fe76bf969a400b9cd6f5be7e58e1bf997f496a8d5beaa755882b9a6340e58f8"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "silent_Sass_notice_source_successor": {
+    "role": "Exact silent-comment source metadata only; inherited review fields describe the original review epoch.",
+    "source_parent": "a9976c96ba09af54754f1e3ec4cb4a98cd5ba49b",
+    "prior_entry_sha256": "377517fd766be5d7063f9c8872ad3ec3f7b1458f2c6313608231dc321a9ea7c6",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-navigation-async-cb820b1d8a8d942965790b75b48c21e345c86219.json",
+      "sha256": "0c6bf9763c4b4808801ecb9951217af2973af2fe1c38eedc773c097ad4d713da",
+      "bytes": 119325
+    },
+    "source_delta": {
+      "path": "compatibility/rc/sass-wrapper-notice-successor.json",
+      "sha256": "5be99f3d9441057f9007868ffc7f1c9efe7d7b766b56fa0e640ba80e4cff7493",
+      "bytes": 3761
+    },
+    "source_reader_delta": {
+      "path": "compatibility/rc/sass-wrapper-notice-reader-successors.json",
+      "sha256": "9ca055d63bd19e5ef82d3c0894683190522aadb60d3bc959ef0565f788395919",
+      "bytes": 11846
+    },
+    "source_evidence_references_updated": 1,
+    "original_hunks_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_Angular_native_artifact_rendered_or_floor_executed": false,
+    "g11_claim": "not-passed"
+  }
+}

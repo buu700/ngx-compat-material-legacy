@@ -1,0 +1,475 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "c6505d8ea45631d58c5dc1f427996dfb93d6de92",
+  "subject": "test(material/expansion): switch tests away from fakeAsync (#33617)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent audit remains separate",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "cefaf9a5ee944546877c6f28819b16d1d240fe12",
+      "after_blob": "228c36023389a0f6e151b8c6106ed27331951564"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 11,
+  "raw_commit_sha256": "f0a1a24c151a81e336d3055d4637eb506a7327b56a0578bcfbdf9ccad122498d",
+  "original_sources": [
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "before": {
+        "git_blob": "cefaf9a5ee944546877c6f28819b16d1d240fe12",
+        "sha256": "049573a38fb7e2128841d18b71337c846e4780bb8b800a21f46b6246e37eca1e",
+        "bytes": 22863
+      },
+      "after": {
+        "git_blob": "228c36023389a0f6e151b8c6106ed27331951564",
+        "sha256": "8e683bf538548d0f06183cd70ed08e16360ee825eda25b8dedcc7bb6c1752b39",
+        "bytes": 22995
+      }
+    }
+  ],
+  "diff": "diff --git a/src/material/expansion/expansion.spec.ts b/src/material/expansion/expansion.spec.ts\nindex cefaf9a5ee944546877c6f28819b16d1d240fe12..228c36023389a0f6e151b8c6106ed27331951564 100644\n--- a/src/material/expansion/expansion.spec.ts\n+++ b/src/material/expansion/expansion.spec.ts\n@@ -5,14 +5,7 @@ import {\n   dispatchKeyboardEvent,\n } from '@angular/cdk/testing/private';\n import {Component, ViewChild, ChangeDetectionStrategy} from '@angular/core';\n-import {\n-  ComponentFixture,\n-  TestBed,\n-  fakeAsync,\n-  flush,\n-  tick,\n-  waitForAsync,\n-} from '@angular/core/testing';\n+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';\n import {By} from '@angular/platform-browser';\n import {\n   MAT_EXPANSION_PANEL_DEFAULT_OPTIONS,\n@@ -34,7 +27,7 @@ describe('MatExpansionPanel', () => {\n     });\n   }));\n \n-  it('should expand and collapse the panel', fakeAsync(() => {\n+  it('should expand and collapse the panel', async () => {\n     const fixture = TestBed.createComponent(PanelWithContent);\n     const headerEl = fixture.nativeElement.querySelector('.mat-expansion-panel-header');\n     fixture.detectChanges();\n@@ -44,10 +37,10 @@ describe('MatExpansionPanel', () => {\n     fixture.componentInstance.expanded = true;\n     fixture.changeDetectorRef.markForCheck();\n     fixture.detectChanges();\n-    flush();\n+    await fixture.whenStable();\n \n     expect(headerEl.classList).toContain('mat-expanded');\n-  }));\n+  });\n \n   it('should add strong focus indication', () => {\n     const fixture = TestBed.createComponent(PanelWithContent);\n@@ -234,12 +227,12 @@ describe('MatExpansionPanel', () => {\n     expect(wrapper.hasAttribute('inert')).toBe(true);\n   });\n \n-  it('should restore focus to header if focused element is inside panel on close', fakeAsync(() => {\n+  it('should restore focus to header if focused element is inside panel on close', async () => {\n     const fixture = TestBed.createComponent(PanelWithContent);\n     fixture.componentInstance.expanded = true;\n     fixture.changeDetectorRef.markForCheck();\n     fixture.detectChanges();\n-    tick(250);\n+    await wait(300);\n \n     const button = fixture.debugElement.query(By.css('button'))!.nativeElement;\n     const header = fixture.debugElement.query(By.css('mat-expansion-panel-header'))!.nativeElement;\n@@ -252,17 +245,17 @@ describe('MatExpansionPanel', () => {\n     fixture.componentInstance.expanded = false;\n     fixture.changeDetectorRef.markForCheck();\n     fixture.detectChanges();\n-    tick(250);\n+    await wait(300);\n \n     expect(document.activeElement).withContext('Expected header to be focused.').toBe(header);\n-  }));\n+  });\n \n-  it('should not change focus origin if origin not specified', fakeAsync(() => {\n+  it('should not change focus origin if origin not specified', async () => {\n     const fixture = TestBed.createComponent(PanelWithContent);\n     fixture.componentInstance.expanded = true;\n     fixture.changeDetectorRef.markForCheck();\n     fixture.detectChanges();\n-    tick(250);\n+    await wait(300);\n \n     const header = fixture.debugElement.query(By.css('mat-expansion-panel-header'))!;\n     const headerInstance = header.componentInstance;\n@@ -270,13 +263,13 @@ describe('MatExpansionPanel', () => {\n     headerInstance.focus('mouse');\n     headerInstance.focus();\n     fixture.detectChanges();\n-    tick(250);\n+    await wait(300);\n \n     expect(header.nativeElement.classList).toContain('cdk-focused');\n     expect(header.nativeElement.classList).toContain('cdk-mouse-focused');\n-  }));\n+  });\n \n-  it('should not override the panel margin if it is not inside an accordion', fakeAsync(() => {\n+  it('should not override the panel margin if it is not inside an accordion', async () => {\n     const fixture = TestBed.createComponent(PanelWithCustomMargin);\n     fixture.detectChanges();\n \n@@ -292,7 +285,7 @@ describe('MatExpansionPanel', () => {\n     fixture.componentInstance.expanded = true;\n     fixture.changeDetectorRef.markForCheck();\n     fixture.detectChanges();\n-    tick(250);\n+    await wait(300);\n \n     styles = getComputedStyle(panel.nativeElement);\n \n@@ -301,7 +294,7 @@ describe('MatExpansionPanel', () => {\n     expect(styles.marginBottom).toBe('13px');\n     expect(styles.marginLeft).toBe('37px');\n     expect(styles.marginRight).toBe('37px');\n-  }));\n+  });\n \n   it('should be able to hide the toggle', () => {\n     const fixture = TestBed.createComponent(PanelWithContent);\n@@ -352,7 +345,7 @@ describe('MatExpansionPanel', () => {\n     expect(fixture.componentInstance.expanded).toBe(false);\n   });\n \n-  it('should emit events for body expanding and collapsing animations', fakeAsync(() => {\n+  it('should emit events for body expanding and collapsing animations', async () => {\n     const fixture = TestBed.createComponent(PanelWithContent);\n     fixture.detectChanges();\n     let afterExpand = 0;\n@@ -363,17 +356,17 @@ describe('MatExpansionPanel', () => {\n     fixture.componentInstance.expanded = true;\n     fixture.changeDetectorRef.markForCheck();\n     fixture.detectChanges();\n-    flush();\n+    await fixture.whenStable();\n     expect(afterExpand).toBe(1);\n     expect(afterCollapse).toBe(0);\n \n     fixture.componentInstance.expanded = false;\n     fixture.changeDetectorRef.markForCheck();\n     fixture.detectChanges();\n-    flush();\n+    await fixture.whenStable();\n     expect(afterExpand).toBe(1);\n     expect(afterCollapse).toBe(1);\n-  }));\n+  });\n \n   it('should be able to set the default options through the injection token', () => {\n     TestBed.resetTestingModule().configureTestingModule({\n@@ -544,6 +537,10 @@ describe('MatExpansionPanel', () => {\n   });\n });\n \n+function wait(milliseconds: number) {\n+  return new Promise(resolve => setTimeout(resolve, milliseconds));\n+}\n+\n @Component({\n   template: `\n   <mat-expansion-panel [expanded]=\"expanded\"\n",
+  "diff_sha256": "022579a9fc00671557a0f88f117c57951826d176ad7d3f4c5714fa8c3c016aa8",
+  "hunk_reviews": [
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -5,14 +5,7 @@ import {",
+      "sha256": "9691c25341c3476c931f554cce3d133bcf231d24a8e6be8400b79d54f7faa4b6",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -34,7 +27,7 @@ describe('MatExpansionPanel', () => {",
+      "sha256": "943733c3ddd113aafc2d1d453139b3dff2b2fd97b022c33b85b8714834ba4bb7",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -44,10 +37,10 @@ describe('MatExpansionPanel', () => {",
+      "sha256": "c25ee0ee98c49cb46e1080ca9b1d17c294d808eb55105297442738598219c26b",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -234,12 +227,12 @@ describe('MatExpansionPanel', () => {",
+      "sha256": "772267ba0c1ad447302831484defd8ae61aa60b2336bfa991d62b497bc8bf1fc",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -252,17 +245,17 @@ describe('MatExpansionPanel', () => {",
+      "sha256": "58a166bbfd057e9980c961263d7f2787b964be32f45b67273e53343e40ee5fb2",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -270,13 +263,13 @@ describe('MatExpansionPanel', () => {",
+      "sha256": "1b53d24733aa9562bf468a2e800fb003194982730b31b0961fcd91030612740f",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -292,7 +285,7 @@ describe('MatExpansionPanel', () => {",
+      "sha256": "5338f6952634135e45ff965d304f9403714e16d66ae1a4ed97919b2c14800801",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -301,7 +294,7 @@ describe('MatExpansionPanel', () => {",
+      "sha256": "04fccdb2e9f47933c48d989208a42bd71fad5751010f45b0967c06a08b8b23a9",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -352,7 +345,7 @@ describe('MatExpansionPanel', () => {",
+      "sha256": "10bc42d84fe67d47e0528c760ef062f246c79e5af126b1dbbfc0146676acc334",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -363,17 +356,17 @@ describe('MatExpansionPanel', () => {",
+      "sha256": "66ae66d67fb395690aeb86d3ca34a43bed95d45345eabcd27e780c8bdb0ac374",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    },
+    {
+      "path": "src/material/expansion/expansion.spec.ts",
+      "header": "@@ -544,6 +537,10 @@ describe('MatExpansionPanel', () => {",
+      "sha256": "64c0fc2b30f0a66b198bbdff3b7a48f140858e47b42824648f5ce03a834c8bc4",
+      "judgment": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+      "review_basis": "Whole authenticated original; exact ordered suite/path/mode/occurrence pairing; full nonboundary callback/helper/predicate/declaration comparison and every recorded boundary; complete setup/provider/helper/import and raw fixture class/template/style comparison. No scheduler/peer/security runtime equivalence."
+    }
+  ],
+  "async_source_semantics": {
+    "sha": "c6505d8ea45631d58c5dc1f427996dfb93d6de92",
+    "complete_original_files": 1,
+    "complete_original_hunks": 11,
+    "static_occurrences_paired": 29,
+    "unchanged_complete_callback_semantics": 24,
+    "fixtureClasses": [
+      {
+        "name": "PanelWithContent",
+        "raw_sha256": "ce95a0076a70d9328e09ed34abfe95a2f97cb46f6276d60d07db95183f6b2aef"
+      },
+      {
+        "name": "PanelWithContentInNgIf",
+        "raw_sha256": "30da8a3b3579c151789754b316cd7d8bcb00a6151b722ed12d75664c1ce18d1e"
+      },
+      {
+        "name": "PanelWithCustomMargin",
+        "raw_sha256": "14f9b91dcd605fb2db7aeac4dfd863f54ef43bedf877297c36a13cc8a826d5fe"
+      },
+      {
+        "name": "LazyPanelWithContent",
+        "raw_sha256": "9463a6552204d6ca578be3b2e5fb64915c26d0019997d4802adb76f77eb5d20f"
+      },
+      {
+        "name": "LazyPanelOpenOnLoad",
+        "raw_sha256": "f3cff7bc1fc847abfbfa7df7002ffefa866ce305a5a7dddacbfcb1ced4b28a91"
+      },
+      {
+        "name": "PanelWithTwoWayBinding",
+        "raw_sha256": "52193768d4fefc87f4548faa012a522e8a9d9361c84a65803f32277da36ea086"
+      },
+      {
+        "name": "PanelWithHeaderTabindex",
+        "raw_sha256": "48d84f41169d68e6378d89303288d81a809a3e2547978e3c63d74b8e1b080bb6"
+      },
+      {
+        "name": "NestedLazyPanelWithContent",
+        "raw_sha256": "9819b5b4f57f0758447bbe3a040ee021ed4ac23bd4c659e85d3e0d88dd51c285"
+      }
+    ],
+    "removed_testing_imports": [
+      "fakeAsync",
+      "flush",
+      "tick"
+    ],
+    "native_wait_helper_added": true,
+    "all_other_noncase_helpers_and_metadata_equal": true,
+    "retained_expansion_waitForAsync_binding_and_setup": true,
+    "trustChecks": [],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "security_clearance": "not-passed",
+    "complete_case_pairs_boundary_positions_and_setup_hooks": {
+      "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+      "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+    }
+  },
+  "decision": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "022579a9fc00671557a0f88f117c57951826d176ad7d3f4c5714fa8c3c016aa8",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Review all11 hunks of the complete expansion spec migration. Pair29 exact static registrations;24 callback semantics are unchanged and five fakeAsync callbacks become native async. Three flush calls become fixture.whenStable observations. Five simulated250ms waits in focus restoration, focus-origin and custom-margin tests become native300ms waits through an exact Promise/setTimeout helper. The wider windows and real timers are individually recorded, not equivalent deadlines or animation/focus lifecycle proof. All29 predicate expressions and every nonboundary operation remain equal; all eight fixture classes/templates and two setup hooks remain exact. The existing waitForAsync import and animation-disabled provider setup are retained, not removed by a general testing-import filter. Decline this private scheduling preference. Preserve the owned historical M2 expansion Sass and actual reachable public expansion integration used by Cyph account-settings panels; no expansion or animation-engine fork, new selector or required consumer CSS/SCSS change. Actual focus restoration/origin, margin/event, mixed theme/peer and supported-floor observations remain pending.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-surface-async-source-review.mjs",
+        "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+      },
+      {
+        "path": "tests/spec_surface_async_source_probe.mjs",
+        "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+        "sha256": "2ed9950eeba1d35a3c356a7356dd247797e0b2c4dcc2c5057970cd174d2ad185"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+        "sha256": "664fcf7edf5f10c1d847538b2669fee5ca77a930160fa42afd5002236a210dee"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+        "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-controls.json",
+        "sha256": "ca11d9db6fbb69fc880517eb6c8ca3a920ad1a2e769e919f201c4d7f771a4077"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+        "sha256": "5fe84575f5ced6c35f590f9a493f3c005fb9c3bd968749a9b299bd6742f3fb2e"
+      },
+      {
+        "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+        "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+        "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+      },
+      {
+        "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+        "sha256": "dfde6c6c08858f72f40e7260441eb7840d511a322a2fc196983028632c5ff54f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+        "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+        "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+        "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+        "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+        "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+        "sha256": "3dfc8f81fa358b147d86fbc1fba409eec4409a9a80cc741f8e9d93b2c5894728"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+        "sha256": "e47d0786961bf4cd1365c795f159151a412c43e1f1566bf928be040f34f63cec"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+        "sha256": "e94e25372f4e17bfa41069cfdb59176da580f1ee92dc6e825b2559d264fd9bd7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+        "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+        "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+      },
+      {
+        "path": "testing/legacy-runner/historical-inventory.json",
+        "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "security_clearance": "not-passed",
+    "silent_Sass_notice_source_successor": {
+      "role": "Exact silent-comment source metadata only; inherited review fields describe the original review epoch.",
+      "source_parent": "a9976c96ba09af54754f1e3ec4cb4a98cd5ba49b",
+      "prior_entry_sha256": "5991250f844eb52238f49a549fe2ab598d91673971f06696563840c9e08935b0",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-surface-async-c6505d8ea45631d58c5dc1f427996dfb93d6de92.json",
+        "sha256": "722f0e92b830ec52b3082681a99e3cec0126e234fdbc46f7b2ac3f7d7026423a",
+        "bytes": 42558
+      },
+      "source_delta": {
+        "path": "compatibility/rc/sass-wrapper-notice-successor.json",
+        "sha256": "5be99f3d9441057f9007868ffc7f1c9efe7d7b766b56fa0e640ba80e4cff7493",
+        "bytes": 3761
+      },
+      "source_reader_delta": {
+        "path": "compatibility/rc/sass-wrapper-notice-reader-successors.json",
+        "sha256": "9ca055d63bd19e5ef82d3c0894683190522aadb60d3bc959ef0565f788395919",
+        "bytes": 11846
+      },
+      "source_evidence_references_updated": 3,
+      "original_hunks_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_Angular_native_artifact_rendered_or_floor_executed": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "prior_entry": {
+    "sha": "c6505d8ea45631d58c5dc1f427996dfb93d6de92",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(material/expansion): switch tests away from fakeAsync (#33617)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=64ad10b70c905a63da886be944dc46384485ca783a01ffdb7ed6e13830f5f59f, bytes=5761). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/expansion/expansion.spec.ts). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/expansion/expansion.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/c6505d8ea45631d58c5dc1f427996dfb93d6de92.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "64ad10b70c905a63da886be944dc46384485ca783a01ffdb7ed6e13830f5f59f"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-surface-async-source-prior.json.gz",
+    "sha256": "52414ff5a703bf58dc8ffba868e78ad163348470291b2cb9e2e9b89ca7e1bd06"
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-surface-async-source-review.mjs",
+      "sha256": "3df2f9bfc0c98175dbe22ff2e836f8c4b034a8325a5e5b880f9d22dcb971f35b"
+    },
+    {
+      "path": "tests/spec_surface_async_source_probe.mjs",
+      "sha256": "03286d41ac286a13081a2f13bb01d1335cbc6faead1e29ecfba031d72cf6c242"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-subjects.json.gz",
+      "sha256": "2ed9950eeba1d35a3c356a7356dd247797e0b2c4dcc2c5057970cd174d2ad185"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-acquisition.json.gz",
+      "sha256": "664fcf7edf5f10c1d847538b2669fee5ca77a930160fa42afd5002236a210dee"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-review.json.gz",
+      "sha256": "438c515a74bdde3bc3cbeb68a10be45a161f2c3db5c3bb12c6a8defd771cd73e"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-controls.json",
+      "sha256": "ca11d9db6fbb69fc880517eb6c8ca3a920ad1a2e769e919f201c4d7f771a4077"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-python.log.gz",
+      "sha256": "5fe84575f5ced6c35f590f9a493f3c005fb9c3bd968749a9b299bd6742f3fb2e"
+    },
+    {
+      "path": "compatibility/rc/spec-surface-async-source-cyph-sanity.json",
+      "sha256": "f61de8033f6acccabf80caee946c70467d42c2c7cd68d16c8bdc0055364a9d4a"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-stability-context-checkpoint.json",
+      "sha256": "0a7710d23ad4f3167f9811210197a06013e806bc343f05999a29956fbeae7c90"
+    },
+    {
+      "path": "compatibility/rc/spec-form-async-source-checkpoint.json",
+      "sha256": "dfde6c6c08858f72f40e7260441eb7840d511a322a2fc196983028632c5ff54f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "ba8ba4b6094c4b57b5a0bb322deb1fd01c43421690cbd4e686297d0550096c2c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/internal/table-data-source-base.ts",
+      "sha256": "1099ece9faa43b45a176249ffa9aef4def1f91caa3849ade6b4735d6cd1f1374"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table-data-source.spec.ts",
+      "sha256": "69cf9ee2662c3c7ef95d07dbf4fe1ac4db574ae48ae9297c3668e2db64a55bd5"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/shared.spec.ts",
+      "sha256": "79f91af902e493a4a3e1e1bbe8b77663fcab60995fe867d2bab1e810273db27d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/testing/chip-list-harness.spec.ts",
+      "sha256": "167fc9336006c449744495f8b63214da56ae0bd64d269cdbb6c7dc0cc4ed3bf3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/icon/_icon-theme.scss",
+      "sha256": "300eeb984267971f75889443333e5907bccdd9e715c99ab530d2617991c34bc7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/button-toggle/_button-toggle-theme.scss",
+      "sha256": "3dfc8f81fa358b147d86fbc1fba409eec4409a9a80cc741f8e9d93b2c5894728"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/expansion/_expansion-theme.scss",
+      "sha256": "e47d0786961bf4cd1365c795f159151a412c43e1f1566bf928be040f34f63cec"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/sort/_sort-theme.scss",
+      "sha256": "e94e25372f4e17bfa41069cfdb59176da580f1ee92dc6e825b2559d264fd9bd7"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_legacy-button-toggle.scss",
+      "sha256": "1b1af290f84848fbf677aa5045bf950b7ecfbdaf169b7c8b674b04a0433e224d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/core/tokens/m2/mat/_standard-button-toggle.scss",
+      "sha256": "fc3df28f0b1a47fb978ef43728ed2810baff88c5b8bdd8d2d9c56b14ccb77ff0"
+    },
+    {
+      "path": "testing/legacy-runner/historical-inventory.json",
+      "sha256": "a6077c325b7f13e34eded6d0831f17fe880a229519d183d52de99f4924288c77"
+    }
+  ],
+  "all_other1693_rows_unchanged": true,
+  "product_or_consumer_files_changed": 0,
+  "actual_new_Angular_chip_case_executed": false,
+  "actual_Angular_native_artifact_or_floor_qualified": false,
+  "security_clearance": "not-passed",
+  "g11_claim": "not-passed",
+  "silent_Sass_notice_source_successor": {
+    "role": "Exact silent-comment source metadata only; inherited review fields describe the original review epoch.",
+    "source_parent": "a9976c96ba09af54754f1e3ec4cb4a98cd5ba49b",
+    "prior_entry_sha256": "5991250f844eb52238f49a549fe2ab598d91673971f06696563840c9e08935b0",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-surface-async-c6505d8ea45631d58c5dc1f427996dfb93d6de92.json",
+      "sha256": "722f0e92b830ec52b3082681a99e3cec0126e234fdbc46f7b2ac3f7d7026423a",
+      "bytes": 42558
+    },
+    "source_delta": {
+      "path": "compatibility/rc/sass-wrapper-notice-successor.json",
+      "sha256": "5be99f3d9441057f9007868ffc7f1c9efe7d7b766b56fa0e640ba80e4cff7493",
+      "bytes": 3761
+    },
+    "source_reader_delta": {
+      "path": "compatibility/rc/sass-wrapper-notice-reader-successors.json",
+      "sha256": "9ca055d63bd19e5ef82d3c0894683190522aadb60d3bc959ef0565f788395919",
+      "bytes": 11846
+    },
+    "source_evidence_references_updated": 3,
+    "original_hunks_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_Angular_native_artifact_rendered_or_floor_executed": false,
+    "g11_claim": "not-passed"
+  }
+}
