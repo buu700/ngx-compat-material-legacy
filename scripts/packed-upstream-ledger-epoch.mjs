@@ -61,7 +61,7 @@ function registryBeforeMetadata(root,read,line,ref){
 }
 function selectionReaders(root,read,line){
   const cached=selectionReaderCache.get(read);
-  if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.spec.line,line);cached.scope.assertCurrent();return cached.scope;}
+  if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.spec.line,line);return cached.scope;}
   const scope=autocompleteSelectionReaderSubject({root,read,line});selectionReaderCache.set(read,{root,scope});return scope;
 }
 function selectionMember({root,read,line,ref,bound}){
@@ -693,7 +693,10 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const before = gitBytes(root, data.before_ledger.source_parent, ledgerPath);
   assert.equal(hash(before), data.before_ledger.sha256);
   const bound = new Map([[inputPath, hash(input)]]);
-  const specReaders=selectionReaders(root,read,line);for(const ref of specReaders.bound)bound.set(ref.path,ref.sha256);
+  // Scope checks bracket the complete preparation instead of rereading every
+  // scope member for each unrelated member. Individual reads still check their
+  // own digest, and returned epoch readers retain their full late-change gate.
+  const specReaders=selectionReaders(root,read,line);specReaders.assertCurrent();for(const ref of specReaders.bound)bound.set(ref.path,ref.sha256);
   const nativeSubjects=selectionNative(root,read,line);for(const ref of nativeSubjects.bound)bound.set(ref.path,ref.sha256);
   function member(ref, authenticate = false) {
     const raw=selectionMember({root,read,line,ref,bound});
@@ -769,6 +772,7 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const nativeSelection=prepareSelectionNativeStage({root,read,line,before:nativeSpec.after,bound});
   const historicalWrapper=prepareHistoricalWrapperMetadataStage({root,read,line,before:nativeSelection.after,bound});
   const consumerWrapper=prepareHistoricalConsumerWrapperMetadataStage({root,read,line,before:historicalWrapper.after,bound});
+  specReaders.assertCurrent();
   return {line, before, after, canonical_after:consumerWrapper.after,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
     input_sha256: hash(input),
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
