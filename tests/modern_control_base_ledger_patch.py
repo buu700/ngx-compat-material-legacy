@@ -65,7 +65,10 @@ def derive_control_successor(root=ROOT, expected_before=None):
 
 def verify_control_successor(root=ROOT, expected_before=None, candidate=None):
     before, after = derive_control_successor(root=root, expected_before=expected_before)
-    assert (Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()) == after
+    current = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    if current != after:
+        from theme_token_root_ledger_patch import verify_root_successor
+        verify_root_successor(root=root, expected_before=after, candidate=candidate)
     return dict(line='21.x', individual_decisions=4, unselected_entry_bytes_preserved=1693,
         before_sha256=HASH(before), after_sha256=HASH(after), after_bytes=len(after),
         closed_dispositions=367, pending_dispositions=1330, pending_security_reviews=1,

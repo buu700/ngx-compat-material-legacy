@@ -26,4 +26,8 @@ export const sourceContractDefinitions = [
     scope_key:'modern_control_base_source_scope',module:'upstream-modern-control-base-admission.cjs'},
   {sha:'7c16cc8b659133167f1b875dcfe77ca806bfe876',proof_kind:'individual-historical-modern-control-base-source-exclusion',
     scope_key:'modern_control_base_source_scope',module:'upstream-modern-control-base-admission.cjs'},
+  {sha:'408c0b492f5d7edd6571b2287bb06aa89d582758',proof_kind:'individual-historical-token-root-source-exclusion',
+    scope_key:'theme_token_root_source_scope',module:'upstream-theme-token-root-admission.cjs'},
+  {sha:'6cc6cf21f292d78c930cbda79c1f337bd6b82bfe',proof_kind:'individual-historical-token-root-source-exclusion',
+    scope_key:'theme_token_root_source_scope',module:'upstream-theme-token-root-admission.cjs'},
 ];
