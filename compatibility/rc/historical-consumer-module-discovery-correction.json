@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Module discovery correction reproduced by changed wrapper integration; no original probe, assertion, capsule, golden or product source changed.",
+  "source_parent": "35688ab4bfe88de585342f194f3463f409c03cbc",
+  "source_edits": [
+    {
+      "path": "scripts/historical-consumer-reference-fixture.py",
+      "before_sha256": "e65df2b390a704df5c1ddb7502a13361d847c6320d63b859e1971ff3184c93ca",
+      "after_sha256": "aef65724de8acb51922fb09b875cbedf1d4f44086178686270f454019031295c",
+      "unified_diff": "--- scripts/historical-consumer-reference-fixture.py (before)\n+++ scripts/historical-consumer-reference-fixture.py (after)\n@@ -9,7 +9,6 @@\n import json\n import os\n from pathlib import Path, PurePosixPath\n-import re\n import subprocess\n import sys\n \n@@ -19,6 +18,8 @@\n         '21.x': 'aadca3d619b2f8bd017ee0ee3e90b894de826df57ebaad342501083aa200118e'}\n BASE = 'scripts/historical-chip-reference-fixture.py'\n BASE_SHA = 'dc675455781e6b4119f9230412250499974e6f016dd720dfdd40c4ddea9329d3'\n+GRAPH = 'scripts/historical-consumer-module-graph.mjs'\n+GRAPH_SHA = '72eac7900d6ee5241d991060fe43d023032b023b6c1622a08c6ecd3299060a2e'\n \n \n def stage(root, line, family, output):\n@@ -34,11 +35,11 @@\n     spec = importlib.util.spec_from_file_location('historical_chip_reference_fixture', root / BASE)\n     base = importlib.util.module_from_spec(spec)\n     spec.loader.exec_module(base)\n-    # Configure the unchanged staging implementation inside this private child\n-    # process. Its selection, Git/blob verification and extraction rules remain\n-    # unchanged. No source file or original Git object is modified.\n+    # Reuse the unchanged shared extraction and Git/blob checks. Module discovery\n+    # belongs to the parsed extension below, so quoted source fixtures never\n+    # become phantom imports in the shared implementation's older regex scan.\n     base.REFERENCES = {line: subject['reference_commit']}\n-    base.PROBES = (subject['probe'],)\n+    base.PROBES = ()\n     base.stage(root, line, output)\n     manifest_path = output / 'historical-reference-manifest.json'\n     base_raw = manifest_path.read_bytes()\n@@ -77,12 +78,12 @@\n     for path in ('package.json', 'pnpm-lock.yaml', 'toolchain-lock.json', '.node-version', '.npm-version',\n                  'tsconfig.json', 'justfile', 'pnpm-workspace.yaml'):\n         select(path)\n-    for path in manifest['local_module_closure']:\n-        text = (output / path).read_text()\n-        for _, prefix in re.findall(r\"(['\\\"])((?:compatibility|scripts|tests|testing|projects)/[^'\\\"\\n]+-)\\1\", text):\n-            for candidate in index:\n-                if candidate.startswith(prefix):\n-                    select(candidate)\n+    assert hashlib.sha256((root / GRAPH).read_bytes()).hexdigest() == GRAPH_SHA, 'historical module parser changed'\n+    graph = json.loads(subprocess.check_output(['node', str(root / GRAPH)], cwd=root, env=env,\n+        input=json.dumps(dict(reference=subject['reference_commit'], probe=subject['probe'], paths=sorted(index))).encode()))\n+    manifest['local_module_closure'] = graph['modules']\n+    for path in graph['modules'] + graph['inputs']:\n+        select(path)\n \n     def references(value):\n         if isinstance(value, dict):\n@@ -120,6 +121,7 @@\n     manifest['members_sha256'] = hashlib.sha256(json.dumps(manifest['members'], separators=(',', ':'), ensure_ascii=False).encode()).hexdigest()\n     manifest['consumer_extension'] = dict(family=family, catalog_sha256=PINS[line],\n         shared_stager=dict(path=BASE, sha256=BASE_SHA), base_manifest_sha256=hashlib.sha256(base_raw).hexdigest(),\n+        module_graph_parser=dict(path=GRAPH, sha256=GRAPH_SHA, runtime=graph['parser']),\n         extra_exact_Git_members=len(additions), original_probe_source_unchanged=True)\n     manifest_path.write_text(json.dumps(manifest, indent=2) + '\\n')\n     return dict(line=line, family=family, reference_commit=subject['reference_commit'],\n"
+    },
+    {
+      "path": "scripts/run-historical-consumer-probe.mjs",
+      "before_sha256": "b42cc9f903506b716d935a7be0d45cb09626422a612c19daf4fd305f71756ad3",
+      "after_sha256": "5d86e06fae056a3e6296e8ec817b327b2e05c99df749221fa960e376ff650f05",
+      "unified_diff": "--- scripts/run-historical-consumer-probe.mjs (before)\n+++ scripts/run-historical-consumer-probe.mjs (after)\n@@ -18,7 +18,7 @@\n const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');\n const catalogPath='compatibility/rc/historical-consumer-source-subjects.json';\n const stagerPath='scripts/historical-consumer-reference-fixture.py';\n-const stagerHash='e65df2b390a704df5c1ddb7502a13361d847c6320d63b859e1971ff3184c93ca';\n+const stagerHash='aef65724de8acb51922fb09b875cbedf1d4f44086178686270f454019031295c';\n const pins={main:'8a0d7419de3d3ed7e7d0825b5223174f05e34cff86d184bb0632dc16b8d16b36',\n   '21.x':'aadca3d619b2f8bd017ee0ee3e90b894de826df57ebaad342501083aa200118e'};\n const hash=raw=>createHash('sha256').update(raw).digest('hex');\n"
+    }
+  ],
+  "new_module_graph_parser": {
+    "path": "scripts/historical-consumer-module-graph.mjs",
+    "sha256": "72eac7900d6ee5241d991060fe43d023032b023b6c1622a08c6ecd3299060a2e",
+    "bytes": 3050
+  },
+  "shared_base_stager": {
+    "path": "scripts/historical-chip-reference-fixture.py",
+    "sha256": "dc675455781e6b4119f9230412250499974e6f016dd720dfdd40c4ddea9329d3",
+    "bytes": 6525
+  },
+  "shared_base_stager_unchanged": true,
+  "cause": "The shared extraction helper's older text regex reads quoted TypeScript fixture imports such as from './component' as real dependencies. The extension now supplies an AST-derived module graph instead of calling that regex.",
+  "exact_Git_extraction_blob_hashes_and_post_probe_hashes_preserved": true,
+  "real_unresolved_static_modules_still_rejected": true,
+  "parser_and_subject_unit_tests": {
+    "path": "compatibility/rc/historical-consumer-module-graph-unit-tests.txt",
+    "sha256": "abbb3ad783498b16333d6fc6e7804a997efc3171e21b1485801909323091b7f6",
+    "bytes": 682
+  },
+  "unit_tests_passed": 3,
+  "quoted_fixture_false_dependencies_excluded": 3,
+  "negative_parser_controls": 6,
+  "prior_subject_negative_controls": 12,
+  "before_fix_unit_logs": [
+    {
+      "path": "compatibility/rc/historical-consumer-wrapper-historical-roster-reconciliation-unit.txt",
+      "sha256": "cbfd90d54b9c0f3a7ffb040c3bfef8202444270fde1f60c8d091affb8c6be352",
+      "bytes": 2861
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-wrapper-mixed-build-harness-source-unit.txt",
+      "sha256": "9d64627b580ba561ab2362382761515216db5db9bdda90e9d765b39ba4e09bc8",
+      "bytes": 1677
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-wrapper-mixed-cdk-behavior-source-unit.txt",
+      "sha256": "303c7f62eeee0ca42c6f95661442f2e165df1be74586e2b24a5e79a1e4f5c743",
+      "bytes": 238
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-wrapper-mixed-compiler-build-source-unit.txt",
+      "sha256": "e3f72b8422c7895e00be52d91eb86aa17177f766c6befbd9f2820d0420669bf5",
+      "bytes": 242
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-wrapper-mixed-example-docs-source-unit.txt",
+      "sha256": "66132172c54da71cba04b4cbbdcd9fce7e1016a488b155008df4183f1421133a",
+      "bytes": 1668
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-wrapper-mixed-explicit-detection-source-unit.txt",
+      "sha256": "5be2800f84741b378b9b00e73bd44786b5d18b5ca9d75076a56a47ca7759f0aa",
+      "bytes": 250
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-wrapper-mixed-fixture-build-source-unit.txt",
+      "sha256": "e06443da0e4995a7bd6fa45a9ec3f10286d1cea86c2ae830798c18f7da165af5",
+      "bytes": 240
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-wrapper-mixed-global-zoneless-source-unit.txt",
+      "sha256": "f9fb068e0c8c0015078f447f42322d0c17543adb22f2c0130551ebd46af7e574",
+      "bytes": 244
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-wrapper-mixed-peer-async-source-unit.txt",
+      "sha256": "b02540421c18b01dbc5c4090608310292e1d543265c39f3243d233fbe8794cf9",
+      "bytes": 234
+    }
+  ],
+  "before_fix_batch_interrupted_for_source_fix": true,
+  "source_reference_updates_or_upstream_decisions_applied": false,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g13_claim": "not-passed"
+}

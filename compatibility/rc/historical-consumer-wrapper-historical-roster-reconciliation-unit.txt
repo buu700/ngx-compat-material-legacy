@@ -1,0 +1,50 @@
+test_current_writer_validator_and_source_footprint_controls (tests.test_historical_roster_reconciliation.HistoricalRosterReconciliationTests.test_current_writer_validator_and_source_footprint_controls) ... FAIL
+
+======================================================================
+FAIL: test_current_writer_validator_and_source_footprint_controls (tests.test_historical_roster_reconciliation.HistoricalRosterReconciliationTests.test_current_writer_validator_and_source_footprint_controls)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/tests/test_historical_roster_reconciliation.py", line 20, in test_current_writer_validator_and_source_footprint_controls
+    self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: 
+Traceback (most recent call last):
+  File "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/historical-consumer-reference-fixture.py", line 132, in <module>
+    print(json.dumps(stage(*sys.argv[1:])))
+                     ~~~~~^^^^^^^^^^^^^^^
+  File "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/historical-consumer-reference-fixture.py", line 42, in stage
+    base.stage(root, line, output)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/historical-chip-reference-fixture.py", line 61, in stage
+    assert dep in index, 'missing historical local module ' + dep
+           ^^^^^^^^^^^^
+AssertionError: missing historical local module scripts/component
+
+
+1 !== 0
+
+    at child (file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/run-historical-consumer-probe.mjs:51:12)
+    at runHistoricalConsumerProbe (file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/run-historical-consumer-probe.mjs:54:29)
+    at file:///home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy/scripts/run-historical-consumer-probe.mjs:97:16
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 1,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.21.0
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.260s
+
+FAILED (failures=1)

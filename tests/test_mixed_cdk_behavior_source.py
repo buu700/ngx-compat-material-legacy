@@ -16,7 +16,8 @@ class MixedCdkBehaviorSourceTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         with tempfile.TemporaryDirectory(prefix='ngx-mixed-cdk-source-') as temp:
             report = Path(temp) / 'controls.json'
-            subprocess.run(['node', 'tests/mixed_cdk_behavior_source_probe.mjs', str(report)],
+            # Original snapshot assertions; live contracts run in test_current_inspector_contracts.py.
+            subprocess.run(['node', 'scripts/run-historical-consumer-probe.mjs', 'mixed-cdk-behavior-source', '--original-report', str(report)],
                            cwd=root, check=True, timeout=90, capture_output=True, text=True)
             data = json.loads(report.read_text())
             self.assertEqual(data['negative_controls'], 64)

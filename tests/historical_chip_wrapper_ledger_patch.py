@@ -166,11 +166,17 @@ def verify_historical_wrapper_successor(expected_before=None, root=ROOT, candida
     after = ''.join(chunks).encode()
     assert SHA(after) == packet['after_sha256'] and len(after) == packet['after_bytes'] and json.loads(after) == expected
     actual = (root / LEDGER).read_bytes()
-    assert (candidate if candidate is not None else actual) == after
+    successor_applied = False
+    if candidate is not None:
+        assert candidate == after
+    elif actual != after:
+        from historical_consumer_wrapper_ledger_patch import verify_consumer_wrapper_successor
+        successor_applied = verify_consumer_wrapper_successor(expected_before=after, root=root)['canonical_applied']
+        assert successor_applied
     return dict(line=line, result='pass', metadata_entry_replacements=4, source_reference_updates=4,
                 report_reference_updates=4, report_digest_updates=4, original_hunks_preserved=198,
                 unchanged_other_entries=1693, original_dispositions_or_hunk_judgments_changed=0,
-                unrelated_entry_or_byte_changes=0, canonical_applied=actual == after,
+                unrelated_entry_or_byte_changes=0, canonical_applied=actual == after or successor_applied,
                 before_sha256=SHA(before), after_sha256=SHA(after), actual_native_artifact_floor_or_G11_qualified=False)
 
 

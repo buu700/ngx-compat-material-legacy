@@ -14,7 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class WideFixtureAdapterTests(unittest.TestCase):
     def test_actual_adapter_and_historical_metadata_against_both_minima(self):
-        result = subprocess.run(['node', 'tests/spec_wide_fixture_adapter_probe.mjs'],
+        # Original snapshot assertions; live contracts run in test_current_inspector_contracts.py.
+        result = subprocess.run(['node', 'scripts/run-historical-consumer-probe.mjs', 'spec-wide-fixture-adapter'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])

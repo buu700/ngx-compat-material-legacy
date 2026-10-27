@@ -1,0 +1,742 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "39b0f5521960f93af96943968961f1ba3e241307",
+  "subject": "refactor(material/tooltip): switch tests away from fakeAsync (#33100)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "b95b0ae95db839dd5da12c67bfab8eb71fd64256",
+      "after_blob": "a02732999d86eb0a371f816cac18cc53f3d4eef4"
+    },
+    {
+      "path": "src/material/tooltip/tooltip.zone.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "33c18c642b678f6c2c81b9f6ba30bf443cc76360",
+      "after_blob": "1130cad2baa306a2ed1d7401b6c8824032daabf3"
+    }
+  ],
+  "original_files": 2,
+  "original_hunks": 57,
+  "raw_commit_sha256": "befa8815e0f2b80a6f060858b4936f56f14a58e9b0bc6fe6ea8ea79586888bdc",
+  "original_sources": {
+    "path": "compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz",
+    "sha256": "c198d23bd997dda6fa5115f413eeed2863abee04a3357075d6a86fae3e317960"
+  },
+  "patch_file": "compatibility/rc/spec-date-tooltip-slider-source-39b0f5521960f93af96943968961f1ba3e241307.patch",
+  "diff_sha256": "cac83ee0420a613e7e1afcd21211b9c1e6b2763edca066c2850fb3f134e7415b",
+  "hunk_reviews": [
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -23,20 +23,12 @@ import {",
+      "sha256": "ab00d1e9edb4a7067e05e643246f4b17f1e990560efcabed9a1158b48b24b11a",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -49,7 +41,11 @@ describe('MatTooltip', () => {",
+      "sha256": "295d64f35d6768ef0747fda2ffe89953ffe2f41e4edc4bfe2bb77f5133a6f134",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -59,7 +55,7 @@ describe('MatTooltip', () => {",
+      "sha256": "c8509eb047c820af19a1a976dfa34e97660a21a72bb866be5e351d94d1e33d18",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -67,20 +63,20 @@ describe('MatTooltip', () => {",
+      "sha256": "d545bb105939676e1e6c02f6a74fb9014621e9f4097fdcaeab3692d5e77cc8a3",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -98,62 +94,60 @@ describe('MatTooltip', () => {",
+      "sha256": "1df2c98e51d1a08f29179d9a6d2811d98e8f0ba4adaf1756bd49d0091dc79106",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -166,23 +160,22 @@ describe('MatTooltip', () => {",
+      "sha256": "03cb18ad48171e628df3cbb10a3061d349594d7bc07c54a43f29819ea009733b",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -200,14 +193,14 @@ describe('MatTooltip', () => {",
+      "sha256": "b7fe9c1231f6fd166ba88896d09e504d5cdc4765b6939006111027e27ef02d5b",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -222,7 +215,7 @@ describe('MatTooltip', () => {",
+      "sha256": "75adfb4193773367f7130da2bb3d0ed0b52f8a07392f5b4a7abbbb2a02e32ac0",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -230,9 +223,9 @@ describe('MatTooltip', () => {",
+      "sha256": "4dc51ff9c1d84065ee34a4f4e2f37cf48318edd3047987ca9f51d8e0640e472e",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -247,7 +240,7 @@ describe('MatTooltip', () => {",
+      "sha256": "5578347fba010090ab55590033e55bca3cdf75c1f7a7f89469076d02f1b1d071",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -256,9 +249,9 @@ describe('MatTooltip', () => {",
+      "sha256": "693cc111d86dad0d06e82338c6f096b3677bb515190d4e0a8ca8bd8c7f1038f1",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -275,7 +268,7 @@ describe('MatTooltip', () => {",
+      "sha256": "1a7db5406301b3862617397a58c0062ed4f241d44f2b6b3119d5ea1071182cd8",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -284,7 +277,7 @@ describe('MatTooltip', () => {",
+      "sha256": "ca3587f27f2e353eed97990f58fcaa9cda64293699df9072f529e3d4ec20339c",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -311,7 +304,7 @@ describe('MatTooltip', () => {",
+      "sha256": "48e6888003d5ea1ae770d22bd340877eb23c8873befb7e65e933c5e9e9f733a3",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -321,7 +314,7 @@ describe('MatTooltip', () => {",
+      "sha256": "a6a9627451fbcbf9581793ea446577d5f992ddec4dd038a2d58ad781c1193e54",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -339,17 +332,17 @@ describe('MatTooltip', () => {",
+      "sha256": "b8af17f2d3d3dc788824231f856179e5b88bb56f79e1714c6b92a126a556e507",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -357,15 +350,15 @@ describe('MatTooltip', () => {",
+      "sha256": "aa89da062d01af5f8afa78956670f67232418316e0c10da1ddd61ff1f15dee9e",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -374,36 +367,36 @@ describe('MatTooltip', () => {",
+      "sha256": "a075c681545b46298be350043a5836df31b68c31f8d95e81c94e5d3dde49fcee",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -444,42 +437,42 @@ describe('MatTooltip', () => {",
+      "sha256": "a9c46f5b2639a5c90555499952899d1514740bb77236ff71579f767b4fc25d9f",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -488,31 +481,31 @@ describe('MatTooltip', () => {",
+      "sha256": "4917734438710ff4f16f1cf090bee205c9f6613af3419c88ff69f80549597964",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -523,13 +516,13 @@ describe('MatTooltip', () => {",
+      "sha256": "ba350eb8b825450b6201a6ac6f0e8d39b3d1db22414fe807ef1e1c49e4f925d9",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -556,26 +549,25 @@ describe('MatTooltip', () => {",
+      "sha256": "a822f3e14d749ac71c1a47cfe874c5c2de7f81bc371abb0852fdece4ba1326f0",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -583,48 +575,48 @@ describe('MatTooltip', () => {",
+      "sha256": "5858d4fa71002fe42229b3aa0da8f33ca2a91b546edc9055e0a06906cbedcc6c",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -635,12 +627,12 @@ describe('MatTooltip', () => {",
+      "sha256": "a11927660721135fba05c0836fcf56bb1168bcf61b00daaff88784cfe0fcd0b1",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -691,11 +683,11 @@ describe('MatTooltip', () => {",
+      "sha256": "639f17838a90fb403658199b0a033742933702d74c56225273fcafddd6d7a9d8",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -706,12 +698,12 @@ describe('MatTooltip', () => {",
+      "sha256": "252e14d3846c8a456e9fd568c56e16f62145f53b5ea892f42702a0d5b02ae544",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -723,13 +715,13 @@ describe('MatTooltip', () => {",
+      "sha256": "226cdc7e257c9ca60e5894ebba474391b8e97314be07403d58448a29bb9318df",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -739,20 +731,19 @@ describe('MatTooltip', () => {",
+      "sha256": "5b9b2b0f0c89df75b818832ca755852d20b250daf068598f4961f43096015a0e",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -760,18 +751,18 @@ describe('MatTooltip', () => {",
+      "sha256": "f6eeeb60396d589746335c05a88a9b9bfd645d41394437f6596fe42a288eb6dc",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -779,124 +770,121 @@ describe('MatTooltip', () => {",
+      "sha256": "fe7a35a76d65ba49cc5b96a7ba0c29bc8698825f4c88fba81e61c7be530605fe",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -906,16 +894,15 @@ describe('MatTooltip', () => {",
+      "sha256": "f1d52bea00918dba3badb64932b3a5d90224d577d5f810a5954c40fe32a088cb",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -923,37 +910,37 @@ describe('MatTooltip', () => {",
+      "sha256": "5cc5ffc9a13e85b9f3434c9f481da008b429148aecf4eb53976379eba8b7aa34",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -966,9 +953,9 @@ describe('MatTooltip', () => {",
+      "sha256": "97ff6d57830fd7c8756efe0bc6a61dfd21c763ed31299ef31fe58c56be5e3e57",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -978,21 +965,21 @@ describe('MatTooltip', () => {",
+      "sha256": "10900b8a749b8d178a3a4b59ea267d8f605814350c565a552971e2f7787a7b23",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1001,16 +988,15 @@ describe('MatTooltip', () => {",
+      "sha256": "d879176313d773803973c39c460324b14c7095c82dcdd15dd43bd73e9645dbe2",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1018,16 +1004,15 @@ describe('MatTooltip', () => {",
+      "sha256": "e47681b3c1e5881f520065b49e09802e8d3e6f8870b14cc5fd3d85fcc6431f42",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1038,9 +1023,9 @@ describe('MatTooltip', () => {",
+      "sha256": "ddb4a57dee451c06035da398bdd40bc67b350d76f718c73e9983f708f5e3dbfc",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1048,16 +1033,16 @@ describe('MatTooltip', () => {",
+      "sha256": "5474234f571261eface9c4d111bea34d5a639b3758200e41241d32ddf2561f37",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1065,7 +1050,7 @@ describe('MatTooltip', () => {",
+      "sha256": "804da85e962100576b7164c3b003f0c415b8e27d6b4a15819c45e49cecd4e94d",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1076,11 +1061,11 @@ describe('MatTooltip', () => {",
+      "sha256": "4b151bde7384c99896d126380c7d3ef635962f53525dc870facf5a9f6e2bccfe",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1088,7 +1073,7 @@ describe('MatTooltip', () => {",
+      "sha256": "78cc40b54e7a05a3f20206977b30c7f9e13574e28c8bb40f1e42af3c58b19078",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1096,11 +1081,11 @@ describe('MatTooltip', () => {",
+      "sha256": "96e22147f62c98485e5b133b3541d7e3206eedffe6dbdb6d21d5a7b432cfb770",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1108,7 +1093,7 @@ describe('MatTooltip', () => {",
+      "sha256": "eab6b87e56380825f939729b2b2f00ff7e95ed8062bec847e88eed79ae10c33d",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1121,9 +1106,9 @@ describe('MatTooltip', () => {",
+      "sha256": "8897d03fce7ae6e29f8f5fd6821c64ab5c94c098bd836b776fa5cde011c78326",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1185,15 +1170,14 @@ describe('MatTooltip', () => {",
+      "sha256": "b711853108ff0c3d11f7a94a6ed6f2171f22d5f47d2da4fb8fe652788de5f534",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1201,19 +1185,19 @@ describe('MatTooltip', () => {",
+      "sha256": "233eda03a413bee8a9d1157e4f86e689ac3967ed6092d71973da21f9cf0560c2",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1230,11 +1214,11 @@ describe('MatTooltip', () => {",
+      "sha256": "c7ce30392c93e74caa529096cfab6474c17ea01e13f8102b9f1cc797f2de388a",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1250,22 +1234,21 @@ describe('MatTooltip', () => {",
+      "sha256": "fa468779ec6cc85c81c2a90f20acaabfc277124d2e2703abaa43303fbff852d5",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1273,13 +1256,13 @@ describe('MatTooltip', () => {",
+      "sha256": "8e2632ac6a4eaa51e62f08f6a571f184255f9c019634603528da60f2c2178e70",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1287,26 +1270,25 @@ describe('MatTooltip', () => {",
+      "sha256": "d40004e4059964d95c670c977d94df8fd1d245d68ec191a8b73be5dd8644e7d4",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1314,12 +1296,11 @@ describe('MatTooltip', () => {",
+      "sha256": "fcd69354e1b4e6668f631aea5209cc9cd12867b68a0d88a39ab3c29e195722ed",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1527,7 +1508,7 @@ describe('MatTooltip', () => {",
+      "sha256": "643a9c214850eb5653b063474f55295a7daabc58b13e387e6aa96b284a6a909e",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1539,7 +1520,7 @@ describe('MatTooltip', () => {",
+      "sha256": "50408214c765a59bcd10d99c2ab466e04e1445bdcb7218d0ac1639a59e83cdac",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1554,13 +1535,12 @@ describe('MatTooltip', () => {",
+      "sha256": "548a914b40a5821a170f6cb8b95de9e3aa8008fa46466f1dc6707b5fa4cd9b97",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.zone.spec.ts",
+      "header": "@@ -8,7 +8,7 @@ import {",
+      "sha256": "9ecc277dfd1a8de1d22350e5149cfe5bb27077d0692dc19a5f4ac3691f494aa0",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.zone.spec.ts",
+      "header": "@@ -16,11 +16,15 @@ import {MatTooltip, TooltipPosition} from './tooltip';",
+      "sha256": "7ff568fac30c83f6713569750abfdcf626941c77568e8dfafd68862c571ba77a",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.zone.spec.ts",
+      "header": "@@ -34,24 +38,24 @@ describe('MatTooltip Zone.js integration', () => {",
+      "sha256": "59e2581535e5801c0148cb81595aa7fe7702e6310b164e52ab22dfe8575d6e81",
+      "judgment": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "39b0f5521960f93af96943968961f1ba3e241307",
+    "complete_original_files": 2,
+    "complete_original_hunks": 57,
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 75,
+    "hooks": 8,
+    "fixture_classes": 12,
+    "template_style_properties": 13
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-date-tooltip-slider-source-review.json.gz",
+    "sha256": "d2ea0e9c6f766e4381441a178801675e9c36c5c4ddba6f76343a8ddff3a599ac"
+  },
+  "decision": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+  "prior_entry": {
+    "sha": "39b0f5521960f93af96943968961f1ba3e241307",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/tooltip): switch tests away from fakeAsync (#33100)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=128b3a7199b925d8f7868b2d9c0c9534d4fdd50f839dfbbb4122f3fdb44dda31, bytes=49247). Changed paths are only unit/harness specs and testing BUILD.bazel (src/material/tooltip/tooltip.spec.ts, src/material/tooltip/tooltip.zone.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/material/tooltip/tooltip.spec.ts",
+      "src/material/tooltip/tooltip.zone.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/39b0f5521960f93af96943968961f1ba3e241307.json",
+    "batch_id": "test-only-refactor-wave2-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:47:11Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "128b3a7199b925d8f7868b2d9c0c9534d4fdd50f839dfbbb4122f3fdb44dda31"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-date-tooltip-slider-source-prior.json.gz",
+    "sha256": "c544e47e26adb67f191bec7b499762cf8397f6be4a8f8d911dfe7893b74006eb"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "cac83ee0420a613e7e1afcd21211b9c1e6b2763edca066c2850fb3f134e7415b",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Decline this private tooltip scheduler migration after individual review of all57 hunks in both complete files. All75 cases and8 hooks retain full identities/order;19 complete callbacks are unchanged and56 change. Six exact cases shorten configured delays, commonly1000ms to10ms and default1337/7331ms to10/20ms; these literal changes are individually pinned rather than erased as timing. Two same-name show/hide cases retain distinct suites. The closed-tooltip position nonthrow observer changes only its nested scheduler boundary; an inner position helper becomes async. Removed imports are enumerated exactly: the main file retains fakeAsync/flush/tick while SCROLL_THROTTLE_MS and waitForAsync are removed, and the zone file removes its three scheduling imports. All12 fixture classes and13 template/style properties remain raw-byte identical. Retain the owned legacy tooltip tests, including1000/1337/7331ms deadlines and the explicit LEGACY_SCROLL_THROTTLE_MS boundary. Cyph imports the legacy module, uses matTooltip position/disabled bindings and styles .mat-tooltip directly. Native waits/stability and equal remaining predicates prove no throttle, rendering, position, error or destruction equivalence. Preserve Material16 HTML/CSS/SCSS and the distinct legacy tokens. No product/consumer change or new TypeScript API is needed; actual packed/native/browser, public-peer and supported-floor observations remain pending.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-date-tooltip-slider-source-review.mjs",
+        "sha256": "cd01bbfbe2eab5210e869164edf7382fcb47cc8249c9a24f44b51d7828410a72"
+      },
+      {
+        "path": "tests/spec_date_tooltip_slider_source_probe.mjs",
+        "sha256": "e0085698046c9b2d3b6252ad24e3a63cb8c0b5554c91674de259b973b127f757"
+      },
+      {
+        "path": "tests/test_spec_date_tooltip_slider_source.py",
+        "sha256": "d1543145ede99577ea126982073a38ec932d6bb62f1cf42cddc331a4f8086634"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-qualification-inspector.py",
+        "sha256": "fd616bb0e9d9b100830cc42a86c68e0cce3bba40e67d8462406da7357358b1d9"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz",
+        "sha256": "c198d23bd997dda6fa5115f413eeed2863abee04a3357075d6a86fae3e317960"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-acquisition.json.gz",
+        "sha256": "f05338b6b7912c26bd66fd217455f3edb9993e5dfcfddabf64ebff8a6fb0b3f1"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-observation-pins.json",
+        "sha256": "2285c73f7df75fdec78233c659d350f055a5e168db453b9d5a665aee6846f199"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-prior.json.gz",
+        "sha256": "c544e47e26adb67f191bec7b499762cf8397f6be4a8f8d911dfe7893b74006eb"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-review.json.gz",
+        "sha256": "d2ea0e9c6f766e4381441a178801675e9c36c5c4ddba6f76343a8ddff3a599ac"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-controls.json",
+        "sha256": "954ddb3348be4bf6e743bb9471b245b6c9643e956f5269af3533976879b16443"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-python.log.gz",
+        "sha256": "01554f16ebcbbad82ff3841c8c4ed609ef287ce95326acb2602ab8ad3b66ac86"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-cyph-sanity.json",
+        "sha256": "10f008c37068891eeb270d28a122ccfd927e5bc82817beddfaa3dfba49442d62"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-checkpoint.json",
+        "sha256": "13f66ee75f6e43e60feae59dacf703aaa04b84460ce1113020fa9a5486ec794b"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-replay-checkpoint.json",
+        "sha256": "e000db87affaea3f5cb759d67ba9865483a1f97ce22ff88f5ed44136594ac729"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+        "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+        "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+        "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+        "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/datepicker/_datepicker-theme.scss",
+        "sha256": "eb040074a9659058b64e4594018400e855a546d0d94ef040fff6e9e8fc77b948"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "35688ab4bfe88de585342f194f3463f409c03cbc",
+      "prior_entry_sha256": "6293d3dc7086eaa487e7f51b61f402da26bb06120c7f1ca0af2101a5cad13958",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-39b0f5521960f93af96943968961f1ba3e241307.json",
+        "sha256": "16923c98a41358cfbc913687ba380c789eb302c4f2353d215a0af670da83dcd4",
+        "bytes": 125884
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "a1f9d4e3455d6c8ffc74bbbfefa69b001c0db6a091c3edfefab57999e7c3d0b4",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "4fc9e314d4b1bd43dab9b2745cdcb336a9222f6bc0f618852e4cc15edccc0da2",
+        "bytes": 31567
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "3a160fce33ddc2b79a6f4a144c07baed655648d4216f8d1a4450f12457d0e79c",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-39b0f5521960f93af96943968961f1ba3e241307.json",
+        "sha256": "16923c98a41358cfbc913687ba380c789eb302c4f2353d215a0af670da83dcd4",
+        "bytes": 125884
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-date-tooltip-slider-source-review.mjs",
+      "sha256": "cd01bbfbe2eab5210e869164edf7382fcb47cc8249c9a24f44b51d7828410a72"
+    },
+    {
+      "path": "tests/spec_date_tooltip_slider_source_probe.mjs",
+      "sha256": "e0085698046c9b2d3b6252ad24e3a63cb8c0b5554c91674de259b973b127f757"
+    },
+    {
+      "path": "tests/test_spec_date_tooltip_slider_source.py",
+      "sha256": "d1543145ede99577ea126982073a38ec932d6bb62f1cf42cddc331a4f8086634"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-qualification-inspector.py",
+      "sha256": "fd616bb0e9d9b100830cc42a86c68e0cce3bba40e67d8462406da7357358b1d9"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz",
+      "sha256": "c198d23bd997dda6fa5115f413eeed2863abee04a3357075d6a86fae3e317960"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-acquisition.json.gz",
+      "sha256": "f05338b6b7912c26bd66fd217455f3edb9993e5dfcfddabf64ebff8a6fb0b3f1"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-observation-pins.json",
+      "sha256": "2285c73f7df75fdec78233c659d350f055a5e168db453b9d5a665aee6846f199"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-prior.json.gz",
+      "sha256": "c544e47e26adb67f191bec7b499762cf8397f6be4a8f8d911dfe7893b74006eb"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-review.json.gz",
+      "sha256": "d2ea0e9c6f766e4381441a178801675e9c36c5c4ddba6f76343a8ddff3a599ac"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-controls.json",
+      "sha256": "954ddb3348be4bf6e743bb9471b245b6c9643e956f5269af3533976879b16443"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-python.log.gz",
+      "sha256": "01554f16ebcbbad82ff3841c8c4ed609ef287ce95326acb2602ab8ad3b66ac86"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-cyph-sanity.json",
+      "sha256": "10f008c37068891eeb270d28a122ccfd927e5bc82817beddfaa3dfba49442d62"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-checkpoint.json",
+      "sha256": "13f66ee75f6e43e60feae59dacf703aaa04b84460ce1113020fa9a5486ec794b"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-replay-checkpoint.json",
+      "sha256": "e000db87affaea3f5cb759d67ba9865483a1f97ce22ff88f5ed44136594ac729"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+      "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+      "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+      "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/datepicker/_datepicker-theme.scss",
+      "sha256": "eb040074a9659058b64e4594018400e855a546d0d94ef040fff6e9e8fc77b948"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "35688ab4bfe88de585342f194f3463f409c03cbc",
+    "prior_entry_sha256": "6293d3dc7086eaa487e7f51b61f402da26bb06120c7f1ca0af2101a5cad13958",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-39b0f5521960f93af96943968961f1ba3e241307.json",
+      "sha256": "16923c98a41358cfbc913687ba380c789eb302c4f2353d215a0af670da83dcd4",
+      "bytes": 125884
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "a1f9d4e3455d6c8ffc74bbbfefa69b001c0db6a091c3edfefab57999e7c3d0b4",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "4fc9e314d4b1bd43dab9b2745cdcb336a9222f6bc0f618852e4cc15edccc0da2",
+      "bytes": 31567
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "3a160fce33ddc2b79a6f4a144c07baed655648d4216f8d1a4450f12457d0e79c",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-39b0f5521960f93af96943968961f1ba3e241307.json",
+      "sha256": "16923c98a41358cfbc913687ba380c789eb302c4f2353d215a0af670da83dcd4",
+      "bytes": 125884
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

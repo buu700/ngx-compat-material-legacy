@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Bound historical transport runtime to original test budgets and reduce unrelated metadata staging; no original assertion or timeout changed.",
+  "source_parent": "35688ab4bfe88de585342f194f3463f409c03cbc",
+  "cumulative_source_edits": [
+    {
+      "path": "scripts/historical-consumer-reference-fixture.py",
+      "before_sha256": "e65df2b390a704df5c1ddb7502a13361d847c6320d63b859e1971ff3184c93ca",
+      "after_sha256": "ed6d9abef60885e0e5751043a6145b6d118af7d34052e104307a9261f8edfc3d",
+      "unified_diff": "--- scripts/historical-consumer-reference-fixture.py (source parent)\n+++ scripts/historical-consumer-reference-fixture.py (current)\n@@ -9,7 +9,6 @@\n import json\n import os\n from pathlib import Path, PurePosixPath\n-import re\n import subprocess\n import sys\n \n@@ -19,6 +18,8 @@\n         '21.x': 'aadca3d619b2f8bd017ee0ee3e90b894de826df57ebaad342501083aa200118e'}\n BASE = 'scripts/historical-chip-reference-fixture.py'\n BASE_SHA = 'dc675455781e6b4119f9230412250499974e6f016dd720dfdd40c4ddea9329d3'\n+GRAPH = 'scripts/historical-consumer-module-graph.mjs'\n+GRAPH_SHA = '72eac7900d6ee5241d991060fe43d023032b023b6c1622a08c6ecd3299060a2e'\n \n \n def stage(root, line, family, output):\n@@ -34,11 +35,11 @@\n     spec = importlib.util.spec_from_file_location('historical_chip_reference_fixture', root / BASE)\n     base = importlib.util.module_from_spec(spec)\n     spec.loader.exec_module(base)\n-    # Configure the unchanged staging implementation inside this private child\n-    # process. Its selection, Git/blob verification and extraction rules remain\n-    # unchanged. No source file or original Git object is modified.\n+    # Reuse the unchanged shared extraction and Git/blob checks. Module discovery\n+    # belongs to the parsed extension below, so quoted source fixtures never\n+    # become phantom imports in the shared implementation's older regex scan.\n     base.REFERENCES = {line: subject['reference_commit']}\n-    base.PROBES = (subject['probe'],)\n+    base.PROBES = ()\n     base.stage(root, line, output)\n     manifest_path = output / 'historical-reference-manifest.json'\n     base_raw = manifest_path.read_bytes()\n@@ -77,12 +78,12 @@\n     for path in ('package.json', 'pnpm-lock.yaml', 'toolchain-lock.json', '.node-version', '.npm-version',\n                  'tsconfig.json', 'justfile', 'pnpm-workspace.yaml'):\n         select(path)\n-    for path in manifest['local_module_closure']:\n-        text = (output / path).read_text()\n-        for _, prefix in re.findall(r\"(['\\\"])((?:compatibility|scripts|tests|testing|projects)/[^'\\\"\\n]+-)\\1\", text):\n-            for candidate in index:\n-                if candidate.startswith(prefix):\n-                    select(candidate)\n+    assert hashlib.sha256((root / GRAPH).read_bytes()).hexdigest() == GRAPH_SHA, 'historical module parser changed'\n+    graph = json.loads(subprocess.check_output(['node', str(root / GRAPH)], cwd=root, env=env,\n+        input=json.dumps(dict(reference=subject['reference_commit'], probe=subject['probe'], paths=sorted(index))).encode()))\n+    manifest['local_module_closure'] = graph['modules']\n+    for path in graph['modules'] + graph['inputs']:\n+        select(path)\n \n     def references(value):\n         if isinstance(value, dict):\n@@ -97,7 +98,8 @@\n     visited = set()\n     while True:\n         pending = sorted(path for path in selected | additions\n-                         if path.startswith('compatibility/') and path.endswith(('.json', '.json.gz')) and path not in visited)\n+                         if path.startswith('compatibility/') and path.endswith(('.json', '.json.gz')) and path not in visited\n+                         and path != 'compatibility/f10/disposition-ledger/ledger.json')\n         if not pending:\n             break\n         for path in pending:\n@@ -120,6 +122,7 @@\n     manifest['members_sha256'] = hashlib.sha256(json.dumps(manifest['members'], separators=(',', ':'), ensure_ascii=False).encode()).hexdigest()\n     manifest['consumer_extension'] = dict(family=family, catalog_sha256=PINS[line],\n         shared_stager=dict(path=BASE, sha256=BASE_SHA), base_manifest_sha256=hashlib.sha256(base_raw).hexdigest(),\n+        module_graph_parser=dict(path=GRAPH, sha256=GRAPH_SHA, runtime=graph['parser']),\n         extra_exact_Git_members=len(additions), original_probe_source_unchanged=True)\n     manifest_path.write_text(json.dumps(manifest, indent=2) + '\\n')\n     return dict(line=line, family=family, reference_commit=subject['reference_commit'],\n"
+    },
+    {
+      "path": "scripts/run-historical-consumer-probe.mjs",
+      "before_sha256": "b42cc9f903506b716d935a7be0d45cb09626422a612c19daf4fd305f71756ad3",
+      "after_sha256": "840f80712f8372f5bae216f8c362487f1ea3fdd10d272100fc7aebf0b67bb90e",
+      "unified_diff": "--- scripts/run-historical-consumer-probe.mjs (source parent)\n+++ scripts/run-historical-consumer-probe.mjs (current)\n@@ -8,7 +8,7 @@\n /** Exact original-source subjects. Current contracts require their separate live checks. */\n import assert from 'node:assert/strict';\n import {createHash} from 'node:crypto';\n-import {spawnSync} from 'node:child_process';\n+import {historicalConsumerChild} from './historical-consumer-child.mjs';\n import {existsSync,mkdtempSync,readFileSync,rmSync,writeFileSync} from 'node:fs';\n import {tmpdir} from 'node:os';\n import {dirname,join,resolve} from 'node:path';\n@@ -18,10 +18,11 @@\n const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');\n const catalogPath='compatibility/rc/historical-consumer-source-subjects.json';\n const stagerPath='scripts/historical-consumer-reference-fixture.py';\n-const stagerHash='e65df2b390a704df5c1ddb7502a13361d847c6320d63b859e1971ff3184c93ca';\n+const stagerHash='ed6d9abef60885e0e5751043a6145b6d118af7d34052e104307a9261f8edfc3d';\n const pins={main:'8a0d7419de3d3ed7e7d0825b5223174f05e34cff86d184bb0632dc16b8d16b36',\n   '21.x':'aadca3d619b2f8bd017ee0ee3e90b894de826df57ebaad342501083aa200118e'};\n const hash=raw=>createHash('sha256').update(raw).digest('hex');\n+const originalTimeoutSeconds={\"historical-roster-reconciliation\":60,\"mixed-build-harness-source\":90,\"mixed-cdk-behavior-source\":90,\"mixed-compiler-build-source\":90,\"mixed-example-docs-source\":90,\"mixed-explicit-detection-source\":90,\"mixed-fixture-build-source\":90,\"mixed-global-zoneless-source\":90,\"mixed-peer-async-source\":90,\"mixed-strict-tests-source\":90,\"mixed-theming-source\":90,\"mixed-tree-source\":90,\"mixed-zone-moves-source\":90,\"spec-animation-fixture-source\":180,\"spec-cdk-async-source\":60,\"spec-date-tooltip-slider-source\":60,\"spec-final-fixture-source\":90,\"spec-import-cleanup-source\":120,\"spec-interaction-async-source\":60,\"spec-overlay-async-source\":60,\"spec-stability-source\":60,\"spec-wide-fixture-adapter\":60,\"spec-wide-fixture-source\":60};\n \n export function historicalConsumerSubject({root=rootDefault,family}={}){\n   const version=JSON.parse(readEvidenceMember(root,'projects/ngx-material-legacy/package.json')).version;\n@@ -37,6 +38,7 @@\n \n export function runHistoricalConsumerProbe({root=rootDefault,family,originalReportPath,reportPath}={}){\n   const {line,subject,catalog_sha256}=historicalConsumerSubject({root,family});\n+  const deadline=Date.now()+originalTimeoutSeconds[family]*1000-5000;\n   if(originalReportPath)originalReportPath=resolve(originalReportPath);\n   if(reportPath)reportPath=resolve(reportPath);\n   for(const path of [originalReportPath,reportPath].filter(Boolean))assert.equal(existsSync(path),false,'report destination must be fresh');\n@@ -47,7 +49,8 @@\n   for(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY',\n     'GIT_ALTERNATE_OBJECT_DIRECTORIES','RC_CHECK_ID','RC_RUN_ID','RC_INVOCATION_ID','RC_EVIDENCE_BINDING','RC_ASSERTION_OUTPUT_DIR'])delete env[key];\n   const child=(command,args,cwd)=>{\n-    const result=spawnSync(command,args,{cwd,env,encoding:'utf8',timeout:90000,maxBuffer:4*1024*1024});\n+    const remaining=deadline-Date.now();assert.ok(remaining>0,'original wrapper execution budget exhausted');\n+    const result=historicalConsumerChild(command,args,{cwd,env,timeout:remaining});\n     assert.equal(result.status,0,(result.error?.message??'')+'\\n'+result.stderr.slice(-8000));return result.stdout;\n   };\n   try{\n"
+    }
+  ],
+  "module_discovery_correction": {
+    "path": "compatibility/rc/historical-consumer-module-discovery-correction.json",
+    "sha256": "eb1aa8e63861f43d281799d010e252ea43efca8794898c25f09cfca6cb780665",
+    "bytes": 8458
+  },
+  "new_helpers": [
+    {
+      "path": "scripts/historical-consumer-module-graph.mjs",
+      "sha256": "72eac7900d6ee5241d991060fe43d023032b023b6c1622a08c6ecd3299060a2e",
+      "bytes": 3050
+    },
+    {
+      "path": "scripts/historical-consumer-child.mjs",
+      "sha256": "deb0b5da83c50eab7bfded0618eefd10aa4f356812468173f737a774ca3cd32e",
+      "bytes": 688
+    }
+  ],
+  "unchanged_shared_extractor": {
+    "path": "scripts/historical-chip-reference-fixture.py",
+    "sha256": "dc675455781e6b4119f9230412250499974e6f016dd720dfdd40c4ddea9329d3",
+    "bytes": 6525
+  },
+  "original_wrapper_timeout_seconds": {
+    "historical-roster-reconciliation": 60,
+    "mixed-build-harness-source": 90,
+    "mixed-cdk-behavior-source": 90,
+    "mixed-compiler-build-source": 90,
+    "mixed-example-docs-source": 90,
+    "mixed-explicit-detection-source": 90,
+    "mixed-fixture-build-source": 90,
+    "mixed-global-zoneless-source": 90,
+    "mixed-peer-async-source": 90,
+    "mixed-strict-tests-source": 90,
+    "mixed-theming-source": 90,
+    "mixed-tree-source": 90,
+    "mixed-zone-moves-source": 90,
+    "spec-animation-fixture-source": 180,
+    "spec-cdk-async-source": 60,
+    "spec-date-tooltip-slider-source": 60,
+    "spec-final-fixture-source": 90,
+    "spec-import-cleanup-source": 120,
+    "spec-interaction-async-source": 60,
+    "spec-overlay-async-source": 60,
+    "spec-stability-source": 60,
+    "spec-wide-fixture-adapter": 60,
+    "spec-wide-fixture-source": 60
+  },
+  "data_selection_rule": "Retain requested ledger bytes, but do not recursively stage unrelated audit entry evidence through the ledger. Explicit source, context, producer and checkpoint references remain staged and Git-verified.",
+  "child_execution_rule": "Use each unchanged original wrapper budget with cleanup margin; kill the owned child process group on timeout or failure.",
+  "unit_tests": {
+    "path": "compatibility/rc/historical-consumer-transport-tool-unit-tests.txt",
+    "sha256": "51ff123b02900dcb5e8121bafedf3ea18c8bd1e6c6ad5131279689367e410d6d",
+    "bytes": 851
+  },
+  "unit_tests_passed": 4,
+  "child_and_grandchild_timeout_cleanup_qualified": true,
+  "original_wrapper_assertions_or_timeouts_changed": false,
+  "current_source_or_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g13_claim": "not-passed",
+  "extra_90_second_inner_cap_removed": true,
+  "original_outer_wrapper_budgets_unchanged": true,
+  "observed_cases": {
+    "date_tooltip_transport": "Main passed with the narrowed data staging in 21.274 seconds under the original 60-second outer limit.",
+    "main_roster_diagnostic_retry": "Main passed unchanged in 28.758 seconds after a recorded 55-second inner-budget timeout; the original timeout failure is retained.",
+    "animation_inner_cap": "21.x reached the old 90-second child cap inside its original 180-second outer budget; only that extra inner cap was removed."
+  }
+}

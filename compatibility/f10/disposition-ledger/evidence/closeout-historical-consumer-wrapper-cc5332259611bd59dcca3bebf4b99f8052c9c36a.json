@@ -1,0 +1,461 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "cc5332259611bd59dcca3bebf4b99f8052c9c36a",
+  "subject": "fix(cdk/tree): warn if mixed node types are used within the same tree",
+  "status": "reviewed",
+  "final_disposition": "not-applicable",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/tree/nested-node.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "406c4d65e8bb615c153c669542b79aa24c0ea73f",
+      "after_blob": "6d7a93b88264a9252abc53b810211d87f851bd18"
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "603f6b9dee3ebc1b8dc42d7d0dd7a69a676d2717",
+      "after_blob": "c7daf68f9fd142a9795f938a36b9102929b41841"
+    },
+    {
+      "path": "src/material/tree/testing/tree-harness.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a5dd4e17fd44bc8d09bfbed93140c30a1b36744c",
+      "after_blob": "c281d4d28b4e790143f427da282b52a59b4a0558"
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "655f0f2c54566fb001918a79a6cdc65a4fba0837",
+      "after_blob": "dda4541d9306f259fb681e566c71f74a28a501d2"
+    }
+  ],
+  "original_files": 4,
+  "original_hunks": 11,
+  "raw_commit_sha256": "31a15728fe68a70ab707ccb978382ce74ce896b26511197f26261bd4b226902d",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-tree-source-subjects.json.gz",
+    "sha256": "ce46de875ed322a07213564aa3bb3365b6b6b6030e81e73c00851d19211ae4b1"
+  },
+  "patch_file": "compatibility/rc/mixed-tree-source-cc5332259611bd59dcca3bebf4b99f8052c9c36a.original.patch",
+  "diff_sha256": "5b04085971e990c9a8c7832d50849c1567ccabafcc849fe8f253c2e8411e87ea",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/tree/nested-node.ts",
+      "header": "@@ -12,7 +12,6 @@ import {",
+      "sha256": "9e20098640baabe929969e1eb0476820387ea1395f0006ca1ba5ef434495e493",
+      "judgment": "Complete nested runtime: replace the nested ngOnInit wrapper/OnInit heritage with protected _type=nested. Preserve remaining constructor, child differ/subscription, outlet and teardown operations. Inherited initializer/lifecycle execution remains unproved."
+    },
+    {
+      "path": "src/cdk/tree/nested-node.ts",
+      "header": "@@ -40,8 +39,9 @@ import {CdkTreeNode} from './tree';",
+      "sha256": "a74d617aafd5be73bb36e1380848ff3fa8049bd68a76d368acec90b64c612e1c",
+      "judgment": "Complete nested runtime: replace the nested ngOnInit wrapper/OnInit heritage with protected _type=nested. Preserve remaining constructor, child differ/subscription, outlet and teardown operations. Inherited initializer/lifecycle execution remains unproved."
+    },
+    {
+      "path": "src/cdk/tree/nested-node.ts",
+      "header": "@@ -75,13 +75,6 @@ export class CdkNestedTreeNode<T, K = T>",
+      "sha256": "1514e3b636fd9d79c40297a40f8d8fb37cdd853a066924dbf62a684c48ea5df2",
+      "judgment": "Complete nested runtime: replace the nested ngOnInit wrapper/OnInit heritage with protected _type=nested. Preserve remaining constructor, child differ/subscription, outlet and teardown operations. Inherited initializer/lifecycle execution remains unproved."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "header": "@@ -323,9 +323,17 @@ export class CdkTree<T, K = T>",
+      "sha256": "d4ca464f3a2e2ba9513f4e5985fd316df2f059d12806a96612b5190ee56cb0ed",
+      "judgment": "Complete tree runtime: dev-only mixed-type warning preserves the initial type; base node _type=flat and ngOnInit now classify via virtual _type. Preserve expansion subscription and registration; no new warning regression test is supplied by this patch."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "header": "@@ -1169,6 +1177,7 @@ export class CdkTreeNode<T, K = T> implements OnDestroy, OnInit, TreeKeyManagerI",
+      "sha256": "a143b038432042ccb863c613a0a38a39d7284661e9c6bf709871609f2c3d290b",
+      "judgment": "Complete tree runtime: dev-only mixed-type warning preserves the initial type; base node _type=flat and ngOnInit now classify via virtual _type. Preserve expansion subscription and registration; no new warning regression test is supplied by this patch."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "header": "@@ -1368,10 +1377,8 @@ export class CdkTreeNode<T, K = T> implements OnDestroy, OnInit, TreeKeyManagerI",
+      "sha256": "12435444063a81430ca4b834158d4ce943a2c9ee901b5f5cb75a28686f2c7ff2",
+      "judgment": "Complete tree runtime: dev-only mixed-type warning preserves the initial type; base node _type=flat and ngOnInit now classify via virtual _type. Preserve expansion subscription and registration; no new warning regression test is supplied by this patch."
+    },
+    {
+      "path": "src/material/tree/testing/tree-harness.spec.ts",
+      "header": "@@ -235,9 +235,9 @@ interface ExampleFlatNode {",
+      "sha256": "cacd8ec643ecf7bbfc0864dc222c12cacf9f27be6b825b237dcac8640ce41d11",
+      "judgment": "Complete harness fixture replaces mixed flat leaf markup with mat-nested-tree-node under a nested tree. All seven callbacks keep complete semantics; source fixture correction alone is not an executed warning or lifecycle test."
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "header": "@@ -54,7 +54,7 @@ export abstract class BaseTreeControl<T, K = T> implements TreeControl<T, K> {",
+      "sha256": "ee8c1bd743a0675bceffc6cfd45a94da495577fefeab8df6863a4cce16eef660",
+      "judgment": "Complete untouched upstream API-reference before/after bodies record the exact added/removed public leaf getter or protected type/initializer declaration. This is source contract evidence only; no owned golden is updated."
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "header": "@@ -64,9 +64,9 @@ export class CdkNestedTreeNode<T, K = T> extends CdkTreeNode<T, K> implements Af",
+      "sha256": "479dfff90dd5de955973f3fc25bd36f65861faaf7c7c82b9f305f4fbec7547cd",
+      "judgment": "Complete untouched upstream API-reference before/after bodies record the exact added/removed public leaf getter or protected type/initializer declaration. This is source contract evidence only; no owned golden is updated."
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "header": "@@ -118,7 +118,7 @@ export class CdkTree<T, K = T> implements AfterContentChecked, AfterContentInit,",
+      "sha256": "01dd61ffe406882ad2906892a4436b1bedaea5501f8e12dea62664f7111ed8cd",
+      "judgment": "Complete untouched upstream API-reference before/after bodies record the exact added/removed public leaf getter or protected type/initializer declaration. This is source contract evidence only; no owned golden is updated."
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "header": "@@ -205,6 +205,8 @@ export class CdkTreeNode<T, K = T> implements OnDestroy, OnInit, TreeKeyManagerI",
+      "sha256": "686680107261e0bd022d9097aaa423b4027b2c9b6baf4a28d794ee59da7cb978",
+      "judgment": "Complete untouched upstream API-reference before/after bodies record the exact added/removed public leaf getter or protected type/initializer declaration. This is source contract evidence only; no owned golden is updated."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "src/cdk/tree/nested-node.ts",
+      "review": "Complete nested runtime: replace the nested ngOnInit wrapper/OnInit heritage with protected _type=nested. Preserve remaining constructor, child differ/subscription, outlet and teardown operations. Inherited initializer/lifecycle execution remains unproved."
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "review": "Complete tree runtime: dev-only mixed-type warning preserves the initial type; base node _type=flat and ngOnInit now classify via virtual _type. Preserve expansion subscription and registration; no new warning regression test is supplied by this patch."
+    },
+    {
+      "path": "src/material/tree/testing/tree-harness.spec.ts",
+      "review": "Complete harness fixture replaces mixed flat leaf markup with mat-nested-tree-node under a nested tree. All seven callbacks keep complete semantics; source fixture correction alone is not an executed warning or lifecycle test."
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "review": "Complete untouched upstream API-reference before/after bodies record the exact added/removed public leaf getter or protected type/initializer declaration. This is source contract evidence only; no owned golden is updated."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-tree-source-review.json.gz",
+    "sha256": "d0ba97804e63c9d1b03afb8114367f4e36ff7e3f18df64a9bb290e68cbfcf402"
+  },
+  "source_semantics": {
+    "sha": "cc5332259611bd59dcca3bebf4b99f8052c9c36a",
+    "cases_before": 7,
+    "cases_after": 7,
+    "unchanged_complete_callbacks": 7,
+    "source_conclusion_only": true,
+    "actual_lifecycle_Angular_accessibility_browser_or_floor_qualified": false,
+    "review": "Individually review all four complete files and eleven hunks of the mixed-node warning change. CdkTree reads the current node type, sets it only when unset, and warns in development on conflicting later types while retaining the initial classification. The base node adds protected readonly _type=flat and its initializer passes this._type instead of a literal flat; nested nodes override _type=nested and remove their own ngOnInit wrapper and implements OnInit. This makes classification follow the actual subtype once through the inherited initializer, while preserving parent aria level, expansion subscription/markForCheck and node registration. The complete runtime projection preserves every other operation; exact removed/added methods, import/heritage changes and protected API references remain pinned. The harness fixture changes its nested leaf markup to mat-nested-tree-node; all seven complete callbacks are unchanged. No new warning/lifecycle regression case is added by this upstream patch, so source review does not assert such execution. The owned legacy add-on has no public tree dependency, tree markup or tree fork; this warning/lifecycle/protected-contract change belongs to the unrelated peer. Do not copy the TreeControl/private machinery or make a consumer template/style change. No Angular/native/a11y/floor equivalence is claimed."
+  },
+  "decision": "Individually review all four complete files and eleven hunks of the mixed-node warning change. CdkTree reads the current node type, sets it only when unset, and warns in development on conflicting later types while retaining the initial classification. The base node adds protected readonly _type=flat and its initializer passes this._type instead of a literal flat; nested nodes override _type=nested and remove their own ngOnInit wrapper and implements OnInit. This makes classification follow the actual subtype once through the inherited initializer, while preserving parent aria level, expansion subscription/markForCheck and node registration. The complete runtime projection preserves every other operation; exact removed/added methods, import/heritage changes and protected API references remain pinned. The harness fixture changes its nested leaf markup to mat-nested-tree-node; all seven complete callbacks are unchanged. No new warning/lifecycle regression case is added by this upstream patch, so source review does not assert such execution. The owned legacy add-on has no public tree dependency, tree markup or tree fork; this warning/lifecycle/protected-contract change belongs to the unrelated peer. Do not copy the TreeControl/private machinery or make a consumer template/style change. No Angular/native/a11y/floor equivalence is claimed. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "exact_revert_reapply_relations": [
+    {
+      "path": "src/cdk/tree/tree.spec.ts",
+      "before_sha256": "5cd69846cacffd1e8596a1c917882ae0e3771e2d8fe46dde258582d3617ca1e3",
+      "after_sha256": "2b41289c2ed64ac046824cdc95960a7b3972579b9ecf3b392ce2b26c7af6cc39",
+      "exact_revert_and_byte_identical_reapply": true
+    },
+    {
+      "path": "src/cdk/tree/tree.ts",
+      "before_sha256": "eacebcae45da178d842efbf7cc2d5fc27d17a40dfcc157632f1d0ceeacfa9f40",
+      "after_sha256": "21c01c68942aca7cc71a39050047d7e396ce4fb2738fed60accd662a1b3f7e51",
+      "exact_revert_and_byte_identical_reapply": true
+    },
+    {
+      "path": "src/material/tree/tree.spec.ts",
+      "before_sha256": "985edfdeaa43d8f25956b368def0b56103bcda9adba216968d284d7cff2a473f",
+      "after_sha256": "16aa5373bf37e942b409bd2de38ad062bb67747e6ea41f2eea1a51788e99521a",
+      "exact_revert_and_byte_identical_reapply": true
+    },
+    {
+      "path": "tools/public_api_guard/cdk/tree.md",
+      "before_sha256": "e3155b5b8a16d1257d577dc1f270018c627bf257b3934cbe6997580ec8662b97",
+      "after_sha256": "ec2cf26e5b7f4939ae336387952f60307798d32c4c8ceebef63e885a3b4fc0d3",
+      "exact_revert_and_byte_identical_reapply": true
+    }
+  ],
+  "owned_scope": {
+    "source_members": 1028,
+    "members_sha256": "5d1d290d9405e02363840fb94fb743739ef52a3b9afd9d0f111d418967c77b05",
+    "owned_tree_import_export_dynamic_import_or_require_routes": 0,
+    "ordinary_tree_forks": 0,
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "scope_source_only": true,
+    "actual_peer_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "cc5332259611bd59dcca3bebf4b99f8052c9c36a",
+    "bucket": "test-only-batch-candidate",
+    "subject": "fix(cdk/tree): warn if mixed node types are used within the same tree",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=1bc6918fc384e8250f6f44c9825ccfc2d795ec4e8da23d81f91399415fb8474a, bytes=6165). Changed paths: src/cdk/tree/nested-node.ts, src/cdk/tree/tree.ts, src/material/tree/testing/tree-harness.spec.ts, tools/public_api_guard/cdk/tree.md. Tree is not a retained legacy product family in this package. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+    "batch_id": "needs-triage-testonly-button-tokens-structural-nonshipped-2026-10-01",
+    "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/cc5332259611bd59dcca3bebf4b99f8052c9c36a.json"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-tree-source-prior.json.gz",
+    "sha256": "11795433f51443715cf3fa82995197bf897ea6576dc6dcc6a3a6d7f88caa3dd1"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-tree-source-applicability",
+    "diff_sha256": "5b04085971e990c9a8c7832d50849c1567ccabafcc849fe8f253c2e8411e87ea",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Individually review all four complete files and eleven hunks of the mixed-node warning change. CdkTree reads the current node type, sets it only when unset, and warns in development on conflicting later types while retaining the initial classification. The base node adds protected readonly _type=flat and its initializer passes this._type instead of a literal flat; nested nodes override _type=nested and remove their own ngOnInit wrapper and implements OnInit. This makes classification follow the actual subtype once through the inherited initializer, while preserving parent aria level, expansion subscription/markForCheck and node registration. The complete runtime projection preserves every other operation; exact removed/added methods, import/heritage changes and protected API references remain pinned. The harness fixture changes its nested leaf markup to mat-nested-tree-node; all seven complete callbacks are unchanged. No new warning/lifecycle regression case is added by this upstream patch, so source review does not assert such execution. The owned legacy add-on has no public tree dependency, tree markup or tree fork; this warning/lifecycle/protected-contract change belongs to the unrelated peer. Do not copy the TreeControl/private machinery or make a consumer template/style change. No Angular/native/a11y/floor equivalence is claimed. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-tree-source-review.mjs",
+        "sha256": "18715e004a4f9f41ceb112a15db85306098882a69792155f4137c84411af68b6"
+      },
+      {
+        "path": "tests/mixed_tree_source_probe.mjs",
+        "sha256": "faa12a6720a1691bb0ebbbdbe9719d6b7e281e282ad232457412cfcda7957384"
+      },
+      {
+        "path": "tests/test_mixed_tree_source.py",
+        "sha256": "4c76300c3eb9b9e322d095a955dbcc90880cdfbd07ebe5f989f4228abf88c13d"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-qualification-record.py",
+        "sha256": "8531d96d81b210b8acbbc0cde95604bf668a253d482d2641c4a719c143f00c93"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-tree-originals.py",
+        "sha256": "f250bfee18b2dff0d21acbf3587be94b7b0e2522fdc0cb71fb2aa50ee1ca23fc"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-authenticator.mjs",
+        "sha256": "5475c715ec2869f0646e85b95cb64b27d5520e49cf9b0630d284202d7716f871"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-subjects.json.gz",
+        "sha256": "ce46de875ed322a07213564aa3bb3365b6b6b6030e81e73c00851d19211ae4b1"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-acquisition.json.gz",
+        "sha256": "c35d8be2a688568397fb2ac1bf646da5dc02c8cd87d6dc2769f4540427f2f47c"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-authentication.json.gz",
+        "sha256": "5107f6b5f9fbc966884a0cc940a87ccf0c9df160da5b6ff49560723dd9b7079a"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-acquisition-checkpoint.json",
+        "sha256": "020d8b7077a95c428c13e71469442331b37892c4f8dd3b7139c803548ae87b65"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-intake.json",
+        "sha256": "d84d492d246902127f89fb20369e3bbe23106f142bf3ddaf2dbca0c0f04564b5"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-observation-pins.json.gz",
+        "sha256": "55c34d2a4c6ed3554f341de1445b9b6776cf04fc20a01c9931d45d7a269f8bec"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-prior.json.gz",
+        "sha256": "11795433f51443715cf3fa82995197bf897ea6576dc6dcc6a3a6d7f88caa3dd1"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-review.json.gz",
+        "sha256": "d0ba97804e63c9d1b03afb8114367f4e36ff7e3f18df64a9bb290e68cbfcf402"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-controls.json",
+        "sha256": "4bae43076406052ac620cf5a23ba3520a09fc15d915d2b9f1858d677fd5bc037"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-python.log.gz",
+        "sha256": "91113567f2a599f4560060d752aef2635d1d307857986fe88e240a75557c0eab"
+      },
+      {
+        "path": "compatibility/rc/mixed-tree-source-cyph-sanity.json",
+        "sha256": "6b21fdacb40a04bd682ceb417fe8379967a7f534fcbe3ba34049d097d525f122"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "35688ab4bfe88de585342f194f3463f409c03cbc",
+      "prior_entry_sha256": "992bc230ebe2832f32cbb44fc9c7e4f7b9a63d52267137264cf4e9b4b323c8d1",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/mixed-tree-cc5332259611bd59dcca3bebf4b99f8052c9c36a.json",
+        "sha256": "8cb9be08813b5cd2e8f0030d6b7b268ee69767924fa26f88ffe46cffc3469c37",
+        "bytes": 24221
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "a1f9d4e3455d6c8ffc74bbbfefa69b001c0db6a091c3edfefab57999e7c3d0b4",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "4fc9e314d4b1bd43dab9b2745cdcb336a9222f6bc0f618852e4cc15edccc0da2",
+        "bytes": 31567
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "3a160fce33ddc2b79a6f4a144c07baed655648d4216f8d1a4450f12457d0e79c",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/mixed-tree-cc5332259611bd59dcca3bebf4b99f8052c9c36a.json",
+        "sha256": "8cb9be08813b5cd2e8f0030d6b7b268ee69767924fa26f88ffe46cffc3469c37",
+        "bytes": 24221
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-tree-source-review.mjs",
+      "sha256": "18715e004a4f9f41ceb112a15db85306098882a69792155f4137c84411af68b6"
+    },
+    {
+      "path": "tests/mixed_tree_source_probe.mjs",
+      "sha256": "faa12a6720a1691bb0ebbbdbe9719d6b7e281e282ad232457412cfcda7957384"
+    },
+    {
+      "path": "tests/test_mixed_tree_source.py",
+      "sha256": "4c76300c3eb9b9e322d095a955dbcc90880cdfbd07ebe5f989f4228abf88c13d"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-qualification-record.py",
+      "sha256": "8531d96d81b210b8acbbc0cde95604bf668a253d482d2641c4a719c143f00c93"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-tree-originals.py",
+      "sha256": "f250bfee18b2dff0d21acbf3587be94b7b0e2522fdc0cb71fb2aa50ee1ca23fc"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-authenticator.mjs",
+      "sha256": "5475c715ec2869f0646e85b95cb64b27d5520e49cf9b0630d284202d7716f871"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-subjects.json.gz",
+      "sha256": "ce46de875ed322a07213564aa3bb3365b6b6b6030e81e73c00851d19211ae4b1"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-acquisition.json.gz",
+      "sha256": "c35d8be2a688568397fb2ac1bf646da5dc02c8cd87d6dc2769f4540427f2f47c"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-authentication.json.gz",
+      "sha256": "5107f6b5f9fbc966884a0cc940a87ccf0c9df160da5b6ff49560723dd9b7079a"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-acquisition-checkpoint.json",
+      "sha256": "020d8b7077a95c428c13e71469442331b37892c4f8dd3b7139c803548ae87b65"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-intake.json",
+      "sha256": "d84d492d246902127f89fb20369e3bbe23106f142bf3ddaf2dbca0c0f04564b5"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-observation-pins.json.gz",
+      "sha256": "55c34d2a4c6ed3554f341de1445b9b6776cf04fc20a01c9931d45d7a269f8bec"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-prior.json.gz",
+      "sha256": "11795433f51443715cf3fa82995197bf897ea6576dc6dcc6a3a6d7f88caa3dd1"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-review.json.gz",
+      "sha256": "d0ba97804e63c9d1b03afb8114367f4e36ff7e3f18df64a9bb290e68cbfcf402"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-controls.json",
+      "sha256": "4bae43076406052ac620cf5a23ba3520a09fc15d915d2b9f1858d677fd5bc037"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-python.log.gz",
+      "sha256": "91113567f2a599f4560060d752aef2635d1d307857986fe88e240a75557c0eab"
+    },
+    {
+      "path": "compatibility/rc/mixed-tree-source-cyph-sanity.json",
+      "sha256": "6b21fdacb40a04bd682ceb417fe8379967a7f534fcbe3ba34049d097d525f122"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "35688ab4bfe88de585342f194f3463f409c03cbc",
+    "prior_entry_sha256": "992bc230ebe2832f32cbb44fc9c7e4f7b9a63d52267137264cf4e9b4b323c8d1",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mixed-tree-cc5332259611bd59dcca3bebf4b99f8052c9c36a.json",
+      "sha256": "8cb9be08813b5cd2e8f0030d6b7b268ee69767924fa26f88ffe46cffc3469c37",
+      "bytes": 24221
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "a1f9d4e3455d6c8ffc74bbbfefa69b001c0db6a091c3edfefab57999e7c3d0b4",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "4fc9e314d4b1bd43dab9b2745cdcb336a9222f6bc0f618852e4cc15edccc0da2",
+      "bytes": 31567
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "3a160fce33ddc2b79a6f4a144c07baed655648d4216f8d1a4450f12457d0e79c",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mixed-tree-cc5332259611bd59dcca3bebf4b99f8052c9c36a.json",
+      "sha256": "8cb9be08813b5cd2e8f0030d6b7b268ee69767924fa26f88ffe46cffc3469c37",
+      "bytes": 24221
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

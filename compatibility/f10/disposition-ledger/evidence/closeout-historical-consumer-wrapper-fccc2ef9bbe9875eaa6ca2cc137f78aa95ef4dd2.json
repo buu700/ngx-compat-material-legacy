@@ -1,0 +1,710 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2",
+  "subject": "refactor(cdk/scrolling): switch tests away from fakeAsync (#33150)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a6ccb2765ce5d9fc60850fb605e0d3f0f6e93146",
+      "after_blob": "286ffb262af035350300a38ff5da3b5811c25083"
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "bf068b6d23c390ce026615c974723776a0122a1d",
+      "after_blob": "110db7da75499f954a5ce84d1f9aa83b240e42da"
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "7ef43e58f3a42ff44b6bc162aa297b892c02e5d1",
+      "after_blob": "4a22f31b652d4092b1a421fd194b5e9ea30c6bc0"
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "4137a8e74fa6958baae86b81836893a0700a601f",
+      "after_blob": "71940e599fa5a6918baa9c4cfa40c41d4c11600e"
+    }
+  ],
+  "original_files": 4,
+  "original_hunks": 38,
+  "raw_commit_sha256": "f4ee53585c951db27833e5241845504a4f8a09794caa97be49ad387a0dff425e",
+  "original_sources": {
+    "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+    "sha256": "ef515f777d07954c79743aac97363eee5066dd73cd9258dd7a141c345738d72d"
+  },
+  "patch_file": "compatibility/rc/spec-cdk-async-source-fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2.patch",
+  "diff_sha256": "5dde1ced48907cd34bb29dd212623cbfa3c3b1079f01939c327b4b55d3cbcebd",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.spec.ts",
+      "header": "@@ -1,4 +1,4 @@",
+      "sha256": "bfcfd09dbdab3d98c619e757545a66878f75bf55c8af3d9d66f5ee6ebdfa351d",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.spec.ts",
+      "header": "@@ -31,7 +31,7 @@ describe('ScrollDispatcher', () => {",
+      "sha256": "04ee50ba08329682cd0066c1055c6c4dc7f80edf9f6d6769f23d97b1311b311f",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.spec.ts",
+      "header": "@@ -55,9 +55,9 @@ describe('ScrollDispatcher', () => {",
+      "sha256": "ce167aa8afe9edcb90fef1fb8c23faa3bb1f0caac053db5546e490436d96c8f0",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.spec.ts",
+      "header": "@@ -1,4 +1,4 @@",
+      "sha256": "bd832852dae6ea3b78768bea3a93ded6b1a35af0d8af1497771594174b918dfa",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.spec.ts",
+      "header": "@@ -109,17 +109,17 @@ describe('ViewportRuler', () => {",
+      "sha256": "285632533db5e8b33d3d8d3731df1c1e3defb418d87fc1704a31d845b6e52ca9",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -16,18 +16,15 @@ import {",
+      "sha256": "aed79fac51cb1e9012b0a08a6d2736203e162a8a47e808ac9351ce3fdaa8ad4b",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -39,8 +36,8 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "b07cc423ac2fe638770222f51bd59cc10e95b921beed140e1f51139cfaa936eb",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -48,144 +45,144 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "197cd6033a4ff04d7aee57515364d5e0e883f17467f847160f5d724cde208cb3",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -197,22 +194,22 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "ce74456078381d17de0a57bc8adbad51b8de2ec4973f2492f910e8c2c23ecdfc",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -220,103 +217,105 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "68f90383cbf5c1c778b84e5a1c3d5db55a9f0819af7c2c8e2470dee87e5938c8",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -334,17 +333,17 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "bbfeee2d261b48d8a299ddd8082eb8d3657af1aefa96f9440d237a67d51cc748",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -362,12 +361,12 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "0512461ac70be70ca75cdbebb4903a7cde066821ab029e55170afac43bddf904",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -375,15 +374,16 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "d0c3508501b596c91e696f61073a2ccb8ea862b1f72951528d322e4196c84f02",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -391,15 +391,15 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "2b194b66b20d4f49e62e862d21f5630a4208ebb24cc06560fb6593454d06dd2d",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -407,13 +407,13 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "3e07aecffb7ce4587ee9328fa4c1943b71d61309364e3df1a194a4e15f3bc3c9",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -422,18 +422,18 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "ea269ecee41cdbc7af088a446d443f4c63e9c1c37b38f9a490a868336626e6a8",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -443,18 +443,18 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "873a64e6955a15c1deec3c747c8a1e2d896953c3fac28def498fd07d9148d038",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -463,18 +463,18 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "ab8b0a58da4cb2d9fc4d47577acf6a8ae1bf901663f30e4ae120baca5d75a80e",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -486,19 +486,19 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "fb749b031e755c7c61fee685bf0f67e0f797c2ddff89fb819d2a19d3905a9692",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -507,23 +507,23 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "b8c04a143a38d2ea924387abf39c0bd24236636dbbd30c76eb16e2cab5659213",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -541,18 +541,18 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "61150efb19dfe7bcece85c31ec4db52b63bda303faf754b0aa35fea60ac76506",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -570,22 +570,22 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "3f6dbc9dd5951740997c11c3afbcf741169245abfd355beb7dfb6f5801c7f70e",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -593,17 +593,17 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "48dff252c6f403e8a4c4fdc57d4b647bf1deaf22c9572869b47097900c5deba1",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -611,14 +611,14 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "483a24360d13856afdf918f26feea11620aea9e8f447f8b8bbf690719ceebb2d",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -626,69 +626,69 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "9f6bd193fd0361a42e1b4c412a5d8de98da624274a7bfc15a137f6458deb0936",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -699,30 +699,30 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "e6844d89260da06f86146a728c61ad67ea18c668de1a731312d2063b31409daa",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -733,93 +733,89 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "04f150b2a09fc63de7c0f8fcbc137834a74be7ebf7411a0ff0db5b2bb6659933",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -840,97 +836,95 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "48315da821274d346f419620751847b8d0a0ee8e8d4b681aad9a50efbf0a81d9",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -947,8 +941,8 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "55043d39d421e7ed23798b5b4aabdbca695aa749918b4356c8cd2dfaf9e420de",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -957,7 +951,7 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "2e9c009d5d2cb7d4f8efa0b2afc03e912c793da0a47175f107e29ec080d0b5c1",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -972,19 +966,19 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "9870dbf0e12ced7b6e56a79f0008a8dcee7e5a8d77e9cdaeda3cf6bf5d77e9a1",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -1002,64 +996,65 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "095dd354b189bb158e03268e855d1c67a456e68bf604298ef2fb275d4232346c",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -1073,24 +1068,24 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "c15a7e6b56a890de268e234b7343f30b23e6a1aaa79d409be0fab733bca56854",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -1104,18 +1099,18 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "7bdec90ba4f103a8221db90ce88f14718025a0d993efdc5717a18e374e132fd5",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "header": "@@ -1127,28 +1122,28 @@ describe('CdkVirtualScrollViewport', () => {",
+      "sha256": "eacf4d6f3bc049773769f560710c6277b5ad0d144e9720395aff2b2058a07eb0",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts",
+      "header": "@@ -9,8 +9,7 @@ import {",
+      "sha256": "e11b661ebce296e053d596f86a0b3f40146844a26f179bde5d6fff517cfe71f0",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts",
+      "header": "@@ -32,30 +31,30 @@ describe('CdkVirtualScrollViewport Zone.js intergation', () => {",
+      "sha256": "7c12083b311c314b4e865a1ab9232b7902916d5eda85ed09530aa2ddb733ad29",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts",
+      "header": "@@ -132,29 +131,29 @@ class FixedSizeVirtualScroll {",
+      "sha256": "03ca6b435f412acad4234ae6fecd0d2fa56ef3ec7cb83ff763fcd33f2fed0a29",
+      "judgment": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2",
+    "complete_original_files": 4,
+    "complete_original_hunks": 38,
+    "removed": [],
+    "helpers": [
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "side": "before",
+        "scopes": [],
+        "name": "finishInit",
+        "raw": "function finishInit(fixture: ComponentFixture<any>) {\n  // On the first cycle we render and measure the viewport.\n  fixture.detectChanges();\n  flush();\n\n  // On the second cycle we render the items.\n  fixture.detectChanges();\n  flush();\n\n  // Flush the initial fake scroll event.\n  tick(16); // flush animation frame\n  flush();\n  fixture.detectChanges();\n}",
+        "sha256": "b615bfa4b18b2e7f6a9d2c2de3ba35b726eb477591d0391bc0cbc71d9563c05f"
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "side": "before",
+        "scopes": [],
+        "name": "triggerScroll",
+        "raw": "function triggerScroll(viewport: CdkVirtualScrollViewport, offset?: number) {\n  if (offset !== undefined) {\n    viewport.scrollToOffset(offset);\n  }\n  dispatchFakeEvent(viewport.scrollable!.getElementRef().nativeElement, 'scroll');\n  tick(16); // flush animation frame\n}",
+        "sha256": "24129d9770c4657ad1888975675f506b83cbd30af76d219b9b89692e88573a10"
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "side": "after",
+        "scopes": [],
+        "name": "finishInit",
+        "raw": "async function finishInit(fixture: ComponentFixture<any>) {\n  // On the first cycle we render and measure the viewport.\n  fixture.detectChanges();\n  await fixture.whenStable();\n\n  // On the second cycle we render the items.\n  fixture.detectChanges();\n  await fixture.whenStable();\n\n  // Flush the initial fake scroll event.\n  await new Promise(resolve => requestAnimationFrame(resolve));\n  await fixture.whenStable();\n  fixture.detectChanges();\n}",
+        "sha256": "7905eca64a4c7e5411dd51dfbfc161798122177d1a87bf5fa070dd4fc8a053f5"
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+        "side": "after",
+        "scopes": [],
+        "name": "triggerScroll",
+        "raw": "async function triggerScroll(viewport: CdkVirtualScrollViewport, offset?: number) {\n  if (offset !== undefined) {\n    viewport.scrollToOffset(offset);\n  }\n  dispatchFakeEvent(viewport.scrollable!.getElementRef().nativeElement, 'scroll');\n  await new Promise(resolve => setTimeout(resolve, 50));\n}",
+        "sha256": "e77101068a4682c191bd49b3f05a82dbfee58cc0920692494e92f5209ca9d4ce"
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts",
+        "side": "before",
+        "scopes": [],
+        "name": "finishInit",
+        "raw": "function finishInit(fixture: ComponentFixture<any>) {\n  // On the first cycle we render and measure the viewport.\n  fixture.changeDetectorRef.markForCheck();\n  fixture.detectChanges();\n  flush();\n\n  // On the second cycle we render the items.\n  fixture.changeDetectorRef.markForCheck();\n  fixture.detectChanges();\n  flush();\n\n  // Flush the initial fake scroll event.\n  animationFrameScheduler.flush();\n  flush();\n  fixture.changeDetectorRef.markForCheck();\n  fixture.detectChanges();\n}",
+        "sha256": "89a82b61859aef21fbf2fbea6aafc22b5239d73fbb11a3f489dfbf3fe2ebdf83"
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts",
+        "side": "before",
+        "scopes": [],
+        "name": "triggerScroll",
+        "raw": "function triggerScroll(viewport: CdkVirtualScrollViewport, offset?: number) {\n  if (offset !== undefined) {\n    viewport.scrollToOffset(offset);\n  }\n  dispatchFakeEvent(viewport.scrollable.getElementRef().nativeElement, 'scroll');\n  animationFrameScheduler.flush();\n}",
+        "sha256": "01751ba18263dae82cd5adfa6b57517beb8acf599107069348e7f76e3a361738"
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts",
+        "side": "after",
+        "scopes": [],
+        "name": "finishInit",
+        "raw": "async function finishInit(fixture: ComponentFixture<any>) {\n  // On the first cycle we render and measure the viewport.\n  fixture.changeDetectorRef.markForCheck();\n  fixture.detectChanges();\n  await fixture.whenStable();\n\n  // On the second cycle we render the items.\n  fixture.changeDetectorRef.markForCheck();\n  fixture.detectChanges();\n  await fixture.whenStable();\n\n  // Flush the initial fake scroll event.\n  await new Promise(resolve => requestAnimationFrame(resolve));\n  await fixture.whenStable();\n  fixture.changeDetectorRef.markForCheck();\n  fixture.detectChanges();\n}",
+        "sha256": "11d214c36df1dc51414d38221cb252793129c5b319641825ce839f50c052367b"
+      },
+      {
+        "path": "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts",
+        "side": "after",
+        "scopes": [],
+        "name": "triggerScroll",
+        "raw": "async function triggerScroll(viewport: CdkVirtualScrollViewport, offset?: number) {\n  if (offset !== undefined) {\n    viewport.scrollToOffset(offset);\n  }\n  dispatchFakeEvent(viewport.scrollable.getElementRef().nativeElement, 'scroll');\n  await new Promise(resolve => setTimeout(resolve, 16));\n}",
+        "sha256": "69756354279f3f4740c2336c7f45dbf06969fef6788951b13c68a1666cb566bd"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 94,
+    "hooks": 13,
+    "fixture_classes": 13,
+    "template_style_properties": 21
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+    "sha256": "bac1c2bbf8986c45cbedd75b015880139e24c73092cd2140be2030813d6412d0"
+  },
+  "decision": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+  "prior_entry": {
+    "sha": "fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(cdk/scrolling): switch tests away from fakeAsync (#33150)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=d479a108388660bf8ab548e82c924d035b3f84809964382ef5cdb81fece08fdd, bytes=56169). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/scrolling/scroll-dispatcher.spec.ts, src/cdk/scrolling/viewport-ruler.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.spec.ts, src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts). No production runtime, style, public API, or harness implementation sources. Subject is refactor test-plumbing (fakeAsync/standalone/change-detection), not fix/feat/build. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/cdk/scrolling/scroll-dispatcher.spec.ts",
+      "src/cdk/scrolling/viewport-ruler.spec.ts",
+      "src/cdk/scrolling/virtual-scroll-viewport.spec.ts",
+      "src/cdk/scrolling/virtual-scroll-viewport.zone.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2.json",
+    "batch_id": "test-only-refactor-wave2-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:47:11Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "d479a108388660bf8ab548e82c924d035b3f84809964382ef5cdb81fece08fdd"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+    "sha256": "d266bfdc06bb5c290007521513d5b2e551a278a5457f9d2131dccac488c7f001"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "5dde1ced48907cd34bb29dd212623cbfa3c3b1079f01939c327b4b55d3cbcebd",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Decline this private CDK scrolling scheduler migration after individual review of all 38 hunks in all four complete files. Pair all 94 static registrations with one finite RTL literal-concatenation label mapping and 13 hooks;23 complete callbacks retain semantics and 71 change. Individually pin viewport throttle 1337 ms to 10 ms with a 20 ms native observation, the buffer error observer changing to async rejection with assignments moved outside it, and the cache-disposal 50-iteration loop losing its explicit nonthrow wrapper. Eight exact initialization/scroll helper bodies account for animation-frame and 16/50 ms native waits, two removed zone-helper animationFrameScheduler.flush calls and its entire removed RxJS import. All 13 fixture classes and 21 template/style properties remain raw-byte identical. Shared comparison strips only these exact private helper statements, leaving unrelated flush operations intact; no frame/throttle/scroll/geometry/disposal equivalence is proved. ScrollDispatcher and public overlay/scroll behavior remain reachable through tooltip/autocomplete/select/table. The add-on separately owns bounded historical viewport primitives used by eight bindings; this proof does not admit them as equivalent to current ViewportRuler. A synthetic no-global-window/null-defaultView edge reproduces in both the untouched Material 16 helper and the owned helper and is explicitly retained as an open actual-SSR validation item. Preserve all owned code, selectors, CSS/SCSS and tests; no CDK fork, public API mirror or required consumer edit. Actual scrolling/SSR/native/browser/peer-floor validation remains open.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-cdk-async-source-review.mjs",
+        "sha256": "982719c6e0b660c03dbf682dbcd213821401846ef0353a5bc1bd801462ebd13c"
+      },
+      {
+        "path": "tests/spec_cdk_async_source_probe.mjs",
+        "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9"
+      },
+      {
+        "path": "tests/test_spec_cdk_async_source.py",
+        "sha256": "de8ee5c55766edeea84f529ce790ef51bc81fe149aef80d5084141750c32b642"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-qualification-inspector.py",
+        "sha256": "ca63e1d8fbeb973a805e3822dd623e6a13b3c423d2ed33d8af2dbf8cda1c0328"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+        "sha256": "ef515f777d07954c79743aac97363eee5066dd73cd9258dd7a141c345738d72d"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-acquisition.json.gz",
+        "sha256": "66273c1785f6149e4ef73743ea58262751ca59b94070c9c3d8cc5ba8765e008b"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-observation-pins.json",
+        "sha256": "90d5226c7425d697d525b923dc66d5f9aa1e8b79341f97c5b2e2534d8fe390de"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+        "sha256": "d266bfdc06bb5c290007521513d5b2e551a278a5457f9d2131dccac488c7f001"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+        "sha256": "bac1c2bbf8986c45cbedd75b015880139e24c73092cd2140be2030813d6412d0"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-controls.json",
+        "sha256": "77b519f445caa2e870d1271ff05aa4808d0bd77f047a9cd732fd3941528cc949"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-python.log.gz",
+        "sha256": "d9cc9df950599c8a19643dd26224dbf82b4cdab715cd544ed8b6d24bc2be842c"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-cyph-sanity.json",
+        "sha256": "4a2143dea859b118422041e79e57c858069ad9000fa5ab9b0aa85a873b9883be"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-probe.mjs",
+        "sha256": "f7ebe44564f0d6da673e5e3023ae97b2944a36e646cd253d4fb32f52f4907ee3"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+        "sha256": "f9c0a6c9717d731ab263d4c8d39ad2d1292b7b479f666fad00dd7a4abdfcfc44"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-checkpoint.json",
+        "sha256": "878f0d5a276091ffe256dfa0220486fc1007192483ccf82df8bd12dec7715c52"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-replay-checkpoint.json",
+        "sha256": "ff42a8648cb6433f742117d1e3e2eb3329542c642a81bba9013166732f0db95d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+        "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+        "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+        "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "35688ab4bfe88de585342f194f3463f409c03cbc",
+      "prior_entry_sha256": "48c0382235bbe716dcc99e77c42d89d928e53d3179b208fc9c79d6a082e8d7c2",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2.json",
+        "sha256": "8dd602ce20bd2d560cdd23c721e4c4838fbef5c385119b865c79b25cf9d3f17e",
+        "bytes": 112169
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "a1f9d4e3455d6c8ffc74bbbfefa69b001c0db6a091c3edfefab57999e7c3d0b4",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "4fc9e314d4b1bd43dab9b2745cdcb336a9222f6bc0f618852e4cc15edccc0da2",
+        "bytes": 31567
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "3a160fce33ddc2b79a6f4a144c07baed655648d4216f8d1a4450f12457d0e79c",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2.json",
+        "sha256": "8dd602ce20bd2d560cdd23c721e4c4838fbef5c385119b865c79b25cf9d3f17e",
+        "bytes": 112169
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-cdk-async-source-review.mjs",
+      "sha256": "982719c6e0b660c03dbf682dbcd213821401846ef0353a5bc1bd801462ebd13c"
+    },
+    {
+      "path": "tests/spec_cdk_async_source_probe.mjs",
+      "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9"
+    },
+    {
+      "path": "tests/test_spec_cdk_async_source.py",
+      "sha256": "de8ee5c55766edeea84f529ce790ef51bc81fe149aef80d5084141750c32b642"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-qualification-inspector.py",
+      "sha256": "ca63e1d8fbeb973a805e3822dd623e6a13b3c423d2ed33d8af2dbf8cda1c0328"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+      "sha256": "ef515f777d07954c79743aac97363eee5066dd73cd9258dd7a141c345738d72d"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-acquisition.json.gz",
+      "sha256": "66273c1785f6149e4ef73743ea58262751ca59b94070c9c3d8cc5ba8765e008b"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-observation-pins.json",
+      "sha256": "90d5226c7425d697d525b923dc66d5f9aa1e8b79341f97c5b2e2534d8fe390de"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+      "sha256": "d266bfdc06bb5c290007521513d5b2e551a278a5457f9d2131dccac488c7f001"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+      "sha256": "bac1c2bbf8986c45cbedd75b015880139e24c73092cd2140be2030813d6412d0"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-controls.json",
+      "sha256": "77b519f445caa2e870d1271ff05aa4808d0bd77f047a9cd732fd3941528cc949"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-python.log.gz",
+      "sha256": "d9cc9df950599c8a19643dd26224dbf82b4cdab715cd544ed8b6d24bc2be842c"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-cyph-sanity.json",
+      "sha256": "4a2143dea859b118422041e79e57c858069ad9000fa5ab9b0aa85a873b9883be"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-probe.mjs",
+      "sha256": "f7ebe44564f0d6da673e5e3023ae97b2944a36e646cd253d4fb32f52f4907ee3"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+      "sha256": "f9c0a6c9717d731ab263d4c8d39ad2d1292b7b479f666fad00dd7a4abdfcfc44"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-checkpoint.json",
+      "sha256": "878f0d5a276091ffe256dfa0220486fc1007192483ccf82df8bd12dec7715c52"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-replay-checkpoint.json",
+      "sha256": "ff42a8648cb6433f742117d1e3e2eb3329542c642a81bba9013166732f0db95d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+      "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "35688ab4bfe88de585342f194f3463f409c03cbc",
+    "prior_entry_sha256": "48c0382235bbe716dcc99e77c42d89d928e53d3179b208fc9c79d6a082e8d7c2",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2.json",
+      "sha256": "8dd602ce20bd2d560cdd23c721e4c4838fbef5c385119b865c79b25cf9d3f17e",
+      "bytes": 112169
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "a1f9d4e3455d6c8ffc74bbbfefa69b001c0db6a091c3edfefab57999e7c3d0b4",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "4fc9e314d4b1bd43dab9b2745cdcb336a9222f6bc0f618852e4cc15edccc0da2",
+      "bytes": 31567
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "3a160fce33ddc2b79a6f4a144c07baed655648d4216f8d1a4450f12457d0e79c",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-fccc2ef9bbe9875eaa6ca2cc137f78aa95ef4dd2.json",
+      "sha256": "8dd602ce20bd2d560cdd23c721e4c4838fbef5c385119b865c79b25cf9d3f17e",
+      "bytes": 112169
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

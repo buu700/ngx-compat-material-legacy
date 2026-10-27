@@ -1,0 +1,634 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "bc0c443e569975e4ddd16a2659104a0e790587e4",
+  "subject": "test(multiple): remove animations module from tests (#30497)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/accordion/accordion-item.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "cbf5c7bfbc4d58aeeb38e9cde6c2146beb252584",
+      "after_blob": "441ec3f46f3cd6e64e21d7a24bf2bfaee287df84"
+    },
+    {
+      "path": "src/cdk/accordion/accordion.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "f0e137a50b7fa0cd40667c9571c8fd2baf21bf22",
+      "after_blob": "81984fe39c802b0b346cf0cd1335a77f412d5273"
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "6865f4e49565a68bc431a32233523e0ecb716e56",
+      "after_blob": "ae569dede5614092b86cc47b24cce4be4307c2e1"
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "b3752a42af52d719923e757f74611ead4727b0c6",
+      "after_blob": "8c2f3991f3c188b4ae33be9f08fd96f42f9023de"
+    },
+    {
+      "path": "src/material/expansion/accordion.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "64cb07a80b7dfb9bf36828f1cd19ab2bc3c04d6c",
+      "after_blob": "5f846d66c6ed1049ddfa0f99ef6c2bdabb146243"
+    },
+    {
+      "path": "src/material/input/input.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "3a778acbcee4d9f943f08ad190dc9d28243828cd",
+      "after_blob": "8ecedf942c606f14c8527dd2390f9728d7766177"
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "144207131276d9ee3be1a3a2cbb0feebc9a4e8ae",
+      "after_blob": "7e21171f5b973c9648b7bee7211a9b8064ef2d96"
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "15f321f57370544ee03839c2504c1cbcd08b4659",
+      "after_blob": "d19e22d080e97c5fc52cd99f36936401b071a8bd"
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "f3cb50704c18e81e009d0c583666216726e857aa",
+      "after_blob": "d640cfd62abf49b7e717e91e7e79365e9f7b3a67"
+    }
+  ],
+  "original_files": 9,
+  "original_hunks": 29,
+  "raw_commit_sha256": "cd4e966d00c966008f20b9cf4858308b7e1cfcd8acb778a565c68f39515264f8",
+  "original_sources": {
+    "path": "compatibility/rc/spec-animation-fixture-source-subjects.json.gz",
+    "sha256": "99b0639c14d8b475ce5f2a27853e0191f5c04ae92b0bc1c126a975344bb4701f"
+  },
+  "patch_file": "compatibility/rc/spec-animation-fixture-source-bc0c443e569975e4ddd16a2659104a0e790587e4.patch",
+  "diff_sha256": "016b8c879f8da1f5ee5253aaf42e9eee7d6b94283442bc1dfc557ca0b6c99867",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/accordion/accordion-item.spec.ts",
+      "header": "@@ -1,19 +1,12 @@",
+      "sha256": "b97cbeca26e245797b690213cd4b896547a2432a354ce9eaceb6fa8ac9482645",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/cdk/accordion/accordion.spec.ts",
+      "header": "@@ -1,7 +1,6 @@",
+      "sha256": "4eaa5e39f44a0c16422be63040e83213a804e1274094f9c7695cae98adbdc9da",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/cdk/accordion/accordion.spec.ts",
+      "header": "@@ -9,7 +8,7 @@ import {CdkAccordionModule} from './accordion-module';",
+      "sha256": "0c9970dff3c9b515f5e549069f18df2dd5617e8f2d712625102408b49e759972",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -37,8 +37,8 @@ import {FormControl, FormsModule, NgForm, ReactiveFormsModule, Validators} from",
+      "sha256": "a09488125d833065dfeabc6e405312805f9e1fadbcf3ebbb202b16a2c7a7815f",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -339,7 +339,7 @@ describe('MatChipGrid', () => {",
+      "sha256": "b99294359c4ae2b82ee0d2db242fac6c62c0b3afeb07cf5302d24c4af1456f08",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -1015,9 +1015,6 @@ describe('MatChipGrid', () => {",
+      "sha256": "99dd7f0f13452e54da1ab4de307a3c8656dd36a0b87479d402d5464c80b70c31",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "header": "@@ -1032,7 +1029,7 @@ describe('MatChipGrid', () => {",
+      "sha256": "4658fb7884349ea0eed47069d2326c863a0cef74d1d50a3b891250167d5a45ee",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -38,7 +38,7 @@ import {",
+      "sha256": "80e89c0e0692143f084f050d3b58dd0493fec665e4cee93e61accd7f7438d91a",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2043,12 +2043,7 @@ describe('MatDialog with animations enabled', () => {",
+      "sha256": "1eb656eb41ef487f20aa86889f0ddb82012c835a0a003a42c743cb40f566e9e9",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2102,7 +2097,7 @@ describe('MatDialog with explicit injector provided', () => {",
+      "sha256": "de46e3b21a6e42c3e6acec02b7371372f30af46ef6cde49203cb6a7404f663a8",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/expansion/accordion.spec.ts",
+      "header": "@@ -8,7 +8,6 @@ import {",
+      "sha256": "75e2d9b94c7774e647c3f506246bfcbae88a2b2f4412da9a75ce8b0304be5364",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/expansion/accordion.spec.ts",
+      "header": "@@ -22,7 +21,6 @@ describe('MatAccordion', () => {",
+      "sha256": "66f45532c42433f0ff1a383c93056cb8a0c1b50c2ad5e872929da85e59a86201",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/input/input.spec.ts",
+      "header": "@@ -36,7 +36,6 @@ import {",
+      "sha256": "061e6d5275bf89d7f4ff30a0558213ecf3d0bb12da97270534ed9eb312027a9b",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/input/input.spec.ts",
+      "header": "@@ -1656,17 +1655,15 @@ function configureTestingModule(",
+      "sha256": "55573e84deede2246caa200254453c35b71825b22042e432972e4ac8c059c30e",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -18,7 +18,7 @@ import {",
+      "sha256": "def1d84241f609706a5a6d7448ef2401d6a74743ba4d27b928e25ee45632d79e",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -517,14 +517,12 @@ describe('MatDrawer', () => {",
+      "sha256": "da30fe35870446ac4dce4a86b4104532a5e29220f3f3b907f0ef70e1bbb3348d",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "header": "@@ -1019,7 +1017,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "984bb039b8ebf26381499c2c60768688b3268e361b947e0ce5e803937c8c0787",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -11,7 +11,7 @@ import {",
+      "sha256": "30e2716dc9ac7dadad8c150b3bac5204640305637ca93dad23b253c5b393f132",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1026,12 +1026,7 @@ describe('MatTabGroup', () => {",
+      "sha256": "b8f6265a276450cd09ae678dce8aa114e06e12714bf39fb88b2b21efa566d468",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1066,7 +1061,7 @@ describe('MatTabGroup with ink bar fit to content', () => {",
+      "sha256": "002a36c0f30ec7f9eb0efb18a13f1a6748c7669938df8d8e3082a8cd5bd36fa5",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1108,7 +1103,7 @@ describe('MatTabNavBar with a default config', () => {",
+      "sha256": "4106026d2150156420b1970d50c0993f01530ae53b109fca68c52e920f70ddfc",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1139,7 +1134,7 @@ describe('MatTabNavBar with a default config', () => {",
+      "sha256": "22b92aabb5eab8d27a0813ad13269c8149bbbac481d0e018a046986747e69b95",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1155,7 +1150,7 @@ describe('MatTabGroup labels aligned with a config', () => {",
+      "sha256": "70c6d07f4929e9a2cd54aa7bd415209e2c43b237badc30caf6eac78ef25f18b2",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1171,7 +1166,7 @@ describe('MatTabGroup labels aligned with a config', () => {",
+      "sha256": "d98d4dda06a382e76c29654763e7681342f915f18403c77aa0f1366ab95d339d",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1187,7 +1182,7 @@ describe('MatTabGroup labels aligned with a config', () => {",
+      "sha256": "7f7e36daea9395412045213dad3ea0ee44e7963adbdb45ec7ba08e666ae6100b",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-group.spec.ts",
+      "header": "@@ -1206,7 +1201,7 @@ describe('MatTabGroup labels aligned with a config', () => {",
+      "sha256": "ce1bb3ce4edf2052c927775fb3fc5c2099d86bd8e864fe059c54d21f47b89078",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -10,7 +10,6 @@ import {Component, QueryList, ViewChild, ViewChildren} from '@angular/core';",
+      "sha256": "96a435b603c885c770491d2a062fe0be1b6ebee04d267aec21203bf9a58f9784",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -512,7 +511,7 @@ describe('MatTabNavBar with a default config', () => {",
+      "sha256": "92a5870d35943e785e0b6a40c496d924efb286d31305e0f85889da90bab35cf0",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    },
+    {
+      "path": "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts",
+      "header": "@@ -534,7 +533,7 @@ describe('MatTabNavBar with a default config', () => {",
+      "sha256": "de9dd3f198e6d873d3c0dd57827bdb91f8fcd9b7539d81ca0272820d6b203e81",
+      "judgment": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+      "review_basis": "Complete authenticated originals; per-file raw/position/ancestry partitions; every import binding and reference; all2383 ordered case identities/modes with one reviewed ripple rename;2352 unchanged callbacks and31 individual named source judgments; complete direct/assertion-helper predicates;279 retained hooks with one RTL source exception and four exact hook removals; five fully reviewed private helper pairs/callers; four scope-bound removed chip variables;439 classes and427 raw template/style properties; all remaining non-scaffold globals equal. Eight explicit NoopAnimationsModule call exceptions remain. No compiler, initialization, error, native focus, timing or lifetime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "bc0c443e569975e4ddd16a2659104a0e790587e4",
+    "complete_original_files": 9,
+    "complete_original_hunks": 29,
+    "helper_call_review": {
+      "reviewed_private_helper_pairs": 2,
+      "chip_default_animation_parameter_removed": true,
+      "one_direction_argument_shift": true,
+      "input_animation_option_never_forwarded_by_sole_caller": true,
+      "retained_NoopAnimationsModule_exception_calls": 0
+    },
+    "paired_cases": 465,
+    "unchanged_complete_callbacks": 458,
+    "changed_callbacks": 7,
+    "renamed_cases": 0,
+    "fixture_setup_projection_equal_cases": 465,
+    "individual_callback_source_exceptions": 0,
+    "hooks_before": 53,
+    "hooks_after": 53,
+    "hooks_paired": 53,
+    "removed_hooks": 0,
+    "individual_hook_source_exceptions": 1,
+    "fixture_classes_unchanged": 120,
+    "template_style_properties_unchanged": 116,
+    "removed_bindings": 10,
+    "added_bindings": 0,
+    "actual_Angular_native_artifact_or_floor_qualified": false
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-animation-fixture-source-review.json.gz",
+    "sha256": "03f05daab8395c3827139ed656d2057cbcf989e166107193565189f9063fd3d8"
+  },
+  "decision": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+  "prior_entry": {
+    "sha": "bc0c443e569975e4ddd16a2659104a0e790587e4",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(multiple): remove animations module from tests (#30497)",
+    "final_disposition": "irrelevant",
+    "reason": "Inspected upstream patch content (sha256=1c835160acc1368bcedbe5ee0ad824e48f5a09b1fc9958d8d1d0a8ab232f2116, bytes=14473). Changed paths are only unit/harness specs and testing BUILD.bazel (src/cdk/accordion/accordion-item.spec.ts, src/cdk/accordion/accordion.spec.ts, src/material/chips/chip-grid.spec.ts, src/material/dialog/dialog.spec.ts, src/material/expansion/accordion.spec.ts, src/material/input/input.spec.ts…). No production runtime, style, public API, or harness implementation sources. This package does not ship or depend on upstream Material harness shared-spec layout; historical behavior is exercised by the owned artifact-bound legacy suite. Irrelevant to retained legacy product behavior.",
+    "read_note_disposition": null,
+    "files": [
+      "src/cdk/accordion/accordion-item.spec.ts",
+      "src/cdk/accordion/accordion.spec.ts",
+      "src/material/chips/chip-grid.spec.ts",
+      "src/material/dialog/dialog.spec.ts",
+      "src/material/expansion/accordion.spec.ts",
+      "src/material/input/input.spec.ts",
+      "src/material/sidenav/drawer.spec.ts",
+      "src/material/tabs/tab-group.spec.ts",
+      "src/material/tabs/tab-nav-bar/tab-nav-bar.spec.ts"
+    ],
+    "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/bc0c443e569975e4ddd16a2659104a0e790587e4.json",
+    "batch_id": "test-only-clear-wave1-2026-10-01",
+    "recorded_at_utc": "2026-10-01T18:25:29Z",
+    "g11_claim": "not-passed",
+    "patch_sha256": "1c835160acc1368bcedbe5ee0ad824e48f5a09b1fc9958d8d1d0a8ab232f2116"
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-animation-fixture-source-prior.json.gz",
+    "sha256": "01f5c5913f6bdc9e88584a5ea85903799ed1df36e781cf977c48e2d22a0bfafa"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "016b8c879f8da1f5ee5253aaf42e9eee7d6b94283442bc1dfc557ca0b6c99867",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "main"
+    ],
+    "decision": "Decline this BrowserAnimationsModule fixture cleanup after individual review of all 29 hunks in nine complete originals. Pair all 465 cases in exact identity/mode/order: 458 complete callbacks retain semantics; seven change only test import setup and preserve every direct/helper predicate. Pair all 53 hooks, with one explicitly reviewed RTL argument shift across the removed defaulted animation-module helper parameter. The two complete private chip/input helper bodies and all symbol-resolved callers are individually reviewed: the chip module parameter is never supplied with a nondefault module, and the input options caller never forwards animations. All 120 classes and 116 template/style properties remain byte-identical. Record ten removed import bindings and no additions or unresolved removed names; all changed references lie in individually reviewed source partitions. All other complete globals remain equal after exact original fixture metadata partitions. Owned historical input error rethrow, focus/directionality, sidenav/tabs lifecycle and animation-mode requirements remain; source comparison proves no compiler, module, initialization, error, timing or lifetime equivalence. Cyph actually imports/exports BrowserAnimationsModule alongside legacy controls and direct legacy style selectors. The owned motion resolver already reads the public MATERIAL_ANIMATIONS config, public ANIMATION_MODULE_TYPE and MediaMatcher without current private animation helpers. This private test preference calls for no product, consumer or TS API edit. Preserve Material 16 HTML/CSS/SCSS and all owned tests. Actual packed/native/browser/SSR/consumer and supported-floor checks remain open.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-animation-fixture-source-review.mjs",
+        "sha256": "d7460583d9b889f8e4d0f39a2996896b720cdc7e6ee8fbfc6c731540b48315bd"
+      },
+      {
+        "path": "tests/spec_animation_fixture_source_probe.mjs",
+        "sha256": "45b0689e4187df49cfcda895d9b915aafcfbe1f72a94c0a36c06c00516c2ff54"
+      },
+      {
+        "path": "tests/test_spec_animation_fixture_source.py",
+        "sha256": "3ee3b60146bffad7aea0585e4db76b55c6daaf7f19b6a21ae5879ca98a474a7d"
+      },
+      {
+        "path": "compatibility/rc/spec-animation-fixture-source-qualification-inspector.py",
+        "sha256": "5642c81fc8595e13232ff51f5f3f5d0854efd7eb3ef9af6ef6cb781659d4e8d5"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-animation-fixture-source-subjects.json.gz",
+        "sha256": "99b0639c14d8b475ce5f2a27853e0191f5c04ae92b0bc1c126a975344bb4701f"
+      },
+      {
+        "path": "compatibility/rc/spec-animation-fixture-source-acquisition.json.gz",
+        "sha256": "b4bbeb0792578ca2ce10b83a5fc623ea4df41876694de6850ff822d5e164ae69"
+      },
+      {
+        "path": "compatibility/rc/spec-animation-fixture-source-observation-pins-v2.json.gz",
+        "sha256": "f76c9d2e0f4055b2356781a927caf35dee9164e8b4e0cfd2898005942dbb4b2b"
+      },
+      {
+        "path": "compatibility/rc/spec-animation-fixture-source-pin-revision.json",
+        "sha256": "0621ef35b49da5837c2a9f343257e49e0d6a2ac6cfb649156329c6e6e257fbc5"
+      },
+      {
+        "path": "compatibility/rc/spec-animation-fixture-source-prior.json.gz",
+        "sha256": "01f5c5913f6bdc9e88584a5ea85903799ed1df36e781cf977c48e2d22a0bfafa"
+      },
+      {
+        "path": "compatibility/rc/spec-animation-fixture-source-review.json.gz",
+        "sha256": "03f05daab8395c3827139ed656d2057cbcf989e166107193565189f9063fd3d8"
+      },
+      {
+        "path": "compatibility/rc/spec-animation-fixture-source-controls.json",
+        "sha256": "74423b3d76162cac2fbc23c7637a43b13cccfb4cdf20074a96f8642c4ddcfd84"
+      },
+      {
+        "path": "compatibility/rc/spec-animation-fixture-source-python.log.gz",
+        "sha256": "37ad3a24861b1c33505b0d242253f837960a4cab6fa833ff82a83dec32d271fa"
+      },
+      {
+        "path": "compatibility/rc/spec-animation-fixture-source-cyph-sanity.json",
+        "sha256": "356c35fba4237114d4ac73d0188a23f972940a52e3c6b6807151ceaa1dddf6d4"
+      },
+      {
+        "path": "compatibility/rc/spec-import-cleanup-source-checkpoint.json",
+        "sha256": "e81ec71077b5472485358fc2f35326fffb2f87d3782f456cee3edf580e4aa1a0"
+      },
+      {
+        "path": "compatibility/rc/spec-import-cleanup-source-replay-checkpoint.json",
+        "sha256": "0307012813ad3473f8b654ef2f4c931c3a0cfaa66e8e36068c502c7ff6328be0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+        "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+        "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "35688ab4bfe88de585342f194f3463f409c03cbc",
+      "prior_entry_sha256": "ea7c7c0431684151f8d6dab399ab41ab2f6dd85682739ecbd8bec12a59d375db",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-animation-fixture-bc0c443e569975e4ddd16a2659104a0e790587e4.json",
+        "sha256": "b38cceddd3d5e7670f2b4de4e133975d926d02cb217ff1dd42c645dfa799d297",
+        "bytes": 96279
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "a1f9d4e3455d6c8ffc74bbbfefa69b001c0db6a091c3edfefab57999e7c3d0b4",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "4fc9e314d4b1bd43dab9b2745cdcb336a9222f6bc0f618852e4cc15edccc0da2",
+        "bytes": 31567
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "3a160fce33ddc2b79a6f4a144c07baed655648d4216f8d1a4450f12457d0e79c",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-animation-fixture-bc0c443e569975e4ddd16a2659104a0e790587e4.json",
+        "sha256": "b38cceddd3d5e7670f2b4de4e133975d926d02cb217ff1dd42c645dfa799d297",
+        "bytes": 96279
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-animation-fixture-source-review.mjs",
+      "sha256": "d7460583d9b889f8e4d0f39a2996896b720cdc7e6ee8fbfc6c731540b48315bd"
+    },
+    {
+      "path": "tests/spec_animation_fixture_source_probe.mjs",
+      "sha256": "45b0689e4187df49cfcda895d9b915aafcfbe1f72a94c0a36c06c00516c2ff54"
+    },
+    {
+      "path": "tests/test_spec_animation_fixture_source.py",
+      "sha256": "3ee3b60146bffad7aea0585e4db76b55c6daaf7f19b6a21ae5879ca98a474a7d"
+    },
+    {
+      "path": "compatibility/rc/spec-animation-fixture-source-qualification-inspector.py",
+      "sha256": "5642c81fc8595e13232ff51f5f3f5d0854efd7eb3ef9af6ef6cb781659d4e8d5"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-animation-fixture-source-subjects.json.gz",
+      "sha256": "99b0639c14d8b475ce5f2a27853e0191f5c04ae92b0bc1c126a975344bb4701f"
+    },
+    {
+      "path": "compatibility/rc/spec-animation-fixture-source-acquisition.json.gz",
+      "sha256": "b4bbeb0792578ca2ce10b83a5fc623ea4df41876694de6850ff822d5e164ae69"
+    },
+    {
+      "path": "compatibility/rc/spec-animation-fixture-source-observation-pins-v2.json.gz",
+      "sha256": "f76c9d2e0f4055b2356781a927caf35dee9164e8b4e0cfd2898005942dbb4b2b"
+    },
+    {
+      "path": "compatibility/rc/spec-animation-fixture-source-pin-revision.json",
+      "sha256": "0621ef35b49da5837c2a9f343257e49e0d6a2ac6cfb649156329c6e6e257fbc5"
+    },
+    {
+      "path": "compatibility/rc/spec-animation-fixture-source-prior.json.gz",
+      "sha256": "01f5c5913f6bdc9e88584a5ea85903799ed1df36e781cf977c48e2d22a0bfafa"
+    },
+    {
+      "path": "compatibility/rc/spec-animation-fixture-source-review.json.gz",
+      "sha256": "03f05daab8395c3827139ed656d2057cbcf989e166107193565189f9063fd3d8"
+    },
+    {
+      "path": "compatibility/rc/spec-animation-fixture-source-controls.json",
+      "sha256": "74423b3d76162cac2fbc23c7637a43b13cccfb4cdf20074a96f8642c4ddcfd84"
+    },
+    {
+      "path": "compatibility/rc/spec-animation-fixture-source-python.log.gz",
+      "sha256": "37ad3a24861b1c33505b0d242253f837960a4cab6fa833ff82a83dec32d271fa"
+    },
+    {
+      "path": "compatibility/rc/spec-animation-fixture-source-cyph-sanity.json",
+      "sha256": "356c35fba4237114d4ac73d0188a23f972940a52e3c6b6807151ceaa1dddf6d4"
+    },
+    {
+      "path": "compatibility/rc/spec-import-cleanup-source-checkpoint.json",
+      "sha256": "e81ec71077b5472485358fc2f35326fffb2f87d3782f456cee3edf580e4aa1a0"
+    },
+    {
+      "path": "compatibility/rc/spec-import-cleanup-source-replay-checkpoint.json",
+      "sha256": "0307012813ad3473f8b654ef2f4c931c3a0cfaa66e8e36068c502c7ff6328be0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "35688ab4bfe88de585342f194f3463f409c03cbc",
+    "prior_entry_sha256": "ea7c7c0431684151f8d6dab399ab41ab2f6dd85682739ecbd8bec12a59d375db",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-animation-fixture-bc0c443e569975e4ddd16a2659104a0e790587e4.json",
+      "sha256": "b38cceddd3d5e7670f2b4de4e133975d926d02cb217ff1dd42c645dfa799d297",
+      "bytes": 96279
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "a1f9d4e3455d6c8ffc74bbbfefa69b001c0db6a091c3edfefab57999e7c3d0b4",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "4fc9e314d4b1bd43dab9b2745cdcb336a9222f6bc0f618852e4cc15edccc0da2",
+      "bytes": 31567
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "3a160fce33ddc2b79a6f4a144c07baed655648d4216f8d1a4450f12457d0e79c",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-animation-fixture-bc0c443e569975e4ddd16a2659104a0e790587e4.json",
+      "sha256": "b38cceddd3d5e7670f2b4de4e133975d926d02cb217ff1dd42c645dfa799d297",
+      "bytes": 96279
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}
