@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Existing owned structural source deltas observed during five complete token-placement reviews; no delta is adopted or waived here.",
+  "families": [
+    {
+      "family": "checkbox",
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.scss",
+        "sha256": "5bb880767ff062ead6604140938cd5d23136a135494e817291a81b13fc20d7b1",
+        "bytes": 13687
+      },
+      "tagged_blob": "5a460ce841a3335b69abec5fc95cec8589412095",
+      "complete_current_delta": "--- untouched16.2.14\n+++ projects/ngx-material-legacy/legacy-checkbox/checkbox.scss\n@@ -1,12 +1,12 @@\n @use 'sass:math';\n-@use '@angular/cdk';\n-\n-@use '../core/style/elevation';\n-@use '../core/style/checkbox-common';\n-@use '../core/style/layout-common';\n-@use '../core/style/vendor-prefixes';\n-@use '../core/style/private';\n-@use '../core/style/variables';\n+@use '../styles/core/style/component-high-contrast' as cdk;\n+\n+@use '../styles/core/style/elevation';\n+@use '../styles/core/style/checkbox-common';\n+@use '../styles/core/style/layout-common';\n+@use '../styles/core/style/vendor-prefixes';\n+@use '../styles/core/style/private';\n+@use '../styles/core/style/variables';\n \n // Manual calculation done on SVG\n $_path-length: 22.910259;\n@@ -345,7 +345,8 @@\n     width: $_mark-stroke-size;\n   }\n \n-  @include cdk.high-contrast(black-on-white, off) {\n+  // Preserve the historical palette-specific class; current CDK coerces it to active.\n+  .cdk-high-contrast-black-on-white & {\n     // In the checkbox theme this `stroke` has !important which ends up overriding the browser's\n     // automatic color inversion so we need to re-invert it ourselves for black-on-white.\n     stroke: #000 !important;\n",
+      "role": "Existing source context only; not a new repair or qualification of structural CSS.",
+      "targeted_followup": "Retain the existing separately reviewed local public high-contrast helper/import mappings; full rendered/style audit remains required."
+    },
+    {
+      "family": "progress-bar",
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.scss",
+        "sha256": "9072277ad7c923e98433ee109a83eb412bd85571dda1dd90c3be5db0f6d5d6b6",
+        "bytes": 9704
+      },
+      "tagged_blob": "bd1f9fb64db5855c23485d68318551292e2c33be",
+      "complete_current_delta": "--- untouched16.2.14\n+++ projects/ngx-material-legacy/legacy-progress-bar/progress-bar.scss\n@@ -1,7 +1,7 @@\n-@use '@angular/cdk';\n-\n-@use '../core/style/vendor-prefixes';\n-@use '../core/style/private';\n+@use '../styles/core/style/component-high-contrast' as cdk;\n+\n+@use '../styles/core/style/vendor-prefixes';\n+@use '../styles/core/style/private';\n \n $height: 4px !default;\n $full-animation-duration: 2000ms !default;\n@@ -32,7 +32,7 @@\n     // during the background scroll animation.\n     width: calc(100% + 10px);\n \n-    @include cdk.high-contrast(active, off) {\n+    @include cdk.high-contrast(active) {\n       display: none;\n     }\n   }\n@@ -43,7 +43,7 @@\n     transform-origin: top left;\n     transition: transform $piece-animation-duration ease;\n \n-    @include cdk.high-contrast(active, off) {\n+    @include cdk.high-contrast(active) {\n       border-top: solid 5px;\n       opacity: 0.5;\n     }\n@@ -61,7 +61,7 @@\n     transform-origin: top left;\n     transition: transform $piece-animation-duration ease;\n \n-    @include cdk.high-contrast(active, off) {\n+    @include cdk.high-contrast(active) {\n       border-top: solid $height;\n     }\n   }\n",
+      "role": "Existing source context only; not a new repair or qualification of structural CSS.",
+      "targeted_followup": "Retain the existing separately reviewed local public high-contrast helper/import mappings; full rendered/style audit remains required."
+    },
+    {
+      "family": "tooltip",
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+        "sha256": "692e27d01ea6a8deb1502c3f6d143f7ca868368655126d4ac8f6958eb6179458",
+        "bytes": 1336
+      },
+      "tagged_blob": "61a547d431b9223be2f2700f5a3ac1e2475bc4f1",
+      "complete_current_delta": "--- untouched16.2.14\n+++ projects/ngx-material-legacy/legacy-tooltip/tooltip.scss\n@@ -1,4 +1,4 @@\n-@use '@angular/cdk';\n+@use '../styles/core/style/component-high-contrast' as cdk;\n \n $horizontal-padding: 8px;\n $max-width: 250px;\n@@ -34,7 +34,7 @@\n   padding-right: $handset-horizontal-padding;\n }\n \n-.mat-tooltip-panel-non-interactive {\n+.mat-tooltip-panel.mat-tooltip-panel-non-interactive {\n   pointer-events: none;\n }\n \n",
+      "role": "Existing source context only; not a new repair or qualification of structural CSS.",
+      "targeted_followup": "Reconcile the existing .mat-tooltip-panel.mat-tooltip-panel-non-interactive specificity change against historical selectors, actual caller classes and stylesheet override behavior before full style/audit acceptance."
+    },
+    {
+      "family": "progress-spinner",
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.scss",
+        "sha256": "c49e724b39ca30c472b418b644cd4c9da6893c74a0b0fa45518555b4672142f3",
+        "bytes": 3867
+      },
+      "tagged_blob": "2db723c01002af1d0f97079032edfcc15a6bd208",
+      "complete_current_delta": "--- untouched16.2.14\n+++ projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.scss\n@@ -1,6 +1,6 @@\n-@use '@angular/cdk';\n+@use '../styles/core/style/component-high-contrast' as cdk;\n \n-@use '../core/style/variables';\n+@use '../styles/core/style/variables';\n \n $_default-radius: 45px;\n $_default-circumference: variables.$pi * $_default-radius * 2;\n@@ -26,7 +26,7 @@\n     fill: transparent;\n     transition: stroke-dashoffset 225ms linear;\n \n-    @include cdk.high-contrast(active, off) {\n+    @include cdk.high-contrast(active) {\n       // SVG colors aren't inverted automatically in high contrast mode. Set the\n       // stroke to `CanvasText` in order to respect the user's color settings.\n       // Note that we use `CanvasText` instead of `currentColor`, because\n",
+      "role": "Existing source context only; not a new repair or qualification of structural CSS.",
+      "targeted_followup": "Retain the existing separately reviewed local public high-contrast helper/import mappings; full rendered/style audit remains required."
+    },
+    {
+      "family": "card",
+      "current": {
+        "path": "projects/ngx-material-legacy/legacy-card/card.scss",
+        "sha256": "418edaffc1bbf45372b948ae5c5845c9cc1e1bd4c1f997276d3ea254dc39ef24",
+        "bytes": 5960
+      },
+      "tagged_blob": "b8185ac94f387ec512abf538e34d046a0ca7c91d",
+      "complete_current_delta": "--- untouched16.2.14\n+++ projects/ngx-material-legacy/legacy-card/card.scss\n@@ -1,9 +1,9 @@\n @use 'sass:math';\n-@use '@angular/cdk';\n-\n-@use '../core/style/variables';\n-@use '../core/style/elevation';\n-@use '../core/style/private';\n+@use '../styles/core/style/component-high-contrast' as cdk;\n+\n+@use '../styles/core/style/variables';\n+@use '../styles/core/style/elevation';\n+@use '../styles/core/style/private';\n \n \n $padding: 16px !default;\n@@ -39,7 +39,7 @@\n     }\n   }\n \n-  @include cdk.high-contrast(active, off) {\n+  @include cdk.high-contrast(active) {\n     outline: solid 1px;\n   }\n }\n",
+      "role": "Existing source context only; not a new repair or qualification of structural CSS.",
+      "targeted_followup": "Retain the existing separately reviewed local public high-contrast helper/import mappings; full rendered/style audit remains required."
+    }
+  ],
+  "new_product_changes": 0,
+  "pending_tooltip_specificity_followup": true,
+  "g11_claim": "not-passed"
+}

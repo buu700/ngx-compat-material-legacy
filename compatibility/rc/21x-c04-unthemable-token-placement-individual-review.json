@@ -1,0 +1,472 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "source_review_complete": true,
+  "recorded_at_utc": "2026-10-27T20:36:44.882196+00:00",
+  "role": "Five separate complete original source/contract reviews; shared compiler transport is not a low-risk behavior batch.",
+  "originals": {
+    "path": "compatibility/rc/21x-c04-unthemable-token-placement-originals.json.gz",
+    "sha256": "997e466e46efd9983304138a21491409bf37757243e48e7d89df4afbe75ff4b4",
+    "bytes": 57962
+  },
+  "original_file_occurrences": 15,
+  "original_hunks": 20,
+  "original_before_after_blob_identities": 30,
+  "tagged_context_members": 21,
+  "reviews": [
+    {
+      "sha": "03a773a0237843fd1e1e600d0b9911eb924319bc",
+      "family": "checkbox",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex 53d2b2f165ff2f5813b6030aa685909b7e51bb28..b36fa3481e94e0a93cf7c3387a93c732db281746 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -99,7 +99,7 @@\n @forward './legacy-checkbox/checkbox-theme' as legacy-checkbox-* show\n   legacy-checkbox-theme, legacy-checkbox-color, legacy-checkbox-typography;\n @forward './checkbox/checkbox-theme' as checkbox-* show checkbox-theme, checkbox-color,\n-  checkbox-typography, checkbox-density;\n+  checkbox-typography, checkbox-density, checkbox-base;\n @forward './legacy-chips/chips-theme' as legacy-chips-* show legacy-chips-theme,\n   legacy-chips-color, legacy-chips-typography;\n @forward './chips/chips-theme' as chips-* show chips-theme, chips-color, chips-typography,\ndiff --git a/src/material/checkbox/_checkbox-theme.scss b/src/material/checkbox/_checkbox-theme.scss\nindex 31ec45129c0371164ce491367de3107720973fdd..02e909527d13c0c12913903eb000c73bc4621671 100644\n--- a/src/material/checkbox/_checkbox-theme.scss\n+++ b/src/material/checkbox/_checkbox-theme.scss\n@@ -7,6 +7,13 @@\n @use '../core/mdc-helpers/mdc-helpers';\n @use '../core/tokens/m2/mdc/checkbox' as tokens-mdc-checkbox;\n \n+@mixin base($config-or-theme) {\n+  // Add default values for tokens not related to color, typography, or density.\n+  @include sass-utils.current-selector-or-root() {\n+    @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-unthemable-tokens());\n+  }\n+}\n+\n @mixin color($config-or-theme) {\n   $config: theming.get-color-config($config-or-theme);\n   $primary: map.get($config, primary);\n@@ -77,6 +84,7 @@\n     $density: theming.get-density-config($theme);\n     $typography: theming.get-typography-config($theme);\n \n+    @include base($theme);\n     @if $color != null {\n       @include color($color);\n     }\ndiff --git a/src/material/checkbox/checkbox.scss b/src/material/checkbox/checkbox.scss\nindex e004237a82115b08ac6ef540f967c44f362fe3ed..75b367ff532d1684681e383d9d45d267029ca8c8 100644\n--- a/src/material/checkbox/checkbox.scss\n+++ b/src/material/checkbox/checkbox.scss\n@@ -141,11 +141,6 @@\n       }\n     }\n   }\n-\n-  html {\n-    // Add default values for MDC checkbox tokens that aren't outputted by the theming API.\n-    @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-unthemable-tokens());\n-  }\n }\n \n .mat-mdc-checkbox {\n",
+      "diff_sha256": "e5bda39bf076f86110ad768df51328159044a41bff466039f7e6de2037669d9a",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/checkbox/_checkbox-theme.scss",
+        "src/material/checkbox/checkbox.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/checkbox/_checkbox-theme.scss",
+        "src/material/checkbox/checkbox.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 0,
+          "header": "@@ -99,7 +99,7 @@",
+          "hunk_sha256": "d442075ef1d10e01102036a674f2e570692863082a68bd2523730aded9a8d82a",
+          "status": "reviewed",
+          "decision": "This root-facade hunk adds checkbox-base to the modern namespace and leaves the neighboring legacy exports alone. The untouched16.2.14 facade and both actual owned compiler runs omit this post16 name while retaining all seven selected modern/legacy names for checkbox. Adding the new export would expand the finite historical API and create a new consumer mixin requirement; decline it for the frozen compatibility facade."
+        },
+        {
+          "path": "src/material/checkbox/_checkbox-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -7,6 +7,13 @@",
+          "hunk_sha256": "7bd1d9335406da963aeb8213adad446e263ff0dfeb2a5ce2c8e5f409c973734d",
+          "status": "reviewed",
+          "decision": "This hunk creates a modern base mixin for MDC checkbox defaults, with its original selector wrapper and imports as shown in the authenticated hunk. Its purpose is to move unthemable values out of component structure so future design-system themes can choose them. The owned legacy theme at projects/ngx-material-legacy/styles/legacy-checkbox/_checkbox-theme.scss is byte-identical to the tagged reference and targets .mat-checkbox; it requires no such new stage. Preserve that historical allocation. The modern16 theme is also retained after MDC import relocation. This source exclusion introduces no empty replacement mixin."
+        },
+        {
+          "path": "src/material/checkbox/_checkbox-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -77,6 +84,7 @@",
+          "hunk_sha256": "f146aaa179ca39f40818b9d4541b1393daf1a3a6db61fc8c950f8ae7c0c2f8b6",
+          "status": "reviewed",
+          "decision": "This theme-body hunk unconditionally invokes base($theme) inside the existing duplicate-style guard before the color/density/typography branches. That changes the CSS emitted by the complete modern theme relative to partial mixins, including configurations with absent dimensions. The frozen16 owned theme keeps the original conditional sequence. All three legacy default outputs and the independent direct legacy color output for checkbox match the untouched oracle on each advertised installed Material floor; decline this new emission stage rather than making consumers add another include."
+        },
+        {
+          "path": "src/material/checkbox/checkbox.scss",
+          "hunk_index": 0,
+          "header": "@@ -141,11 +141,6 @@",
+          "hunk_sha256": "b746b0104fe0c22adc75d1857f78d5dee1f1a8e76f22f946d417fd007ab4fa2d",
+          "status": "reviewed",
+          "decision": "This structural hunk removes MDC checkbox default emission from the original modern component stylesheet. Its deletion is coupled to the new base export/call above, so it cannot be transplanted independently. The owned runtime metadata points to the retained legacy family stylesheet and .mat-checkbox structure; this patch does not edit the original legacy family. Keep the existing resource allocation and inspect its separately recorded pre-existing structural deltas under the full rendered/style audit. The narrow compiler checks here do not qualify those structural deltas or native behavior."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/styles/checkbox/_checkbox-theme.scss",
+          "sha256": "df6de506e004cd540ccbcd35683e9bdf034366137eeeda07e8f4e1b7e233eeb4",
+          "bytes": 3364
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-checkbox/_checkbox-theme.scss",
+          "sha256": "f50e3f7ec838c204e1ef92c4ceed4b6b4f4aae38602fc3a69b58e5e5c796d3f1",
+          "bytes": 4496
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.scss",
+          "sha256": "5bb880767ff062ead6604140938cd5d23136a135494e817291a81b13fc20d7b1",
+          "bytes": 13687
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-checkbox/checkbox.ts",
+          "sha256": "774db12b55590d631d0a69c68a9aa7289adf600ac3fe62e288dd22fcf3c86766",
+          "bytes": 5525
+        }
+      ],
+      "legacy_selectors": ".mat-checkbox",
+      "decision": "Do not adopt the post16 checkbox-base API or the coupled default-style relocation. Preserve the finite16.2.14 Sass surface, original legacy checkbox theme/color/typography output and retained component resources. Current public peers own their modern implementations; no new legacy consumer include or CSS/SCSS change is required. This is an individually reviewed source-contract decision; packed/rendered/native and full floor/audit requirements remain separate.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    },
+    {
+      "sha": "047404067865a2452bfcb93b2374ac07aca319be",
+      "family": "progress-bar",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex b36fa3481e94e0a93cf7c3387a93c732db281746..4c03ec5a21e88675166e5244e7327d1a5dba262d 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -139,7 +139,8 @@\n @forward './legacy-progress-bar/progress-bar-theme' as legacy-progress-bar-* show\n   legacy-progress-bar-theme, legacy-progress-bar-color, legacy-progress-bar-typography;\n @forward './progress-bar/progress-bar-theme' as progress-bar-* show\n-  progress-bar-theme, progress-bar-color, progress-bar-typography, progress-bar-density;\n+  progress-bar-theme, progress-bar-color, progress-bar-typography,\n+  progress-bar-density, progress-bar-base;\n @forward './progress-spinner/progress-spinner-theme' as progress-spinner-* show\n   progress-spinner-theme, progress-spinner-color, progress-spinner-typography,\n   progress-spinner-density;\ndiff --git a/src/material/progress-bar/_progress-bar-theme.scss b/src/material/progress-bar/_progress-bar-theme.scss\nindex 8441588fce506ba824d4a4af75c6572febd04b2b..c01e44956650f31c632c251c4e2d610c27acb474 100644\n--- a/src/material/progress-bar/_progress-bar-theme.scss\n+++ b/src/material/progress-bar/_progress-bar-theme.scss\n@@ -1,8 +1,16 @@\n+@use '../core/style/sass-utils';\n @use '../core/theming/theming';\n @use '../core/tokens/m2/mdc/linear-progress' as tokens-mdc-linear-progress;\n @use '@material/linear-progress/linear-progress-theme' as mdc-linear-progress-theme;\n @use 'sass:map';\n \n+@mixin base($config-or-theme) {\n+  // Add default values for tokens not related to color, typography, or density.\n+  @include sass-utils.current-selector-or-root() {\n+    @include mdc-linear-progress-theme.theme(tokens-mdc-linear-progress.get-unthemable-tokens());\n+  }\n+}\n+\n @mixin _palette-styles($config, $palette-name) {\n   $palette-config: map.merge($config, (primary: map.get($config, $palette-name)));\n   $color-tokens: tokens-mdc-linear-progress.get-color-tokens($palette-config);\n@@ -49,6 +57,7 @@\n     $density: theming.get-density-config($theme);\n     $typography: theming.get-typography-config($theme);\n \n+    @include base($theme);\n     @if $color != null {\n       @include color($color);\n     }\ndiff --git a/src/material/progress-bar/progress-bar.scss b/src/material/progress-bar/progress-bar.scss\nindex ba209a1fffabdb48c2a8c950cc6c99fab4ea53a4..d95748e39404822bee9e0f1a35da2fd2a0868da3 100644\n--- a/src/material/progress-bar/progress-bar.scss\n+++ b/src/material/progress-bar/progress-bar.scss\n@@ -17,12 +17,6 @@\n       track-color: null,\n     ))\n   );\n-\n-  // Add default values for tokens that aren't outputted by the theming API.\n-  .mat-mdc-progress-bar {\n-    // Add default values for tokens that aren't outputted by the theming API.\n-    @include mdc-linear-progress-theme.theme(m2-mdc-linear-progress.get-unthemable-tokens());\n-  }\n }\n \n .mat-mdc-progress-bar {\n",
+      "diff_sha256": "2b19b5f042b200e5ac797241543b363865e9565f84bf727dfdfa801c2ce57c01",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/progress-bar/_progress-bar-theme.scss",
+        "src/material/progress-bar/progress-bar.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/progress-bar/_progress-bar-theme.scss",
+        "src/material/progress-bar/progress-bar.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 0,
+          "header": "@@ -139,7 +139,8 @@",
+          "hunk_sha256": "79162a55d4ac0d6103b5f872bca1780ca3fdf4c26c2ad78bab79189e8911adea",
+          "status": "reviewed",
+          "decision": "This root-facade hunk adds progress-bar-base to the modern namespace and leaves the neighboring legacy exports alone. The untouched16.2.14 facade and both actual owned compiler runs omit this post16 name while retaining all seven selected modern/legacy names for progress-bar. Adding the new export would expand the finite historical API and create a new consumer mixin requirement; decline it for the frozen compatibility facade."
+        },
+        {
+          "path": "src/material/progress-bar/_progress-bar-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,8 +1,16 @@",
+          "hunk_sha256": "fea435bce8fcd6bc5a39cbb6ff2782487d57da1cc7705835019a3389c019e002",
+          "status": "reviewed",
+          "decision": "This hunk creates a modern base mixin for MDC linear-progress defaults, with its original selector wrapper and imports as shown in the authenticated hunk. Its purpose is to move unthemable values out of component structure so future design-system themes can choose them. The owned legacy theme at projects/ngx-material-legacy/styles/legacy-progress-bar/_progress-bar-theme.scss is byte-identical to the tagged reference and targets .mat-progress-bar; it requires no such new stage. Preserve that historical allocation. The modern16 theme is also retained after MDC import relocation and the separately reviewed public progress color bridge. This source exclusion introduces no empty replacement mixin."
+        },
+        {
+          "path": "src/material/progress-bar/_progress-bar-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -49,6 +57,7 @@",
+          "hunk_sha256": "b36b80a2fccd79ca25a9bb445972c5bcdbbdd8d141794b464aad25830cfea304",
+          "status": "reviewed",
+          "decision": "This theme-body hunk unconditionally invokes base($theme) inside the existing duplicate-style guard before the color/density/typography branches. That changes the CSS emitted by the complete modern theme relative to partial mixins, including configurations with absent dimensions. The frozen16 owned theme keeps the original conditional sequence. All three legacy default outputs and the independent direct legacy color output for progress-bar match the untouched oracle on each advertised installed Material floor; decline this new emission stage rather than making consumers add another include."
+        },
+        {
+          "path": "src/material/progress-bar/progress-bar.scss",
+          "hunk_index": 0,
+          "header": "@@ -17,12 +17,6 @@",
+          "hunk_sha256": "2bf45c708c24ab21d938484347e632e7999dee14111dc4d601c87fe436794fc6",
+          "status": "reviewed",
+          "decision": "This structural hunk removes MDC linear-progress default emission from the original modern component stylesheet. Its deletion is coupled to the new base export/call above, so it cannot be transplanted independently. The owned runtime metadata points to the retained legacy family stylesheet and .mat-progress-bar structure; this patch does not edit the original legacy family. Keep the existing resource allocation and inspect its separately recorded pre-existing structural deltas under the full rendered/style audit. The narrow compiler checks here do not qualify those structural deltas or native behavior."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/styles/progress-bar/_progress-bar-theme.scss",
+          "sha256": "ab15375193165ec7eefe33eb919213e51a9f3a3aff6789a5abcd834dc34a4f7a",
+          "bytes": 2506
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-progress-bar/_progress-bar-theme.scss",
+          "sha256": "83ffec6443517aa2c843643ece7d7707c78aaa9dce8999ba6081d51dee0cbf32",
+          "bytes": 2986
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.scss",
+          "sha256": "9072277ad7c923e98433ee109a83eb412bd85571dda1dd90c3be5db0f6d5d6b6",
+          "bytes": 9704
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-bar/progress-bar.ts",
+          "sha256": "815ce6bcc47f7218ee8cc175c84327829c7778ab429fc8b5e137a783e5d7aa3b",
+          "bytes": 7572
+        }
+      ],
+      "legacy_selectors": ".mat-progress-bar",
+      "decision": "Do not adopt the post16 progress-bar-base API or the coupled default-style relocation. Preserve the finite16.2.14 Sass surface, original legacy progress-bar theme/color/typography output and retained component resources. Current public peers own their modern implementations; no new legacy consumer include or CSS/SCSS change is required. This is an individually reviewed source-contract decision; packed/rendered/native and full floor/audit requirements remain separate.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    },
+    {
+      "sha": "ccd2d7fa72f4566ab2c2aeb78a5ac4b7d4149bbf",
+      "family": "tooltip",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex 4c03ec5a21e88675166e5244e7327d1a5dba262d..5519f8833a4b559dc801fbccf4d69533aeaeebae 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -183,7 +183,7 @@ legacy-tabs-typography;\n @forward './legacy-tooltip/tooltip-theme' as legacy-tooltip-* show legacy-tooltip-theme,\n   legacy-tooltip-color, legacy-tooltip-typography;\n @forward './tooltip/tooltip-theme' as tooltip-* show tooltip-theme, tooltip-color,\n-  tooltip-typography, tooltip-density;\n+  tooltip-typography, tooltip-density, tooltip-base;\n @forward './tree/tree-theme' as tree-* show tree-theme, tree-color, tree-typography, tree-density;\n \n // MDC Helpers\ndiff --git a/src/material/tooltip/_tooltip-theme.scss b/src/material/tooltip/_tooltip-theme.scss\nindex cbb1d364b1bf5f403cc205bc76605390d3eaa7df..6d3b8dd662b97970d10447f04c0ab737e2185d7c 100644\n--- a/src/material/tooltip/_tooltip-theme.scss\n+++ b/src/material/tooltip/_tooltip-theme.scss\n@@ -1,8 +1,16 @@\n @use '@material/tooltip/plain-tooltip-theme' as mdc-plain-tooltip-theme;\n+@use '../core/style/sass-utils';\n @use '../core/theming/theming';\n @use '../core/typography/typography';\n @use '../core/tokens/m2/mdc/plain-tooltip' as m2-mdc-plain-tooltip;\n \n+@mixin base($config-or-theme) {\n+  // Add default values for tokens not related to color, typography, or density.\n+  @include sass-utils.current-selector-or-root() {\n+    @include mdc-plain-tooltip-theme.theme(m2-mdc-plain-tooltip.get-unthemable-tokens());\n+  }\n+}\n+\n @mixin color($config-or-theme) {\n   $config: theming.get-color-config($config-or-theme);\n   $mdc-tooltip-color-tokens: m2-mdc-plain-tooltip.get-color-tokens($config);\n@@ -41,6 +49,7 @@\n     $density: theming.get-density-config($theme);\n     $typography: theming.get-typography-config($theme);\n \n+    @include base($theme);\n     @if $color != null {\n       @include color($color);\n     }\ndiff --git a/src/material/tooltip/tooltip.scss b/src/material/tooltip/tooltip.scss\nindex bcbf87e6f6c97c4a162772577a687a2d74893a24..32f098e640bce869b520f0e0b77e0d83fb170422 100644\n--- a/src/material/tooltip/tooltip.scss\n+++ b/src/material/tooltip/tooltip.scss\n@@ -13,9 +13,6 @@ $emit-fallback-vars: false) {\n   .mat-mdc-tooltip {\n     // Add the official slots for the MDC tooltip.\n     @include mdc-plain-tooltip-theme.theme-styles($mdc-tooltip-token-slots);\n-\n-    // Add default values for MDC tooltip tokens that aren't outputted by the theming API.\n-    @include mdc-plain-tooltip-theme.theme(m2-mdc-plain-tooltip.get-unthemable-tokens());\n   }\n }\n \n",
+      "diff_sha256": "035e338969646bbf2f155722fffac924cc034ae37d41374d7531e85c5facda6f",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/tooltip/_tooltip-theme.scss",
+        "src/material/tooltip/tooltip.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/tooltip/_tooltip-theme.scss",
+        "src/material/tooltip/tooltip.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 0,
+          "header": "@@ -183,7 +183,7 @@ legacy-tabs-typography;",
+          "hunk_sha256": "60fc1e543dc8782791c989d862b29e5a44573d3fc4e6e5e0a47c33d700b4c2a8",
+          "status": "reviewed",
+          "decision": "This root-facade hunk adds tooltip-base to the modern namespace and leaves the neighboring legacy exports alone. The untouched16.2.14 facade and both actual owned compiler runs omit this post16 name while retaining all seven selected modern/legacy names for tooltip. Adding the new export would expand the finite historical API and create a new consumer mixin requirement; decline it for the frozen compatibility facade."
+        },
+        {
+          "path": "src/material/tooltip/_tooltip-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,8 +1,16 @@",
+          "hunk_sha256": "105c97c3ef6b7e505ac470e0f3f7c27e16d99b00f8968a7190a8d09a249bb031",
+          "status": "reviewed",
+          "decision": "This hunk creates a modern base mixin for MDC plain-tooltip defaults, with its original selector wrapper and imports as shown in the authenticated hunk. Its purpose is to move unthemable values out of component structure so future design-system themes can choose them. The owned legacy theme at projects/ngx-material-legacy/styles/legacy-tooltip/_tooltip-theme.scss is byte-identical to the tagged reference and targets .mat-tooltip; it requires no such new stage. Preserve that historical allocation. The modern16 theme is also retained after MDC import relocation. This source exclusion introduces no empty replacement mixin."
+        },
+        {
+          "path": "src/material/tooltip/_tooltip-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -41,6 +49,7 @@",
+          "hunk_sha256": "77dddacf3f9d11839b94b4b5f36d9c9d8547e6902263c081f53a7e5cc72603f5",
+          "status": "reviewed",
+          "decision": "This theme-body hunk unconditionally invokes base($theme) inside the existing duplicate-style guard before the color/density/typography branches. That changes the CSS emitted by the complete modern theme relative to partial mixins, including configurations with absent dimensions. The frozen16 owned theme keeps the original conditional sequence. All three legacy default outputs and the independent direct legacy color output for tooltip match the untouched oracle on each advertised installed Material floor; decline this new emission stage rather than making consumers add another include."
+        },
+        {
+          "path": "src/material/tooltip/tooltip.scss",
+          "hunk_index": 0,
+          "header": "@@ -13,9 +13,6 @@ $emit-fallback-vars: false) {",
+          "hunk_sha256": "8ac98422b8884e1f4704f097d31e5fa81cbbfd5d2b84950d7e5db356b0596505",
+          "status": "reviewed",
+          "decision": "This structural hunk removes MDC plain-tooltip default emission from the original modern component stylesheet. Its deletion is coupled to the new base export/call above, so it cannot be transplanted independently. The owned runtime metadata points to the retained legacy family stylesheet and .mat-tooltip structure; this patch does not edit the original legacy family. Keep the existing resource allocation and inspect its separately recorded pre-existing structural deltas under the full rendered/style audit. The narrow compiler checks here do not qualify those structural deltas or native behavior."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/styles/tooltip/_tooltip-theme.scss",
+          "sha256": "71de982631421fb0f488cee8a04f475f11e2c54fbc1c689af98fad79476a2733",
+          "bytes": 1788
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-tooltip/_tooltip-theme.scss",
+          "sha256": "54937c2a741816f0c8547b6855b0ab5d3ef05f8aee5188469515d38401079098",
+          "bytes": 2205
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.scss",
+          "sha256": "692e27d01ea6a8deb1502c3f6d143f7ca868368655126d4ac8f6958eb6179458",
+          "bytes": 1336
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+          "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29",
+          "bytes": 4001
+        }
+      ],
+      "legacy_selectors": ".mat-tooltip",
+      "decision": "Do not adopt the post16 tooltip-base API or the coupled default-style relocation. Preserve the finite16.2.14 Sass surface, original legacy tooltip theme/color/typography output and retained component resources. Current public peers own their modern implementations; no new legacy consumer include or CSS/SCSS change is required. This is an individually reviewed source-contract decision; packed/rendered/native and full floor/audit requirements remain separate.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    },
+    {
+      "sha": "593fc79ecbc6677f04e2d3707bff024b00a517e8",
+      "family": "progress-spinner",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex 5519f8833a4b559dc801fbccf4d69533aeaeebae..c80e6fee0b0405f7c3f4414ccdb17e507ec900de 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -143,7 +143,7 @@\n   progress-bar-density, progress-bar-base;\n @forward './progress-spinner/progress-spinner-theme' as progress-spinner-* show\n   progress-spinner-theme, progress-spinner-color, progress-spinner-typography,\n-  progress-spinner-density;\n+  progress-spinner-density, progress-spinner-base;\n @forward './legacy-progress-spinner/progress-spinner-theme' as legacy-progress-spinner-* show\n   legacy-progress-spinner-theme, legacy-progress-spinner-color, legacy-progress-spinner-typography;\n @forward './radio/radio-theme' as radio-* show radio-theme, radio-color, radio-typography,\ndiff --git a/src/material/progress-spinner/_progress-spinner-theme.scss b/src/material/progress-spinner/_progress-spinner-theme.scss\nindex 66a468c42321ca679c35c07713eb187de8f0ca64..dbe3311ec3ad3b5b836312905a63327f7344a4d7 100644\n--- a/src/material/progress-spinner/_progress-spinner-theme.scss\n+++ b/src/material/progress-spinner/_progress-spinner-theme.scss\n@@ -1,8 +1,18 @@\n @use 'sass:map';\n+@use '../core/style/sass-utils';\n @use '../core/theming/theming';\n @use '../core/tokens/m2/mdc/circular-progress' as tokens-mdc-circular-progress;\n @use '@material/circular-progress/circular-progress-theme' as mdc-circular-progress-theme;\n \n+@mixin base($config-or-theme) {\n+  // Add default values for tokens not related to color, typography, or density.\n+  @include sass-utils.current-selector-or-root() {\n+    @include mdc-circular-progress-theme.theme(\n+      tokens-mdc-circular-progress.get-unthemable-tokens()\n+    );\n+  }\n+}\n+\n @mixin color($config-or-theme) {\n   $config: theming.get-color-config($config-or-theme);\n   $mdc-circular-progress-color-tokens: tokens-mdc-circular-progress.get-color-tokens($config);\n@@ -33,6 +43,7 @@\n     $density: theming.get-density-config($theme);\n     $typography: theming.get-typography-config($theme);\n \n+    @include base($theme);\n     @if $color != null {\n       @include color($color);\n     }\ndiff --git a/src/material/progress-spinner/progress-spinner.scss b/src/material/progress-spinner/progress-spinner.scss\nindex 2e992a134e78fd0f3c75534de06d4ffb13f8aaef..37e5c025e428e0ddd118cc13a757a2d0ef4215c2 100644\n--- a/src/material/progress-spinner/progress-spinner.scss\n+++ b/src/material/progress-spinner/progress-spinner.scss\n@@ -14,9 +14,6 @@\n   .mat-mdc-progress-spinner {\n     // Add the official slots for the MDC circular progress.\n     @include mdc-circular-progress-theme.theme-styles($mdc-circular-progress-token-slots);\n-\n-    // Add default values for tokens that aren't outputted by the theming API.\n-    @include mdc-circular-progress-theme.theme(m2-mdc-circular-progress.get-unthemable-tokens());\n   }\n }\n \n",
+      "diff_sha256": "7842e39d21f89ec17eac312b91a8ee47ceb83fc1579dba8f3c47d669d9233d02",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/progress-spinner/_progress-spinner-theme.scss",
+        "src/material/progress-spinner/progress-spinner.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/progress-spinner/_progress-spinner-theme.scss",
+        "src/material/progress-spinner/progress-spinner.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 0,
+          "header": "@@ -143,7 +143,7 @@",
+          "hunk_sha256": "da7c55bcf67fc1788b3491b23f0b38f25b9d451cc3b85a7626f802c2c0fe43d1",
+          "status": "reviewed",
+          "decision": "This root-facade hunk adds progress-spinner-base to the modern namespace and leaves the neighboring legacy exports alone. The untouched16.2.14 facade and both actual owned compiler runs omit this post16 name while retaining all seven selected modern/legacy names for progress-spinner. Adding the new export would expand the finite historical API and create a new consumer mixin requirement; decline it for the frozen compatibility facade."
+        },
+        {
+          "path": "src/material/progress-spinner/_progress-spinner-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -1,8 +1,18 @@",
+          "hunk_sha256": "cdf9f318cfeb3db817c67d8578345cdadfcb23d4e29b09e4c532a8012fa46529",
+          "status": "reviewed",
+          "decision": "This hunk creates a modern base mixin for MDC circular-progress defaults, with its original selector wrapper and imports as shown in the authenticated hunk. Its purpose is to move unthemable values out of component structure so future design-system themes can choose them. The owned legacy theme at projects/ngx-material-legacy/styles/legacy-progress-spinner/_progress-spinner-theme.scss is byte-identical to the tagged reference and targets .mat-progress-spinner / .mat-spinner; it requires no such new stage. Preserve that historical allocation. The modern16 theme is also retained after MDC import relocation. This source exclusion introduces no empty replacement mixin."
+        },
+        {
+          "path": "src/material/progress-spinner/_progress-spinner-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -33,6 +43,7 @@",
+          "hunk_sha256": "7e157b22be8403d26d8b6af4e8ec379caaa8b683e0776f6de4ac6821c74b2468",
+          "status": "reviewed",
+          "decision": "This theme-body hunk unconditionally invokes base($theme) inside the existing duplicate-style guard before the color/density/typography branches. That changes the CSS emitted by the complete modern theme relative to partial mixins, including configurations with absent dimensions. The frozen16 owned theme keeps the original conditional sequence. All three legacy default outputs and the independent direct legacy color output for progress-spinner match the untouched oracle on each advertised installed Material floor; decline this new emission stage rather than making consumers add another include."
+        },
+        {
+          "path": "src/material/progress-spinner/progress-spinner.scss",
+          "hunk_index": 0,
+          "header": "@@ -14,9 +14,6 @@",
+          "hunk_sha256": "c5afa6e79c8b2aa4dda67522c75df61bac5d2295826a1a003318c40910175508",
+          "status": "reviewed",
+          "decision": "This structural hunk removes MDC circular-progress default emission from the original modern component stylesheet. Its deletion is coupled to the new base export/call above, so it cannot be transplanted independently. The owned runtime metadata points to the retained legacy family stylesheet and .mat-progress-spinner / .mat-spinner structure; this patch does not edit the original legacy family. Keep the existing resource allocation and inspect its separately recorded pre-existing structural deltas under the full rendered/style audit. The narrow compiler checks here do not qualify those structural deltas or native behavior."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/styles/progress-spinner/_progress-spinner-theme.scss",
+          "sha256": "5644d8e6c8e74ec610371384ca33b60e41af97a4ed07d0027e41125c4d53bb9c",
+          "bytes": 1528
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-progress-spinner/_progress-spinner-theme.scss",
+          "sha256": "71314118b07d874c6331a53fb1a545df1cf3d230f81d490df917dd1ab9546616",
+          "bytes": 1706
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.scss",
+          "sha256": "c49e724b39ca30c472b418b644cd4c9da6893c74a0b0fa45518555b4672142f3",
+          "bytes": 3867
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-progress-spinner/progress-spinner.ts",
+          "sha256": "85936bc7161a1dcbbc377fbf19c3de46b09f13a32adaa3d503d7dc09204c736c",
+          "bytes": 12785
+        }
+      ],
+      "legacy_selectors": ".mat-progress-spinner / .mat-spinner",
+      "decision": "Do not adopt the post16 progress-spinner-base API or the coupled default-style relocation. Preserve the finite16.2.14 Sass surface, original legacy progress-spinner theme/color/typography output and retained component resources. Current public peers own their modern implementations; no new legacy consumer include or CSS/SCSS change is required. This is an individually reviewed source-contract decision; packed/rendered/native and full floor/audit requirements remain separate.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    },
+    {
+      "sha": "06460d17703ef28a8fc89833c389c479b1ba6bcf",
+      "family": "card",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex c80e6fee0b0405f7c3f4414ccdb17e507ec900de..7b7680990015bbbcaff191fe800330d116b488c2 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -93,7 +93,8 @@\n   icon-button-typography, icon-button-density, icon-button-theme;\n @forward './button-toggle/button-toggle-theme' as button-toggle-* show button-toggle-theme,\n   button-toggle-color, button-toggle-typography, button-toggle-density;\n-@forward './card/card-theme' as card-* show card-theme, card-color, card-typography, card-density;\n+@forward './card/card-theme' as card-* show card-theme, card-color, card-typography, card-density,\n+  card-base;\n @forward './legacy-card/card-theme' as legacy-card-* show legacy-card-theme, legacy-card-color,\n   legacy-card-typography;\n @forward './legacy-checkbox/checkbox-theme' as legacy-checkbox-* show\ndiff --git a/src/material/card/_card-theme.scss b/src/material/card/_card-theme.scss\nindex 44333115353c08fa1b2d5dcf20d4f9f817375c6c..7dc94612f5f4fd8d3541bf65995c46afda142824 100644\n--- a/src/material/card/_card-theme.scss\n+++ b/src/material/card/_card-theme.scss\n@@ -8,6 +8,15 @@\n @use '@material/card/elevated-card-theme' as mdc-elevated-card-theme;\n @use '@material/card/outlined-card-theme' as mdc-outlined-card-theme;\n \n+@mixin base($config-or-theme) {\n+  .mat-mdc-card {\n+    @include mdc-elevated-card-theme.theme(tokens-mdc-elevated-card.get-unthemable-tokens());\n+    @include mdc-outlined-card-theme.theme(tokens-mdc-outlined-card.get-unthemable-tokens());\n+    @include token-utils.create-token-values(\n+        tokens-mat-card.$prefix, tokens-mat-card.get-unthemable-tokens());\n+  }\n+}\n+\n @mixin color($config-or-theme) {\n   $config: theming.get-color-config($config-or-theme);\n   $mdc-elevated-card-color-tokens: token-utils.resolve-elevation(\n@@ -66,6 +75,7 @@\n     $density: theming.get-density-config($theme);\n     $typography: theming.get-typography-config($theme);\n \n+    @include base($theme);\n     @if $color != null {\n       @include color($color);\n     }\ndiff --git a/src/material/card/card.scss b/src/material/card/card.scss\nindex 40350ec01c8d2f011e21310d8ade62117cca52ea..119874c5f9ab48b452761c97a83d5e56b6a6573a 100644\n--- a/src/material/card/card.scss\n+++ b/src/material/card/card.scss\n@@ -30,12 +30,6 @@\n         tokens-mdc-elevated-card.$prefix, $mdc-elevated-card-token-slots) {\n       @include token-utils.create-token-slot(box-shadow, container-elevation);\n     }\n-\n-    // Add default values for MDC card tokens that aren't outputted by the theming API.\n-    @include mdc-elevated-card-theme.theme(tokens-mdc-elevated-card.get-unthemable-tokens());\n-    @include mdc-outlined-card-theme.theme(tokens-mdc-outlined-card.get-unthemable-tokens());\n-    @include token-utils.create-token-values(\n-            tokens-mat-card.$prefix, tokens-mat-card.get-unthemable-tokens());\n   }\n \n   .mat-mdc-card-outlined {\n",
+      "diff_sha256": "fd9ccc35586356e90e9a140d0de99369234048bede3eb2059eb0c4d6b981ca51",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/card/_card-theme.scss",
+        "src/material/card/card.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/card/_card-theme.scss",
+        "src/material/card/card.scss"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 0,
+          "header": "@@ -93,7 +93,8 @@",
+          "hunk_sha256": "5bd7e26b0adcf5aeb1be6b058d2aa84f925829dc785121aa2ae69fd66b7674ce",
+          "status": "reviewed",
+          "decision": "This root-facade hunk adds card-base to the modern namespace and leaves the neighboring legacy exports alone. The untouched16.2.14 facade and both actual owned compiler runs omit this post16 name while retaining all seven selected modern/legacy names for card. Adding the new export would expand the finite historical API and create a new consumer mixin requirement; decline it for the frozen compatibility facade."
+        },
+        {
+          "path": "src/material/card/_card-theme.scss",
+          "hunk_index": 0,
+          "header": "@@ -8,6 +8,15 @@",
+          "hunk_sha256": "cf5bc68f4b103aa3695bd76f2124fd5efeaf9faffbe4ee1f2347a609e3338630",
+          "status": "reviewed",
+          "decision": "This hunk creates a modern base mixin for MDC elevated-card/outlined-card and Material card defaults, with its original selector wrapper and imports as shown in the authenticated hunk. Its purpose is to move unthemable values out of component structure so future design-system themes can choose them. The owned legacy theme at projects/ngx-material-legacy/styles/legacy-card/_card-theme.scss is byte-identical to the tagged reference and targets .mat-card; it requires no such new stage. Preserve that historical allocation. The modern16 theme is also retained after MDC import relocation. This source exclusion introduces no empty replacement mixin."
+        },
+        {
+          "path": "src/material/card/_card-theme.scss",
+          "hunk_index": 1,
+          "header": "@@ -66,6 +75,7 @@",
+          "hunk_sha256": "8cfe72588d1d9c39f75e4a0f23e4e41d832f9c80624b168e57ddf8ee3f90695c",
+          "status": "reviewed",
+          "decision": "This theme-body hunk unconditionally invokes base($theme) inside the existing duplicate-style guard before the color/density/typography branches. That changes the CSS emitted by the complete modern theme relative to partial mixins, including configurations with absent dimensions. The frozen16 owned theme keeps the original conditional sequence. All three legacy default outputs and the independent direct legacy color output for card match the untouched oracle on each advertised installed Material floor; decline this new emission stage rather than making consumers add another include."
+        },
+        {
+          "path": "src/material/card/card.scss",
+          "hunk_index": 0,
+          "header": "@@ -30,12 +30,6 @@",
+          "hunk_sha256": "8f61e40c74ef83187da7cbd264b9235d3ca389b1034c0b35247cf08272dde164",
+          "status": "reviewed",
+          "decision": "This structural hunk removes MDC elevated-card/outlined-card and Material card default emission from the original modern component stylesheet. Its deletion is coupled to the new base export/call above, so it cannot be transplanted independently. The owned runtime metadata points to the retained legacy family stylesheet and .mat-card structure; this patch does not edit the original legacy family. Keep the existing resource allocation and inspect its separately recorded pre-existing structural deltas under the full rendered/style audit. The narrow compiler checks here do not qualify those structural deltas or native behavior."
+        }
+      ],
+      "owned_context": [
+        {
+          "path": "projects/ngx-material-legacy/styles/card/_card-theme.scss",
+          "sha256": "639fbbeab9868e1ba7f9f2f9ce4ec062496b722844943025bfe18e46418ccd74",
+          "bytes": 4273
+        },
+        {
+          "path": "projects/ngx-material-legacy/styles/legacy-card/_card-theme.scss",
+          "sha256": "d42a67062c2687ad7d21e9d31b2ab2548e7c2ace4c28494a685cbb1f9e05524c",
+          "bytes": 2518
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-card/card.scss",
+          "sha256": "418edaffc1bbf45372b948ae5c5845c9cc1e1bd4c1f997276d3ea254dc39ef24",
+          "bytes": 5960
+        },
+        {
+          "path": "projects/ngx-material-legacy/legacy-card/card.ts",
+          "sha256": "2e2c16ba865b712214e0d51a739fd01e20af819e65065e2b99b55cc1433208ad",
+          "bytes": 5279
+        }
+      ],
+      "legacy_selectors": ".mat-card",
+      "decision": "Do not adopt the post16 card-base API or the coupled default-style relocation. Preserve the finite16.2.14 Sass surface, original legacy card theme/color/typography output and retained component resources. Current public peers own their modern implementations; no new legacy consumer include or CSS/SCSS change is required. This is an individually reviewed source-contract decision; packed/rendered/native and full floor/audit requirements remain separate.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    }
+  ],
+  "actual_line_scopes": [
+    {
+      "path": "compatibility/rc/21x-c04-unthemable-token-placement-21-scope.json",
+      "sha256": "939ed5181a07ecfe41df7ba76700cab51478fab1732a6b5a0a0628aa0827f9db",
+      "bytes": 109422
+    },
+    {
+      "path": "compatibility/rc/21x-c04-unthemable-token-placement-main-scope.json",
+      "sha256": "81a1734bca8b522c946345de7812b3ad247422cb186ae57e579f6c992227984f",
+      "bytes": 109616
+    }
+  ],
+  "existing_structural_context": {
+    "path": "compatibility/rc/21x-c04-unthemable-token-placement-structural-context.json",
+    "sha256": "e6fbfb6e47e3acc017d8a2566434fe5bd466ea62155323112b2a73469ee1f69c",
+    "bytes": 7799
+  },
+  "main_reference_previous_dispositions": {
+    "03a773a0237843fd1e1e600d0b9911eb924319bc": "not-applicable",
+    "047404067865a2452bfcb93b2374ac07aca319be": "not-applicable",
+    "ccd2d7fa72f4566ab2c2aeb78a5ac4b7d4149bbf": "not-applicable",
+    "593fc79ecbc6677f04e2d3707bff024b00a517e8": "not-applicable",
+    "06460d17703ef28a8fc89833c389c479b1ba6bcf": "not-applicable"
+  },
+  "common_producer_source_root_line": "21.x",
+  "actual_source_roots_measured": [
+    "21.x",
+    "main"
+  ],
+  "read_only_consumer_sanity": {
+    "consumer": "~/cyph",
+    "observed_retained_calls": [
+      "legacy-checkbox-theme",
+      "legacy-card-theme",
+      "legacy-progress-bar-theme",
+      "legacy-progress-spinner-theme"
+    ],
+    "selected_post16_base_calls_found": 0,
+    "consumer_files_written": 0,
+    "consumer_build_or_deployment_executed": false
+  },
+  "technical_authority": "Preserve the already agreed finite Material16 source/API contract; no owner exception or relaxation requested.",
+  "canonical_decisions_changed": 0,
+  "canonical_guard_or_owner_stage_integrated": false,
+  "pending_dispositions": 1339,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "g13_claim": "not-passed"
+}
