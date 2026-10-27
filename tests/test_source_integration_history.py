@@ -13,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SourceIntegrationHistory(unittest.TestCase):
     def test_registered_frames_and_unchanged_assertions(self):
-        child = subprocess.run(['node', 'tests/source_integration_history_probe.mjs'],
+        # Original snapshot assertions; current policy runs in test_source_integration_policy_current.py.
+        child = subprocess.run(['node', 'scripts/run-historical-source-probe.mjs', 'source-integration-history-controls'],
                                cwd=ROOT, capture_output=True, text=True, timeout=90)
         self.assertEqual(child.returncode, 0, child.stdout + child.stderr)
         report = json.loads(child.stdout)

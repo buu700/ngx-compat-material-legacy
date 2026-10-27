@@ -29,6 +29,11 @@ const integrationSpecs=[
  ['dialog-owned-integration','dialog_caller_owned_contract_integration',null,180000],
 ];
 export const SOURCE_INTEGRATION_HISTORY_IDS=Object.freeze(integrationSpecs.map(row=>row[0]));
+export const SOURCE_INTEGRATION_POLICY_HISTORY_ID='source-integration-history-controls';
+const policyFrames={
+ main:{commit:'280c1e8016725e234c7c272154a863fa0e96681f',tree:'ce2b19fa9db2221f886cd9cf5f2fef3293720ac2',tree_listing_sha256:'2af2563c232874fa327e79c9c4b6dd56b4d2e91e32de7327a02f79e83f046a55',members:10569},
+ '21.x':{commit:'ec3899a44639ff5f5453c1e7efb5acfd3d24be79',tree:'ad6d74ddf912e4af46bcb6db4797dd5ffdd0cb3a',tree_listing_sha256:'e665da55d9487188c57c2bb6c61f788099ed88c4217143dfd600f0c7708a593d',members:9212},
+};
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const pins={main:'8ad760d6882de13da503abc8483a436feb96e59d1f2fc82f6207fd1c8f65265b','21.x':'9abc2344805fe9b8f0ca1240932b861b7ba20435340060d1421bdea256fe541b'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
@@ -237,10 +242,37 @@ export function sourceIntegrationWrapperHash({root=rootDefault,path,expectedSha,
  assert.ok(wrapper);assert.ok([wrapper.before_sha256,wrapper.after_sha256].includes(expectedSha),'unknown source integration wrapper reference');
  return wrapper.after_sha256;
 }
+/** Retain the complete original policy probe at its passing source checkpoint.
+ * Current eight-entry policy validation still runs through its existing owner. */
+export function sourceIntegrationPolicyHistoryInputs({root=rootDefault,readMember}={}){
+ const read=readMember||((path)=>readFileSync(resolve(root,path)));
+ const current=sourceIntegrationHistoryInputs({root,readMember:read}),line=current.data.line;
+ const probe='tests/source_integration_history_probe.mjs',wrapper='tests/test_source_integration_history.py';
+ const frame=structuredClone(policyFrames[line]);assert.ok(frame);
+ const original=git(root,['show',frame.commit+':'+probe]);
+ assert.equal(hash(original),'5b3de6c0f4e3da6273c2769634bbb0723ad4957619527a4185d5441a6ad9b424');
+ assert.ok(read(probe).equals(original),'original source policy probe changed');
+ const before=git(root,['show',frame.commit+':'+wrapper]);
+ assert.equal(hash(before),'966b5a107b9cd974f78f995f59dc604abb75a20ff77875e9acea6c2402ffaca7');
+ let after=before.toString();
+ for(const [from,to]of [
+  ["        child = subprocess.run(['node', 'tests/source_integration_history_probe.mjs'],",
+   "        # Original snapshot assertions; current policy runs in test_source_integration_policy_current.py.\n        child = subprocess.run(['node', 'tests/source_integration_history_probe.mjs'],"],
+  ["['node', 'tests/source_integration_history_probe.mjs']",
+   "['node', 'scripts/run-historical-source-probe.mjs', 'source-integration-history-controls']"],
+ ]){assert.equal(after.split(from).length,2,'policy wrapper edit not exact');after=after.replace(from,to);}
+ assert.equal(read(wrapper).toString(),after,'current source policy wrapper changed');
+ const entry={id:SOURCE_INTEGRATION_POLICY_HISTORY_ID,probe,probe_sha256:hash(original),frame,timeout_ms:90000};
+ const data={line,entries:[entry],current_integration_programs:current.data.entries.length,
+  source_history_inputs_sha256:current.sha256,wrapper:{path:wrapper,before_sha256:hash(before),after_sha256:hash(after)},
+  actual_current_source_native_packed_or_floor_qualified:false};
+ return {data,sha256:hash(JSON.stringify(data))};
+}
 export async function runHistoricalSourceProbe({root=rootDefault,id,reportPath,originalReportPath}={}){
- const supplemental=SOURCE_INTEGRATION_HISTORY_IDS.includes(id)?sourceIntegrationHistoryInputs({root}):null;
+ const policy=id===SOURCE_INTEGRATION_POLICY_HISTORY_ID;
+ const supplemental=policy?sourceIntegrationPolicyHistoryInputs({root}):SOURCE_INTEGRATION_HISTORY_IDS.includes(id)?sourceIntegrationHistoryInputs({root}):null;
  assert.ok(ids.includes(id)||supplemental,'unregistered historical probe');
- assert.ok(!originalReportPath||supplemental,'original report output is restricted to the eight integration programs');
+ assert.ok(!originalReportPath||SOURCE_INTEGRATION_HISTORY_IDS.includes(id),'original report output is restricted to the eight integration programs');
  if(originalReportPath)assert.equal(existsSync(originalReportPath),false,'original report destination already exists');
  const started=Date.now(),{data,members:currentMembers,guard}=inspectHistoricalReplayCurrent({root});
  const entry=(supplemental?.data??data).entries.find(row=>row.id===id);assert.ok(entry,'unregistered historical probe');
@@ -275,7 +307,7 @@ export async function runHistoricalSourceProbe({root=rootDefault,id,reportPath,o
   if(original){assert.equal(original.line,data.line,'historical report line changed');assert.notEqual(original.g11_claim,'passed');for(const flag of ['actual_native_packed_or_floor_qualified','native_or_packed_qualified','packed_or_native_qualified'])assert.notEqual(original[flag],true,'historical probe claimed runtime qualification');}
   // Recheck the caller graph after the original program runs. It was never replaced.
   const after=verifyHistoricalCurrentSubjects({root,data,members:currentMembers});assert.deepEqual(after,guard);
-  if(supplemental)assert.equal(sourceIntegrationHistoryInputs({root}).sha256,supplemental.sha256);
+  if(supplemental)assert.equal((policy?sourceIntegrationPolicyHistoryInputs({root}):sourceIntegrationHistoryInputs({root})).sha256,supplemental.sha256);
   report={schema_version:1,line:data.line,inputs_sha256:hash(readFileSync(resolve(root,HISTORICAL_REPLAY_INPUTS))),helper_sha256:hash(readFileSync(resolve(root,'scripts/historical-source-replay.mjs'))),cli_sha256:hash(readFileSync(resolve(root,'scripts/run-historical-source-probe.mjs'))),probe_id:id,probe:entry.probe,probe_sha256:entry.probe_sha256,frame:entry.frame,
    historical_members_verified:members.length,historical_bytes_verified:historicalBytes,complete_original_program_unchanged:true,
    current_guard:guard,current_guard_passed_before_and_after:true,exit_code:finished.code,signal:finished.signal,timed_out:timedOut,
