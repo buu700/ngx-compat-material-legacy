@@ -35,6 +35,7 @@ import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
 import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';
+import {requiresRulesJsBuild,rulesJsBuildEntryEvidenceOk,rulesJsBuildOriginalPatch} from './upstream-rules-js-build-admission.mjs';
 import {requiresSassInspectionScope,sassInspectionEntryEvidenceOk} from './upstream-sass-inspection-admission.mjs';
 import {requiresHistoricalBehavior,validateHistoricalBehavior,historicalBehaviorRequirements} from './upstream-historical-behavior-evidence.mjs';
 import {CHIP_LIFECYCLE_SCOPE_ROLE,requiresChipLifecycleScope,chipLifecycleScopeEvidenceOk} from './upstream-chip-lifecycle-admission.mjs';
@@ -167,6 +168,8 @@ function evidenceJson(file) {
 function evidenceClass(entry) {
   const rel = entry.evidence_report;
   if (typeof rel !== 'string' || !rel.trim()) return 'missing';
+  const rulesJsBuildScope = requiresRulesJsBuild(entry);
+  if (rulesJsBuildScope && !rel.endsWith('.json')) return 'invalid-rules-js-build-scope';
   const sassInspectionScope = requiresSassInspectionScope(entry);
   if (sassInspectionScope && !rel.endsWith('.json')) return 'invalid-sass-inspection-scope';
   if (requiresModernChipScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-modern-chip-source-scope';
@@ -190,6 +193,8 @@ function evidenceClass(entry) {
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
     if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';
+    if (rulesJsBuildScope && !rulesJsBuildEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,
+      line:line||body.line})) return 'invalid-rules-js-build-scope';
     if (sassInspectionScope && !sassInspectionEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,
       line:line||body.line})) return 'invalid-sass-inspection-scope';
     if (requiresChipLifecycleScope(entry,entry.individual_proof) || body.role === CHIP_LIFECYCLE_SCOPE_ROLE) {
@@ -299,7 +304,9 @@ function individualPatchBound(entry, proof) {
     requiresIndividual:Boolean(sensitiveClass(entry))||requiresChipLifecycleScope(entry,proof)||requiresChipModernizationScope(entry,proof)||requiresChipInputApiScope(entry,proof)||requiresChipEditScope(entry,proof)||requiresHistoricalBehavior(entry,proof)||requiresArtifactBehavior(entry,proof)||requiresOwnedStyle(entry,proof)||INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition),
     claimsBehavior:INHERITED.has(entry.final_disposition)||BEHAVIOR.has(entry.final_disposition)}))return false;
   let bytes;
-  if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {
+  if (requiresRulesJsBuild(entry)) {
+    bytes = rulesJsBuildOriginalPatch(readRegularRepoBytes,entry.sha);
+  } else if (typeof review.diff === 'string' && review.diff.startsWith('diff --git ')) {
     bytes = Buffer.from(review.diff, 'utf8');
   } else {
     const file = regularRepoMember(review.patch_file);

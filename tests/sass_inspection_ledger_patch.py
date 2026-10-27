@@ -74,7 +74,9 @@ for change in packet['source_digest_updates']:
     i = by_sha[change['sha']]; parts = tuple(change['path']); node = original['entries'][i]
     for key in parts: node = node[key]
     assert node == change['before']
-    assert change['after'] == SHA((ROOT/'scripts/check-upstream-audit-disposition.mjs').read_bytes())
+    checker_parent = {'main':'6484f6dcb499c5c62cdd94d98b28e355f1962485','21.x':'29911639fb9b7b49482ea6f99741d1a9f753722e'}[line]
+    original_checker = subprocess.check_output(['git','--no-replace-objects','-c','gc.auto=0','show',checker_parent+':scripts/check-upstream-audit-disposition.mjs'],cwd=ROOT,env=env)
+    assert change['after'] == SHA(original_checker)
     s,e = spans[('entries',i)+parts]; assert json.loads(text[s:e]) == change['before']
     edits.append((s,e,json.dumps(change['after']))); changed.append(change['sha'])
 assert len(edits) == len(changed) == len(set(changed)) == 9
@@ -85,10 +87,18 @@ chunks.append(text[end:]); after = ''.join(chunks).encode(); assert SHA(after) =
 after_rows = json.loads(after)['entries']; assert len(after_rows) == 1697
 assert [r['sha'] for r in after_rows] == [r['sha'] for r in original['entries']]
 assert {old['sha'] for old,new in zip(original['entries'],after_rows) if old != new} == set(changed)
-current = (ROOT/path).read_bytes(); assert current in (before,after)
+current = (ROOT/path).read_bytes(); applied = current == after
+if current not in (before,after):
+    build_pins = {'main':'c9a98435c6c654996955d808a8ea2717f5f4d89f8eb360c0fd4df7854712b975','21.x':'c0e61d07aecb56a56c6c3b1d70d836c28edcfccbb36967f28460921037894191'}
+    build_raw = (ROOT/'compatibility/rc/upstream-rules-js-build-ledger-transition.json.gz').read_bytes()
+    assert SHA(build_raw) == build_pins[line]
+    build_packet = json.loads(gzip.decompress(build_raw)); assert build_packet['before']['sha256'] == SHA(after)
+    child = subprocess.run([sys.executable,str(ROOT/'tests/rules_js_build_ledger_patch.py')],cwd=ROOT,env=env,capture_output=True,text=True,check=True)
+    assert json.loads(child.stdout)['canonical_applied'] is True
+    applied = True
 report = {'line':line,'result':'pass','independent_parser':'Python JSON object/scalar spans; no TypeScript AST',
           'canonical_entries':1697,'individual_decisions_changed':6,'checker_source_digests_changed':3,'unrelated_entry_or_byte_changes':0,
-          'before_sha256':SHA(before),'after_sha256':SHA(after),'canonical_applied':current == after,'changed_sha_ids':changed,
+          'before_sha256':SHA(before),'after_sha256':SHA(after),'canonical_applied':applied,'changed_sha_ids':changed,
           'full_Sass_native_floor_or_G11_qualified':False,'producer_sha256':SHA(Path(__file__).read_bytes())}
 if len(sys.argv)>1:
     with open(sys.argv[1],'x') as output: output.write(json.dumps(report,indent=2)+'\n')

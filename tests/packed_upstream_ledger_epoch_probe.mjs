@@ -104,7 +104,8 @@ assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equa
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
 assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
-assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?13:6);
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?16:9);
+assert.equal(epoch.rules_js_decisions_applied,3);
 if(input.line==='21.x'){
  const nextPath='compatibility/rc/upstream-testing-api-21x-ledger-transition.json.gz';
  rejects('changed-seven-individual-transition',path=>path===nextPath?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
@@ -130,6 +131,20 @@ const sassReview='compatibility/rc/upstream-sass-inspection-individual-review.js
 const liveSass=packedUpstreamLedgerEpoch({root,read:path=>lateSass&&path===sassReview?Buffer.concat([read(path),Buffer.from(' ')]):read(path)});
 lateSass=true;assert.throws(()=>liveSass.read(ledgerPath));rejected.push('late-Sass-review-change');
 cases.push('six-source-decisions-are-qualified-current-epoch');
+
+const rulesTransition='compatibility/rc/upstream-rules-js-build-ledger-transition.json.gz';
+rejects('changed-three-build-transition',path=>path===rulesTransition?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+const rulesValidator='scripts/upstream-rules-js-build-admission.mjs';
+rejects('changed-three-build-validator',path=>path===rulesValidator?Buffer.concat([read(path),Buffer.from('\n// changed\n')]):read(path));
+const partialRules=JSON.parse(prepared.canonical_after),beforeRules=JSON.parse(prepared.rules_js_stage.before);
+const rulesRow=partialRules.entries.find(row=>row.individual_proof?.rules_js_build_source_scope);
+partialRules.entries[partialRules.entries.findIndex(row=>row.sha===rulesRow.sha)]=beforeRules.entries.find(row=>row.sha===rulesRow.sha);
+rejects('partial-three-build-admission',path=>path===ledgerPath?bytes(partialRules):read(path));
+let lateRules=false;
+const rulesReview='compatibility/rc/upstream-rules-js-build-individual-review.json';
+const liveRules=packedUpstreamLedgerEpoch({root,read:path=>lateRules&&path===rulesReview?Buffer.concat([read(path),Buffer.from(' ')]):read(path)});
+lateRules=true;assert.throws(()=>liveRules.read(ledgerPath));rejected.push('late-build-review-change');
+cases.push('three-complete-build-decisions-are-qualified-current-epoch');
 
 console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   canonical_entries: 1697, qualified_source_entries: 85, changed_scalar_tokens: 179,
