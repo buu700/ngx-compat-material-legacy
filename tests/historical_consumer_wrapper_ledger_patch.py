@@ -155,7 +155,14 @@ def verify_consumer_wrapper_successor(expected_before=None, root=ROOT, candidate
         after_text = after_text[:start] + replacement + after_text[end:]
     after = after_text.encode()
     assert json.loads(after) == expected and SHA(after) == packet['after_sha256'] and len(after) == packet['after_bytes']
-    assert (Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()) == after
+    actual = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    if actual != after and line == '21.x':
+        # Only the independently reconstructed one-SHA semantic successor may
+        # follow this unchanged 65-entry metadata boundary.
+        from legacy_sass_entrypoint_ledger_patch import verify_sass_entrypoint_successor
+        verify_sass_entrypoint_successor(expected_before=after, root=root, candidate=candidate)
+    else:
+        assert actual == after
     assert [(row['sha'], row['final_disposition']) for row in original['entries']] == [(row['sha'], row['final_disposition']) for row in expected['entries']]
     return dict(line=line, metadata_entries=65, original_hunks_preserved=7770, other_entries_preserved=1632,
                 canonical_applied=candidate is None,

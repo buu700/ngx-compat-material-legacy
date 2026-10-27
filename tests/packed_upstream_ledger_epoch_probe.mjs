@@ -104,7 +104,13 @@ assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equa
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
 assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
-assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?20:13);
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?21:13);
+assert.equal(epoch.legacy_sass_entrypoint_decisions_applied,input.line==='21.x'?1:0);
+if(input.line==='21.x'){
+ assert.equal(prepared.legacy_sass_entrypoint_stage.individual_decisions,1);
+ assert.equal(prepared.legacy_sass_entrypoint_stage.unselected_entries_preserved,1696);
+ assert.equal(prepared.legacy_sass_entrypoint_stage.before.equals(prepared.historical_consumer_wrapper_metadata_stage.after),true);
+}
 assert.equal(epoch.rules_js_decisions_applied,3);
 assert.equal(epoch.summary_scalar_updates_applied,2);
 if(input.line==='21.x'){

@@ -11,11 +11,13 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {historicalConsumerWrapperMetadata,CONSUMER_WRAPPER_LEDGER,CONSUMER_WRAPPER_PACKET,CONSUMER_WRAPPER_TRANSPORT,CONSUMER_WRAPPER_QUALIFICATION} from '../scripts/historical-consumer-wrapper-metadata.mjs';
-import {packedUpstreamLedgerEpoch} from '../scripts/packed-upstream-ledger-epoch.mjs';
+import {preparePackedUpstreamLedger,packedUpstreamLedgerEpoch} from '../scripts/packed-upstream-ledger-epoch.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=path=>readFileSync(join(root,path));
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),json=value=>Buffer.from(JSON.stringify(value,null,2)+'\n');
 const transport=JSON.parse(read(CONSUMER_WRAPPER_TRANSPORT)),packet=JSON.parse(read(CONSUMER_WRAPPER_PACKET));
-const source=historicalConsumerWrapperMetadata({root});assert.equal(source.after.equals(read(CONSUMER_WRAPPER_LEDGER)),true);
+const source=historicalConsumerWrapperMetadata({root}),prepared=preparePackedUpstreamLedger({root});
+assert.equal(source.after.equals(prepared.historical_consumer_wrapper_metadata_stage.after),true);
+assert.equal(prepared.canonical_after.equals(read(CONSUMER_WRAPPER_LEDGER)),true);
 assert.equal(source.metadata_entries,65);assert.equal(source.individual_decisions,0);source.assertCurrent();
 const controls=[];
 function reject(id,member,change){
@@ -37,7 +39,8 @@ let late=false;const lateSource=historicalConsumerWrapperMetadata({root,read:pat
 late=true;assert.throws(()=>lateSource.assertCurrent(),/late historical consumer metadata input/);controls.push({id:'late-wrapper-drift',result:'rejected'});
 const epoch=packedUpstreamLedgerEpoch({root});
 assert.equal(epoch.historical_consumer_wrapper_metadata_entries_applied,65);assert.equal(epoch.historical_consumer_wrapper_metadata_references_applied,65);
-assert.equal(epoch.historical_wrapper_metadata_entries_applied,4);assert.equal(epoch.individual_decisions_applied,source.line==='main'?13:20);
+assert.equal(epoch.historical_wrapper_metadata_entries_applied,4);assert.equal(epoch.individual_decisions_applied,source.line==='main'?13:21);
+assert.equal(epoch.legacy_sass_entrypoint_decisions_applied,source.line==='main'?0:1);
 assert.equal(epoch.current_native_packed_or_floor_or_g11_credit,false);epoch.assertCurrent();
 const altered=Buffer.from(read(CONSUMER_WRAPPER_LEDGER));altered[0]=32;
 assert.notEqual(hash(altered),packet.after_sha256);
