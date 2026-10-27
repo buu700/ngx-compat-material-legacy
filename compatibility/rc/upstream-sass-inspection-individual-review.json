@@ -1,0 +1,598 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "status": "reviewed",
+  "role": "Six individual source/caller applicability proposals; mandatory canonical integration remains pending",
+  "upstream_originals": {
+    "path": "compatibility/rc/upstream-sass-inspection-21x-subjects.json.gz",
+    "sha256": "f1b87f0f3f9a88263641767bd350a7c8b79998199a2235a92b5e53f50c450e5b",
+    "capture_line": "21.x",
+    "scope": "Shared immutable upstream commit/blob/complete-patch identity only; not another line's consumer or peer qualification."
+  },
+  "current_compiler_scope": {
+    "path": "compatibility/rc/upstream-sass-inspection-current-scope.json.gz",
+    "sha256": "6432e6b856ee57431709fe9b407d8535734c8bad3fb534a57ddb9310cf4ce8fd"
+  },
+  "source_census": {
+    "path": "compatibility/rc/upstream-complete-patch-census.json.gz",
+    "sha256": "f15c6ac715aee315acba7e4bc017458c9deb4bd489b67225e3bf80e5d685bead"
+  },
+  "reviews": [
+    {
+      "sha": "1a85dd299b4ac38d201c3cc38c396b2f08398adc",
+      "status": "reviewed",
+      "proposed_final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Do not add the experimental type/color inspection APIs or versioned M3 palette internals to the owned Material16 facade. Its original M2 constructors and palette helpers remain independently owned; the current public Material namespace retains its own newer API.",
+      "diff_sha256": "e691c7c73a5064dc68cec494f3dbbc934f1f4c43262840494410dd8ce5fdc037",
+      "diff": "diff --git a/src/material-experimental/theming/_definition.scss b/src/material-experimental/theming/_definition.scss\nindex 2ce0ff16e245f65e84bbfc7e190bc6169c8ffe63..5c2036bb76b598c6f25c06f8f87fd93b598c37b2 100644\n--- a/src/material-experimental/theming/_definition.scss\n+++ b/src/material-experimental/theming/_definition.scss\n@@ -46,6 +46,14 @@ $theme-version: 1;\n     $internals: (\n       theme-version: $theme-version,\n       theme-type: $type,\n+      palettes: (\n+        primary: map.remove($primary, neutral-variant),\n+        secondary: map.remove($secondary, neutral-variant),\n+        tertiary: map.remove($tertiary, neutral-variant),\n+        neutral: m3-palettes.$neutral-palette,\n+        neutral-variant: map.get($primary, neutral-variant),\n+        error: m3-palettes.$red-palette\n+      ),\n       color-tokens: m3-tokens.generate-color-tokens($type, $primary, $secondary, $tertiary,\n         m3-palettes.$neutral-palette, m3-palettes.$red-palette)\n     )\ndiff --git a/src/material/_index.scss b/src/material/_index.scss\nindex 0bfc68809902b4a031c19aa6c732e416cf42c47e..c2e2076abb869dbe43a410351d631b9a73125898 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -144,4 +144,5 @@ list-density, list-base;\n   $private-mdc-theme-styles-query, $private-mdc-typography-styles-query;\n \n // New theming APIs, currently in development:\n-@forward './core/theming/inspection' as private-* show private-get-theme-version;\n+@forward './core/theming/inspection' as private-* show private-get-theme-version,\n+  private-get-theme-type, private-get-theme-color;\ndiff --git a/src/material/core/theming/_inspection.scss b/src/material/core/theming/_inspection.scss\nindex 476fdd72da65ceef6f9d93c1e3379a67113fe90b..de6a3446addea0bd5277daeb67fa64565dab9c6b 100644\n--- a/src/material/core/theming/_inspection.scss\n+++ b/src/material/core/theming/_inspection.scss\n@@ -24,6 +24,81 @@ $_internals: _mat-theming-internals-do-not-access;\n   @return if($err, 0, map.get($theme, $_internals, theme-version) or 0);\n }\n \n+/// Gets the type of theme represented by a theme object (light or dark).\n+/// @param {Map} $theme The theme\n+/// @return {String} The type of theme (either `light` or `dark`).\n+@function get-theme-type($theme) {\n+  $err: _validate-theme-object($theme);\n+  @if $err {\n+    // TODO(mmalerba): implement for old style theme objects.\n+    @error #{'get-theme-type does not support legacy theme objects.'};\n+  }\n+  @return map.get($theme, $_internals, theme-type) or light;\n+}\n+\n+/// Gets a color from a theme object. This function can take 2 or 3 arguments. If 2 arguments are\n+/// passed, the second argument is treated as the name of a color role. If 3 arguments are passed,\n+/// the second argument is treated as the name of a color palette (primary, secondary, etc.) and the\n+/// third is treated as the palette hue (10, 50, etc.)\n+/// @param {Map} $theme The theme\n+/// @param {String} $color-role-or-palette-name The name of the color role to get, or the name of a\n+///   color palette.\n+/// @param {Number} $hue The palette hue to get (passing this argument means the second argument is\n+///   interpreted as a palette name).\n+/// @return {Color} The requested theme color.\n+@function get-theme-color($theme, $args...) {\n+  $args-count: list.length($args);\n+  @if $args-count == 1 {\n+    @return _get-theme-role-color($theme, $args...);\n+  } @else if $args-count == 2 {\n+    @return _get-theme-palette-color($theme, $args...);\n+  }\n+  @error #{'Expected 2 or 3 arguments. Got:'} $args-count + 1;\n+}\n+\n+/// Gets a role color from a theme object.\n+/// @param {Map} $theme The theme\n+/// @param {String} $color-role-name The name of the color role to get.\n+/// @return {Color} The requested role color.\n+@function _get-theme-role-color($theme, $color-role-name) {\n+  $err: _validate-theme-object($theme);\n+  @if $err {\n+    // TODO(mmalerba): implement for old style theme objects.\n+    @error #{'get-theme-color does not support legacy theme objects.'};\n+  }\n+  $color-roles: map.get($theme, $_internals, color-tokens, (mdc, theme));\n+  $result: map.get($color-roles, $color-role-name);\n+  @if not $result {\n+    @error #{'Valid color roles are: #{map.keys($color-roles)}. Got:'} $color-role-name;\n+  }\n+  @return $result;\n+}\n+\n+/// Gets a palette color from a theme object.\n+/// @param {Map} $theme The theme\n+/// @param {String} $palette-name The name of the palette to get the color from.\n+/// @param {Number} $hue The hue to read from the palette.\n+/// @return {Color} The requested palette color.\n+@function _get-theme-palette-color($theme, $palette-name, $hue) {\n+  $err: _validate-theme-object($theme);\n+  @if $err {\n+    // TODO(mmalerba): implement for old style theme objects.\n+    @error #{'get-theme-color does not support legacy theme objects.'};\n+  }\n+  $palettes: map.get($theme, $_internals, palettes);\n+  $palette: map.get($palettes, $palette-name);\n+  @if not $palette {\n+    $supported-palettes: map.keys($palettes);\n+    @error #{'Valid palettes are: #{$supported-palettes}. Got:'} $palette-name;\n+  }\n+  $result: map.get($palette, $hue);\n+  @if not $result {\n+    $supported-hues: map.keys($palette);\n+    @error #{'Valid hues for'} $palette-name #{'are: #{$supported-hues}. Got:'} $hue;\n+  }\n+  @return $result;\n+}\n+\n /// Gets the set of tokens from the given theme, limited to those affected by the requested theming\n /// systems.\n /// @param {Map} $theme The theme to get tokens from.\n@@ -38,9 +113,8 @@ $_internals: _mat-theming-internals-do-not-access;\n   }\n   $err: validation.validate-allowed-values($systems, color, typography, density, base);\n   @if $err {\n-   @error\n-     #{'Expected $systems to contain valid system names (color, typographt, density, or base).'}\n-     #{'Got invalid system names:'} $err;\n+    @error #{'Expected $systems to contain valid system names (color, typography, density, or'}\n+    #{'base). Got invalid system names:'} $err;\n   }\n   $result: ();\n   @each $system in $systems {\ndiff --git a/src/material/core/theming/tests/theming-inspection-api.spec.ts b/src/material/core/theming/tests/theming-inspection-api.spec.ts\nindex c4ca492dad8c8a35217e28d31cdd62612c02c20c..188199eaf06938ca84e2ae7c134a1b25b258a7a2 100644\n--- a/src/material/core/theming/tests/theming-inspection-api.spec.ts\n+++ b/src/material/core/theming/tests/theming-inspection-api.spec.ts\n@@ -124,13 +124,12 @@ describe('theming inspection api', () => {\n     it('should get theme version', () => {\n       expect(\n         transpile(`\n-        $theme: ${defineM2Theme()};\n-\n-        div {\n-          content: mat.private-get-theme-version($theme);\n-        }\n-      `),\n-      ).toMatch('content: 0;');\n+          $theme: ${defineM2Theme()};\n+          div {\n+            content: mat.private-get-theme-version($theme);\n+          }\n+        `),\n+      ).toMatch(/content: 0;/);\n     });\n   });\n \n@@ -139,12 +138,88 @@ describe('theming inspection api', () => {\n       expect(\n         transpile(`\n         $theme: ${defineM3Theme()};\n+          div {\n+            content: mat.private-get-theme-version($theme);\n+          }\n+        `),\n+      ).toMatch(/content: 1;/);\n+    });\n+\n+    it('should get theme type', () => {\n+      expect(\n+        transpile(`\n+          $theme: ${defineM3Theme()};\n+          div {\n+            content: mat.private-get-theme-type($theme);\n+          }\n+        `),\n+      ).toMatch(/content: light;/);\n+    });\n+\n+    it('should get role color', () => {\n+      expect(\n+        transpile(`\n+          $theme: ${defineM3Theme()};\n+          div {\n+            content: mat.private-get-theme-color($theme, primary-container);\n+          }\n+        `),\n+      ).toMatch(/content: #e0e0ff;/);\n+    });\n+\n+    it('should error on invalid color role', () => {\n+      expect(() =>\n+        transpile(`\n+          $theme: ${defineM3Theme()};\n+          div {\n+            content: mat.private-get-theme-color($theme, fake-role);\n+          }\n+        `),\n+      ).toThrowError(/Valid color roles are.*Got: fake-role/);\n+    });\n+\n+    it('should get palette color', () => {\n+      expect(\n+        transpile(`\n+          $theme: ${defineM3Theme()};\n+          div {\n+            content: mat.private-get-theme-color($theme, tertiary, 20);\n+          }\n+        `),\n+      ).toMatch(/content: #323200;/);\n+    });\n+\n+    it('should error on invalid color palette', () => {\n+      expect(() =>\n+        transpile(`\n+          $theme: ${defineM3Theme()};\n+          div {\n+            content: mat.private-get-theme-color($theme, fake-palette, 20);\n+          }\n+        `),\n+      ).toThrowError(/Valid palettes are.*Got: fake-palette/);\n+    });\n+\n+    it('should error on invalid color hue', () => {\n+      expect(() =>\n+        transpile(`\n+          $theme: ${defineM3Theme()};\n+          div {\n+            content: mat.private-get-theme-color($theme, neutral, 11);\n+          }\n+        `),\n+      ).toThrowError(/Valid hues for neutral are.*Got: 11/);\n+    });\n \n-        div {\n-          content: mat.private-get-theme-version($theme);\n-        }\n-      `),\n-      ).toMatch('content: 1;');\n+    it('should error on wrong number of get-color-theme args', () => {\n+      expect(() =>\n+        transpile(`\n+          $theme: ${defineM3Theme()};\n+          div {\n+            content: mat.private-get-theme-color($theme);\n+          }\n+        `),\n+      ).toThrowError(/Expected 2 or 3 arguments. Got: 1/);\n     });\n   });\n });\n",
+      "complete_original_paths": [
+        "src/material-experimental/theming/_definition.scss",
+        "src/material/_index.scss",
+        "src/material/core/theming/_inspection.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "frozen_seed_paths": [
+        "src/material-experimental/theming/_definition.scss",
+        "src/material/_index.scss",
+        "src/material/core/theming/_inspection.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "prior_entry_sha256": "c5618a004b4229d13ee634dc01e44d4cad8b6298420a60e43ea8a3ccaada4d3b",
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material-experimental/theming/_definition.scss",
+          "hunk_index": 1,
+          "header": "@@ -46,6 +46,14 @@ $theme-version: 1;",
+          "hunk_sha256": "13eb504a789f6d24706008ee9fa40630e42ccb9d98fd9d881f0e15edc768c259",
+          "decision": "Adds primary/secondary/tertiary/neutral/error palettes to the experimental versioned M3 internals. The owned Material16 model uses its original primary/accent/warn configs; no owned constructor or bridge produces or consumes this new internals object.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 1,
+          "header": "@@ -144,4 +144,5 @@ list-density, list-base;",
+          "hunk_sha256": "13417d7991f667199f0daab4a67c57e03d031e8f0d0ff87ff9706f6f508db126",
+          "decision": "Exposes get-theme-type and get-theme-color only through private-prefixed experimental exports. They are outside the authentic 25-function Material16 facade; the compiler confirms the current peer exports them in its separate namespace without adding them to the facade.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 1,
+          "header": "@@ -24,6 +24,81 @@ $_internals: _mat-theming-internals-do-not-access;",
+          "hunk_sha256": "f00f6b2304a364d48b27d988fc1c02cd3153ebc096310e82616060a082db717d",
+          "decision": "Adds type, role-color and palette-color inspection with M3 validation, arity checks and unsupported-role/palette/hue diagnostics. These new getters initially reject legacy theme maps; transplanting them would add a modern API mirror rather than repair an original palette helper.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 2,
+          "header": "@@ -38,9 +113,8 @@ $_internals: _mat-theming-internals-do-not-access;",
+          "hunk_sha256": "d5e48066a6f78ce9a7ea75e80676cb7bf6709c0ca1e2d0a43652e287e67f50f9",
+          "decision": "Corrects spelling and formatting in the new token-system validation error. This module is peer-owned and absent from the owned Sass sources; existing historical helper diagnostics and immutable expected CSS are not changed.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -124,13 +124,12 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "356c687cf88ee692456800b7991a80ce79df77088ea7846916edf7c510e25b15",
+          "decision": "Reformats the M2 version test and changes its equivalent expected content assertion to a regular expression. This is an upstream inspection test, not evidence that the original or candidate Sass suites executed.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 2,
+          "header": "@@ -139,12 +138,88 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "4198d52a9141fd879b618ef2ec7c08811dd7a026fe71a93bd97e8cc7f67f2524",
+          "decision": "Adds M3 type, role/palette color, invalid key/hue and argument-count tests. Those tests explain the new inspection contract; they do not authorize new legacy exports or replacement of historical palette/theme calls.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "source_review_complete": true,
+      "canonical_admitted": false,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "f52e97958ac8d9845017a5ead077952f3228144f",
+      "status": "reviewed",
+      "proposed_final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Do not add the new M3 typography inspection getter or typescale contract to the finite historical facade. Existing historical typography helpers remain exported under their original names; current peer typography inspection stays in the peer namespace.",
+      "diff_sha256": "14bfd0ac5683b1c0ef96e69415fb009d4cdd277398bca05a7e8358004e3c847f",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex c2e2076abb869dbe43a410351d631b9a73125898..df46cc06041dfa538aefeb990bf6ed8be6887ef5 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -145,4 +145,4 @@ list-density, list-base;\n \n // New theming APIs, currently in development:\n @forward './core/theming/inspection' as private-* show private-get-theme-version,\n-  private-get-theme-type, private-get-theme-color;\n+  private-get-theme-type, private-get-theme-color, private-get-theme-typography;\ndiff --git a/src/material/core/theming/_inspection.scss b/src/material/core/theming/_inspection.scss\nindex de6a3446addea0bd5277daeb67fa64565dab9c6b..b538a8174c08f49a8c9aa3f05a43cb468fc6b887 100644\n--- a/src/material/core/theming/_inspection.scss\n+++ b/src/material/core/theming/_inspection.scss\n@@ -6,6 +6,26 @@\n \n $_internals: _mat-theming-internals-do-not-access;\n \n+$_m3-typescales: (\n+  display-large,\n+  display-medium,\n+  display-small,\n+  headline-large,\n+  headline-medium,\n+  headline-small,\n+  title-large,\n+  title-medium,\n+  title-small,\n+  label-large,\n+  label-medium,\n+  label-small,\n+  body-large,\n+  body-medium,\n+  body-small,\n+);\n+\n+$_typography-properties: (font, font-family, line-height, font-size, letter-spacing, font-weight);\n+\n /// Validates that the given value is a versioned theme object.\n /// @param {Any} $theme The theme object to validate.\n /// @return {Boolean|Null} true if the theme has errors, else null.\n@@ -99,6 +119,36 @@ $_internals: _mat-theming-internals-do-not-access;\n   @return $result;\n }\n \n+/// Gets a typography value from a theme object.\n+/// @param {Map} $theme The theme\n+/// @param {String} $typescale The typescale name.\n+/// @param {String} $property The CSS font property to get\n+///   (font, font-family, font-size, font-weight, line-height, or letter-spacing).\n+/// @return {*} The value of the requested font property.\n+@function get-theme-typography($theme, $typescale, $property: font) {\n+  $err: _validate-theme-object($theme);\n+  @if $err {\n+    // TODO(mmalerba): implement for old style theme objects.\n+    @error #{'get-theme-typography does not support legacy theme objects.'};\n+  }\n+  @if not list.index($_m3-typescales, $typescale) {\n+    @error #{'Valid typescales are: #{$_m3-typescales}. Got:'} $typescale;\n+  }\n+  @if not list.index($_typography-properties, $property) {\n+    @error #{'Valid typography properties are: #{$_typography-properties}. Got:'} $property;\n+  }\n+  $property-key: map.get((\n+    font: '',\n+    font-family: '-font',\n+    line-height: '-line-height',\n+    font-size: '-size',\n+    letter-spacing: '-tracking',\n+    font-weight: '-weight'\n+  ), $property);\n+  $token-name: '#{$typescale}#{$property-key}';\n+  @return map.get($theme, $_internals, typography-tokens, (mdc, typography), $token-name);\n+}\n+\n /// Gets the set of tokens from the given theme, limited to those affected by the requested theming\n /// systems.\n /// @param {Map} $theme The theme to get tokens from.\ndiff --git a/src/material/core/theming/tests/theming-inspection-api.spec.ts b/src/material/core/theming/tests/theming-inspection-api.spec.ts\nindex 188199eaf06938ca84e2ae7c134a1b25b258a7a2..5d65b831e4f81938e01d5b70512721c36f4e8bfc 100644\n--- a/src/material/core/theming/tests/theming-inspection-api.spec.ts\n+++ b/src/material/core/theming/tests/theming-inspection-api.spec.ts\n@@ -126,10 +126,10 @@ describe('theming inspection api', () => {\n         transpile(`\n           $theme: ${defineM2Theme()};\n           div {\n-            content: mat.private-get-theme-version($theme);\n+            --theme-version: #{mat.private-get-theme-version($theme)};\n           }\n         `),\n-      ).toMatch(/content: 0;/);\n+      ).toMatch('--theme-version: 0;');\n     });\n   });\n \n@@ -139,10 +139,10 @@ describe('theming inspection api', () => {\n         transpile(`\n         $theme: ${defineM3Theme()};\n           div {\n-            content: mat.private-get-theme-version($theme);\n+            --theme-version: #{mat.private-get-theme-version($theme)};\n           }\n         `),\n-      ).toMatch(/content: 1;/);\n+      ).toMatch('--theme-version: 1;');\n     });\n \n     it('should get theme type', () => {\n@@ -150,10 +150,10 @@ describe('theming inspection api', () => {\n         transpile(`\n           $theme: ${defineM3Theme()};\n           div {\n-            content: mat.private-get-theme-type($theme);\n+            --theme-type: #{mat.private-get-theme-type($theme)};\n           }\n         `),\n-      ).toMatch(/content: light;/);\n+      ).toMatch('--theme-type: light;');\n     });\n \n     it('should get role color', () => {\n@@ -161,10 +161,10 @@ describe('theming inspection api', () => {\n         transpile(`\n           $theme: ${defineM3Theme()};\n           div {\n-            content: mat.private-get-theme-color($theme, primary-container);\n+            color: mat.private-get-theme-color($theme, primary-container);\n           }\n         `),\n-      ).toMatch(/content: #e0e0ff;/);\n+      ).toMatch('color: #e0e0ff;');\n     });\n \n     it('should error on invalid color role', () => {\n@@ -172,7 +172,7 @@ describe('theming inspection api', () => {\n         transpile(`\n           $theme: ${defineM3Theme()};\n           div {\n-            content: mat.private-get-theme-color($theme, fake-role);\n+            color: mat.private-get-theme-color($theme, fake-role);\n           }\n         `),\n       ).toThrowError(/Valid color roles are.*Got: fake-role/);\n@@ -183,10 +183,10 @@ describe('theming inspection api', () => {\n         transpile(`\n           $theme: ${defineM3Theme()};\n           div {\n-            content: mat.private-get-theme-color($theme, tertiary, 20);\n+            color: mat.private-get-theme-color($theme, tertiary, 20);\n           }\n         `),\n-      ).toMatch(/content: #323200;/);\n+      ).toMatch('color: #323200;');\n     });\n \n     it('should error on invalid color palette', () => {\n@@ -194,7 +194,7 @@ describe('theming inspection api', () => {\n         transpile(`\n           $theme: ${defineM3Theme()};\n           div {\n-            content: mat.private-get-theme-color($theme, fake-palette, 20);\n+            color: mat.private-get-theme-color($theme, fake-palette, 20);\n           }\n         `),\n       ).toThrowError(/Valid palettes are.*Got: fake-palette/);\n@@ -205,7 +205,7 @@ describe('theming inspection api', () => {\n         transpile(`\n           $theme: ${defineM3Theme()};\n           div {\n-            content: mat.private-get-theme-color($theme, neutral, 11);\n+            color: mat.private-get-theme-color($theme, neutral, 11);\n           }\n         `),\n       ).toThrowError(/Valid hues for neutral are.*Got: 11/);\n@@ -216,10 +216,52 @@ describe('theming inspection api', () => {\n         transpile(`\n           $theme: ${defineM3Theme()};\n           div {\n-            content: mat.private-get-theme-color($theme);\n+            color: mat.private-get-theme-color($theme);\n           }\n         `),\n       ).toThrowError(/Expected 2 or 3 arguments. Got: 1/);\n     });\n+\n+    it('should get typography properties from theme', () => {\n+      const css = transpile(`\n+        $theme: ${defineM3Theme()};\n+        div {\n+          font: mat.private-get-theme-typography($theme, headline-large);\n+          font-family: mat.private-get-theme-typography($theme, headline-large, font-family);\n+          font-size: mat.private-get-theme-typography($theme, headline-large, font-size);\n+          font-weight: mat.private-get-theme-typography($theme, headline-large, font-weight);\n+          line-height: mat.private-get-theme-typography($theme, headline-large, line-height);\n+          letter-spacing: mat.private-get-theme-typography($theme, headline-large, letter-spacing);\n+        }\n+      `);\n+      expect(css).toMatch('font: 400 2rem / 2.5rem Google Sans;');\n+      expect(css).toMatch('font-family: Google Sans;');\n+      expect(css).toMatch('font-size: 2rem;');\n+      expect(css).toMatch('font-weight: 400;');\n+      expect(css).toMatch('line-height: 2.5rem;');\n+      expect(css).toMatch('letter-spacing: 0rem;');\n+    });\n+  });\n+\n+  it('should error on invalid typescale', () => {\n+    expect(() =>\n+      transpile(`\n+        $theme: ${defineM3Theme()};\n+        div {\n+          font: mat.private-get-theme-typography($theme, subtitle-large);\n+        }\n+      `),\n+    ).toThrowError(/Valid typescales are:.*Got: subtitle-large/);\n+  });\n+\n+  it('should error on invalid typography property', () => {\n+    expect(() =>\n+      transpile(`\n+        $theme: ${defineM3Theme()};\n+        div {\n+          font: mat.private-get-theme-typography($theme, body-small, text-transform);\n+        }\n+      `),\n+    ).toThrowError(/Valid typography properties are:.*Got: text-transform/);\n   });\n });\n",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/core/theming/_inspection.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "frozen_seed_paths": [
+        "src/material/_index.scss",
+        "src/material/core/theming/_inspection.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "prior_entry_sha256": "3268fff6e57e72d7f8919b950b6e0a0f73824abf12a6624edc56393e752a0a4a",
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 1,
+          "header": "@@ -145,4 +145,4 @@ list-density, list-base;",
+          "hunk_sha256": "35d16ecd5cf8162bc8234c726efb9db56228dee46186237cabee34a188971b11",
+          "decision": "Adds a private-prefixed typography inspection export to the developing API. The historical facade retains the original typography functions and does not mirror this newer getter into its public or historical private namespace.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 1,
+          "header": "@@ -6,6 +6,26 @@",
+          "hunk_sha256": "95ca3557aeadaff458bd80238b35b44016ed0f74074bb430239b34f32017b445",
+          "decision": "Defines the M3 display/headline/title/label/body typescale names and allowed font properties. These constants belong to the new inspection module; the owned typography model continues using the independently owned historical configuration levels.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 2,
+          "header": "@@ -99,6 +119,36 @@ $_internals: _mat-theming-internals-do-not-access;",
+          "hunk_sha256": "7028884903877f01e371b1f3620910b694d5d851f349aefa4e2dedde1137e27f",
+          "decision": "Adds get-theme-typography with M3 validation, typescale/property checks and token-name lookup. It explicitly rejects legacy maps at this stage; the original font-family/font-size/font-weight/line-height/letter-spacing helpers remain the owned contract.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -126,10 +126,10 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "1b52a8e11f51a6c44351f680197fd93d5420ab514965bd79d7879ab28f4d8bcb",
+          "decision": "Changes the M2 version fixture from content to an interpolated custom property while keeping version zero. This test-output rewrite is not copied into an immutable historical golden or counted as an executed product assertion.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 2,
+          "header": "@@ -139,10 +139,10 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "cef1f7a8bc16612f47dbcc4389dd8c26f8de45204e9873ca96f3aa212aa6cc12",
+          "decision": "Changes the M3 version fixture to an interpolated custom property while retaining version one. It documents the experimental module and does not change the legacy facade's theme representation.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 3,
+          "header": "@@ -150,10 +150,10 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "0ea60b75dc368551c043d139fdbeba49a597329334d1a6e5e02b1a5d2cd0d5a0",
+          "decision": "Changes the M3 type fixture to a custom property with the same light result. This affects only the upstream inspection fixture; no owned selector, theme-map key or consumer namespace is renamed.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 4,
+          "header": "@@ -161,10 +161,10 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "440ddd95cce9011b68426040301b7da7c1e6b975589bf54785e01f176680822c",
+          "decision": "Uses a real color declaration rather than content for the role-color success fixture. The new API remains outside the owned legacy function set, while current Material keeps its own public implementation.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 5,
+          "header": "@@ -172,7 +172,7 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "fb70550fb0bced13b4371f5e4f1f97c7e4238c6fa6538c20adfc037cca01a562",
+          "decision": "Changes the invalid-role fixture's CSS property while preserving its expected rejection. This is reviewed upstream intent, not a substitute for original legacy palette argument or error tests.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 6,
+          "header": "@@ -183,10 +183,10 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "ab1f641d5f0466c8eec40fa8709b9cfc20537a2e81bf66e55587c90d2c04376d",
+          "decision": "Uses a color declaration and exact string expectation for the tertiary palette success case. Its M3 hue semantics are not imposed on the historical numeric/A-hue palette helpers.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 7,
+          "header": "@@ -194,7 +194,7 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "d2a58f61794e4696d8a35ae088ac260f45d1c17a2ad92f458e946cdb19e0658c",
+          "decision": "Changes only the CSS property in the invalid-palette fixture. Historical palette-name and value behavior remains covered by its separate original contracts, not this new inspection API test.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 8,
+          "header": "@@ -205,7 +205,7 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "61ee2ee0393e1edd1e3a0837d45ef220468c5e4e30d36348cffaa61f07cf01df",
+          "decision": "Changes only the CSS property in the invalid-hue fixture. The legacy facade continues accepting its original palette hue conventions without adding the M3 inspection getter.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 9,
+          "header": "@@ -216,10 +216,52 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "9e2695cc5b994ed86c04602745dd395cb281a33204504033b3fbfa84d7045119",
+          "decision": "Changes the arity fixture's property and adds typography value plus invalid typescale/property tests. The added Google Sans/M3 expectations are scoped to the new getter and never replace original typography or CSS goldens.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "source_review_complete": true,
+      "canonical_admitted": false,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "e608f5fa392e9a5cd80923ba545b66217ad01c30",
+      "status": "reviewed",
+      "proposed_final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Do not add the new density inspection getter to the Material16 facade. Its original get-density-config API and owned component/bridge clamping remain separate from versioned-theme inspection; no consumer call or theme map changes are required.",
+      "diff_sha256": "e51c5b40aaacfdb9175438572d87fd382466c7278d77f3270c43da4b6bd7e27b",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex df46cc06041dfa538aefeb990bf6ed8be6887ef5..3bb532fc39b4c7106fd63abd283977fc8b885e82 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -145,4 +145,5 @@ list-density, list-base;\n \n // New theming APIs, currently in development:\n @forward './core/theming/inspection' as private-* show private-get-theme-version,\n-  private-get-theme-type, private-get-theme-color, private-get-theme-typography;\n+  private-get-theme-type, private-get-theme-color, private-get-theme-typography,\n+  private-get-theme-density;\ndiff --git a/src/material/core/theming/_inspection.scss b/src/material/core/theming/_inspection.scss\nindex b538a8174c08f49a8c9aa3f05a43cb468fc6b887..cd88677767654848201f740d83689e0f12dfeed4 100644\n--- a/src/material/core/theming/_inspection.scss\n+++ b/src/material/core/theming/_inspection.scss\n@@ -149,6 +149,18 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n   @return map.get($theme, $_internals, typography-tokens, (mdc, typography), $token-name);\n }\n \n+/// Gets the density scale from a theme object.\n+/// @param {Map} $theme The theme\n+/// @return {Number} The density scale.\n+@function get-theme-density($theme) {\n+  $err: _validate-theme-object($theme);\n+  @if $err {\n+    // TODO(mmalerba): implement for old style theme objects.\n+    @error #{'get-theme-density does not support legacy theme objects.'};\n+  }\n+  @return map.get($theme, $_internals, density-scale);\n+}\n+\n /// Gets the set of tokens from the given theme, limited to those affected by the requested theming\n /// systems.\n /// @param {Map} $theme The theme to get tokens from.\ndiff --git a/src/material/core/theming/tests/theming-inspection-api.spec.ts b/src/material/core/theming/tests/theming-inspection-api.spec.ts\nindex 5d65b831e4f81938e01d5b70512721c36f4e8bfc..a53831ea0941e0f56d147673d9417377d5bacaca 100644\n--- a/src/material/core/theming/tests/theming-inspection-api.spec.ts\n+++ b/src/material/core/theming/tests/theming-inspection-api.spec.ts\n@@ -259,9 +259,20 @@ describe('theming inspection api', () => {\n       transpile(`\n         $theme: ${defineM3Theme()};\n         div {\n-          font: mat.private-get-theme-typography($theme, body-small, text-transform);\n+          text-transform: mat.private-get-theme-typography($theme, body-small, text-transform);\n         }\n       `),\n     ).toThrowError(/Valid typography properties are:.*Got: text-transform/);\n   });\n+\n+  it('should get density scale', () => {\n+    expect(\n+      transpile(`\n+        $theme: ${defineM3Theme()};\n+        div {\n+          --density-scale: #{mat.private-get-theme-density($theme)};\n+        }\n+      `),\n+    ).toMatch('--density-scale: 0;');\n+  });\n });\n",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/core/theming/_inspection.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "frozen_seed_paths": [
+        "src/material/_index.scss",
+        "src/material/core/theming/_inspection.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "prior_entry_sha256": "89ad1e4440ef6fe5086bebc145b680ec4813dcd4ba727c790c7037f9b0cbfddb",
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 1,
+          "header": "@@ -145,4 +145,5 @@ list-density, list-base;",
+          "hunk_sha256": "440baeae5df95fb51f7b93504c500526b01c7a943ab67caa830af467bd6e2597",
+          "decision": "Adds the private-prefixed density inspection export. The authentic Material16 facade exposes get-density-config instead; adding this newer getter would expand the finite legacy API rather than preserve it.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 1,
+          "header": "@@ -149,6 +149,18 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "832531303321ca2ebdea643016da2490574b1cbf8502e25e7641f0840406742a",
+          "decision": "Adds a versioned-theme density-scale lookup that explicitly rejects legacy theme objects. Owned density config retrieval and component-specific clamping continue using their historical helpers and independently owned bridge code.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -259,9 +259,20 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "31c10577dffb96f42f87fe06368dc514c4a0afe3f337269faf287093aa2c42e1",
+          "decision": "Corrects the unsupported typography-property fixture and adds an M3 density-scale-zero assertion. These upstream test changes are read for intent; no claim is made that their original test runner or full Sass gate executed.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "source_review_complete": true,
+      "canonical_admitted": false,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "9906aa3443ad874c7470c94fea137c72779c9fcd",
+      "status": "reviewed",
+      "proposed_final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Do not transplant the new theme-has predicate and inspection diagnostics into the legacy facade. The owned historical API does not expose or directly call the inspection family, and direct current-peer calls remain public override mixins.",
+      "diff_sha256": "c5af07170b7c83199db3f3dd0e7d45aa318debfaacaa2987d33d7c97889b40d7",
+      "diff": "diff --git a/src/material/_index.scss b/src/material/_index.scss\nindex 3bb532fc39b4c7106fd63abd283977fc8b885e82..87603bb9fe9f1d9a531bff10d66abe6b06b069d6 100644\n--- a/src/material/_index.scss\n+++ b/src/material/_index.scss\n@@ -146,4 +146,4 @@ list-density, list-base;\n // New theming APIs, currently in development:\n @forward './core/theming/inspection' as private-* show private-get-theme-version,\n   private-get-theme-type, private-get-theme-color, private-get-theme-typography,\n-  private-get-theme-density;\n+  private-get-theme-density, private-theme-has;\ndiff --git a/src/material/core/theming/_inspection.scss b/src/material/core/theming/_inspection.scss\nindex cd88677767654848201f740d83689e0f12dfeed4..b1e9e19c7ff7132bf6e402c67050092ac6a7b15f 100644\n--- a/src/material/core/theming/_inspection.scss\n+++ b/src/material/core/theming/_inspection.scss\n@@ -53,6 +53,9 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n     // TODO(mmalerba): implement for old style theme objects.\n     @error #{'get-theme-type does not support legacy theme objects.'};\n   }\n+  @if not theme-has($theme, color) {\n+    @error 'Color information is not available on this theme.';\n+  }\n   @return map.get($theme, $_internals, theme-type) or light;\n }\n \n@@ -86,6 +89,9 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n     // TODO(mmalerba): implement for old style theme objects.\n     @error #{'get-theme-color does not support legacy theme objects.'};\n   }\n+  @if not theme-has($theme, color) {\n+    @error 'Color information is not available on this theme.';\n+  }\n   $color-roles: map.get($theme, $_internals, color-tokens, (mdc, theme));\n   $result: map.get($color-roles, $color-role-name);\n   @if not $result {\n@@ -105,6 +111,9 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n     // TODO(mmalerba): implement for old style theme objects.\n     @error #{'get-theme-color does not support legacy theme objects.'};\n   }\n+  @if not theme-has($theme, color) {\n+    @error 'Color information is not available on this theme.';\n+  }\n   $palettes: map.get($theme, $_internals, palettes);\n   $palette: map.get($palettes, $palette-name);\n   @if not $palette {\n@@ -131,6 +140,9 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n     // TODO(mmalerba): implement for old style theme objects.\n     @error #{'get-theme-typography does not support legacy theme objects.'};\n   }\n+  @if not theme-has($theme, typography) {\n+    @error 'Typography information is not available on this theme.';\n+  }\n   @if not list.index($_m3-typescales, $typescale) {\n     @error #{'Valid typescales are: #{$_m3-typescales}. Got:'} $typescale;\n   }\n@@ -158,9 +170,39 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n     // TODO(mmalerba): implement for old style theme objects.\n     @error #{'get-theme-density does not support legacy theme objects.'};\n   }\n+  @if not theme-has($theme, density) {\n+    @error 'Density information is not available on this theme.';\n+  }\n   @return map.get($theme, $_internals, density-scale);\n }\n \n+/// Checks whether the theme has information about given theming system.\n+/// @param {Map} $theme The theme\n+/// @param {String} $system The system to check\n+/// @param {Boolean} Whether the theme has information about the system.\n+@function theme-has($theme, $system) {\n+  $err: _validate-theme-object($theme);\n+  @if $err {\n+    // TODO(mmalerba): implement for old style theme objects.\n+    @error #{'get-theme-density does not support legacy theme objects.'};\n+  }\n+  @if $system == base {\n+    @return map.get($theme, $_internals, base-tokens) != null;\n+  }\n+  @if $system == color {\n+    @return map.get($theme, $_internals, color-tokens) != null and\n+        map.get($theme, $_internals, theme-type) != null and\n+        map.get($theme, $_internals, palettes) != null;\n+  }\n+  @if $system == typography {\n+    @return map.get($theme, $_internals, typography-tokens) != null;\n+  }\n+  @if $system == density {\n+    @return map.get($theme, $_internals, density-scale) != null\n+  }\n+  @error 'Valid systems are: base, color, typography, density. Got:' $system;\n+}\n+\n /// Gets the set of tokens from the given theme, limited to those affected by the requested theming\n /// systems.\n /// @param {Map} $theme The theme to get tokens from.\ndiff --git a/src/material/core/theming/tests/theming-inspection-api.spec.ts b/src/material/core/theming/tests/theming-inspection-api.spec.ts\nindex a53831ea0941e0f56d147673d9417377d5bacaca..9698d5ee294f67659ae535ca623cb5f1c4a734a9 100644\n--- a/src/material/core/theming/tests/theming-inspection-api.spec.ts\n+++ b/src/material/core/theming/tests/theming-inspection-api.spec.ts\n@@ -21,88 +21,6 @@ const mdcSassImporter = {\n   },\n };\n \n-interface M2ThemeConfig {\n-  type: string;\n-  density: string;\n-  typography: string;\n-  primary: string;\n-  accent: string;\n-  warn: string;\n-}\n-\n-interface M3ThemeConfig {\n-  type: string;\n-  density: string;\n-  brand: string;\n-  plain: string;\n-  bold: string;\n-  medium: string;\n-  regular: string;\n-  primary: string;\n-  secondary: string;\n-  tertiary: string;\n-}\n-\n-function defineM2Theme(config: Partial<M2ThemeConfig> = {}) {\n-  const {type, density, typography, primary, accent, warn} = {\n-    type: 'light',\n-    density: '0',\n-    typography: 'mat.define-typography-config()',\n-    primary: 'mat.define-palette(mat.$blue-palette)',\n-    accent: 'mat.define-palette(mat.$green-palette)',\n-    warn: 'mat.define-palette(mat.$red-palette)',\n-    ...config,\n-  };\n-  const collapseColor = primary === 'null' && accent === 'null' && warn === 'null';\n-  return `mat.define-${type}-theme((\n-    color: ${\n-      collapseColor\n-        ? `(\n-      primary: ${primary},\n-      accent: ${accent},\n-      warn: ${warn},\n-    )`\n-        : 'null'\n-    },\n-    typography: ${typography},\n-    density: ${density},\n-  ))`;\n-}\n-\n-function defineM3Theme(config: Partial<M3ThemeConfig> = {}) {\n-  const {type, density, brand, plain, bold, medium, regular, primary, secondary, tertiary} = {\n-    type: 'light',\n-    density: '0',\n-    brand: 'Google Sans',\n-    plain: 'Roboto',\n-    bold: '700',\n-    medium: '500',\n-    regular: '400',\n-    primary: 'matx.$m3-blue-palette',\n-    secondary: 'matx.$m3-green-palette',\n-    tertiary: 'matx.$m3-yellow-palette',\n-    ...config,\n-  };\n-  return `matx.define-theme((\n-    color: (\n-      theme-type: ${type},\n-      primary: ${primary},\n-      secondary: ${secondary},\n-      tertiary: ${tertiary},\n-    ),\n-    typography: (\n-      brand-family: ${brand},\n-      plain-family: ${plain},\n-      bold-weight: ${bold},\n-      medium-weight: ${medium},\n-      regular-weight: ${regular},\n-    ),\n-    density: (\n-      scale: ${density}\n-    ),\n-  ))`;\n-}\n-\n /** Transpiles given Sass content into CSS. */\n function transpile(content: string) {\n   return compileString(\n@@ -124,7 +42,15 @@ describe('theming inspection api', () => {\n     it('should get theme version', () => {\n       expect(\n         transpile(`\n-          $theme: ${defineM2Theme()};\n+          $theme: mat.define-light-theme((\n+            color: (\n+              primary: mat.define-palette(mat.$red-palette),\n+              accent: mat.define-palette(mat.$red-palette),\n+              warn: mat.define-palette(mat.$red-palette),\n+            ),\n+            typography: mat.define-typography-config(),\n+            density: 0,\n+          ));\n           div {\n             --theme-version: #{mat.private-get-theme-version($theme)};\n           }\n@@ -137,7 +63,7 @@ describe('theming inspection api', () => {\n     it('should get theme version', () => {\n       expect(\n         transpile(`\n-        $theme: ${defineM3Theme()};\n+          $theme: matx.define-theme();\n           div {\n             --theme-version: #{mat.private-get-theme-version($theme)};\n           }\n@@ -148,7 +74,7 @@ describe('theming inspection api', () => {\n     it('should get theme type', () => {\n       expect(\n         transpile(`\n-          $theme: ${defineM3Theme()};\n+          $theme: matx.define-theme();\n           div {\n             --theme-type: #{mat.private-get-theme-type($theme)};\n           }\n@@ -159,18 +85,18 @@ describe('theming inspection api', () => {\n     it('should get role color', () => {\n       expect(\n         transpile(`\n-          $theme: ${defineM3Theme()};\n+          $theme: matx.define-theme();\n           div {\n             color: mat.private-get-theme-color($theme, primary-container);\n           }\n         `),\n-      ).toMatch('color: #e0e0ff;');\n+      ).toMatch('color: #f0dbff;');\n     });\n \n     it('should error on invalid color role', () => {\n       expect(() =>\n         transpile(`\n-          $theme: ${defineM3Theme()};\n+          $theme: matx.define-theme();\n           div {\n             color: mat.private-get-theme-color($theme, fake-role);\n           }\n@@ -181,18 +107,18 @@ describe('theming inspection api', () => {\n     it('should get palette color', () => {\n       expect(\n         transpile(`\n-          $theme: ${defineM3Theme()};\n+          $theme: matx.define-theme();\n           div {\n             color: mat.private-get-theme-color($theme, tertiary, 20);\n           }\n         `),\n-      ).toMatch('color: #323200;');\n+      ).toMatch('color: #4a0080;');\n     });\n \n     it('should error on invalid color palette', () => {\n       expect(() =>\n         transpile(`\n-          $theme: ${defineM3Theme()};\n+          $theme: matx.define-theme();\n           div {\n             color: mat.private-get-theme-color($theme, fake-palette, 20);\n           }\n@@ -203,7 +129,7 @@ describe('theming inspection api', () => {\n     it('should error on invalid color hue', () => {\n       expect(() =>\n         transpile(`\n-          $theme: ${defineM3Theme()};\n+          $theme: matx.define-theme();\n           div {\n             color: mat.private-get-theme-color($theme, neutral, 11);\n           }\n@@ -214,7 +140,7 @@ describe('theming inspection api', () => {\n     it('should error on wrong number of get-color-theme args', () => {\n       expect(() =>\n         transpile(`\n-          $theme: ${defineM3Theme()};\n+          $theme: matx.define-theme();\n           div {\n             color: mat.private-get-theme-color($theme);\n           }\n@@ -224,7 +150,7 @@ describe('theming inspection api', () => {\n \n     it('should get typography properties from theme', () => {\n       const css = transpile(`\n-        $theme: ${defineM3Theme()};\n+        $theme: matx.define-theme();\n         div {\n           font: mat.private-get-theme-typography($theme, headline-large);\n           font-family: mat.private-get-theme-typography($theme, headline-large, font-family);\n@@ -234,8 +160,8 @@ describe('theming inspection api', () => {\n           letter-spacing: mat.private-get-theme-typography($theme, headline-large, letter-spacing);\n         }\n       `);\n-      expect(css).toMatch('font: 400 2rem / 2.5rem Google Sans;');\n-      expect(css).toMatch('font-family: Google Sans;');\n+      expect(css).toMatch('font: 400 2rem / 2.5rem Roboto, sans-serif;');\n+      expect(css).toMatch('font-family: Roboto, sans-serif;');\n       expect(css).toMatch('font-size: 2rem;');\n       expect(css).toMatch('font-weight: 400;');\n       expect(css).toMatch('line-height: 2.5rem;');\n@@ -246,7 +172,7 @@ describe('theming inspection api', () => {\n   it('should error on invalid typescale', () => {\n     expect(() =>\n       transpile(`\n-        $theme: ${defineM3Theme()};\n+        $theme: matx.define-theme();\n         div {\n           font: mat.private-get-theme-typography($theme, subtitle-large);\n         }\n@@ -257,7 +183,7 @@ describe('theming inspection api', () => {\n   it('should error on invalid typography property', () => {\n     expect(() =>\n       transpile(`\n-        $theme: ${defineM3Theme()};\n+        $theme: matx.define-theme();\n         div {\n           text-transform: mat.private-get-theme-typography($theme, body-small, text-transform);\n         }\n@@ -268,11 +194,94 @@ describe('theming inspection api', () => {\n   it('should get density scale', () => {\n     expect(\n       transpile(`\n-        $theme: ${defineM3Theme()};\n+        $theme: matx.define-theme();\n         div {\n           --density-scale: #{mat.private-get-theme-density($theme)};\n         }\n       `),\n     ).toMatch('--density-scale: 0;');\n   });\n+\n+  it('should check what information the theme has', () => {\n+    const css = transpile(`\n+      $theme: matx.define-theme();\n+      $color-only: matx.define-colors();\n+      $typography-only: matx.define-typography();\n+      $density-only: matx.define-density();\n+      div {\n+        --base: #{(\n+          mat.private-theme-has($theme, base),\n+          mat.private-theme-has($color-only, base),\n+          mat.private-theme-has($typography-only, base),\n+          mat.private-theme-has($density-only, base),\n+        )};\n+        --color: #{(\n+          mat.private-theme-has($theme, color),\n+          mat.private-theme-has($color-only, color),\n+          mat.private-theme-has($typography-only, color),\n+          mat.private-theme-has($density-only, color),\n+        )};\n+        --typography: #{(\n+          mat.private-theme-has($theme, typography),\n+          mat.private-theme-has($color-only, typography),\n+          mat.private-theme-has($typography-only, typography),\n+          mat.private-theme-has($density-only, typography),\n+        )};\n+        --density: #{(\n+          mat.private-theme-has($theme, density),\n+          mat.private-theme-has($color-only, density),\n+          mat.private-theme-has($typography-only, density),\n+          mat.private-theme-has($density-only, density),\n+        )};\n+      }\n+    `);\n+    expect(css).toMatch(/--base: true, false, false, false;/);\n+    expect(css).toMatch(/--color: true, true, false, false;/);\n+    expect(css).toMatch(/--typography: true, false, true, false;/);\n+    expect(css).toMatch(/--density: true, false, false, true;/);\n+  });\n+\n+  it('should error when reading theme type from a theme with no color information', () => {\n+    expect(() =>\n+      transpile(`\n+        $theme: matx.define-density();\n+        div {\n+          color: mat.private-get-theme-type($theme);\n+        }\n+      `),\n+    ).toThrowError(/Color information is not available on this theme/);\n+  });\n+\n+  it('should error when reading color from a theme with no color information', () => {\n+    expect(() =>\n+      transpile(`\n+        $theme: matx.define-density();\n+        div {\n+          color: mat.private-get-theme-color($theme, primary);\n+        }\n+      `),\n+    ).toThrowError(/Color information is not available on this theme/);\n+  });\n+\n+  it('should error when reading typography from a theme with no typography information', () => {\n+    expect(() =>\n+      transpile(`\n+        $theme: matx.define-density();\n+        div {\n+          font: mat.private-get-theme-typography($theme, body-small);\n+        }\n+      `),\n+    ).toThrowError(/Typography information is not available on this theme/);\n+  });\n+\n+  it('should error when reading density from a theme with no density information', () => {\n+    expect(() =>\n+      transpile(`\n+        $theme: matx.define-colors();\n+        div {\n+          --density: #{mat.private-get-theme-density($theme)};\n+        }\n+      `),\n+    ).toThrowError(/Density information is not available on this theme/);\n+  });\n });\n",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/core/theming/_inspection.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "frozen_seed_paths": [
+        "src/material/_index.scss",
+        "src/material/core/theming/_inspection.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "prior_entry_sha256": "438785c6288f89a194c5f00121ed9ef7bd3b09c50f949ca806230405a4e340e3",
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "hunk_index": 1,
+          "header": "@@ -146,4 +146,4 @@ list-density, list-base;",
+          "hunk_sha256": "4d902242953600a344f5f2aafd05524b4134a58686d2372cdd3ae324d6794c07",
+          "decision": "Adds private-theme-has to the developing inspection export list. The legacy facade does not acquire this newer theme-system predicate; current peer consumers retain it through the separate public Material namespace.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 1,
+          "header": "@@ -53,6 +53,9 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "b5f4a4e7d01ca6155b933013e94d7f5aaeb183083977508e958b04984cd8056f",
+          "decision": "Adds a color-information presence check before reading a versioned theme type. This changes the new inspection API's diagnostics and does not repair or replace the owned Material16 light/dark theme constructors.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 2,
+          "header": "@@ -86,6 +89,9 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "91753654aa9d330ce3f19107dc5997bdbcb783dd9a957b7381c1774fac59a692",
+          "decision": "Adds a color-information check before role lookup. Owned palette helpers use original M2 palette/config inputs; the compiler and source census show no direct owned call to this inspection function.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 3,
+          "header": "@@ -105,6 +111,9 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "7006f5521ad0d3173686dcd965745059facfc06ae1eb3c166fe25cbae078fecc",
+          "decision": "Adds a color-information check before palette inspection. The historical facade's get-color-from-palette behavior remains separate and is not redirected to this versioned-theme getter.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 4,
+          "header": "@@ -131,6 +140,9 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "676f070648ca484b3440aa0fe152c1c5736505850e525ea7f792ed7c90fd7d32",
+          "decision": "Adds a typography-information check before typescale lookup. This concerns the new M3 inspection function, while the original 25-function owned namespace and its typography helpers remain intact.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 5,
+          "header": "@@ -158,9 +170,39 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "f650595df3f65b46897620bc02524558a331b116c109ac2fb4dc4ac8c6a6dfa8",
+          "decision": "Adds density-information checking and the base/color/typography/density presence predicate. Its versioned internals and initially legacy-rejecting semantics are outside the finite historical model, so this implementation is not transplanted.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -21,88 +21,6 @@ const mdcSassImporter = {",
+          "hunk_sha256": "2cad3e9cad93b5684303a3fa28f61ad68c2549a4caa34d2c7c92c34d39af1e7a",
+          "decision": "Removes local M2/M3 fixture-construction interfaces and helper functions. Their replacement with explicit/default theme construction is a test refactor, not a change to the add-on's public constructors or consumer theme maps.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 2,
+          "header": "@@ -124,7 +42,15 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "a1c7405a52d302e0a8f8067920fa6299dd75f11821e4d5b71b6b3a5743f654f5",
+          "decision": "Replaces the M2 version fixture helper with explicit palette, typography and density settings. This fixes the upstream fixture setup without changing owned defaults or deriving a new historical expected value from the candidate.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 3,
+          "header": "@@ -137,7 +63,7 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "445b733bb0a5881d031c6bf1936797d00fc56124b7c6e9b6ad29b36f9a04e402",
+          "decision": "Uses the experimental default M3 theme in the version fixture. Its version-one expectation belongs to the upstream module; no source or runtime floor is inferred from that test alone.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 4,
+          "header": "@@ -148,7 +74,7 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "6f3cb6e022af5c7999852d44d16d71e084e473274d3bf27962f3a67f11b61309",
+          "decision": "Uses the default M3 theme for type inspection. The owned facade still exports only historical helper functions, with separate peer namespace visibility measured on each maintained line.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 5,
+          "header": "@@ -159,18 +85,18 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "e17909992027e9d947fb806550a77a3cf788a6a0f5cd990075435cc4657ac47f",
+          "decision": "Replaces custom M3 colors with default colors and updates the two color expectations accordingly. These fixture-dependent values do not justify changing any original palette or CSS golden.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 6,
+          "header": "@@ -181,18 +107,18 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "974fde03571e37721aa3e28136a291184c0ea6575d2f08564d1b483699ae5e56",
+          "decision": "Replaces the custom M3 palette fixture with default palette data and its corresponding expected color. Invalid-palette rejection remains an upstream new-API assertion and is not a legacy palette behavior change.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 7,
+          "header": "@@ -203,7 +129,7 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "b2579c7ea9cc30f15ba844ec6e15770ff28b180f12b02979ce3f8ad2de3d6cd1",
+          "decision": "Replaces the custom theme in the invalid-hue fixture with the default M3 theme. The expected invalid-hue error remains scoped to the modern inspection API, without changing owned historical hue interpretation.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 8,
+          "header": "@@ -214,7 +140,7 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "c68ef65d038eed848628b9a10d96958f91d077cf857e6e48fb296c3295c8f3ee",
+          "decision": "Replaces the custom theme in the wrong-argument-count fixture. The new API's arity check is reviewed as intent; it creates no new required legacy function or consumer call rewrite.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 9,
+          "header": "@@ -224,7 +150,7 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "22f66dfaf318564126f752d090ed872bfff79be2429f2dfe73969ef122520c0b",
+          "decision": "Uses the experimental default theme for typography inspection. The owned typography configuration model and original function names remain the source of legacy values.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 10,
+          "header": "@@ -234,8 +160,8 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "f193cca341972564acebda7a8c18bbfdc3eb122e8ec58218d83edc2e745ec86a",
+          "decision": "Updates font expectations from the removed Google Sans fixture to the default Roboto stack. This is an upstream test-oracle adjustment caused by changed fixture input, not authority to update retained historical typography goldens.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 11,
+          "header": "@@ -246,7 +172,7 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "952d39d8f6f2db4a8e5f2d9f42e1fecd2061f99130a45d125671c75442d22be8",
+          "decision": "Uses the default M3 theme for invalid typescale validation. This new getter's supported M3 scale list does not replace the historical typography level names or mixin arguments.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 12,
+          "header": "@@ -257,7 +183,7 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "cf6daec7b37296de3c9cea461dcec8fba7ff0efb5d30fff6c6f499ef3bb2f802",
+          "decision": "Uses the default M3 theme for invalid typography-property validation. The resulting expected error remains an upstream inspection API contract and is not reported as executed legacy behavior.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 13,
+          "header": "@@ -268,11 +194,94 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "fd81bb89bed48bf41d77cef462d0039473bae7c1e11dc7bbd8718706d9be408c",
+          "decision": "Uses the default density fixture and adds theme-system presence plus missing-color/typography/density errors. These tests define the new versioned-theme API; the add-on keeps its historical config helpers and public peer override boundary.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "source_review_complete": true,
+      "canonical_admitted": false,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "8b4b58beae8cad4c857f4952eeaaf44cfe25adfe",
+      "status": "reviewed",
+      "proposed_final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Do not transplant the formatting and semicolon fixes for the peer-owned inspection module into owned legacy Sass. The module is loaded through current public Material imports but has no owned inspection implementation or direct owned inspection call to repair.",
+      "diff_sha256": "fa161a62d60221bdf7cf7327e85252f5a080edb422230f5c6b67219e6e83f868",
+      "diff": "diff --git a/src/material/core/theming/_inspection.scss b/src/material/core/theming/_inspection.scss\nindex b1e9e19c7ff7132bf6e402c67050092ac6a7b15f..5eaf6180a399fb64e0600fea8c10a9912ab73595 100644\n--- a/src/material/core/theming/_inspection.scss\n+++ b/src/material/core/theming/_inspection.scss\n@@ -73,7 +73,8 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n   $args-count: list.length($args);\n   @if $args-count == 1 {\n     @return _get-theme-role-color($theme, $args...);\n-  } @else if $args-count == 2 {\n+  }\n+  @else if $args-count == 2 {\n     @return _get-theme-palette-color($theme, $args...);\n   }\n   @error #{'Expected 2 or 3 arguments. Got:'} $args-count + 1;\n@@ -198,7 +199,7 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n     @return map.get($theme, $_internals, typography-tokens) != null;\n   }\n   @if $system == density {\n-    @return map.get($theme, $_internals, density-scale) != null\n+    @return map.get($theme, $_internals, density-scale) != null;\n   }\n   @error 'Valid systems are: base, color, typography, density. Got:' $system;\n }\n",
+      "complete_original_paths": [
+        "src/material/core/theming/_inspection.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/core/theming/_inspection.scss"
+      ],
+      "prior_entry_sha256": "4eb74a17a93f7f1f8fd981703c4a0006469bbda27ab0b41cfc17fdd8323e24e6",
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 1,
+          "header": "@@ -73,7 +73,8 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "66b6ace05e4740fc86e647ab22c21ec903c2eef4f684f9e5dc7a8cf641eaf3a9",
+          "decision": "Moves @else onto its own line after the same closing brace. Role/palette dispatch conditions and calls remain unchanged in the peer-owned inspection module; no equivalent code exists in the owned historical API to patch.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 2,
+          "header": "@@ -198,7 +199,7 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "e8cd374885c9761fcc4e076d32c7f628ff6a489ba1714d1cae9249b074a1c860",
+          "decision": "Adds the missing semicolon to the density-presence return expression. This is a syntax correction in the newer inspection implementation and does not alter a historical helper, consumer theme map or legacy CSS output.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "source_review_complete": true,
+      "canonical_admitted": false,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "685b585f70fded62813480b849832fd1bfd1bffb",
+      "status": "reviewed",
+      "proposed_final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "decision": "Do not copy or call through the new M2 inspection adapter. Its support for historical-shaped maps adds modern getter contracts rather than repairing original helper names; the facade keeps the independently owned Material16 model and public override bridge boundary.",
+      "diff_sha256": "7f62c3366463ffe405f77e51a3278009715b5d81c76c8a362a3fe9152caa63da",
+      "diff": "diff --git a/src/material/core/theming/_inspection.scss b/src/material/core/theming/_inspection.scss\nindex 5eaf6180a399fb64e0600fea8c10a9912ab73595..2d64c9b19ba71ce69c36f66e635ef8d13191aa24 100644\n--- a/src/material/core/theming/_inspection.scss\n+++ b/src/material/core/theming/_inspection.scss\n@@ -1,8 +1,7 @@\n-// This file contains functions used to inspect Angular Material theme objects.\n-\n @use 'sass:list';\n @use 'sass:map';\n @use '../style/validation';\n+@use './m2-inspection';\n \n $_internals: _mat-theming-internals-do-not-access;\n \n@@ -48,15 +47,19 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n /// @param {Map} $theme The theme\n /// @return {String} The type of theme (either `light` or `dark`).\n @function get-theme-type($theme) {\n-  $err: _validate-theme-object($theme);\n-  @if $err {\n-    // TODO(mmalerba): implement for old style theme objects.\n-    @error #{'get-theme-type does not support legacy theme objects.'};\n+  $version: get-theme-version($theme);\n+  @if $version == 0 {\n+    @return m2-inspection.get-theme-type($theme);\n   }\n-  @if not theme-has($theme, color) {\n-    @error 'Color information is not available on this theme.';\n+  @else if $version == 1 {\n+    @if not theme-has($theme, color) {\n+      @error 'Color information is not available on this theme.';\n+    }\n+    @return map.get($theme, $_internals, theme-type) or light;\n+  }\n+  @else {\n+    @error #{'Unrecognized theme version:'} $version;\n   }\n-  @return map.get($theme, $_internals, theme-type) or light;\n }\n \n /// Gets a color from a theme object. This function can take 2 or 3 arguments. If 2 arguments are\n@@ -70,14 +73,26 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n ///   interpreted as a palette name).\n /// @return {Color} The requested theme color.\n @function get-theme-color($theme, $args...) {\n+  $version: get-theme-version($theme);\n   $args-count: list.length($args);\n-  @if $args-count == 1 {\n-    @return _get-theme-role-color($theme, $args...);\n+  @if $args-count != 1 and $args-count != 2 {\n+    @error #{'Expected 2 or 3 arguments. Got:'} $args-count + 1;\n   }\n-  @else if $args-count == 2 {\n-    @return _get-theme-palette-color($theme, $args...);\n+\n+  @if $version == 0 {\n+    @return m2-inspection.get-theme-color($theme, $args...);\n+  }\n+  @else if $version == 1 {\n+    @if $args-count == 1 {\n+      @return _get-theme-role-color($theme, $args...);\n+    }\n+    @else if $args-count == 2 {\n+      @return _get-theme-palette-color($theme, $args...);\n+    }\n+  }\n+  @else {\n+    @error #{'Unrecognized theme version:'} $version;\n   }\n-  @error #{'Expected 2 or 3 arguments. Got:'} $args-count + 1;\n }\n \n /// Gets a role color from a theme object.\n@@ -136,45 +151,53 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n ///   (font, font-family, font-size, font-weight, line-height, or letter-spacing).\n /// @return {*} The value of the requested font property.\n @function get-theme-typography($theme, $typescale, $property: font) {\n-  $err: _validate-theme-object($theme);\n-  @if $err {\n-    // TODO(mmalerba): implement for old style theme objects.\n-    @error #{'get-theme-typography does not support legacy theme objects.'};\n-  }\n-  @if not theme-has($theme, typography) {\n-    @error 'Typography information is not available on this theme.';\n-  }\n-  @if not list.index($_m3-typescales, $typescale) {\n-    @error #{'Valid typescales are: #{$_m3-typescales}. Got:'} $typescale;\n-  }\n-  @if not list.index($_typography-properties, $property) {\n-    @error #{'Valid typography properties are: #{$_typography-properties}. Got:'} $property;\n-  }\n-  $property-key: map.get((\n-    font: '',\n-    font-family: '-font',\n-    line-height: '-line-height',\n-    font-size: '-size',\n-    letter-spacing: '-tracking',\n-    font-weight: '-weight'\n-  ), $property);\n-  $token-name: '#{$typescale}#{$property-key}';\n-  @return map.get($theme, $_internals, typography-tokens, (mdc, typography), $token-name);\n+  $version: get-theme-version($theme);\n+  @if $version == 0 {\n+    @return m2-inspection.get-theme-typography($theme, $typescale, $property);\n+  }\n+  @else if $version == 1 {\n+    @if not theme-has($theme, typography) {\n+      @error 'Typography information is not available on this theme.';\n+    }\n+    @if not list.index($_m3-typescales, $typescale) {\n+      @error #{'Valid typescales are: #{$_m3-typescales}. Got:'} $typescale;\n+    }\n+    @if not list.index($_typography-properties, $property) {\n+      @error #{'Valid typography properties are: #{$_typography-properties}. Got:'} $property;\n+    }\n+    $property-key: map.get((\n+      font: '',\n+      font-family: '-font',\n+      line-height: '-line-height',\n+      font-size: '-size',\n+      letter-spacing: '-tracking',\n+      font-weight: '-weight'\n+    ), $property);\n+    $token-name: '#{$typescale}#{$property-key}';\n+    @return map.get($theme, $_internals, typography-tokens, (mdc, typography), $token-name);\n+  }\n+  @else {\n+    @error #{'Unrecognized theme version:'} $version;\n+  }\n }\n \n /// Gets the density scale from a theme object.\n /// @param {Map} $theme The theme\n /// @return {Number} The density scale.\n @function get-theme-density($theme) {\n-  $err: _validate-theme-object($theme);\n-  @if $err {\n-    // TODO(mmalerba): implement for old style theme objects.\n-    @error #{'get-theme-density does not support legacy theme objects.'};\n+  $version: get-theme-version($theme);\n+  @if $version == 0 {\n+    @return m2-inspection.get-theme-density($theme);\n+  }\n+  @else if $version == 1 {\n+    @if not theme-has($theme, density) {\n+      @error 'Density information is not available on this theme.';\n+    }\n+    @return map.get($theme, $_internals, density-scale);\n   }\n-  @if not theme-has($theme, density) {\n-    @error 'Density information is not available on this theme.';\n+  @else {\n+    @error #{'Unrecognized theme version:'} $version;\n   }\n-  @return map.get($theme, $_internals, density-scale);\n }\n \n /// Checks whether the theme has information about given theming system.\n@@ -182,26 +205,29 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac\n /// @param {String} $system The system to check\n /// @param {Boolean} Whether the theme has information about the system.\n @function theme-has($theme, $system) {\n-  $err: _validate-theme-object($theme);\n-  @if $err {\n-    // TODO(mmalerba): implement for old style theme objects.\n-    @error #{'get-theme-density does not support legacy theme objects.'};\n-  }\n-  @if $system == base {\n-    @return map.get($theme, $_internals, base-tokens) != null;\n-  }\n-  @if $system == color {\n-    @return map.get($theme, $_internals, color-tokens) != null and\n+  $version: get-theme-version($theme);\n+  @if $version == 0 {\n+    @return m2-inspection.theme-has($theme, $system);\n+  }\n+  @else if $version == 1 {\n+    @if $system == base {\n+      @return map.get($theme, $_internals, base-tokens) != null;\n+    }\n+    @if $system == color {\n+      @return map.get($theme, $_internals, color-tokens) != null and\n         map.get($theme, $_internals, theme-type) != null and\n         map.get($theme, $_internals, palettes) != null;\n+    }\n+    @if $system == typography {\n+      @return map.get($theme, $_internals, typography-tokens) != null;\n+    }\n+    @if $system == density {\n+      @return map.get($theme, $_internals, density-scale) != null;\n+    }\n+    @error 'Valid systems are: base, color, typography, density. Got:' $system;  }\n+  @else {\n+    @error #{'Unrecognized theme version:'} $version;\n   }\n-  @if $system == typography {\n-    @return map.get($theme, $_internals, typography-tokens) != null;\n-  }\n-  @if $system == density {\n-    @return map.get($theme, $_internals, density-scale) != null;\n-  }\n-  @error 'Valid systems are: base, color, typography, density. Got:' $system;\n }\n \n /// Gets the set of tokens from the given theme, limited to those affected by the requested theming\ndiff --git a/src/material/core/theming/_m2-inspection.scss b/src/material/core/theming/_m2-inspection.scss\nnew file mode 100644\nindex 0000000000000000000000000000000000000000..39b1fe981d09f8a91f0debe5137e28f7f3aad22a\n--- /dev/null\n+++ b/src/material/core/theming/_m2-inspection.scss\n@@ -0,0 +1,104 @@\n+@use 'sass:list';\n+@use 'sass:map';\n+@use './theming';\n+@use '../typography/typography-utils';\n+\n+$_typography-properties: (font, font-family, line-height, font-size, letter-spacing, font-weight);\n+\n+/// Gets the type of theme represented by a theme object (light or dark).\n+/// @param {Map} $theme The theme\n+/// @return {String} The type of theme (either `light` or `dark`).\n+@function get-theme-type($theme) {\n+  @if not theme-has($theme, color) {\n+    @error 'Color information is not available on this theme.';\n+  }\n+  $colors: theming.get-color-config($theme);\n+  @return if(map.get($colors, is-dark), dark, light);\n+}\n+\n+/// Gets a color from a theme object. This function can take 2 or 3 arguments. If 2 arguments are\n+/// passed, the second argument is treated as the name of a color role. If 3 arguments are passed,\n+/// the second argument is treated as the name of a color palette (primary, secondary, etc.) and the\n+/// third is treated as the palette hue (10, 50, etc.)\n+/// @param {Map} $theme The theme\n+/// @param {String} $palette-name The name of a color palette.\n+/// @param {Number} $hue The palette hue to get (passing this argument means the second argument is\n+///   interpreted as a palette name).\n+/// @return {Color} The requested theme color.\n+@function get-theme-color($theme, $palette-name, $args...) {\n+  @if not theme-has($theme, color) {\n+    @error 'Color information is not available on this theme.';\n+  }\n+  $colors: theming.get-color-config($theme);\n+  $palette: map.get($colors, $palette-name);\n+  @if not $palette {\n+    @error 'Unrecognized palette name:' $palette-name;\n+  }\n+  @return theming.get-color-from-palette($palette, $args...);\n+}\n+\n+/// Gets a typography value from a theme object.\n+/// @param {Map} $theme The theme\n+/// @param {String} $typescale The typescale name.\n+/// @param {String} $property The CSS font property to get\n+///   (font, font-family, font-size, font-weight, line-height, or letter-spacing).\n+/// @return {*} The value of the requested font property.\n+@function get-theme-typography($theme, $typescale, $property) {\n+  @if not theme-has($theme, typography) {\n+    @error 'Typography information is not available on this theme.';\n+  }\n+  $typography: theming.get-typography-config($theme);\n+  @if $property == font {\n+    $font-weight: typography-utils.font-weight($typography, $typescale);\n+    $font-size: typography-utils.font-size($typography, $typescale);\n+    $line-height: typography-utils.line-height($typography, $typescale);\n+    $font-family: typography-utils.font-family($typography, $typescale);\n+    @return ($font-weight list.slash($font-size, $line-height) $font-family);\n+  }\n+  @else if $property == font-family {\n+    @return typography-utils.font-family($typography, $typescale);\n+  }\n+  @else if $property == font-size {\n+    @return typography-utils.font-size($typography, $typescale);\n+  }\n+  @else if $property == font-weight {\n+    @return typography-utils.font-weight($typography, $typescale);\n+  }\n+  @else if $property == line-height {\n+    @return typography-utils.line-height($typography, $typescale);\n+  }\n+  @else if $property == letter-spacing {\n+    @return typography-utils.letter-spacing($typography, $typescale);\n+  }\n+  @else {\n+    @error #{'Valid typography properties are: #{$_typography-properties}. Got:'} $property;\n+  }\n+}\n+\n+/// Gets the density scale from a theme object.\n+/// @param {Map} $theme The theme\n+/// @return {Number} The density scale.\n+@function get-theme-density($theme) {\n+  @if not theme-has($theme, density) {\n+    @error 'Density information is not available on this theme.';\n+  }\n+  $scale: theming.get-density-config($theme);\n+  @return theming.clamp-density($scale, -5);\n+}\n+\n+@function theme-has($theme, $system) {\n+  $theme: theming.private-legacy-get-theme($theme);\n+  @if $system == base {\n+    @return true;\n+  }\n+  @if $system == color {\n+    @return theming.get-color-config($theme) != null;\n+  }\n+  @if $system == typography {\n+    @return theming.get-typography-config($theme) != null;\n+  }\n+  @if $system == density {\n+    @return theming.get-density-config($theme, $default: null) != null;\n+  }\n+  @error 'Valid systems are: base, color, typography, density. Got:' $system;\n+}\ndiff --git a/src/material/core/theming/tests/theming-inspection-api.spec.ts b/src/material/core/theming/tests/theming-inspection-api.spec.ts\nindex 9698d5ee294f67659ae535ca623cb5f1c4a734a9..501587d9f277289928d6cc91c16befa15051b993 100644\n--- a/src/material/core/theming/tests/theming-inspection-api.spec.ts\n+++ b/src/material/core/theming/tests/theming-inspection-api.spec.ts\n@@ -57,6 +57,150 @@ describe('theming inspection api', () => {\n         `),\n       ).toMatch('--theme-version: 0;');\n     });\n+\n+    it('should get theme type', () => {\n+      expect(\n+        transpile(`\n+          $theme: mat.define-dark-theme((\n+            color: (\n+              primary: mat.define-palette(mat.$red-palette),\n+              accent: mat.define-palette(mat.$red-palette),\n+            ),\n+          ));\n+          div {\n+            --theme-type: #{mat.private-get-theme-type($theme)};\n+          }\n+        `),\n+      ).toMatch('--theme-type: dark;');\n+    });\n+\n+    it('should get role color', () => {\n+      expect(\n+        transpile(`\n+          $theme: mat.define-light-theme((\n+            color: (\n+              primary: mat.define-palette(mat.$red-palette),\n+              accent: mat.define-palette(mat.$green-palette)\n+            )\n+          ));\n+          div {\n+            color: mat.private-get-theme-color($theme, accent);\n+          }\n+        `),\n+      ).toMatch('color: #4caf50;');\n+    });\n+\n+    it('should get palette color', () => {\n+      expect(\n+        transpile(`\n+          $theme: mat.define-light-theme((\n+            color: (\n+              primary: mat.define-palette(mat.$red-palette),\n+              accent: mat.define-palette(mat.$green-palette)\n+            )\n+          ));\n+          div {\n+            color: mat.private-get-theme-color($theme, accent, A200);\n+          }\n+        `),\n+      ).toMatch('color: #69f0ae;');\n+    });\n+\n+    it('should get typography properties from theme', () => {\n+      const css = transpile(`\n+        $theme: mat.define-light-theme((\n+          typography: mat.define-typography-config()\n+        ));\n+        div {\n+          font: mat.private-get-theme-typography($theme, headline-1);\n+          font-family: mat.private-get-theme-typography($theme, headline-1, font-family);\n+          font-size: mat.private-get-theme-typography($theme, headline-1, font-size);\n+          font-weight: mat.private-get-theme-typography($theme, headline-1, font-weight);\n+          line-height: mat.private-get-theme-typography($theme, headline-1, line-height);\n+          letter-spacing: mat.private-get-theme-typography($theme, headline-1, letter-spacing);\n+        }\n+      `);\n+      expect(css).toMatch('font: 300 96px / 96px Roboto, sans-serif;');\n+      expect(css).toMatch('font-family: Roboto, sans-serif;');\n+      expect(css).toMatch('font-size: 96px;');\n+      expect(css).toMatch('font-weight: 300;');\n+      expect(css).toMatch('line-height: 96px;');\n+      expect(css).toMatch('letter-spacing: -0.015625em;');\n+    });\n+\n+    it('should get density scale', () => {\n+      expect(\n+        transpile(`\n+        $theme: mat.define-light-theme((\n+          density: -1\n+        ));\n+        div {\n+          --density-scale: #{mat.private-get-theme-density($theme)};\n+        }\n+      `),\n+      ).toMatch('--density-scale: -1;');\n+    });\n+\n+    it('should check what information the theme has', () => {\n+      const css = transpile(`\n+      $theme: mat.define-light-theme((\n+        color: (\n+          primary: mat.define-palette(mat.$red-palette),\n+          accent: mat.define-palette(mat.$red-palette),\n+        ),\n+        typography: mat.define-typography-config(),\n+        density: -1,\n+      ));\n+      $color-only: mat.define-light-theme((\n+        color: (\n+          primary: mat.define-palette(mat.$red-palette),\n+          accent: mat.define-palette(mat.$red-palette),\n+        ),\n+        typography: null,\n+        density: null,\n+      ));\n+      $typography-only: mat.define-light-theme((\n+        color: null,\n+        typography: mat.define-typography-config(),\n+        density: null,\n+      ));\n+      $density-only: mat.define-light-theme((\n+        color: null,\n+        typography: null,\n+        density: -1,\n+      ));\n+      div {\n+        --base: #{(\n+          mat.private-theme-has($theme, base),\n+          mat.private-theme-has($color-only, base),\n+          mat.private-theme-has($typography-only, base),\n+          mat.private-theme-has($density-only, base),\n+        )};\n+        --color: #{(\n+          mat.private-theme-has($theme, color),\n+          mat.private-theme-has($color-only, color),\n+          mat.private-theme-has($typography-only, color),\n+          mat.private-theme-has($density-only, color),\n+        )};\n+        --typography: #{(\n+          mat.private-theme-has($theme, typography),\n+          mat.private-theme-has($color-only, typography),\n+          mat.private-theme-has($typography-only, typography),\n+          mat.private-theme-has($density-only, typography),\n+        )};\n+        --density: #{(\n+          mat.private-theme-has($theme, density),\n+          mat.private-theme-has($color-only, density),\n+          mat.private-theme-has($typography-only, density),\n+          mat.private-theme-has($density-only, density),\n+        )};\n+      }\n+    `);\n+      expect(css).toMatch(/--base: true, true, true, true;/);\n+      expect(css).toMatch(/--color: true, true, false, false;/);\n+      expect(css).toMatch(/--typography: true, false, true, false;/);\n+      expect(css).toMatch(/--density: true, false, false, true;/);\n+    });\n   });\n \n   describe('for m3 theme', () => {\n",
+      "complete_original_paths": [
+        "src/material/core/theming/_inspection.scss",
+        "src/material/core/theming/_m2-inspection.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "frozen_seed_paths": [
+        "src/material/core/theming/_inspection.scss",
+        "src/material/core/theming/_m2-inspection.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "prior_entry_sha256": "3fa846e983f7338ee5f4392469a4854223846a521633d64ffce946e81e0cd0b2",
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 1,
+          "header": "@@ -1,8 +1,7 @@",
+          "hunk_sha256": "89e7c8d69cdbc88cc44623163feadb1c48dcc442af2699edb5241c7d4d17a163",
+          "decision": "Imports a new M2 inspection module and removes the introductory comment. The owned Sass facade does not import this peer-private module or forward its newer API; its M2 model remains independently owned.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 2,
+          "header": "@@ -48,15 +47,19 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "3059d328ca318561cfbfa63c51dd92f7971cb1dba6af6266be58a980f30a1698",
+          "decision": "Dispatches theme-type inspection by version, adding M2 delegation and retaining M3 color checks with unknown-version rejection. This extends the new getter's accepted inputs rather than changing the original light/dark constructors.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 3,
+          "header": "@@ -70,14 +73,26 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "4cd80e3ab799c2584f15365ee35f9b7eb4c765be6983ca3499e8b64f3f2e6732",
+          "decision": "Adds argument validation and version dispatch to color inspection. Although the new API now accepts M2 maps, its extra public contract is still absent from the Material16 inventory; historical palette helper names and arguments are preserved.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 4,
+          "header": "@@ -136,45 +151,53 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "8fc8c46480c5c47539f9f038d62a6f12536f79dd17f43acdc01d383cf0b75726",
+          "decision": "Adds M2 delegation for typography and density, keeps the M3 checks/token lookups, and rejects unknown versions. The original get-typography-config/get-density-config and font helpers are not redirected to the current compatibility implementation.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "hunk_index": 5,
+          "header": "@@ -182,26 +205,29 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "hunk_sha256": "eac9f48c076075daab97795b5cc8416809edd8ce35c91d4700302aa9977fce85",
+          "decision": "Adds version dispatch for theme-has while retaining the M3 system-key checks. The owned legacy model does not gain this modern predicate or start interpreting its maps through peer inspection internals.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/_m2-inspection.scss",
+          "hunk_index": 1,
+          "header": "@@ -0,0 +1,104 @@",
+          "hunk_sha256": "5a34b4c3a9bd616618e60867c9b44aef8c34adeb5b327b64c4bb83117fe5e07c",
+          "decision": "Adds the complete M2 adapter: theme type, palette access, typography properties, density clamping and system presence. It calls old helpers but exposes new APIs; copying or calling through it would violate the finite independent historical facade requirement.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -57,6 +57,150 @@ describe('theming inspection api', () => {",
+          "hunk_sha256": "f44cdb5a41bdcabf369a5d00989f1693672666799f162fc78f1e9ffae1babde9",
+          "decision": "Adds M2 inspection success and presence fixtures using original palettes, font levels and density. These confirm the new adapter's intended reach without making it part of the older facade or replacing independent historical function-value/CSS tests.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "source_review_complete": true,
+      "canonical_admitted": false,
+      "actual_native_packed_or_floor_qualified": false
+    }
+  ],
+  "original_hunks_reviewed": 49,
+  "original_file_occurrences": 17,
+  "source_scope_only": true,
+  "function_names_compiler_observed": 25,
+  "owned_scss_population": 409,
+  "public_peer_override_mixins": 16,
+  "direct_owned_inspection_calls": 0,
+  "peer_inspection_module_loaded_via_public_index": true,
+  "limitations": [
+    "No full function-value/signature/CSS/Sass/native/browser/SSR/compiler/runtime or peer-floor gate is claimed.",
+    "Main is measured against installed22.1.7; advertised22.1.6 qualification remains required.",
+    "Current peer modules may use their own inspection internals; no owned private import or copied modern API is authorized.",
+    "The canonical ledger still requires explicit typed per-SHA admission; these reports alone do not clear it."
+  ],
+  "canonical_decisions_changed": 0,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "full_plan_complete": false
+}
