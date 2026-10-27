@@ -30,7 +30,7 @@ const integrationSpecs=[
 ];
 export const SOURCE_INTEGRATION_HISTORY_IDS=Object.freeze(integrationSpecs.map(row=>row[0]));
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const pins={main:'5516c405e1aaa824daa06c3cd658958b8aaac1c0844c86c8a843986b07e797de','21.x':'2398a158745109731137dbb7e48b18f0c590357cb94478c29321ec74a234ed40'};
+const pins={main:'313aed4b5482ddd70200000c2c55a9b6eee7e9811c6eda2e71ccd22f9c0ba834','21.x':'4a65095990a11e451c0bc0391d9280f48b17d58702ebd0b8b3449453c1700b71'};
 const ids=['historical-menu-import','historical-menu-import-admission','menu-exit-context','selection-comparator-source','native-admission-source','tab-lifecycle-source',
  'native-individual-source','native-individual-admission','spec-fixture-context',
  'small-spec-source','followup-spec-source','peer-spec-source','control-case-context',
@@ -120,9 +120,35 @@ function currentWrapperSuccessors(root,data,members,read){
  }
  assert.deepEqual(data.current_wrapper_successors,expected,'unregistered wrapper successor identity');return result;
 }
+/** The adapter's other method acquired one separately qualified replay route.
+ * Reconstruct that exact transport on top of the original registered wrapper;
+ * retain acceptance of both original wrapper forms for the unchanged controls. */
+function consumerWrapperSuccessors(root,data,members,read){
+ const path='compatibility/rc/historical-consumer-wrapper-successor.json';
+ const expected={main:'a1f9d4e3455d6c8ffc74bbbfefa69b001c0db6a091c3edfefab57999e7c3d0b4',
+  '21.x':'fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502'};
+ const raw=read(path);assert.equal(hash(raw),expected[data.line],'current consumer wrapper transport changed');
+ assert.ok(raw.equals(git(root,['show',data.current_frame.commit+':'+path])),'consumer wrapper transport frame changed');
+ const transport=JSON.parse(raw);assert.equal(transport.line,data.line);
+ const overlaps=transport.wrappers.filter(row=>data.wrapper_edits.some(wrapper=>wrapper.path===row.path));
+ assert.deepEqual(overlaps.map(row=>row.path),['tests/test_spec_wide_fixture_adapter.py']);
+ const result=new Map();
+ for(const row of overlaps){
+  const wrapper=data.wrapper_edits.find(wrapper=>wrapper.path===row.path);
+  const before=git(root,['show',transport.source_parent+':'+row.path]);
+  assert.equal(hash(before),row.before.sha256);assert.equal(row.before.sha256,wrapper.after_sha256);
+  let after=before.toString();assert.equal(row.literal_edits.length,2);
+  for(const edit of row.literal_edits){assert.equal(after.split(edit.before).length,2,'consumer wrapper edit not exact');after=after.replace(edit.before,edit.after);}
+  const bytes=Buffer.from(after);assert.equal(hash(bytes),row.after.sha256);assert.equal(bytes.length,row.after.bytes);
+  const member=members.find(member=>member.path===row.path);assert.ok(member);
+  assert.equal(member.blob,blobHash(bytes),'consumer wrapper frame changed');
+  result.set(row.path,{bytes,sha256:row.after.sha256});
+ }
+ return result;
+}
 export function verifyHistoricalCurrentSubjects({root=rootDefault,data,members,readMember,productPaths}={}){
  const read=readMember||((path)=>{let cursor=root;assert.ok(lstatSync(root).isDirectory()&&!lstatSync(root).isSymbolicLink());for(const part of path.split('/')){cursor=join(cursor,part);assert.ok(!lstatSync(cursor).isSymbolicLink(),'symlink in current source route '+path);}assert.ok(lstatSync(cursor).isFile());return readFileSync(cursor);}),mutable=new Set(data.mutable_progress_paths),wrappers=new Map(data.wrapper_edits.map(row=>[row.path,row]));
- const currentByPath=new Map(members.map(row=>[row.path,row])),tooling=new Set(toolingPaths),successors=currentWrapperSuccessors(root,data,members,read);let guarded=0;
+ const currentByPath=new Map(members.map(row=>[row.path,row])),tooling=new Set(toolingPaths),successors=currentWrapperSuccessors(root,data,members,read),consumerSuccessors=consumerWrapperSuccessors(root,data,members,read);let guarded=0;
  for(const member of members){
   if(mutable.has(member.path)||tooling.has(member.path))continue;
   const bytes=read(member.path),wrapper=wrappers.get(member.path);
@@ -130,9 +156,9 @@ export function verifyHistoricalCurrentSubjects({root=rootDefault,data,members,r
    const original=git(root,['show',(wrapper.reference_commit||data.wrapper_reference_commit)+':'+member.path]);assert.equal(hash(original),wrapper.before_sha256);
    let proposed=original.toString();for(const edit of wrapper.edits){assert.equal(proposed.split(edit.before).length,2,'wrapper edit not exact');proposed=proposed.replace(edit.before,edit.after);}
    assert.equal(hash(proposed),wrapper.after_sha256);
-   const successor=successors.get(member.path);
-   assert.ok([blobHash(original),blobHash(Buffer.from(proposed)),...(successor?[blobHash(successor.bytes)]:[])].includes(member.blob),'registered wrapper base changed');
-   assert.ok([wrapper.before_sha256,wrapper.after_sha256,...(successor?[successor.sha256]:[])].includes(hash(bytes)),'current historical-replay wrapper changed '+member.path);
+   const admitted=[successors.get(member.path),consumerSuccessors.get(member.path)].filter(Boolean);
+   assert.ok([blobHash(original),blobHash(Buffer.from(proposed)),...admitted.map(row=>blobHash(row.bytes))].includes(member.blob),'registered wrapper base changed');
+   assert.ok([wrapper.before_sha256,wrapper.after_sha256,...admitted.map(row=>row.sha256)].includes(hash(bytes)),'current historical-replay wrapper changed '+member.path);
   }else assert.equal(blobHash(bytes),member.blob,'current historical-replay subject changed '+member.path);
   guarded++;
  }
@@ -148,7 +174,7 @@ export function verifyHistoricalCurrentSubjects({root=rootDefault,data,members,r
  for(const entry of data.entries){assert.equal(hash(read(entry.probe)),entry.probe_sha256,'original historical probe changed');assert.ok(currentByPath.has(entry.probe));}
  return {line:data.line,guarded_current_members:guarded,current_product_members:product.length,
   current_tooling_members:toolingPaths.length,tooling_reference:{commit:toolingCommit,tree:toolingTree},
-  exact_wrapper_edits_only:true,authenticated_current_wrapper_successors:successors.size,mutable_progress_paths:[...mutable],current_source_qualification:false,current_native_or_packed_qualification:false};
+  exact_wrapper_edits_only:true,authenticated_current_wrapper_successors:successors.size,authenticated_consumer_wrapper_transitions:consumerSuccessors.size,mutable_progress_paths:[...mutable],current_source_qualification:false,current_native_or_packed_qualification:false};
 }
 export function inspectHistoricalReplayCurrent({root=rootDefault,readMember,productPaths}={}){
  const data=historicalReplayInputs({root,readMember}),members=historicalFrameMembers(root,data.current_frame);
