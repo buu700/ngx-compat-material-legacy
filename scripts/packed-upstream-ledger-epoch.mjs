@@ -16,6 +16,7 @@ import {join} from 'node:path';
 import {testingApi21xEntryEvidenceOk} from './upstream-testing-api-21x-admission.mjs';
 import {sassInspectionEntrySourceOk} from './upstream-sass-inspection-admission.mjs';
 import {rulesJsBuildEntrySourceOk,rulesJsBuildBoundInputs} from './upstream-rules-js-build-admission.mjs';
+import {autocompleteLandscapeSourceJudgment,AUTOCOMPLETE_LANDSCAPE_SHA} from './autocomplete-landscape-source-judgment.mjs';
 
 const ts = createRequire(import.meta.url)('typescript');
 const inputPath = 'compatibility/rc/packed-upstream-source-inputs.json';
@@ -405,6 +406,68 @@ function qualifyAutocompleteRegistry({root,read,line,ref,bound}){
   }
 }
 
+const autocompleteLedgerTransitions={
+  main:'823684fe3cb4a30ec4ef012c742df3dc140f010c1aa43f5407c4cd1c2266a6c8',
+  '21.x':'d8de61098c5eb4fba574da97b1e6d582f13a3a3be3332bdb83ad00aa9c0f64ba',
+};
+function prepareAutocompleteLandscapeStage({root,read,line,before,bound}){
+  const path='compatibility/rc/autocomplete-landscape-ledger-transition.json.gz',raw=read(path);
+  assert.equal(hash(raw),autocompleteLedgerTransitions[line]);bound.set(path,hash(raw));
+  const packet=JSON.parse(gunzipSync(raw));assert.equal(packet.schema_version,1);assert.equal(packet.line,line);
+  assert.equal(packet.individual_source_judgments,1);assert.equal(packet.registry_proof_digests_changed,10);
+  assert.equal(packet.unrelated_entry_or_original_hunk_changes,0);assert.equal(packet.current_native_packed_or_floor_or_g11_credit,false);
+  assert.equal(packet.before.path,ledgerPath);assert.equal(packet.before.entries,1697);assert.equal(packet.before.sha256,hash(before));
+  assert.equal(hash(gitBytes(root,packet.before.source_parent,ledgerPath)),hash(before));
+  const member=ref=>{const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256);assert.equal(bytes.length,ref.bytes);bound.set(ref.path,ref.sha256);return bytes;};
+  assert.deepEqual(packet.code_subjects.map(ref=>ref.path),['scripts/autocomplete-landscape-source-judgment.mjs',autocompleteRegistryPath,testingApiChecker]);
+  for(const ref of packet.code_subjects)member(ref);
+  const currentSource=autocompleteLandscapeSourceJudgment({root,read,line}),review=JSON.parse(member(packet.review));
+  assert.deepEqual(review,currentSource.body);assert.deepEqual(packet.qualification_members,currentSource.bound);
+  for(const ref of currentSource.bound)member(ref);
+  const text=before.toString(),syntax=ts.parseJsonText('landscape-ledger.json',text);assert.equal(syntax.parseDiagnostics.length,0);
+  const nodes=property(syntax.statements[0].expression,'entries');assert.equal(nodes.elements.length,1697);
+  const data=JSON.parse(before),expected=structuredClone(data),index=data.entries.findIndex(row=>row.sha===AUTOCOMPLETE_LANDSCAPE_SHA);
+  assert.ok(index>=0);const prior=data.entries[index];assert.equal(hash(json(prior)),packet.entry.before_entry_sha256);
+  assert.equal(packet.entry.sha,AUTOCOMPLETE_LANDSCAPE_SHA);
+  assert.equal(prior.final_disposition,line==='21.x'?'needs-individual-review':'already-adapted');
+  const current={...prior,final_disposition:'already-adapted',reason:review.decision,read_note_disposition:'individual-source-reviewed-on-'+line,
+    evidence_report:packet.review.path,source_check:{kind:'individual-source-reviewed-runtime-required',diff_sha256:review.diff_sha256,
+      patch_path:review.patch_file,evidence_report_sha256:packet.review.sha256},
+    files:['src/material/autocomplete/autocomplete-trigger.ts','src/material/autocomplete/autocomplete.spec.ts'],
+    review_depth:'individual-compatibility',affected_branches:[line],individual_proof:currentSource.proof,
+    prior_dispositions:[{source_parent:packet.before.source_parent,source_entry_sha256:hash(json(prior)),source_line:line,final_disposition:prior.final_disposition}]};
+  assert.deepEqual(packet.entry.after_entry,current);expected.entries[index]=current;
+  const edits=[{start:nodes.elements[index].getStart(syntax),end:nodes.elements[index].end,text:JSON.stringify(current,null,2).replace(/\n/g,'\n    ')}];
+  const native=data.entries.filter(row=>row.individual_proof?.historical_behavior?.source_members?.some(ref=>ref.path===autocompleteRegistryPath));
+  assert.equal(native.length,10);assert.equal(packet.source_digest_updates.length,10);
+  assert.deepEqual(packet.source_digest_updates.map(row=>row.sha).sort(),native.map(row=>row.sha).sort());
+  for(const update of packet.source_digest_updates){
+    assert.deepEqual(update.path.slice(0,3),['individual_proof','historical_behavior','source_members']);
+    assert.equal(update.path.length,5);assert.equal(update.path[4],'sha256');
+    const i=data.entries.findIndex(row=>row.sha===update.sha);assert.ok(i>=0&&i!==index);
+    const ref=expected.entries[i].individual_proof.historical_behavior.source_members[update.path[3]];
+    assert.equal(ref.path,autocompleteRegistryPath);assert.equal(ref.sha256,update.before);
+    assert.equal(update.before,'7e04af26527d8520bdf3ae4b5ce7bfc861b642877c714708193bc87a8c7948f0');
+    assert.equal(update.after,hash(read(autocompleteRegistryPath)));ref.sha256=update.after;
+    let node=nodes.elements[i];for(const key of update.path)node=typeof key==='number'?node.elements[key]:property(node,key);
+    assert.equal(JSON.parse(node.getText(syntax)),update.before);
+    edits.push({start:node.getStart(syntax),end:node.end,text:JSON.stringify(update.after)});
+  }
+  // The preceding stage derives every count from the actual checker policy.
+  // Only21.x moves this one known pending value to the known closed value.
+  const summary=line==='21.x'?[
+    {field:'closed_dispositions',before:data.closed_dispositions,after:data.closed_dispositions+1},
+    {field:'open_or_deferred',before:data.open_or_deferred,after:data.open_or_deferred-1},
+  ]:[];
+  assert.deepEqual(packet.summary_updates,summary);assert.equal(packet.disposition_values_changed,line==='21.x'?1:0);
+  for(const update of summary){const node=property(syntax.statements[0].expression,update.field);assert.equal(JSON.parse(node.getText(syntax)),update.before);
+    edits.push({start:node.getStart(syntax),end:node.end,text:JSON.stringify(update.after)});expected[update.field]=update.after;}
+  assert.equal(edits.length,line==='21.x'?13:11);let end=0;const chunks=[];
+  for(const edit of edits.sort((a,b)=>a.start-b.start)){assert.ok(edit.start>=end);chunks.push(text.slice(end,edit.start),edit.text);end=edit.end;}chunks.push(text.slice(end));
+  const after=Buffer.from(chunks.join(''));assert.equal(hash(after),packet.after_sha256);assert.deepEqual(JSON.parse(after),expected);
+  assert.equal(expected.g11_claim,'not-passed');return {before,after,individual_decisions:1,proof_digest_updates:10,summary_scalar_updates:summary.length,assertExternal:currentSource.assertExternal};
+}
+
 export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {
   read = packedUpstreamLedgerRawRead({root, read});
   const input = read(inputPath), line = Object.keys(subjects).find(name => subjects[name].sha256 === hash(input));
@@ -487,7 +550,8 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const sass = prepareSassStage({root,read,line,before:next?.after??after,bound});
   const rulesJs = prepareRulesJsStage({root,read,line,before:sass.after,bound});
   const summary = prepareSummaryStage({root,read,line,before:rulesJs.after,bound});
-  return {line, before, after, canonical_after: summary.after, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, bound, population, analysis_python_version: syntax.current_pinned_python,
+  const landscape=prepareAutocompleteLandscapeStage({root,read,line,before:summary.after,bound});
+  return {line, before, after, canonical_after: landscape.after, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, bound, population, analysis_python_version: syntax.current_pinned_python,
     input_sha256: hash(input),
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
     current_native_packed_or_floor_qualified: false};
@@ -502,11 +566,13 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   const testingHash=prepared.testing_api_stage?hash(prepared.testing_api_stage.after):null;
   const sassHash=hash(prepared.sass_stage.after);
   const rulesHash=hash(prepared.rules_js_stage.after);
-  assert.ok([beforeHash,afterHash,testingHash,sassHash,rulesHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
+  const summaryHash=hash(prepared.summary_stage.after);
+  assert.ok([beforeHash,afterHash,testingHash,sassHash,rulesHash,summaryHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
   const applied = current !== beforeHash;
   const assertCurrent = () => {
     prepared.sass_stage.assertExternal();
     prepared.rules_js_stage.assertExternal();
+    prepared.autocomplete_landscape_stage.assertExternal();
     for (const [path, digest] of prepared.bound)
       assert.equal(hash(read(path)), digest, 'late current upstream subject change ' + path);
     const population = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '--',
@@ -523,10 +589,12 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   return {line: prepared.line, read: historical, raw: read, assertCurrent, applied,
     projected_metadata_paths: applied ? [ledgerPath] : [], entries_changed: 85,
     scalar_tokens_changed: 179,
-    testing_api_decisions_applied: [testingHash,sassHash,rulesHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0,
-    sass_decisions_applied: [sassHash,rulesHash,canonicalHash].includes(current)?6:0,
-    rules_js_decisions_applied:[rulesHash,canonicalHash].includes(current)?3:0,
-    summary_scalar_updates_applied:current===canonicalHash?2:0,
-    individual_decisions_applied: ([testingHash,sassHash,rulesHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0)+([sassHash,rulesHash,canonicalHash].includes(current)?6:0)+([rulesHash,canonicalHash].includes(current)?3:0),
+    testing_api_decisions_applied: [testingHash,sassHash,rulesHash,summaryHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0,
+    sass_decisions_applied: [sassHash,rulesHash,summaryHash,canonicalHash].includes(current)?6:0,
+    rules_js_decisions_applied:[rulesHash,summaryHash,canonicalHash].includes(current)?3:0,
+    summary_scalar_updates_applied:[summaryHash,canonicalHash].includes(current)?2:0,
+    autocomplete_landscape_decisions_applied:current===canonicalHash?1:0,
+    autocomplete_landscape_registry_digests_applied:current===canonicalHash?10:0,
+    individual_decisions_applied: ([testingHash,sassHash,rulesHash,summaryHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0)+([sassHash,rulesHash,summaryHash,canonicalHash].includes(current)?6:0)+([rulesHash,summaryHash,canonicalHash].includes(current)?3:0)+(current===canonicalHash?1:0),
     current_native_packed_or_floor_or_g11_credit: false};
 }

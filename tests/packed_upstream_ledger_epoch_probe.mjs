@@ -104,7 +104,7 @@ assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equa
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
 assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
-assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?16:9);
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?17:10);
 assert.equal(epoch.rules_js_decisions_applied,3);
 assert.equal(epoch.summary_scalar_updates_applied,2);
 if(input.line==='21.x'){
@@ -151,7 +151,8 @@ const summaryPath='compatibility/rc/upstream-ledger-summary-transition.json';
 rejects('changed-summary-transition',path=>path===summaryPath?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
 const wrongSummary=JSON.parse(prepared.canonical_after);wrongSummary.open_or_deferred++;
 rejects('wrong-summary-count-with-identical-entries',path=>path===ledgerPath?bytes(wrongSummary):read(path));
-assert.deepEqual(JSON.parse(prepared.canonical_after).entries,JSON.parse(prepared.summary_stage.before).entries);
+assert.deepEqual(JSON.parse(prepared.summary_stage.after).entries,JSON.parse(prepared.summary_stage.before).entries);
+assert.equal(prepared.autocomplete_landscape_stage.before.equals(prepared.summary_stage.after),true);
 assert.equal(prepared.summary_stage.scalar_updates,2);
 cases.push('two-derived-summary-counters-preserve-every-entry');
 
@@ -169,6 +170,27 @@ let lateLandscapePacket=false;
 const liveLandscapePacket=packedUpstreamLedgerEpoch({root,read:path=>lateLandscapePacket&&path===landscapeTransition?Buffer.concat([read(path),Buffer.from(' ')]):read(path)});
 lateLandscapePacket=true;assert.throws(()=>liveLandscapePacket.read(ledgerPath));rejected.push('late-landscape-transition-change');
 cases.push('exact-additive-landscape-contract-keeps-all-canonical-ledger-and-product-bytes-raw');
+
+assert.equal(epoch.autocomplete_landscape_decisions_applied,1);
+assert.equal(epoch.autocomplete_landscape_registry_digests_applied,10);
+const landscapeLedgerTransition='compatibility/rc/autocomplete-landscape-ledger-transition.json.gz';
+rejects('changed-landscape-ledger-transition',path=>path===landscapeLedgerTransition?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+const partialLandscape=JSON.parse(prepared.canonical_after),beforeLandscape=JSON.parse(prepared.autocomplete_landscape_stage.before);
+const landscapeIndex=partialLandscape.entries.findIndex(row=>row.sha==='008212a9807fd01fd32fe136a075763b7b2c854d');
+partialLandscape.entries[landscapeIndex]=beforeLandscape.entries[landscapeIndex];
+rejects('partial-landscape-source-decision',path=>path===ledgerPath?bytes(partialLandscape):read(path));
+const partialRegistryDigests=JSON.parse(prepared.canonical_after);
+const oneNative=partialRegistryDigests.entries.find(row=>row.sha!=='008212a9807fd01fd32fe136a075763b7b2c854d'&&row.individual_proof?.historical_behavior);
+assert.ok(oneNative);oneNative.individual_proof.historical_behavior.source_members.find(ref=>ref.path===landscapeRegistry).sha256='7e04af26527d8520bdf3ae4b5ce7bfc861b642877c714708193bc87a8c7948f0';
+rejects('partial-landscape-registry-digests',path=>path===ledgerPath?bytes(partialRegistryDigests):read(path));
+const landscapeReview='compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-landscape-individual-source-judgment.json';
+rejects('changed-landscape-individual-source-judgment',path=>path===landscapeReview?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+const landscapeHelper='scripts/autocomplete-landscape-source-judgment.mjs';
+rejects('changed-landscape-source-helper',path=>path===landscapeHelper?Buffer.concat([read(path),Buffer.from('\n// changed\n')]):read(path));
+let lateLandscapeReview=false;
+const liveLandscapeReview=packedUpstreamLedgerEpoch({root,read:path=>lateLandscapeReview&&path===landscapeReview?Buffer.concat([read(path),Buffer.from(' ')]):read(path)});
+lateLandscapeReview=true;assert.throws(()=>liveLandscapeReview.read(ledgerPath));rejected.push('late-landscape-source-review-change');
+cases.push('one-complete-landscape-source-decision-and-ten-exact-registry-digests-are-qualified');
 
 console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   canonical_entries: 1697, qualified_source_entries: 85, changed_scalar_tokens: 179,

@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "008212a9807fd01fd32fe136a075763b7b2c854d",
+  "status": "reviewed",
+  "final_disposition": "already-adapted",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent complete audit remains separate",
+  "patch_file": "compatibility/rc/resource-style-upstream-patches/008212a9807fd01fd32fe136a075763b7b2c854d.patch",
+  "diff_sha256": "6aef092d6a8579b310fbf94242da1a1adf3125f3934ba5d7649d56f49290855b",
+  "original_files": 2,
+  "original_hunks": 6,
+  "hunk_reviews": [
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -9,6 +9,7 @@",
+      "hunk_sha256": "6221fa6161ccb310a47ba25ae85af7e7367e3042964aee4682613f66571574e0",
+      "decision": "The import adds public BreakpointObserver/Breakpoints from @angular/cdk/layout. Both actual advertised CDK minima retain the public entry point. The owned source uses that public service for one fixed HandsetLandscape query, without a modern component or private upstream import."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -161,6 +162,10 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "08380c3ab0da3c818f2032a27b36a9dc45cb9a29eafe44340d2e9ac577c28255",
+      "decision": "The original injected observer and Subscription.EMPTY field introduce per-trigger observation. The owned trigger preserves the historical eleven-argument constructor and obtains the service from the supplied public ViewContainerRef.injector instead of requiring ambient inject(). The diagnostic excludes constructor and view execution; those remain separate obligations."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -282,6 +287,7 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "672c154e2e21ef3f5793618c27e98abfd88a1985fe5e5f6033a38f02d754b673",
+      "decision": "The added destruction call releases the trigger-owned landscape subscription. It does not complete the borrowed observer stream. Current complete prototype teardown is exercised with a real owned initialization Subject in the synthetic fixture; no production method or lifecycle assertion was changed to cure the stale fixture."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -790,6 +796,26 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "96977993f1d35a0a5354a6570df18affdd5cf4dc6868f97307ea1ec1f74002d9",
+      "decision": "The complete new-overlay branch observes one HandsetLandscape stream before attachment. Landscape enables flexible dimensions/growth with margin8; portrait resets all three settings. The existing closing/reopening path reuses the overlay and one subscription. Seven source-protocol/lifetime cases per retained minimum and all six original corruptions are required; they do not measure viewport geometry."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -881,6 +907,7 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "fd14c46d01ff745d1897034793b84409fac6c3fbb47ebadfd6cc1cca149b4156",
+      "decision": "This hunk adds only a default-position comment. The owned initial strategy still uses flexibleDimensions(false) and push(false), then the breakpoint callback controls landscape-specific settings. No selector, theme, consumer map or stylesheet change follows from this comment."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete.spec.ts",
+      "header": "@@ -2183,7 +2183,7 @@ describe('MDC-based MatAutocomplete', () => {",
+      "hunk_sha256": "0012ce8a8b7e1e788ee66d9d3aeae7326aa26e83bc9749e6d964b8e13451523d",
+      "decision": "The sole upstream spec hunk changes75px to100px in an MDC form-field positioning test. Preserve the untouched legacy75px assertion and its mat-form-field-flex selector. The three already-added local landscape regressions, legacy grow/reopen case and original75px fallback case remain distinct required native observations; none ran in this source inspection."
+    }
+  ],
+  "decision": "The complete two-file/six-hunk patch is adapted in the owned legacy trigger. Its supplied public view injector resolves the nondeprecated public BreakpointObserver at the advertised CDK 22.1.7 minimum while retaining the historical eleven-argument constructor. One fixed HandsetLandscape subscription is created before first overlay attachment and reused across close/reopen. It sets flexible dimensions/growth/margin to true/true/8 in landscape and false/false/0 otherwise, and teardown unsubscribes without completing the borrowed observer. The original comment adds no behavior. The sole upstream MDC spec offset change does not replace the legacy75px selector/geometry assertion. Five exact existing native tests are mandatory in the complete same-run packed/historical suite. Current source-protocol/lifetime diagnostics and corruption controls support this source decision; actual Angular geometry, artifact behavior and runtime/peer floors require their separate executions. No product API, HTML, CSS or SCSS change is required.",
+  "original_source_intake": {
+    "path": "compatibility/rc/autocomplete-landscape-current-source-review.json",
+    "sha256": "7a542de44d39dce6b6c81bfac4bcd4c503452de06f4329fb72a505f8e44b9925",
+    "bytes": 8872
+  },
+  "original_source_intake_role": "Authenticated pre-registration whole-patch inspection; its native-registration gap is closed by the separately required current contract.",
+  "current_owned_sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "bytes": 40967
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+      "sha256": "6b9c00dbf365e6b6ea9b2b65eb7e67911775322c78848b996d3590f8fded3d58",
+      "bytes": 1975
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "09a96761ccbb96309989dfc13517170c3600fb2bd57b3fb7e9c9cb02f788d423",
+      "bytes": 147026
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.html",
+      "sha256": "8fae4afdffea376599d694a16698ee1a9502097cc9819ec2766a4a5d55b418ae",
+      "bytes": 325
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+      "sha256": "9fbb5eb60784e41f97296c9fd958871dfa4cee3975f0c4bcd3cfe54f6ec6aae4",
+      "bytes": 1171
+    }
+  ],
+  "current_public_CDK_minimum": "22.1.7",
+  "private_node": "v24.21.0",
+  "private_typescript": "6.0.3",
+  "diagnostic": {
+    "path": "compatibility/rc/autocomplete-landscape-current-diagnostics.json.gz",
+    "sha256": "72e4b7580c5ac065ea63f39c267044683a4a2482f2b87a9663e1f676a34a1e13",
+    "bytes": 1774
+  },
+  "source_diagnostic_cases_per_retained_minimum": 7,
+  "source_diagnostic_retained_minima": 2,
+  "source_diagnostic_mutants_rejected": 6,
+  "native_contract_controls": {
+    "path": "compatibility/rc/autocomplete-landscape-native-contract-controls.json",
+    "sha256": "ee6ca89d2a2f30bf19d8892643ed543c026d708a8928d3c7b8e6875805d3decd",
+    "bytes": 3542
+  },
+  "required_named_native_cases": [
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#105",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > Fallback positions > should fit an above-position panel inside the handset landscape viewport"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#106",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > Fallback positions > should reset landscape configuration and unsubscribe without destroying the observer"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#107",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > Fallback positions > should reuse one handset subscription across panel close and reopen"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#108",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > Fallback positions > should allow the panel to expand when the number of results increases"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#110",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > Fallback positions > should fall back to above position when requested if options are added while the panel is open"
+    }
+  ],
+  "complete_historical_case_count": 2236,
+  "public_layout_exports_non_deprecated": true,
+  "original_legacy75px_assertion_retained": true,
+  "consumer_TS_HTML_CSS_SCSS_changes_required": false,
+  "actual_native_browser_artifact_or_floor_executed": false,
+  "g11_claim": "not-passed"
+}

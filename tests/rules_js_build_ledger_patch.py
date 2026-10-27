@@ -92,8 +92,12 @@ if current not in (before,after):
     for update in summary['updates']:
         assert after_data[update['field']]==update['before'] and values[update['field']]==update['after']
         normalized,n=re.subn(r'(^  "'+update['field']+r'": )\d+(,?$)',lambda m:m[1]+str(update['after'])+m[2],normalized,flags=re.M);assert n==1
-    normalized=normalized.encode();assert sha(normalized)==summary['after_sha256'] and current==normalized
+    normalized=normalized.encode();assert sha(normalized)==summary['after_sha256']
     assert json.loads(normalized)==dict(after_data,**values)
+    if current!=normalized:
+        from autocomplete_landscape_ledger_patch import verify_landscape_successor
+        successor=verify_landscape_successor(expected_before=normalized,root=ROOT)
+        assert successor['canonical_applied'] is True and successor['before_sha256']==sha(normalized)
     applied=True;summary_updates=2
 assert {a['sha'] for a,b in zip(original['entries'],json.loads(after)['entries']) if a!=b}==set(changed)
 report=dict(line=line,result='pass',independent_parser='Python JSON object/scalar spans; no TypeScript AST',canonical_entries=1697,
