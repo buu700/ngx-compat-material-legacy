@@ -106,6 +106,7 @@ assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
 assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?16:9);
 assert.equal(epoch.rules_js_decisions_applied,3);
+assert.equal(epoch.summary_scalar_updates_applied,2);
 if(input.line==='21.x'){
  const nextPath='compatibility/rc/upstream-testing-api-21x-ledger-transition.json.gz';
  rejects('changed-seven-individual-transition',path=>path===nextPath?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
@@ -145,6 +146,14 @@ const rulesReview='compatibility/rc/upstream-rules-js-build-individual-review.js
 const liveRules=packedUpstreamLedgerEpoch({root,read:path=>lateRules&&path===rulesReview?Buffer.concat([read(path),Buffer.from(' ')]):read(path)});
 lateRules=true;assert.throws(()=>liveRules.read(ledgerPath));rejected.push('late-build-review-change');
 cases.push('three-complete-build-decisions-are-qualified-current-epoch');
+
+const summaryPath='compatibility/rc/upstream-ledger-summary-transition.json';
+rejects('changed-summary-transition',path=>path===summaryPath?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+const wrongSummary=JSON.parse(prepared.canonical_after);wrongSummary.open_or_deferred++;
+rejects('wrong-summary-count-with-identical-entries',path=>path===ledgerPath?bytes(wrongSummary):read(path));
+assert.deepEqual(JSON.parse(prepared.canonical_after).entries,JSON.parse(prepared.summary_stage.before).entries);
+assert.equal(prepared.summary_stage.scalar_updates,2);
+cases.push('two-derived-summary-counters-preserve-every-entry');
 
 console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   canonical_entries: 1697, qualified_source_entries: 85, changed_scalar_tokens: 179,
