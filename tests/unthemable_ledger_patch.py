@@ -165,7 +165,10 @@ def derive_unthemable_successor(root=ROOT, expected_before=None):
 
 def verify_unthemable_successor(root=ROOT, expected_before=None, candidate=None):
     before, five, after = derive_unthemable_stages(root=root, expected_before=expected_before)
-    assert (Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()) == after
+    current = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    if current != after:
+        from modern_control_base_ledger_patch import verify_control_successor
+        verify_control_successor(root=root, expected_before=after, candidate=candidate)
     return dict(line='21.x', individual_decisions=5, checker_digest_tokens_updated=14,
         five_decision_stage_unselected_entry_bytes_preserved=1692, final_unmodified_entry_bytes_preserved=1678,
         before_sha256=HASH(before), five_decision_stage_sha256=HASH(five), after_sha256=HASH(after), after_bytes=len(after),

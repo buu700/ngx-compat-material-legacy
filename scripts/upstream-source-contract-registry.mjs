@@ -18,4 +18,12 @@ export const sourceContractDefinitions = [
     scope_key:'unthemable_token_source_scope',module:'upstream-unthemable-token-admission.cjs'},
   {sha:'06460d17703ef28a8fc89833c389c479b1ba6bcf',proof_kind:'individual-historical-base-token-source-exclusion',
     scope_key:'unthemable_token_source_scope',module:'upstream-unthemable-token-admission.cjs'},
+  {sha:'68096ec9d34aae793a7b3037c39e6ae7d1700933',proof_kind:'individual-historical-modern-control-base-source-exclusion',
+    scope_key:'modern_control_base_source_scope',module:'upstream-modern-control-base-admission.cjs'},
+  {sha:'c572dc4bf4d48448699288aeac2be14db0186a86',proof_kind:'individual-historical-modern-control-base-source-exclusion',
+    scope_key:'modern_control_base_source_scope',module:'upstream-modern-control-base-admission.cjs'},
+  {sha:'65c97170d2b3d239fda25bd049ec417e0098fe12',proof_kind:'individual-historical-modern-control-base-source-exclusion',
+    scope_key:'modern_control_base_source_scope',module:'upstream-modern-control-base-admission.cjs'},
+  {sha:'7c16cc8b659133167f1b875dcfe77ca806bfe876',proof_kind:'individual-historical-modern-control-base-source-exclusion',
+    scope_key:'modern_control_base_source_scope',module:'upstream-modern-control-base-admission.cjs'},
 ];

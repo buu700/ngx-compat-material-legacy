@@ -16,7 +16,14 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=p=>readFil
 const source=historicalChipWrapperMetadata({root,read}),packet=JSON.parse(read(HISTORICAL_WRAPPER_PACKET)),positive=[],rejected=[];
 assert.equal(source.metadata_entries,4);assert.equal(source.original_hunks_preserved,198);assert.equal(source.original_dispositions_or_hunk_judgments_changed,0);
 positive.push('four-wrapper-references-preserve-198-original-hunk-judgments-and-dispositions');
-const epoch=packedUpstreamLedgerEpoch({root,read});assert.equal(epoch.historical_wrapper_metadata_entries_applied,4);
+// Reconstruct this exact metadata-only checkpoint before later source decisions.
+let fixture=source.before.toString();const fixtureRows=JSON.parse(source.before).entries;
+for(const change of source.entries){
+  const prior=fixtureRows.find(row=>row.sha===change.sha),from=JSON.stringify(prior,null,2).replace(/\n/g,'\n    '),to=JSON.stringify(change.after_entry,null,2).replace(/\n/g,'\n    ');
+  assert.equal(fixture.split(from).length,2);fixture=fixture.replace(from,to);
+}
+const checkpoint=Buffer.from(fixture);assert.equal(hash(checkpoint),packet.after_sha256);assert.equal(checkpoint.length,packet.after_bytes);
+const epoch=packedUpstreamLedgerEpoch({root,read:p=>p===HISTORICAL_WRAPPER_LEDGER?checkpoint:read(p)});assert.equal(epoch.historical_wrapper_metadata_entries_applied,4);
 assert.equal(epoch.historical_wrapper_metadata_references_applied,4);assert.equal(epoch.individual_decisions_applied,source.line==='main'?13:20);
 assert.equal(epoch.current_native_packed_or_floor_or_g11_credit,false);
 positive.push('metadata-stage-adds-no-upstream-decision-or-native-credit');

@@ -15,10 +15,13 @@ import {packedUpstreamLedgerEpoch} from '../scripts/packed-upstream-ledger-epoch
 import {registeredSourceCheckerTransition} from '../scripts/registered-source-checker-transition.mjs';
 import {checkerReferenceMetadata} from '../scripts/checker-reference-metadata.mjs';
 import {LEGACY_SASS_ENTRYPOINT_SHA as SHA,LEGACY_SASS_ENTRYPOINT_REVIEW as REVIEW} from '../scripts/upstream-legacy-sass-entrypoint-admission.mjs';
-const root=process.cwd(),read=path=>readFileSync(join(root,path)),ledger='compatibility/f10/disposition-ledger/ledger.json';
+const root=process.cwd(),diskRead=path=>readFileSync(join(root,path)),ledger='compatibility/f10/disposition-ledger/ledger.json';
 const json=value=>Buffer.from(JSON.stringify(value,null,2)+'\n');
 const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
 for(const name of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[name];
+// Preserve this probe's exact27-decision image; the new31-decision epoch has its own independent probe.
+const registeredBefore=execFileSync('git',['--no-replace-objects','show','051c1e83402f38fed1073aefeb965b2115875246' + ':' + ledger],{cwd:root,env,maxBuffer:8*1024*1024});
+const read=path=>path===ledger?registeredBefore:diskRead(path);
 const stage={before:execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',
   '518be10d4de943ebfef51854d9c013cde2afbefe:'+ledger],{cwd:root,env,maxBuffer:8*1024*1024}),
   after:execFileSync('python3',['-c','import sys;sys.path.insert(0,"tests");from legacy_sass_entrypoint_ledger_patch import derive_sass_entrypoint_successor;sys.stdout.buffer.write(derive_sass_entrypoint_successor()[1])'],{cwd:root,maxBuffer:8*1024*1024})};

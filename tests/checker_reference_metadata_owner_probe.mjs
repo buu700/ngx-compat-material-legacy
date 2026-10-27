@@ -15,9 +15,11 @@ import {registeredSourceCheckerTransition} from '../scripts/registered-source-ch
 const root=process.cwd(),read=path=>readFileSync(join(root,path));
 const source=checkerReferenceMetadata({root,read:registeredSourceCheckerTransition({root,read}).beforeRead}),preflight=process.argv.includes('--preflight');
 const final=execFileSync('python3',['-c','import sys;sys.path.insert(0,"tests");from unthemable_ledger_patch import derive_unthemable_successor;sys.stdout.buffer.write(derive_unthemable_successor()[1])'],{cwd:root,maxBuffer:8*1024*1024});
-assert.equal(read(ledger).equals(preflight?source.before:final),true);
+// Keep this probe at its authenticated27-decision checkpoint; the successor has a separate probe.
+const registeredBefore=execFileSync('git',['--no-replace-objects','show','051c1e83402f38fed1073aefeb965b2115875246:'+ledger],{cwd:root,env:{...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'},maxBuffer:8*1024*1024});
+assert.equal((preflight?read(ledger):registeredBefore).equals(preflight?source.before:final),true);
 let late=null;const actual=path=>{
-  const raw=preflight&&path===ledger?source.after:read(path);
+  const raw=path===ledger?(preflight?source.after:final):read(path);
   return path===late?Buffer.concat([raw,Buffer.from('\n')]):raw;
 };
 const current=packedUpstreamLedgerEpoch({root,read:actual}),previous=packedUpstreamLedgerEpoch({root,read:path=>path===ledger?source.before:read(path)});

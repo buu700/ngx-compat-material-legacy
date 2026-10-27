@@ -37,7 +37,9 @@ reject('changed-delegated-hunk-review',delegated.original_hunk_review_subject.pa
 const prior=JSON.parse(read(transport.canonical_reference_refresh_required[0].prior_review.path));reject('changed-original-patch',prior.patch_file,append);
 let late=false;const lateSource=historicalConsumerWrapperMetadata({root,read:path=>late&&path===transport.wrappers[0].path?append(read(path)):read(path)});
 late=true;assert.throws(()=>lateSource.assertCurrent(),/late historical consumer metadata input/);controls.push({id:'late-wrapper-drift',result:'rejected'});
-const epoch=packedUpstreamLedgerEpoch({root});
+// Retain the exact checkpoint this probe asserts; canonical_after above still checks the actual current ledger.
+const checkpoint=source.line==='21.x'?prepared.registered_checker_metadata_stage.after:prepared.canonical_after;
+const epoch=packedUpstreamLedgerEpoch({root,read:path=>path===CONSUMER_WRAPPER_LEDGER?checkpoint:read(path)});
 assert.equal(epoch.historical_consumer_wrapper_metadata_entries_applied,65);assert.equal(epoch.historical_consumer_wrapper_metadata_references_applied,65);
 assert.equal(epoch.historical_wrapper_metadata_entries_applied,4);assert.equal(epoch.individual_decisions_applied,source.line==='main'?13:27);
 assert.equal(epoch.token_build_decisions_applied,source.line==='main'?0:1);
