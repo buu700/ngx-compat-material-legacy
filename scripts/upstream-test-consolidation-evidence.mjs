@@ -122,7 +122,7 @@ export function testConsolidationBatchOk(body,readRepo,currentProductPaths){
     // The current copy preserves the original review and rebinds its complete
     // product snapshot. Both paths still require the same strict build proof.
     const contextPath=body.candidate_context.path;
-    if(contextPath==='compatibility/rc/snack-dom-source-context-build.json'){
+    if(contextPath==='compatibility/rc/snack-dom-source-context-build.json'||contextPath==='compatibility/rc/packed-upstream-source-build.json'){
       // A separately qualified successor still passes the same complete build
       // and historical-suite checks below; this grants no alternate predicate.
       const qualified=qualifyIndependentSnackProductDelta({read:readRepo});

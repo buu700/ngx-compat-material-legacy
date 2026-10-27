@@ -13,8 +13,8 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 
 const inputPath = 'compatibility/rc/packed-upstream-source-inspector-inputs.json';
-const pins = {main: '7e9659e29aef130ebc2984fc46ef11c04435bf015109c4ad6518b4bbd57868f4',
-  '21.x': 'd727819acececcb133cbaacc15670a4e77ce2785a3ea63751d41d5527d325563'};
+const pins = {main: 'ea593eb8c71952bfc0de94e56f14774cdeff655e97e85685047b4823955271fb',
+  '21.x': '9e0e7349d6623fb4344584e60688b762b6cdd110c70384a156cd3e9321c54e27'};
 const inspectorPath = 'scripts/chip-focus-contract.mjs';
 const frozenPath = 'compatibility/f10/authored-dependency-dispositions.json';
 const reviewPath = 'compatibility/f10/authored-use-reviews/packed-upstream-focus-source-context.json';
@@ -53,9 +53,31 @@ export function qualifyPackedUpstreamFocusInspector({root = process.cwd(), read 
   return {profile, before, ref: {path: profile.path, sha256: profile.sha256}};
 }
 
+function consolidationInspector(root, read, profile, member) {
+  const delta = profile.consolidation_inspector;
+  assert.equal(delta.path, 'scripts/upstream-test-consolidation-evidence.mjs');
+  assert.equal(delta.edits.length, 1);
+  if (member) {assert.equal(member.path, delta.path); assert.equal(member.sha256, delta.before_sha256);}
+  const before = original(root, delta.source_parent, delta.path);
+  assert.equal(hash(before), delta.before_sha256);
+  const edit = delta.edits[0], text = before.toString();
+  assert.equal(text.split(edit.before).length, 2);
+  const current = text.replace(edit.before, edit.after);
+  assert.equal(hash(current), delta.sha256);
+  assert.equal(read(delta.path).toString(), current, 'unqualified current consolidation inspector');
+  return {before, ref: {path: delta.path, sha256: delta.sha256}};
+}
+
+/** The new context uses exactly the same full build and suite predicates. */
+export function qualifyPackedUpstreamConsolidationInspector({root = process.cwd(), read = disk(root), member} = {}) {
+  const inspector = qualifyPackedUpstreamFocusInspector({root, read});
+  return consolidationInspector(root, read, inspector.profile, member);
+}
+
 /** Construct fresh evidence; never rewrite its original 63-review document. */
 export function preparePackedUpstreamFocusMetadata({root = process.cwd(), read = disk(root)} = {}) {
   const inspector = qualifyPackedUpstreamFocusInspector({root, read}), {profile} = inspector;
+  const consolidation = consolidationInspector(root, read, profile);
   const metadata = profile.source_role_metadata;
   assert.equal(metadata.frozen_ledger.path, frozenPath); assert.equal(metadata.review.path, reviewPath);
   assert.deepEqual(metadata.use, {file: 'legacy-chips/chip.ts', module: '@angular/core', symbol: 'NgZone'});
@@ -84,7 +106,7 @@ export function preparePackedUpstreamFocusMetadata({root = process.cwd(), read =
   const writes = new Map([[reviewPath, reviewBytes], [frozenPath, bytes(ledger)]]);
   // All other source judgments, source bytes, and the complete old review stay
   // byte-for-byte represented by the authenticated reconstruction above.
-  return {line: profile.line, inspector, before, writes, source_judgments_changed: 0,
+  return {line: profile.line, inspector, consolidation, before, writes, source_judgments_changed: 0,
     independent_code_bindings_refreshed: 1, actual_native_packed_or_floor_qualified: false};
 }
 
@@ -98,15 +120,20 @@ export function packedUpstreamFocusMetadataEpoch({root = process.cwd(), read = d
     for (const [path, expected] of prepared.writes)
       assert.equal(hash(read(path)), hash(expected), 'changed current focus source metadata ' + path);
     assert.equal(hash(read(inspectorPath)), prepared.inspector.ref.sha256, 'late current focus inspector change');
+    assert.equal(hash(read(prepared.consolidation.ref.path)), prepared.consolidation.ref.sha256,
+      'late current consolidation inspector change');
   };
   assertCurrent();
   const historical = path => {
-    if (prepared.writes.has(path) || path === inspectorPath) assertCurrent();
+    if (prepared.writes.has(path) || path === inspectorPath || path === prepared.consolidation.ref.path) assertCurrent();
     if (path === frozenPath) return Buffer.from(prepared.before);
     if (path === inspectorPath) return Buffer.from(prepared.inspector.before);
+    if (path === prepared.consolidation.ref.path) return Buffer.from(prepared.consolidation.before);
     return read(path);
   };
   return {line: prepared.line, read: historical, raw: read, assertCurrent,
-    inspector: {...prepared.inspector.ref}, projected_metadata_paths: [frozenPath, inspectorPath],
+    inspector: {...prepared.inspector.ref},
+    inspectors: [{...prepared.inspector.ref}, {...prepared.consolidation.ref}],
+    projected_metadata_paths: [frozenPath, inspectorPath, prepared.consolidation.ref.path],
     source_judgments_changed: 0, actual_native_packed_or_floor_qualified: false};
 }
