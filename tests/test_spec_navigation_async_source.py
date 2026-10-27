@@ -14,10 +14,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class NavigationSourceTests(unittest.TestCase):
     def test_complete_originals_observers_imports_helpers_and_mutations(self):
-        result = subprocess.run(['node', 'tests/spec_navigation_async_source_probe.mjs'],
+        result = subprocess.run(['node', 'scripts/run-historical-source-inspector.mjs', '--family', 'navigation'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
-        report = json.loads(result.stdout.strip().splitlines()[-1])
+        replay = json.loads(result.stdout.strip().splitlines()[-1])
+        self.assertFalse(replay['current_source_qualified'])
+        self.assertTrue(replay['historical_subject']['original_probe_source_unchanged'])
+        self.assertTrue(replay['historical_subject']['all_selected_members_rehashed'])
+        report = replay['historical_report']
         for key, expected in {'complete_original_files': 9, 'complete_original_hunks': 198,
                               'paired_cases': 370, 'unchanged_complete_callbacks': 217,
                               'changed_callbacks': 153, 'hooks_paired': 42,
