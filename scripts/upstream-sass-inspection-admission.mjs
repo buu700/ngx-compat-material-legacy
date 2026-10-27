@@ -13,6 +13,7 @@ import {join,isAbsolute} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';
 import {measureSassInspectionScope} from './measure-sass-inspection-scope.mjs';
+import {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';
 
 const reviewPath='compatibility/rc/upstream-sass-inspection-individual-review.json';
 const pins={main:'365e3b6177017f35a8bc073ff999723fcf189bebf2dbf8bb01e521fc552df79f',
@@ -42,6 +43,7 @@ function member(read,ref){const raw=read(ref.path);assert.equal(hash(raw),ref.sh
 function safe(path){assert.equal(typeof path,'string');assert.ok(path&&!isAbsolute(path)&&!path.includes('\\')&&path.split('/').every(part=>part&&part!=='.'&&part!=='..'));}
 function inspect({root,read,line}){
  assert.ok(Object.hasOwn(pins,line));
+ const notices=sassWrapperNoticeSubject({root,read,line});
  assert.equal(JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main',line);
  const body=JSON.parse(member(read,{path:reviewPath,sha256:pins[line]}));
  assert.equal(body.line,line);assert.equal(body.status,'reviewed');assert.equal(body.reviews.length,6);
@@ -69,7 +71,7 @@ function inspect({root,read,line}){
    assert.ok(review.decision.length>80);assert.equal(review.upstream_original_suite_executed,false);});
  }
  assert.equal(count,49);
- const packetBytes=member(read,body.current_compiler_scope),packet=JSON.parse(gunzipSync(packetBytes)),scope=packet.actual;
+ const packetBytes=member(read,body.current_compiler_scope),packet=JSON.parse(gunzipSync(packetBytes)),scope=notices.qualifySassScope(packet.actual);
  assert.equal(packet.summary.line,line);assert.equal(packet.summary.result,'pass');assert.equal(packet.summary.positive.length,5);assert.equal(packet.summary.rejected.length,10);
  assert.equal(scope.line,line);assert.equal(scope.result,'pass');assert.equal(scope.entry_override_used,false);
  assert.equal(scope.candidate_entry,'projects/ngx-material-legacy/_index.scss');member(read,scope.producer);
@@ -84,7 +86,7 @@ function inspect({root,read,line}){
   for(const ref of program.loaded_sources){safe(ref.path);assert.ok(Number.isInteger(ref.root)&&ref.root>=0&&ref.root<roots.length);
    const raw=readFileSync(join(roots[ref.root],ref.path));assert.equal(hash(raw),ref.sha256,'changed loaded Sass input '+ref.path);assert.equal(raw.length,ref.bytes);}
  }
- return {body,scope,scopeHash:hash(packetBytes)};
+ notices.assertCurrent();return {body,scope,scopeHash:hash(packetBytes)};
 }
 function validateEntry({root,read,entry,body,line},fresh){
  try{

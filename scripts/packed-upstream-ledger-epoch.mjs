@@ -20,6 +20,7 @@ import {autocompleteLandscapeSourceJudgment,AUTOCOMPLETE_LANDSCAPE_SHA,AUTOCOMPL
 import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';
 import {autocompleteSelectionNativeSubject,SELECTION_NATIVE_REGISTRY,SELECTION_NATIVE_SHAS} from './autocomplete-selection-native-subject.mjs';
 import {autocompleteSelectionSourceJudgments} from './autocomplete-selection-source-judgment.mjs';
+import {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';
 
 const ts = createRequire(import.meta.url)('typescript');
 const inputPath = 'compatibility/rc/packed-upstream-source-inputs.json';
@@ -277,7 +278,7 @@ function prepareSassStage({root,read,line,before,bound}){
   const member=ref=>{const raw=read(ref.path);
     if(ref.path===testingApiChecker){const original=gitBytes(root,rulesJsParents[line],ref.path);
       assert.equal(hash(original),ref.sha256);assert.equal(raw.toString(),rulesJsCheckerSuccessor(original.toString()),'unqualified rules_js checker successor');
-    }else assert.equal(hash(raw),ref.sha256,'changed Sass admission input '+ref.path);
+    }else return selectionMember({root,read,line,ref,bound});
     bound.set(ref.path,hash(raw));return raw;};
   const packet=JSON.parse(gunzipSync(member(sassTransitions[line])));
   assert.equal(packet.line,line);assert.equal(packet.decisions_changed,6);
@@ -290,7 +291,8 @@ function prepareSassStage({root,read,line,before,bound}){
   for(const ref of packet.code_subjects)member(ref);
   const review=JSON.parse(member(packet.review));assert.equal(review.line,line);assert.equal(review.reviews.length,6);
   for(const ref of [review.upstream_originals,review.source_census,review.current_compiler_scope])member(ref);
-  const scope=JSON.parse(gunzipSync(member(review.current_compiler_scope))).actual;member(scope.producer);member(scope.oracle);
+  const notices=sassWrapperNoticeSubject({root,read,line});
+  const scope=notices.qualifySassScope(JSON.parse(gunzipSync(member(review.current_compiler_scope))).actual);member(scope.producer);member(scope.oracle);
   const peerRoots=[realpathSync(join(root,'node_modules/@angular/material')),realpathSync(join(root,'node_modules/@angular/cdk'))];
   const external=new Map();
   for(const [program,roots]of [[scope.candidate,[realpathSync(join(root,'projects/ngx-material-legacy')),...peerRoots]],[scope.current,peerRoots]]){
@@ -542,7 +544,7 @@ function prepareSelectionSpecMetadata({root,read,line,before,bound,currentSource
   assert.deepEqual(packet.source_spec,spec.bound[0]);
   assert.deepEqual(packet.source_readers,readers.bound.find(ref=>ref.path==='compatibility/rc/autocomplete-selection-source-reader-successors.json'));
   for(const ref of [packet.code_subject,packet.current_review,packet.historical_review]){
-    const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256);assert.equal(bytes.length,ref.bytes);bound.set(ref.path,ref.sha256);
+    selectionMember({root,read,line,ref,bound});
   }
   assert.equal(packet.code_subject.path,'scripts/autocomplete-selection-spec-subject.mjs');
   assert.equal(packet.current_review.path,AUTOCOMPLETE_LANDSCAPE_REVIEW);
@@ -645,6 +647,8 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const before = gitBytes(root, data.before_ledger.source_parent, ledgerPath);
   assert.equal(hash(before), data.before_ledger.sha256);
   const bound = new Map([[inputPath, hash(input)]]);
+  if(line==='main'){const path='scripts/sass-wrapper-notice-subject.mjs';
+    assert.equal(hash(read(path)),'d3cc81cda9599840bcef5ad019c4aae4d892368474f7767e1ee56c9a7434d4fd','changed finite Sass notice qualifier');bound.set(path,hash(read(path)));}
   const specReaders=selectionReaders(root,read,line);for(const ref of specReaders.bound)bound.set(ref.path,ref.sha256);
   const nativeSubjects=selectionNative(root,read,line);for(const ref of nativeSubjects.bound)bound.set(ref.path,ref.sha256);
   function member(ref, authenticate = false) {

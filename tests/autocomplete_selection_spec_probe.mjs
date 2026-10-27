@@ -8,6 +8,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {sassWrapperNoticeSubject} from '../scripts/sass-wrapper-notice-subject.mjs';
 import {createRequire} from 'node:module';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -84,9 +85,12 @@ const readerPacketPath='compatibility/rc/autocomplete-selection-source-reader-su
 const readerPacket=JSON.parse(read(readerPacketPath)),reader=autocompleteSelectionReaderSubject({root,read}),readerRejected=[];
 assert.equal(reader.native_or_full_source_admission_credit,false);assert.equal(readerPacket.code_subjects.length,7);
 assert.equal(reader.qualify({path:'unrelated.mjs',sha256:'0'.repeat(64)}),null);
+const notices=sassWrapperNoticeSubject({root,read});
 for(const row of readerPacket.code_subjects){
-  assert.deepEqual(reader.qualify({path:row.path,...row.before}),{path:row.path,...row.after});
-  assert.deepEqual(reader.qualify({path:row.path,...row.after}),{path:row.path,...row.after});
+  const current=notices.qualify({path:row.path,...row.after})??{path:row.path,...row.after};
+  assert.deepEqual(reader.qualify({path:row.path,...row.before}),current);
+  assert.deepEqual(reader.qualify({path:row.path,...row.after}),current);
+  assert.deepEqual(reader.qualify(current),current);
   assert.deepEqual(reader.historicalMetadataReference(row.path),{path:row.path,sha256:row.before.sha256});
   assert.throws(()=>reader.qualify({path:row.path,sha256:'0'.repeat(64)}));readerRejected.push('unknown-code-digest-'+row.path);
   assert.throws(()=>reader.qualify({path:row.path,...row.before,bytes:row.before.bytes+1}));readerRejected.push('wrong-code-size-'+row.path);

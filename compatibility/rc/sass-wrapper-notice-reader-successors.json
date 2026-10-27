@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "8dccb816e63c1f417ac6f1d5b502b8ea43aae2d0",
+  "role": "Finite current source-reader hooks for seven exact silent Sass notice prefixes. No historical report or code bytes are projected through current readers.",
+  "code_subjects": [
+    {
+      "path": "scripts/autocomplete-selection-spec-subject.mjs",
+      "before": {
+        "sha256": "6dfd283b57fc9c2f96b87f634dcdb5f2dc41755469f228bb5efc8cf49bcbafde",
+        "bytes": 9292
+      },
+      "after": {
+        "sha256": "c57e09c9649666999fa4ee4ff8ae3aa2c6462e450e1d3b0257ccedb5d6b2bded",
+        "bytes": 9965
+      },
+      "literal_edits": [
+        {
+          "before": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';",
+          "after": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\nimport {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';"
+        },
+        {
+          "before": "  const spec=autocompleteSelectionSpecSubject({root,read,line});line=spec.line;",
+          "after": "  const spec=autocompleteSelectionSpecSubject({root,read,line});line=spec.line;\n  const notices=sassWrapperNoticeSubject({root,read,line});"
+        },
+        {
+          "before": "  const bound=[...spec.bound,{path:readersPath,sha256:hash(raw),bytes:raw.length}];",
+          "after": "  const bound=[...spec.bound,{path:readersPath,sha256:hash(raw),bytes:raw.length},...notices.bound];"
+        },
+        {
+          "before": "    assert.equal(hash(read(row.path)),row.after.sha256,'unqualified native spec source-reader change');\n    bound.push({path:row.path,...row.after});",
+          "after": "    const current=notices.qualify({path:row.path,...row.after})??{path:row.path,...row.after};\n    assert.equal(hash(read(row.path)),current.sha256,'unqualified native spec source-reader change');\n    bound.push(current);"
+        },
+        {
+          "before": "    const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return null;",
+          "after": "    const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return notices.qualify(ref);\n    const notice=notices.qualify({path:row.path,...row.after});\n    if(notice?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,notice.bytes);return notice;}"
+        },
+        {
+          "before": "    return {path:ref.path,...row.after};",
+          "after": "    return notice??{path:ref.path,...row.after};"
+        },
+        {
+          "before": "  const assertCurrent=()=>{spec.assertCurrent();for(const ref of bound)",
+          "after": "  const assertCurrent=()=>{spec.assertCurrent();notices.assertCurrent();for(const ref of bound)"
+        },
+        {
+          "before": "const targets=['prepareRequiredSelection'",
+          "after": "const gitObjects=new Map();\nfunction originalBytes(root,env,parent,path){\n  const key=JSON.stringify([root,parent,path]);\n  if(!gitObjects.has(key))gitObjects.set(key,execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',parent+':'+path],\n    {cwd:root,env,maxBuffer:1024*1024}));\n  return Buffer.from(gitObjects.get(key));\n}\nconst targets=['prepareRequiredSelection'"
+        },
+        {
+          "before": "  const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+packet.path],\n    {cwd:root,env,maxBuffer:1024*1024});",
+          "after": "  const before=originalBytes(root,env,packet.source_parent,packet.path);"
+        },
+        {
+          "before": "    let text=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+row.path],\n      {cwd:root,env,maxBuffer:1024*1024}).toString();",
+          "after": "    let text=originalBytes(root,env,packet.source_parent,row.path).toString();"
+        },
+        {
+          "before": "    bound.push(current);",
+          "after": "    const existing=bound.find(ref=>ref.path===current.path);\n    if(existing)assert.deepEqual(existing,current);else bound.push(current);"
+        },
+        {
+          "before": "  const assertCurrent=()=>{spec.assertCurrent();notices.assertCurrent();for(const ref of bound)",
+          "after": "  const assertCurrent=()=>{spec.assertCurrent();for(const ref of bound)"
+        }
+      ]
+    },
+    {
+      "path": "scripts/packed-product-source-recovery.mjs",
+      "before": {
+        "sha256": "1dc5ad8c196d411f21b7b8efbede7cfd6f0870d58afe52cf52fe03691008f9b8",
+        "bytes": 12722
+      },
+      "after": {
+        "sha256": "d1efbd02bed5faf05df137660f361fe7d851709ff1c5e0ea4e6c4bdec7b285ec",
+        "bytes": 12673
+      },
+      "literal_edits": [
+        {
+          "before": "  if(member.path===nativeSpec.spec.path){assert.equal(member.sha256,nativeSpec.spec.before.sha256);assert.equal(currentTargets.some(t=>t.path===member.path),false);expected=nativeSpec.spec.after.sha256;}",
+          "after": "  const qualified=nativeSpec.qualify(member);\n  if(qualified){assert.equal(currentTargets.some(t=>t.path===member.path),false);expected=qualified.sha256;}"
+        }
+      ]
+    },
+    {
+      "path": "scripts/dialog-portal-failure-recovery.mjs",
+      "before": {
+        "sha256": "e0f84875c25438c7027960762382e5e8fd8fb5efee5b3b8de744f99953dd5aa2",
+        "bytes": 12162
+      },
+      "after": {
+        "sha256": "a23eacb5c90c1e952235cc0a9ba458ce2938ad09c3689126bd9ae35fa15967ba",
+        "bytes": 12177
+      },
+      "literal_edits": [
+        {
+          "before": "import {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';",
+          "after": "import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';"
+        },
+        {
+          "before": "nativeSpec=autocompleteSelectionSpecSubject({root,read,line:prior.line})",
+          "after": "nativeSpec=autocompleteSelectionReaderSubject({root,read,line:prior.line})"
+        },
+        {
+          "before": " const expected=m.path===nativeSpec.path?nativeSpec.after.sha256:m.sha256;\n if(m.path===nativeSpec.path)assert.equal(m.sha256,nativeSpec.before.sha256);",
+          "after": " const expected=(nativeSpec.qualify(m)??m).sha256;"
+        },
+        {
+          "before": "other_product_resource_members_unchanged:1140,independently_qualified_native_test_source:{path:nativeSpec.path,before:{...nativeSpec.before},after:{...nativeSpec.after},qualification:{...nativeSpec.bound[0]}}",
+          "after": "other_product_resource_members_unchanged:prior.line==='main'?1133:1140,independently_qualified_silent_Sass_notices:prior.line==='main'?7:0,independently_qualified_native_test_source:{path:nativeSpec.spec.path,before:{...nativeSpec.spec.before},after:{...nativeSpec.spec.after},qualification:{...nativeSpec.spec.bound[0]}}"
+        }
+      ]
+    },
+    {
+      "path": "scripts/snack-dom-source-context.mjs",
+      "before": {
+        "sha256": "90f153554f101c610d1a477b2143f9e26df8d0f1951ac0ee6988a6176146d8a5",
+        "bytes": 42431
+      },
+      "after": {
+        "sha256": "90961de79aa264ac04fc50afb0525d31026b96cd1683e8b467a34f66892659c7",
+        "bytes": 42560
+      },
+      "literal_edits": [
+        {
+          "before": "const {independently_qualified_native_test_source:qualifiedTest,...historicalSource}=source;",
+          "after": "const {independently_qualified_native_test_source:qualifiedTest,independently_qualified_silent_Sass_notices:qualifiedNotices,...historicalSource}=source;"
+        },
+        {
+          "before": " assert.equal(source.other_product_resource_members_unchanged,1140);",
+          "after": " assert.equal(qualifiedNotices,line==='main'?7:0);\n assert.equal(source.other_product_resource_members_unchanged,1140-qualifiedNotices);"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-sass-inspection-admission.mjs",
+      "before": {
+        "sha256": "29291c30c7469cd3e0517574fddbcbf6a1cbf49f0a750d974f4736fd1ea22345",
+        "bytes": 8760
+      },
+      "after": {
+        "sha256": "ccacc057737d1eaf571aa800b300101b56d2181ad5f14fec0dfd279256d07edb",
+        "bytes": 8945
+      },
+      "literal_edits": [
+        {
+          "before": "import {measureSassInspectionScope} from './measure-sass-inspection-scope.mjs';",
+          "after": "import {measureSassInspectionScope} from './measure-sass-inspection-scope.mjs';\nimport {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';"
+        },
+        {
+          "before": "function inspect({root,read,line}){\n assert.ok(Object.hasOwn(pins,line));",
+          "after": "function inspect({root,read,line}){\n assert.ok(Object.hasOwn(pins,line));\n const notices=sassWrapperNoticeSubject({root,read,line});"
+        },
+        {
+          "before": "packet=JSON.parse(gunzipSync(packetBytes)),scope=packet.actual;",
+          "after": "packet=JSON.parse(gunzipSync(packetBytes)),scope=notices.qualifySassScope(packet.actual);"
+        },
+        {
+          "before": " return {body,scope,scopeHash:hash(packetBytes)};",
+          "after": " notices.assertCurrent();return {body,scope,scopeHash:hash(packetBytes)};"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-rules-js-build-admission.mjs",
+      "before": {
+        "sha256": "45a308f40bc92cf2072799c538d9b4c202709b74dd8ce3551808017bc58ce0c0",
+        "bytes": 9409
+      },
+      "after": {
+        "sha256": "37a6c7d37d456d9c2a32fb9db07e37353b8170b4d231a026cb28992596cf1578",
+        "bytes": 9376
+      },
+      "literal_edits": [
+        {
+          "before": "import {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';",
+          "after": "import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';"
+        },
+        {
+          "before": " const spec=autocompleteSelectionSpecSubject({root,read,line});",
+          "after": " const readers=autocompleteSelectionReaderSubject({root,read,line}),spec=readers.spec;"
+        },
+        {
+          "before": "  if(ref.path!==spec.path)return ref;",
+          "after": "  if(ref.path!==spec.path)return readers.qualify(ref)??ref;"
+        },
+        {
+          "before": " for(const ref of spec.bound)if(!refs.some(row=>row.path===ref.path))refs.push(ref);",
+          "after": " for(const ref of readers.bound)if(!refs.some(row=>row.path===ref.path))refs.push(ref);"
+        },
+        {
+          "before": " const assertExternal=()=>{spec.assertCurrent();for(const ref of external)",
+          "after": " const assertExternal=()=>{readers.assertCurrent();for(const ref of external)"
+        },
+        {
+          "before": "   const spec=autocompleteSelectionSpecSubject({root,read,line}),expected=structuredClone(checked.proposal);\n   const refs=expected.candidate_context.product_members.filter(ref=>ref.path===spec.path);assert.equal(refs.length,1);\n   assert.equal(refs[0].sha256,spec.before.sha256);assert.equal(refs[0].bytes,spec.before.bytes);Object.assign(refs[0],spec.after);\n   assert.equal(isDeepStrictEqual(actual.body,expected),true,'fresh full build-source facts changed beyond the exact additive native spec');",
+          "after": "   const readers=autocompleteSelectionReaderSubject({root,read,line}),expected=structuredClone(checked.proposal);\n   expected.candidate_context.product_members=expected.candidate_context.product_members.map(ref=>readers.qualify(ref)??ref);\n   assert.equal(isDeepStrictEqual(actual.body,expected),true,'fresh full build-source facts changed beyond independently qualified source deltas');\n   readers.assertCurrent();"
+        }
+      ]
+    }
+  ],
+  "unrelated_code_changes": 0,
+  "original_receipts_or_goldens_rewritten": 0,
+  "actual_native_packed_or_floor_executed": false,
+  "g13_claim": "not-passed"
+}

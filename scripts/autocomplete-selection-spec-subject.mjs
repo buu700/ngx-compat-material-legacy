@@ -10,6 +10,7 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';
 
 export const AUTOCOMPLETE_SELECTION_SPEC='projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts';
 export const AUTOCOMPLETE_SELECTION_SPEC_PACKET='compatibility/rc/autocomplete-selection-spec-successor.json';
@@ -20,6 +21,13 @@ const readerPins={main:'bf806c5628500798e6045d40858b0523b6744656cf582ee1d263847d
 const pins={main:'bf629b45cf65bc93a98a43a9f7fc2d0fb9cf720cc72c07d9c8545c60ee1e10a3',
   '21.x':'7351ca1bb38ed03c8487db227d73194d94383941ca310a64604b0516188e33a5'};
 const hash=raw=>createHash('sha256').update(raw).digest('hex'),ts=createRequire(import.meta.url)('typescript');
+const gitObjects=new Map();
+function originalBytes(root,env,parent,path){
+  const key=JSON.stringify([root,parent,path]);
+  if(!gitObjects.has(key))gitObjects.set(key,execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',parent+':'+path],
+    {cwd:root,env,maxBuffer:1024*1024}));
+  return Buffer.from(gitObjects.get(key));
+}
 const targets=['prepareRequiredSelection','should retain the selected model while typing when selection is required',
   'should reset unmatched required-selection text once on outside click',
   'should update the control back to a string if user types after an option is selected',
@@ -41,8 +49,7 @@ export function autocompleteSelectionSpecSubject({root,read=p=>readEvidenceMembe
   assert.match(packet.source_parent,/^[0-9a-f]{40}$/);
   const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
   for(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[key];
-  const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+packet.path],
-    {cwd:root,env,maxBuffer:1024*1024});
+  const before=originalBytes(root,env,packet.source_parent,packet.path);
   assert.equal(hash(before),packet.before.sha256);assert.equal(before.length,packet.before.bytes);
   let end=0;const chunks=[];
   for(const edit of [...packet.insertions].sort((a,b)=>a.byte_offset-b.byte_offset)){
@@ -71,6 +78,7 @@ export function autocompleteSelectionSpecSubject({root,read=p=>readEvidenceMembe
  * through a current reader, and no historical report is silently rewritten. */
 export function autocompleteSelectionReaderSubject({root,read=p=>readEvidenceMember(root,p),line}={}){
   const spec=autocompleteSelectionSpecSubject({root,read,line});line=spec.line;
+  const notices=sassWrapperNoticeSubject({root,read,line});
   readEvidenceMember(root,readersPath);
   const raw=read(readersPath);assert.equal(hash(raw),readerPins[line]);
   const packet=JSON.parse(raw);assert.equal(packet.schema_version,1);assert.equal(packet.line,line);
@@ -81,16 +89,17 @@ export function autocompleteSelectionReaderSubject({root,read=p=>readEvidenceMem
   assert.deepEqual(packet.code_subjects.map(row=>row.path),['scripts/upstream-rules-js-build-admission.mjs','scripts/autocomplete-landscape-source-judgment.mjs','scripts/upstream-testing-api-21x-admission.mjs','scripts/packed-product-source-recovery.mjs','scripts/packed-cva-source-requalification.mjs','scripts/dialog-portal-failure-recovery.mjs','scripts/snack-dom-source-context.mjs']);
   const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
   for(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[key];
-  const bound=[...spec.bound,{path:readersPath,sha256:hash(raw),bytes:raw.length}];
+  const bound=[...spec.bound,{path:readersPath,sha256:hash(raw),bytes:raw.length},...notices.bound];
   for(const row of packet.code_subjects){
-    let text=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+row.path],
-      {cwd:root,env,maxBuffer:1024*1024}).toString();
+    let text=originalBytes(root,env,packet.source_parent,row.path).toString();
     assert.equal(hash(text),row.before.sha256);assert.equal(Buffer.byteLength(text),row.before.bytes);
     for(const edit of row.literal_edits){assert.equal(text.split(edit.before).length,2);text=text.replace(edit.before,edit.after);}
     assert.equal(hash(text),row.after.sha256);assert.equal(Buffer.byteLength(text),row.after.bytes);
     readEvidenceMember(root,row.path);
-    assert.equal(hash(read(row.path)),row.after.sha256,'unqualified native spec source-reader change');
-    bound.push({path:row.path,...row.after});
+    const current=notices.qualify({path:row.path,...row.after})??{path:row.path,...row.after};
+    assert.equal(hash(read(row.path)),current.sha256,'unqualified native spec source-reader change');
+    const existing=bound.find(ref=>ref.path===current.path);
+    if(existing)assert.deepEqual(existing,current);else bound.push(current);
   }
   const qualify=ref=>{
     if(ref.path===spec.path){
@@ -98,10 +107,12 @@ export function autocompleteSelectionReaderSubject({root,read=p=>readEvidenceMem
       if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===spec.before.sha256?spec.before.bytes:spec.after.bytes);
       return {path:ref.path,...spec.after};
     }
-    const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return null;
+    const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return notices.qualify(ref);
+    const notice=notices.qualify({path:row.path,...row.after});
+    if(notice?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,notice.bytes);return notice;}
     assert.ok([row.before.sha256,row.after.sha256].includes(ref.sha256));
     if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===row.before.sha256?row.before.bytes:row.after.bytes);
-    return {path:ref.path,...row.after};
+    return notice??{path:ref.path,...row.after};
   };
   const assertCurrent=()=>{spec.assertCurrent();for(const ref of bound){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late native source-reader change');assert.equal(bytes.length,ref.bytes);}};
   const publicSpec={...spec,before:{...spec.before},after:{...spec.after},packet:structuredClone(spec.packet),bound:structuredClone(spec.bound)};
