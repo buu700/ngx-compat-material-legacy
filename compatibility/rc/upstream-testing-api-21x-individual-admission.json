@@ -1,0 +1,877 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "role": "Seven individual complete original harness/API reviews on the 21.x legacy add-on",
+  "reviews": [
+    {
+      "sha": "422e85d1524f8eeff2425e403702fbfc23a2cc2e",
+      "status": "reviewed",
+      "final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "decision": "The original commit adds public content-loader methods to the modern MDC option harness. The owned legacy option harness retains its untouched Material16 class implementation and public parent. Adding those methods is outside the finite historical legacy API contract.",
+      "diff_sha256": "981e03d36244ac78ac3950c1038ac029694837dc4023eb0450009ed9432919b9",
+      "diff": "diff --git a/src/material/core/testing/option-harness.ts b/src/material/core/testing/option-harness.ts\nindex a68b96117d6395b975f3a6ee46fd123914253d6b..925bfc35f57dda2f2ba88b136d21026646678678 100644\n--- a/src/material/core/testing/option-harness.ts\n+++ b/src/material/core/testing/option-harness.ts\n@@ -7,14 +7,14 @@\n  */\n \n import {\n-  ComponentHarness,\n   ComponentHarnessConstructor,\n+  ContentContainerComponentHarness,\n   HarnessPredicate,\n } from '@angular/cdk/testing';\n import {OptionHarnessFilters} from './option-harness-filters';\n \n /** Harness for interacting with an MDC-based `mat-option` in tests. */\n-export class MatOptionHarness extends ComponentHarness {\n+export class MatOptionHarness extends ContentContainerComponentHarness {\n   /** Selector used to locate option instances. */\n   static hostSelector = '.mat-mdc-option';\n \ndiff --git a/tools/public_api_guard/material/core-testing.md b/tools/public_api_guard/material/core-testing.md\nindex 850d9d2a0d61be910459019b1fee27bb2a5f099a..fb623f6627a3557448c3a709055c0b2c9671bd3c 100644\n--- a/tools/public_api_guard/material/core-testing.md\n+++ b/tools/public_api_guard/material/core-testing.md\n@@ -7,6 +7,7 @@\n import { BaseHarnessFilters } from '@angular/cdk/testing';\n import { ComponentHarness } from '@angular/cdk/testing';\n import { ComponentHarnessConstructor } from '@angular/cdk/testing';\n+import { ContentContainerComponentHarness } from '@angular/cdk/testing';\n import { HarnessPredicate } from '@angular/cdk/testing';\n \n // @public\n@@ -19,7 +20,7 @@ export class MatOptgroupHarness extends ComponentHarness {\n }\n \n // @public\n-export class MatOptionHarness extends ComponentHarness {\n+export class MatOptionHarness extends ContentContainerComponentHarness {\n     click(): Promise<void>;\n     getText(): Promise<string>;\n     static hostSelector: string;\n",
+      "complete_original_paths": [
+        "src/material/core/testing/option-harness.ts",
+        "tools/public_api_guard/material/core-testing.md"
+      ],
+      "frozen_seed_files": [
+        "src/material/core/testing/option-harness.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/core/testing/option-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -7,14 +7,14 @@",
+          "hunk_sha256": "19c7b8b496e10e4e7625de65254a80524601630877b588e8bf7e819eeb2d4d3f",
+          "decision": "The modern MDC option replaces ComponentHarness with ContentContainerComponentHarness, exposing additional public loader methods. The untouched legacy option keeps its original parent and exact six methods; actual packed protocol cases reject changing that parent.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "tools/public_api_guard/material/core-testing.md",
+          "hunk_index": 1,
+          "header": "@@ -7,6 +7,7 @@",
+          "hunk_sha256": "a1344e63ac4a2af66b1723dcba2f02b1c642477e6dfe6d0bbd818e0adf159f37",
+          "decision": "The added import records the modern public parent dependency. The owned historical option contract does not acquire that dependency or modify an original API golden.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "tools/public_api_guard/material/core-testing.md",
+          "hunk_index": 2,
+          "header": "@@ -19,7 +20,7 @@ export class MatOptgroupHarness extends ComponentHarness {",
+          "hunk_sha256": "46e0037d1af1f92e03fb2178f9e0c768e56da76f638fef09f497193727f7a10c",
+          "decision": "The modern public guard changes the option parent. This is a real public API expansion, not an inherited legacy fix; actual packed prototype and method-set checks preserve Material 16.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "prior_entry_sha256": "22ffa4d80422db2f6b11a8559e091e69f129144eb6baf89e58b0c10ebb419f3a",
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "4de7c0fb2d033bd81074764a52cc46edd02e6774",
+      "status": "reviewed",
+      "final_disposition": "inherited",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "decision": "The current21.2.14public CDK supplies the two loader methods, and current public input/native-select/datepicker label lookup accepts legacy label bindings without the initial MDC prefix. The owned input adapter preserves predicate identity/native disabled behavior. The owned legacy select retains its finite disabled-only filter and old parent; modern select label API is not copied. Upstream fixture/doc edits are source review, not execution of those suites.",
+      "diff_sha256": "789e84d9089de9fe4f45a5297d6afc944dd3fadf3fab2de9293e2e0cd50c1879",
+      "diff": "diff --git a/src/cdk/testing/component-harness.ts b/src/cdk/testing/component-harness.ts\nindex 4fe49ab6e2208041d4929462541b9688be62b563..646ac6ef1edca7d423dbb8fdbe4c253388a75466 100644\n--- a/src/cdk/testing/component-harness.ts\n+++ b/src/cdk/testing/component-harness.ts\n@@ -120,12 +120,31 @@\n   getHarnessOrNull<T extends ComponentHarness>(query: HarnessQuery<T>): Promise<T | null>;\n \n   /**\n+   * Searches for an instance of the component corresponding to the given harness type under the\n+   * `HarnessLoader`'s root element, and returns a `ComponentHarness` for the instance on the page\n+   * at the given index. If no matching component exists at that index, an error is thrown.\n+   * @param query A query for a harness to create\n+   * @param index The zero-indexed offset of the matching component instance to return\n+   * @return An instance of the given harness type.\n+   * @throws If a matching component instance can't be found at the given index.\n+   */\n+  getHarnessAtIndex<T extends ComponentHarness>(query: HarnessQuery<T>, index: number): Promise<T>;\n+\n+  /**\n    * Searches for all instances of the component corresponding to the given harness type under the\n    * `HarnessLoader`'s root element, and returns a list `ComponentHarness` for each instance.\n    * @param query A query for a harness to create\n    * @return A list instances of the given harness type.\n    */\n   getAllHarnesses<T extends ComponentHarness>(query: HarnessQuery<T>): Promise<T[]>;\n+\n+  /**\n+   * Searches for all instances of the component corresponding to the given harness type under the\n+   * `HarnessLoader`'s root element, and returns the total count of all matching components.\n+   * @param query A query for a harness to create\n+   * @return An integer indicating the number of instances that were found.\n+   */\n+  countHarnesses<T extends ComponentHarness>(query: HarnessQuery<T>): Promise<number>;\n \n   /**\n    * Searches for an instance of the component corresponding to the given harness type under the\n@@ -501,6 +520,20 @@\n   }\n \n   /**\n+   * Gets a matching harness for the given query and index within the current harness's content.\n+   * @param query The harness query to search for.\n+   * @param index The zero-indexed offset of the component to find.\n+   * @returns The first harness matching the given query.\n+   * @throws If no matching harness is found.\n+   */\n+  async getHarnessAtIndex<T extends ComponentHarness>(\n+    query: HarnessQuery<T>,\n+    index: number,\n+  ): Promise<T> {\n+    return (await this.getRootHarnessLoader()).getHarnessAtIndex(query, index);\n+  }\n+\n+  /**\n    * Gets all matching harnesses for the given query within the current harness's content.\n    * @param query The harness query to search for.\n    * @returns The list of harness matching the given query.\n@@ -510,11 +543,22 @@\n   }\n \n   /**\n+   * Returns the number of matching harnesses for the given query within the current harness's\n+   * content.\n+   *\n+   * @param query The harness query to search for.\n+   * @returns The number of matching harnesses for the given query.\n+   */\n+  async countHarnesses<T extends ComponentHarness>(query: HarnessQuery<T>): Promise<number> {\n+    return (await this.getRootHarnessLoader()).countHarnesses(query);\n+  }\n+\n+  /**\n    * Checks whether there is a matching harnesses for the given query within the current harness's\n    * content.\n    *\n    * @param query The harness query to search for.\n-   * @returns Whetehr there is matching harnesses for the given query.\n+   * @returns Whether there is matching harnesses for the given query.\n    */\n   async hasHarness<T extends ComponentHarness>(query: HarnessQuery<T>): Promise<boolean> {\n     return (await this.getRootHarnessLoader()).hasHarness(query);\ndiff --git a/src/cdk/testing/harness-environment.ts b/src/cdk/testing/harness-environment.ts\nindex e03f479e17d00d4b25e1a1ea453ee0d036e35a54..a2fdb2228c40b32ec3c76bb23292648ff35ebad2 100644\n--- a/src/cdk/testing/harness-environment.ts\n+++ b/src/cdk/testing/harness-environment.ts\n@@ -249,6 +249,30 @@\n   }\n \n   /**\n+   * Searches for an instance of the component corresponding to the given harness type and index\n+   * under the `HarnessEnvironment`'s root element, and returns a `ComponentHarness` for that\n+   * instance. The index specifies the offset of the component to find. If no matching\n+   * component is found at that index, an error is thrown.\n+   * @param query A query for a harness to create\n+   * @param index The zero-indexed offset of the component to find\n+   * @return An instance of the given harness type\n+   * @throws If a matching component instance can't be found.\n+   */\n+  async getHarnessAtIndex<T extends ComponentHarness>(\n+    query: HarnessQuery<T>,\n+    offset: number,\n+  ): Promise<T> {\n+    if (offset < 0) {\n+      throw Error('Index must not be negative');\n+    }\n+    const harnesses = await this.locatorForAll(query)();\n+    if (offset >= harnesses.length) {\n+      throw Error(`No harness was located at index ${offset}`);\n+    }\n+    return harnesses[offset];\n+  }\n+\n+  /**\n    * Searches for all instances of the component corresponding to the given harness type under the\n    * `HarnessEnvironment`'s root element, and returns a list `ComponentHarness` for each instance.\n    * @param query A query for a harness to create\n@@ -256,6 +280,16 @@\n    */\n   getAllHarnesses<T extends ComponentHarness>(query: HarnessQuery<T>): Promise<T[]> {\n     return this.locatorForAll(query)();\n+  }\n+\n+  /**\n+   * Searches for all instance of the component corresponding to the given harness type under the\n+   * `HarnessEnvironment`'s root element, and returns the number that were found.\n+   * @param query A query for a harness to create\n+   * @return The number of instances that were found.\n+   */\n+  async countHarnesses<T extends ComponentHarness>(query: HarnessQuery<T>): Promise<number> {\n+    return (await this.locatorForAll(query)()).length;\n   }\n \n   /**\ndiff --git a/src/cdk/testing/test-harnesses.md b/src/cdk/testing/test-harnesses.md\nindex 9025d5b0ea8a890669b1e7c02ea9f31ddb2d98fd..c2710b1eff6e16bf5fa33b207cda54e92fe1fc13 100644\n--- a/src/cdk/testing/test-harnesses.md\n+++ b/src/cdk/testing/test-harnesses.md\n@@ -134,9 +134,12 @@\n | `getChildLoader(selector: string): Promise<HarnessLoader>` | Searches for an element matching the given selector below the root element of this `HarnessLoader`, and returns a new `HarnessLoader` rooted at the first matching element |\n | `getAllChildLoaders(selector: string): Promise<HarnessLoader[]>` | Acts like `getChildLoader`, but returns an array of `HarnessLoader` instances, one for each matching element, rather than just the first matching element |\n | `getHarness<T extends ComponentHarness>(harnessType: ComponentHarnessConstructor<T> \\| HarnessPredicate<T>): Promise<T>` | Searches for an instance of the given `ComponentHarness` class or `HarnessPredicate` below the root element of this `HarnessLoader` and returns an instance of the harness corresponding to the first matching element |\n+| `getHarnessAtIndex<T extends ComponentHarness>(harnessType: ComponentHarnessConstructor<T> \\| HarnessPredicate<T>, index: number): Promise<T>` | Acts like `getHarness`, but returns an instance of the harness corresponding to the matching element with the given index (zero-indexed) |\n | `getAllHarnesses<T extends ComponentHarness>(harnessType: ComponentHarnessConstructor<T> \\| HarnessPredicate<T>): Promise<T[]>` | Acts like `getHarness`, but returns an array of harness instances, one for each matching element, rather than just the first matching element  |\n-\n-Calls to `getHarness` and `getAllHarnesses` can either take `ComponentHarness` subclass or a\n+| `countHarnesses<T extends ComponentHarness>(harnessType: ComponentHarnessConstructor<T> \\| HarnessPredicate<T>): Promise<number>` | Counts the number of instances of the given `ComponentHarness` class or `HarnessPredicate` below the root element of this `HarnessLoader`, and returns the result. |\n+| `hasHarness<T extends ComponentHarness>(harnessType: ComponentHarnessConstructor<T> \\| HarnessPredicate<T>): Promise<boolean>` | Returns true if an instance of the given `ComponentHarness` class or `HarnessPredicate` exists below the root element of this `HarnessLoader` |\n+\n+Calls to the harness functions can either take `ComponentHarness` subclass or a\n `HarnessPredicate`. `HarnessPredicate` applies additional restrictions to the search (e.g. searching\n for a button that has some particular text, etc). The\n [details of `HarnessPredicate`](#filtering-harness-instances-with-harnesspredicate) are discussed in\ndiff --git a/src/material/datepicker/testing/date-range-input-harness.spec.ts b/src/material/datepicker/testing/date-range-input-harness.spec.ts\nindex 5396975fe711bdf714446b73b35a01850ca49fbe..cb1a9b5356d9cde521fc163924e4ddf9c6f4c462 100644\n--- a/src/material/datepicker/testing/date-range-input-harness.spec.ts\n+++ b/src/material/datepicker/testing/date-range-input-harness.spec.ts\n@@ -11,6 +11,7 @@\n   MatEndDate,\n   MatStartDate,\n } from '../../datepicker';\n+import {MatFormFieldModule} from '../../form-field';\n import {MatCalendarHarness} from './calendar-harness';\n import {\n   MatDateRangeInputHarness,\n@@ -34,7 +35,14 @@\n \n   it('should load all date range input harnesses', async () => {\n     const inputs = await loader.getAllHarnesses(MatDateRangeInputHarness);\n-    expect(inputs.length).toBe(2);\n+    expect(inputs.length).toBe(3);\n+  });\n+\n+  it('should load date range input with a specific label', async () => {\n+    const inputs = await loader.getAllHarnesses(\n+      MatDateRangeInputHarness.with({label: 'Date range'}),\n+    );\n+    expect(inputs.length).toBe(1);\n   });\n \n   it('should get whether the input is disabled', async () => {\n@@ -261,6 +269,14 @@\n       <input matStartDate>\n       <input matEndDate>\n     </mat-date-range-input>\n+\n+    <mat-form-field>\n+      <mat-label>Date range</mat-label>\n+      <mat-date-range-input basic>\n+      <input matStartDate>\n+      <input matEndDate>\n+    </mat-date-range-input>\n+    </mat-form-field>\n   `,\n   imports: [\n     MatNativeDateModule,\n@@ -268,6 +284,7 @@\n     MatStartDate,\n     MatEndDate,\n     MatDateRangePicker,\n+    MatFormFieldModule,\n     FormsModule,\n   ],\n })\ndiff --git a/src/material/datepicker/testing/date-range-input-harness.ts b/src/material/datepicker/testing/date-range-input-harness.ts\nindex c2a12d8dc040efdf582d21362ea667b9f01cd2f3..037f6f9a598786c3ff62310c3fa69b6b3d3c576c 100644\n--- a/src/material/datepicker/testing/date-range-input-harness.ts\n+++ b/src/material/datepicker/testing/date-range-input-harness.ts\n@@ -48,6 +48,8 @@\n export class MatDateRangeInputHarness extends DatepickerTriggerHarnessBase {\n   static hostSelector = '.mat-date-range-input';\n \n+  private readonly floatingLabelSelector = '.mdc-floating-label';\n+\n   /**\n    * Gets a `HarnessPredicate` that can be used to search for a `MatDateRangeInputHarness`\n    * that meets certain criteria.\n@@ -57,11 +59,13 @@\n   static with(\n     options: DateRangeInputHarnessFilters = {},\n   ): HarnessPredicate<MatDateRangeInputHarness> {\n-    return new HarnessPredicate(MatDateRangeInputHarness, options).addOption(\n-      'value',\n-      options.value,\n-      (harness, value) => HarnessPredicate.stringMatches(harness.getValue(), value),\n-    );\n+    return new HarnessPredicate(MatDateRangeInputHarness, options)\n+      .addOption('value', options.value, (harness, value) =>\n+        HarnessPredicate.stringMatches(harness.getValue(), value),\n+      )\n+      .addOption('label', options.label, (harness, label) => {\n+        return HarnessPredicate.stringMatches(harness.getLabel(), label);\n+      });\n   }\n \n   /** Gets the combined value of the start and end inputs, including the separator. */\n@@ -85,6 +89,31 @@\n   async getEndInput(): Promise<MatEndDateHarness> {\n     // Don't pass in filters here since the end input is required and there can only be one.\n     return this.locatorFor(MatEndDateHarness)();\n+  }\n+\n+  /** Gets the floating label text for the range input, if it exists. */\n+  async getLabel(): Promise<string | null> {\n+    // Copied from MatFormFieldControlHarnessBase since this class cannot extend two classes\n+    const documentRootLocator = await this.documentRootLocatorFactory();\n+    const labelId = await (await this.host()).getAttribute('aria-labelledby');\n+    const hostId = await (await this.host()).getAttribute('id');\n+\n+    if (labelId) {\n+      // First option, try to fetch the label using the `aria-labelledby`\n+      // attribute.\n+      const labelEl = await await documentRootLocator.locatorForOptional(\n+        `${this.floatingLabelSelector}[id=\"${labelId}\"]`,\n+      )();\n+      return labelEl ? labelEl.text() : null;\n+    } else if (hostId) {\n+      // Fallback option, try to match the id of the input with the `for`\n+      // attribute of the label.\n+      const labelEl = await await documentRootLocator.locatorForOptional(\n+        `${this.floatingLabelSelector}[for=\"${hostId}\"]`,\n+      )();\n+      return labelEl ? labelEl.text() : null;\n+    }\n+    return null;\n   }\n \n   /** Gets the separator text between the values of the two inputs. */\ndiff --git a/src/material/datepicker/testing/datepicker-harness-filters.ts b/src/material/datepicker/testing/datepicker-harness-filters.ts\nindex 4245ad9625efd6974a12844e5d15e9f51c7c484f..90e750fd7ad27ac21d6d3c32dc013418dddc6c26 100644\n--- a/src/material/datepicker/testing/datepicker-harness-filters.ts\n+++ b/src/material/datepicker/testing/datepicker-harness-filters.ts\n@@ -6,10 +6,11 @@\n  * found in the LICENSE file at https://angular.dev/license\n  */\n \n+import {MatFormFieldControlHarnessFilters} from '@angular/material/form-field/testing/control';\n import {BaseHarnessFilters} from '@angular/cdk/testing';\n \n /** A set of criteria that can be used to filter a list of datepicker input instances. */\n-export interface DatepickerInputHarnessFilters extends BaseHarnessFilters {\n+export interface DatepickerInputHarnessFilters extends MatFormFieldControlHarnessFilters {\n   /** Filters based on the value of the input. */\n   value?: string | RegExp;\n   /** Filters based on the placeholder text of the input. */\n@@ -43,7 +44,7 @@\n }\n \n /** A set of criteria that can be used to filter a list of date range input instances. */\n-export interface DateRangeInputHarnessFilters extends BaseHarnessFilters {\n+export interface DateRangeInputHarnessFilters extends MatFormFieldControlHarnessFilters {\n   /** Filters based on the value of the input. */\n   value?: string | RegExp;\n }\ndiff --git a/src/material/datepicker/testing/datepicker-input-harness-base.ts b/src/material/datepicker/testing/datepicker-input-harness-base.ts\nindex 6e736928836fd56be8c4e441c6d4b953dad1c559..e2a41fa70e76efd471b2175803e2a481b9065e88 100644\n--- a/src/material/datepicker/testing/datepicker-input-harness-base.ts\n+++ b/src/material/datepicker/testing/datepicker-input-harness-base.ts\n@@ -7,7 +7,7 @@\n  */\n \n import {ComponentHarnessConstructor, HarnessPredicate} from '@angular/cdk/testing';\n-import {MatFormFieldControlHarness} from '../../form-field/testing/control';\n+import {MatFormFieldControlHarnessBase} from '@angular/material/form-field/testing/control';\n import {DatepickerInputHarnessFilters} from './datepicker-harness-filters';\n \n /** Sets up the filter predicates for a datepicker input harness. */\n@@ -21,11 +21,14 @@\n     })\n     .addOption('placeholder', options.placeholder, (harness, placeholder) => {\n       return HarnessPredicate.stringMatches(harness.getPlaceholder(), placeholder);\n+    })\n+    .addOption('label', options.label, (harness, label) => {\n+      return HarnessPredicate.stringMatches(harness.getLabel(), label);\n     });\n }\n \n /** Base class for datepicker input harnesses. */\n-export abstract class MatDatepickerInputHarnessBase extends MatFormFieldControlHarness {\n+export abstract class MatDatepickerInputHarnessBase extends MatFormFieldControlHarnessBase {\n   /** Whether the input is disabled. */\n   async isDisabled(): Promise<boolean> {\n     return (await this.host()).getProperty<boolean>('disabled');\ndiff --git a/src/material/datepicker/testing/datepicker-input-harness.spec.ts b/src/material/datepicker/testing/datepicker-input-harness.spec.ts\nindex 8cf8739c62a880f405c53291c781ccdbca6ad793..72aa47c883533bd597a97d4ceef7859a0d5e6721 100644\n--- a/src/material/datepicker/testing/datepicker-input-harness.spec.ts\n+++ b/src/material/datepicker/testing/datepicker-input-harness.spec.ts\n@@ -5,6 +5,8 @@\n import {FormsModule} from '@angular/forms';\n import {DateAdapter, MATERIAL_ANIMATIONS, MatNativeDateModule} from '../../core';\n import {MatDatepickerModule} from '../../datepicker';\n+import {MatFormFieldModule} from '../../form-field';\n+import {MatInputModule} from '../../input';\n import {MatCalendarHarness} from './calendar-harness';\n import {MatDatepickerInputHarness} from './datepicker-input-harness';\n \n@@ -27,6 +29,13 @@\n     expect(inputs.length).toBe(2);\n   });\n \n+  it('should load datepicker input with a specific label', async () => {\n+    const selects = await loader.getAllHarnesses(\n+      MatDatepickerInputHarness.with({label: 'Pick a date'}),\n+    );\n+    expect(selects.length).toBe(1);\n+  });\n+\n   it('should filter inputs based on their value', async () => {\n     fixture.componentInstance.date = new Date(2020, 0, 1, 12, 0, 0);\n     fixture.changeDetectorRef.markForCheck();\n@@ -187,21 +196,31 @@\n \n @Component({\n   template: `\n-    <input\n-      id=\"basic\"\n-      matInput\n-      [matDatepicker]=\"picker\"\n-      (dateChange)=\"dateChangeCount = dateChangeCount + 1\"\n-      [(ngModel)]=\"date\"\n-      [min]=\"minDate\"\n-      [max]=\"maxDate\"\n-      [disabled]=\"disabled\"\n-      [required]=\"required\"\n-      placeholder=\"Type a date\">\n-    <mat-datepicker #picker [touchUi]=\"touchUi\"></mat-datepicker>\n+    <mat-form-field>\n+      <mat-label>Pick a date</mat-label>\n+      <input\n+        id=\"basic\"\n+        matInput\n+        [matDatepicker]=\"picker\"\n+        (dateChange)=\"dateChangeCount = dateChangeCount + 1\"\n+        [(ngModel)]=\"date\"\n+        [min]=\"minDate\"\n+        [max]=\"maxDate\"\n+        [disabled]=\"disabled\"\n+        [required]=\"required\"\n+        placeholder=\"Type a date\">\n+      <mat-datepicker #picker [touchUi]=\"touchUi\"></mat-datepicker>\n+    </mat-form-field>\n+\n     <input id=\"no-datepicker\" matDatepicker>\n   `,\n-  imports: [MatNativeDateModule, MatDatepickerModule, FormsModule],\n+  imports: [\n+    MatNativeDateModule,\n+    MatDatepickerModule,\n+    MatFormFieldModule,\n+    MatInputModule,\n+    FormsModule,\n+  ],\n })\n class DatepickerInputHarnessTest {\n   date: Date | null = null;\ndiff --git a/src/material/form-field/testing/control/form-field-control-harness-filters.ts b/src/material/form-field/testing/control/form-field-control-harness-filters.ts\nnew file mode 100644\nindex 0000000000000000000000000000000000000000..2959983406ab430c8a0e13066684cf03dfba2073\n--- /dev/null\n+++ b/src/material/form-field/testing/control/form-field-control-harness-filters.ts\n@@ -0,0 +1,18 @@\n+/**\n+ * @license\n+ * Copyright Google LLC All Rights Reserved.\n+ *\n+ * Use of this source code is governed by an MIT-style license that can be\n+ * found in the LICENSE file at https://angular.dev/license\n+ */\n+\n+import {BaseHarnessFilters} from '@angular/cdk/testing';\n+\n+/**\n+ * A set of criteria shared by any class derived from `MatFormFieldControlHarness`, that can be\n+ * used to filter a list of those components.\n+ */\n+export interface MatFormFieldControlHarnessFilters extends BaseHarnessFilters {\n+  /** Filters based on the text of the form field's floating label. */\n+  label?: string | RegExp;\n+}\ndiff --git a/src/material/form-field/testing/control/form-field-control-harness.ts b/src/material/form-field/testing/control/form-field-control-harness.ts\nindex 518f893a29dd19684004d92bc894b32457007b0c..05edc1b89fe8eb4d7907010fb1b14f23160feb53 100644\n--- a/src/material/form-field/testing/control/form-field-control-harness.ts\n+++ b/src/material/form-field/testing/control/form-field-control-harness.ts\n@@ -13,3 +13,34 @@\n  * custom controls with form-fields need to implement this interface.\n  */\n export abstract class MatFormFieldControlHarness extends ComponentHarness {}\n+\n+/**\n+ * Shared behavior for `MatFormFieldControlHarness` implementations\n+ */\n+export abstract class MatFormFieldControlHarnessBase extends MatFormFieldControlHarness {\n+  private readonly floatingLabelSelector = '.mdc-floating-label';\n+\n+  /** Gets the text content of the floating label, if it exists. */\n+  public async getLabel(): Promise<string | null> {\n+    const documentRootLocator = await this.documentRootLocatorFactory();\n+    const labelId = await (await this.host()).getAttribute('aria-labelledby');\n+    const hostId = await (await this.host()).getAttribute('id');\n+\n+    if (labelId) {\n+      // First option, try to fetch the label using the `aria-labelledby`\n+      // attribute.\n+      const labelEl = await await documentRootLocator.locatorForOptional(\n+        `${this.floatingLabelSelector}[id=\"${labelId}\"]`,\n+      )();\n+      return labelEl ? labelEl.text() : null;\n+    } else if (hostId) {\n+      // Fallback option, try to match the id of the input with the `for`\n+      // attribute of the label.\n+      const labelEl = await await documentRootLocator.locatorForOptional(\n+        `${this.floatingLabelSelector}[for=\"${hostId}\"]`,\n+      )();\n+      return labelEl ? labelEl.text() : null;\n+    }\n+    return null;\n+  }\n+}\ndiff --git a/src/material/form-field/testing/control/index.ts b/src/material/form-field/testing/control/index.ts\nindex e289ebb6c6f22f5988ef810bbe5540a5c07f42e9..4454049bc88ae29dcd6f4812ba480b0033a8f252 100644\n--- a/src/material/form-field/testing/control/index.ts\n+++ b/src/material/form-field/testing/control/index.ts\n@@ -7,3 +7,4 @@\n  */\n \n export * from './form-field-control-harness';\n+export * from './form-field-control-harness-filters';\ndiff --git a/src/material/input/testing/input-harness-filters.ts b/src/material/input/testing/input-harness-filters.ts\nindex c68b0d626708d83e3864a20c7cab5e8080e83ac7..1635877e6ae952fd4c218c80f14f5430e05389d6 100644\n--- a/src/material/input/testing/input-harness-filters.ts\n+++ b/src/material/input/testing/input-harness-filters.ts\n@@ -6,10 +6,10 @@\n  * found in the LICENSE file at https://angular.dev/license\n  */\n \n-import {BaseHarnessFilters} from '@angular/cdk/testing';\n+import {MatFormFieldControlHarnessFilters} from '@angular/material/form-field/testing/control';\n \n /** A set of criteria that can be used to filter a list of `MatInputHarness` instances. */\n-export interface InputHarnessFilters extends BaseHarnessFilters {\n+export interface InputHarnessFilters extends MatFormFieldControlHarnessFilters {\n   /** Filters based on the value of the input. */\n   value?: string | RegExp;\n   /** Filters based on the placeholder text of the input. */\ndiff --git a/src/material/input/testing/input-harness.spec.ts b/src/material/input/testing/input-harness.spec.ts\nindex e4d95ee6f4de6ffcf998447db67e4382008887d0..3d93514de9fa09bf238a08548010c2cbb1de6c94 100644\n--- a/src/material/input/testing/input-harness.spec.ts\n+++ b/src/material/input/testing/input-harness.spec.ts\n@@ -18,8 +18,7 @@\n   });\n \n   it('should load all input harnesses', async () => {\n-    const inputs = await loader.getAllHarnesses(MatInputHarness);\n-    expect(inputs.length).toBe(7);\n+    expect(await loader.countHarnesses(MatInputHarness)).toBe(7);\n   });\n \n   it('should load input with specific id', async () => {\n@@ -36,6 +35,11 @@\n \n   it('should load input with a specific value', async () => {\n     const inputs = await loader.getAllHarnesses(MatInputHarness.with({value: 'Sushi'}));\n+    expect(inputs.length).toBe(1);\n+  });\n+\n+  it('should load input with a specific label', async () => {\n+    const inputs = await loader.getAllHarnesses(MatInputHarness.with({label: 'Favorite food'}));\n     expect(inputs.length).toBe(1);\n   });\n \n@@ -231,6 +235,7 @@\n @Component({\n   template: `\n     <mat-form-field>\n+      <mat-label>Favorite food</mat-label>\n       <input matInput placeholder=\"Favorite food\" value=\"Sushi\" name=\"favorite-food\">\n     </mat-form-field>\n \ndiff --git a/src/material/input/testing/input-harness.ts b/src/material/input/testing/input-harness.ts\nindex 61e087f01cbb1a46b63672d16ecee3899c56b49b..c88101a32ad9f301a68cc9afe43e52f0a222b7d8 100644\n--- a/src/material/input/testing/input-harness.ts\n+++ b/src/material/input/testing/input-harness.ts\n@@ -7,12 +7,12 @@\n  */\n \n import {HarnessPredicate, parallel} from '@angular/cdk/testing';\n-import {MatFormFieldControlHarness} from '../../form-field/testing/control';\n+import {MatFormFieldControlHarnessBase} from '@angular/material/form-field/testing/control';\n import {coerceBooleanProperty} from '@angular/cdk/coercion';\n import {InputHarnessFilters} from './input-harness-filters';\n \n /** Harness for interacting with a standard Material inputs in tests. */\n-export class MatInputHarness extends MatFormFieldControlHarness {\n+export class MatInputHarness extends MatFormFieldControlHarnessBase {\n   // TODO: We do not want to handle `select` elements with `matNativeControl` because\n   // not all methods of this harness work reasonably for native select elements.\n   // For more details. See: https://github.com/angular/components/pull/18221.\n@@ -31,6 +31,9 @@\n       })\n       .addOption('placeholder', options.placeholder, (harness, placeholder) => {\n         return HarnessPredicate.stringMatches(harness.getPlaceholder(), placeholder);\n+      })\n+      .addOption('label', options.label, (harness, label) => {\n+        return HarnessPredicate.stringMatches(harness.getLabel(), label);\n       });\n   }\n \ndiff --git a/src/material/input/testing/native-select-harness-filters.ts b/src/material/input/testing/native-select-harness-filters.ts\nindex 438549ff0cb4d1a4db5d4a777502cfb761a0ca3b..e44566192d32b10955991a69eee05237305b2694 100644\n--- a/src/material/input/testing/native-select-harness-filters.ts\n+++ b/src/material/input/testing/native-select-harness-filters.ts\n@@ -7,9 +7,10 @@\n  */\n \n import {BaseHarnessFilters} from '@angular/cdk/testing';\n+import {MatFormFieldControlHarnessFilters} from '@angular/material/form-field/testing/control';\n \n /** A set of criteria that can be used to filter a list of `MatNativeSelectHarness` instances. */\n-export interface NativeSelectHarnessFilters extends BaseHarnessFilters {}\n+export interface NativeSelectHarnessFilters extends MatFormFieldControlHarnessFilters {}\n \n /** A set of criteria that can be used to filter a list of `MatNativeOptionHarness` instances. */\n export interface NativeOptionHarnessFilters extends BaseHarnessFilters {\ndiff --git a/src/material/input/testing/native-select-harness.spec.ts b/src/material/input/testing/native-select-harness.spec.ts\nindex 856b3c2739efbaf25e2e5abdb7f013dfdc490317..a3492f0e2460daf9a5e4ab84b62a0a789d5e9582 100644\n--- a/src/material/input/testing/native-select-harness.spec.ts\n+++ b/src/material/input/testing/native-select-harness.spec.ts\n@@ -21,6 +21,13 @@\n     expect(selects.length).toBe(2);\n   });\n \n+  it('should load select with a specific label', async () => {\n+    const inputs = await loader.getAllHarnesses(\n+      MatNativeSelectHarness.with({label: 'Favorite food'}),\n+    );\n+    expect(inputs.length).toBe(1);\n+  });\n+\n   it('should get the id of a select', async () => {\n     const selects = await loader.getAllHarnesses(MatNativeSelectHarness);\n     expect(await parallel(() => selects.map(select => select.getId()))).toEqual(['food', 'drink']);\n@@ -187,6 +194,7 @@\n @Component({\n   template: `\n     <mat-form-field>\n+      <mat-label>Favorite food</mat-label>\n       <select\n         id=\"food\"\n         matNativeControl\ndiff --git a/src/material/input/testing/native-select-harness.ts b/src/material/input/testing/native-select-harness.ts\nindex 3641d08b343870f666b335ddea34f98ead8a1573..7b0b17b175b18edb915da9521da74c34a7e142d0 100644\n--- a/src/material/input/testing/native-select-harness.ts\n+++ b/src/material/input/testing/native-select-harness.ts\n@@ -7,7 +7,7 @@\n  */\n \n import {HarnessPredicate, parallel} from '@angular/cdk/testing';\n-import {MatFormFieldControlHarness} from '../../form-field/testing/control';\n+import {MatFormFieldControlHarnessBase} from '../../form-field/testing/control';\n import {MatNativeOptionHarness} from './native-option-harness';\n import {\n   NativeOptionHarnessFilters,\n@@ -15,7 +15,7 @@\n } from './native-select-harness-filters';\n \n /** Harness for interacting with a native `select` in tests. */\n-export class MatNativeSelectHarness extends MatFormFieldControlHarness {\n+export class MatNativeSelectHarness extends MatFormFieldControlHarnessBase {\n   static hostSelector = 'select[matNativeControl]';\n \n   /**\n@@ -25,7 +25,13 @@\n    * @return a `HarnessPredicate` configured with the given options.\n    */\n   static with(options: NativeSelectHarnessFilters = {}): HarnessPredicate<MatNativeSelectHarness> {\n-    return new HarnessPredicate(MatNativeSelectHarness, options);\n+    return new HarnessPredicate(MatNativeSelectHarness, options).addOption(\n+      'label',\n+      options.label,\n+      (harness, label) => {\n+        return HarnessPredicate.stringMatches(harness.getLabel(), label);\n+      },\n+    );\n   }\n \n   /** Gets a boolean promise indicating if the select is disabled. */\ndiff --git a/src/material/select/testing/select-harness-filters.ts b/src/material/select/testing/select-harness-filters.ts\nindex db83564fc513147c6f3f6da6556aa336ec71b863..34e219a456d070ab6b86e75d6f91ef6d2dbeabc8 100644\n--- a/src/material/select/testing/select-harness-filters.ts\n+++ b/src/material/select/testing/select-harness-filters.ts\n@@ -7,9 +7,10 @@\n  */\n \n import {BaseHarnessFilters} from '@angular/cdk/testing';\n+import {MatFormFieldControlHarnessFilters} from '@angular/material/form-field/testing/control';\n \n /** A set of criteria that can be used to filter a list of `MatSelectHarness` instances. */\n-export interface SelectHarnessFilters extends BaseHarnessFilters {\n+export interface SelectHarnessFilters extends MatFormFieldControlHarnessFilters {\n   /** Only find instances which match the given disabled state. */\n   disabled?: boolean;\n }\ndiff --git a/src/material/select/testing/select-harness.spec.ts b/src/material/select/testing/select-harness.spec.ts\nindex df198b2eade427a496439b5ae73f95c39fe70e63..ff4fc2165a3f33b2945987c55c075ed605018fc3 100644\n--- a/src/material/select/testing/select-harness.spec.ts\n+++ b/src/material/select/testing/select-harness.spec.ts\n@@ -52,6 +52,11 @@\n     expect(disabledSelects.length).toBe(1);\n   });\n \n+  it('should load select with a specific label', async () => {\n+    const selects = await loader.getAllHarnesses(MatSelectHarness.with({label: 'US States'}));\n+    expect(selects.length).toBe(1);\n+  });\n+\n   it('should be able to check whether a select is in multi-selection mode', async () => {\n     const singleSelection = await loader.getHarness(\n       MatSelectHarness.with({\n@@ -265,6 +270,7 @@\n @Component({\n   template: `\n     <mat-form-field>\n+      <mat-label>US States</mat-label>\n       <mat-select [disabled]=\"isDisabled()\" [required]=\"isRequired()\" id=\"single-selection\">\n         @for (state of states; track state) {\n           <mat-option [value]=\"state.code\">{{ state.name }}</mat-option>\ndiff --git a/src/material/select/testing/select-harness.ts b/src/material/select/testing/select-harness.ts\nindex 8c577d63cc99882dc2a8eddec41d9102e88b2c42..36d10d4ed5b0ea27e2ed717a8121af4cba5678dd 100644\n--- a/src/material/select/testing/select-harness.ts\n+++ b/src/material/select/testing/select-harness.ts\n@@ -12,12 +12,12 @@\n   MatOptgroupHarness,\n   OptionHarnessFilters,\n   OptgroupHarnessFilters,\n-} from '../../core/testing';\n-import {MatFormFieldControlHarness} from '../../form-field/testing/control';\n+} from '@angular/material/core/testing';\n+import {MatFormFieldControlHarnessBase} from '@angular/material/form-field/testing/control';\n import {SelectHarnessFilters} from './select-harness-filters';\n \n /** Harness for interacting with a mat-select in tests. */\n-export class MatSelectHarness extends MatFormFieldControlHarness {\n+export class MatSelectHarness extends MatFormFieldControlHarnessBase {\n   static hostSelector = '.mat-mdc-select';\n   private _prefix = 'mat-mdc';\n   private _optionClass = MatOptionHarness;\n@@ -34,13 +34,13 @@\n     this: ComponentHarnessConstructor<T>,\n     options: SelectHarnessFilters = {},\n   ): HarnessPredicate<T> {\n-    return new HarnessPredicate(this, options).addOption(\n-      'disabled',\n-      options.disabled,\n-      async (harness, disabled) => {\n+    return new HarnessPredicate(this, options)\n+      .addOption('disabled', options.disabled, async (harness, disabled) => {\n         return (await harness.isDisabled()) === disabled;\n-      },\n-    );\n+      })\n+      .addOption('label', options.label, (harness, label) => {\n+        return HarnessPredicate.stringMatches(harness.getLabel(), label);\n+      });\n   }\n \n   /** Gets a boolean promise indicating if the select is disabled. */\n",
+      "complete_original_paths": [
+        "src/cdk/testing/component-harness.ts",
+        "src/cdk/testing/harness-environment.ts",
+        "src/cdk/testing/test-harnesses.md",
+        "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+        "src/material/datepicker/testing/date-range-input-harness.ts",
+        "src/material/datepicker/testing/datepicker-harness-filters.ts",
+        "src/material/datepicker/testing/datepicker-input-harness-base.ts",
+        "src/material/datepicker/testing/datepicker-input-harness.spec.ts",
+        "src/material/form-field/testing/control/form-field-control-harness-filters.ts",
+        "src/material/form-field/testing/control/form-field-control-harness.ts",
+        "src/material/form-field/testing/control/index.ts",
+        "src/material/input/testing/input-harness-filters.ts",
+        "src/material/input/testing/input-harness.spec.ts",
+        "src/material/input/testing/input-harness.ts",
+        "src/material/input/testing/native-select-harness-filters.ts",
+        "src/material/input/testing/native-select-harness.spec.ts",
+        "src/material/input/testing/native-select-harness.ts",
+        "src/material/select/testing/select-harness-filters.ts",
+        "src/material/select/testing/select-harness.spec.ts",
+        "src/material/select/testing/select-harness.ts"
+      ],
+      "frozen_seed_files": [
+        "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+        "src/material/datepicker/testing/date-range-input-harness.ts",
+        "src/material/datepicker/testing/datepicker-harness-filters.ts",
+        "src/material/datepicker/testing/datepicker-input-harness-base.ts",
+        "src/material/datepicker/testing/datepicker-input-harness.spec.ts",
+        "src/material/form-field/testing/control/form-field-control-harness-filters.ts",
+        "src/material/form-field/testing/control/form-field-control-harness.ts",
+        "src/material/form-field/testing/control/index.ts",
+        "src/material/input/testing/input-harness-filters.ts",
+        "src/material/input/testing/input-harness.spec.ts",
+        "src/material/input/testing/input-harness.ts",
+        "src/material/input/testing/native-select-harness-filters.ts",
+        "src/material/input/testing/native-select-harness.spec.ts",
+        "src/material/input/testing/native-select-harness.ts",
+        "src/material/select/testing/select-harness-filters.ts",
+        "src/material/select/testing/select-harness.spec.ts",
+        "src/material/select/testing/select-harness.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/cdk/testing/component-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -120,12 +120,31 @@",
+          "hunk_sha256": "47d7b03c8e4b006ac925ab80b330576797c6c30b2e0cda8a79feeba556af3d03",
+          "decision": "The public loader interface gains indexed lookup and counting. The installed 21.2.14 CDK declares these stable methods; the packed legacy button inherits them through its existing content-container parent. No CDK interface or implementation is copied.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/cdk/testing/component-harness.ts",
+          "hunk_index": 2,
+          "header": "@@ -501,6 +520,20 @@",
+          "hunk_sha256": "d77cb18eb3e8d48c8ef53d6a89d83edc18b7161749c62f7d90abb84f519738f9",
+          "decision": "The new content-container method delegates indexed lookup to its root loader. Actual minimum-peer execution covers content/document separation, filtered indexing, bounds errors, query failures and fresh content state.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/cdk/testing/component-harness.ts",
+          "hunk_index": 3,
+          "header": "@@ -510,11 +543,22 @@",
+          "hunk_sha256": "c54f56bb10c29f56ab46551c8f6a9c50af716efd115e45eb59adf427d3a517cb",
+          "decision": "The new count method delegates to the root loader; the adjacent hasHarness edit corrects documentation spelling only. Actual minimum-peer counts cover filters, zero results and document siblings.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/cdk/testing/harness-environment.ts",
+          "hunk_index": 1,
+          "header": "@@ -249,6 +249,30 @@",
+          "hunk_sha256": "73dd31b702b92420ab6fdc763c0d58895ca3a3cca34cc1820624b84b1c832167",
+          "decision": "The new environment lookup checks a negative offset and an offset beyond the filtered result length before returning the indexed harness. The actual public environment executes each boundary and rejection case; this does not qualify browser stabilization.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/cdk/testing/harness-environment.ts",
+          "hunk_index": 2,
+          "header": "@@ -256,6 +280,16 @@",
+          "hunk_sha256": "e97cd1cc612defb281e701c16124c2c7b92ac51ae902cf5103aef07efbbba7e6",
+          "decision": "The new count operation returns the locator result length. Actual public execution verifies filtered, empty and newly changed content; no independent CDK fork is introduced.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/cdk/testing/test-harnesses.md",
+          "hunk_index": 1,
+          "header": "@@ -134,9 +134,12 @@",
+          "hunk_sha256": "4d2c7fa6a3b582e258753ca3523bf17eea6278fa511fc2c4cb5787af4cf8c6e7",
+          "decision": "The table documents indexed lookup, count and hasHarness and generalizes the predicate wording. The public methods are covered by the minimum-peer protocol cases; upstream documentation is read rather than executed.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -11,6 +11,7 @@",
+          "hunk_sha256": "7c6bf2a8b43069ec67b432777560bf7378f19b4e62ccee85514377226582d639",
+          "decision": "This import enables an added upstream form-field label fixture. It is not an owned legacy fixture change or evidence that this upstream suite ran.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+          "hunk_index": 2,
+          "header": "@@ -34,7 +35,14 @@",
+          "hunk_sha256": "9555441bf0b1325b546c2bc83ee45f3049e4cb226d68b9d0a93042d28c36aec2",
+          "decision": "The third fixture changes the expected harness count and adds a label filter assertion. Our actual current public range harness label/predicate cases cover legacy and modern labels; this upstream suite is not claimed executed.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+          "hunk_index": 3,
+          "header": "@@ -261,6 +269,14 @@",
+          "hunk_sha256": "fd83bb26b6fe082fcb2042f97dbc41ad58ced48119d7330f8abe012e82a563be",
+          "decision": "The added modern form-field/date-range template supplies the label example. Consumer and owned Material-16 templates stay unchanged; the public minimum range harness is exercised with explicit legacy label records.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/date-range-input-harness.spec.ts",
+          "hunk_index": 4,
+          "header": "@@ -268,6 +284,7 @@",
+          "hunk_sha256": "f624f20be0a2584f5e3316d32793fbd48539f93bb33623e8ac035a9c78ea68e6",
+          "decision": "The new module import belongs only to that upstream fixture. Current source validation and protocol execution do not claim its Angular fixture lifecycle.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/date-range-input-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -48,6 +48,8 @@",
+          "hunk_sha256": "b1640551d74e1614a50ebf68701ca0792b55c46331048cd96ca9d3d692a6360c",
+          "decision": "The initial private label selector requires MDC classes. Do not transplant it: untouched legacy labels use mat-form-field-label. The current minimum public successor is prefix-free and passes the actual legacy label cases.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/date-range-input-harness.ts",
+          "hunk_index": 2,
+          "header": "@@ -57,11 +59,13 @@",
+          "hunk_sha256": "2acee12847861443761cb2e0922b9f6f7a5489f90bd97972cb7df0893b5f0a12",
+          "decision": "The added label predicate is inherited from the current public range harness; existing value behavior is not replaced locally. Actual predicate acceptance and rejection run against legacy labels.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/date-range-input-harness.ts",
+          "hunk_index": 3,
+          "header": "@@ -85,6 +89,31 @@",
+          "hunk_sha256": "32a47a6bea26640afe9c672a515f88b357f1b59223585e73bf26b84d7d71dd07",
+          "decision": "The original copied getter uses an MDC-prefixed id/for query. Its original implementation is replayed and fails the legacy label controls, while the current minimum successor passes id, for, aria-label precedence and missing-label behavior.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/datepicker-harness-filters.ts",
+          "hunk_index": 1,
+          "header": "@@ -6,10 +6,11 @@",
+          "hunk_sha256": "2176ff84133328250f030875d2ab7849735cbeaf962a80bb9bab9effe21600ec",
+          "decision": "The public datepicker-input filter now extends the shared label filter. This remains a current peer surface; no label interface or modern form-field implementation is copied into the add-on.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/datepicker-harness-filters.ts",
+          "hunk_index": 2,
+          "header": "@@ -43,7 +44,7 @@",
+          "hunk_sha256": "b3ae74c5d1cff4849ff6fd2be73be2537aab7c6fac465c38c61fc75cb502cb37",
+          "decision": "The public range-input filter adds the same label contract. The peer range harness predicate is exercised on legacy label records, with the supplied legacy templates preserved.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/datepicker-input-harness-base.ts",
+          "hunk_index": 1,
+          "header": "@@ -7,7 +7,7 @@",
+          "hunk_sha256": "82e59e0afcbd317b1a188816940ffa91ea16d055c716f2c83ef713a1253c7bc1",
+          "decision": "The import changes to the public form-field control harness base. The installed minimum exports that stable base; the peer datepicker hierarchy is consumed without recreating its implementation.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/datepicker-input-harness-base.ts",
+          "hunk_index": 2,
+          "header": "@@ -21,11 +21,14 @@",
+          "hunk_sha256": "ecfff2ef6cc48c7f502cb683eaec58f06d0598055f81022122fb787147ca98cd",
+          "decision": "The new label predicate and parent class provide the minimum-peer getter behavior. Actual datepicker-input label and predicate execution covers the supported legacy label paths without copying the initial MDC query.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/datepicker-input-harness.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -5,6 +5,8 @@",
+          "hunk_sha256": "9bf48101a45e7c9b8466621a8e526aab0ac8d1435305bd17589cdd7d60bc5cc9",
+          "decision": "The added form-field/input imports support only an upstream fixture expansion. No owned module or consumer import is changed by this source review.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/datepicker-input-harness.spec.ts",
+          "hunk_index": 2,
+          "header": "@@ -27,6 +29,13 @@",
+          "hunk_sha256": "4dbd8c5152703f84355bd6ddf7ade58e854a6a14a9b8b4ea889b487469364f83",
+          "decision": "The new label-filter test is reviewed as upstream intent. Independent current public datepicker-input predicate cases execute the legacy id/for label behavior; this upstream suite is not claimed run.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/datepicker/testing/datepicker-input-harness.spec.ts",
+          "hunk_index": 3,
+          "header": "@@ -187,21 +196,31 @@",
+          "hunk_sha256": "ecd25e1a310e4a48299b97459fa7b4dfd5b8e5411f5f5e20a6cc8317de9ba8fe",
+          "decision": "The old input/date-picker test fixture is wrapped with a form-field and label and imports the associated modules. It is a test-only change; original add-on templates and historical suite assertions are retained.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/form-field/testing/control/form-field-control-harness-filters.ts",
+          "hunk_index": 1,
+          "header": "@@ -0,0 +1,18 @@",
+          "hunk_sha256": "37554630450f41e6cb374e848f80086b339002554f07e3f585f73151baa2dc4d",
+          "decision": "This new public interface adds an optional label predicate. Its minimum-peer declarations and label predicate behavior are checked; no modern form-field API mirror or new owned declaration is introduced.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/form-field/testing/control/form-field-control-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -13,3 +13,34 @@",
+          "hunk_sha256": "d01eb535db618ae34b6de52009b19f73c5951ee259da7d3ef55fb7e7ac9472b9",
+          "decision": "The entire new base/getter is reviewed. Its initial MDC-only selector cannot satisfy legacy labels, so that code is not copied. The actual stable minimum successor uses unprefixed queries and passes both legacy and modern label records; the original MDC reversion controls fail as expected.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/form-field/testing/control/index.ts",
+          "hunk_index": 1,
+          "header": "@@ -7,3 +7,4 @@",
+          "hunk_sha256": "10159eb5158fadf128087207ee5b1fdea2fba276631f3b49b319189f4f238716",
+          "decision": "The new filter export belongs to the peer testing entry point. The minimum public namespace is authenticated and consumed through existing peer parents/aliases; the add-on export surface is not expanded by a copied declaration.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/input-harness-filters.ts",
+          "hunk_index": 1,
+          "header": "@@ -6,10 +6,10 @@",
+          "hunk_sha256": "cdb16e6346204000247af3842669dd66714a80cbf10a46df26a3735311258f3f",
+          "decision": "The current public input filter inherits the shared label criterion. The existing owned input adapter consumes its public parent/filter identity; independent legacy label predicates run on the actual packed adapter.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/input-harness.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -18,8 +18,7 @@",
+          "hunk_sha256": "e2dacd2efe5409bd571b01e0975fe0a1273e74621b0d323e6cb46cb328c315ed",
+          "decision": "This replaces a length assertion with the new public loader count method while preserving the expected count. The actual minimum method is exercised independently; original upstream tests are not reported as executed.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/input-harness.spec.ts",
+          "hunk_index": 2,
+          "header": "@@ -36,6 +35,11 @@",
+          "hunk_sha256": "d2ad9e9d2f45b12cf60fd0749c66b6536a52d98f48e1c3d7326782414f080a3e",
+          "decision": "The value assertion remains and a label filter case is added. Actual packed input predicate acceptance and wrong-label rejection cover the legacy label path.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/input-harness.spec.ts",
+          "hunk_index": 3,
+          "header": "@@ -231,6 +235,7 @@",
+          "hunk_sha256": "0c951cc8ac5746eb202c1f45903a81fcc28998d496cc0d20573bd6fe16d13c94",
+          "decision": "The added explicit label is an upstream fixture-only change. The untouched legacy label structure supplies our independent expectations; no consumer or owned HTML change is made.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/input-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -7,12 +7,12 @@",
+          "hunk_sha256": "1a91ea0462767391ef2ea0753bc917dff85cdf55882340418c8f347625f03193",
+          "decision": "The public input changes parent to the new shared base. The packed legacy input retains the exact current public input parent; independent current minimum declarations and prototype identity are checked.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/input-harness.ts",
+          "hunk_index": 2,
+          "header": "@@ -31,6 +31,9 @@",
+          "hunk_sha256": "1981d877f801477ba4ae124c97159d4f15432a2ce9933e4c77d200ed4c6660b8",
+          "decision": "The new label predicate is exercised through the actual packed legacy input/current parent. Legacy id/for labels and accessibility precedence work with the current successor; no MDC-only getter is copied.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/native-select-harness-filters.ts",
+          "hunk_index": 1,
+          "header": "@@ -7,9 +7,10 @@",
+          "hunk_sha256": "6ad8062da69edf3f06d0a834ea32c23eab282e9df47058e13428518f7491fe6e",
+          "decision": "Only the native-select filter gains the shared label criterion; the native-option filter still uses BaseHarnessFilters. The legacy native-select export remains the genuine current peer identity.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/native-select-harness.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -21,6 +21,13 @@",
+          "hunk_sha256": "cf42c8c6cca775c21a9b0a9ec41b09f1b46bf3b0b7f555e2b8aa1fe1d12abc1f",
+          "decision": "The new label-filter test states upstream intent. The independent current native-select alias executes label predicate acceptance and rejection with legacy label records.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/native-select-harness.spec.ts",
+          "hunk_index": 2,
+          "header": "@@ -187,6 +194,7 @@",
+          "hunk_sha256": "58c0481dda08e1b7988af3b3b14a04c2ec78579084887a5964f62c4a23d02c07",
+          "decision": "The explicit label is confined to an upstream test fixture. Existing legacy component structure/styles and consumer templates stay unchanged.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/native-select-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -7,7 +7,7 @@",
+          "hunk_sha256": "3b678af8afbe8e9e2b912626434d56f863d587b3f52b5717487be7f5d44e681f",
+          "decision": "The import changes to the shared public control harness base. Its current minimum export is authenticated; no private or compatibility-only symbol is used.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/native-select-harness.ts",
+          "hunk_index": 2,
+          "header": "@@ -15,7 +15,7 @@",
+          "hunk_sha256": "60dcaa4119299714a6bf4001ce4ca272b314cefd9102cc26911d9fe5a40c8e4c",
+          "decision": "The native-select parent now supplies label behavior. The add-on keeps its peer alias identity and inherits the current prefix-free successor.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/input/testing/native-select-harness.ts",
+          "hunk_index": 3,
+          "header": "@@ -25,7 +25,13 @@",
+          "hunk_sha256": "09f9b6dcdc94cfceca8fb6ae285913e5ca772a5627696cde852f8866c83f7d7d",
+          "decision": "The added static predicate calls getLabel. Actual public native-select predicates run against legacy id/for labels, including wrong-label rejection.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/select/testing/select-harness-filters.ts",
+          "hunk_index": 1,
+          "header": "@@ -7,9 +7,10 @@",
+          "hunk_sha256": "62c109d1a3194ac20eb05b028c75975d1a052ac755bba08be5f235c76d2f289d",
+          "decision": "This adds a modern select label filter. Do not adopt it: the owned legacy select intentionally retains its historical disabled-only filter and no getLabel contract.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/select/testing/select-harness.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -52,6 +52,11 @@",
+          "hunk_sha256": "c08d216c03da77bbbeb15c59bc5356da57e94ccd0005013f867584ef1c8bf312",
+          "decision": "The new modern-select label test is outside the finite owned legacy testing API. The packed legacy filter/no-getLabel assertions demonstrate the exclusion; this upstream test is not reported run.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/select/testing/select-harness.spec.ts",
+          "hunk_index": 2,
+          "header": "@@ -265,6 +270,7 @@",
+          "hunk_sha256": "980c60a2a39efe2d9f95d8b99e57ba61ef0259131c3a57677e236cb5a68dcc44",
+          "decision": "The extra modern form-field label is an upstream fixture change and is not copied to the owned legacy select or any consumer HTML.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/select/testing/select-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -12,12 +12,12 @@",
+          "hunk_sha256": "d227a3f176be7a005ff8d9bd33bfd67c0175666779cc82b23f8704948e98f868",
+          "decision": "The modern select changes core testing imports and its form-field base. The owned legacy select remains independently owned with its existing option harnesses and historical parent; no modern import/parent migration is copied.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/select/testing/select-harness.ts",
+          "hunk_index": 2,
+          "header": "@@ -34,13 +34,13 @@",
+          "hunk_sha256": "00979b242e4a0e1cffcddce604006255c58a57c90bc18fd54ded9e902909abee",
+          "decision": "The modern select preserves disabled filtering and adds label filtering. The owned legacy filter remains disabled-only, as verified against actual packed source and public API behavior.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "prior_entry_sha256": "364b7a3392384187e2980b53c49852fc6da965625276540c6bfe39de6f3ef957",
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "54d514df66b9a1ea544df0aacc7069defcd78dcd",
+      "status": "reviewed",
+      "final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "decision": "The four-file change adds modern buttonType/getType API. The packed owned legacy harness preserves raised/flat/stroked variants, its finite historical filter interface and native text predicate. Adding a new modern button API is outside this finite legacy contract.",
+      "diff_sha256": "d257a644e34595668af3a4f4da4c7e2efff1fc4229dcd494456929f527c94ec1",
+      "diff": "diff --git a/goldens/material/button/testing/index.api.md b/goldens/material/button/testing/index.api.md\nindex 582029883cd26f6db52b281881b0193ec032d336..c6ea75d18022b10edbf26a4db02eb95209e8bf23 100644\n--- a/goldens/material/button/testing/index.api.md\n+++ b/goldens/material/button/testing/index.api.md\n@@ -15,10 +15,14 @@\n // @public\n export interface ButtonHarnessFilters extends BaseHarnessFilters {\n     appearance?: ButtonAppearance;\n+    buttonType?: ButtonType;\n     disabled?: boolean;\n     text?: string | RegExp;\n     variant?: ButtonVariant;\n }\n+\n+// @public\n+export type ButtonType = 'button' | 'submit' | 'reset';\n \n // @public\n export type ButtonVariant = 'basic' | 'icon' | 'fab' | 'mini-fab';\n@@ -32,6 +36,7 @@\n     focus(): Promise<void>;\n     getAppearance(): Promise<ButtonAppearance | null>;\n     getText(): Promise<string>;\n+    getType(): Promise<ButtonType | null>;\n     getVariant(): Promise<ButtonVariant>;\n     static hostSelector: string;\n     isDisabled(): Promise<boolean>;\ndiff --git a/src/material/button/testing/button-harness-filters.ts b/src/material/button/testing/button-harness-filters.ts\nindex 7f053c133ad01adc334ed6f848689a721fe71d0c..c88e9a122b120082629887b5f433ab09170dcef7 100644\n--- a/src/material/button/testing/button-harness-filters.ts\n+++ b/src/material/button/testing/button-harness-filters.ts\n@@ -14,6 +14,9 @@\n /** Possible button appearances. */\n export type ButtonAppearance = 'text' | 'filled' | 'elevated' | 'outlined' | 'tonal';\n \n+/** Possible button types. */\n+export type ButtonType = 'button' | 'submit' | 'reset';\n+\n /** A set of criteria that can be used to filter a list of button harness instances. */\n export interface ButtonHarnessFilters extends BaseHarnessFilters {\n   /** Only find instances whose text matches the given value. */\n@@ -27,4 +30,7 @@\n \n   /** Only find instances which match the given disabled state. */\n   disabled?: boolean;\n+\n+  /** Only find instances with the specified type. */\n+  buttonType?: ButtonType;\n }\ndiff --git a/src/material/button/testing/button-harness.spec.ts b/src/material/button/testing/button-harness.spec.ts\nindex 0dfa249854d86d9aeacf4f2eff61300cd855f259..cc0485eea71e04a2cf02592348daa632d39685c3 100644\n--- a/src/material/button/testing/button-harness.spec.ts\n+++ b/src/material/button/testing/button-harness.spec.ts\n@@ -21,7 +21,7 @@\n \n   it('should load all button harnesses', async () => {\n     const buttons = await loader.getAllHarnesses(MatButtonHarness);\n-    expect(buttons.length).toBe(17);\n+    expect(buttons.length).toBe(18);\n   });\n \n   it('should load button with exact text', async () => {\n@@ -40,7 +40,7 @@\n   it('should filter by whether a button is disabled', async () => {\n     const enabledButtons = await loader.getAllHarnesses(MatButtonHarness.with({disabled: false}));\n     const disabledButtons = await loader.getAllHarnesses(MatButtonHarness.with({disabled: true}));\n-    expect(enabledButtons.length).toBe(15);\n+    expect(enabledButtons.length).toBe(16);\n     expect(disabledButtons.length).toBe(2);\n   });\n \n@@ -57,6 +57,13 @@\n     expect(await disabledFilledButton.isDisabled()).toBe(true);\n     expect(await enabledElevatedButton.isDisabled()).toBe(false);\n     expect(await disabledElevatedAnchor.isDisabled()).toBe(true);\n+  });\n+\n+  it('should load button with type attribute', async () => {\n+    const buttons = await loader.getAllHarnesses(MatButtonHarness.with({buttonType: 'submit'}));\n+    expect(buttons.length).toBe(1);\n+    expect(await buttons[0].getText()).toBe('Submit button');\n+    expect(await buttons[0].getType()).toBe('submit');\n   });\n \n   it('should get button text', async () => {\n@@ -127,6 +134,7 @@\n       'basic',\n       'basic',\n       'basic',\n+      'basic',\n       'icon',\n       'fab',\n       'mini-fab',\n@@ -147,6 +155,7 @@\n       null,\n       null,\n       null,\n+      'text',\n       'text',\n       'filled',\n       'elevated',\n@@ -199,6 +208,7 @@\n     </button>\n     <button id=\"fab\" type=\"button\" matFab>Fab button</button>\n     <button id=\"mini-fab\" type=\"button\" matMiniFab>Mini Fab button</button>\n+    <button id=\"submit\" type=\"submit\" matButton>Submit button</button>\n \n     <a id=\"anchor-basic\" matButton>Basic anchor</a>\n     <a id=\"anchor-flat\" matButton=\"filled\">Filled anchor</a>\ndiff --git a/src/material/button/testing/button-harness.ts b/src/material/button/testing/button-harness.ts\nindex 65bc7fc0040f9cba04ab24f18f028fd8fcd229f3..34caf427620d734f8b7a9c4b568dcdf0d39e36a4 100644\n--- a/src/material/button/testing/button-harness.ts\n+++ b/src/material/button/testing/button-harness.ts\n@@ -12,7 +12,12 @@\n   ContentContainerComponentHarness,\n   HarnessPredicate,\n } from '@angular/cdk/testing';\n-import {ButtonAppearance, ButtonHarnessFilters, ButtonVariant} from './button-harness-filters';\n+import {\n+  ButtonAppearance,\n+  ButtonHarnessFilters,\n+  ButtonType,\n+  ButtonVariant,\n+} from './button-harness-filters';\n \n /** Harness for interacting with a mat-button in tests. */\n export class MatButtonHarness extends ContentContainerComponentHarness {\n@@ -50,7 +55,10 @@\n       )\n       .addOption('disabled', options.disabled, async (harness, disabled) => {\n         return (await harness.isDisabled()) === disabled;\n-      });\n+      })\n+      .addOption('buttonType', options.buttonType, (harness, buttonType) =>\n+        HarnessPredicate.stringMatches(harness.getType(), buttonType),\n+      );\n   }\n \n   /**\n@@ -150,4 +158,16 @@\n \n     return null;\n   }\n+\n+  /**\n+   * Gets the type of the button. Supported values are 'button', 'submit', and 'reset'.\n+   */\n+  async getType(): Promise<ButtonType | null> {\n+    const host = await this.host();\n+    const buttonType = await host.getAttribute('type');\n+    if (buttonType === 'button' || buttonType === 'submit' || buttonType === 'reset') {\n+      return buttonType;\n+    }\n+    return null;\n+  }\n }\n",
+      "complete_original_paths": [
+        "goldens/material/button/testing/index.api.md",
+        "src/material/button/testing/button-harness-filters.ts",
+        "src/material/button/testing/button-harness.spec.ts",
+        "src/material/button/testing/button-harness.ts"
+      ],
+      "frozen_seed_files": [
+        "src/material/button/testing/button-harness-filters.ts",
+        "src/material/button/testing/button-harness.spec.ts",
+        "src/material/button/testing/button-harness.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "goldens/material/button/testing/index.api.md",
+          "hunk_index": 1,
+          "header": "@@ -15,10 +15,14 @@",
+          "hunk_sha256": "8a6381eefea540c04de2cc35572c99f7fd0ccb9e07952d5e0adb82a78e728d9a",
+          "decision": "The modern API adds buttonType and ButtonType; the finite owned legacy filter remains text/variant/disabled. No candidate expectation or original golden is rewritten.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "goldens/material/button/testing/index.api.md",
+          "hunk_index": 2,
+          "header": "@@ -32,6 +36,7 @@",
+          "hunk_sha256": "10e8206a49a877502ddcdebab69363585ca6f008886b7d24c25c8d334a1842e6",
+          "decision": "The modern getType getter is new API. The owned legacy harness keeps its historical getVariant and no getType promise.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness-filters.ts",
+          "hunk_index": 1,
+          "header": "@@ -14,6 +14,9 @@",
+          "hunk_sha256": "0b7ec6b72307047dae0c75e3f4babd8a649bcd0552b14e00544915aea97d1f5d",
+          "decision": "The new ButtonType union belongs to modern button API and is not added to the legacy interface.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness-filters.ts",
+          "hunk_index": 2,
+          "header": "@@ -27,4 +30,7 @@",
+          "hunk_sha256": "16cd4b8a033e670be71c0b9200ee9707b91d60018e28537898120d3df573833f",
+          "decision": "The new buttonType filter is outside the historical filter surface; actual packed interface checks retain the finite three original filters.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -21,7 +21,7 @@",
+          "hunk_sha256": "7c2a4ffec1ad5e65b5876b85f456781c25f2060c2dbaa830d5af8b1b7ba3b49a",
+          "decision": "The expected count increases for one new modern submit-button fixture, not an owned behavior fix.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.spec.ts",
+          "hunk_index": 2,
+          "header": "@@ -40,7 +40,7 @@",
+          "hunk_sha256": "cfde3c8585a7d60f7c2f391e0fdf24048efe44454108286f7b91ea193400b8c1",
+          "decision": "The enabled count changes for that added fixture; no historical expected count is adjusted.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.spec.ts",
+          "hunk_index": 3,
+          "header": "@@ -57,6 +57,13 @@",
+          "hunk_sha256": "e0ee90bb548da40fc9322e5d73d49b55bc1f86e794da8af3b277dec5379cb951",
+          "decision": "The new submit-button filter/getType assertion exercises new modern API. The owned packed harness explicitly lacks this method/filter.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.spec.ts",
+          "hunk_index": 4,
+          "header": "@@ -127,6 +134,7 @@",
+          "hunk_sha256": "ebf70be9567e25172ade9de010601d92e66e0a41816a02b58cbcd8209d702e1c",
+          "decision": "The expected variant list gains the newly added basic button; the owned raised/flat/stroked variants remain their historical meanings.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.spec.ts",
+          "hunk_index": 5,
+          "header": "@@ -147,6 +155,7 @@",
+          "hunk_sha256": "50d764d124cdb22f801e3c4dc8cb3cc16ded875a3edb9f7e95f2d719188ffb44",
+          "decision": "The appearance list adds the new modern text appearance; no modern appearance model is copied to the legacy harness.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.spec.ts",
+          "hunk_index": 6,
+          "header": "@@ -199,6 +208,7 @@",
+          "hunk_sha256": "4cc94393a5b83ec5ebab5c4f6c4243c2305db90ae81411a5f9286c2f07ec8081",
+          "decision": "The submit-button template fixture is upstream-only. No owned or consumer HTML change is required.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -12,7 +12,12 @@",
+          "hunk_sha256": "4b34c53c967256f30e2e5322c586f17e73de360ff9ab930dd49872eb0e0f39a7",
+          "decision": "The import adds the modern ButtonType declaration; the legacy harness imports no such type.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.ts",
+          "hunk_index": 2,
+          "header": "@@ -50,7 +55,10 @@",
+          "hunk_sha256": "0326c96e2713c1336117be859c8bca38593acb5aeb998c63ea5f2b47a174ebd9",
+          "decision": "The buttonType predicate is new modern functionality and is not copied into the legacy with() method.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.ts",
+          "hunk_index": 3,
+          "header": "@@ -150,4 +158,16 @@",
+          "hunk_sha256": "46505ee7fe6a7e9198399dcaa724f60e81575e6c781c15754dc699cccaab6cb2",
+          "decision": "The full getter maps the type attribute to a finite union or null. It adds a new method rather than repairing an original legacy promise, so it is excluded.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "prior_entry_sha256": "d38cf2a4a58fb0f717993ee5195a0ea55f53f48e57af17ab954a10f4e681a474",
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "3619903fa26910a784f01bee627e30d922b9b525",
+      "status": "reviewed",
+      "final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "decision": "The five-file change adds iconName and a MatIconHarness dependency to modern buttons. The owned historical filter has no iconName promise or icon-harness import. Its text/variant predicates and inherited content-container behavior remain separate. No new icon predicate or Bazel dependency is copied.",
+      "diff_sha256": "313e0b12a7ae53865d2352540c46b389eb4a80a9d98bc1e91f4fedfcf5ad2355",
+      "diff": "diff --git a/goldens/material/button/testing/index.api.md b/goldens/material/button/testing/index.api.md\nindex c6ea75d18022b10edbf26a4db02eb95209e8bf23..c57ebcb1c0d95bc73d254efc66b1fee66aa74143 100644\n--- a/goldens/material/button/testing/index.api.md\n+++ b/goldens/material/button/testing/index.api.md\n@@ -17,6 +17,7 @@\n     appearance?: ButtonAppearance;\n     buttonType?: ButtonType;\n     disabled?: boolean;\n+    iconName?: string | RegExp;\n     text?: string | RegExp;\n     variant?: ButtonVariant;\n }\ndiff --git a/src/material/button/testing/BUILD.bazel b/src/material/button/testing/BUILD.bazel\nindex 2490bd8565478984e9b1cf6cc16c98583c55fa06..c71f12a1082e50e4f4232d160ca329eec6556a58 100644\n--- a/src/material/button/testing/BUILD.bazel\n+++ b/src/material/button/testing/BUILD.bazel\n@@ -11,6 +11,7 @@\n     deps = [\n         \"//:node_modules/@angular/core\",\n         \"//src/cdk/testing\",\n+        \"//src/material/icon/testing\",\n     ],\n )\n \ndiff --git a/src/material/button/testing/button-harness-filters.ts b/src/material/button/testing/button-harness-filters.ts\nindex c88e9a122b120082629887b5f433ab09170dcef7..eb490a364773d56a8f59ca1c237a3ab54d30593e 100644\n--- a/src/material/button/testing/button-harness-filters.ts\n+++ b/src/material/button/testing/button-harness-filters.ts\n@@ -33,4 +33,7 @@\n \n   /** Only find instances with the specified type. */\n   buttonType?: ButtonType;\n+\n+  /** Only find instances that contain an icon whose name matches the given value. */\n+  iconName?: string | RegExp;\n }\ndiff --git a/src/material/button/testing/button-harness.spec.ts b/src/material/button/testing/button-harness.spec.ts\nindex cc0485eea71e04a2cf02592348daa632d39685c3..e63fd6bec0f8f2fe5f7e4d1b20454194537f588e 100644\n--- a/src/material/button/testing/button-harness.spec.ts\n+++ b/src/material/button/testing/button-harness.spec.ts\n@@ -113,6 +113,13 @@\n \n     expect(await homeIcon.getName()).toBe('home');\n     expect(await favIcon.getName()).toBe('favorite');\n+  });\n+\n+  it('should be able to filter buttons containing a named icon', async () => {\n+    const favBtn = await loader.getHarness(MatButtonHarness.with({iconName: 'favorite'}));\n+\n+    expect(await (await favBtn.host()).getAttribute('id')).toBe('favorite-icon');\n+    expect(await (await favBtn.getHarness(MatIconHarness)).getName()).toBe('favorite');\n   });\n \n   it('should be able to ge the type variant of the button', async () => {\ndiff --git a/src/material/button/testing/button-harness.ts b/src/material/button/testing/button-harness.ts\nindex 34caf427620d734f8b7a9c4b568dcdf0d39e36a4..49edebcb25ce1494440e940a7d90641a893c2c93 100644\n--- a/src/material/button/testing/button-harness.ts\n+++ b/src/material/button/testing/button-harness.ts\n@@ -12,6 +12,7 @@\n   ContentContainerComponentHarness,\n   HarnessPredicate,\n } from '@angular/cdk/testing';\n+import {MatIconHarness} from '@angular/material/icon/testing';\n import {\n   ButtonAppearance,\n   ButtonHarnessFilters,\n@@ -58,7 +59,10 @@\n       })\n       .addOption('buttonType', options.buttonType, (harness, buttonType) =>\n         HarnessPredicate.stringMatches(harness.getType(), buttonType),\n-      );\n+      )\n+      .addOption('iconName', options.iconName, (harness, iconName) => {\n+        return harness.hasHarness(MatIconHarness.with({name: iconName}));\n+      });\n   }\n \n   /**\n",
+      "complete_original_paths": [
+        "goldens/material/button/testing/index.api.md",
+        "src/material/button/testing/BUILD.bazel",
+        "src/material/button/testing/button-harness-filters.ts",
+        "src/material/button/testing/button-harness.spec.ts",
+        "src/material/button/testing/button-harness.ts"
+      ],
+      "frozen_seed_files": [
+        "src/material/button/testing/BUILD.bazel",
+        "src/material/button/testing/button-harness-filters.ts",
+        "src/material/button/testing/button-harness.spec.ts",
+        "src/material/button/testing/button-harness.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "goldens/material/button/testing/index.api.md",
+          "hunk_index": 1,
+          "header": "@@ -17,6 +17,7 @@",
+          "hunk_sha256": "4f96568f05a936b5cac010cd341563c916473d1ce0a770512f7acafc6cf33d80",
+          "decision": "The new iconName filter is absent from the original owned contract; the historical API golden is preserved.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/BUILD.bazel",
+          "hunk_index": 1,
+          "header": "@@ -11,6 +11,7 @@",
+          "hunk_sha256": "06efb7b7f9a5e0651bca2a842db3d9e2161fdf425affd2bf0ef5503f7f2fd687",
+          "decision": "The MatIconHarness target is needed only by the new modern iconName predicate. The owned button has no corresponding icon/testing edge.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness-filters.ts",
+          "hunk_index": 1,
+          "header": "@@ -33,4 +33,7 @@",
+          "hunk_sha256": "c96209f488525604ee81b1e6f33c2ad50a46034d186772abcfd76751f612aaa2",
+          "decision": "The added string/RegExp iconName criterion is excluded from the finite legacy filter interface.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -113,6 +113,13 @@",
+          "hunk_sha256": "fc89864d58403d5d475f022d5d382071ea37637cc48c3a581a95c6a08ab62cdb",
+          "decision": "The new named-icon search tests modern content querying. The actual packed legacy harness retains its text/variant predicates without adding this API.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -12,6 +12,7 @@",
+          "hunk_sha256": "6b5f47e772e85e985538e4a19ec9bc068808ea820a0e88423566873aa9302e6e",
+          "decision": "The new MatIconHarness dependency is not copied into the owned harness. The owned legacy testing surface and its existing selectors remain unchanged.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/button/testing/button-harness.ts",
+          "hunk_index": 2,
+          "header": "@@ -58,7 +59,10 @@",
+          "hunk_sha256": "9ab722505788c84221273d84fc0f62d0ffae6a2615bb461c73ab334d506587ea",
+          "decision": "The new hasHarness iconName predicate is excluded, while unrelated public content-container methods remain their genuine existing peer implementation.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "prior_entry_sha256": "faa94089d76d74ace5aa8a9cf991fd20e2f2b286519d6567e1c5e795b7f952da",
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "85f596b3c32d22541c3825da3479b67832a2f4da",
+      "status": "reviewed",
+      "final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "decision": "The five-file change adds modern no-data row/cell harness classes and getNoDataRow with an MDC row selector. The packed legacy table retains its finite row/cell harnesses and ordered cell-text behavior. This testing-API decision makes no change to the legacy no-data component or its markup.",
+      "diff_sha256": "b3e350158631e54b258becfd29ffedb4e4204766d375542050a72a2351983a48",
+      "diff": "diff --git a/goldens/material/table/testing/index.api.md b/goldens/material/table/testing/index.api.md\nindex 80f429d6c34da68ce5e85de6e5bb873b17ed1679..6ebe4ec17923419a28dabed4b5d0096d99fdc762 100644\n--- a/goldens/material/table/testing/index.api.md\n+++ b/goldens/material/table/testing/index.api.md\n@@ -59,6 +59,20 @@\n }\n \n // @public\n+export class MatNoDataCellHarness extends _MatCellHarnessBase {\n+    static hostSelector: string;\n+    static with(options?: CellHarnessFilters): HarnessPredicate<MatNoDataCellHarness>;\n+}\n+\n+// @public\n+export class MatNoDataRowHarness extends _MatRowHarnessBase<typeof MatHeaderCellHarness, MatHeaderCellHarness> {\n+    // (undocumented)\n+    protected _cellHarness: typeof MatNoDataCellHarness;\n+    static hostSelector: string;\n+    static with<T extends MatNoDataRowHarness>(this: ComponentHarnessConstructor<T>, options?: RowHarnessFilters): HarnessPredicate<T>;\n+}\n+\n+// @public\n export class MatRowHarness extends _MatRowHarnessBase<typeof MatCellHarness, MatCellHarness> {\n     // (undocumented)\n     protected _cellHarness: typeof MatCellHarness;\n@@ -89,6 +103,7 @@\n     getCellTextByIndex(): Promise<string[][]>;\n     getFooterRows(filter?: RowHarnessFilters): Promise<MatFooterRowHarness[]>;\n     getHeaderRows(filter?: RowHarnessFilters): Promise<MatHeaderRowHarness[]>;\n+    getNoDataRow(filter?: RowHarnessFilters): Promise<MatNoDataRowHarness | null>;\n     getRows(filter?: RowHarnessFilters): Promise<MatRowHarness[]>;\n     // (undocumented)\n     _headerRowHarness: typeof MatHeaderRowHarness;\ndiff --git a/src/material/table/testing/cell-harness.ts b/src/material/table/testing/cell-harness.ts\nindex 47fa5ccc92f5b72c36e08e4bee628e4e4ed246fc..2cae26f526650a50087861dc4a17d85b4c479169 100644\n--- a/src/material/table/testing/cell-harness.ts\n+++ b/src/material/table/testing/cell-harness.ts\n@@ -99,3 +99,18 @@\n     return _MatCellHarnessBase._getCellPredicate(this, options);\n   }\n }\n+\n+/** Harness for interacting with an Angular Material table cell inside a \"no data\" row. */\n+export class MatNoDataCellHarness extends _MatCellHarnessBase {\n+  /** The selector for the host element of a `MatNoDataCellHarness` instance. */\n+  static hostSelector = '.mat-no-data-cell';\n+\n+  /**\n+   * Gets a `HarnessPredicate` that can be used to search for a table cell with specific attributes.\n+   * @param options Options for narrowing the search\n+   * @return a `HarnessPredicate` configured with the given options.\n+   */\n+  static with(options: CellHarnessFilters = {}): HarnessPredicate<MatNoDataCellHarness> {\n+    return _MatCellHarnessBase._getCellPredicate(this, options);\n+  }\n+}\ndiff --git a/src/material/table/testing/row-harness.ts b/src/material/table/testing/row-harness.ts\nindex 5db30792c7ce06f3e61a846bad7631b1cc5d01eb..605aec6538fbd674db2483715cfc0217adbd1f0a 100644\n--- a/src/material/table/testing/row-harness.ts\n+++ b/src/material/table/testing/row-harness.ts\n@@ -17,6 +17,7 @@\n   MatCellHarness,\n   MatFooterCellHarness,\n   MatHeaderCellHarness,\n+  MatNoDataCellHarness,\n } from './cell-harness';\n import {CellHarnessFilters, RowHarnessFilters} from './table-harness-filters';\n \n@@ -122,3 +123,26 @@\n     return new HarnessPredicate(this, options);\n   }\n }\n+\n+/** Harness for interacting with an Angular Material table \"no data\" row. */\n+export class MatNoDataRowHarness extends _MatRowHarnessBase<\n+  typeof MatHeaderCellHarness,\n+  MatHeaderCellHarness\n+> {\n+  /** The selector for the host element of a `MatNoDataRowHarness` instance. */\n+  static hostSelector = '.mat-mdc-no-data-row';\n+  protected _cellHarness = MatNoDataCellHarness;\n+\n+  /**\n+   * Gets a `HarnessPredicate` that can be used to search for a table header row with specific\n+   * attributes.\n+   * @param options Options for narrowing the search\n+   * @return a `HarnessPredicate` configured with the given options.\n+   */\n+  static with<T extends MatNoDataRowHarness>(\n+    this: ComponentHarnessConstructor<T>,\n+    options: RowHarnessFilters = {},\n+  ): HarnessPredicate<T> {\n+    return new HarnessPredicate(this, options);\n+  }\n+}\ndiff --git a/src/material/table/testing/table-harness.spec.ts b/src/material/table/testing/table-harness.spec.ts\nindex 723b39af7a4490a8ef0fb371207c40224a247f09..e0e3dd46516d4479da6df719f3b2297e446f02c8 100644\n--- a/src/material/table/testing/table-harness.spec.ts\n+++ b/src/material/table/testing/table-harness.spec.ts\n@@ -1,4 +1,4 @@\n-import {Component} from '@angular/core';\n+import {Component, signal} from '@angular/core';\n import {ComponentFixture, TestBed} from '@angular/core/testing';\n import {HarnessLoader, parallel} from '@angular/cdk/testing';\n import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';\n@@ -176,11 +176,24 @@\n       symbol: 'H',\n     });\n   });\n+\n+  it('should be able to get the \"no data\" row', async () => {\n+    const table = await loader.getHarness(MatTableHarness);\n+    expect(await table.getNoDataRow()).toBe(null);\n+\n+    fixture.componentInstance.dataSource.set([]);\n+    const row = await table.getNoDataRow();\n+    const cells = await row?.getCells();\n+\n+    expect(row).toBeTruthy();\n+    expect(cells?.length).toBe(1);\n+    expect(await cells?.[0].getText()).toBe('No data');\n+  });\n });\n \n @Component({\n   template: `\n-    <table mat-table [dataSource]=\"dataSource\">\n+    <table mat-table [dataSource]=\"dataSource()\">\n       <ng-container matColumnDef=\"position\">\n         <th mat-header-cell *matHeaderCellDef>No.</th>\n         <td mat-cell *matCellDef=\"let element\">{{element.position}}</td>\n@@ -208,13 +221,17 @@\n       <tr mat-header-row *matHeaderRowDef=\"displayedColumns\"></tr>\n       <tr mat-footer-row *matFooterRowDef=\"displayedColumns\"></tr>\n       <tr mat-row *matRowDef=\"let row; columns: displayedColumns;\"></tr>\n+\n+      <tr *matNoDataRow>\n+        <td>No data</td>\n+      </tr>\n     </table>\n   `,\n   imports: [MatTableModule],\n })\n class TableHarnessTest {\n   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];\n-  dataSource = [\n+  dataSource = signal([\n     {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},\n     {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},\n     {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},\n@@ -225,5 +242,5 @@\n     {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},\n     {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},\n     {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},\n-  ];\n+  ]);\n }\ndiff --git a/src/material/table/testing/table-harness.ts b/src/material/table/testing/table-harness.ts\nindex 0b8cd7b81a1bd54731c493d766ec6908534b1633..4ca8a40ac541ec8bae8a18c3f9b7febe734aebaa 100644\n--- a/src/material/table/testing/table-harness.ts\n+++ b/src/material/table/testing/table-harness.ts\n@@ -15,6 +15,7 @@\n import {\n   MatFooterRowHarness,\n   MatHeaderRowHarness,\n+  MatNoDataRowHarness,\n   MatRowHarness,\n   MatRowHarnessColumnsText,\n } from './row-harness';\n@@ -62,6 +63,11 @@\n   /** Gets all the footer rows in a table. */\n   async getFooterRows(filter: RowHarnessFilters = {}): Promise<MatFooterRowHarness[]> {\n     return this.locatorForAll(this._footerRowHarness.with(filter))();\n+  }\n+\n+  /** Gets the \"no data\" row in the table, if any. */\n+  async getNoDataRow(filter: RowHarnessFilters = {}): Promise<MatNoDataRowHarness | null> {\n+    return this.locatorForOptional(MatNoDataRowHarness.with(filter))();\n   }\n \n   /** Gets the text inside the entire table organized by rows. */\n",
+      "complete_original_paths": [
+        "goldens/material/table/testing/index.api.md",
+        "src/material/table/testing/cell-harness.ts",
+        "src/material/table/testing/row-harness.ts",
+        "src/material/table/testing/table-harness.spec.ts",
+        "src/material/table/testing/table-harness.ts"
+      ],
+      "frozen_seed_files": [
+        "src/material/table/testing/cell-harness.ts",
+        "src/material/table/testing/row-harness.ts",
+        "src/material/table/testing/table-harness.spec.ts",
+        "src/material/table/testing/table-harness.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "goldens/material/table/testing/index.api.md",
+          "hunk_index": 1,
+          "header": "@@ -59,6 +59,20 @@",
+          "hunk_sha256": "fabf8ae7e4d8092533ffa3652c6065274293d519fe6a7b5be1325fe3739a96d0",
+          "decision": "The two no-data harness classes are new modern testing API, outside the finite owned row/cell surface.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "goldens/material/table/testing/index.api.md",
+          "hunk_index": 2,
+          "header": "@@ -89,6 +103,7 @@",
+          "hunk_sha256": "d98e1ea9c892b1a15571fd30d6003741d2a22281540aa3c105a0d51ea3df090c",
+          "decision": "The getNoDataRow method is new API; the legacy table does not promise it. The owned legacy testing surface and its existing selectors remain unchanged.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/table/testing/cell-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -99,3 +99,18 @@",
+          "hunk_sha256": "b1c8b62f7599948a140d5d5d2af5b6e27d3f18b78f8a220c0297258d0524ff96",
+          "decision": "The entire MatNoDataCellHarness class is new modern API. Existing owned legacy cell selectors, text behavior and predicates remain unchanged.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/table/testing/row-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -17,6 +17,7 @@",
+          "hunk_sha256": "e1e9d5854d7825dc6144c6e802f4e3bcd73b8362967281cc2a1ba2c215f9e751",
+          "decision": "The new no-data cell import belongs only to the new modern row harness. The owned legacy testing surface and its existing selectors remain unchanged.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/table/testing/row-harness.ts",
+          "hunk_index": 2,
+          "header": "@@ -122,3 +123,26 @@",
+          "hunk_sha256": "44a3cde9fcce683ce187811e595c6af9b50d00769ffdda52241c13252b45df33",
+          "decision": "The new row uses an MDC row selector and a new cell harness. Neither class is copied or adapted; the existing legacy no-data component itself is unaffected.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/table/testing/table-harness.spec.ts",
+          "hunk_index": 1,
+          "header": "@@ -1,4 +1,4 @@",
+          "hunk_sha256": "3849c6f74a02a9d62333ab60ea43144601828b8c070fbda637a525cfd4bd2e34",
+          "decision": "The signal import supports a new modern testing fixture, not a production table change.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/table/testing/table-harness.spec.ts",
+          "hunk_index": 2,
+          "header": "@@ -176,11 +176,24 @@",
+          "hunk_sha256": "525eb9dd232e3f7337c3d92f54e525c0536f40b028ee910fb3ff284941da7cd6",
+          "decision": "The new empty-data row lookup asserts newly added modern harness APIs; independent packed legacy row/cell behavior is covered without this API expansion.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/table/testing/table-harness.spec.ts",
+          "hunk_index": 3,
+          "header": "@@ -208,13 +221,17 @@",
+          "hunk_sha256": "bc226b3a5b651c77dc869f0570b4595aee123e3a09195de4cfeaa308b8b8eacc",
+          "decision": "The template switches to a signal call and adds a no-data row fixture. Neither the owned template nor its historical expected output is modified.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/table/testing/table-harness.spec.ts",
+          "hunk_index": 4,
+          "header": "@@ -225,5 +242,5 @@",
+          "hunk_sha256": "0ba5b582aa6f8fada0f48d8ea11b598399e11c3da4a8ad709097f365df77a868",
+          "decision": "The data-source initializer is wrapped in a signal for that fixture; no owned data-source implementation changes.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/table/testing/table-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -15,6 +15,7 @@",
+          "hunk_sha256": "2c43b7d2294dfd3a5d33ed0a2ae2ff9ce1b7d0099ea5305124d89244335bce84",
+          "decision": "The new row-harness import is outside the finite legacy table harness dependency graph.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/table/testing/table-harness.ts",
+          "hunk_index": 2,
+          "header": "@@ -62,6 +63,11 @@",
+          "hunk_sha256": "a7fa23b51e2b91585965f7a3dd2244f5dde57dadca48aae7d9a97337abb75f21",
+          "decision": "The locatorForOptional getNoDataRow method adds modern API. Actual packed legacy row/cell order is checked and the new method/classes are absent.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "prior_entry_sha256": "f4d692363118654c85876ae1017158866244072480bfa37f8bd69851a59dcb67",
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "9cf15019d9d82bcb7460df5febd898a1b1eec59b",
+      "status": "reviewed",
+      "final_disposition": "not-applicable",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "decision": "This one-file follow-up changes the newly added modern iconName predicate from hasHarness to locatorForOptional. The owned legacy button implements neither that filter nor that query path; its separately qualified content-container methods are inherited from public CDK.",
+      "diff_sha256": "32277eb9848681e7cdceaf2c6e22a4cb3047c1ad6d8560758b7cf66f0a9bdfd0",
+      "diff": "diff --git a/src/material/button/testing/button-harness.ts b/src/material/button/testing/button-harness.ts\nindex 49edebcb25ce1494440e940a7d90641a893c2c93..7f3ba9eacff90d701fa5b5d8039f7f1c8982f14a 100644\n--- a/src/material/button/testing/button-harness.ts\n+++ b/src/material/button/testing/button-harness.ts\n@@ -60,8 +60,9 @@\n       .addOption('buttonType', options.buttonType, (harness, buttonType) =>\n         HarnessPredicate.stringMatches(harness.getType(), buttonType),\n       )\n-      .addOption('iconName', options.iconName, (harness, iconName) => {\n-        return harness.hasHarness(MatIconHarness.with({name: iconName}));\n+      .addOption('iconName', options.iconName, async (harness, iconName) => {\n+        const result = await harness.locatorForOptional(MatIconHarness.with({name: iconName}))();\n+        return result !== null;\n       });\n   }\n \n",
+      "complete_original_paths": [
+        "src/material/button/testing/button-harness.ts"
+      ],
+      "frozen_seed_files": [
+        "src/material/button/testing/button-harness.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/button/testing/button-harness.ts",
+          "hunk_index": 1,
+          "header": "@@ -60,8 +60,9 @@",
+          "hunk_sha256": "96e0a95f8f9e932d10a234830232ec3ad37bd9fc8cb2bdecb98bc3b28deb8e29",
+          "decision": "The iconName predicate changes from hasHarness to locatorForOptional and a null check. Since the owned legacy button implements neither iconName nor MatIconHarness querying, this follow-up has no applicable owned behavior.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "prior_entry_sha256": "e15f76c7a7fa1fc5f6aed5a66ee2e02f9481d5829ff36ca96b0edb1a1b2e2065",
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    },
+    {
+      "sha": "3ef56a682fa797563d3269f18769ddceda05f760",
+      "status": "reviewed",
+      "final_disposition": "do-not-adopt",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "21.x"
+      ],
+      "decision": "The one-file research-head decorator replacement requires Service, which is absent from the21.xframework public namespace. The actual21.2.14public FakeMatIconRegistry injects and keeps its font-alias behavior using the installed framework. The owned production source graph has no icon/testing delegation to port; no younger peer or Service shim is introduced.",
+      "diff_sha256": "967da3c19a9e8fc4b6f1145e52be6f02f3377d544c60b1559119bb3bf547c9ec",
+      "diff": "diff --git a/src/material/icon/testing/fake-icon-registry.ts b/src/material/icon/testing/fake-icon-registry.ts\nindex b46617f26c452645db5e1e0c77ae3228f63f24fc..0551cf77f8538f58f815a80d28eb52db155cace2 100644\n--- a/src/material/icon/testing/fake-icon-registry.ts\n+++ b/src/material/icon/testing/fake-icon-registry.ts\n@@ -6,7 +6,7 @@\n  * found in the LICENSE file at https://angular.dev/license\n  */\n \n-import {Injectable, NgModule, OnDestroy} from '@angular/core';\n+import {Service, NgModule, OnDestroy} from '@angular/core';\n import {MatIconRegistry} from '../../icon';\n import {Observable, of as observableOf} from 'rxjs';\n \n@@ -18,7 +18,7 @@\n  * A null icon registry that must be imported to allow disabling of custom\n  * icons.\n  */\n-@Injectable()\n+@Service({autoProvided: false})\n export class FakeMatIconRegistry implements PublicApi<MatIconRegistry>, OnDestroy {\n   addSvgIcon(): this {\n     return this;\n",
+      "complete_original_paths": [
+        "src/material/icon/testing/fake-icon-registry.ts"
+      ],
+      "frozen_seed_files": [
+        "src/material/icon/testing/fake-icon-registry.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/icon/testing/fake-icon-registry.ts",
+          "hunk_index": 1,
+          "header": "@@ -6,7 +6,7 @@",
+          "hunk_sha256": "47b1f8a09bc34d6bf184fd1bcfada6ceb4c544e8c234c1a6e62a330c0366f72d",
+          "decision": "The import replaces Injectable with the newer Service API. Service is absent from the advertised 21.x framework namespace; no younger peer or shim is introduced.",
+          "upstream_original_suite_executed": false
+        },
+        {
+          "path": "src/material/icon/testing/fake-icon-registry.ts",
+          "hunk_index": 2,
+          "header": "@@ -18,7 +18,7 @@",
+          "hunk_sha256": "2b9ce6c0f5a6722d0231dcd4d8348c3f0a8c4d25c7202023e31361e6108680c1",
+          "decision": "The decorator changes to Service({autoProvided:false}). The existing public 21.2.14 FakeMatIconRegistry constructs through the actual public Injector and preserves its fake font behavior; the owned production graph has no icon/testing delegation to port.",
+          "upstream_original_suite_executed": false
+        }
+      ],
+      "prior_entry_sha256": "d1ac4bded005bfdfe3ce6141e7dc6c341689a42a108118408a66bc02ce36df78",
+      "source_scope_only": true,
+      "actual_native_packed_or_floor_qualified": false
+    }
+  ],
+  "original_subjects": [
+    {
+      "path": "compatibility/rc/upstream-option-harness-21x-subject.json.gz",
+      "sha256": "63b64e51c3b87011c4f5384bb1499b8e97737e58fe01f32a146f91784a831f6b"
+    },
+    {
+      "path": "compatibility/rc/upstream-testing-api-21x-subjects.json.gz",
+      "sha256": "dee4da78a6d7fcc0dfd2aeb3fd0c5d062adc7d794c2eed0be8e41fb5ec127560"
+    }
+  ],
+  "prior_reviews": [
+    {
+      "path": "compatibility/rc/upstream-option-harness-21x-review.json",
+      "sha256": "993894603ff94e45e34383de326507753fa0aaaed37e72f2974d9902c8b9477f"
+    },
+    {
+      "path": "compatibility/rc/upstream-testing-api-21x-review.json",
+      "sha256": "d62d960bcd61ad4e1ef33457e2116d7762d223e7199b1b919fcd18420655e3e4"
+    }
+  ],
+  "current_product": {
+    "path": "compatibility/rc/upstream-testing-api-21x-current-product.json.gz",
+    "sha256": "6ea89f0c510248657ba44dde8edb8e1a63a9edbb856c51f645d9a7671943fd8a"
+  },
+  "current_observations": [
+    {
+      "kind": "option",
+      "path": "compatibility/rc/upstream-testing-api-21x-current-option-observation.json.gz",
+      "sha256": "8a4d8bb542db8567b82f0260aa4d49a429f99f06307cfff1354b0a91bc8e4532"
+    },
+    {
+      "kind": "testing",
+      "path": "compatibility/rc/upstream-testing-api-21x-current-testing-observation.json.gz",
+      "sha256": "2c177ffa4866f5de32a4dcbb116db5e4cdc90d4fe7374d51ec238cd3ae2c755a"
+    }
+  ],
+  "public_sdk_subject": {
+    "path": "compatibility/rc/material-remaining-caller-public-subjects.json",
+    "sha256": "676a0091788c4f133875d1b1c556a7cd0a150e31a7f8df0928d398ca1eed35c5"
+  },
+  "original_hunks_reviewed": 76,
+  "original_file_occurrences": 38,
+  "source_scope_only": true,
+  "actual_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed"
+}

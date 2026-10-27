@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/** Exactly 85 qualified evidence refreshes; no source judgments or runtime credit. */
+/** Qualified 85-entry source epoch and seven finite 21.x decisions; no native gate credit. */
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
@@ -13,6 +13,7 @@ import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
 import {join} from 'node:path';
+import {testingApi21xEntryEvidenceOk} from './upstream-testing-api-21x-admission.mjs';
 
 const ts = createRequire(import.meta.url)('typescript');
 const inputPath = 'compatibility/rc/packed-upstream-source-inputs.json';
@@ -40,6 +41,19 @@ const ownerEdits = [
   ['const rawCurrent=read,focusEpoch=packedUpstreamFocusMetadataEpoch({root,read}),',
     'const rawCurrent=read,upstreamEpoch=packedUpstreamLedgerEpoch({root,read}),focusEpoch=packedUpstreamFocusMetadataEpoch({root,read:upstreamEpoch.read}),'],
 ];
+
+// This successor adds only the mandatory seven-SHA 21.x review guard. Its
+// original checker remains the authenticated subject of the earlier receipts.
+const testingApiChecker = 'scripts/check-upstream-audit-disposition.mjs';
+const testingApiCheckerEdits = [
+  ["import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';",
+    "import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';\nimport {requiresTestingApi21xEntry,testingApi21xEntryEvidenceOk} from './upstream-testing-api-21x-admission.mjs';"],
+  ["  if (typeof rel !== 'string' || !rel.trim()) return 'missing';",
+    "  if (typeof rel !== 'string' || !rel.trim()) return 'missing';\n  const testingApi21xScope = requiresTestingApi21xEntry(entry,line,readRegularRepoBytes);\n  if (testingApi21xScope && !rel.endsWith('.json')) return 'invalid-testing-api-21x-scope';"],
+  ["    if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';",
+    "    if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';\n    if (testingApi21xScope && !testingApi21xEntryEvidenceOk({entry,body,read:readRegularRepoBytes,\n      productPaths:()=>candidateProductSourcePaths(root),line:line||body.line})) return 'invalid-testing-api-21x-scope';"],
+];
+
 const allowed = new Set(['evidence_report', 'source_check/evidence_report_sha256',
   ...['modern_chip', 'chip_lifecycle', 'chip_modernization', 'chip_input_api', 'chip_edit']
     .map(name => 'individual_proof/' + name + '_source_scope/source_context_sha256')]);
@@ -89,6 +103,82 @@ function applyTokens(before, packet) {
   chunks.push(text.slice(end)); return Buffer.from(chunks.join(''));
 }
 
+const testingApiTransition = {path: 'compatibility/rc/upstream-testing-api-21x-ledger-transition.json.gz',
+  sha256: 'cd65646ca6055cac2cd23077d6bcf75c66f7c111666de703227efcc018d2a3e1'};
+function prepareTestingApiStage({root, read, before, bound, population}) {
+  const member = ref => {const raw = read(ref.path); assert.equal(hash(raw), ref.sha256,
+    'changed individual testing API subject ' + ref.path); bound.set(ref.path, ref.sha256); return raw;};
+  const packet = JSON.parse(gunzipSync(member(testingApiTransition)));
+  assert.equal(packet.line, '21.x'); assert.equal(packet.decisions_changed, 7);
+  assert.equal(packet.existing_historical_proof_digests_changed, 3);
+  assert.equal(packet.unrelated_entry_or_original_hunk_changes, 0);
+  assert.equal(packet.current_native_packed_or_floor_or_g11_credit, false);
+  assert.equal(packet.before.path, ledgerPath); assert.equal(packet.before.entries, 1697);
+  assert.equal(hash(before), packet.before.sha256);
+  assert.equal(hash(gitBytes(root, packet.before.source_parent, ledgerPath)), hash(before));
+  assert.equal(packet.code_subjects.length, 4);
+  assert.deepEqual(packet.code_subjects.map(ref => ref.path), [testingApiChecker,
+    'scripts/upstream-testing-api-21x-admission.mjs', 'scripts/upstream-candidate-source-evidence.mjs',
+    'scripts/upstream-inherited-execution-evidence.mjs']);
+  for (const ref of packet.code_subjects) member(ref);
+  const review = JSON.parse(member(packet.review)); assert.equal(review.reviews.length, 7);
+  for (const ref of [...review.original_subjects, ...review.prior_reviews, review.current_product,
+    ...review.current_observations, review.public_sdk_subject]) member(ref);
+  for (const ref of review.current_observations) {
+    const observation = JSON.parse(gunzipSync(member(ref))); member(observation.producer);
+    if (ref.kind === 'testing') member(observation.retained_packed_evidence.run);
+    else assert.equal(ref.kind, 'option');
+  }
+  const library = {path: 'compatibility/rc/upstream-testing-api-21x-library.tgz',
+    sha256: 'b22cc5742c078ef3e61d6d1817da9f7f8e0872cd06c4190ceef73bdb40c044fc'};
+  member(library);
+  const text = before.toString(), source = ts.parseJsonText('testing-api-ledger.json', text);
+  assert.equal(source.parseDiagnostics.length, 0);
+  const nodes = property(source.statements[0].expression, 'entries'); assert.equal(nodes.elements.length, 1697);
+  const bySha = new Map(nodes.elements.map(node => [JSON.parse(property(node, 'sha').getText(source)), node]));
+  const expected = JSON.parse(before), edits = [];
+  assert.equal(packet.entries.length, 7);
+  assert.deepEqual(packet.entries.map(row => row.sha).sort(), review.reviews.map(row => row.sha).sort());
+  for (const change of packet.entries) {
+    const index = expected.entries.findIndex(entry => entry.sha === change.sha); assert.ok(index >= 0);
+    const previous = expected.entries[index], current = change.after_entry;
+    assert.equal(previous.final_disposition, 'needs-individual-review');
+    assert.equal(hash(json(previous)), change.before_entry_sha256);
+    const allowedFields = new Set(['final_disposition', 'reason', 'review_depth', 'evidence_report', 'individual_proof']);
+    for (const key of new Set([...Object.keys(previous), ...Object.keys(current)]))
+      if (!allowedFields.has(key)) assert.deepEqual(current[key], previous[key], 'changed original testing API entry ' + key);
+    assert.equal(testingApi21xEntryEvidenceOk({entry: current, body: review, read,
+      productPaths: () => population.filter(path => /\.(ts|scss|css|html)$/.test(path)), line: '21.x'}), true);
+    const node = bySha.get(change.sha);
+    edits.push({start: node.getStart(source), end: node.end, text: JSON.stringify(current, null, 2).replace(/\n/g, '\n    ')});
+    expected.entries[index] = current;
+  }
+  const nativeShas = ['8e1711216f7d07324e311e0f6ada3d2426c7891e',
+    '7c9c898faac8daac1bbb20a0807168a74360760d', '20bf71c40f565c59101b63b5a878d2ddb7fe251d'];
+  assert.deepEqual(packet.source_digest_updates.map(row => row.sha).sort(), nativeShas.sort());
+  const checkerSha = hash(read(testingApiChecker));
+  for (const update of packet.source_digest_updates) {
+    assert.deepEqual(update.path.slice(0, 3), ['individual_proof', 'historical_behavior', 'source_members']);
+    assert.equal(update.path.length, 5); assert.equal(update.path[4], 'sha256');
+    const entry = expected.entries.find(row => row.sha === update.sha), index = update.path[3];
+    const ref = entry.individual_proof.historical_behavior.source_members[index];
+    assert.equal(ref.path, testingApiChecker); assert.equal(ref.sha256, update.before);
+    assert.equal(update.before, '63dd648bdc8e29da97c7241bd5e9c201c73e6ef6e8f13a138caa7b4a88a91b6d');
+    assert.equal(update.after, checkerSha);
+    let node = bySha.get(update.sha);
+    for (const key of update.path) node = typeof key === 'number' ? node.elements[key] : property(node, key);
+    assert.equal(JSON.parse(node.getText(source)), update.before);
+    edits.push({start: node.getStart(source), end: node.end, text: JSON.stringify(update.after)});
+    ref.sha256 = update.after;
+  }
+  assert.equal(edits.length, 10); edits.sort((a, b) => a.start - b.start);
+  let end = 0; const chunks = [];
+  for (const edit of edits) {assert.ok(edit.start >= end); chunks.push(text.slice(end, edit.start), edit.text); end = edit.end;}
+  chunks.push(text.slice(end)); const after = Buffer.from(chunks.join(''));
+  assert.equal(hash(after), packet.after_sha256); assert.deepEqual(JSON.parse(after), expected);
+  return {after, individual_decisions: 7, existing_proof_digest_updates: 3};
+}
+
 export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {
   read = packedUpstreamLedgerRawRead({root, read});
   const input = read(inputPath), line = Object.keys(subjects).find(name => subjects[name].sha256 === hash(input));
@@ -128,6 +218,11 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
       for (const [from, to] of ownerEdits) {assert.equal(owner.split(from).length, 2); owner = owner.replace(from, to);}
       assert.equal(read(ownerPath).toString(), owner, 'unqualified source-owner ledger integration');
       bound.set(ownerPath, hash(owner));
+    } else if (line === '21.x' && ref.path === testingApiChecker) {
+      let checker = gitBytes(root, authority, ref.path).toString(); assert.equal(hash(checker), ref.sha256);
+      for (const [from, to] of testingApiCheckerEdits) {assert.equal(checker.split(from).length, 2); checker = checker.replace(from, to);}
+      assert.equal(read(ref.path).toString(), checker, 'unqualified 21.x testing API checker integration');
+      bound.set(ref.path, hash(checker));
     } else member(ref);
   }
   const reports = new Map(); assert.equal(data.reports.length, 12);
@@ -159,7 +254,8 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   }
   const after = applyTokens(before, packet);
   assert.equal(hash(after), data.after_ledger_sha256); assert.deepEqual(JSON.parse(after), expected);
-  return {line, before, after, bound, population, analysis_python_version: syntax.current_pinned_python,
+  const next = line === '21.x' ? prepareTestingApiStage({root, read, before: after, bound, population}) : null;
+  return {line, before, after, canonical_after: next?.after ?? after, testing_api_stage: next, bound, population, analysis_python_version: syntax.current_pinned_python,
     input_sha256: hash(input),
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
     current_native_packed_or_floor_qualified: false};
@@ -170,8 +266,9 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   read = packedUpstreamLedgerRawRead({root, read});
   const prepared = preparePackedUpstreamLedger({root, read});
   const current = hash(read(ledgerPath)), beforeHash = hash(prepared.before), afterHash = hash(prepared.after);
-  assert.ok(current === beforeHash || current === afterHash, 'unqualified canonical upstream ledger');
-  const applied = current === afterHash;
+  const canonicalHash = hash(prepared.canonical_after);
+  assert.ok([beforeHash, afterHash, canonicalHash].includes(current), 'unqualified canonical upstream ledger');
+  const applied = current !== beforeHash;
   const assertCurrent = () => {
     for (const [path, digest] of prepared.bound)
       assert.equal(hash(read(path)), digest, 'late current upstream subject change ' + path);
@@ -188,5 +285,6 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   readers.set(historical, {root, raw: read});
   return {line: prepared.line, read: historical, raw: read, assertCurrent, applied,
     projected_metadata_paths: applied ? [ledgerPath] : [], entries_changed: 85,
-    scalar_tokens_changed: 179, current_native_packed_or_floor_or_g11_credit: false};
+    scalar_tokens_changed: 179, individual_decisions_applied: current === canonicalHash ? (prepared.testing_api_stage?.individual_decisions ?? 0) : 0,
+    current_native_packed_or_floor_or_g11_credit: false};
 }

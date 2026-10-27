@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {createHash} from 'node:crypto';
+import {validateTestingApi21xInheritedExecution} from './upstream-testing-api-21x-admission.mjs';
 import {isDeepStrictEqual} from 'node:util';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 import {TABLE_ONPUSH_SHA, validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
@@ -30,6 +31,8 @@ export function validateInheritedExecution({root, entry, proof, request, line}) 
   try {
     demand(tablePeers.has(line), 'unknown inherited execution branch');
     demand(!request || request.line === line, 'wrong inherited execution branch');
+    if (line === '21.x' && entry?.sha === '4de7c0fb2d033bd81074764a52cc46edd02e6774')
+      return validateTestingApi21xInheritedExecution({root,entry,proof,line});
     if (inheritedHelperRequirements(entry?.sha, line)) return validateInheritedHelperExecution({root, entry, proof, line});
     if (entry?.sha === TABLE_ONPUSH_SHA) {
       const peer = tablePeers.get(line), path = `compatibility/rc/table-public-module-sources/cdk-${peer.version}-table.mjs`;
