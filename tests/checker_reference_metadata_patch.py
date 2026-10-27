@@ -109,10 +109,17 @@ def derive_checker_reference_successor(root=ROOT, expected_before=None):
 
 def verify_checker_reference_successor(root=ROOT, expected_before=None, candidate=None):
     before, after = derive_checker_reference_successor(root=root, expected_before=expected_before)
-    assert (Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()) == after
+    actual = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    following_source_decisions = 0
+    if actual != after:
+        from token_build_ledger_patch import verify_token_build_successor
+        verify_token_build_successor(root=root, expected_before=after, candidate=candidate)
+        following_source_decisions = 1
     return dict(line='21.x', checker_digest_tokens_updated=14, unselected_entries_preserved=1683,
         original_reviews_or_hunk_judgments_changed=0, new_SHA_decisions=0, header_changes=0,
         before_sha256=HASH(before), after_sha256=HASH(after), bytes=len(after),
+        preservation_scope='fourteen-token metadata stage; following source successor verified separately',
+        following_token_build_source_decisions=following_source_decisions,
         actual_native_artifact_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed')
 
 

@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
-import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,existsSync} from 'node:fs';
 import {dirname,join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
@@ -63,6 +63,20 @@ try{
   }
  };
  copyModule('scripts/check-upstream-audit-disposition.mjs');
+ // Sass validators authenticate these data assets when their modules load.
+ // Copy their exact bytes too; these are fixture inputs, never replacements
+ // for the original catalogs, CSS expectations or validator assertions.
+ const sassInputs=[
+  'compatibility/rc/oracles/material-16.2.14-sass-api.json',
+  'compatibility/rc/original16-sass-source-diagnostic-identity.json',
+  ...['default-core-cdk','default-companion','default-mapped-companion','default-aggregate',
+   'datepicker-controls','form-field-state','ripple-color','mixin-argument','owned-aggregate',
+   'aggregate-color-theme','ordered-aggregate'].map(name=>'fixtures/sass/'+name+'-contracts.json'),
+  ...['_index.scss','styles/core/ripple/_ripple-theme.scss','styles/core/theming/_theming.scss',
+   'styles/core/theming/_palette.scss','styles/core/density/private/_compatibility.scss',
+   'styles/core/style/_sass-utils.scss'].map(path=>'projects/ngx-material-legacy/'+path),
+ ];
+ for(const path of sassInputs){const bytes=read(path);put(path,bytes);assert.equal(hash(readFileSync(join(fixture,path))),hash(bytes));}
  // The actual checker requires a known source epoch even in synthetic CLI
  // fixtures. Restore the authenticated pre-repair panel, whose seven imports
  // are additional fixture obligations alongside the original synthetic route.
@@ -125,7 +139,8 @@ try{
   const output=join(fixture,'report-'+name+'.json');
   const child=spawnSync(process.execPath,[join(fixture,checker),'--seed',join(fixture,'seed.json'),'--ledger',join(fixture,'ledger.json'),
    '--symbols',join(fixture,'symbols.json'),'--current-symbols',join(fixture,'current.json'),'--report',output,'--admission','--line',line],{cwd:fixture,env:environment,encoding:'utf8',timeout:30000});
-  assert.ok([0,1].includes(child.status),child.stderr||String(child.error));const report=JSON.parse(readFileSync(output));
+  assert.ok([0,1].includes(child.status),child.stderr||String(child.error));
+  assert.ok(existsSync(output),name+' '+child.stderr);const report=JSON.parse(readFileSync(output));
   assert.equal(report.authored_use_inventory.expected,1736);assert.equal(report.authored_use_review_evidence.reviewed,1736);assert.equal(report.authored_use_review_evidence.insufficient,0);
   assert.equal(report.current_authored_use_inventory.ready,true,JSON.stringify(report.current_authored_use_inventory));
   assert.equal(report.current_authored_use_inventory.additional_uses,8);

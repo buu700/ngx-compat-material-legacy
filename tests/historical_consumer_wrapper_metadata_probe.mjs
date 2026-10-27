@@ -39,7 +39,8 @@ let late=false;const lateSource=historicalConsumerWrapperMetadata({root,read:pat
 late=true;assert.throws(()=>lateSource.assertCurrent(),/late historical consumer metadata input/);controls.push({id:'late-wrapper-drift',result:'rejected'});
 const epoch=packedUpstreamLedgerEpoch({root});
 assert.equal(epoch.historical_consumer_wrapper_metadata_entries_applied,65);assert.equal(epoch.historical_consumer_wrapper_metadata_references_applied,65);
-assert.equal(epoch.historical_wrapper_metadata_entries_applied,4);assert.equal(epoch.individual_decisions_applied,source.line==='main'?13:21);
+assert.equal(epoch.historical_wrapper_metadata_entries_applied,4);assert.equal(epoch.individual_decisions_applied,source.line==='main'?13:22);
+assert.equal(epoch.token_build_decisions_applied,source.line==='main'?0:1);
 assert.equal(epoch.legacy_sass_entrypoint_decisions_applied,source.line==='main'?0:1);
 assert.equal(epoch.current_native_packed_or_floor_or_g11_credit,false);epoch.assertCurrent();
 const altered=Buffer.from(read(CONSUMER_WRAPPER_LEDGER));altered[0]=32;

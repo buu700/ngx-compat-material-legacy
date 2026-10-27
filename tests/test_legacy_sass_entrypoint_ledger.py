@@ -48,7 +48,7 @@ class LegacySassEntrypointLedgerTests(unittest.TestCase):
         self.assertEqual(report['real_root_checker_positive'], 1)
         self.assertEqual(report['real_root_checker_rejections'], 3)
         self.assertEqual(report['rejection_controls'], 11)
-        self.assertEqual(report['individual_decisions_applied'], 21)
+        self.assertEqual(report['individual_decisions_applied'], 22)
         self.assertEqual(report['legacy_sass_entrypoint_decisions_applied'], 1)
         self.assertTrue(report['current_checker_bytes_returned_raw'])
         self.assertTrue(report['all_fixture_roots_removed'])
