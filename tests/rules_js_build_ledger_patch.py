@@ -7,6 +7,7 @@ import gzip
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -74,11 +75,30 @@ assert len(edits)==len(set(changed))==6 and len(packet['entries'])==3
 chunks=[];end=0
 for a,b,value in sorted(edits):assert a>=end;chunks.extend((text[end:a],value));end=b
 chunks.append(text[end:]);after=''.join(chunks).encode();assert sha(after)==packet['after_sha256']
-current=(ROOT/path).read_bytes();assert current in (before,after)
+current=(ROOT/path).read_bytes();applied=current==after;summary_updates=0
+if current not in (before,after):
+    summary_pins={'main':'8346997a4b0135fc858748ff2520230e3a537efe00ac04c3ef71646858996152','21.x':'2d4fc0ff09b993cca3d202d75844141574ddd55c9730ca84339744f3d9b2083c'}
+    summary_raw=(ROOT/'compatibility/rc/upstream-ledger-summary-transition.json').read_bytes();assert sha(summary_raw)==summary_pins[line]
+    summary=json.loads(summary_raw);assert summary['line']==line and summary['before']['sha256']==sha(after)
+    assert summary['before']['source_parent']=={'main':'eb7309f5a9b0108aa22a7d9de2f28d4c502dbae8','21.x':'13a036b88364373898729bed5ccbeda98b2cb891'}[line]
+    assert summary['entries_changed']==summary['new_SHA_decisions']==0 and summary['full_audit_or_gate_credit'] is False
+    after_data=json.loads(after)
+    closed={'irrelevant','not-applicable','inherited','already-adapted','do-not-adopt','adapt','already-present'}
+    pending={'open','needs-individual-review','security-review'}
+    assert all(r['final_disposition'] in closed|pending for r in after_data['entries'])
+    values=dict(closed_dispositions=sum(r['final_disposition'] in closed for r in after_data['entries']),open_or_deferred=sum(r['final_disposition'] in pending for r in after_data['entries']))
+    assert sum(values.values())==1697 and [r['field'] for r in summary['updates']]==list(values)
+    normalized=after.decode()
+    for update in summary['updates']:
+        assert after_data[update['field']]==update['before'] and values[update['field']]==update['after']
+        normalized,n=re.subn(r'(^  "'+update['field']+r'": )\d+(,?$)',lambda m:m[1]+str(update['after'])+m[2],normalized,flags=re.M);assert n==1
+    normalized=normalized.encode();assert sha(normalized)==summary['after_sha256'] and current==normalized
+    assert json.loads(normalized)==dict(after_data,**values)
+    applied=True;summary_updates=2
 assert {a['sha'] for a,b in zip(original['entries'],json.loads(after)['entries']) if a!=b}==set(changed)
 report=dict(line=line,result='pass',independent_parser='Python JSON object/scalar spans; no TypeScript AST',canonical_entries=1697,
     individual_decisions_changed=3,checker_source_digests_changed=3,unrelated_entry_or_byte_changes=0,
-    before_sha256=sha(before),after_sha256=sha(after),canonical_applied=current==after,current_native_packed_or_floor_or_G11_qualified=False)
+    before_sha256=sha(before),after_sha256=sha(after),canonical_applied=applied,subsequent_summary_scalar_updates=summary_updates,current_native_packed_or_floor_or_G11_qualified=False)
 if len(sys.argv)>1:
     with open(sys.argv[1],'x') as output:output.write(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report))

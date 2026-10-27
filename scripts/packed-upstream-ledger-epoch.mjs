@@ -342,6 +342,42 @@ function prepareRulesJsStage({root,read,line,before,bound}){
   return {before,after,individual_decisions:3,proof_digest_updates:3,assertExternal:scope.assertExternal};
 }
 
+const summaryTransitions={
+  main:{path:'compatibility/rc/upstream-ledger-summary-transition.json',sha256:'8346997a4b0135fc858748ff2520230e3a537efe00ac04c3ef71646858996152'},
+  '21.x':{path:'compatibility/rc/upstream-ledger-summary-transition.json',sha256:'2d4fc0ff09b993cca3d202d75844141574ddd55c9730ca84339744f3d9b2083c'},
+};
+function prepareSummaryStage({root,read,line,before,bound}){
+  const ref=summaryTransitions[line],raw=read(ref.path);assert.equal(hash(raw),ref.sha256);bound.set(ref.path,ref.sha256);
+  const packet=JSON.parse(raw);assert.equal(packet.line,line);assert.equal(packet.entries_changed,0);
+  assert.equal(packet.new_SHA_decisions,0);assert.equal(packet.full_audit_or_gate_credit,false);
+  assert.equal(packet.before.path,ledgerPath);assert.equal(packet.before.sha256,hash(before));
+  assert.equal(hash(gitBytes(root,packet.before.source_parent,ledgerPath)),hash(before));
+  // The checker owns the classification policy. Read its actual finite sets
+  // as syntax rather than introducing a second production policy definition.
+  const policy=ts.createSourceFile(testingApiChecker,read(testingApiChecker).toString(),ts.ScriptTarget.Latest,true);
+  const declarations=policy.statements.filter(ts.isVariableStatement).flatMap(node=>[...node.declarationList.declarations]);
+  const states=name=>{
+    const matches=declarations.filter(node=>node.name.getText(policy)===name);assert.equal(matches.length,1);
+    const init=matches[0].initializer;assert.ok(ts.isNewExpression(init)&&init.expression.getText(policy)==='Set'&&init.arguments.length===1);
+    const values=init.arguments[0];assert.ok(ts.isArrayLiteralExpression(values)&&values.elements.every(ts.isStringLiteral));
+    const result=new Set(values.elements.map(node=>node.text));assert.equal(result.size,values.elements.length);return result;
+  };
+  const closed=states('ALLOWED_FINAL'),pending=states('PENDING'),data=JSON.parse(before);
+  assert.equal(data.entries.length,1697);let closedCount=0,pendingCount=0;
+  for(const entry of data.entries){assert.ok(closed.has(entry.final_disposition)||pending.has(entry.final_disposition));
+    if(closed.has(entry.final_disposition))closedCount++;else pendingCount++;}
+  assert.equal(closedCount+pendingCount,1697);assert.equal(data.g11_claim,'not-passed');
+  const text=before.toString(),syntax=ts.parseJsonText('ledger-summary.json',text);assert.equal(syntax.parseDiagnostics.length,0);
+  const values={closed_dispositions:closedCount,open_or_deferred:pendingCount};
+  assert.deepEqual(packet.updates.map(row=>row.field),Object.keys(values));const edits=[];
+  for(const update of packet.updates){assert.equal(data[update.field],update.before);assert.equal(values[update.field],update.after);
+    const node=property(syntax.statements[0].expression,update.field);assert.equal(JSON.parse(node.getText(syntax)),update.before);
+    edits.push({start:node.getStart(syntax),end:node.end,text:JSON.stringify(update.after)});}
+  let end=0;const chunks=[];for(const edit of edits.sort((a,b)=>a.start-b.start)){assert.ok(edit.start>=end);chunks.push(text.slice(end,edit.start),edit.text);end=edit.end;}
+  chunks.push(text.slice(end));const after=Buffer.from(chunks.join(''));assert.equal(hash(after),packet.after_sha256);
+  assert.deepEqual(JSON.parse(after),{...data,...values});return {before,after,scalar_updates:2};
+}
+
 export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {
   read = packedUpstreamLedgerRawRead({root, read});
   const input = read(inputPath), line = Object.keys(subjects).find(name => subjects[name].sha256 === hash(input));
@@ -421,7 +457,8 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const next = line === '21.x' ? prepareTestingApiStage({root, read, before: after, bound, population}) : null;
   const sass = prepareSassStage({root,read,line,before:next?.after??after,bound});
   const rulesJs = prepareRulesJsStage({root,read,line,before:sass.after,bound});
-  return {line, before, after, canonical_after: rulesJs.after, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, bound, population, analysis_python_version: syntax.current_pinned_python,
+  const summary = prepareSummaryStage({root,read,line,before:rulesJs.after,bound});
+  return {line, before, after, canonical_after: summary.after, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, bound, population, analysis_python_version: syntax.current_pinned_python,
     input_sha256: hash(input),
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
     current_native_packed_or_floor_qualified: false};
@@ -435,7 +472,8 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   const canonicalHash = hash(prepared.canonical_after);
   const testingHash=prepared.testing_api_stage?hash(prepared.testing_api_stage.after):null;
   const sassHash=hash(prepared.sass_stage.after);
-  assert.ok([beforeHash,afterHash,testingHash,sassHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
+  const rulesHash=hash(prepared.rules_js_stage.after);
+  assert.ok([beforeHash,afterHash,testingHash,sassHash,rulesHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
   const applied = current !== beforeHash;
   const assertCurrent = () => {
     prepared.sass_stage.assertExternal();
@@ -456,9 +494,10 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   return {line: prepared.line, read: historical, raw: read, assertCurrent, applied,
     projected_metadata_paths: applied ? [ledgerPath] : [], entries_changed: 85,
     scalar_tokens_changed: 179,
-    testing_api_decisions_applied: [testingHash,sassHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0,
-    sass_decisions_applied: [sassHash,canonicalHash].includes(current)?6:0,
-    rules_js_decisions_applied:current===canonicalHash?3:0,
-    individual_decisions_applied: ([testingHash,sassHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0)+([sassHash,canonicalHash].includes(current)?6:0)+(current===canonicalHash?3:0),
+    testing_api_decisions_applied: [testingHash,sassHash,rulesHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0,
+    sass_decisions_applied: [sassHash,rulesHash,canonicalHash].includes(current)?6:0,
+    rules_js_decisions_applied:[rulesHash,canonicalHash].includes(current)?3:0,
+    summary_scalar_updates_applied:current===canonicalHash?2:0,
+    individual_decisions_applied: ([testingHash,sassHash,rulesHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0)+([sassHash,rulesHash,canonicalHash].includes(current)?6:0)+([rulesHash,canonicalHash].includes(current)?3:0),
     current_native_packed_or_floor_or_g11_credit: false};
 }

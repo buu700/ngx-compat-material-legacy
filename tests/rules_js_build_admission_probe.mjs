@@ -11,6 +11,7 @@ import {gunzipSync} from 'node:zlib';
 import {join} from 'node:path';
 import {RULES_JS_BUILD_SHAS,RULES_JS_BUILD_REPORT,requiresRulesJsBuild,rulesJsBuildEntryEvidenceOk,
  rulesJsBuildEntrySourceOk,rulesJsBuildOriginalPatch} from '../scripts/upstream-rules-js-build-admission.mjs';
+import {packedUpstreamLedgerEpoch} from '../scripts/packed-upstream-ledger-epoch.mjs';
 const root=process.cwd(),read=p=>readFileSync(join(root,p)),hash=raw=>createHash('sha256').update(raw).digest('hex');
 const body=JSON.parse(read(RULES_JS_BUILD_REPORT)),line=body.line;
 const packet=JSON.parse(gunzipSync(read('compatibility/rc/upstream-rules-js-build-ledger-transition.json.gz')));
@@ -45,7 +46,7 @@ let late=false;const current=p=>late&&p==='scripts/pack-library.mjs'?Buffer.conc
 assert.equal(rulesJsBuildEntryEvidenceOk({root,read:current,line,entry,body}),true);late=true;
 assert.equal(rulesJsBuildEntryEvidenceOk({root,read:current,line,entry,body}),false);rejected.push('late-current-build-change');
 const summary={line,result:'pass',cases,rejected,original_file_occurrences:135,original_hunks:195,
- canonical_applied:hash(read(packet.before.path))===packet.after_sha256,fresh_original_and_current_source_check:true,
+ canonical_applied:packedUpstreamLedgerEpoch({root,read}).rules_js_decisions_applied===3,fresh_original_and_current_source_check:true,
  current_native_packed_or_floor_or_G11_qualified:false};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(summary,null,2)+'\n',{flag:'wx'});
 console.log(JSON.stringify(summary));
