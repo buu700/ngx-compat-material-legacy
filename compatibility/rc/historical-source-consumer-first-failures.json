@@ -1,0 +1,927 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "source_parent": "3991054f3176e7fcd380fd794cedba74662c9dcf",
+  "role": "First-failure diagnostics of unchanged current source probes; no historical replay or acceptance.",
+  "inventory": {
+    "path": "compatibility/rc/historical-source-consumer-inventory-worksheet.json",
+    "sha256": "4a66a0914db976ac9cd611b0db5b6b5192b5c2b2efa531cc9fe62e1de0016855"
+  },
+  "producer": {
+    "path": "scripts/inspect-historical-source-consumers.py",
+    "sha256": "e36173d63e9fe394717f308632d7eeda1d6610a16520a9164e99dcb32741c5a3"
+  },
+  "serial": true,
+  "per_probe_bound_seconds": 45,
+  "counts": {
+    "passed": 0,
+    "failed": 27,
+    "timeout": 0,
+    "diagnostic-error": 0
+  },
+  "probes": [
+    {
+      "path": "tests/historical_roster_reconciliation_probe.mjs",
+      "sha256": "1211a9cea2f09ac6f63cdfefc36e5d083f66fc63db69cbc9e3ac29297a39282b",
+      "bytes": 9669,
+      "elapsed_seconds": 0.369,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed native validator delta\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' * Use of this source code is governed by an MIT-style license that can be\\n' +\n...\n    \"import {createHash} from 'node:crypto';\\n\" +\n+   \"import {autocompleteSelectionHistoricalScopes} from './autocomplete-selection-native-scopes.mjs';\\n\" +\n    \"import {isDeepStrictEqual} from 'node:uti",
+        "message_bytes": 17672,
+        "message_sha256": "be7ae86a164d4f95e203d33a9f312d9b7a2ccc77e4ba6343c71c00c0c926c6b1",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 20121,
+          "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 12389,
+          "sha256": "e04fb5f6f6d89ca2d159aee91e793a9a754693e477dd6b3c5ac04a1c1afda943"
+        },
+        "locations": [
+          "    at inspectHistoricalRosterReconciliation (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/historical-roster-reconciliation.mjs:81:9)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/historical_roster_reconciliation_probe.mjs:19:61",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_build_harness_source_probe.mjs",
+      "sha256": "baa7f180a1249ab45626789d722bc9c614df7a058c61318558710bd6b7fcebf7",
+      "bytes": 8010,
+      "elapsed_seconds": 4.356,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "owned runner/tool/migration context changed pnpm-lock.yaml\n+ actual - expected\n\n+ 'e8b2cd00e56fd38e40f547bcacd2b38088b71548f40b3e15137fb91a1bef87a2'\n- '95f2b2de22393c4d182972fa13252dfa6b83d66c9a5de94e49c81f5270ae7a58'\n",
+        "message_bytes": 218,
+        "message_sha256": "7c1d2da3e095c9117e2eb50f79c1e3385d4e70b20519dcbe0992ba1c391f491d",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "68fc870022e346fb161514c61f911fd5a3589f51096b7dc89718e073a8bba43d"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "8876e164418ee698c93f02b8d4f440525f0ca9617e937a6bee12c9c352574a6c"
+        },
+        "locations": [
+          "    at inspectBuildHarnessOwnedContext (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-build-harness-source-review.mjs:135:55)",
+          "    at inspectBuildHarnessSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-build-harness-source-review.mjs:169:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_build_harness_source_probe.mjs:19:49",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_cdk_behavior_source_probe.mjs",
+      "sha256": "558b4183d0dff055951fa3ee9c5dbb81eeeac938a688042abc5ae6e4adb53ff8",
+      "bytes": 8308,
+      "elapsed_seconds": 0.933,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Expected values to be strictly equal:\n\n1029 !== 1028\n",
+        "message_bytes": 53,
+        "message_sha256": "1baa5fdc9af87700d2c2a8993e348cf06c54fc173ccaf8d09bb1e07688998353",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "number",
+          "value": 1029
+        },
+        "expected": {
+          "type": "number",
+          "value": 1028
+        },
+        "locations": [
+          "    at inspectMixedOwnedScope (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-cdk-behavior-source-review.mjs:252:10)",
+          "    at inspectMixedCdkSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-cdk-behavior-source-review.mjs:298:22)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_cdk_behavior_source_probe.mjs:20:45",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_compiler_build_source_probe.mjs",
+      "sha256": "32be702d805010c9a0588f97ad7eb253c89a6464ba8481a6391a8d221f39d85a",
+      "bytes": 8216,
+      "elapsed_seconds": 1.245,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "owned context changed pnpm-lock.yaml\n+ actual - expected\n\n+ 'e8b2cd00e56fd38e40f547bcacd2b38088b71548f40b3e15137fb91a1bef87a2'\n- '95f2b2de22393c4d182972fa13252dfa6b83d66c9a5de94e49c81f5270ae7a58'\n",
+        "message_bytes": 196,
+        "message_sha256": "0c8868de411d6ac4e26c8aff75a3a3dc929cf99775816e38e0077ca37cfdd048",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "68fc870022e346fb161514c61f911fd5a3589f51096b7dc89718e073a8bba43d"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "8876e164418ee698c93f02b8d4f440525f0ca9617e937a6bee12c9c352574a6c"
+        },
+        "locations": [
+          "    at inspectCompilerBuildOwnedContext (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-compiler-build-source-review.mjs:118:55)",
+          "    at inspectCompilerBuildSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-compiler-build-source-review.mjs:158:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_compiler_build_source_probe.mjs:19:50",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_example_docs_source_probe.mjs",
+      "sha256": "ac229d70fef50377d05b28a47ec2185b8912d8c6d92dd5c411670c213e35e36e",
+      "bytes": 6902,
+      "elapsed_seconds": 1.088,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Expected values to be strictly equal:\n\n1029 !== 1028\n",
+        "message_bytes": 53,
+        "message_sha256": "1baa5fdc9af87700d2c2a8993e348cf06c54fc173ccaf8d09bb1e07688998353",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "number",
+          "value": 1029
+        },
+        "expected": {
+          "type": "number",
+          "value": 1028
+        },
+        "locations": [
+          "    at inspectExampleDocsOwnedContext (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-example-docs-source-review.mjs:139:10)",
+          "    at inspectExampleDocsSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-example-docs-source-review.mjs:183:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_example_docs_source_probe.mjs:19:48",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_explicit_detection_source_probe.mjs",
+      "sha256": "188af5365d3ef45aba61853f4d35e32ecb5fb85417c03342c19e60545dd05c78",
+      "bytes": 6598,
+      "elapsed_seconds": 3.642,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "owned runner/toolchain/context changed pnpm-lock.yaml\n+ actual - expected\n\n+ 'e8b2cd00e56fd38e40f547bcacd2b38088b71548f40b3e15137fb91a1bef87a2'\n- '95f2b2de22393c4d182972fa13252dfa6b83d66c9a5de94e49c81f5270ae7a58'\n",
+        "message_bytes": 213,
+        "message_sha256": "f4a651805228a3147f12f6865db2040b254e6de6f9df68d7bba06fe245cfd056",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "68fc870022e346fb161514c61f911fd5a3589f51096b7dc89718e073a8bba43d"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "8876e164418ee698c93f02b8d4f440525f0ca9617e937a6bee12c9c352574a6c"
+        },
+        "locations": [
+          "    at inspectExplicitDetectionOwnedContext (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-explicit-detection-source-review.mjs:99:55)",
+          "    at inspectExplicitDetectionSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-explicit-detection-source-review.mjs:120:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_explicit_detection_source_probe.mjs:19:136",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_fixture_build_source_probe.mjs",
+      "sha256": "91d93c2589efa668b80ce3922d80e97dc464ec77b0c5c42438b3d2ba0cc025cb",
+      "bytes": 6986,
+      "elapsed_seconds": 0.765,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Expected values to be strictly equal:\n\n1029 !== 1028\n",
+        "message_bytes": 53,
+        "message_sha256": "1baa5fdc9af87700d2c2a8993e348cf06c54fc173ccaf8d09bb1e07688998353",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "number",
+          "value": 1029
+        },
+        "expected": {
+          "type": "number",
+          "value": 1028
+        },
+        "locations": [
+          "    at inspectFixtureBuildOwnedContext (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-fixture-build-source-review.mjs:80:59)",
+          "    at inspectFixtureBuildSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-fixture-build-source-review.mjs:119:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_fixture_build_source_probe.mjs:19:49",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_global_zoneless_source_probe.mjs",
+      "sha256": "0af823f52f4e67882271f3735c753a8d886c0505683edf1149aad0fa1c88052a",
+      "bytes": 7112,
+      "elapsed_seconds": 4.065,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "owned runner/toolchain/context drifted pnpm-lock.yaml\n+ actual - expected\n\n+ 'e8b2cd00e56fd38e40f547bcacd2b38088b71548f40b3e15137fb91a1bef87a2'\n- '95f2b2de22393c4d182972fa13252dfa6b83d66c9a5de94e49c81f5270ae7a58'\n",
+        "message_bytes": 213,
+        "message_sha256": "4be9b3cfe2004a884390721d03fb323e031d124f5c5a7fd4f2823febc0eb0446",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "68fc870022e346fb161514c61f911fd5a3589f51096b7dc89718e073a8bba43d"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "8876e164418ee698c93f02b8d4f440525f0ca9617e937a6bee12c9c352574a6c"
+        },
+        "locations": [
+          "    at inspectGlobalZonelessOwnedContext (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-global-zoneless-source-review.mjs:126:55)",
+          "    at inspectGlobalZonelessSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-global-zoneless-source-review.mjs:148:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_global_zoneless_source_probe.mjs:20:51",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_peer_async_source_probe.mjs",
+      "sha256": "89e0635576163d851971bb655b7f3a0e545f6bb86a7efba1a07ef3983221b995",
+      "bytes": 8053,
+      "elapsed_seconds": 2.013,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Expected values to be strictly equal:\n\n1029 !== 1028\n",
+        "message_bytes": 53,
+        "message_sha256": "1baa5fdc9af87700d2c2a8993e348cf06c54fc173ccaf8d09bb1e07688998353",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "number",
+          "value": 1029
+        },
+        "expected": {
+          "type": "number",
+          "value": 1028
+        },
+        "locations": [
+          "    at inspectPeerOwnedScope (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-peer-async-source-review.mjs:201:10)",
+          "    at inspectPeerAsyncSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-peer-async-source-review.mjs:244:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_peer_async_source_probe.mjs:22:46",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_strict_tests_source_probe.mjs",
+      "sha256": "9cb8643abf2f3a9a43935531bc378648d0fcbb6cd9371ba0afed0897fb8eea21",
+      "bytes": 6688,
+      "elapsed_seconds": 2.46,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "owned strict runner/context changed pnpm-lock.yaml\n+ actual - expected\n\n+ 'e8b2cd00e56fd38e40f547bcacd2b38088b71548f40b3e15137fb91a1bef87a2'\n- '95f2b2de22393c4d182972fa13252dfa6b83d66c9a5de94e49c81f5270ae7a58'\n",
+        "message_bytes": 210,
+        "message_sha256": "454bead998fd3a42f1808e4ab431434e261f731db6a585db8df1bb1e5662ac67",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "68fc870022e346fb161514c61f911fd5a3589f51096b7dc89718e073a8bba43d"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "8876e164418ee698c93f02b8d4f440525f0ca9617e937a6bee12c9c352574a6c"
+        },
+        "locations": [
+          "    at inspectStrictTestOwnedContext (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-strict-tests-source-review.mjs:119:55)",
+          "    at inspectStrictTestSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-strict-tests-source-review.mjs:147:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_strict_tests_source_probe.mjs:19:47",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_theming_source_probe.mjs",
+      "sha256": "a9653a6aa5a373ad0c10a666dc4b88d5dcea78101ba8833615e52299663bdabb",
+      "bytes": 6407,
+      "elapsed_seconds": 0.486,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Expected values to be strictly equal:\n\n1029 !== 1028\n",
+        "message_bytes": 53,
+        "message_sha256": "1baa5fdc9af87700d2c2a8993e348cf06c54fc173ccaf8d09bb1e07688998353",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "number",
+          "value": 1029
+        },
+        "expected": {
+          "type": "number",
+          "value": 1028
+        },
+        "locations": [
+          "    at inspectThemingOwnedContext (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-theming-source-review.mjs:136:10)",
+          "    at inspectThemingSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-theming-source-review.mjs:175:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_theming_source_probe.mjs:19:44",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_tree_source_probe.mjs",
+      "sha256": "faa12a6720a1691bb0ebbbdbe9719d6b7e281e282ad232457412cfcda7957384",
+      "bytes": 6100,
+      "elapsed_seconds": 1.065,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Expected values to be strictly equal:\n\n1029 !== 1028\n",
+        "message_bytes": 53,
+        "message_sha256": "1baa5fdc9af87700d2c2a8993e348cf06c54fc173ccaf8d09bb1e07688998353",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "number",
+          "value": 1029
+        },
+        "expected": {
+          "type": "number",
+          "value": 1028
+        },
+        "locations": [
+          "    at inspectTreeOwnedScope (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-tree-source-review.mjs:126:10)",
+          "    at inspectTreeSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-tree-source-review.mjs:157:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_tree_source_probe.mjs:19:41",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/mixed_zone_moves_source_probe.mjs",
+      "sha256": "a66dbd79a054f104331f6f90623b5765fcf9f2bd5169ca3c9baee10f79e8ce43",
+      "bytes": 6579,
+      "elapsed_seconds": 0.88,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "owned zone/lifecycle context changed projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts\n+ actual - expected\n\n+ '2610d311569c9a6fdb063dc0652b423414622cf1370b2434f13ba86070293236'\n- '9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9'\n",
+        "message_bytes": 266,
+        "message_sha256": "fb8ad8a2d5aa4cd7e5a4aa5c1ed3ddcf0f4ec797be66f9441542fb1a0aa945fa",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "b545510b8837d1fab7bb7b6f3a1f631d0adedbd3ec2a7e117e1e0ac5a0acfd63"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 64,
+          "sha256": "62ca54ca7a02e31ba684a620f7e3d117824548cba8bb5756a7ffad631ad2e37d"
+        },
+        "locations": [
+          "    at inspectZoneOwnedContext (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-zone-moves-source-review.mjs:127:55)",
+          "    at inspectZoneMovesSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/mixed-zone-moves-source-review.mjs:176:17)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/mixed_zone_moves_source_probe.mjs:19:46",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/original_patch_storage_probe.mjs",
+      "sha256": "1ff864698dd78955025ce290010a416473be33416c137ffbc9ab960098ed5c85",
+      "bytes": 8737,
+      "elapsed_seconds": 0.444,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "restored-exact-originalnode:internal/modules/cjs/loader:1564\n  const err = new Error(message);\n              ^\n\nError: Cannot find module 'typescript'\nRequire stack:\n- /tmp/nix-shell.2pKJth/original-patch-binding-7Q24ur/repo/scripts/component-config-caller-contracts.mjs\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)\n    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)\n    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)\n   ",
+        "message_bytes": 1186,
+        "message_sha256": "a4da4509d9cb91b1a3ff0f1361593029fc6ab39e0cf14e6dca0ce77b9118ea92",
+        "operator": "==",
+        "actual": {
+          "type": "string",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected": {
+          "type": "boolean",
+          "value": true
+        },
+        "locations": [
+          "    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)",
+          "    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)",
+          "    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)",
+          "    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)",
+          "    at Module._load (node:internal/modules/cjs/loader:1341:5)",
+          "    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_animation_fixture_source_probe.mjs",
+      "sha256": "45b0689e4187df49cfcda895d9b915aafcfbe1f72a94c0a36c06c00516c2ff54",
+      "bytes": 7418,
+      "elapsed_seconds": 25.365,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at inspectAnimationFixtureSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-animation-fixture-source-review.mjs:193:16)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_animation_fixture_source_probe.mjs:19:14",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_cdk_async_source_probe.mjs",
+      "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9",
+      "bytes": 11140,
+      "elapsed_seconds": 1.077,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at inspectCdkAsyncSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-cdk-async-source-review.mjs:109:16)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_cdk_async_source_probe.mjs:20:14",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_date_tooltip_slider_source_probe.mjs",
+      "sha256": "e0085698046c9b2d3b6252ad24e3a63cb8c0b5554c91674de259b973b127f757",
+      "bytes": 10107,
+      "elapsed_seconds": 0.938,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at inspectDateTooltipSliderSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-date-tooltip-slider-source-review.mjs:101:16)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_date_tooltip_slider_source_probe.mjs:20:14",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_final_fixture_source_probe.mjs",
+      "sha256": "303a8f64e1e1508efbca860e86cc6af6049f42ffa8f7759062fb6f55f658bb2e",
+      "bytes": 4594,
+      "elapsed_seconds": 4.723,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at inspectFinalFixtureSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-final-fixture-source-review.mjs:189:19)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_final_fixture_source_probe.mjs:17:49",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_import_cleanup_source_probe.mjs",
+      "sha256": "13494c7a9886a5e6afb11802a7e406739bf8905f09d96c97561bea8aebf3442f",
+      "bytes": 7727,
+      "elapsed_seconds": 9.45,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at inspectImportCleanupSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-import-cleanup-source-review.mjs:146:16)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_import_cleanup_source_probe.mjs:17:14",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_interaction_async_source_probe.mjs",
+      "sha256": "e445d5ed73b0af2123296d35ba89704b81f2d3eb7932ba9ecacbd40edbd210c1",
+      "bytes": 12265,
+      "elapsed_seconds": 1.966,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at inspectInteractionAsyncSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-interaction-async-source-review.mjs:105:16)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_interaction_async_source_probe.mjs:20:14",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_navigation_async_source_probe.mjs",
+      "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee",
+      "bytes": 9803,
+      "elapsed_seconds": 0.813,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at inspectNavigationSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-navigation-async-source-review.mjs:91:16)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_navigation_async_source_probe.mjs:20:14",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_overlay_async_source_probe.mjs",
+      "sha256": "c2dd8dd8c37a4ad33a81c36ca10dbd70ae2f7d263053c6c2129efdd9a7fddd12",
+      "bytes": 10207,
+      "elapsed_seconds": 1.127,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at inspectOverlayAsyncSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-overlay-async-source-review.mjs:177:90)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_overlay_async_source_probe.mjs:19:14",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_stability_chip_probe.mjs",
+      "sha256": "2abc2e89300ca68cf4c88e57ecc166f649db1b62203301b098473e37109bf032",
+      "bytes": 7374,
+      "elapsed_seconds": 0.41,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_stability_chip_probe.mjs:22:16"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_stability_context_probe.mjs",
+      "sha256": "2a31f08dfdf0631e2798dc645a3302445eb081ba55dc2ec495541c20ff694e73",
+      "bytes": 15523,
+      "elapsed_seconds": 0.262,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed current context source .github/workflows/ci.yml\n+ actual - expected\n\n+ 'f62263bdfe7b65714a6c48f4ae63362a9d35e00a'\n- 'd208cd35e7f97a39a5b37b9a66f820d43cc4fe4d'\n",
+        "message_bytes": 170,
+        "message_sha256": "f9a959b84665a4ad7fa4d8503cf80e64cd5e25ddad92d1b77a8f316c07a8044b",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 40,
+          "sha256": "f73c2a9a50d12491c67851bfa1a8b81fbe37abbb4f43df16678fd0a58057a6c6"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 40,
+          "sha256": "92a255a58a665be68656be40efe5c7e66eaa39f51021c13d26ec2a324c578c21"
+        },
+        "locations": [
+          "    at inspectStabilityContextRequalification (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-context-requalification.mjs:100:108)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_stability_context_probe.mjs:25:16",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)",
+          "    at async node:internal/modules/esm/loader:647:26",
+          "    at async file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/[eval1]:12:3"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_stability_source_probe.mjs",
+      "sha256": "11215d22f86336a9d9bd2f20f6f6f35ece30e64ed1228cbe37bda2a8207f8ce2",
+      "bytes": 10222,
+      "elapsed_seconds": 0.804,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at inspectStabilitySources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-source-review.mjs:285:79)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_stability_source_probe.mjs:23:16",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_wide_fixture_adapter_probe.mjs",
+      "sha256": "f34358d7b9f9f6f6415a87c50330d83584fde662d46d22fc6e91cefd71122c73",
+      "bytes": 10683,
+      "elapsed_seconds": 1.726,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_wide_fixture_adapter_probe.mjs:137:16"
+        ]
+      }
+    },
+    {
+      "path": "tests/spec_wide_fixture_source_probe.mjs",
+      "sha256": "b572af3b69cd69d43e386e0f355f2869c43c2e5bde52a9fa89598fcf27d9df55",
+      "bytes": 6995,
+      "elapsed_seconds": 0.317,
+      "state": "failed",
+      "runtime": "v24.21.0",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "unreviewed chip source delta: projects/ngx-material-legacy/legacy-chips/chip-list.ts\n+ actual - expected\n... Skipped lines\n\n  '/**\\n' +\n    ' * @license\\n' +\n    ' * Copyright Google LLC All Rights Reserved.\\n' +\n    ' * Copyright (c) 2026 Ryan Lester.\\n' +\n    ' *\\n' +\n...\n    '  set tabIndex(value: number) {\\n' +\n+   '    this._userTabIn'... 16446 more characters\n-   '    this._userTabIn'... 16577 more characters\n",
+        "message_bytes": 419,
+        "message_sha256": "4402c778bc6f22ada7aca04c2312f7e48255ac5aec436da445070fcefe9568a6",
+        "operator": "strictEqual",
+        "actual": {
+          "type": "string",
+          "bytes": 26446,
+          "sha256": "116ae888bec943be4316defd421543fbf4871765fab62c13048fbe7382adf151"
+        },
+        "expected": {
+          "type": "string",
+          "bytes": 26577,
+          "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+        },
+        "locations": [
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:112:12",
+          "    at Array.map (<anonymous>)",
+          "    at inspectChipEmptyRepair (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-stability-chip-repair.mjs:111:57)",
+          "    at inspectWideFixtureSources (file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/scripts/spec-wide-fixture-source-review.mjs:173:15)",
+          "    at file:///home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy/tests/spec_wide_fixture_source_probe.mjs:17:14",
+          "    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+        ]
+      }
+    }
+  ],
+  "original_assertions_changed": false,
+  "product_or_consumer_changes": false,
+  "native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g13_claim": "not-passed"
+}
