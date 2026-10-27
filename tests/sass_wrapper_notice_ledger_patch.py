@@ -159,12 +159,18 @@ def verify_sass_notice_metadata_successor(expected_before=None, root=ROOT, candi
     after = ''.join(chunks).encode()
     assert SHA(after) == packet['after_sha256'] and len(after) == packet['after_bytes'] and json.loads(after) == expected
     actual = (root / LEDGER).read_bytes()
-    assert (candidate if candidate is not None else actual) == after
+    successor_applied = False
+    if candidate is None and actual != after:
+        from historical_chip_wrapper_ledger_patch import verify_historical_wrapper_successor
+        successor_applied = verify_historical_wrapper_successor(expected_before=after, root=root)['canonical_applied']
+        assert successor_applied
+    else:
+        assert (candidate if candidate is not None else actual) == after
     assert expected['g11_claim'] == 'not-passed'
     return dict(line='main', result='pass', metadata_entry_replacements=12, source_reference_updates=20,
                 report_reference_updates=20, report_digest_updates=4, original_hunks_preserved=474,
                 unchanged_other_entries=1685, disposition_or_original_hunk_judgments_changed=0,
-                unrelated_entry_or_byte_changes=0, canonical_applied=actual == after,
+                unrelated_entry_or_byte_changes=0, canonical_applied=actual == after or successor_applied,
                 before_sha256=SHA(before), after_sha256=SHA(after), actual_native_artifact_floor_or_G11_qualified=False)
 
 
