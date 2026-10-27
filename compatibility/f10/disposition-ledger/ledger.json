@@ -20523,7 +20523,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "63dd648bdc8e29da97c7241bd5e9c201c73e6ef6e8f13a138caa7b4a88a91b6d"
+              "sha256": "820b2ad2a2031cd0a79ff2d218e4f2d80e5646a5301ad3458fcb4d92e0f9645e"
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
@@ -23538,7 +23538,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "63dd648bdc8e29da97c7241bd5e9c201c73e6ef6e8f13a138caa7b4a88a91b6d"
+              "sha256": "820b2ad2a2031cd0a79ff2d218e4f2d80e5646a5301ad3458fcb4d92e0f9645e"
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",
@@ -40739,8 +40739,8 @@
       "sha": "1a85dd299b4ac38d201c3cc38c396b2f08398adc",
       "bucket": "needs-triage",
       "subject": "feat(material/theming): Add APIs to get color info from theme",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=6a7b91e815355d7e15cc395fc62a1f1d14516ff5ab736fd3198103880445a772, bytes=9160). Changed paths: src/material-experimental/theming/_definition.scss, src/material/_index.scss, src/material/core/theming/_inspection.scss, src/material/core/theming/tests/theming-inspection-api.spec.ts. current Material theming-inspection / token-system APIs and theme SCSS migrations; legacy Sass facade does not call inspection.get-theme-version or these new theming APIs. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not add the experimental type/color inspection APIs or versioned M3 palette internals to the owned Material16 facade. Its original M2 constructors and palette helpers remain independently owned; the current public Material namespace retains its own newer API.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "src/material-experimental/theming/_definition.scss",
@@ -40748,105 +40748,237 @@
         "src/material/core/theming/_inspection.scss",
         "src/material/core/theming/tests/theming-inspection-api.spec.ts"
       ],
-      "patch_sha256": "6a7b91e815355d7e15cc395fc62a1f1d14516ff5ab736fd3198103880445a772",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/1a85dd299b4ac38d201c3cc38c396b2f08398adc.json",
+      "patch_sha256": "e691c7c73a5064dc68cec494f3dbbc934f1f4c43262840494410dd8ce5fdc037",
+      "evidence_report": "compatibility/rc/upstream-sass-inspection-individual-review.json",
       "read_note_disposition": "irrelevant",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-01T20:50:49Z",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-historical-sass-api-exclusion",
+        "diff_sha256": "e691c7c73a5064dc68cec494f3dbbc934f1f4c43262840494410dd8ce5fdc037",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not add the experimental type/color inspection APIs or versioned M3 palette internals to the owned Material16 facade. Its original M2 constructors and palette helpers remain independently owned; the current public Material namespace retains its own newer API.",
+        "sass_inspection": {
+          "sha": "1a85dd299b4ac38d201c3cc38c396b2f08398adc",
+          "review": {
+            "path": "compatibility/rc/upstream-sass-inspection-individual-review.json",
+            "sha256": "365e3b6177017f35a8bc073ff999723fcf189bebf2dbf8bb01e521fc552df79f"
+          },
+          "source_scope_only": true,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      }
     },
     {
       "sha": "f52e97958ac8d9845017a5ead077952f3228144f",
       "bucket": "needs-triage",
       "subject": "feat(material/theming): Add APIs to get typography info from theme",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=17cef5090d64a5a33c7d16e29f20dac443b262d062e686b3ae6c25b2b4f40ae9, bytes=8554). Changed paths: src/material/_index.scss, src/material/core/theming/_inspection.scss, src/material/core/theming/tests/theming-inspection-api.spec.ts. current Material theming-inspection / token-system APIs and theme SCSS migrations; legacy Sass facade does not call inspection.get-theme-version or these new theming APIs. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not add the new M3 typography inspection getter or typescale contract to the finite historical facade. Existing historical typography helpers remain exported under their original names; current peer typography inspection stays in the peer namespace.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "src/material/_index.scss",
         "src/material/core/theming/_inspection.scss",
         "src/material/core/theming/tests/theming-inspection-api.spec.ts"
       ],
-      "patch_sha256": "17cef5090d64a5a33c7d16e29f20dac443b262d062e686b3ae6c25b2b4f40ae9",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/f52e97958ac8d9845017a5ead077952f3228144f.json",
+      "patch_sha256": "14bfd0ac5683b1c0ef96e69415fb009d4cdd277398bca05a7e8358004e3c847f",
+      "evidence_report": "compatibility/rc/upstream-sass-inspection-individual-review.json",
       "read_note_disposition": "irrelevant",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-01T20:50:49Z",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-historical-sass-api-exclusion",
+        "diff_sha256": "14bfd0ac5683b1c0ef96e69415fb009d4cdd277398bca05a7e8358004e3c847f",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not add the new M3 typography inspection getter or typescale contract to the finite historical facade. Existing historical typography helpers remain exported under their original names; current peer typography inspection stays in the peer namespace.",
+        "sass_inspection": {
+          "sha": "f52e97958ac8d9845017a5ead077952f3228144f",
+          "review": {
+            "path": "compatibility/rc/upstream-sass-inspection-individual-review.json",
+            "sha256": "365e3b6177017f35a8bc073ff999723fcf189bebf2dbf8bb01e521fc552df79f"
+          },
+          "source_scope_only": true,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      }
     },
     {
       "sha": "e608f5fa392e9a5cd80923ba545b66217ad01c30",
       "bucket": "needs-triage",
       "subject": "feat(material/theming): Add APIs to get density info from theme",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=4d9136515a99d6866c4aa610badc1cf9aaf27ed34a214f9171f22b84427a4003, bytes=2568). Changed paths: src/material/_index.scss, src/material/core/theming/_inspection.scss, src/material/core/theming/tests/theming-inspection-api.spec.ts. current Material theming-inspection / token-system APIs and theme SCSS migrations; legacy Sass facade does not call inspection.get-theme-version or these new theming APIs. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not add the new density inspection getter to the Material16 facade. Its original get-density-config API and owned component/bridge clamping remain separate from versioned-theme inspection; no consumer call or theme map changes are required.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "src/material/_index.scss",
         "src/material/core/theming/_inspection.scss",
         "src/material/core/theming/tests/theming-inspection-api.spec.ts"
       ],
-      "patch_sha256": "4d9136515a99d6866c4aa610badc1cf9aaf27ed34a214f9171f22b84427a4003",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/e608f5fa392e9a5cd80923ba545b66217ad01c30.json",
+      "patch_sha256": "e51c5b40aaacfdb9175438572d87fd382466c7278d77f3270c43da4b6bd7e27b",
+      "evidence_report": "compatibility/rc/upstream-sass-inspection-individual-review.json",
       "read_note_disposition": "irrelevant",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-01T20:50:49Z",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-historical-sass-api-exclusion",
+        "diff_sha256": "e51c5b40aaacfdb9175438572d87fd382466c7278d77f3270c43da4b6bd7e27b",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not add the new density inspection getter to the Material16 facade. Its original get-density-config API and owned component/bridge clamping remain separate from versioned-theme inspection; no consumer call or theme map changes are required.",
+        "sass_inspection": {
+          "sha": "e608f5fa392e9a5cd80923ba545b66217ad01c30",
+          "review": {
+            "path": "compatibility/rc/upstream-sass-inspection-individual-review.json",
+            "sha256": "365e3b6177017f35a8bc073ff999723fcf189bebf2dbf8bb01e521fc552df79f"
+          },
+          "source_scope_only": true,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      }
     },
     {
       "sha": "9906aa3443ad874c7470c94fea137c72779c9fcd",
       "bucket": "needs-triage",
       "subject": "feat(material/theming): Add APIs to check what information theme has",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=d6081d7e0c733468f331dd69c61bcd3b55e58609b908ac800d9a859d07204e5d, bytes=15209). Changed paths: src/material/_index.scss, src/material/core/theming/_inspection.scss, src/material/core/theming/tests/theming-inspection-api.spec.ts. current Material theming-inspection / token-system APIs and theme SCSS migrations; legacy Sass facade does not call inspection.get-theme-version or these new theming APIs. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not transplant the new theme-has predicate and inspection diagnostics into the legacy facade. The owned historical API does not expose or directly call the inspection family, and direct current-peer calls remain public override mixins.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "src/material/_index.scss",
         "src/material/core/theming/_inspection.scss",
         "src/material/core/theming/tests/theming-inspection-api.spec.ts"
       ],
-      "patch_sha256": "d6081d7e0c733468f331dd69c61bcd3b55e58609b908ac800d9a859d07204e5d",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/9906aa3443ad874c7470c94fea137c72779c9fcd.json",
+      "patch_sha256": "c5af07170b7c83199db3f3dd0e7d45aa318debfaacaa2987d33d7c97889b40d7",
+      "evidence_report": "compatibility/rc/upstream-sass-inspection-individual-review.json",
       "read_note_disposition": "irrelevant",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-01T20:50:49Z",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-historical-sass-api-exclusion",
+        "diff_sha256": "c5af07170b7c83199db3f3dd0e7d45aa318debfaacaa2987d33d7c97889b40d7",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not transplant the new theme-has predicate and inspection diagnostics into the legacy facade. The owned historical API does not expose or directly call the inspection family, and direct current-peer calls remain public override mixins.",
+        "sass_inspection": {
+          "sha": "9906aa3443ad874c7470c94fea137c72779c9fcd",
+          "review": {
+            "path": "compatibility/rc/upstream-sass-inspection-individual-review.json",
+            "sha256": "365e3b6177017f35a8bc073ff999723fcf189bebf2dbf8bb01e521fc552df79f"
+          },
+          "source_scope_only": true,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      }
     },
     {
       "sha": "8b4b58beae8cad4c857f4952eeaaf44cfe25adfe",
       "bucket": "needs-triage",
       "subject": "fixup! feat(material/theming): Add APIs to check what information theme has",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=ce981824e62e39689870e39ea11ebb4d7d402e39118b54495d93751a735509ef, bytes=1065). Changed paths: src/material/core/theming/_inspection.scss. current Material theming-inspection / token-system APIs and theme SCSS migrations; legacy Sass facade does not call inspection.get-theme-version or these new theming APIs. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not transplant the formatting and semicolon fixes for the peer-owned inspection module into owned legacy Sass. The module is loaded through current public Material imports but has no owned inspection implementation or direct owned inspection call to repair.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "src/material/core/theming/_inspection.scss"
       ],
-      "patch_sha256": "ce981824e62e39689870e39ea11ebb4d7d402e39118b54495d93751a735509ef",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/8b4b58beae8cad4c857f4952eeaaf44cfe25adfe.json",
+      "patch_sha256": "fa161a62d60221bdf7cf7327e85252f5a080edb422230f5c6b67219e6e83f868",
+      "evidence_report": "compatibility/rc/upstream-sass-inspection-individual-review.json",
       "read_note_disposition": "irrelevant",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-01T20:50:49Z",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-historical-sass-api-exclusion",
+        "diff_sha256": "fa161a62d60221bdf7cf7327e85252f5a080edb422230f5c6b67219e6e83f868",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not transplant the formatting and semicolon fixes for the peer-owned inspection module into owned legacy Sass. The module is loaded through current public Material imports but has no owned inspection implementation or direct owned inspection call to repair.",
+        "sass_inspection": {
+          "sha": "8b4b58beae8cad4c857f4952eeaaf44cfe25adfe",
+          "review": {
+            "path": "compatibility/rc/upstream-sass-inspection-individual-review.json",
+            "sha256": "365e3b6177017f35a8bc073ff999723fcf189bebf2dbf8bb01e521fc552df79f"
+          },
+          "source_scope_only": true,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      }
     },
     {
       "sha": "685b585f70fded62813480b849832fd1bfd1bffb",
       "bucket": "needs-triage",
       "subject": "feat(material/theming): add support for M2 themes to theme inspection API",
-      "final_disposition": "irrelevant",
-      "reason": "Inspected upstream patch content (sha256=3a14af809717790353999eabf1fcd48e7005aac9be30bddb37cd9693d25bce18, bytes=17923). Changed paths: src/material/core/theming/_inspection.scss, src/material/core/theming/_m2-inspection.scss, src/material/core/theming/tests/theming-inspection-api.spec.ts. current Material theming-inspection / token-system APIs and theme SCSS migrations; legacy Sass facade does not call inspection.get-theme-version or these new theming APIs. Fail-closed: not deferred=pass; g11_claim remains not-passed.",
+      "final_disposition": "do-not-adopt",
+      "reason": "Do not copy or call through the new M2 inspection adapter. Its support for historical-shaped maps adds modern getter contracts rather than repairing original helper names; the facade keeps the independently owned Material16 model and public override bridge boundary.",
       "batch_id": "needs-triage-experimental-m3-mixin-build-test-2026-10-01",
       "files": [
         "src/material/core/theming/_inspection.scss",
         "src/material/core/theming/_m2-inspection.scss",
         "src/material/core/theming/tests/theming-inspection-api.spec.ts"
       ],
-      "patch_sha256": "3a14af809717790353999eabf1fcd48e7005aac9be30bddb37cd9693d25bce18",
-      "evidence_report": "compatibility/f10/disposition-ledger/evidence/mechanical/685b585f70fded62813480b849832fd1bfd1bffb.json",
+      "patch_sha256": "7f62c3366463ffe405f77e51a3278009715b5d81c76c8a362a3fe9152caa63da",
+      "evidence_report": "compatibility/rc/upstream-sass-inspection-individual-review.json",
       "read_note_disposition": "irrelevant",
       "g11_claim": "not-passed",
       "cursor_preserved": "5db4fcf95b0cf835720003cfd73b2c154bb38aa1",
-      "recorded_at_utc": "2026-10-01T20:50:49Z"
+      "recorded_at_utc": "2026-10-01T20:50:49Z",
+      "review_depth": "individual-compatibility",
+      "affected_branches": [
+        "main"
+      ],
+      "individual_proof": {
+        "proof_kind": "individual-historical-sass-api-exclusion",
+        "diff_sha256": "7f62c3366463ffe405f77e51a3278009715b5d81c76c8a362a3fe9152caa63da",
+        "review_depth": "individual-compatibility",
+        "affected_branches": [
+          "main"
+        ],
+        "decision": "Do not copy or call through the new M2 inspection adapter. Its support for historical-shaped maps adds modern getter contracts rather than repairing original helper names; the facade keeps the independently owned Material16 model and public override bridge boundary.",
+        "sass_inspection": {
+          "sha": "685b585f70fded62813480b849832fd1bfd1bffb",
+          "review": {
+            "path": "compatibility/rc/upstream-sass-inspection-individual-review.json",
+            "sha256": "365e3b6177017f35a8bc073ff999723fcf189bebf2dbf8bb01e521fc552df79f"
+          },
+          "source_scope_only": true,
+          "actual_native_packed_or_floor_qualified": false
+        }
+      }
     },
     {
       "sha": "eeb0cf2666a2346ee99bb023c833da7255720654",
@@ -52156,7 +52288,7 @@
             },
             {
               "path": "scripts/check-upstream-audit-disposition.mjs",
-              "sha256": "63dd648bdc8e29da97c7241bd5e9c201c73e6ef6e8f13a138caa7b4a88a91b6d"
+              "sha256": "820b2ad2a2031cd0a79ff2d218e4f2d80e5646a5301ad3458fcb4d92e0f9645e"
             },
             {
               "path": "scripts/upstream-historical-behavior-evidence.mjs",

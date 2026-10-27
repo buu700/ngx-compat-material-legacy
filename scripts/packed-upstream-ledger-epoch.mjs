@@ -5,15 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/** Qualified 85-entry source epoch and seven finite 21.x decisions; no native gate credit. */
+/** Qualified source and finite individual-decision epochs; no native gate credit. */
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,realpathSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {gunzipSync} from 'node:zlib';
 import {join} from 'node:path';
 import {testingApi21xEntryEvidenceOk} from './upstream-testing-api-21x-admission.mjs';
+import {sassInspectionEntrySourceOk} from './upstream-sass-inspection-admission.mjs';
 
 const ts = createRequire(import.meta.url)('typescript');
 const inputPath = 'compatibility/rc/packed-upstream-source-inputs.json';
@@ -53,6 +54,19 @@ const testingApiCheckerEdits = [
   ["    if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';",
     "    if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';\n    if (testingApi21xScope && !testingApi21xEntryEvidenceOk({entry,body,read:readRegularRepoBytes,\n      productPaths:()=>candidateProductSourcePaths(root),line:line||body.line})) return 'invalid-testing-api-21x-scope';"],
 ];
+
+const sassCheckerEdits = [
+  ["import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';",
+    "import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';\nimport {requiresSassInspectionScope,sassInspectionEntryEvidenceOk} from './upstream-sass-inspection-admission.mjs';"],
+  ["  if (typeof rel !== 'string' || !rel.trim()) return 'missing';",
+    "  if (typeof rel !== 'string' || !rel.trim()) return 'missing';\n  const sassInspectionScope = requiresSassInspectionScope(entry);\n  if (sassInspectionScope && !rel.endsWith('.json')) return 'invalid-sass-inspection-scope';"],
+  ["    if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';",
+    "    if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';\n    if (sassInspectionScope && !sassInspectionEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,\n      line:line||body.line})) return 'invalid-sass-inspection-scope';"],
+];
+function sassCheckerSuccessor(before) {
+  for (const [from,to] of sassCheckerEdits) {assert.equal(before.split(from).length,2); before=before.replace(from,to);}
+  return before;
+}
 
 const allowed = new Set(['evidence_report', 'source_check/evidence_report_sha256',
   ...['modern_chip', 'chip_lifecycle', 'chip_modernization', 'chip_input_api', 'chip_edit']
@@ -106,8 +120,15 @@ function applyTokens(before, packet) {
 const testingApiTransition = {path: 'compatibility/rc/upstream-testing-api-21x-ledger-transition.json.gz',
   sha256: 'cd65646ca6055cac2cd23077d6bcf75c66f7c111666de703227efcc018d2a3e1'};
 function prepareTestingApiStage({root, read, before, bound, population}) {
-  const member = ref => {const raw = read(ref.path); assert.equal(hash(raw), ref.sha256,
-    'changed individual testing API subject ' + ref.path); bound.set(ref.path, ref.sha256); return raw;};
+  const member = ref => {
+    const raw=read(ref.path);
+    if(ref.path===testingApiChecker){
+      const original=gitBytes(root,'cda185336a04e813b0cfff5d3e51e5d4c91d7148',ref.path);
+      assert.equal(hash(original),ref.sha256);
+      assert.equal(raw.toString(),sassCheckerSuccessor(original.toString()),'unqualified Sass checker successor');
+    }else assert.equal(hash(raw),ref.sha256,'changed individual testing API subject '+ref.path);
+    bound.set(ref.path,hash(raw));return raw;
+  };
   const packet = JSON.parse(gunzipSync(member(testingApiTransition)));
   assert.equal(packet.line, '21.x'); assert.equal(packet.decisions_changed, 7);
   assert.equal(packet.existing_historical_proof_digests_changed, 3);
@@ -156,7 +177,7 @@ function prepareTestingApiStage({root, read, before, bound, population}) {
   const nativeShas = ['8e1711216f7d07324e311e0f6ada3d2426c7891e',
     '7c9c898faac8daac1bbb20a0807168a74360760d', '20bf71c40f565c59101b63b5a878d2ddb7fe251d'];
   assert.deepEqual(packet.source_digest_updates.map(row => row.sha).sort(), nativeShas.sort());
-  const checkerSha = hash(read(testingApiChecker));
+  const checkerSha = packet.code_subjects.find(ref => ref.path === testingApiChecker).sha256;
   for (const update of packet.source_digest_updates) {
     assert.deepEqual(update.path.slice(0, 3), ['individual_proof', 'historical_behavior', 'source_members']);
     assert.equal(update.path.length, 5); assert.equal(update.path[4], 'sha256');
@@ -177,6 +198,68 @@ function prepareTestingApiStage({root, read, before, bound, population}) {
   chunks.push(text.slice(end)); const after = Buffer.from(chunks.join(''));
   assert.equal(hash(after), packet.after_sha256); assert.deepEqual(JSON.parse(after), expected);
   return {after, individual_decisions: 7, existing_proof_digest_updates: 3};
+}
+
+const sassTransitions={
+  main:{path:'compatibility/rc/upstream-sass-inspection-ledger-transition.json.gz',sha256:'922c6f5ef0f7635db93e694931a9aa7e54762479418ed5b1330b27adf12cebc4'},
+  '21.x':{path:'compatibility/rc/upstream-sass-inspection-ledger-transition.json.gz',sha256:'98d02b52e86689e4e05f4a750f044ee5c8a22f812ddb92dc9214d5156d298803'},
+};
+function prepareSassStage({root,read,line,before,bound}){
+  const member=ref=>{const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed Sass admission input '+ref.path);bound.set(ref.path,ref.sha256);return raw;};
+  const packet=JSON.parse(gunzipSync(member(sassTransitions[line])));
+  assert.equal(packet.line,line);assert.equal(packet.decisions_changed,6);
+  assert.equal(packet.historical_checker_proof_digests_changed,3);assert.equal(packet.unrelated_entry_changes,0);
+  assert.equal(packet.current_native_packed_or_floor_or_g11_credit,false);
+  assert.equal(packet.before.path,ledgerPath);assert.equal(packet.before.entries,1697);assert.equal(hash(before),packet.before.sha256);
+  assert.equal(hash(gitBytes(root,packet.before.source_parent,ledgerPath)),hash(before));
+  assert.deepEqual(packet.code_subjects.map(ref=>ref.path),[testingApiChecker,'scripts/upstream-sass-inspection-admission.mjs',
+    'scripts/measure-sass-inspection-scope.mjs','scripts/upstream-candidate-source-evidence.mjs']);
+  for(const ref of packet.code_subjects)member(ref);
+  const review=JSON.parse(member(packet.review));assert.equal(review.line,line);assert.equal(review.reviews.length,6);
+  for(const ref of [review.upstream_originals,review.source_census,review.current_compiler_scope])member(ref);
+  const scope=JSON.parse(gunzipSync(member(review.current_compiler_scope))).actual;member(scope.producer);member(scope.oracle);
+  const peerRoots=[realpathSync(join(root,'node_modules/@angular/material')),realpathSync(join(root,'node_modules/@angular/cdk'))];
+  const external=new Map();
+  for(const [program,roots]of [[scope.candidate,[realpathSync(join(root,'projects/ngx-material-legacy')),...peerRoots]],[scope.current,peerRoots]]){
+    for(const ref of program.loaded_sources){const path=join(roots[ref.root],ref.path);external.set(path,ref.sha256);}
+  }
+  external.set(join(peerRoots[0],'package.json'),scope.peer.package_json_sha256);
+  const assertExternal=()=>{
+    assert.deepEqual([realpathSync(join(root,'node_modules/@angular/material')),realpathSync(join(root,'node_modules/@angular/cdk'))],peerRoots,'changed Sass peer resolution');
+    for(const [path,digest]of external)assert.equal(hash(readFileSync(path)),digest,'changed current Sass source '+path);
+  };
+  assertExternal();
+  const text=before.toString(),source=ts.parseJsonText('sass-ledger.json',text);assert.equal(source.parseDiagnostics.length,0);
+  const nodes=property(source.statements[0].expression,'entries');assert.equal(nodes.elements.length,1697);
+  const bySha=new Map(nodes.elements.map(node=>[JSON.parse(property(node,'sha').getText(source)),node]));
+  const expected=JSON.parse(before),edits=[];
+  assert.equal(packet.entries.length,6);assert.deepEqual(packet.entries.map(row=>row.sha).sort(),review.reviews.map(row=>row.sha).sort());
+  for(const change of packet.entries){
+    const index=expected.entries.findIndex(row=>row.sha===change.sha);assert.ok(index>=0);
+    const previous=expected.entries[index],current=change.after_entry;
+    assert.equal(hash(json(previous)),change.before_entry_sha256);
+    const allowedFields=new Set(['final_disposition','reason','review_depth','affected_branches','evidence_report','individual_proof','patch_sha256']);
+    for(const key of new Set([...Object.keys(previous),...Object.keys(current)]))
+      if(!allowedFields.has(key))assert.deepEqual(current[key],previous[key],'changed unrelated Sass entry field '+key);
+    assert.equal(sassInspectionEntrySourceOk({root,read,entry:current,body:review,line}),true,'unqualified individual Sass source decision');
+    const node=bySha.get(change.sha);edits.push({start:node.getStart(source),end:node.end,text:JSON.stringify(current,null,2).replace(/\n/g,'\n    ')});
+    expected.entries[index]=current;
+  }
+  const native=['8e1711216f7d07324e311e0f6ada3d2426c7891e','7c9c898faac8daac1bbb20a0807168a74360760d','20bf71c40f565c59101b63b5a878d2ddb7fe251d'];
+  assert.deepEqual(packet.source_digest_updates.map(row=>row.sha).sort(),native.sort());
+  const oldChecker=hash(gitBytes(root,packet.before.source_parent,testingApiChecker)),newChecker=hash(read(testingApiChecker));
+  for(const update of packet.source_digest_updates){
+    assert.deepEqual(update.path.slice(0,3),['individual_proof','historical_behavior','source_members']);
+    assert.equal(update.path.length,5);assert.equal(update.path[4],'sha256');
+    const entry=expected.entries.find(row=>row.sha===update.sha),ref=entry.individual_proof.historical_behavior.source_members[update.path[3]];
+    assert.equal(ref.path,testingApiChecker);assert.equal(ref.sha256,update.before);assert.equal(update.before,oldChecker);assert.equal(update.after,newChecker);
+    let node=bySha.get(update.sha);for(const part of update.path)node=typeof part==='number'?node.elements[part]:property(node,part);
+    assert.equal(JSON.parse(node.getText(source)),update.before);edits.push({start:node.getStart(source),end:node.end,text:JSON.stringify(update.after)});ref.sha256=update.after;
+  }
+  assert.equal(edits.length,9);edits.sort((a,b)=>a.start-b.start);let end=0;const chunks=[];
+  for(const edit of edits){assert.ok(edit.start>=end);chunks.push(text.slice(end,edit.start),edit.text);end=edit.end;}chunks.push(text.slice(end));
+  const after=Buffer.from(chunks.join(''));assert.equal(hash(after),packet.after_sha256);assert.deepEqual(JSON.parse(after),expected);
+  return {before,after,individual_decisions:6,proof_digest_updates:3,assertExternal};
 }
 
 export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {
@@ -218,10 +301,11 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
       for (const [from, to] of ownerEdits) {assert.equal(owner.split(from).length, 2); owner = owner.replace(from, to);}
       assert.equal(read(ownerPath).toString(), owner, 'unqualified source-owner ledger integration');
       bound.set(ownerPath, hash(owner));
-    } else if (line === '21.x' && ref.path === testingApiChecker) {
+    } else if (ref.path === testingApiChecker) {
       let checker = gitBytes(root, authority, ref.path).toString(); assert.equal(hash(checker), ref.sha256);
-      for (const [from, to] of testingApiCheckerEdits) {assert.equal(checker.split(from).length, 2); checker = checker.replace(from, to);}
-      assert.equal(read(ref.path).toString(), checker, 'unqualified 21.x testing API checker integration');
+      if (line === '21.x') for (const [from, to] of testingApiCheckerEdits) {assert.equal(checker.split(from).length, 2); checker = checker.replace(from, to);}
+      checker = sassCheckerSuccessor(checker);
+      assert.equal(read(ref.path).toString(), checker, 'unqualified finite source-decision checker integration');
       bound.set(ref.path, hash(checker));
     } else member(ref);
   }
@@ -255,7 +339,8 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const after = applyTokens(before, packet);
   assert.equal(hash(after), data.after_ledger_sha256); assert.deepEqual(JSON.parse(after), expected);
   const next = line === '21.x' ? prepareTestingApiStage({root, read, before: after, bound, population}) : null;
-  return {line, before, after, canonical_after: next?.after ?? after, testing_api_stage: next, bound, population, analysis_python_version: syntax.current_pinned_python,
+  const sass = prepareSassStage({root,read,line,before:next?.after??after,bound});
+  return {line, before, after, canonical_after: sass.after, testing_api_stage: next, sass_stage: sass, bound, population, analysis_python_version: syntax.current_pinned_python,
     input_sha256: hash(input),
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
     current_native_packed_or_floor_qualified: false};
@@ -267,9 +352,11 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   const prepared = preparePackedUpstreamLedger({root, read});
   const current = hash(read(ledgerPath)), beforeHash = hash(prepared.before), afterHash = hash(prepared.after);
   const canonicalHash = hash(prepared.canonical_after);
-  assert.ok([beforeHash, afterHash, canonicalHash].includes(current), 'unqualified canonical upstream ledger');
+  const testingHash=prepared.testing_api_stage?hash(prepared.testing_api_stage.after):null;
+  assert.ok([beforeHash,afterHash,testingHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
   const applied = current !== beforeHash;
   const assertCurrent = () => {
+    prepared.sass_stage.assertExternal();
     for (const [path, digest] of prepared.bound)
       assert.equal(hash(read(path)), digest, 'late current upstream subject change ' + path);
     const population = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '--',
@@ -285,6 +372,9 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   readers.set(historical, {root, raw: read});
   return {line: prepared.line, read: historical, raw: read, assertCurrent, applied,
     projected_metadata_paths: applied ? [ledgerPath] : [], entries_changed: 85,
-    scalar_tokens_changed: 179, individual_decisions_applied: current === canonicalHash ? (prepared.testing_api_stage?.individual_decisions ?? 0) : 0,
+    scalar_tokens_changed: 179,
+    testing_api_decisions_applied: current===testingHash||current===canonicalHash?(prepared.testing_api_stage?.individual_decisions??0):0,
+    sass_decisions_applied: current===canonicalHash?6:0,
+    individual_decisions_applied: (current===testingHash||current===canonicalHash?(prepared.testing_api_stage?.individual_decisions??0):0)+(current===canonicalHash?6:0),
     current_native_packed_or_floor_or_g11_credit: false};
 }

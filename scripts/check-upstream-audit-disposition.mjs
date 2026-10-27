@@ -35,6 +35,7 @@ import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream
 import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';
 import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';
 import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';
+import {requiresSassInspectionScope,sassInspectionEntryEvidenceOk} from './upstream-sass-inspection-admission.mjs';
 import {requiresHistoricalBehavior,validateHistoricalBehavior,historicalBehaviorRequirements} from './upstream-historical-behavior-evidence.mjs';
 import {CHIP_LIFECYCLE_SCOPE_ROLE,requiresChipLifecycleScope,chipLifecycleScopeEvidenceOk} from './upstream-chip-lifecycle-admission.mjs';
 import {requiresProgressCsp,validateProgressCsp} from './upstream-progress-csp-evidence.mjs';
@@ -166,6 +167,8 @@ function evidenceJson(file) {
 function evidenceClass(entry) {
   const rel = entry.evidence_report;
   if (typeof rel !== 'string' || !rel.trim()) return 'missing';
+  const sassInspectionScope = requiresSassInspectionScope(entry);
+  if (sassInspectionScope && !rel.endsWith('.json')) return 'invalid-sass-inspection-scope';
   if (requiresModernChipScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-modern-chip-source-scope';
   if (requiresChipEditScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-edit-source-scope';
   if (requiresChipInputApiScope(entry,entry.individual_proof) && !rel.endsWith('.json')) return 'invalid-chip-input-api-source-scope';
@@ -187,6 +190,8 @@ function evidenceClass(entry) {
   if (rel.endsWith('.json')) {
     const body = evidenceJson(file);
     if (!body || typeof body !== 'object' || Array.isArray(body)) return 'unreadable';
+    if (sassInspectionScope && !sassInspectionEntryEvidenceOk({root,read:readRegularRepoBytes,entry,body,
+      line:line||body.line})) return 'invalid-sass-inspection-scope';
     if (requiresChipLifecycleScope(entry,entry.individual_proof) || body.role === CHIP_LIFECYCLE_SCOPE_ROLE) {
       const readMember = rel => {const member=regularRepoMember(rel);return member?readFileSync(member):null;};
       if (!chipLifecycleScopeEvidenceOk(body,entry,readMember,root,line || body.line,historicalBehaviorRequirements)) return 'invalid-chip-lifecycle-source-scope';
