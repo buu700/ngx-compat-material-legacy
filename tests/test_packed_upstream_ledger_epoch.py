@@ -44,7 +44,7 @@ class PackedUpstreamLedgerEpochTests(unittest.TestCase):
         report = json.loads(result.stdout)
         self.assertEqual(len(report['cases']), 13)
         self.assertEqual(len(report['rejected']), 59 if report['line'] == '21.x' else 56)
-        self.assertEqual(report['original_dispositions_changed'], 22 if report['line'] == '21.x' else 13)
+        self.assertEqual(report['original_dispositions_changed'], 27 if report['line'] == '21.x' else 13)
         self.assertEqual(report['selection_source_decisions'], 3)
         self.assertEqual(report['selection_registry_digest_updates'], 11)
         self.assertEqual(report['canonical_entries'], 1697)

@@ -13,8 +13,11 @@ import {join} from 'node:path';
 import {createRequire} from 'node:module';
 import {runInNewContext} from 'node:vm';
 import {checkerReferenceMetadata,reconstructReviewedChecker,CHECKER_REFERENCE_REVIEW} from '../scripts/checker-reference-metadata.mjs';
+import {registeredSourceCheckerTransition} from '../scripts/registered-source-checker-transition.mjs';
 const ts=createRequire(import.meta.url)('typescript');
-const root=process.cwd(),read=path=>readFileSync(join(root,path));
+const root=process.cwd(),rawRead=path=>readFileSync(join(root,path));
+// Preserve the original fourteen-token stage under the exact additive checker successor.
+const read=registeredSourceCheckerTransition({root,read:rawRead}).beforeRead;
 const independent=execFileSync('python3',['-c','import sys;sys.path.insert(0,"tests");from checker_reference_metadata_patch import derive_checker_reference_successor;sys.stdout.buffer.write(derive_checker_reference_successor()[1])'],{cwd:root,maxBuffer:8*1024*1024});
 const review=JSON.parse(read(CHECKER_REFERENCE_REVIEW)),source=checkerReferenceMetadata({root,read});
 assert.equal(source.checker_digest_tokens,14);assert.equal(source.individual_decisions,0);source.assertCurrent();

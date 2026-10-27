@@ -52,7 +52,7 @@ class TokenBuildAdmissionTests(unittest.TestCase):
                                capture_output=True, text=True, timeout=150)
         self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-6000:])
         report = json.loads(child.stdout)
-        self.assertEqual(report['current_source_admissions'], 22)
+        self.assertEqual(report['current_source_admissions'], 27)
         self.assertEqual(report['previous_source_admissions'], 21)
         self.assertEqual(report['real_root_checker_positive'], 1)
         self.assertEqual(report['real_root_checker_rejections'], 3)

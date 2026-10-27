@@ -91,10 +91,17 @@ def derive_token_build_successor(root=ROOT, expected_before=None):
 
 def verify_token_build_successor(root=ROOT, expected_before=None, candidate=None):
     before, after = derive_token_build_successor(root=root, expected_before=expected_before)
-    assert (Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()) == after
+    actual = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    following_source_decisions = 0
+    if actual != after:
+        from unthemable_ledger_patch import verify_unthemable_successor
+        verify_unthemable_successor(root=root, expected_before=after, candidate=candidate)
+        following_source_decisions = 5
     return dict(line='21.x', individual_decisions=1, unselected_entry_bytes_preserved=1696,
         before_sha256=HASH(before), after_sha256=HASH(after), after_bytes=len(after),
-        pending_dispositions=1339, actual_native_artifact_browser_floor_or_full_audit_qualified=False,
+        pending_dispositions=1339, following_individual_source_decisions=following_source_decisions,
+        preservation_scope='one-row token-build stage; following five decisions and fourteen checker tokens verified separately',
+        actual_native_artifact_browser_floor_or_full_audit_qualified=False,
         g11_claim='not-passed', g13_claim='not-passed')
 
 

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "scope": "Exact registered-source requirement; preserve pure metadata and all existing checker policy.",
+  "before_commit": "e5f713f9d7eb088da729aec53835041dd6ffc521",
+  "before_sha256": "96b287075747b100d615b9ee720fa0db2d1dfecf39545ae0dbb36504c472ce44",
+  "after_checker": {
+    "path": "scripts/check-upstream-audit-disposition.mjs",
+    "sha256": "4a6002153caabe102887bcd8847128818c2f7025a3d1257d97cd446f34fbf106",
+    "bytes": 46960
+  },
+  "complete_diff": "--- a/scripts/check-upstream-audit-disposition.mjs\n+++ b/scripts/check-upstream-audit-disposition.mjs\n@@ -33,6 +33,7 @@\n import {SLIDER_RANGE_SHAS,SLIDER_RANGE_ROLE,sliderRangeEvidenceOk} from './upstream-slider-range-followups.mjs';\n import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';\n import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';\n+import {requiresRegisteredSourceReview} from './upstream-registered-source-review.mjs';\n import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';\n import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';\n import {requiresLegacySassEntrypointScope,legacySassEntrypointEntryEvidenceOk} from './upstream-legacy-sass-entrypoint-admission.mjs';\n@@ -457,7 +458,7 @@\n     missingEvidence.push(entry.sha);\n     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});\n   }\n-  const sensitive = sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n+  const sensitive = requiresRegisteredSourceReview(entry, entry.individual_proof) || sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n     || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof) || requiresChipEditScope(entry, entry.individual_proof) || requiresChipInputApiScope(entry, entry.individual_proof) || requiresChipModernizationScope(entry, entry.individual_proof) || requiresChipLifecycleScope(entry, entry.individual_proof);\n   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);\n   if (needsIndividual && !individualProofOk(entry)) {\n",
+  "complete_hunk_reviews": [
+    {
+      "index": 1,
+      "sha256": "8f5793f399b9fb58de4613cecbe2ffb48bcc8a180e699d5d30015c7280f9a5e6",
+      "text": "@@ -33,6 +33,7 @@\n import {SLIDER_RANGE_SHAS,SLIDER_RANGE_ROLE,sliderRangeEvidenceOk} from './upstream-slider-range-followups.mjs';\n import {candidateSourceEvidenceOk, candidateProductSourcePaths} from './upstream-candidate-source-evidence.mjs';\n import {reviewMetadataComplete,individualReviewScopeOk} from './upstream-individual-evidence-scope.mjs';\n+import {requiresRegisteredSourceReview} from './upstream-registered-source-review.mjs';\n import {requiresArtifactBehavior,validateArtifactBehavior} from './upstream-artifact-behavior-evidence.mjs';\n import {validateInheritedExecution} from './upstream-inherited-execution-evidence.mjs';\n import {requiresLegacySassEntrypointScope,legacySassEntrypointEntryEvidenceOk} from './upstream-legacy-sass-entrypoint-admission.mjs';\n",
+      "decision": "Import the pure finite-registration predicate. The existing metadata dispatcher and candidate-source helper remain byte-identical. This module only identifies registered subjects or borrowed markers; it never reads files, executes the compiler or grants source/behavior credit."
+    },
+    {
+      "index": 2,
+      "sha256": "b062657abe7a7b131f12c6fc67cb6ce01feac53dec275706defca2bbcca2bce0",
+      "text": "@@ -457,7 +458,7 @@\n     missingEvidence.push(entry.sha);\n     evidenceFailures.push({sha: entry.sha, reason: evidence, evidence_report: entry.evidence_report ?? null});\n   }\n-  const sensitive = sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n+  const sensitive = requiresRegisteredSourceReview(entry, entry.individual_proof) || sensitiveClass(entry) || requiresHistoricalBehavior(entry, entry.individual_proof) || requiresArtifactBehavior(entry, entry.individual_proof) || requiresOwnedStyle(entry, entry.individual_proof) || requiresNativeDate(entry, entry.individual_proof) || requiresProgressCsp(entry, entry.individual_proof) || requiresGeneratedIdentity(entry, entry.individual_proof) || requiresBidiBehavior(entry, entry.individual_proof) || requiresSelectionBehavior(entry, entry.individual_proof)\n     || requiresFormFieldHover(entry, entry.individual_proof) || requiresTabCompletion(entry, entry.individual_proof) || requiresRippleReplay(entry, entry.individual_proof) || requiresContentObserver(entry, entry.individual_proof) || requiresMediaMatcher(entry, entry.individual_proof) || requiresChipEditScope(entry, entry.individual_proof) || requiresChipInputApiScope(entry, entry.individual_proof) || requiresChipModernizationScope(entry, entry.individual_proof) || requiresChipLifecycleScope(entry, entry.individual_proof);\n   const needsIndividual = Boolean(sensitive) || INHERITED.has(disposition) || BEHAVIOR.has(disposition);\n   if (needsIndividual && !individualProofOk(entry)) {\n",
+      "decision": "Include registered source decisions in the existing contract/sensitive classification. That makes the existing needsIndividual path validate their complete individual proof and account for a failure, including final do-not-adopt labels. Merely adding needsIndividual without a failure bucket would not reject admission. Every existing condition, allowed-final set and failure counter remains intact. The actual CLI source-fault control and its deliberately weakened-checker counterexample exercise this exact addition."
+    }
+  ],
+  "existing_function_bodies_or_policy_sets_changed": 0,
+  "existing_individual_scope_dispatcher_changed": false,
+  "existing_candidate_helper_changed": false,
+  "pure_predicate": {
+    "path": "scripts/upstream-registered-source-review.mjs",
+    "sha256": "524b9dc06153cac660f42c64039f13c7d388306ea6dfbab3bbcef168c92bfe61",
+    "bytes": 603
+  },
+  "qualified_historical_metadata_transition": {
+    "path": "scripts/registered-source-checker-transition.mjs",
+    "sha256": "b78c455045b7144b3b3a04ee3a39c84a5dd0ea3509ad10507b2d1b399bf8eac4",
+    "bytes": 5564
+  },
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "actual_AST_observation": {
+    "path": "compatibility/rc/21x-c04-unthemable-token-placement-registered-checker-ast.json",
+    "sha256": "7d7568a8cd982c080fd097cd2628c03e73d3f69ca67540caf9ab4358f737d6f9",
+    "bytes": 115
+  }
+}

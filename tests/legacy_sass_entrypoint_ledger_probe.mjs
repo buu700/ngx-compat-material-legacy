@@ -12,6 +12,7 @@ import {readFileSync,writeFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {packedUpstreamLedgerEpoch} from '../scripts/packed-upstream-ledger-epoch.mjs';
+import {registeredSourceCheckerTransition} from '../scripts/registered-source-checker-transition.mjs';
 import {checkerReferenceMetadata} from '../scripts/checker-reference-metadata.mjs';
 import {LEGACY_SASS_ENTRYPOINT_SHA as SHA,LEGACY_SASS_ENTRYPOINT_REVIEW as REVIEW} from '../scripts/upstream-legacy-sass-entrypoint-admission.mjs';
 const root=process.cwd(),read=path=>readFileSync(join(root,path)),ledger='compatibility/f10/disposition-ledger/ledger.json';
@@ -21,15 +22,15 @@ for(const name of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','
 const stage={before:execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',
   '518be10d4de943ebfef51854d9c013cde2afbefe:'+ledger],{cwd:root,env,maxBuffer:8*1024*1024}),
   after:execFileSync('python3',['-c','import sys;sys.path.insert(0,"tests");from legacy_sass_entrypoint_ledger_patch import derive_sass_entrypoint_successor;sys.stdout.buffer.write(derive_sass_entrypoint_successor()[1])'],{cwd:root,maxBuffer:8*1024*1024})};
-const checkerMetadata=checkerReferenceMetadata({root,read});
-const final=execFileSync('python3',['-c','import sys;sys.path.insert(0,"tests");from token_build_ledger_patch import derive_token_build_successor;sys.stdout.buffer.write(derive_token_build_successor()[1])'],{cwd:root,maxBuffer:8*1024*1024});
+const checkerMetadata=checkerReferenceMetadata({root,read:registeredSourceCheckerTransition({root,read}).beforeRead});
+const final=execFileSync('python3',['-c','import sys;sys.path.insert(0,"tests");from unthemable_ledger_patch import derive_unthemable_successor;sys.stdout.buffer.write(derive_unthemable_successor()[1])'],{cwd:root,maxBuffer:8*1024*1024});
 assert.equal(checkerMetadata.before.equals(stage.after),true);assert.equal(final.equals(read(ledger)),true);
 assert.equal(createHash('sha256').update(checkerMetadata.after).digest('hex'),'d015c3d9cca4b9ea489da7028ab5a8bcd675adf428db3000ed60c0b2380f0e27');
 assert.equal(createHash('sha256').update(stage.before).digest('hex'),'c444a0532332e11c1bfb4f737135a0710909a1a6f91332f8327e8ed2e0174ac3');
 assert.equal(createHash('sha256').update(stage.after).digest('hex'),'fbefd5a78fd9d09694567a59636e6452cb1f08ef668f4b6596378662ab00b355');
 let changedPath=null;const liveRead=path=>path===changedPath?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const current=packedUpstreamLedgerEpoch({root,read:liveRead});current.assertCurrent();
-assert.equal(current.individual_decisions_applied,22);assert.equal(current.legacy_sass_entrypoint_decisions_applied,1);
+assert.equal(current.individual_decisions_applied,27);assert.equal(current.legacy_sass_entrypoint_decisions_applied,1);
 assert.equal(current.token_build_decisions_applied,1);
 assert.equal(current.checker_reference_metadata_tokens_applied,14);
 assert.equal(current.raw,liveRead);assert.equal(current.read('scripts/check-upstream-audit-disposition.mjs').equals(read('scripts/check-upstream-audit-disposition.mjs')),true);

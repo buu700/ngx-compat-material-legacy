@@ -11,9 +11,10 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {checkerReferenceMetadata,CHECKER_REFERENCE_LEDGER as ledger} from '../scripts/checker-reference-metadata.mjs';
 import {packedUpstreamLedgerEpoch} from '../scripts/packed-upstream-ledger-epoch.mjs';
+import {registeredSourceCheckerTransition} from '../scripts/registered-source-checker-transition.mjs';
 const root=process.cwd(),read=path=>readFileSync(join(root,path));
-const source=checkerReferenceMetadata({root,read}),preflight=process.argv.includes('--preflight');
-const final=execFileSync('python3',['-c','import sys;sys.path.insert(0,"tests");from token_build_ledger_patch import derive_token_build_successor;sys.stdout.buffer.write(derive_token_build_successor()[1])'],{cwd:root,maxBuffer:8*1024*1024});
+const source=checkerReferenceMetadata({root,read:registeredSourceCheckerTransition({root,read}).beforeRead}),preflight=process.argv.includes('--preflight');
+const final=execFileSync('python3',['-c','import sys;sys.path.insert(0,"tests");from unthemable_ledger_patch import derive_unthemable_successor;sys.stdout.buffer.write(derive_unthemable_successor()[1])'],{cwd:root,maxBuffer:8*1024*1024});
 assert.equal(read(ledger).equals(preflight?source.before:final),true);
 let late=null;const actual=path=>{
   const raw=preflight&&path===ledger?source.after:read(path);
@@ -22,7 +23,7 @@ let late=null;const actual=path=>{
 const current=packedUpstreamLedgerEpoch({root,read:actual}),previous=packedUpstreamLedgerEpoch({root,read:path=>path===ledger?source.before:read(path)});
 assert.equal(current.checker_reference_metadata_tokens_applied,14);assert.equal(previous.checker_reference_metadata_tokens_applied,0);
 for(const state of [current,previous]){
-  state.assertCurrent();assert.equal(state.individual_decisions_applied,state===current&&!preflight?22:21);
+  state.assertCurrent();assert.equal(state.individual_decisions_applied,state===current&&!preflight?27:21);
   assert.equal(state.token_build_decisions_applied,state===current&&!preflight?1:0);
   assert.equal(state.legacy_sass_entrypoint_decisions_applied,1);assert.equal(state.selection_native_decisions_applied,3);
   assert.equal(state.historical_consumer_wrapper_metadata_entries_applied,65);

@@ -104,8 +104,10 @@ assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equa
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
 assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
-assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?22:13);
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?27:13);
 assert.equal(epoch.token_build_decisions_applied,input.line==='21.x'?1:0);
+assert.equal(epoch.unthemable_source_decisions_applied,input.line==='21.x'?5:0);
+assert.equal(epoch.registered_checker_metadata_tokens_applied,input.line==='21.x'?14:0);
 assert.equal(epoch.legacy_sass_entrypoint_decisions_applied,input.line==='21.x'?1:0);
 assert.equal(epoch.checker_reference_metadata_tokens_applied,input.line==='21.x'?14:0);
 if(input.line==='21.x'){

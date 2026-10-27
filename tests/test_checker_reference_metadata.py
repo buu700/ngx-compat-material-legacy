@@ -61,7 +61,7 @@ class CheckerReferenceMetadataTests(unittest.TestCase):
         self.assertFalse(report['preflight_only'])
         self.assertEqual(report['metadata_tokens_applied'], 14)
         self.assertEqual(report['previous_metadata_tokens_applied'], 0)
-        self.assertEqual(report['individual_decisions_applied'], 22)
+        self.assertEqual(report['individual_decisions_applied'], 27)
         self.assertEqual(report['rejection_controls'], 4)
         self.assertTrue(report['raw_checker_bytes_preserved'])
         self.assertFalse(report['actual_native_artifact_browser_floor_or_full_audit_qualified'])

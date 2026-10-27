@@ -20,7 +20,8 @@ const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','m
 let late=null;const actual=path=>path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const current=packedUpstreamLedgerEpoch({root,read:actual}),previous=packedUpstreamLedgerEpoch({root,read:path=>path===ledger?before:read(path)});
 current.assertCurrent();previous.assertCurrent();
-assert.equal(current.individual_decisions_applied,22);assert.equal(current.token_build_decisions_applied,1);
+assert.equal(current.individual_decisions_applied,27);assert.equal(current.token_build_decisions_applied,1);
+assert.equal(current.unthemable_source_decisions_applied,5);assert.equal(current.registered_checker_metadata_tokens_applied,14);
 assert.equal(previous.individual_decisions_applied,21);assert.equal(previous.token_build_decisions_applied,0);
 for(const state of [current,previous]){
   assert.equal(state.checker_reference_metadata_tokens_applied,14);assert.equal(state.legacy_sass_entrypoint_decisions_applied,1);
@@ -64,7 +65,7 @@ try{
   }
 }finally{rmSync(dir,{recursive:true,force:true});}
 const report={schema_version:1,line:'21.x',positive_current_and_previous_states:2,
-  current_source_admissions:22,previous_source_admissions:21,new_token_build_decisions:1,
+  current_source_admissions:27,previous_source_admissions:21,new_token_build_decisions:1,
   real_root_checker_positive:positive,real_root_checker_rejections:3,rejection_controls:rejected.length,rejected,
   current_raw_reader_identity_preserved:true,root_checker_overall_admission:'incomplete; unrelated authored rosters deliberately absent',
   actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};

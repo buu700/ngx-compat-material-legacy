@@ -24,6 +24,8 @@ import {historicalChipWrapperMetadata,HISTORICAL_WRAPPER_PACKET} from './histori
 import {historicalConsumerWrapperMetadata,CONSUMER_WRAPPER_PACKET,replaceHistoricalConsumerEntries} from './historical-consumer-wrapper-metadata.mjs';
 import {checkerReferenceMetadata} from './checker-reference-metadata.mjs';
 import tokenBuildAdmission from './upstream-token-build-admission.cjs';
+import unthemedAdmission from './upstream-unthemable-token-admission.cjs';
+import {registeredSourceCheckerTransition,refreshRegisteredCheckerReferences} from './registered-source-checker-transition.mjs';
 import {sourceContractDefinitions} from './upstream-source-contract-registry.mjs';
 import {LEGACY_SASS_ENTRYPOINT_SHA,LEGACY_SASS_ENTRYPOINT_REVIEW,legacySassEntrypointProof,
   inspectLegacySassEntrypointReview} from './upstream-legacy-sass-entrypoint-admission.mjs';
@@ -832,10 +834,41 @@ function prepareTokenBuildStage({root,read,line,before,bound}){
   source.assertCurrent();return {before,after,individual_decisions:1,unselected_entries_preserved:1696,assertCurrent:source.assertCurrent};
 }
 
+function prepareUnthemedStage({root,read,before,bound}){
+  assert.equal(hash(before),'65273c52bd8435614ff51212bc454cc9b7ed266557b0b6276bdd9e70b36e6ef3');
+  assert.equal(before.equals(gitBytes(root,'e5f713f9d7eb088da729aec53835041dd6ffc521',ledgerPath)),true);
+  const helper='scripts/upstream-unthemable-token-admission.cjs',digest='66068054b0eb25fd494a5bd4ade24bd6b452222badfcfd2bdd6a74d211f96c54';
+  assert.equal(hash(read(helper)),digest);bound.set(helper,digest);
+  for(const sha of unthemedAdmission.UNTHEMED_SHAS)assert.deepEqual(sourceContractDefinitions.find(row=>row.sha===sha),{
+    sha,proof_kind:'individual-historical-base-token-source-exclusion',scope_key:'unthemable_token_source_scope',module:'upstream-unthemable-token-admission.cjs'});
+  const source=unthemedAdmission.inspectUnthemedSource({root,read});for(const ref of source.bound)bound.set(ref.path,ref.sha256);
+  const original=JSON.parse(before),expected=structuredClone(original),replacements=[];
+  assert.equal(original.closed_dispositions,358);assert.equal(original.open_or_deferred,1339);
+  for(const row of source.body.reviews){
+    const index=expected.entries.findIndex(entry=>entry.sha===row.sha);assert.ok(index>=0);const prior=expected.entries[index];
+    assert.equal(prior.final_disposition,'needs-individual-review');assert.equal(prior.evidence_report,null);
+    const entry={...prior,final_disposition:'do-not-adopt',reason:row.decision,review_depth:'individual-compatibility',
+      evidence_report:unthemedAdmission.UNTHEMED_REVIEW,individual_proof:unthemedAdmission.unthemedProof(row)};
+    assert.equal(unthemedAdmission.unthemedSourceOk({root,read,entry,body:source.body,review:row,proof:entry.individual_proof}),true);
+    expected.entries[index]=entry;replacements.push({sha:row.sha,after_entry:entry});
+  }
+  assert.equal(replacements.length,5);expected.closed_dispositions=363;expected.open_or_deferred=1334;
+  const text=replaceHistoricalConsumerEntries(before,replacements).toString(),marker='"entries": [',split=text.indexOf(marker);assert.ok(split>=0);
+  let header=text.slice(0,split);
+  for(const [key,from,to]of [['closed_dispositions',358,363],['open_or_deferred',1339,1334]]){
+    const old='  "'+key+'": '+from+',',next='  "'+key+'": '+to+',';assert.equal(header.split(old).length,2);header=header.replace(old,next);
+  }
+  const after=Buffer.from(header+text.slice(split));assert.deepEqual(JSON.parse(after),expected);
+  assert.equal(hash(after),'a19edf5beb6479065bef5c4a08b1b0988118f5fd4ed5f42c7def6f900c7fe911');
+  source.assertCurrent();return {before,after,individual_decisions:5,unselected_entries_preserved:1692,assertCurrent:source.assertCurrent};
+}
+
 export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {
   read = packedUpstreamLedgerRawRead({root, read});
   const input = read(inputPath), line = Object.keys(subjects).find(name => subjects[name].sha256 === hash(input));
   assert.ok(line, 'changed qualified upstream inputs');
+  const currentRead=read,registeredChecker=line==='21.x'?registeredSourceCheckerTransition({root,read:currentRead}):null;
+  if(registeredChecker)read=registeredChecker.beforeRead;
   const data = JSON.parse(input), authority = subjects[line].authority;
   assert.equal(data.line, line); assert.equal(data.schema_version, 1);
   assert.equal(JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.') ? '21.x' : 'main', line);
@@ -928,8 +961,12 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const sassEntrypoint=line==='21.x'?prepareLegacySassEntrypointStage({root,read,line,before:consumerWrapper.after,bound}):null;
   const checkerMetadata=line==='21.x'?prepareCheckerReferenceMetadataStage({root,read,line,before:sassEntrypoint.after,bound}):null;
   const tokenBuild=line==='21.x'?prepareTokenBuildStage({root,read,line,before:checkerMetadata.after,bound}):null;
+  const unthemed=line==='21.x'?prepareUnthemedStage({root,read:currentRead,before:tokenBuild.after,bound}):null;
+  const registeredMetadata=line==='21.x'?refreshRegisteredCheckerReferences({root,read:currentRead,before:unthemed.after}):null;
+  if(registeredMetadata){assert.equal(hash(registeredMetadata.after),'1a6efeb50fff4ab828deff45262c0686dfc1bbed1c3fe118983882ac44990829');for(const ref of registeredMetadata.bound)bound.set(ref.path,ref.sha256);
+    const path='scripts/registered-source-checker-transition.mjs',digest='b78c455045b7144b3b3a04ee3a39c84a5dd0ea3509ad10507b2d1b399bf8eac4';assert.equal(hash(currentRead(path)),digest);bound.set(path,digest);}
   specReaders.assertCurrent();
-  return {line, before, after, canonical_after:tokenBuild?.after??consumerWrapper.after,token_build_stage:tokenBuild,checker_reference_metadata_stage:checkerMetadata,legacy_sass_entrypoint_stage:sassEntrypoint,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
+  return {line, before, after, canonical_after:registeredMetadata?.after??consumerWrapper.after,registered_checker_metadata_stage:registeredMetadata,unthemable_stage:unthemed,token_build_stage:tokenBuild,checker_reference_metadata_stage:checkerMetadata,legacy_sass_entrypoint_stage:sassEntrypoint,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
     input_sha256: hash(input),
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
     current_native_packed_or_floor_qualified: false};
@@ -946,16 +983,19 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   const consumerWrapperHash=hash(prepared.historical_consumer_wrapper_metadata_stage.after);
   const sassEntrypointHash=prepared.legacy_sass_entrypoint_stage?hash(prepared.legacy_sass_entrypoint_stage.after):null;
   const checkerMetadataHash=prepared.checker_reference_metadata_stage?hash(prepared.checker_reference_metadata_stage.after):null;
-  const tokenBuildApplied=Boolean(prepared.token_build_stage)&&current===canonicalHash;
-  const sassEntrypointApplied=Boolean(prepared.legacy_sass_entrypoint_stage)&&[sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current);
-  const selectionApplied=[nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current);
+  const tokenBuildHash=prepared.token_build_stage?hash(prepared.token_build_stage.after):null;
+  const unthemedHash=prepared.unthemable_stage?hash(prepared.unthemable_stage.after):null;
+  const tokenBuildApplied=Boolean(prepared.token_build_stage)&&[tokenBuildHash,unthemedHash,canonicalHash].includes(current);
+  const unthemedApplied=Boolean(prepared.unthemable_stage)&&[unthemedHash,canonicalHash].includes(current);
+  const sassEntrypointApplied=Boolean(prepared.legacy_sass_entrypoint_stage)&&[sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current);
+  const selectionApplied=[nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current);
   const testingHash=prepared.testing_api_stage?hash(prepared.testing_api_stage.after):null;
   const sassHash=hash(prepared.sass_stage.after);
   const rulesHash=hash(prepared.rules_js_stage.after);
   const summaryHash=hash(prepared.summary_stage.after);
   const landscapeHash=hash(prepared.autocomplete_landscape_stage.after);
   const nativeSpecHash=hash(prepared.native_spec_metadata_stage.after);
-  assert.ok([beforeHash,afterHash,testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
+  assert.ok([beforeHash,afterHash,testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
   const applied = current !== beforeHash;
   const assertCurrent = () => {
     prepared.sass_stage.assertExternal();
@@ -968,6 +1008,8 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
     prepared.legacy_sass_entrypoint_stage?.assertCurrent();
     prepared.checker_reference_metadata_stage?.assertCurrent();
     prepared.token_build_stage?.assertCurrent();
+    prepared.unthemable_stage?.assertCurrent();
+    prepared.registered_checker_metadata_stage?.assertCurrent();
     for (const [path, digest] of prepared.bound)
       assert.equal(hash(read(path)), digest, 'late current upstream subject change ' + path);
     const population = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '--',
@@ -984,23 +1026,25 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   return {line: prepared.line, read: historical, raw: read, assertCurrent, applied,
     projected_metadata_paths: applied ? [ledgerPath] : [], entries_changed: 85,
     scalar_tokens_changed: 179,
-    testing_api_decisions_applied: [testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0,
-    sass_decisions_applied: [sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?6:0,
-    rules_js_decisions_applied:[rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?3:0,
-    summary_scalar_updates_applied:[summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?2:0,
-    autocomplete_landscape_decisions_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?1:0,
-    autocomplete_landscape_registry_digests_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?10:0,
-    individual_decisions_applied: ([testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0)+([sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?6:0)+([rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?3:0)+([landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?1:0)+(selectionApplied?3:0)+(sassEntrypointApplied?1:0)+(tokenBuildApplied?1:0),
+    testing_api_decisions_applied: [testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0,
+    sass_decisions_applied: [sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?6:0,
+    rules_js_decisions_applied:[rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?3:0,
+    summary_scalar_updates_applied:[summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?2:0,
+    autocomplete_landscape_decisions_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?1:0,
+    autocomplete_landscape_registry_digests_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?10:0,
+    individual_decisions_applied: ([testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0)+([sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?6:0)+([rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?3:0)+([landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?1:0)+(selectionApplied?3:0)+(sassEntrypointApplied?1:0)+(tokenBuildApplied?1:0)+(unthemedApplied?5:0),
     token_build_decisions_applied:tokenBuildApplied?1:0,
+    unthemable_source_decisions_applied:unthemedApplied?5:0,
+    registered_checker_metadata_tokens_applied:prepared.registered_checker_metadata_stage&&current===canonicalHash?14:0,
     legacy_sass_entrypoint_decisions_applied:sassEntrypointApplied?1:0,
-    checker_reference_metadata_tokens_applied:prepared.checker_reference_metadata_stage&&[checkerMetadataHash,canonicalHash].includes(current)?14:0,
+    checker_reference_metadata_tokens_applied:prepared.checker_reference_metadata_stage&&[checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?14:0,
     selection_native_decisions_applied:selectionApplied?3:0,
     selection_native_registry_digests_applied:selectionApplied?11:0,
-    native_spec_source_digests_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?3:0,
-    native_spec_review_pointers_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?2:0,
-    historical_wrapper_metadata_entries_applied:[historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?4:0,
-    historical_wrapper_metadata_references_applied:[historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?4:0,
-    historical_consumer_wrapper_metadata_entries_applied:[consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?65:0,
-    historical_consumer_wrapper_metadata_references_applied:[consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,canonicalHash].includes(current)?65:0,
+    native_spec_source_digests_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?3:0,
+    native_spec_review_pointers_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?2:0,
+    historical_wrapper_metadata_entries_applied:[historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?4:0,
+    historical_wrapper_metadata_references_applied:[historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?4:0,
+    historical_consumer_wrapper_metadata_entries_applied:[consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?65:0,
+    historical_consumer_wrapper_metadata_references_applied:[consumerWrapperHash,sassEntrypointHash,checkerMetadataHash,tokenBuildHash,unthemedHash,canonicalHash].includes(current)?65:0,
     current_native_packed_or_floor_or_g11_credit: false};
 }
