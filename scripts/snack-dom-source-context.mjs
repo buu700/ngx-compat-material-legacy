@@ -18,6 +18,7 @@ import {qualifiedMenuContentTypeBoundary,MENU_CONTENT_PANEL_SOURCE} from './menu
 import {dialogConfigOverlayBridge} from './dialog-caller-config-boundary.mjs';
 import {inspectDialogOwnedContracts} from './dialog-caller-owned-contract-boundary.mjs';
 import {componentConfigGraph} from './component-config-caller-contracts.mjs';
+import {packedUpstreamLedgerEpoch,packedUpstreamLedgerRawRead} from './packed-upstream-ledger-epoch.mjs';
 import {qualifyPackedUpstreamFocusInspector,qualifyPackedUpstreamConsolidationInspector,packedUpstreamFocusMetadataEpoch} from './packed-upstream-source-requalification.mjs';
 import {qualifyPackedProductSourceRepairs} from './packed-product-source-recovery.mjs';
 import {packedCvaRoleHistoricalReader,packedCvaMetadataToolingEpoch} from './packed-cva-source-requalification.mjs';
@@ -28,7 +29,7 @@ export const SNACK_SOURCE='projects/ngx-material-legacy/legacy-snack-bar/interna
 export const TOOLTIP_SOURCE='projects/ngx-material-legacy/legacy-tooltip/internal/tooltip-base.ts';
 const pins={"main":"ed200be4fe777b10a42d5af73ce4e9818fb0584989aa887a635d5750e636260d","21.x":"1f65a5b4a9cdaa950df1d5556f1210c214c4b6299e1dd2833f9345f7222499ab"},hash=b=>createHash('sha256').update(b).digest('hex'),authenticated=new Set(),decoded=new Map(),authenticatedPriors=new Set(),branded=new WeakMap(),packedCurrentEpochs=new WeakMap();
 const rawRead=root=>p=>{let path=root;for(const part of p.split('/')){assert.ok(part&&part!=='.'&&part!=='..');path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}assert.ok(lstatSync(path).isFile());return readFileSync(path);};
-function currentRaw(root,read){if(!branded.has(read))return read;const previous=branded.get(read);assert.equal(previous.root,root);return previous.raw;}
+function currentRaw(root,read){for(;;){read=packedUpstreamLedgerRawRead({root,read});if(!branded.has(read))return read;const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}}
 export function snackDomRawCurrentRead({root=process.cwd(),read=rawRead(root)}={}){return currentRaw(root,read);}
 function freeze(v){if(v&&typeof v==='object'){for(const x of Object.values(v))freeze(x);Object.freeze(v);}return v;}
 function original(root,commit,m){const key=JSON.stringify([root,commit,m.path,m.sha256]);if(authenticated.has(key))return;const raw=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',commit+':'+m.path],{cwd:root,maxBuffer:24*1024*1024,env:{...process.env,GIT_NO_LAZY_FETCH:'1'}});assert.equal(hash(raw),m.sha256,'unauthenticated snack context member '+m.path);authenticated.add(key);}
@@ -192,8 +193,8 @@ export function inspectPackedProductSourceRepairs({root=process.cwd(),read=rawRe
 }
 /** Finite old task subjects only, after every current successor is rechecked. */
 export function snackDomSourceContext({root=process.cwd(),read=rawRead(root)}={}){
- if(branded.has(read)){const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}
- const rawCurrent=read,focusEpoch=packedUpstreamFocusMetadataEpoch({root,read}),roles=packedCvaRoleHistoricalReader({root,read:focusEpoch.read}),roleRead=p=>{if(focusEpoch.inspectors.some(m=>m.path===p)){focusEpoch.assertCurrent();return rawCurrent(p);}return roles.read(p);},packed=packedRepairEpoch(root,roleRead);packedCurrentEpochs.set(packed.read,{root,actual:rawCurrent,qualification:packed});read=packed.read;
+ read=currentRaw(root,read);
+ const rawCurrent=read,upstreamEpoch=packedUpstreamLedgerEpoch({root,read}),focusEpoch=packedUpstreamFocusMetadataEpoch({root,read:upstreamEpoch.read}),roles=packedCvaRoleHistoricalReader({root,read:focusEpoch.read}),roleRead=p=>{if(focusEpoch.inspectors.some(m=>m.path===p)){focusEpoch.assertCurrent();return rawCurrent(p);}return roles.read(p);},packed=packedRepairEpoch(root,roleRead);packedCurrentEpochs.set(packed.read,{root,actual:rawCurrent,qualification:packed});read=packed.read;
  const qualified=qualifyIndependentSnackProductDelta({root,read}),callerRead=tooltipPriorCallerRead({root,read}),configEpoch=tooltipPriorCallerRead({root,read,currentTooltip:true,currentMenu:true}),owned=inspectSnackCurrentDialogContracts({root,read}),service=owned.defaults,config=service.configuration,{data}=registry(root,read),{data:dataProduct}=productRegistry(root,read),prior=snackDomContextPrior({root,read});tooltipSourceContextPrior({root,read});assert.deepEqual(data.product_inputs,qualified.inputs);assert.equal(data.writes.length,25);for(const m of [...data.writes,...data.history_code_members])assert.equal(hash(read(m.path)),m.sha256,'changed current snack context successor '+m.path);
  for(const m of prior.reports)assert.equal(hash(read(m.path)),m.sha256,'changed immutable original review '+m.path);
  for(const m of data.portal_review_members){assert.equal(hash(read(m.path)),m.sha256,'changed integrated portal review '+m.path);original(root,data.portal_review_source_parent,m);}
