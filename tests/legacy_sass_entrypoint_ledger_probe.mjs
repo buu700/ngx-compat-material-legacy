@@ -12,18 +12,23 @@ import {readFileSync,writeFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {packedUpstreamLedgerEpoch} from '../scripts/packed-upstream-ledger-epoch.mjs';
+import {checkerReferenceMetadata} from '../scripts/checker-reference-metadata.mjs';
 import {LEGACY_SASS_ENTRYPOINT_SHA as SHA,LEGACY_SASS_ENTRYPOINT_REVIEW as REVIEW} from '../scripts/upstream-legacy-sass-entrypoint-admission.mjs';
 const root=process.cwd(),read=path=>readFileSync(join(root,path)),ledger='compatibility/f10/disposition-ledger/ledger.json';
 const json=value=>Buffer.from(JSON.stringify(value,null,2)+'\n');
 const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
 for(const name of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[name];
 const stage={before:execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',
-  '518be10d4de943ebfef51854d9c013cde2afbefe:'+ledger],{cwd:root,env,maxBuffer:8*1024*1024}),after:read(ledger)};
+  '518be10d4de943ebfef51854d9c013cde2afbefe:'+ledger],{cwd:root,env,maxBuffer:8*1024*1024}),
+  after:execFileSync('python3',['-c','import sys;sys.path.insert(0,"tests");from legacy_sass_entrypoint_ledger_patch import derive_sass_entrypoint_successor;sys.stdout.buffer.write(derive_sass_entrypoint_successor()[1])'],{cwd:root,maxBuffer:8*1024*1024})};
+const checkerMetadata=checkerReferenceMetadata({root,read});
+assert.equal(checkerMetadata.before.equals(stage.after),true);assert.equal(checkerMetadata.after.equals(read(ledger)),true);
 assert.equal(createHash('sha256').update(stage.before).digest('hex'),'c444a0532332e11c1bfb4f737135a0710909a1a6f91332f8327e8ed2e0174ac3');
 assert.equal(createHash('sha256').update(stage.after).digest('hex'),'fbefd5a78fd9d09694567a59636e6452cb1f08ef668f4b6596378662ab00b355');
 let changedPath=null;const liveRead=path=>path===changedPath?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const current=packedUpstreamLedgerEpoch({root,read:liveRead});current.assertCurrent();
 assert.equal(current.individual_decisions_applied,21);assert.equal(current.legacy_sass_entrypoint_decisions_applied,1);
+assert.equal(current.checker_reference_metadata_tokens_applied,14);
 assert.equal(current.raw,liveRead);assert.equal(current.read('scripts/check-upstream-audit-disposition.mjs').equals(read('scripts/check-upstream-audit-disposition.mjs')),true);
 const previous=packedUpstreamLedgerEpoch({root,read:path=>path===ledger?stage.before:read(path)});previous.assertCurrent();
 assert.equal(previous.individual_decisions_applied,20);assert.equal(previous.legacy_sass_entrypoint_decisions_applied,0);
@@ -40,7 +45,7 @@ for(const [id,mutate]of [
   ['selected-row-missing-scope',value=>delete value.entries.find(row=>row.sha===SHA).individual_proof.legacy_sass_entrypoint_scope],
   ['incorrect-summary',value=>value.open_or_deferred++],
 ]){
-  const value=JSON.parse(stage.after);mutate(value);
+  const value=JSON.parse(read(ledger));mutate(value);
   assert.throws(()=>packedUpstreamLedgerEpoch({root,read:path=>path===ledger?json(value):read(path)}),undefined,id);rejected.push(id);
 }
 for(const path of [REVIEW,'scripts/check-upstream-audit-disposition.mjs',

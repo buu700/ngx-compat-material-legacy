@@ -106,6 +106,7 @@ assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
 assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?21:13);
 assert.equal(epoch.legacy_sass_entrypoint_decisions_applied,input.line==='21.x'?1:0);
+assert.equal(epoch.checker_reference_metadata_tokens_applied,input.line==='21.x'?14:0);
 if(input.line==='21.x'){
  assert.equal(prepared.legacy_sass_entrypoint_stage.individual_decisions,1);
  assert.equal(prepared.legacy_sass_entrypoint_stage.unselected_entries_preserved,1696);

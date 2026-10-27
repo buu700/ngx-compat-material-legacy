@@ -97,11 +97,17 @@ def derive_sass_entrypoint_successor(root=ROOT, expected_before=None):
 def verify_sass_entrypoint_successor(expected_before=None, root=ROOT, candidate=None):
     before, after = derive_sass_entrypoint_successor(root=root, expected_before=expected_before)
     actual = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
-    assert actual == after
+    following_checker_tokens = 0
+    if actual != after:
+        from checker_reference_metadata_patch import verify_checker_reference_successor
+        verify_checker_reference_successor(root=root, expected_before=after, candidate=candidate)
+        following_checker_tokens = 14
     return dict(line='21.x', individual_decisions=1, other_entries_preserved=1696,
         original_hunks_reviewed=194, original_paths_reviewed=180, frozen_research_paths_preserved=111,
         before_sha256=HASH(before), after_sha256=HASH(after), after_bytes=len(after),
-        pending_dispositions=1340, actual_native_artifact_browser_floor_or_full_audit_qualified=False,
+        pending_dispositions=1340, preservation_scope='one-SHA semantic stage; following checker metadata verified separately',
+        following_checker_digest_updates=following_checker_tokens,
+        actual_native_artifact_browser_floor_or_full_audit_qualified=False,
         g11_claim='not-passed', g13_claim='not-passed')
 
 

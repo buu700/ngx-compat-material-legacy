@@ -22,6 +22,7 @@ import {autocompleteSelectionNativeSubject,SELECTION_NATIVE_REGISTRY,SELECTION_N
 import {autocompleteSelectionSourceJudgments} from './autocomplete-selection-source-judgment.mjs';
 import {historicalChipWrapperMetadata,HISTORICAL_WRAPPER_PACKET} from './historical-chip-wrapper-metadata.mjs';
 import {historicalConsumerWrapperMetadata,CONSUMER_WRAPPER_PACKET,replaceHistoricalConsumerEntries} from './historical-consumer-wrapper-metadata.mjs';
+import {checkerReferenceMetadata} from './checker-reference-metadata.mjs';
 import {LEGACY_SASS_ENTRYPOINT_SHA,LEGACY_SASS_ENTRYPOINT_REVIEW,legacySassEntrypointProof,
   inspectLegacySassEntrypointReview} from './upstream-legacy-sass-entrypoint-admission.mjs';
 
@@ -754,6 +755,14 @@ function prepareLegacySassEntrypointStage({root,read,line,before,bound}){
   assertCurrent();return {before,after,individual_decisions:1,unselected_entries_preserved:1696,assertCurrent};
 }
 
+function prepareCheckerReferenceMetadataStage({root,read,line,before,bound}){
+  const path='scripts/checker-reference-metadata.mjs',digest='f5284108bffa5b61f0183727f199f87b9a07fc831f8f1f976f99e05fa1ed7448';
+  assert.equal(hash(read(path)),digest,'changed checker reference metadata owner');bound.set(path,digest);
+  const source=checkerReferenceMetadata({root,read,line});assert.equal(source.before.equals(before),true);
+  for(const ref of source.bound)bound.set(ref.path,ref.sha256);
+  return source;
+}
+
 export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {
   read = packedUpstreamLedgerRawRead({root, read});
   const input = read(inputPath), line = Object.keys(subjects).find(name => subjects[name].sha256 === hash(input));
@@ -848,8 +857,9 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const historicalWrapper=prepareHistoricalWrapperMetadataStage({root,read,line,before:nativeSelection.after,bound});
   const consumerWrapper=prepareHistoricalConsumerWrapperMetadataStage({root,read,line,before:historicalWrapper.after,bound});
   const sassEntrypoint=line==='21.x'?prepareLegacySassEntrypointStage({root,read,line,before:consumerWrapper.after,bound}):null;
+  const checkerMetadata=line==='21.x'?prepareCheckerReferenceMetadataStage({root,read,line,before:sassEntrypoint.after,bound}):null;
   specReaders.assertCurrent();
-  return {line, before, after, canonical_after:sassEntrypoint?.after??consumerWrapper.after,legacy_sass_entrypoint_stage:sassEntrypoint,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
+  return {line, before, after, canonical_after:checkerMetadata?.after??consumerWrapper.after,checker_reference_metadata_stage:checkerMetadata,legacy_sass_entrypoint_stage:sassEntrypoint,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
     input_sha256: hash(input),
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
     current_native_packed_or_floor_qualified: false};
@@ -864,15 +874,16 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   const noticeMetadataHash=prepared.sass_notice_metadata_stage?hash(prepared.sass_notice_metadata_stage.after):null;
   const historicalWrapperHash=hash(prepared.historical_wrapper_metadata_stage.after);
   const consumerWrapperHash=hash(prepared.historical_consumer_wrapper_metadata_stage.after);
-  const sassEntrypointApplied=Boolean(prepared.legacy_sass_entrypoint_stage)&&current===canonicalHash;
-  const selectionApplied=[nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current);
+  const sassEntrypointHash=prepared.legacy_sass_entrypoint_stage?hash(prepared.legacy_sass_entrypoint_stage.after):null;
+  const sassEntrypointApplied=Boolean(prepared.legacy_sass_entrypoint_stage)&&[sassEntrypointHash,canonicalHash].includes(current);
+  const selectionApplied=[nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current);
   const testingHash=prepared.testing_api_stage?hash(prepared.testing_api_stage.after):null;
   const sassHash=hash(prepared.sass_stage.after);
   const rulesHash=hash(prepared.rules_js_stage.after);
   const summaryHash=hash(prepared.summary_stage.after);
   const landscapeHash=hash(prepared.autocomplete_landscape_stage.after);
   const nativeSpecHash=hash(prepared.native_spec_metadata_stage.after);
-  assert.ok([beforeHash,afterHash,testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
+  assert.ok([beforeHash,afterHash,testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current),'unqualified canonical upstream ledger');
   const applied = current !== beforeHash;
   const assertCurrent = () => {
     prepared.sass_stage.assertExternal();
@@ -883,6 +894,7 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
     prepared.historical_wrapper_metadata_stage.assertCurrent();
     prepared.historical_consumer_wrapper_metadata_stage.assertCurrent();
     prepared.legacy_sass_entrypoint_stage?.assertCurrent();
+    prepared.checker_reference_metadata_stage?.assertCurrent();
     for (const [path, digest] of prepared.bound)
       assert.equal(hash(read(path)), digest, 'late current upstream subject change ' + path);
     const population = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '--',
@@ -899,21 +911,22 @@ export function packedUpstreamLedgerEpoch({root = process.cwd(), read = disk(roo
   return {line: prepared.line, read: historical, raw: read, assertCurrent, applied,
     projected_metadata_paths: applied ? [ledgerPath] : [], entries_changed: 85,
     scalar_tokens_changed: 179,
-    testing_api_decisions_applied: [testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0,
-    sass_decisions_applied: [sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?6:0,
-    rules_js_decisions_applied:[rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?3:0,
-    summary_scalar_updates_applied:[summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?2:0,
-    autocomplete_landscape_decisions_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?1:0,
-    autocomplete_landscape_registry_digests_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?10:0,
-    individual_decisions_applied: ([testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0)+([sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?6:0)+([rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?3:0)+([landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?1:0)+(selectionApplied?3:0)+(sassEntrypointApplied?1:0),
+    testing_api_decisions_applied: [testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0,
+    sass_decisions_applied: [sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?6:0,
+    rules_js_decisions_applied:[rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?3:0,
+    summary_scalar_updates_applied:[summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?2:0,
+    autocomplete_landscape_decisions_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?1:0,
+    autocomplete_landscape_registry_digests_applied:[landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?10:0,
+    individual_decisions_applied: ([testingHash,sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?(prepared.testing_api_stage?.individual_decisions??0):0)+([sassHash,rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?6:0)+([rulesHash,summaryHash,landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?3:0)+([landscapeHash,nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?1:0)+(selectionApplied?3:0)+(sassEntrypointApplied?1:0),
     legacy_sass_entrypoint_decisions_applied:sassEntrypointApplied?1:0,
+    checker_reference_metadata_tokens_applied:prepared.checker_reference_metadata_stage&&current===canonicalHash?14:0,
     selection_native_decisions_applied:selectionApplied?3:0,
     selection_native_registry_digests_applied:selectionApplied?11:0,
-    native_spec_source_digests_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?3:0,
-    native_spec_review_pointers_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?2:0,
-    historical_wrapper_metadata_entries_applied:[historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?4:0,
-    historical_wrapper_metadata_references_applied:[historicalWrapperHash,consumerWrapperHash,canonicalHash].includes(current)?4:0,
-    historical_consumer_wrapper_metadata_entries_applied:[consumerWrapperHash,canonicalHash].includes(current)?65:0,
-    historical_consumer_wrapper_metadata_references_applied:[consumerWrapperHash,canonicalHash].includes(current)?65:0,
+    native_spec_source_digests_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?3:0,
+    native_spec_review_pointers_applied:[nativeSpecHash,nativeSelectionHash,noticeMetadataHash,historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?2:0,
+    historical_wrapper_metadata_entries_applied:[historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?4:0,
+    historical_wrapper_metadata_references_applied:[historicalWrapperHash,consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?4:0,
+    historical_consumer_wrapper_metadata_entries_applied:[consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?65:0,
+    historical_consumer_wrapper_metadata_references_applied:[consumerWrapperHash,sassEntrypointHash,canonicalHash].includes(current)?65:0,
     current_native_packed_or_floor_or_g11_credit: false};
 }
