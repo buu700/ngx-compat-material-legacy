@@ -1,0 +1,32 @@
+from pathlib import Path
+import base64,hashlib,json,subprocess,tarfile,tempfile
+r=Path('/home/parallels/.codex/worktrees/codex-closeout-21/ngx-compat-material-legacy')
+m=Path('/home/parallels/.codex/worktrees/codex-closeout-main/ngx-compat-material-legacy')
+identity=json.loads((r/'compatibility/rc/original16-sass-source-diagnostic-identity.json').read_text())
+archives={'@angular/material':Path('/home/parallels/.cache/ngx-compat-material-legacy-closeout/reference-archives/material-16.2.14.tgz'),'@angular/cdk':Path('/home/parallels/.cache/ngx-compat-material-legacy-closeout/keycode-subjects/cdk-16.2.14.tgz')}
+with tempfile.TemporaryDirectory(prefix='ngx-unthemable-overlay-originals-') as directory:
+ original=Path(directory)/'node_modules';acquired=[]
+ for package,archive in archives.items():
+  expected=next(v for v in identity['packages'] if v['package']==package);raw=archive.read_bytes()
+  assert len(raw)==expected['archive_bytes'] and hashlib.sha256(raw).hexdigest()==expected['archive_sha256']
+  assert 'sha512-'+base64.b64encode(hashlib.sha512(raw).digest()).decode()==expected['integrity']
+  root=original/package;count=0
+  with tarfile.open(archive,'r:gz') as stream:
+   for member in stream.getmembers():
+    if not member.name.startswith('package/') or not member.name.endswith('.scss'):continue
+    assert member.isfile() and not member.issym() and not member.islnk()
+    parts=member.name.split('/')[1:];assert all(part and part not in ['.','..'] for part in parts)
+    target=root.joinpath(*parts);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(stream.extractfile(member).read());count+=1
+  acquired.append({'package':package,'version':expected['version'],'sha256':expected['archive_sha256'],'SRI_verified':True,'regular_Sass_members_extracted':count})
+ output=Path('/tmp/ngx-unthemable-current-overlay-source-proof.json');assert not output.exists()
+ parser=r/'node_modules/.pnpm/postcss@8.5.28/node_modules/postcss'
+ result=subprocess.run(['node',str(r/'tests/overlay_resource_css_probe.mjs'),'--original-root',str(original),'--main-root',str(m/'node_modules'),'--maintenance-root',str(r/'node_modules'),'--parser-root',str(parser),'--report',str(output)],cwd=r,check=True)
+ report=json.loads(output.read_text());assert len(report['observations'])==4 and len(report['mutations'])==12
+ matching=set()
+ for row in report['observations']:
+  for member in row['candidate_loaded_urls']:
+   path=Path(member['path'])
+   if path.is_relative_to(r/'projects/ngx-material-legacy'):
+    relative=path.relative_to(r);assert hashlib.sha256((m/relative).read_bytes()).hexdigest()==member['sha256'];matching.add(str(relative))
+ receipt={'original_package_archives':acquired,'actual_commands':'unchanged tests/overlay_resource_css_probe.mjs; actual current main/21.x node_modules roots','actual_whole_CSS_comparisons':4,'actual_rejections':12,'main_owned_sources_match_all_observed21_owned_sources':sorted(matching),'browser_executed':False,'native_angular_components_executed':False,'temporary_originals_removed_on_exit':True}
+ Path('/tmp/ngx-unthemable-current-overlay-recheck.json').write_text(json.dumps(receipt,indent=2)+'\n')
