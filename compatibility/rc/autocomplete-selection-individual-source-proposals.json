@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Three individually reasoned complete source/protocol proposals; no canonical or native admission",
+  "status": "source-protocol-reviewed-native-strengthening-unfinished",
+  "original_subjects": {
+    "path": "compatibility/rc/autocomplete-selection-originals.json.gz",
+    "sha256": "ddb8eeefba441568d46b9107a88889553320ce2e841c3fdc90a29b3f518aeebc",
+    "bytes": 105021
+  },
+  "originals_intake_producer": {
+    "path": "scripts/inspect-autocomplete-selection-originals.py",
+    "sha256": "178d1735fda09ae8ddeb655734eade8ad4c2681ece709c5a0775e42f57fa6d10",
+    "bytes": 4119
+  },
+  "reviews": [
+    {
+      "sha": "d5d468a29a2db4c0676c57d60bc8431ed4fd6e18",
+      "parent": "70b365b2b491e368364d2a7a6f67d3f0bcb07dba",
+      "diff_sha256": "21cd67ad7117fab8354ea5be9c4deec2026586fa72fceb048ab894af1efdeb1d",
+      "original_files": 2,
+      "original_hunks": 2,
+      "status": "source-protocol-reviewed-native-strengthening-unfinished",
+      "proposed_disposition": "already-adapted, conditional on exact current source and mandatory native qualification",
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/autocomplete/autocomplete-trigger.ts",
+          "header": "@@ -652,6 +652,12 @@ export class MatAutocompleteTrigger",
+          "hunk_sha256": "be79ce53028a2f0d30feda58e564d7d5f619359f2d5cc44f97524c9efb538d51",
+          "source_judgment": "The original reset repair clears selected state inside the low-level native-value updater for every falsy display. The current owned updater instead preserves non-null values and performs quiet deselection in _assignOptionValue when the actual model is nullish. This retains programmatic reactive reset while applying the latercf868 refinement. The before/after originals reproduce the reset defect and show why literal falsy cleanup would regress0/false/empty displays."
+        },
+        {
+          "path": "src/material/autocomplete/autocomplete.spec.ts",
+          "header": "@@ -847,6 +847,33 @@ describe('MDC-based MatAutocomplete', () => {",
+          "hunk_sha256": "13584802acd2170d35be3bdd9c129511684c755a51eb530b7ed3b1cd952687a5",
+          "source_judgment": "The added actual Angular regression first selects an option, then resets the reactive FormControl and checks both null model and deselected option. The current legacy suite only checks its typed text resets. Preserve that existing text assertion and add a real selection/reset cycle, including no option-selection emission. Source FormControl callbacks support the decision but do not execute this native regression."
+        }
+      ],
+      "proposed_existing_native_case_indices": [
+        46
+      ],
+      "actual_original_observations": [
+        {
+          "side": "before",
+          "source_sha256": "e5061fd200194b8ccae36b772e53ecf5cac04ca432afbbff152c15c526392c3a",
+          "failed_case_ids": [
+            "programmatic-null-reset/bare",
+            "programmatic-null-reset/form-field",
+            "programmatic-undefined-assignment",
+            "optional-nonempty-typing-clears-selection-quietly",
+            "optional-updated-display-retains-matching-selected-value",
+            "required-original-attachment/repeated-open",
+            "required-original-attachment/empty-to-visible",
+            "required-original-attachment/hide-and-reshow"
+          ]
+        },
+        {
+          "side": "after",
+          "source_sha256": "5c999d938c448e7cf1905a85f9251db859db9bdf0115b9df30d3fb92c80114bb",
+          "failed_case_ids": [
+            "non-null-value-retains-selection/zero",
+            "non-null-value-retains-selection/false",
+            "non-null-value-retains-selection/empty-string",
+            "non-null-value-retains-selection/empty-display",
+            "optional-nonempty-typing-clears-selection-quietly",
+            "optional-updated-display-retains-matching-selected-value",
+            "required-original-attachment/repeated-open",
+            "required-original-attachment/empty-to-visible",
+            "required-original-attachment/hide-and-reshow"
+          ]
+        }
+      ],
+      "product_or_consumer_changes_required": false,
+      "actual_native_artifact_or_floor_executed": false
+    },
+    {
+      "sha": "13629b0cd814ccc5fa01cf670b8b3001bc0021ff",
+      "parent": "6e295849772188a66151914820ed1aefa4b2e614",
+      "diff_sha256": "425bee27fa61de150f47945e20e09faa7d117b0e61578377edabe7832fd6dd07",
+      "original_files": 2,
+      "original_hunks": 5,
+      "status": "source-protocol-reviewed-native-strengthening-unfinished",
+      "proposed_disposition": "already-adapted, conditional on exact current source and mandatory native qualification",
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/autocomplete/autocomplete-trigger.ts",
+          "header": "@@ -600,7 +600,6 @@ export class MatAutocompleteTrigger",
+          "hunk_sha256": "ee1ded83e194f399ee28113c411dda03c87a1accdeb82df1dcc7f7e0c131f2f3",
+          "source_judgment": "Removing the capture when filtered options make the panel visible preserves the value from original attachment. The new diagnostic executes the complete closing-stream method with real RxJS option-change scheduling and controlled visibility/render boundaries. It reproduces the pre-fix empty-to-visible recapture and also exercises hide/show; actual Angular option filtering and outside dismissal remain required."
+        },
+        {
+          "path": "src/material/autocomplete/autocomplete-trigger.ts",
+          "header": "@@ -626,11 +625,6 @@ export class MatAutocompleteTrigger",
+          "hunk_sha256": "65902a4c4ce1c76ebb57a05c4d3835818eef84c0dcc92085192a196f9446987c",
+          "source_judgment": "The removed helper is private. Current owned and both minimum source implementations use an inline capture, with no call to this helper. Do not restore obsolete private machinery or mirror a modern public component API merely to reproduce the old source layout."
+        },
+        {
+          "path": "src/material/autocomplete/autocomplete-trigger.ts",
+          "header": "@@ -744,6 +738,7 @@ export class MatAutocompleteTrigger",
+          "hunk_sha256": "deb2256f85454010cb01b40b0bd29b2caaffa1c53c293862e7f240347aacaa6d",
+          "source_judgment": "The inline capture belongs only to an actual attach() on a detached overlay. The owned caller additionally supplies the pre-input value used by existing required-selection handling. A reused OverlayRef receiver initially has no captured value; repeated opening must not recapture. The real FormControl/closing-stream diagnostic rejects both missing first capture and repeated-attach recapture."
+        },
+        {
+          "path": "src/material/autocomplete/autocomplete-trigger.ts",
+          "header": "@@ -753,7 +748,6 @@ export class MatAutocompleteTrigger",
+          "hunk_sha256": "dc80097b1611984482a04270cb9bdf4dc395b3ae74e31890024d7be9a9d8ae21",
+          "source_judgment": "Removing the unconditional end-of-attach capture prevents repeated typing/open calls from overwriting the comparison value. The complete before/after prototypes reproduce this defect. Preserve the existing no-options capture fix and require real filtered view/CVA dismissal behavior as a separate native observation."
+        },
+        {
+          "path": "tools/public_api_guard/material/autocomplete.md",
+          "header": "@@ -190,7 +190,7 @@ export class MatAutocompleteTrigger implements ControlValueAccessor, AfterViewIn",
+          "hunk_sha256": "de298211a23cbdb338d897c2f5467e33747d7339e50b45e99b8a0c2247cbf3b5",
+          "source_judgment": "The public API guard hunk removes an unrelated keyboard-event doc comment accidentally attached to a static acceptance declaration. It changes no runtime declaration or consumer behavior. No legacy input API change, obsolete static surface dependency or modern API mirror is required."
+        }
+      ],
+      "proposed_existing_native_case_indices": [
+        37,
+        38,
+        39,
+        172
+      ],
+      "actual_original_observations": [
+        {
+          "side": "before",
+          "source_sha256": "5c999d938c448e7cf1905a85f9251db859db9bdf0115b9df30d3fb92c80114bb",
+          "failed_case_ids": [
+            "non-null-value-retains-selection/zero",
+            "non-null-value-retains-selection/false",
+            "non-null-value-retains-selection/empty-string",
+            "non-null-value-retains-selection/empty-display",
+            "optional-nonempty-typing-clears-selection-quietly",
+            "optional-updated-display-retains-matching-selected-value",
+            "required-original-attachment/repeated-open",
+            "required-original-attachment/empty-to-visible",
+            "required-original-attachment/hide-and-reshow"
+          ]
+        },
+        {
+          "side": "after",
+          "source_sha256": "47435e7a0437861b74b7e0cc1ae1651760b6b01ba3a50fe391d4aebe76aa1801",
+          "failed_case_ids": [
+            "non-null-value-retains-selection/zero",
+            "non-null-value-retains-selection/false",
+            "non-null-value-retains-selection/empty-string",
+            "non-null-value-retains-selection/empty-display",
+            "optional-nonempty-typing-clears-selection-quietly",
+            "optional-updated-display-retains-matching-selected-value"
+          ]
+        }
+      ],
+      "product_or_consumer_changes_required": false,
+      "actual_native_artifact_or_floor_executed": false
+    },
+    {
+      "sha": "cf868a5089a4c9eaddd4a55fd18b952fb96d5c19",
+      "parent": "a6582b51082955cec4c61f04d1407ff02c749c88",
+      "diff_sha256": "3c5ce22fc1cc25cf290cbacd0b1a9a1ddde5eef5d0ce5b1c7183563df30432b3",
+      "original_files": 2,
+      "original_hunks": 3,
+      "status": "source-protocol-reviewed-native-strengthening-unfinished",
+      "proposed_disposition": "already-adapted, conditional on exact current source and mandatory native qualification",
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/material/autocomplete/autocomplete-trigger.ts",
+          "header": "@@ -506,6 +506,18 @@ export class MatAutocompleteTrigger",
+          "hunk_sha256": "e081c3568429e4e8b2722c234df70eb992cc6c872eaaf0e9868363f79eb573ec",
+          "source_judgment": "Optional nonempty typing should quietly deselect the old option when its displayed value differs, while requireSelection retains selection until dismissal. The literal original passes the option object to displayWith; the owned _getDisplayValue(selectedOption.value) correctly passes the value and matches both actual minimum source implementations. Diagnostic cases check mismatch, updated matching display, callback argument identity and required-selection retention. Preserve the original clear-then-type native baseline and add direct nonempty typing coverage."
+        },
+        {
+          "path": "src/material/autocomplete/autocomplete-trigger.ts",
+          "header": "@@ -640,18 +652,16 @@ export class MatAutocompleteTrigger",
+          "hunk_sha256": "b5ebb3a14ff865de7d0604aa21049da7820b91ceae2d993ffc8819d89c602705",
+          "source_judgment": "Moving programmatic cleanup from the low-level display updater to the nullish actual model assignment avoids clearing valid0, false or empty displayed values. The source before/after variants demonstrate the intermediate falsey defect and its later correction; the owned method and both retained minimum peers pass all fourteen cases without a product change."
+        },
+        {
+          "path": "src/material/autocomplete/autocomplete.spec.ts",
+          "header": "@@ -705,6 +705,65 @@ describe('MDC-based MatAutocomplete', () => {",
+          "hunk_sha256": "ad958fc9c6998ed807f54e5f1236e893644c7a19961bd8246f6561d95e6e878c",
+          "source_judgment": "The two added upstream native regressions distinguish optional deselection from required retention after selecting and reopening. The current legacy optional test first clears the input, and the required test prepares only a programmatic model. Strengthen those existing scenarios with a real selection/reopen and direct nonempty typing while retaining every current assertion and named case. Actual native execution is outstanding."
+        }
+      ],
+      "proposed_existing_native_case_indices": [
+        37,
+        39,
+        42,
+        46
+      ],
+      "actual_original_observations": [
+        {
+          "side": "before",
+          "source_sha256": "47435e7a0437861b74b7e0cc1ae1651760b6b01ba3a50fe391d4aebe76aa1801",
+          "failed_case_ids": [
+            "non-null-value-retains-selection/zero",
+            "non-null-value-retains-selection/false",
+            "non-null-value-retains-selection/empty-string",
+            "non-null-value-retains-selection/empty-display",
+            "optional-nonempty-typing-clears-selection-quietly",
+            "optional-updated-display-retains-matching-selected-value"
+          ]
+        },
+        {
+          "side": "after",
+          "source_sha256": "c5d77f4414436a52d1b8225fb778e70b6782df3bfdaeed9be61f812b3aa1c1d8",
+          "failed_case_ids": [
+            "optional-nonempty-typing-clears-selection-quietly",
+            "optional-updated-display-retains-matching-selected-value"
+          ]
+        }
+      ],
+      "product_or_consumer_changes_required": false,
+      "actual_native_artifact_or_floor_executed": false
+    }
+  ],
+  "current_diagnostics": {
+    "path": "compatibility/rc/autocomplete-selection-source-diagnostics.json.gz",
+    "sha256": "a78a63d1abf66d23afe1367d9a4130ff04775a7ec137a0a2a31e11cb75fcef4f",
+    "bytes": 3918
+  },
+  "diagnostic_producer": {
+    "path": "tests/autocomplete_selection_state_probe.mjs",
+    "sha256": "a9646b53b47ea4156394a9f55352c01ce9832c020360ee828e3c5e2fa442cd72",
+    "bytes": 18397
+  },
+  "private_node": "v24.21.0",
+  "private_typescript": "6.0.3",
+  "cases_per_source": 14,
+  "retained_minimum_peer_source_versions": 2,
+  "original_before_after_versions": 6,
+  "mutants_rejected": 9,
+  "actual_installed_minimum_source_matched_line": "main",
+  "current_native_case_intake": {
+    "path": "compatibility/rc/autocomplete-selection-native-case-intake.json",
+    "sha256": "c19f16bd30ada58e781194fbd6ac656cdee1a9c45a229c4ed5f1da7a7bd72fae",
+    "bytes": 3456
+  },
+  "source_impact": {
+    "path": "compatibility/rc/autocomplete-selection-source-impact.json",
+    "sha256": "1ce8d677cd9a1595ca61661dedff291a720826a5c43bed0bac2b5e9d1905232f",
+    "bytes": 12027
+  },
+  "fixture_repair": "The first diagnostic fixture incorrectly supplied a first-attachment capture. Its missing-capture corruption survived. The corrected receiver starts unset until actual attach(), and all nine mutations now reject.",
+  "native_and_source_binding_work_remaining": true,
+  "canonical_SHA_decisions_changed": 0,
+  "actual_native_artifact_or_floor_executed": false,
+  "g11_claim": "not-passed",
+  "original_before_after_samples": 6,
+  "unique_original_trigger_source_images": 4,
+  "recorded_at_utc": "2026-10-27T06:51:17.006163+00:00"
+}
