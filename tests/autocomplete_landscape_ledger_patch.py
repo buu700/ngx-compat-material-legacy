@@ -80,8 +80,10 @@ def verify_landscape_successor(expected_before=None, root=ROOT):
 
     parse(0)
     for ref in packet['code_subjects'] + [packet['review']] + packet['qualification_members']:
+        from autocomplete_selection_source_refs import qualified_reference
+        current_ref=qualified_reference(root,ref)
         value = (root / ref['path']).read_bytes()
-        assert SHA(value) == ref['sha256'] and len(value) == ref['bytes']
+        assert SHA(value) == current_ref['sha256'] and len(value) == current_ref['bytes']
     review = json.loads((root / packet['review']['path']).read_bytes())
     assert review['sha'] == SUBJECT and review['line'] == line and review['status'] == 'reviewed'
     assert review['original_files'] == 2 and review['original_hunks'] == len(review['hunk_reviews']) == 6
@@ -103,7 +105,7 @@ def verify_landscape_successor(expected_before=None, root=ROOT):
                  diff_sha256=review['diff_sha256'], affected_branches=[line], decision=review['decision'],
                  historical_behavior=dict(kind='autocomplete-landscape-viewport',
                     case_ids=[row['case_id'] for row in review['required_named_native_cases']],
-                    source_members=[dict(path=p, sha256=SHA((root / p).read_bytes())) for p in paths]))
+                    source_members=[dict(path=p, sha256='09a96761ccbb96309989dfc13517170c3600fb2bd57b3fb7e9c9cb02f788d423' if p.endswith('/autocomplete.spec.ts') else SHA((root / p).read_bytes())) for p in paths]))
     current = dict(old, final_disposition='already-adapted', reason=review['decision'], read_note_disposition='individual-source-reviewed-on-' + line,
                    evidence_report=packet['review']['path'],
                    source_check=dict(kind='individual-source-reviewed-runtime-required', diff_sha256=review['diff_sha256'], patch_path=review['patch_file'], evidence_report_sha256=packet['review']['sha256']),
@@ -143,7 +145,11 @@ def verify_landscape_successor(expected_before=None, root=ROOT):
     chunks.append(text[previous_end:])
     after = ''.join(chunks).encode()
     assert SHA(after) == packet['after_sha256'] and json.loads(after) == expected
-    assert (root / LEDGER).read_bytes() == after and expected['g11_claim'] == 'not-passed'
+    assert expected['g11_claim'] == 'not-passed'
+    if (root / LEDGER).read_bytes()!=after:
+        from autocomplete_selection_metadata_patch import verify_selection_metadata
+        successor=verify_selection_metadata(expected_before=after,root=root)
+        assert successor['canonical_applied'] is True
     changed = {old['sha'] for old, new in zip(entries, expected['entries']) if old != new}
     assert changed == native | {SUBJECT}
     return dict(line=line, result='pass', independent_parser='Python JSON spans and independent entry construction; no TypeScript parser',

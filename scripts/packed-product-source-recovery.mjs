@@ -14,6 +14,7 @@ import {allConsumerCaseIds,loadExportKeys} from './packed-consumer-evidence.mjs'
 import {packedValueAccessorCases} from './value-accessor-packed-contract.mjs';
 import {packedMenuLazyCase} from './chip-menu-tooltip-packed-contract.mjs';
 import {packedTableOnPushCase} from './table-onpush-packed-contract.mjs';
+import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';
 export const PACKED_REPAIR_PRODUCT_PATHS=Object.freeze([
  'projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts',
  'projects/ngx-material-legacy/legacy-menu/internal/menu-content-base.ts',
@@ -53,14 +54,18 @@ export function qualifyPackedProductSourceRepairs({root,read,line,data,history,r
  assert.deepEqual(data.targets.map(t=>t.path),PACKED_REPAIR_PRODUCT_PATHS);
  assert.deepEqual(data.tooling.map(t=>t.path),PACKED_REPAIR_TOOL_PATHS);
  assert.deepEqual(data.members.map(m=>m.path),['scripts/packed-product-source-recovery.mjs']);
- for(const member of data.members)assert.equal(hash(read(member.path)),member.sha256,'changed packed repair implementation');
+ const nativeSpec=autocompleteSelectionReaderSubject({root,read,line});
+ for(const member of data.members){const current=nativeSpec.qualify(member)??member;assert.equal(hash(read(member.path)),current.sha256,'changed packed repair implementation');}
  // Reject unrelated resource edits before running the larger source review graph.
  // The original full check below its semantic qualifications remains mandatory.
  assert.equal(history.product_members.length,1142);
  const currentTargets=[...data.targets,...registry.owned_contracts.targets,...registry.service_defaults.targets,
   ...registry.dialog_config.targets,registry.delta,registry.dialog.delta,registry.tooltip.delta,registry.menu_type.delta];
- for(const member of history.product_members)assert.equal(hash(read(member.path)),
-  currentTargets.find(t=>t.path===member.path)?.sha256??member.sha256,'changed raw current product/resource '+member.path);
+ for(const member of history.product_members){
+  let expected=currentTargets.find(t=>t.path===member.path)?.sha256??member.sha256;
+  if(member.path===nativeSpec.spec.path){assert.equal(member.sha256,nativeSpec.spec.before.sha256);assert.equal(currentTargets.some(t=>t.path===member.path),false);expected=nativeSpec.spec.after.sha256;}
+  assert.equal(hash(read(member.path)),expected,'changed raw current product/resource '+member.path);
+ }
 
  const authority=data.qualification.source_parent;assert.match(authority,/^[0-9a-f]{40}$/);
  function record(ref,compressed=false,parse=true){
@@ -113,7 +118,9 @@ export function qualifyPackedProductSourceRepairs({root,read,line,data,history,r
  assert.deepEqual({...afterApi,extras:afterApi.extras.filter(row=>row.name!=='ɵLegacyTableColumnClasses')},beforeApi,'unrelated API allowance changed');
  assert.equal(preimages.size,16);
  // Every projected read rechecks the actual file, including after qualification.
- const assertCurrent=path=>{if(current.has(path))assert.equal(hash(read(path)),current.get(path),'late current packed repair mutation '+path);};
+ const nativeBound=new Map(nativeSpec.bound.map(ref=>[ref.path,ref.sha256]));
+ const assertCurrent=path=>{if(current.has(path))assert.equal(hash(read(path)),current.get(path),'late current packed repair mutation '+path);
+  if(nativeBound.has(path))assert.equal(hash(read(path)),nativeBound.get(path),'late current native spec input '+path);};
  const priorRead=path=>{assertCurrent(path);return preimages.has(path)?Buffer.from(preimages.get(path)):read(path);};
  return {line,read:priorRead,raw:read,assertCurrent,targets:data.targets,preimages,product_changes:4,tooling_changes:12,source:subject.source,artifact:subject.artifact,source_scope_only:true,current_coordinator_native_or_floor_qualified:false};
 }
