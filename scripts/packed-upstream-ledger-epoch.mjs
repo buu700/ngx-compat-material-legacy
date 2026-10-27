@@ -63,7 +63,7 @@ function registryBeforeMetadata(root,read,line,ref){
 }
 function selectionReaders(root,read,line){
   const cached=selectionReaderCache.get(read);
-  if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.spec.line,line);cached.scope.assertCurrent();return cached.scope;}
+  if(cached){assert.equal(cached.root,root);assert.equal(cached.scope.spec.line,line);return cached.scope;}
   const scope=autocompleteSelectionReaderSubject({root,read,line});selectionReaderCache.set(read,{root,scope});return scope;
 }
 function selectionMember({root,read,line,ref,bound}){
@@ -734,7 +734,10 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const bound = new Map([[inputPath, hash(input)]]);
   if(line==='main'){const path='scripts/sass-wrapper-notice-subject.mjs';
     assert.equal(hash(read(path)),'d3cc81cda9599840bcef5ad019c4aae4d892368474f7767e1ee56c9a7434d4fd','changed finite Sass notice qualifier');bound.set(path,hash(read(path)));}
-  const specReaders=selectionReaders(root,read,line);for(const ref of specReaders.bound)bound.set(ref.path,ref.sha256);
+  // Scope checks bracket the complete preparation instead of rereading every
+  // scope member for each unrelated member. Individual reads still check their
+  // own digest, and returned epoch readers retain their full late-change gate.
+  const specReaders=selectionReaders(root,read,line);specReaders.assertCurrent();for(const ref of specReaders.bound)bound.set(ref.path,ref.sha256);
   const nativeSubjects=selectionNative(root,read,line);for(const ref of nativeSubjects.bound)bound.set(ref.path,ref.sha256);
   function member(ref, authenticate = false) {
     const raw=selectionMember({root,read,line,ref,bound});
@@ -811,6 +814,7 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   const noticeMetadata=line==='main'?prepareSassNoticeMetadataStage({root,read,line,before:nativeSelection.after,bound}):null;
   const historicalWrapper=prepareHistoricalWrapperMetadataStage({root,read,line,before:noticeMetadata?.after??nativeSelection.after,bound});
   const consumerWrapper=prepareHistoricalConsumerWrapperMetadataStage({root,read,line,before:historicalWrapper.after,bound});
+  specReaders.assertCurrent();
   return {line, before, after, canonical_after:consumerWrapper.after,historical_consumer_wrapper_metadata_stage:consumerWrapper,historical_wrapper_metadata_stage:historicalWrapper,sass_notice_metadata_stage:noticeMetadata, selection_native_stage:nativeSelection, testing_api_stage: next, sass_stage: sass, rules_js_stage:rulesJs, summary_stage:summary, autocomplete_landscape_stage:landscape, native_spec_source:{assertCurrent:specReaders.assertCurrent,bound:structuredClone(specReaders.bound),spec:{path:specReaders.spec.path,line,before:{...specReaders.spec.before},after:{...specReaders.spec.after}}}, native_spec_metadata_stage:nativeSpec, bound, population, analysis_python_version: syntax.current_pinned_python,
     input_sha256: hash(input),
     entries_changed: 85, scalar_tokens_changed: 179, source_scope_only: true,
