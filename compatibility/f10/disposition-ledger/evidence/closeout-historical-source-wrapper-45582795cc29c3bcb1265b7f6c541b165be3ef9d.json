@@ -1,0 +1,607 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "45582795cc29c3bcb1265b7f6c541b165be3ef9d",
+  "subject": "refactor(material/list): switch tests away from fakeAsync (#33189)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/list/list.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "656ceeb1084cc2ee6fef8225607e342d1060423c",
+      "after_blob": "691f04e437d44c7a40563b3d7cf02c358f3b3f4f"
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "24fb0f2a6c73fd61357d3bef176008dbad791d3e",
+      "after_blob": "0f676881857102a7a4328f7b61c3e1cbae98db99"
+    }
+  ],
+  "original_files": 2,
+  "original_hunks": 40,
+  "raw_commit_sha256": "9d4ba847e9e3ec501f48ce851bce41f8cae74e175edbabc0a06cc45b0e028fc6",
+  "original_sources": {
+    "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+    "sha256": "5626ccdbfe448e3698d24ad685bbef2995664c4feb41ed2ce45276f41610099f"
+  },
+  "patch_file": "compatibility/rc/spec-navigation-async-source-45582795cc29c3bcb1265b7f6c541b165be3ef9d.patch",
+  "diff_sha256": "82c1e1c481d7a592d41a835c41f9afbe02782803b626f71451d37e7a2e5a8ccc",
+  "hunk_reviews": [
+    {
+      "path": "src/material/list/list.spec.ts",
+      "header": "@@ -6,7 +6,7 @@ import {",
+      "sha256": "b6689aaf3057b9b6ff4a5010a588e1924a9f7862658eb51079202846ebe0c019",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/list.spec.ts",
+      "header": "@@ -133,7 +133,7 @@ describe('MatList', () => {",
+      "sha256": "a802ea9b3b80bae2f46a77321ee84f6bab621b228c211a3e448536ea3754e862",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/list.spec.ts",
+      "header": "@@ -144,7 +144,7 @@ describe('MatList', () => {",
+      "sha256": "321de870fa54d69bed523c1f3c328391e5a8c5226529fa8c143d261de872144a",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/list.spec.ts",
+      "header": "@@ -252,7 +252,7 @@ describe('MatList', () => {",
+      "sha256": "35d01e3f5420a1f530a4dc80b9edcdf4e3f3bae7bb95b80f33a8db2f4eebe9f6",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/list.spec.ts",
+      "header": "@@ -285,9 +285,9 @@ describe('MatList', () => {",
+      "sha256": "bf38f31e4cc3c20cf454955693e8e24a0cfb5db65e0993bdc80b84df26b0a337",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/list.spec.ts",
+      "header": "@@ -320,7 +320,7 @@ describe('MatList', () => {",
+      "sha256": "4eb3846d2054994dc1a32a98c20bba623bc58bbc5becd73e4106729eb0326f2c",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -13,14 +13,7 @@ import {",
+      "sha256": "d62ef3319ce479fdfb31ce83ea3bcb18fcab75525492e7f2167253b403596228",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -37,18 +30,22 @@ import {",
+      "sha256": "6bb44d892c8a1c7881b840bbac94fc1f1898a05cbd434fa5c87a81b6a9ad0d59",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -287,7 +284,7 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "1924c53a2df8e520aa705fb53a5d558c73108fe29ab944317652cd9884fbfe45",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -305,7 +302,7 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "f904c545ddb94cbd4159d4a3b49b94cf1ec1a6423b6567d0cf7b941eb48bcab3",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -458,7 +455,7 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "e28e1ba96016d4bcee4a341bd60f5c0cd55e4077bdb37a0aa9834ff979b7eb6f",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -466,42 +463,42 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "4b30b950decb4741e4f7bcacbf007d358d14f25032618bf11aab134ef79d2a8a",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -514,17 +511,17 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "fba46419df73ce989978b06827b465ab6dd0eb02063f126927688debed79bb4a",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -627,7 +624,7 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "266f3c1e19cbe043be58a5b0fb84190ff5e4982d08aa76cbb94a2bad1cd2dfc0",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -658,7 +655,7 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "f87250c3d61a0be34b7df5da08de42e0b5c3b9b227d2371a6f2b42a905b1938b",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -691,12 +688,12 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "5522b5a8378491225d0fa3bf1a9130f942e6036aac528a8f6e054930b9a987d5",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -709,23 +706,23 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "5b8d9ea14830199b9ba7aeec2bcc16666bd76135ddb4bece86d76eeb6c79c522",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -748,19 +745,19 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "7dd9ac784dfd71c1ed067065ab95077943f28a1adbf6ba9d22172da5540a5299",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -782,7 +779,7 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "f703b5c29ba8d08a3ee18e4d6c57c3eb37059b356a82b6f6f6bc01a0e743c9df",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -791,7 +788,7 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "60e335b1eac996c074114f805cec835b8e5fb4bfddfa8471306cf21175c18d4a",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -823,12 +820,12 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "bf582e62b90d009a8df9a3a6ce7e9a4d9cbaa0457bf13f68708a5f06e3193e36",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -910,10 +907,10 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "60a55316b388be4f111c38afc7c4a67978ba16667c73b2452624477e9bbdf79f",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1052,14 +1049,14 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "336f933f4947db68f5495dd9d5939bcf53962f4480f30065befa0c7b3f7662d4",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1174,13 +1171,13 @@ describe('MatSelectionList without forms', () => {",
+      "sha256": "e5024989f9c6868141e8e8dbc183669e7f973992f6f6b1f550b8182cea0332ae",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1221,7 +1218,7 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "c48921b16cc70dce270eef47e2b071ca6640cd1e4adf0980a80421c5aa348c0d",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1229,14 +1226,14 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "d90e0aadbdae683f267bf53913039a132f6e1ee3ecd8a63ad460a999244765f4",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1244,14 +1241,14 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "30d202320d4f8fa1d0001797f00918424a6b1b56eedcd053797b4242fd317116",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1260,19 +1257,19 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "dd36b4f8a993b7031969b4236be288a7806dbe5e95646234d884f20fd596e2d5",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1281,37 +1278,37 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "96141f41db2c74bd7d81faf947f97b57187b10c26708ee12c460d997d3f607bc",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1326,7 +1323,7 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "57d7860ba8ff76c7f13710cc063fe57a3b7552137eec019270cfefbc6672b052",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1335,12 +1332,12 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "f937f63b8ac6583fb3a2a5c8c6c183f69de57331c847b1e99b16407f5b782638",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1357,15 +1354,15 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "b43f0cb1ac20ef25bd8ea6544fc9578566821348524b96e0326c3c1c535e3ab7",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1390,11 +1387,11 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "3ff8c4491b56b21c9fbf10f9acb466d3123af5468b631dfda3ef8ca06bd9abf5",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1403,12 +1400,12 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "ef389627de966c887b53e2b2309d87eca2c2b6911cf81cf6e525952ae293f0dd",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1423,18 +1420,18 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "938483040dcce239033749eb0c68d857976b8f9976a8324e652a46c5f37c1af1",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1571,7 +1568,7 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "2cc22c8e397538afbedbebf0dd2cf09f257650a62ca7e3e2275d74a196b45416",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1582,11 +1579,11 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "c3ffe7e7fc3d058160cd761d975435f4d105e4721357bcdb9895032bc7e31bfe",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1606,34 +1603,34 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "5da77645b5959a7940020299c1cd7b659f5ae83c3ff2888f632977296642e04e",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1643,16 +1640,16 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "2825036bbf84b6f6095f1036ff7880ab2b0e13bcbb78c121a85838030e854d94",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1665,11 +1662,11 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "2e4e1d5640541a7575cdc356b463daaf60f3841f6273e1d242867d7dc9c0845a",
+      "judgment": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "45582795cc29c3bcb1265b7f6c541b165be3ef9d",
+    "complete_original_files": 2,
+    "complete_original_hunks": 40,
+    "removed": [],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 118,
+    "hooks": 12,
+    "fixture_classes": 34,
+    "template_style_properties": 33
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+    "sha256": "2a6e33df7be00cc122b314a57db861c012683cd03a10c810fdb299c27b248415"
+  },
+  "decision": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+  "prior_entry": {
+    "sha": "45582795cc29c3bcb1265b7f6c541b165be3ef9d",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/list): switch tests away from fakeAsync (#33189)",
+    "files": [
+      "src/material/list/list.spec.ts",
+      "src/material/list/selection-list.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+    "sha256": "f0eb677a66cdfed1e4981b15fa41ea47fe56a37e55f7aa10f5a850bc75738b91"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "82c1e1c481d7a592d41a835c41f9afbe02782803b626f71451d37e7a2e5a8ccc",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Decline this private list/selection-list scheduler migration after reviewing all40 hunks in both complete files. Pair all118 case identities in full order;93 complete callbacks retain semantics and25 change. All118 projected predicate sequences and other nonboundary operations remain equal, including list selection, keyboard/focus, forms and event observations. Review all12 setup/cleanup hooks and complete globals/helpers/providers/imports: only the actual removed bindings are erased, while the selection-list tick import remains. All34 fixture classes and33 template/style properties remain raw-byte identical. Native wait/stability versus simulated clocks does not prove event, focus, form propagation or lifetime equivalence. Cyph imports the owned legacy list module, renders mat-nav-list/mat-selection-list and directly styles .mat-list-item/.mat-list-item-content. Preserve the entire owned historical list suite and Material16 HTML/CSS/SCSS; no new TS API or consumer edit is justified. Actual packed/browser/forms/focus/event/minimum-floor checks remain required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-navigation-async-source-review.mjs",
+        "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+      },
+      {
+        "path": "tests/spec_navigation_async_source_probe.mjs",
+        "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+      },
+      {
+        "path": "tests/test_spec_navigation_async_source.py",
+        "sha256": "1ea2e42f79588a1ea125bd8b4cd24bad0c7783f98a5f1638a6fc1a6e5eeef861"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+        "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+        "sha256": "5626ccdbfe448e3698d24ad685bbef2995664c4feb41ed2ce45276f41610099f"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+        "sha256": "4dbcf185a2a9365dca431da46fd4e0abc5830d854cb14c533b876fed27129ccf"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+        "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+        "sha256": "f0eb677a66cdfed1e4981b15fa41ea47fe56a37e55f7aa10f5a850bc75738b91"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+        "sha256": "2a6e33df7be00cc122b314a57db861c012683cd03a10c810fdb299c27b248415"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+        "sha256": "6e9b856df6f2c7415cb27f2f9ed8a47f1dc54b8dd8761b488d939eff3cb99084"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+        "sha256": "49e0ad2abae65423b62866b4692f727961d126f39cf127b7750625bbad33d842"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+        "sha256": "63862f4559c0cea83cec6deb3f3577b279c620b6300995eb49a931ae9b83b57d"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+        "sha256": "046663eff8a7c8b0b26fe6e8a4ee87c3953478180e00f3a05e6ae9d01ee11fe7"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+        "sha256": "78fb07523317bcd0a5db5eed633b03d0098597394f99fd24a1575db89f6b5f4c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+        "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+        "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+        "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+        "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+        "sha256": "1fe76bf969a400b9cd6f5be7e58e1bf997f496a8d5beaa755882b9a6340e58f8"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_source_wrapper_successor": {
+      "role": "Exact original-source wrapper transport metadata; inherited review fields retain their original epoch.",
+      "source_parent": "8e3f12f6626edc5fcf87fa65175da16dfe58677b",
+      "prior_entry_sha256": "d0b08523329b25f4adb9bf57f857dc0c7c64732dcb1cccaf7700bbe086c63d92",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-navigation-async-45582795cc29c3bcb1265b7f6c541b165be3ef9d.json",
+        "sha256": "4d35b2e3fe5f45fc6b3521e10850f97dfefd1dfa650ea488a1cda364624a9038",
+        "bytes": 80754
+      },
+      "wrapper_delta": {
+        "path": "compatibility/rc/historical-chip-source-wrapper-successor.json",
+        "sha256": "7c54a1d66d1e3f65b24a4f74129344d18a6e2bf9631c54e0b735005d0c1d5131",
+        "bytes": 7326
+      },
+      "pre_metadata_source_qualification": {
+        "path": "compatibility/rc/historical-chip-source-inspector-qualification.json",
+        "sha256": "0a4e0ebd9e3f4074ef95767247239e67bda85b1fc07923b72482cb4f32b4598a",
+        "bytes": 2719
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "source_reference_updates": 1,
+      "actual_Angular_native_artifact_rendered_or_floor_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-navigation-async-source-review.mjs",
+      "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+    },
+    {
+      "path": "tests/spec_navigation_async_source_probe.mjs",
+      "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+    },
+    {
+      "path": "tests/test_spec_navigation_async_source.py",
+      "sha256": "1ea2e42f79588a1ea125bd8b4cd24bad0c7783f98a5f1638a6fc1a6e5eeef861"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+      "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+      "sha256": "5626ccdbfe448e3698d24ad685bbef2995664c4feb41ed2ce45276f41610099f"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+      "sha256": "4dbcf185a2a9365dca431da46fd4e0abc5830d854cb14c533b876fed27129ccf"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+      "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+      "sha256": "f0eb677a66cdfed1e4981b15fa41ea47fe56a37e55f7aa10f5a850bc75738b91"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+      "sha256": "2a6e33df7be00cc122b314a57db861c012683cd03a10c810fdb299c27b248415"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+      "sha256": "6e9b856df6f2c7415cb27f2f9ed8a47f1dc54b8dd8761b488d939eff3cb99084"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+      "sha256": "49e0ad2abae65423b62866b4692f727961d126f39cf127b7750625bbad33d842"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+      "sha256": "63862f4559c0cea83cec6deb3f3577b279c620b6300995eb49a931ae9b83b57d"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+      "sha256": "046663eff8a7c8b0b26fe6e8a4ee87c3953478180e00f3a05e6ae9d01ee11fe7"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+      "sha256": "78fb07523317bcd0a5db5eed633b03d0098597394f99fd24a1575db89f6b5f4c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+      "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+      "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+      "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+      "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+      "sha256": "1fe76bf969a400b9cd6f5be7e58e1bf997f496a8d5beaa755882b9a6340e58f8"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_source_wrapper_successor": {
+    "role": "Exact original-source wrapper transport metadata; inherited review fields retain their original epoch.",
+    "source_parent": "8e3f12f6626edc5fcf87fa65175da16dfe58677b",
+    "prior_entry_sha256": "d0b08523329b25f4adb9bf57f857dc0c7c64732dcb1cccaf7700bbe086c63d92",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-navigation-async-45582795cc29c3bcb1265b7f6c541b165be3ef9d.json",
+      "sha256": "4d35b2e3fe5f45fc6b3521e10850f97dfefd1dfa650ea488a1cda364624a9038",
+      "bytes": 80754
+    },
+    "wrapper_delta": {
+      "path": "compatibility/rc/historical-chip-source-wrapper-successor.json",
+      "sha256": "7c54a1d66d1e3f65b24a4f74129344d18a6e2bf9631c54e0b735005d0c1d5131",
+      "bytes": 7326
+    },
+    "pre_metadata_source_qualification": {
+      "path": "compatibility/rc/historical-chip-source-inspector-qualification.json",
+      "sha256": "0a4e0ebd9e3f4074ef95767247239e67bda85b1fc07923b72482cb4f32b4598a",
+      "bytes": 2719
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "source_reference_updates": 1,
+    "actual_Angular_native_artifact_rendered_or_floor_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

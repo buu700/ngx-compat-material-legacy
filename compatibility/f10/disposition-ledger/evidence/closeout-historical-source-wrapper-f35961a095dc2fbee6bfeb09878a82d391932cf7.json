@@ -1,0 +1,628 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "f35961a095dc2fbee6bfeb09878a82d391932cf7",
+  "subject": "refactor(material/snack-bar): switch tests away from fakeAsync (#33261)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "fdc3b659849ead15d81414d89b0d3caf82da8927",
+      "after_blob": "a6d3ed6022bb4b7c81d423323a139b9fff44154d"
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.zone.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "9e1a21e040936e26dd04901ece60821a60b651ae",
+      "after_blob": "6821a849c2a0d17ece5b17a7ec418bbfd8cd2bcf"
+    }
+  ],
+  "original_files": 2,
+  "original_hunks": 43,
+  "raw_commit_sha256": "5ccf878d27605bd3520f8ac115ebf28b78c5c3be98a590caf8d0a0c6b072c183",
+  "original_sources": {
+    "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+    "sha256": "5626ccdbfe448e3698d24ad685bbef2995664c4feb41ed2ce45276f41610099f"
+  },
+  "patch_file": "compatibility/rc/spec-navigation-async-source-f35961a095dc2fbee6bfeb09878a82d391932cf7.patch",
+  "diff_sha256": "6f5fc46a12d1595791af141a2f4644c2365776703b83447ef74179eeded2f3d8",
+  "hunk_reviews": [
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -11,7 +11,7 @@ import {",
+      "sha256": "a8659c59df8cc107bfc36fd71e3b19b3854ee716a283c6784acebf7fc8c0bf8c",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -34,9 +34,8 @@ describe('MatSnackBar', () => {",
+      "sha256": "d113030331dc670361569972518976122b36a9e90c24e14a46a43cae935290f7",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -47,7 +46,7 @@ describe('MatSnackBar', () => {",
+      "sha256": "c0b04125c141d212e8db4b2981002b9d1566fdfec3bd447d103a2e8c3e80c428",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -69,13 +68,13 @@ describe('MatSnackBar', () => {",
+      "sha256": "384c48aa5c85e4c9f3794790fc4a69c7b56769dcb6ad203c6fb8f9cf140541f2",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -85,13 +84,13 @@ describe('MatSnackBar', () => {",
+      "sha256": "2836d001fafcd7d0bec84b11906cc7c907e5df8e8fea0fc28abb7fefb4de581c",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -101,50 +100,42 @@ describe('MatSnackBar', () => {",
+      "sha256": "cd5dff2229c702fbbcec1f3f97fab861946cbe999453e54be08f9d0c9bdd2445",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -200,7 +191,7 @@ describe('MatSnackBar', () => {",
+      "sha256": "8c300bf7e252b04a6e9402a0d0f1a2b245e4ae3b8a15747ef244ff3ba6e80ce7",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -211,12 +202,12 @@ describe('MatSnackBar', () => {",
+      "sha256": "d29454bb365c2545f0dd054a7af2aea81b479ab3b7ace2de0376d810229bdc1a",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -267,13 +258,13 @@ describe('MatSnackBar', () => {",
+      "sha256": "64c35ce350b5d657f1951ab94d53c438439561af7a3bc389397708c016f08297",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -287,29 +278,29 @@ describe('MatSnackBar', () => {",
+      "sha256": "698359dd60a2ab9c8b6d789f8a5ff6c3340725ff8056591781ab21701e9efda7",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -317,42 +308,42 @@ describe('MatSnackBar', () => {",
+      "sha256": "16016dc097669030847d4af9c65eaae56071d7103eac9ba87576bbd6fefd9332",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -362,42 +353,42 @@ describe('MatSnackBar', () => {",
+      "sha256": "51c392653829a6722b9fd14f225a0ef31f44c5090baa387af75f4018ba317c9f",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -413,17 +404,17 @@ describe('MatSnackBar', () => {",
+      "sha256": "00a64a6338f396709ba5c535155eb28ed56576a6b265273dc79178096a78ed99",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -434,13 +425,13 @@ describe('MatSnackBar', () => {",
+      "sha256": "836e53cca852a91113d7b4965ed20c42126b15e80e298c1a0baca9b3ede25fd6",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -448,12 +439,12 @@ describe('MatSnackBar', () => {",
+      "sha256": "8aa6e9bc6a5d4ccd034be143024b4fad982d885e7171ef7acaa8ca753b1628b8",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -461,12 +452,12 @@ describe('MatSnackBar', () => {",
+      "sha256": "55151c3094b49a6382055064b9d63195f602bb09fb2e400491eb8bd03974dc45",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -474,14 +465,14 @@ describe('MatSnackBar', () => {",
+      "sha256": "48d230cc657d19ed564f5c8e6f6a5b248385ad393f8cd6b3ae91aa434f105d91",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -505,7 +496,7 @@ describe('MatSnackBar', () => {",
+      "sha256": "9e8d58c5ee75e778625f1af784c338263fb82d3e62789253b0ad651042a5d332",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -516,47 +507,48 @@ describe('MatSnackBar', () => {",
+      "sha256": "fb6f6f761ee018648b9a7487b485bffd62d1a16e7f64c87edaf4efc5c33efb05",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -599,7 +591,7 @@ describe('MatSnackBar', () => {",
+      "sha256": "5e71d75a3c271c9935a6fc10a7939597aa4abb7f40fd1568b9f4172a8d3a4d2e",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -610,11 +602,11 @@ describe('MatSnackBar', () => {",
+      "sha256": "a67d49545f559a9beb71925531ba3ad332a51ba760f24266b24b541360e1cae0",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -662,18 +654,18 @@ describe('MatSnackBar with parent MatSnackBar', () => {",
+      "sha256": "29f6006b4b1690908c8e4d07e99fb5b1aa6b1de47653498eb5a3b9a5400b3cce",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -681,17 +673,17 @@ describe('MatSnackBar with parent MatSnackBar', () => {",
+      "sha256": "020b2ce79c5bbe1d370d05c1906135f6ad84f0b461d1ec49d9a0c84443ae1ee7",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -699,24 +691,24 @@ describe('MatSnackBar with parent MatSnackBar', () => {",
+      "sha256": "541a6c2d6b189e61062819c1a308674714f96c6294b2032d61f4ede230e24338",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -728,18 +720,18 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "9c1f951a9015e3a302e33d116e1ff9d5731d8b6d5e403b90a9ece3540064ec38",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -748,16 +740,16 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "ca4dcc83b8a383a5a5c9948a49b037b077719819631a31b01f56438c6d0231f5",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -768,16 +760,16 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "45d34674847bf74c40c7ba7edb00d472cda7e144ea9ea416996a9d5ff384ea30",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -788,16 +780,16 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "5e7f9be7dae4f9a7a3bf558cc67a22a4494602351ed0936f32e0e9cab3798faf",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -806,16 +798,16 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "3d61cd55412b32b01ac1cc034865bb6b4729a49319a104ad97a0e430d42d7908",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -828,16 +820,16 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "ef0f6f7092cc3482e4b6cb8ad75f2ce11406d1be01c19237400ecfa463a55af3",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -850,16 +842,16 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "007f3dac4bc229162f28f88969aa8e4ddcf0b21d98807bb826081f46c5fcb44e",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -870,9 +862,9 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "fba994c75501a20d84811a90f119663f085c1b872eb9a1a4ed234ad613e41658",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -880,7 +872,7 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "54f588829092d15425c0aa5b4780c6944ae518494ed30b0b3b1d79b2f702794f",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -893,9 +885,9 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "89328bc5153d4ecf2ecff15bd13f4476989643f4982fb2b7a29c11a04226a62a",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -903,7 +895,7 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "f9574a258ab007ab5703b7377a37c35cbc20e689ba3a809095210269321d2221",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -916,9 +908,9 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "9aee99086fa35af4a08354f3d2407728e508385ddfc2e63c65e2bccd0e939850",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -926,7 +918,7 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "c5533a542dadfa573d4ad0b9b76a7f1d71dad05561097e39e8266e85641eefcf",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -939,9 +931,9 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "8d2362226a81dcf7d08795ce91f1aec54d24b18f80f90976f9d06ab824040d4a",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -949,7 +941,7 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "96cf6577a43031d3d76d00876a764e0b24db2f98e84bd7281446066033454941",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "header": "@@ -962,9 +954,13 @@ describe('MatSnackBar Positioning', () => {",
+      "sha256": "9d3bf5f5c7205dcd18f8fb3423f95f5f4f4937a9b9f80dff2cf6679a705d4f1f",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.zone.spec.ts",
+      "header": "@@ -7,7 +7,7 @@ import {",
+      "sha256": "f8ab58f3d87f57b45b5dd93ec80bd23ff40bdf783903ddf4c893730f2719db1d",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.zone.spec.ts",
+      "header": "@@ -16,7 +16,11 @@ describe('MatSnackBar Zone.js integration', () => {",
+      "sha256": "0d81f00c8af325199149da30421974c9b3d47789072eacc0d4e83a2803a6f6dc",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.zone.spec.ts",
+      "header": "@@ -27,34 +31,33 @@ describe('MatSnackBar Zone.js integration', () => {",
+      "sha256": "4295bb81c3d827feacf994fc98c65c00ba8340b4050ab92e4bf93210c28302e7",
+      "judgment": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, seven raw-pinned observer/spy/error exceptions, six finite label mappings, three removed cleanup cases, one removed frame-delay constant, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "f35961a095dc2fbee6bfeb09878a82d391932cf7",
+    "complete_original_files": 2,
+    "complete_original_hunks": 43,
+    "removed": [],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 55,
+    "hooks": 5,
+    "fixture_classes": 7,
+    "template_style_properties": 5
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+    "sha256": "2a6e33df7be00cc122b314a57db861c012683cd03a10c810fdb299c27b248415"
+  },
+  "decision": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+  "prior_entry": {
+    "sha": "f35961a095dc2fbee6bfeb09878a82d391932cf7",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/snack-bar): switch tests away from fakeAsync (#33261)",
+    "files": [
+      "src/material/snack-bar/snack-bar.spec.ts",
+      "src/material/snack-bar/snack-bar.zone.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+    "sha256": "f0eb677a66cdfed1e4981b15fa41ea47fe56a37e55f7aa10f5a850bc75738b91"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "6f5fc46a12d1595791af141a2f4644c2365776703b83447ef74179eeded2f3d8",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Decline this private snack-bar scheduler migration after reviewing all43 hunks in both complete files. Pair55 cases with two finite literal-concatenation label rewrites that retain evaluated names and complete callbacks;18 callbacks retain semantics and37 change. All five setup/cleanup hooks,seven fixture classes andfive template/style properties are accounted for. In the maximum-timeout case, replace callThrough with a setTimeout spy returning0, capture originalSetTimeout and wait200ms through it; retain the Infinity duration and Math.pow(2,31)-1 cap predicate, while making no real timer/initialization equivalence claim. The before-only animationFrameDelay=16 constant is removed; announceDelay=150 and all other global/nonboundary operations remain equal under recorded boundaries. Retain the owned stronger legacy timeout test, dismissal/action/announcement/teardown observations and distinct legacy tokens. Cyph uses legacy MatSnackBar.open with duration, dismiss/dismissWithAction and onAction. Preserve Material16 rendered structure and CSS/SCSS without consumer edits. Actual timer cap/dismissal/announcement/packed/browser/floor qualification remains separate.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-navigation-async-source-review.mjs",
+        "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+      },
+      {
+        "path": "tests/spec_navigation_async_source_probe.mjs",
+        "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+      },
+      {
+        "path": "tests/test_spec_navigation_async_source.py",
+        "sha256": "1ea2e42f79588a1ea125bd8b4cd24bad0c7783f98a5f1638a6fc1a6e5eeef861"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+        "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+        "sha256": "5626ccdbfe448e3698d24ad685bbef2995664c4feb41ed2ce45276f41610099f"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+        "sha256": "4dbcf185a2a9365dca431da46fd4e0abc5830d854cb14c533b876fed27129ccf"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+        "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+        "sha256": "f0eb677a66cdfed1e4981b15fa41ea47fe56a37e55f7aa10f5a850bc75738b91"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+        "sha256": "2a6e33df7be00cc122b314a57db861c012683cd03a10c810fdb299c27b248415"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+        "sha256": "6e9b856df6f2c7415cb27f2f9ed8a47f1dc54b8dd8761b488d939eff3cb99084"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+        "sha256": "49e0ad2abae65423b62866b4692f727961d126f39cf127b7750625bbad33d842"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+        "sha256": "63862f4559c0cea83cec6deb3f3577b279c620b6300995eb49a931ae9b83b57d"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+        "sha256": "046663eff8a7c8b0b26fe6e8a4ee87c3953478180e00f3a05e6ae9d01ee11fe7"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+        "sha256": "78fb07523317bcd0a5db5eed633b03d0098597394f99fd24a1575db89f6b5f4c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+        "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+        "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+        "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+        "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+        "sha256": "1fe76bf969a400b9cd6f5be7e58e1bf997f496a8d5beaa755882b9a6340e58f8"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_source_wrapper_successor": {
+      "role": "Exact original-source wrapper transport metadata; inherited review fields retain their original epoch.",
+      "source_parent": "8e3f12f6626edc5fcf87fa65175da16dfe58677b",
+      "prior_entry_sha256": "c13a1d7db63ac1bca8df4d6f6ab3f4220900fa62695a7600f5035710d3f208dd",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-navigation-async-f35961a095dc2fbee6bfeb09878a82d391932cf7.json",
+        "sha256": "72fa18817bfe94eccdb5f74b12cce2e42a9aeb9206d510eec83293383309bf9a",
+        "bytes": 90093
+      },
+      "wrapper_delta": {
+        "path": "compatibility/rc/historical-chip-source-wrapper-successor.json",
+        "sha256": "7c54a1d66d1e3f65b24a4f74129344d18a6e2bf9631c54e0b735005d0c1d5131",
+        "bytes": 7326
+      },
+      "pre_metadata_source_qualification": {
+        "path": "compatibility/rc/historical-chip-source-inspector-qualification.json",
+        "sha256": "0a4e0ebd9e3f4074ef95767247239e67bda85b1fc07923b72482cb4f32b4598a",
+        "bytes": 2719
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "source_reference_updates": 1,
+      "actual_Angular_native_artifact_rendered_or_floor_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-navigation-async-source-review.mjs",
+      "sha256": "a3c39fc6c354ab74f55577f42c2c1513348e169886b349bd324ea342011fac86"
+    },
+    {
+      "path": "tests/spec_navigation_async_source_probe.mjs",
+      "sha256": "dd361cc05a8c9a456a16017a8bf117b90955e8d780587017c4fd30de60a44bee"
+    },
+    {
+      "path": "tests/test_spec_navigation_async_source.py",
+      "sha256": "1ea2e42f79588a1ea125bd8b4cd24bad0c7783f98a5f1638a6fc1a6e5eeef861"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-qualification-inspector.py",
+      "sha256": "e6b2f3303be3ff5d24063e0041abb4d587bdeb3d1b717eeb9a258459f467df5e"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-subjects.json.gz",
+      "sha256": "5626ccdbfe448e3698d24ad685bbef2995664c4feb41ed2ce45276f41610099f"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-acquisition.json.gz",
+      "sha256": "4dbcf185a2a9365dca431da46fd4e0abc5830d854cb14c533b876fed27129ccf"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-observation-pins.json",
+      "sha256": "e19490b354b1e81cc92e5f894fbf9a2f40dbb5bddb65cb545081ac53850bd363"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-prior.json.gz",
+      "sha256": "f0eb677a66cdfed1e4981b15fa41ea47fe56a37e55f7aa10f5a850bc75738b91"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-review.json.gz",
+      "sha256": "2a6e33df7be00cc122b314a57db861c012683cd03a10c810fdb299c27b248415"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-controls.json",
+      "sha256": "6e9b856df6f2c7415cb27f2f9ed8a47f1dc54b8dd8761b488d939eff3cb99084"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-python.log.gz",
+      "sha256": "49e0ad2abae65423b62866b4692f727961d126f39cf127b7750625bbad33d842"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-cyph-sanity.json",
+      "sha256": "63862f4559c0cea83cec6deb3f3577b279c620b6300995eb49a931ae9b83b57d"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-checkpoint.json",
+      "sha256": "046663eff8a7c8b0b26fe6e8a4ee87c3953478180e00f3a05e6ae9d01ee11fe7"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-replay-checkpoint.json",
+      "sha256": "78fb07523317bcd0a5db5eed633b03d0098597394f99fd24a1575db89f6b5f4c"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-list/selection-list.spec.ts",
+      "sha256": "bb4e81be636c399bd2ce5288d0203bdec01844360afc545c335260f533b367f4"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-header.spec.ts",
+      "sha256": "cb9a251cdfd08314f195c5d3bbc90f6e20f904741aef9cb6bd0e158a6c61604b"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+      "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tabs/tab-group.spec.ts",
+      "sha256": "4bb7e40a519eae2697f2ef01afd8f36b9a0f7b1dde017f517ce9b6c0e093bc2e"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/sidenav/_sidenav-theme.scss",
+      "sha256": "1fe76bf969a400b9cd6f5be7e58e1bf997f496a8d5beaa755882b9a6340e58f8"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_source_wrapper_successor": {
+    "role": "Exact original-source wrapper transport metadata; inherited review fields retain their original epoch.",
+    "source_parent": "8e3f12f6626edc5fcf87fa65175da16dfe58677b",
+    "prior_entry_sha256": "c13a1d7db63ac1bca8df4d6f6ab3f4220900fa62695a7600f5035710d3f208dd",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-navigation-async-f35961a095dc2fbee6bfeb09878a82d391932cf7.json",
+      "sha256": "72fa18817bfe94eccdb5f74b12cce2e42a9aeb9206d510eec83293383309bf9a",
+      "bytes": 90093
+    },
+    "wrapper_delta": {
+      "path": "compatibility/rc/historical-chip-source-wrapper-successor.json",
+      "sha256": "7c54a1d66d1e3f65b24a4f74129344d18a6e2bf9631c54e0b735005d0c1d5131",
+      "bytes": 7326
+    },
+    "pre_metadata_source_qualification": {
+      "path": "compatibility/rc/historical-chip-source-inspector-qualification.json",
+      "sha256": "0a4e0ebd9e3f4074ef95767247239e67bda85b1fc07923b72482cb4f32b4598a",
+      "bytes": 2719
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "source_reference_updates": 1,
+    "actual_Angular_native_artifact_rendered_or_floor_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

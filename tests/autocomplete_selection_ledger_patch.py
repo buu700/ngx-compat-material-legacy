@@ -143,7 +143,15 @@ def verify_native_selection_successor(expected_before=None, root=ROOT):
         end = finish
     chunks.append(text[end:])
     after = ''.join(chunks).encode()
-    assert SHA(after) == packet['after_sha256'] and json.loads(after) == expected and (root / LEDGER).read_bytes() == after
+    assert SHA(after) == packet['after_sha256'] and json.loads(after) == expected
+    current = (root / LEDGER).read_bytes()
+    if current != after:
+        if line == 'main':
+            from sass_wrapper_notice_ledger_patch import verify_sass_notice_metadata_successor
+            assert verify_sass_notice_metadata_successor(expected_before=after, root=root)['canonical_applied']
+        else:
+            from historical_chip_wrapper_ledger_patch import verify_historical_wrapper_successor
+            assert verify_historical_wrapper_successor(expected_before=after, root=root)['canonical_applied']
     assert expected['g11_claim'] == 'not-passed'
     return dict(line=line, result='pass', individual_source_admissions=3, registry_proof_digest_updates=11,
                 summary_scalar_updates=len(summary), literal_edits=len(edits), unrelated_bytes_changed=0,
