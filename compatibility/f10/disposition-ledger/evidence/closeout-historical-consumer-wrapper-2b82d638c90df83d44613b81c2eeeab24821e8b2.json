@@ -1,0 +1,551 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "2b82d638c90df83d44613b81c2eeeab24821e8b2",
+  "subject": "build: fix build failure (#33408)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "goldens/material/chips/index.api.md",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "03eaadd8b43d1421084c46768aab545c9ffa9f8a",
+      "after_blob": "bc2fceff84cb096ea41792d9d4e6efe4b2ef4a45"
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "2fae033dcc220697a7fffab6ffbcee6892c8bcf2",
+      "after_blob": "ba85583bb7b4c6129220f71d030ae6526a3658b4"
+    }
+  ],
+  "original_files": 2,
+  "original_hunks": 4,
+  "raw_commit_sha256": "302a8b33753cc044c87ae27cad96b4a5050b2573fef74f202c40c5daf1954dc1",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-fixture-build-source-subjects.json.gz",
+    "sha256": "59ee277e72e713a52a764794acaa182a044e0d33f5128515b962890e1576ce54"
+  },
+  "patch_file": "compatibility/rc/mixed-fixture-build-source-2b82d638c90df83d44613b81c2eeeab24821e8b2.original.patch",
+  "diff_sha256": "29474919b4df34410bcda73f7125b40eb6956971a946659dc900eed1dd4ef0de",
+  "hunk_reviews": [
+    {
+      "path": "goldens/material/chips/index.api.md",
+      "status": "M",
+      "header": "@@ -228,6 +228,8 @@ export class MatChipGrid extends MatChipSet implements AfterContentInit, AfterVi",
+      "sha256": "b8daa7d5978dd6a4209274a429fcecd195b96fc1902ac6980ba2b97a70fda1df",
+      "judgment": "Adds protected _redirectDestroyedChipFocus declarations for modern grid/set and _lastDestroyedFocusedChipIndex for set. This SHA changes the upstream API golden, not runtime code. Do not update untouched Material16 reference goldens or mirror modern protected APIs."
+    },
+    {
+      "path": "goldens/material/chips/index.api.md",
+      "status": "M",
+      "header": "@@ -514,6 +516,7 @@ export class MatChipSet implements AfterViewInit, OnDestroy {",
+      "sha256": "668a5d5d1c067ba691f830bfd312885fe288954e773542f9af12611213fe2e5d",
+      "judgment": "Adds protected _redirectDestroyedChipFocus declarations for modern grid/set and _lastDestroyedFocusedChipIndex for set. This SHA changes the upstream API golden, not runtime code. Do not update untouched Material16 reference goldens or mirror modern protected APIs."
+    },
+    {
+      "path": "goldens/material/chips/index.api.md",
+      "status": "M",
+      "header": "@@ -523,6 +526,7 @@ export class MatChipSet implements AfterViewInit, OnDestroy {",
+      "sha256": "9c5b847a974adce810c300c11f188fb284a3ae99f0c1c7c3e4c23b89ef3c5f00",
+      "judgment": "Adds protected _redirectDestroyedChipFocus declarations for modern grid/set and _lastDestroyedFocusedChipIndex for set. This SHA changes the upstream API golden, not runtime code. Do not update untouched Material16 reference goldens or mirror modern protected APIs."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "status": "M",
+      "header": "@@ -180,25 +180,24 @@ describe('MatChipGrid', () => {",
+      "sha256": "37423a11915738c4f1770b5a436616dbf1771fa7a6433b82bc3011047280263e",
+      "judgment": "Comments out the previously active last-focused-chip destruction case and adds a TODO to re-enable. Explicitly account for the lost active identity/callback/assertion; all66 remaining callbacks stay equal. Retain the stronger active legacy empty/repopulation regression and full historical roster."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "goldens/material/chips/index.api.md",
+      "review": "Adds protected _redirectDestroyedChipFocus declarations for modern grid/set and _lastDestroyedFocusedChipIndex for set. This SHA changes the upstream API golden, not runtime code. Do not update untouched Material16 reference goldens or mirror modern protected APIs."
+    },
+    {
+      "path": "src/material/chips/chip-grid.spec.ts",
+      "review": "Comments out the previously active last-focused-chip destruction case and adds a TODO to re-enable. Explicitly account for the lost active identity/callback/assertion; all66 remaining callbacks stay equal. Retain the stronger active legacy empty/repopulation regression and full historical roster."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-fixture-build-source-review.json.gz",
+    "sha256": "6feb7d7b412af3c7f15fb7025565d428e6ca11a25616f6ed55ebc826e0619ec8"
+  },
+  "source_semantics": {
+    "sha": "2b82d638c90df83d44613b81c2eeeab24821e8b2",
+    "removed_active_source_cases": [
+      {
+        "path": "src/material/chips/chip-grid.spec.ts",
+        "mode": "it",
+        "suites": [
+          "'MatChipGrid'",
+          "'StandardChipGrid'",
+          "'focus behaviors'"
+        ],
+        "suite_identities": [
+          "3442a1d279c0ef6fdbb47b15a1f4f206e8b69bd70f7b14e6035bb917954ff8dd",
+          "887bda4a947221bd6d1e03b7326e7bc74d931b28d83f664505c2744ef7ca00c4",
+          "019dce237845d1bdc6d5d0d2e30f3c93b75e4597dde4956aa85b8c898836c154"
+        ],
+        "name": "'should clear the active item in key manager when the last focused chip is destroyed'",
+        "name_identity": "922c9847abf9e6b11f5d55f7d080e05c5e802ea08c0923803201e921366dce2d",
+        "key": "[\"src/material/chips/chip-grid.spec.ts\",\"it\",[\"3442a1d279c0ef6fdbb47b15a1f4f206e8b69bd70f7b14e6035bb917954ff8dd\",\"887bda4a947221bd6d1e03b7326e7bc74d931b28d83f664505c2744ef7ca00c4\",\"019dce237845d1bdc6d5d0d2e30f3c93b75e4597dde4956aa85b8c898836c154\"],\"922c9847abf9e6b11f5d55f7d080e05c5e802ea08c0923803201e921366dce2d\"]#0",
+        "raw": "it('should clear the active item in key manager when the last focused chip is destroyed', fakeAsync(() => {\n      const fixture = createComponent(StandardChipGrid);\n      fixture.detectChanges();\n      \n      // Focus a chip\n      chips.first.focus();\n      fixture.detectChanges();\n  \n      // Remove ALL chips\n      fixture.componentInstance.foods = []; // Clear the bound data array\n      fixture.detectChanges();\n      flush();\n  \n      // Verify key manager is reset to prevent stale references\n      expect(chipGridInstance._keyManager.activeItemIndex).toBe(-1);\n    }))",
+        "sha256": "d293e82de3e7582e4782e1f79e01c4f4e6ddc416a6762015e5a5f3e2364b4705",
+        "callback_sha256": "de73d52afbae8a307bfa149bdd1ef3782aa1808770243504db4195e9b93cfe80",
+        "normalized_callback_sha256": "de73d52afbae8a307bfa149bdd1ef3782aa1808770243504db4195e9b93cfe80",
+        "assertions": [
+          {
+            "sha256": "2442d1fd14e87291243fa8505d0185ada817095c4548b7349f37d19f8310de5c",
+            "text": "expect(chipGridInstance._keyManager.activeItemIndex).toBe(-1);"
+          }
+        ]
+      }
+    ],
+    "cases_before": 67,
+    "cases_after": 66,
+    "unchanged_complete_callbacks": 66,
+    "fixture_injector_query_compilation_error_or_lifecycle_equivalence_proved": false,
+    "actual_Angular_native_artifact_browser_SSR_or_floor_qualified": false,
+    "review": "Do not adopt this modern chip build workaround or update historical goldens. The source comments out one active last-focused-chip destruction regression with a TODO, reducing 67 cases to66; the remaining66 callbacks are identical. Its API golden adds protected modern MatChipGrid/MatChipSet focus-redirection declarations without a runtime implementation change in this SHA. The owned legacy chip list retains its active empty-list/repopulation regression and all historical callbacks; no modern chip class or protected API mirror is introduced. Preserve actual focus/reset/lifetime execution obligations and untouched Material16 reference goldens."
+  },
+  "decision": "Do not adopt this modern chip build workaround or update historical goldens. The source comments out one active last-focused-chip destruction regression with a TODO, reducing 67 cases to66; the remaining66 callbacks are identical. Its API golden adds protected modern MatChipGrid/MatChipSet focus-redirection declarations without a runtime implementation change in this SHA. The owned legacy chip list retains its active empty-list/repopulation regression and all historical callbacks; no modern chip class or protected API mirror is introduced. Preserve actual focus/reset/lifetime execution obligations and untouched Material16 reference goldens. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "owned_context": {
+    "owned_context": [
+      {
+        "path": "toolchain-lock.json",
+        "sha256": "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b"
+      },
+      {
+        "path": ".node-version",
+        "sha256": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f"
+      },
+      {
+        "path": ".npm-version",
+        "sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2"
+      },
+      {
+        "path": "package.json",
+        "sha256": "a3a268beffc3620d3fdeeadc1269c9e9676adbf3e40f55d45cd9683c85e4a060"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "sha256": "95f2b2de22393c4d182972fa13252dfa6b83d66c9a5de94e49c81f5270ae7a58"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      },
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/public-constructor-context.ts",
+        "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+        "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts",
+        "sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/public-constructor-context.ts",
+        "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+        "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      }
+    ],
+    "source_members": 1028,
+    "source_members_sha256": "4eea094fdf39828468fc9dfd4d4ae09009e78c4c6d26ce619d9d8a4b3b4dcbd3",
+    "retained_active_chip_empty_repopulation_regression": {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "mode": "it",
+      "suites": [
+        "'MatChipList'"
+      ],
+      "suite_identities": [
+        "7657ebd8bc207f07245c7de61dbb81edd8aac224054f13c01928884600d2a9b9"
+      ],
+      "name": "'should clear a destroyed active chip when the list becomes empty'",
+      "name_identity": "6139190716e4015c39c37551dd0bb971b20bf38c9933f550fc7c5ddf05b4b21a",
+      "key": "[\"projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts\",\"it\",[\"7657ebd8bc207f07245c7de61dbb81edd8aac224054f13c01928884600d2a9b9\"],\"6139190716e4015c39c37551dd0bb971b20bf38c9933f550fc7c5ddf05b4b21a\"]#0",
+      "raw": "it('should clear a destroyed active chip when the list becomes empty', () => {\n    setupStandardList();\n    const keyManager = chipListInstance._keyManager;\n    const removedChip = chips.last;\n\n    removedChip.focus();\n    fixture.detectChanges();\n    expect(keyManager.activeItem).toBe(removedChip);\n\n    testComponent.chips = [];\n    fixture.detectChanges();\n    expect(chips.length).toBe(0);\n    expect(keyManager.activeItemIndex).toBe(-1);\n    expect(keyManager.activeItem).toBeNull();\n\n    testComponent.chips = [10, 11];\n    fixture.detectChanges();\n    expect(keyManager.activeItemIndex).toBe(-1);\n    expect(keyManager.activeItem).toBeNull();\n\n    chips.first.focus();\n    fixture.detectChanges();\n    expect(keyManager.activeItemIndex).toBe(0);\n    expect(keyManager.activeItem).toBe(chips.first);\n    expect(keyManager.activeItem).not.toBe(removedChip);\n  })",
+      "sha256": "82237b7104082d187a1e5ae758990714cb193de0324a1ab5e01c101ce4b70718",
+      "callback_sha256": "1484ce7d142a58e6d053b41c038db9397fb1cd122d46471c534bddd00b0feb1d",
+      "normalized_callback_sha256": "1484ce7d142a58e6d053b41c038db9397fb1cd122d46471c534bddd00b0feb1d",
+      "assertions": [
+        {
+          "sha256": "68c2db17726410be7127cc9398d1e0f89684f7e7325dc56d25c8cd36b6a39128",
+          "text": "expect(keyManager.activeItem).toBe(removedChip);"
+        },
+        {
+          "sha256": "8f5101de573f1ea7d23fca2c06d2c29742bbe726bdf81af1acc081edd4d88711",
+          "text": "expect(chips.length).toBe(0);"
+        },
+        {
+          "sha256": "ba18aa2edd71074c9c770e771d2d734a3464467e62b088e9e89147b279017345",
+          "text": "expect(keyManager.activeItemIndex).toBe(-1);"
+        },
+        {
+          "sha256": "bce0c583ade06b66849d4606f15883d942bca80e9ca25234c8f5cb239d87434c",
+          "text": "expect(keyManager.activeItem).toBeNull();"
+        },
+        {
+          "sha256": "ba18aa2edd71074c9c770e771d2d734a3464467e62b088e9e89147b279017345",
+          "text": "expect(keyManager.activeItemIndex).toBe(-1);"
+        },
+        {
+          "sha256": "bce0c583ade06b66849d4606f15883d942bca80e9ca25234c8f5cb239d87434c",
+          "text": "expect(keyManager.activeItem).toBeNull();"
+        },
+        {
+          "sha256": "90510d4a407ad7722fe99a5ad537edb77b6b82d74ef60f5ffae92d41e96c22e0",
+          "text": "expect(keyManager.activeItemIndex).toBe(0);"
+        },
+        {
+          "sha256": "ff7f6128aeb9b7d89269226f562992130c904f7880d7dd0d61a41a611a7c6a2e",
+          "text": "expect(keyManager.activeItem).toBe(chips.first);"
+        },
+        {
+          "sha256": "fc973cbe85eb0c0764a475766460ab56d577ebe34b57b1c16becb0ec6a6f37cc",
+          "text": "expect(keyManager.activeItem).not.toBe(removedChip);"
+        }
+      ]
+    },
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "actual_Angular_fixture_native_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "2b82d638c90df83d44613b81c2eeeab24821e8b2",
+    "bucket": "test-only-batch-candidate",
+    "subject": "build: fix build failure (#33408)",
+    "files": [
+      "src/material/chips/chip-grid.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-fixture-build-source-prior.json.gz",
+    "sha256": "698c1545fff5f1b1c3ddd5a1e6e6a5980eeefee839e965b280b589d94bcc17e4"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-fixture-build-source-applicability",
+    "diff_sha256": "29474919b4df34410bcda73f7125b40eb6956971a946659dc900eed1dd4ef0de",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Do not adopt this modern chip build workaround or update historical goldens. The source comments out one active last-focused-chip destruction regression with a TODO, reducing 67 cases to66; the remaining66 callbacks are identical. Its API golden adds protected modern MatChipGrid/MatChipSet focus-redirection declarations without a runtime implementation change in this SHA. The owned legacy chip list retains its active empty-list/repopulation regression and all historical callbacks; no modern chip class or protected API mirror is introduced. Preserve actual focus/reset/lifetime execution obligations and untouched Material16 reference goldens. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-fixture-build-source-review.mjs",
+        "sha256": "c97f3adb73def6bb5eeb43d3260cfb3d48350c8ca6cf0ddb6d8628a7fb4274e0"
+      },
+      {
+        "path": "tests/mixed_fixture_build_source_probe.mjs",
+        "sha256": "91d93c2589efa668b80ce3922d80e97dc464ec77b0c5c42438b3d2ba0cc025cb"
+      },
+      {
+        "path": "tests/test_mixed_fixture_build_source.py",
+        "sha256": "59983638b6906bb469261e377e52ec29d84f393b2b2fcd61fc1547d4fa816440"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-qualification-record.py",
+        "sha256": "0abf790ec252f15d414df7c282cf40d06f02d5c63c1bfd8bb5cb5026c36c87b3"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/mixed-zone-moves-source-review.mjs",
+        "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-fixture-build-originals.py",
+        "sha256": "d2daa61695a33a5dffce4475ebf5c7fc8e85d9f34546b750703a0aa5867d483e"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-authenticator.mjs",
+        "sha256": "a51b250960598cec181e87e916ccd313313ba038414ab9b191fccff271a7fcda"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-subjects.json.gz",
+        "sha256": "59ee277e72e713a52a764794acaa182a044e0d33f5128515b962890e1576ce54"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-acquisition.json.gz",
+        "sha256": "4038561b7d292a7cbe28054e667def1c88c09a93538f91cc33002c4afe5e9cd3"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-authentication.json.gz",
+        "sha256": "c0e96c742aa763ea865ec4c92870ce8645f0c70e9852c7f50fab0db33ebe4262"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.json",
+        "sha256": "43a7f1d715250c1aa3144bf2fab977be872985c980f6a235b008d5cadb4c4b65"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.py",
+        "sha256": "08fbd7a8581e6fb0b87370c3175131785896f679e012f999c56ea57c0b5ecd7b"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-acquisition-inspector.mjs",
+        "sha256": "3e647aeae29b650c9b9b3a81320e42ef3a398651d25eedee9aad196f1c6e5277"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-acquisition-checkpoint.json",
+        "sha256": "d220a5c5c1657f7c6d91537197c65c50ec235832a7cd39f75127e18827f1c34f"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-intake.json",
+        "sha256": "938c2be688da15223ba745714d08dfa32410d6e0753ff1a1aa48da7568c3ebe0"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-observation-pins.json.gz",
+        "sha256": "345feb090aac7a4a63a8a8ba7f80c6b138348004a22d028412c130cd14b6b03c"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-prior.json.gz",
+        "sha256": "698c1545fff5f1b1c3ddd5a1e6e6a5980eeefee839e965b280b589d94bcc17e4"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-review.json.gz",
+        "sha256": "6feb7d7b412af3c7f15fb7025565d428e6ca11a25616f6ed55ebc826e0619ec8"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-controls.json",
+        "sha256": "ec16a67b0e0eac1fb14c39f425ecf1715f1ec17739ffdff4cd819b51aac30325"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-python.log.gz",
+        "sha256": "065896e9f8cd0d2ae79ca76f180cc860f295fd22fff8a9ea24fcfe99e2ce9d65"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-cyph-sanity.json",
+        "sha256": "62443ecac62b1bd1ce58ad559886b038ae7b91493e6430f3299c911a4b0caaea"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+      "prior_entry_sha256": "14131b81e369c0fcbcee4f635c6c057085dadb00695d2cc24470fdcb5e34b56c",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-2b82d638c90df83d44613b81c2eeeab24821e8b2.json",
+        "sha256": "2fa317add293fb4bd828bc0510c482aeb34b29a0faba0a25f84e46f19b3c3fdc",
+        "bytes": 26181
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+        "bytes": 31558
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-2b82d638c90df83d44613b81c2eeeab24821e8b2.json",
+        "sha256": "2fa317add293fb4bd828bc0510c482aeb34b29a0faba0a25f84e46f19b3c3fdc",
+        "bytes": 26181
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-fixture-build-source-review.mjs",
+      "sha256": "c97f3adb73def6bb5eeb43d3260cfb3d48350c8ca6cf0ddb6d8628a7fb4274e0"
+    },
+    {
+      "path": "tests/mixed_fixture_build_source_probe.mjs",
+      "sha256": "91d93c2589efa668b80ce3922d80e97dc464ec77b0c5c42438b3d2ba0cc025cb"
+    },
+    {
+      "path": "tests/test_mixed_fixture_build_source.py",
+      "sha256": "59983638b6906bb469261e377e52ec29d84f393b2b2fcd61fc1547d4fa816440"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-qualification-record.py",
+      "sha256": "0abf790ec252f15d414df7c282cf40d06f02d5c63c1bfd8bb5cb5026c36c87b3"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/mixed-zone-moves-source-review.mjs",
+      "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-fixture-build-originals.py",
+      "sha256": "d2daa61695a33a5dffce4475ebf5c7fc8e85d9f34546b750703a0aa5867d483e"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-authenticator.mjs",
+      "sha256": "a51b250960598cec181e87e916ccd313313ba038414ab9b191fccff271a7fcda"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-subjects.json.gz",
+      "sha256": "59ee277e72e713a52a764794acaa182a044e0d33f5128515b962890e1576ce54"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-acquisition.json.gz",
+      "sha256": "4038561b7d292a7cbe28054e667def1c88c09a93538f91cc33002c4afe5e9cd3"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-authentication.json.gz",
+      "sha256": "c0e96c742aa763ea865ec4c92870ce8645f0c70e9852c7f50fab0db33ebe4262"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.json",
+      "sha256": "43a7f1d715250c1aa3144bf2fab977be872985c980f6a235b008d5cadb4c4b65"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.py",
+      "sha256": "08fbd7a8581e6fb0b87370c3175131785896f679e012f999c56ea57c0b5ecd7b"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-acquisition-inspector.mjs",
+      "sha256": "3e647aeae29b650c9b9b3a81320e42ef3a398651d25eedee9aad196f1c6e5277"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-acquisition-checkpoint.json",
+      "sha256": "d220a5c5c1657f7c6d91537197c65c50ec235832a7cd39f75127e18827f1c34f"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-intake.json",
+      "sha256": "938c2be688da15223ba745714d08dfa32410d6e0753ff1a1aa48da7568c3ebe0"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-observation-pins.json.gz",
+      "sha256": "345feb090aac7a4a63a8a8ba7f80c6b138348004a22d028412c130cd14b6b03c"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-prior.json.gz",
+      "sha256": "698c1545fff5f1b1c3ddd5a1e6e6a5980eeefee839e965b280b589d94bcc17e4"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-review.json.gz",
+      "sha256": "6feb7d7b412af3c7f15fb7025565d428e6ca11a25616f6ed55ebc826e0619ec8"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-controls.json",
+      "sha256": "ec16a67b0e0eac1fb14c39f425ecf1715f1ec17739ffdff4cd819b51aac30325"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-python.log.gz",
+      "sha256": "065896e9f8cd0d2ae79ca76f180cc860f295fd22fff8a9ea24fcfe99e2ce9d65"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-cyph-sanity.json",
+      "sha256": "62443ecac62b1bd1ce58ad559886b038ae7b91493e6430f3299c911a4b0caaea"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+    "prior_entry_sha256": "14131b81e369c0fcbcee4f635c6c057085dadb00695d2cc24470fdcb5e34b56c",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-2b82d638c90df83d44613b81c2eeeab24821e8b2.json",
+      "sha256": "2fa317add293fb4bd828bc0510c482aeb34b29a0faba0a25f84e46f19b3c3fdc",
+      "bytes": 26181
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+      "bytes": 31558
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-2b82d638c90df83d44613b81c2eeeab24821e8b2.json",
+      "sha256": "2fa317add293fb4bd828bc0510c482aeb34b29a0faba0a25f84e46f19b3c3fdc",
+      "bytes": 26181
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

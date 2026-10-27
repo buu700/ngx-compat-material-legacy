@@ -9,7 +9,6 @@ import importlib.util
 import json
 import os
 from pathlib import Path, PurePosixPath
-import re
 import subprocess
 import sys
 
@@ -19,6 +18,8 @@ PINS = {'main': '8a0d7419de3d3ed7e7d0825b5223174f05e34cff86d184bb0632dc16b8d16b3
         '21.x': 'aadca3d619b2f8bd017ee0ee3e90b894de826df57ebaad342501083aa200118e'}
 BASE = 'scripts/historical-chip-reference-fixture.py'
 BASE_SHA = 'dc675455781e6b4119f9230412250499974e6f016dd720dfdd40c4ddea9329d3'
+GRAPH = 'scripts/historical-consumer-module-graph.mjs'
+GRAPH_SHA = '72eac7900d6ee5241d991060fe43d023032b023b6c1622a08c6ecd3299060a2e'
 
 
 def stage(root, line, family, output):
@@ -34,11 +35,11 @@ def stage(root, line, family, output):
     spec = importlib.util.spec_from_file_location('historical_chip_reference_fixture', root / BASE)
     base = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(base)
-    # Configure the unchanged staging implementation inside this private child
-    # process. Its selection, Git/blob verification and extraction rules remain
-    # unchanged. No source file or original Git object is modified.
+    # Reuse the unchanged shared extraction and Git/blob checks. Module discovery
+    # belongs to the parsed extension below, so quoted source fixtures never
+    # become phantom imports in the shared implementation's older regex scan.
     base.REFERENCES = {line: subject['reference_commit']}
-    base.PROBES = (subject['probe'],)
+    base.PROBES = ()
     base.stage(root, line, output)
     manifest_path = output / 'historical-reference-manifest.json'
     base_raw = manifest_path.read_bytes()
@@ -77,12 +78,12 @@ def stage(root, line, family, output):
     for path in ('package.json', 'pnpm-lock.yaml', 'toolchain-lock.json', '.node-version', '.npm-version',
                  'tsconfig.json', 'justfile', 'pnpm-workspace.yaml'):
         select(path)
-    for path in manifest['local_module_closure']:
-        text = (output / path).read_text()
-        for _, prefix in re.findall(r"(['\"])((?:compatibility|scripts|tests|testing|projects)/[^'\"\n]+-)\1", text):
-            for candidate in index:
-                if candidate.startswith(prefix):
-                    select(candidate)
+    assert hashlib.sha256((root / GRAPH).read_bytes()).hexdigest() == GRAPH_SHA, 'historical module parser changed'
+    graph = json.loads(subprocess.check_output(['node', str(root / GRAPH)], cwd=root, env=env,
+        input=json.dumps(dict(reference=subject['reference_commit'], probe=subject['probe'], paths=sorted(index))).encode()))
+    manifest['local_module_closure'] = graph['modules']
+    for path in graph['modules'] + graph['inputs']:
+        select(path)
 
     def references(value):
         if isinstance(value, dict):
@@ -97,7 +98,8 @@ def stage(root, line, family, output):
     visited = set()
     while True:
         pending = sorted(path for path in selected | additions
-                         if path.startswith('compatibility/') and path.endswith(('.json', '.json.gz')) and path not in visited)
+                         if path.startswith('compatibility/') and path.endswith(('.json', '.json.gz')) and path not in visited
+                         and path != 'compatibility/f10/disposition-ledger/ledger.json')
         if not pending:
             break
         for path in pending:
@@ -120,6 +122,7 @@ def stage(root, line, family, output):
     manifest['members_sha256'] = hashlib.sha256(json.dumps(manifest['members'], separators=(',', ':'), ensure_ascii=False).encode()).hexdigest()
     manifest['consumer_extension'] = dict(family=family, catalog_sha256=PINS[line],
         shared_stager=dict(path=BASE, sha256=BASE_SHA), base_manifest_sha256=hashlib.sha256(base_raw).hexdigest(),
+        module_graph_parser=dict(path=GRAPH, sha256=GRAPH_SHA, runtime=graph['parser']),
         extra_exact_Git_members=len(additions), original_probe_source_unchanged=True)
     manifest_path.write_text(json.dumps(manifest, indent=2) + '\n')
     return dict(line=line, family=family, reference_commit=subject['reference_commit'],

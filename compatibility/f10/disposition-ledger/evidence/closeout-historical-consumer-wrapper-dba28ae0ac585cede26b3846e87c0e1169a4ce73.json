@@ -1,0 +1,917 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "dba28ae0ac585cede26b3846e87c0e1169a4ce73",
+  "subject": "refactor(cdk/a11y): switch tests away from fakeAsync (#32942)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "1fa26e29dd225da20ff41122e37ce4816ece2f35",
+      "after_blob": "7149fc9568e43ff2ed6c2e4b508b820773955b84"
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "fda5a31dd5c40d8f4ae4bdafe24dedd1ae46114b",
+      "after_blob": "e1a315bbe2dbcca09b3d920c6585eaedb1bf02f8"
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "42f8659f25ed36b9ab4d9bb82880d3e1e7cd2d47",
+      "after_blob": "4b33a33d04c818112272f7b73aa241d548f67fcd"
+    },
+    {
+      "path": "src/cdk/a11y/input-modality/input-modality-detector.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "32279e699e4743199137e3c944f3d9c4b212e089",
+      "after_blob": "fc980918467a0710648807037f123ce6dbed8d57"
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "e40f5aae1c12f5bcc9bfe4fecc5e244d42072ac5",
+      "after_blob": "8d18e35540d520028e3393a09f06d83607eb00a0"
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/tree-key-manager.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "b5c2d83bc87e9bfdcc4954fb034f44e3a9e2af1e",
+      "after_blob": "c96deaf0fa1e50e8c419523face7f2ca9e6b427f"
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "f640fb8513a1c9511e5892975a68229ee284844a",
+      "after_blob": "1d12c3667e8f3641150670190ad842b66682e294"
+    }
+  ],
+  "original_files": 7,
+  "original_hunks": 75,
+  "raw_commit_sha256": "899de62266cfe3a362d63d3e95aa3a0b5b594900955291edffe08eba8ed208d5",
+  "original_sources": {
+    "path": "compatibility/rc/spec-interaction-async-source-subjects.json.gz",
+    "sha256": "4b9b1fed1ce167dd470d32b7e462b7a50a2e1b3e91b3057326ad8e3d29d83454"
+  },
+  "patch_file": "compatibility/rc/spec-interaction-async-source-dba28ae0ac585cede26b3846e87c0e1169a4ce73.patch",
+  "diff_sha256": "38a10be76f9adeb105c16a99dff83d5439d821d3c500f951f0d7254a01ad4707",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -1,7 +1,7 @@",
+      "sha256": "7340122ce0da43b3a1a0b499b8e0391ac553416fdad4845344c056e669b2d326",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -20,6 +20,10 @@ import {",
+      "sha256": "9582f7ff06a8241293616c8706d947ba6a9672901e0a85acc763fa8e2bbdba8e",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -70,23 +74,23 @@ describe('FocusMonitor', () => {",
+      "sha256": "53e8a18c5550c5bd2c15ee32a5e45bc08b9ad4f2595db79ffc02330d448e7a34",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -98,14 +102,14 @@ describe('FocusMonitor', () => {",
+      "sha256": "da57b6b42260af0fbd8a644e8a530d9bf2b9ae4d971b5b9b1e29acaafa3d149b",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -117,14 +121,14 @@ describe('FocusMonitor', () => {",
+      "sha256": "20704a774a9758cfbc7889614dd00005777eb9e7464ea9a474f9a30cd6c3b806",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -136,13 +140,13 @@ describe('FocusMonitor', () => {",
+      "sha256": "21c11dbc2e3df3703f242858fcb59a05b42691354e4f47f1978eea8fd4301d54",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -154,9 +158,9 @@ describe('FocusMonitor', () => {",
+      "sha256": "21d2b684c77563272410d4aed0394a90a676a4cdb7de153bfd7a4d537706f06f",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -165,7 +169,7 @@ describe('FocusMonitor', () => {",
+      "sha256": "0d3fc90092a8637f3fd67034700ef8a7f4c645da77a153e5af208a4cb4ad7b02",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -177,9 +181,9 @@ describe('FocusMonitor', () => {",
+      "sha256": "c6c1ca1b68de3c17ecb2df89249db2275a621c975ed4ae6259c287d1d414deba",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -188,7 +192,7 @@ describe('FocusMonitor', () => {",
+      "sha256": "5cceadb53f77e376578ef87a63ed592517f3c7db86358757520f36ef0ac465ec",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -200,11 +204,11 @@ describe('FocusMonitor', () => {",
+      "sha256": "f04410765d394c39230a67f6534e4156310a22734a930f0a04748430d56bc87b",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -216,12 +220,12 @@ describe('FocusMonitor', () => {",
+      "sha256": "068e9a7c6451cccedbebd4df47252c1bcfc032876877b0ae1b88d41a6ca621aa",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -233,12 +237,12 @@ describe('FocusMonitor', () => {",
+      "sha256": "6c29d87e0925253e64a2ddfcbf38a0abc4e3430bb5e2e34d3041e763cd74c837",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -250,12 +254,12 @@ describe('FocusMonitor', () => {",
+      "sha256": "e78af12f504c3edd08ce294f34e7fca9eba7d144a53c7d0cc69e26ed447c1796",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -267,12 +271,12 @@ describe('FocusMonitor', () => {",
+      "sha256": "057be4948fa679edeff4ed6c0557ef6984d1abcf17d325184e197e2efaadafda",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -288,12 +292,12 @@ describe('FocusMonitor', () => {",
+      "sha256": "c0d17d0e5ecce4d640a799757f2544465856271e0f109ecf928b7e799ec1a6b4",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -305,12 +309,12 @@ describe('FocusMonitor', () => {",
+      "sha256": "f2072bc193c1333cf2861bbfd8f4e7052ada83d3347c3ea9c13a181c7ddde2cd",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -323,27 +327,27 @@ describe('FocusMonitor', () => {",
+      "sha256": "1fe31ee2d95239aa0aae39091b8fbc1f3554a2a74d823a34cd7b7f3bb3f66beb",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -351,19 +355,19 @@ describe('FocusMonitor', () => {",
+      "sha256": "bf61f5615d29bfaff5bb99934651f4a44ab36da8eccb69dddb67011483538d9d",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -373,16 +377,16 @@ describe('FocusMonitor', () => {",
+      "sha256": "a2eed77c1fe39e514e913c7e6fa6f97af13fbee77d1790c5474b695a8152de8e",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -399,7 +403,7 @@ describe('FocusMonitor', () => {",
+      "sha256": "8847fba009d105093b6606358fae4f881c956dc626a556ef25c2a2a3a9633b8b",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -414,15 +418,15 @@ describe('FocusMonitor', () => {",
+      "sha256": "e92d681d1e0f6d0578e9ce77b198315418c99efa8add31fd706a7c5f8001efb4",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -439,7 +443,7 @@ describe('FocusMonitor', () => {",
+      "sha256": "e69aca3c1e80211f21e10bbbb51b617e9f6ef63ede4f1cf0753211f202a038bb",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -454,7 +458,7 @@ describe('FocusMonitor', () => {",
+      "sha256": "2a381c8d8394d8acf7fd71f498968513c639c12cda70529befcc239111c38100",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -486,14 +490,14 @@ describe('FocusMonitor with \"eventual\" detection', () => {",
+      "sha256": "b20ef467984335f1c866a860512cd3a00af111c13f9b25f39fdacd77e18236bd",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -516,12 +520,12 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "5183ea649cf85f0859da87620766469584b60a67b3d3363b8b16dde41e3f44d0",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -533,14 +537,14 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "b057f14f1fd73c2805f0b768aced904f9aba43b7fecda7d68b52b9eb38b04169",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -552,14 +556,14 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "49d50b2c1dc9505390102b2ad5b5010b470e522aa379273c55216c8ebbeac568",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -571,13 +575,13 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "66a05b8ecac3979d574dd557c32056448d6d72ad55dc04c56a111f65573d0ecc",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -589,12 +593,12 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "da56cb6bc14986a027110f0f3cdaa61eb2a63843512170487e1e116cc8c0c6a8",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -608,7 +612,7 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "40d6d8a6f963222c5e447a58d7fe7c73f076bb064e970fc2ddc322e79bd1827b",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -627,25 +631,25 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "3fe63a8f20ceaf2123d2a6af620b97ec0c86997cfb46c0700dab97e104d5b3a0",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -664,25 +668,25 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "2984e08baa3c218f8a2edc4ab9b53c08b986f1600168f830e67ac842e84d68d3",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -705,14 +709,14 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "333fa68a7a3ca247bc184bd6c53d11c4b55105969dde05144f12f2ef59c53f6c",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -733,49 +737,49 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "b27879b4cbadb93f08b2aad47165e88b3d00c1b9f9d486aadd63de268942fd77",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -783,7 +787,7 @@ describe('cdkMonitorFocus', () => {",
+      "sha256": "8880b7c7f5940d69bbe4544781563248ad23eb20fd5f080a6666ad79cd848c0f",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -813,7 +817,7 @@ describe('FocusMonitor observable stream', () => {",
+      "sha256": "972296c6fb7669206402393234603baded69bb2a8c8a40f5a95a7c4bcb89289e",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -824,10 +828,10 @@ describe('FocusMonitor observable stream', () => {",
+      "sha256": "2bc3251df8353cfb696d1b4631fd33d81370556972203149f6602bea477d0105",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -845,7 +849,7 @@ describe('FocusMonitor input label detection', () => {",
+      "sha256": "81fee3e680b02c0537c8d5c70ef435213fd2899ace05c8dd256a51cca1d035f4",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "header": "@@ -856,16 +860,16 @@ describe('FocusMonitor input label detection', () => {",
+      "sha256": "1e62b14245a629ee2f06f980449131df3c0d77b252bdef17ecf8d4523ea3716e",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts",
+      "header": "@@ -1,7 +1,7 @@",
+      "sha256": "ff9f5f2dc6a21b8692eb813f02c983ca795fb687fd10f23e16ab40faa8619a5a",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts",
+      "header": "@@ -23,16 +23,16 @@ describe('FocusMonitor observable stream Zone.js integration', () => {",
+      "sha256": "96033ef66407e002e5cf312ea5e6aa7eee30103b9aed61c26f8d63215995f026",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts",
+      "header": "@@ -7,7 +7,7 @@ import {",
+      "sha256": "13dd7a41de48891a926a232896b3f8cfba867a23ddf2202500c4ff9f489ca1d7",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts",
+      "header": "@@ -21,47 +21,48 @@ describe('EventListenerFocusTrapInertStrategy', () => {",
+      "sha256": "029131e5a4dcdc54be4d0f6fc30279c859a611acc64bde7e549681bba92299bc",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/input-modality/input-modality-detector.spec.ts",
+      "header": "@@ -9,7 +9,7 @@ import {",
+      "sha256": "3dc944cee8de0bfdc57b66fd20060b1f41dafe9b780a40bbddc0c2e5450d41ca",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/input-modality/input-modality-detector.spec.ts",
+      "header": "@@ -194,17 +194,17 @@ describe('InputModalityDetector', () => {",
+      "sha256": "4871109e462acce38602ab4d9b22ecd7ce505498d687cb1c37025cb21aa2b536",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "header": "@@ -1,7 +1,7 @@",
+      "sha256": "b69fe01c192f2ce3f32e80dd7dd5f4a9d75990cadcb5c089dcd6fa37be1d7cd8",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "header": "@@ -44,6 +44,10 @@ describe('Key managers', () => {",
+      "sha256": "fffb10f035610e84fcdb3fa5051bebd111250dfdca5b1fe13c890f466d3c6e6c",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "header": "@@ -816,68 +820,68 @@ describe('Key managers', () => {",
+      "sha256": "f244a6e74e78a06856cfcfe96d868276fb36a3fdd6ae55def0dd7d2a15a33a08",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "header": "@@ -888,12 +892,12 @@ describe('Key managers', () => {",
+      "sha256": "ab9c1f2c913b97de2cc739a61a21f9050a85f07ed321515a82b7f07b546879ff",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "header": "@@ -902,19 +906,19 @@ describe('Key managers', () => {",
+      "sha256": "24e4fc9e1f960c405520a2c1171afd66b035ca08b2d11fdc7b52355f6a396a2f",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "header": "@@ -923,12 +927,12 @@ describe('Key managers', () => {",
+      "sha256": "77cd01fe027163fafa49e0e1fb1c4c89b95ea370abc93179b3be33b6e97bd8da",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "header": "@@ -940,12 +944,12 @@ describe('Key managers', () => {",
+      "sha256": "84626bb764e66fd6db16bd44251fceded0869bd51c0eeadbffc1ec29ace44f18",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "header": "@@ -957,48 +961,48 @@ describe('Key managers', () => {",
+      "sha256": "5a579a18090032ae8f52968fa376baeec4e2daadef93ee13e700494307e231a8",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "header": "@@ -1006,18 +1010,18 @@ describe('Key managers', () => {",
+      "sha256": "5518152d392b2b8c37d9b4eaed3b7a417f91532b58f63eb1a257c07920831b9e",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/tree-key-manager.spec.ts",
+      "header": "@@ -3,7 +3,6 @@ import {QueryList} from '@angular/core';",
+      "sha256": "0092cbec991116cf609e36df89117fce30636da72b49a2f2320a78c19aa995a6",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/tree-key-manager.spec.ts",
+      "header": "@@ -100,6 +99,10 @@ describe('TreeKeyManager', () => {",
+      "sha256": "98a7b2b1cbbcb219c2f936f5d8db60e743f8304b08228fba6a898d6245e1f921",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/tree-key-manager.spec.ts",
+      "header": "@@ -694,87 +697,87 @@ describe('TreeKeyManager', () => {",
+      "sha256": "a9d843e0eb21cf4b42502ea66858eed4038edd36ff545c6fef29048e1fd603da",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/tree-key-manager.spec.ts",
+      "header": "@@ -785,12 +788,12 @@ describe('TreeKeyManager', () => {",
+      "sha256": "405fb83e58055e056d0ea73bff6ede252cc5d60a282ecc7708a5e9b83de89ea6",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/tree-key-manager.spec.ts",
+      "header": "@@ -799,30 +802,30 @@ describe('TreeKeyManager', () => {",
+      "sha256": "7d61196f1cad33dbfd78567049ebd00fb0cc0b77a813eb07761d90aa7a4ba2f7",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/tree-key-manager.spec.ts",
+      "header": "@@ -835,12 +838,12 @@ describe('TreeKeyManager', () => {",
+      "sha256": "f6ba62449444eaf605e436edd8db93822ed0466cb242580d8d6e4eb7b539b1e7",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/key-manager/tree-key-manager.spec.ts",
+      "header": "@@ -853,32 +856,32 @@ describe('TreeKeyManager', () => {",
+      "sha256": "a900f24d6256e75415b96f029ef1ce281b85488edefc4260daa6a3df316167b3",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -1,7 +1,7 @@",
+      "sha256": "f716b8cbaea58a5783ef6691f27443746fb69173e8545e57a3915a92d00234a5",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -18,76 +18,80 @@ describe('LiveAnnouncer', () => {",
+      "sha256": "2622eff017d78a71a6e74341b4fd927be223fae95c5d47caaac67b64e1a6484c",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -95,28 +99,28 @@ describe('LiveAnnouncer', () => {",
+      "sha256": "09c83fd034779bfaee4488cc2fdd436b88be68dae9cd0735f7a9202c5e8f8fe6",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -128,39 +132,39 @@ describe('LiveAnnouncer', () => {",
+      "sha256": "6f612adbb516dd88410c4f0fe88226a55ab73961db1823430571ceeaf4afb439",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -171,16 +175,16 @@ describe('LiveAnnouncer', () => {",
+      "sha256": "3d6206a28e323b7ae3f883d1d4bb108e2f800b7504fcd0934cd8b9e6411b424f",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -194,16 +198,16 @@ describe('LiveAnnouncer', () => {",
+      "sha256": "f3b669aa69ed37b5e60cacd2e2623ce2ec23e73f97a440370a1d185fcd85d5e5",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -211,10 +215,10 @@ describe('LiveAnnouncer', () => {",
+      "sha256": "00a4b933c3d6ceadc1c63f55f125b1f8c057f5328e389e573243aa9b16bf6454",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -233,14 +237,14 @@ describe('LiveAnnouncer', () => {",
+      "sha256": "d470aa7cabc50533f5ae9a885da090e977e443353d1cdf93b6e1a630ec55b37a",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -263,23 +267,23 @@ describe('LiveAnnouncer', () => {",
+      "sha256": "40b181d79232740190d74c0cc290b5ce2df0ca876a1bc5f3f586ed1a05453570",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -291,7 +295,7 @@ describe('CdkAriaLive', () => {",
+      "sha256": "882c999e891209b53f1b5ceaea90af7d5b2234c7331830699868ab7c52b62ae2",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -308,32 +312,32 @@ describe('CdkAriaLive', () => {",
+      "sha256": "c5adad18660fab4290bd6c8bd7f3af5473ad08a6601f11da8adfdcb75fa2b3db",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -343,7 +347,7 @@ describe('CdkAriaLive', () => {",
+      "sha256": "0704d4a869964d3a1da483c654349f1e5ddcd680a3563207c2f398672f3cdb57",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/a11y/live-announcer/live-announcer.spec.ts",
+      "header": "@@ -353,37 +357,37 @@ describe('CdkAriaLive', () => {",
+      "sha256": "ebf45e34cc47316925c88d9ea6d5ac91bbc370ba17cd36d661bff98c8adc7f2b",
+      "judgment": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "dba28ae0ac585cede26b3846e87c0e1169a4ce73",
+    "complete_original_files": 7,
+    "complete_original_hunks": 75,
+    "removed": [],
+    "added_hooks": [],
+    "isolated_chip_iterations": [],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 210,
+    "hooks": 42,
+    "fixture_classes": 19,
+    "template_style_properties": 14
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-interaction-async-source-review.json.gz",
+    "sha256": "287fa9d411e719157416ce1603c09855162f926a15f23d96e0367e604a58fafa"
+  },
+  "decision": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+  "prior_entry": {
+    "sha": "dba28ae0ac585cede26b3846e87c0e1169a4ce73",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(cdk/a11y): switch tests away from fakeAsync (#32942)",
+    "files": [
+      "src/cdk/a11y/focus-monitor/focus-monitor.spec.ts",
+      "src/cdk/a11y/focus-monitor/focus-monitor.zone.spec.ts",
+      "src/cdk/a11y/focus-trap/event-listener-inert-strategy.spec.ts",
+      "src/cdk/a11y/input-modality/input-modality-detector.spec.ts",
+      "src/cdk/a11y/key-manager/list-key-manager.spec.ts",
+      "src/cdk/a11y/key-manager/tree-key-manager.spec.ts",
+      "src/cdk/a11y/live-announcer/live-announcer.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-interaction-async-source-prior.json.gz",
+    "sha256": "807d7c7269152aacc476a2a94f401ef854b1217d81a4da73fd97ca2c4399764a"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "38a10be76f9adeb105c16a99dff83d5439d821d3c500f951f0d7254a01ad4707",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Decline this accessibility fixture scheduling migration after individual review of all 75 hunks in seven complete originals. All 210 static registrations and 42 hooks pair in exact identity/order; 115 complete callbacks remain semantically identical and 95 change. One focus-trap case changes the focused target from its explicit outside element to document.body while retaining the expected first-element predicate. The other complete nonboundary operations and predicates match after enumerated timing/wrapper changes. All 19 fixture classes and 14 template/style properties remain raw-byte identical; four exact native wait helpers are added and one now-empty testing import is removed. Public FocusMonitor/AriaDescriber/FocusKeyManager and related focus/announcement behavior remain relevant to owned legacy tooltip/chips/menu/input consumers used by Cyph. A private test preference proves no focus-origin, type-ahead, inert, announcement, listener or cleanup equivalence. Preserve existing stronger owned tests, distinct legacy contracts and Material 16 HTML/CSS/SCSS. No CDK fork, new component/API mirror or consumer edit. Actual native/browser/packed/public-peer and supported-floor checks remain required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-interaction-async-source-review.mjs",
+        "sha256": "c7387cbea5154b700adadc3e89c91674249641238a487bbcd6fba051acb51df9"
+      },
+      {
+        "path": "tests/spec_interaction_async_source_probe.mjs",
+        "sha256": "e445d5ed73b0af2123296d35ba89704b81f2d3eb7932ba9ecacbd40edbd210c1"
+      },
+      {
+        "path": "tests/test_spec_interaction_async_source.py",
+        "sha256": "2f04b1f2647fbaf58851106d236584ba7e2a85aadfc0c7effd1035e55d8cc116"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-qualification-inspector.py",
+        "sha256": "dfd4b6c81cd59c1ecc6b89cda4219e322e3838a7e9d2123e8317ecc93d26ac8a"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-subjects.json.gz",
+        "sha256": "4b9b1fed1ce167dd470d32b7e462b7a50a2e1b3e91b3057326ad8e3d29d83454"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-acquisition.json.gz",
+        "sha256": "9676e789868f511309aebe35ef7d747fea33a9ce2ee75d2dd47c2ac7e547c7ae"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-observation-pins.json",
+        "sha256": "84cbc29345e9f8e313084c47ddd0fd7400c00765b915b82d5af8778cd3b9951d"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-prior.json.gz",
+        "sha256": "807d7c7269152aacc476a2a94f401ef854b1217d81a4da73fd97ca2c4399764a"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-review.json.gz",
+        "sha256": "287fa9d411e719157416ce1603c09855162f926a15f23d96e0367e604a58fafa"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-controls.json",
+        "sha256": "ac0deb0f7642c343639b9dedb4b5e685d96d48d79101e370ee34350f0f25387c"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-python.log.gz",
+        "sha256": "a2a3447819e9fc2809bf929f5ae33df5a9882af24bb605864a8904786e3da78d"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-cyph-sanity.json",
+        "sha256": "83ce6682f3e4d21117a8eda2e88b4ef1fd24af21896d69208f60554f5d633291"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-checkpoint.json",
+        "sha256": "b1efc27a393c17af7c913dceb013d921e0b072dd35800fc183ef64dab78b493b"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-replay-checkpoint.json",
+        "sha256": "9302bbed68970a56093da48ce6dd683a7e2672210ed4738bb84df1c74aa7b293"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+        "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+        "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+      "prior_entry_sha256": "a505e3224dd2d7fe77a5a49fbfb7b0276a2a3c8b9e6c2984f3f4dcad6f884cf0",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-interaction-async-dba28ae0ac585cede26b3846e87c0e1169a4ce73.json",
+        "sha256": "ce12c91cbc9fc75ec199b8e0e7ec57204d997d17cffec28129c1b70852a2b588",
+        "bytes": 161738
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+        "bytes": 31558
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-interaction-async-dba28ae0ac585cede26b3846e87c0e1169a4ce73.json",
+        "sha256": "ce12c91cbc9fc75ec199b8e0e7ec57204d997d17cffec28129c1b70852a2b588",
+        "bytes": 161738
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-interaction-async-source-review.mjs",
+      "sha256": "c7387cbea5154b700adadc3e89c91674249641238a487bbcd6fba051acb51df9"
+    },
+    {
+      "path": "tests/spec_interaction_async_source_probe.mjs",
+      "sha256": "e445d5ed73b0af2123296d35ba89704b81f2d3eb7932ba9ecacbd40edbd210c1"
+    },
+    {
+      "path": "tests/test_spec_interaction_async_source.py",
+      "sha256": "2f04b1f2647fbaf58851106d236584ba7e2a85aadfc0c7effd1035e55d8cc116"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-qualification-inspector.py",
+      "sha256": "dfd4b6c81cd59c1ecc6b89cda4219e322e3838a7e9d2123e8317ecc93d26ac8a"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-subjects.json.gz",
+      "sha256": "4b9b1fed1ce167dd470d32b7e462b7a50a2e1b3e91b3057326ad8e3d29d83454"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-acquisition.json.gz",
+      "sha256": "9676e789868f511309aebe35ef7d747fea33a9ce2ee75d2dd47c2ac7e547c7ae"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-observation-pins.json",
+      "sha256": "84cbc29345e9f8e313084c47ddd0fd7400c00765b915b82d5af8778cd3b9951d"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-prior.json.gz",
+      "sha256": "807d7c7269152aacc476a2a94f401ef854b1217d81a4da73fd97ca2c4399764a"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-review.json.gz",
+      "sha256": "287fa9d411e719157416ce1603c09855162f926a15f23d96e0367e604a58fafa"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-controls.json",
+      "sha256": "ac0deb0f7642c343639b9dedb4b5e685d96d48d79101e370ee34350f0f25387c"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-python.log.gz",
+      "sha256": "a2a3447819e9fc2809bf929f5ae33df5a9882af24bb605864a8904786e3da78d"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-cyph-sanity.json",
+      "sha256": "83ce6682f3e4d21117a8eda2e88b4ef1fd24af21896d69208f60554f5d633291"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-checkpoint.json",
+      "sha256": "b1efc27a393c17af7c913dceb013d921e0b072dd35800fc183ef64dab78b493b"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-replay-checkpoint.json",
+      "sha256": "9302bbed68970a56093da48ce6dd683a7e2672210ed4738bb84df1c74aa7b293"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+    "prior_entry_sha256": "a505e3224dd2d7fe77a5a49fbfb7b0276a2a3c8b9e6c2984f3f4dcad6f884cf0",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-interaction-async-dba28ae0ac585cede26b3846e87c0e1169a4ce73.json",
+      "sha256": "ce12c91cbc9fc75ec199b8e0e7ec57204d997d17cffec28129c1b70852a2b588",
+      "bytes": 161738
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+      "bytes": 31558
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-interaction-async-dba28ae0ac585cede26b3846e87c0e1169a4ce73.json",
+      "sha256": "ce12c91cbc9fc75ec199b8e0e7ec57204d997d17cffec28129c1b70852a2b588",
+      "bytes": 161738
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

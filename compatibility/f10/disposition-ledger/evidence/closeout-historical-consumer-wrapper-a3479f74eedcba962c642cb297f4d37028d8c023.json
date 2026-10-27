@@ -1,0 +1,691 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "a3479f74eedcba962c642cb297f4d37028d8c023",
+  "subject": "refactor(cdk/overlay): switch tests away from fakeAsync (#33192)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/overlay/overlay-directives.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "013be8a9ec3074582b9c657fba5ad88835c788ed",
+      "after_blob": "09c94ff22556acba9974a62215c1b80d3c7fa468"
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "94ade030a3ed8502049f57d73a1d86eb34d8e8a4",
+      "after_blob": "a6eb23b80a8a363b7dc87b4f5468edbd62f05a7c"
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "e117c48e9627e67db7e2e7a9d84189e4f88b24cb",
+      "after_blob": "178297415e5de73ce6b999aa293889ad6b21b8dd"
+    },
+    {
+      "path": "src/cdk/overlay/scroll/close-scroll-strategy.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "6c7f40a18525ebba9cf02576cd210205fffbcfca",
+      "after_blob": "3f868da013b377b7cc7fdf64f94e0a97e5b98012"
+    },
+    {
+      "path": "src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "446addf4b58af31b398548da88e4a7eb8eedebd5",
+      "after_blob": "22b0520d019457567b8470ea9804462bb0822214"
+    }
+  ],
+  "original_files": 5,
+  "original_hunks": 39,
+  "raw_commit_sha256": "3f4733ef5ad6c7b6b08ca8b75ca4ca1f9d32eb65565038776a45fa849275700e",
+  "original_sources": {
+    "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+    "sha256": "d89ef4b2626885738d37947abf700452837255da40cbb9eccd861220e2bba82d"
+  },
+  "patch_file": "compatibility/rc/spec-cdk-async-source-a3479f74eedcba962c642cb297f4d37028d8c023.patch",
+  "diff_sha256": "2bd363d7cd5d367291ca9bb662aec9ce0843498a9a2ea69f9e853832cea54133",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/overlay/overlay-directives.spec.ts",
+      "header": "@@ -7,7 +7,7 @@ import {",
+      "sha256": "7d8862b22da5600b8c753792e964603be01dabd9d26cd05fcfc651f6209ab2cf",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.spec.ts",
+      "header": "@@ -178,7 +178,7 @@ describe('Overlay directives', () => {",
+      "sha256": "a97c5df32c03dc8c7717c0032ea8f0862c6455dfd904c6904822a72d2c87beff",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.spec.ts",
+      "header": "@@ -189,7 +189,7 @@ describe('Overlay directives', () => {",
+      "sha256": "9fbcde12f82eba02dbe5913b28e3479970e76e1006ea25547f40545550554a36",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.spec.ts",
+      "header": "@@ -204,7 +204,7 @@ describe('Overlay directives', () => {",
+      "sha256": "4466a53a5819df43818933d5d09ecb74d7a1cfe81d72947c61868bcb6deeb4cf",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.spec.ts",
+      "header": "@@ -217,7 +217,7 @@ describe('Overlay directives', () => {",
+      "sha256": "23b22259fb5e1dd06a8372b074faf124920a2e45d385cd7c6f993ecb9bea72cb",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.spec.ts",
+      "header": "@@ -321,7 +321,7 @@ describe('Overlay directives', () => {",
+      "sha256": "3d94d58288364d92dfc610b0dcc9d05092102429f03aa15468167cbe378ed097",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.spec.ts",
+      "header": "@@ -333,7 +333,7 @@ describe('Overlay directives', () => {",
+      "sha256": "97e07a653b7a90543332a7599db095a771dcc68b011fe289c0d7c8dd3d3c73a1",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay-directives.spec.ts",
+      "header": "@@ -342,7 +342,7 @@ describe('Overlay directives', () => {",
+      "sha256": "06b28c66f8cef11c762b5b6b5f77981ac19a82172c6b4481aa4fa418bc376174",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -15,14 +15,7 @@ import {",
+      "sha256": "caf9961e326c1ea13950f6f1894d81b73db763cde75896a73ff4987ccf1314b3",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -77,7 +70,11 @@ describe('Overlay', () => {",
+      "sha256": "ebd87794e8967295560dce05bc3f55ba923631f122807c1aee0c3d0a378c2852",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -299,7 +296,7 @@ describe('Overlay', () => {",
+      "sha256": "fd545e522f48d205f68aeddaab5f6fc706c7b26a6a4b230d7ac218ba2fc8a88f",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -312,7 +309,7 @@ describe('Overlay', () => {",
+      "sha256": "475225bc642b2f1424049bb56233cdd1781aad2e3636460173425abb6bdcf76c",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -323,30 +320,7 @@ describe('Overlay', () => {",
+      "sha256": "0b5f2d3bda768fd40502ff316b56ab19d89a8125dac0d4bb87e90a2d5cdc139b",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -466,7 +440,7 @@ describe('Overlay', () => {",
+      "sha256": "e32d28da2a52f78aa9de9d6b64909485ff3b3b53e516eea74ddb546d029bfd6d",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -476,25 +450,26 @@ describe('Overlay', () => {",
+      "sha256": "e6f3de6c6c8b9e415497de04cc6624b3aedfd58f63e5d26f18f7921e5186610f",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -510,17 +485,17 @@ describe('Overlay', () => {",
+      "sha256": "7bec9174299a07c8a187ad147e282266fb7659a943c11602015b52fb16754a12",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -537,17 +512,17 @@ describe('Overlay', () => {",
+      "sha256": "72333a606e078dbbe2e8977fa3f1023f02f59f0f5e6b75c310933f59769b05d4",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -557,12 +532,12 @@ describe('Overlay', () => {",
+      "sha256": "3aa0ae84c9572109da21b7a814bf103939df1c9a2b2f94fef268b3e1c79c08d9",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -577,7 +552,7 @@ describe('Overlay', () => {",
+      "sha256": "eb76d851e603b7156dbb8c38eaa6cc2735e3d93487a2b56cca4cfa8f26672980",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -587,7 +562,7 @@ describe('Overlay', () => {",
+      "sha256": "14283afef58fcf131157243e9b377ab6b9fe76847b55260d673fec4a2b492ac8",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -595,9 +570,9 @@ describe('Overlay', () => {",
+      "sha256": "b7713d5da2eb10733d256af971ffde4661bf4a1b41753317abb778e38a66000b",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -609,7 +584,7 @@ describe('Overlay', () => {",
+      "sha256": "77f4ad81d8399008b5fb75837dc4d8c70f0958eb3fbf5b1306edf52e0d45c1f5",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -617,12 +592,12 @@ describe('Overlay', () => {",
+      "sha256": "299a29806d5e823caea6db472b471150821df3979ac2400e07d6c14ed82c5186",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -636,15 +611,6 @@ describe('Overlay', () => {",
+      "sha256": "585956637a2c16b8fbd13eb320f151a653f8bc82de4cced35ddd44d2f779526a",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -1050,7 +1016,7 @@ describe('Overlay', () => {",
+      "sha256": "daa88979043536742991a66e55467ee08fcd90aa3622543c964c0a5ee079a1d6",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -1065,7 +1031,7 @@ describe('Overlay', () => {",
+      "sha256": "53f1219c4198fcff028d1b04e386d335be903e43b0a13beabe1faeba81659824",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -1075,7 +1041,7 @@ describe('Overlay', () => {",
+      "sha256": "5005b2dcb7a0a5a03bf2491d69cdc5fc8039e7d15b545c03b287e560d76d9520",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -1084,9 +1050,9 @@ describe('Overlay', () => {",
+      "sha256": "47a6e3e783509ded09a44a334bce81c67d541a4ebbf8bbdb533b82b601563a3c",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -1098,7 +1064,7 @@ describe('Overlay', () => {",
+      "sha256": "f7b5f345c635473f0be9ce0b5fbadd18bdb82de60e46f9eccda13e1b8f702c28",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/overlay.spec.ts",
+      "header": "@@ -1107,13 +1073,13 @@ describe('Overlay', () => {",
+      "sha256": "d632a2db59323f6d991194e0220650e81e06833813087f8f77cedd8000284175",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "header": "@@ -11,7 +11,7 @@ import {",
+      "sha256": "494e38cf844481f9fac7ccb1ec1db79c404b7c491f4356d14fa2304ac6becb78",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "header": "@@ -2457,7 +2457,7 @@ describe('FlexibleConnectedPositionStrategy', () => {",
+      "sha256": "5aa2383632c6798ec5efad94ff065fd1e7f3543281a1f15c857c4d4e6087ce48",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "header": "@@ -2497,11 +2497,12 @@ describe('FlexibleConnectedPositionStrategy', () => {",
+      "sha256": "0fb0a521fd6e026201f3b94dbaa26e4c31d0555504dc8908e013144028ebfe83",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/scroll/close-scroll-strategy.spec.ts",
+      "header": "@@ -1,7 +1,7 @@",
+      "sha256": "c7395878a0a58cafa6005026fa68c8580c5c5d1951952faa2aa1a56a39fea0e7",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/scroll/close-scroll-strategy.spec.ts",
+      "header": "@@ -20,7 +20,7 @@ describe('CloseScrollStrategy', () => {",
+      "sha256": "133be62acd3743de285d16853c537f6cbf8b5043e914481c99f7ee22f6e5c3fc",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/scroll/close-scroll-strategy.spec.ts",
+      "header": "@@ -45,7 +45,7 @@ describe('CloseScrollStrategy', () => {",
+      "sha256": "985df44ef07e64337f1c0c0f8194b0bfb888316878250c1601849b92a16eb059",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts",
+      "header": "@@ -6,7 +6,7 @@ import {",
+      "sha256": "ecf0186c18fe5c48b9b719367dac1a20d4371857f7d0c56cf33eb8fd0ec7294b",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts",
+      "header": "@@ -27,7 +27,7 @@ describe('CloseScrollStrategy Zone.js integration', () => {",
+      "sha256": "c5e8824600c21652ec9092ab14843441fa576017d1e5f8bb5a67b1fb3df4f429",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts",
+      "header": "@@ -53,7 +53,7 @@ describe('CloseScrollStrategy Zone.js integration', () => {",
+      "sha256": "27a23f8fb7e651a717a14a7c02dbc0fea05838eedf43167caeab890fbfab654d",
+      "judgment": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "a3479f74eedcba962c642cb297f4d37028d8c023",
+    "complete_original_files": 5,
+    "complete_original_hunks": 39,
+    "removed": [
+      {
+        "path": "src/cdk/overlay/overlay.spec.ts",
+        "suites": [
+          "'Overlay'"
+        ],
+        "name": "'should clear the backdrop timeout if the transition finishes first'",
+        "mode": "it",
+        "sha256": "a6b808f9d2296188be6fb41477e53570eec45920b3a850359ca2874d4163b1ca"
+      },
+      {
+        "path": "src/cdk/overlay/overlay.spec.ts",
+        "suites": [
+          "'Overlay'"
+        ],
+        "name": "'should clear the backdrop timeout if the overlay is disposed'",
+        "mode": "it",
+        "sha256": "291fa0b612c98bb4ce083f81867897d1f35f47bec7290eab642d503cbebe9bbe"
+      },
+      {
+        "path": "src/cdk/overlay/overlay.spec.ts",
+        "suites": [
+          "'Overlay'",
+          "'positioning'"
+        ],
+        "name": "'should not trigger timers when disposing of an overlay'",
+        "mode": "it",
+        "sha256": "b915604335568dcd5cb91e5c3d62f6d15b3b34e53f3dcd5753161f151aa717a4"
+      }
+    ],
+    "helpers": [],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 221,
+    "hooks": 31,
+    "fixture_classes": 10,
+    "template_style_properties": 7
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+    "sha256": "65ac92b4f85f55d6576821ef397f272d6e3551acc0debe37e51930f084c2c731"
+  },
+  "decision": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+  "prior_entry": {
+    "sha": "a3479f74eedcba962c642cb297f4d37028d8c023",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(cdk/overlay): switch tests away from fakeAsync (#33192)",
+    "files": [
+      "src/cdk/overlay/overlay-directives.spec.ts",
+      "src/cdk/overlay/overlay.spec.ts",
+      "src/cdk/overlay/position/flexible-connected-position-strategy.spec.ts",
+      "src/cdk/overlay/scroll/close-scroll-strategy.spec.ts",
+      "src/cdk/overlay/scroll/close-scroll-strategy.zone.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+    "sha256": "01a60ef4b45609ee8ed40d19a1cfb7dc32d90d5ea5eb0934fa6f828a4d878b31"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "2bd363d7cd5d367291ca9bb662aec9ce0843498a9a2ea69f9e853832cea54133",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Decline this private CDK overlay scheduler migration after individual review of all 39 hunks in all five complete files. Account for 224 before/221 after static registrations:221 pair in exact retained order,207 complete callbacks retain semantics and 14 change, with 31 setup/cleanup hooks. Individually pin three deleted assertion-free fakeAsync timer-queue observations: clearing backdrop timeout on transition completion,on dispose after detach,and no pending timers on immediate disposal. Deletion is not evidence that public OverlayRef lifecycle behavior is absent or inherited correctly. All retained projected predicates/nonboundary operations remain equal and all ten fixture classes/seven template/style properties remain raw-byte identical. Enumerated native waits/stability prove no timer,positioning,focus,scroll-strategy or destruction equivalence. Public Overlay/FlexibleConnectedPositionStrategy are actually used by legacy controls which Cyph consumes. Preserve owned stronger lifecycle/focus/cleanup tests, actual public-peer obligations and Material 16 DOM/classes/CSS/SCSS; create no overlay/CDK fork and require no consumer TS/CSS/SCSS edit. Actual packed/native/browser/SSR/mixed peer and floor qualification remains required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-cdk-async-source-review.mjs",
+        "sha256": "982719c6e0b660c03dbf682dbcd213821401846ef0353a5bc1bd801462ebd13c"
+      },
+      {
+        "path": "tests/spec_cdk_async_source_probe.mjs",
+        "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9"
+      },
+      {
+        "path": "tests/test_spec_cdk_async_source.py",
+        "sha256": "de8ee5c55766edeea84f529ce790ef51bc81fe149aef80d5084141750c32b642"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-qualification-inspector.py",
+        "sha256": "ca63e1d8fbeb973a805e3822dd623e6a13b3c423d2ed33d8af2dbf8cda1c0328"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+        "sha256": "d89ef4b2626885738d37947abf700452837255da40cbb9eccd861220e2bba82d"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-acquisition.json.gz",
+        "sha256": "5da144f4f1c0e49bdf0acb1b73b6e3061009352a271a6f04eb58b59dbd8a55a6"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-observation-pins.json",
+        "sha256": "90d5226c7425d697d525b923dc66d5f9aa1e8b79341f97c5b2e2534d8fe390de"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+        "sha256": "01a60ef4b45609ee8ed40d19a1cfb7dc32d90d5ea5eb0934fa6f828a4d878b31"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+        "sha256": "65ac92b4f85f55d6576821ef397f272d6e3551acc0debe37e51930f084c2c731"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-controls.json",
+        "sha256": "178f7478335597c02ec4a72a8a2a16b0b7771900ecc0a5d2d3e8cd0b868dcf29"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-python.log.gz",
+        "sha256": "c6401e6b7d5e83c04841744eb33b8b2a6d9ae7e230a063fdcbb092722faf8fc9"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-cyph-sanity.json",
+        "sha256": "7b77525aec1d056d1dbcfe6d067dda706cd03a63557b239b5701352e1c2ecda6"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-probe.mjs",
+        "sha256": "f7ebe44564f0d6da673e5e3023ae97b2944a36e646cd253d4fb32f52f4907ee3"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+        "sha256": "84ad6569fddf6674ca61db313d1feb8c41ae556ef0ee11469a91864ca971e650"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-checkpoint.json",
+        "sha256": "1474de3013f2be900dc6fc4041f29834eb0b4baebb24b25999bb2693ba96e62c"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-replay-checkpoint.json",
+        "sha256": "80889905dfa795fca67ba034e66fdc4b65923715cbf3a64fa13959a9fadfcaf3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+        "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+        "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+        "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+      "prior_entry_sha256": "fbe5d095d6fed658abc3246692896f84e4b372f729840351309cda4a09dd10f1",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-a3479f74eedcba962c642cb297f4d37028d8c023.json",
+        "sha256": "56aa32650e8c8d0523aa0b6648f6d75179bc0d355626eb2045525b89107daf0c",
+        "bytes": 93168
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+        "bytes": 31558
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-a3479f74eedcba962c642cb297f4d37028d8c023.json",
+        "sha256": "56aa32650e8c8d0523aa0b6648f6d75179bc0d355626eb2045525b89107daf0c",
+        "bytes": 93168
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-cdk-async-source-review.mjs",
+      "sha256": "982719c6e0b660c03dbf682dbcd213821401846ef0353a5bc1bd801462ebd13c"
+    },
+    {
+      "path": "tests/spec_cdk_async_source_probe.mjs",
+      "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9"
+    },
+    {
+      "path": "tests/test_spec_cdk_async_source.py",
+      "sha256": "de8ee5c55766edeea84f529ce790ef51bc81fe149aef80d5084141750c32b642"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-qualification-inspector.py",
+      "sha256": "ca63e1d8fbeb973a805e3822dd623e6a13b3c423d2ed33d8af2dbf8cda1c0328"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+      "sha256": "d89ef4b2626885738d37947abf700452837255da40cbb9eccd861220e2bba82d"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-acquisition.json.gz",
+      "sha256": "5da144f4f1c0e49bdf0acb1b73b6e3061009352a271a6f04eb58b59dbd8a55a6"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-observation-pins.json",
+      "sha256": "90d5226c7425d697d525b923dc66d5f9aa1e8b79341f97c5b2e2534d8fe390de"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+      "sha256": "01a60ef4b45609ee8ed40d19a1cfb7dc32d90d5ea5eb0934fa6f828a4d878b31"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+      "sha256": "65ac92b4f85f55d6576821ef397f272d6e3551acc0debe37e51930f084c2c731"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-controls.json",
+      "sha256": "178f7478335597c02ec4a72a8a2a16b0b7771900ecc0a5d2d3e8cd0b868dcf29"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-python.log.gz",
+      "sha256": "c6401e6b7d5e83c04841744eb33b8b2a6d9ae7e230a063fdcbb092722faf8fc9"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-cyph-sanity.json",
+      "sha256": "7b77525aec1d056d1dbcfe6d067dda706cd03a63557b239b5701352e1c2ecda6"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-probe.mjs",
+      "sha256": "f7ebe44564f0d6da673e5e3023ae97b2944a36e646cd253d4fb32f52f4907ee3"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+      "sha256": "84ad6569fddf6674ca61db313d1feb8c41ae556ef0ee11469a91864ca971e650"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-checkpoint.json",
+      "sha256": "1474de3013f2be900dc6fc4041f29834eb0b4baebb24b25999bb2693ba96e62c"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-replay-checkpoint.json",
+      "sha256": "80889905dfa795fca67ba034e66fdc4b65923715cbf3a64fa13959a9fadfcaf3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+      "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+    "prior_entry_sha256": "fbe5d095d6fed658abc3246692896f84e4b372f729840351309cda4a09dd10f1",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-a3479f74eedcba962c642cb297f4d37028d8c023.json",
+      "sha256": "56aa32650e8c8d0523aa0b6648f6d75179bc0d355626eb2045525b89107daf0c",
+      "bytes": 93168
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+      "bytes": 31558
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-a3479f74eedcba962c642cb297f4d37028d8c023.json",
+      "sha256": "56aa32650e8c8d0523aa0b6648f6d75179bc0d355626eb2045525b89107daf0c",
+      "bytes": 93168
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

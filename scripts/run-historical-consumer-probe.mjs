@@ -8,7 +8,7 @@
 /** Exact original-source subjects. Current contracts require their separate live checks. */
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {spawnSync} from 'node:child_process';
+import {historicalConsumerChild} from './historical-consumer-child.mjs';
 import {existsSync,mkdtempSync,readFileSync,rmSync,writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname,join,resolve} from 'node:path';
@@ -18,10 +18,11 @@ import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
 const rootDefault=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const catalogPath='compatibility/rc/historical-consumer-source-subjects.json';
 const stagerPath='scripts/historical-consumer-reference-fixture.py';
-const stagerHash='e65df2b390a704df5c1ddb7502a13361d847c6320d63b859e1971ff3184c93ca';
+const stagerHash='ed6d9abef60885e0e5751043a6145b6d118af7d34052e104307a9261f8edfc3d';
 const pins={main:'8a0d7419de3d3ed7e7d0825b5223174f05e34cff86d184bb0632dc16b8d16b36',
   '21.x':'aadca3d619b2f8bd017ee0ee3e90b894de826df57ebaad342501083aa200118e'};
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
+const originalTimeoutSeconds={"historical-roster-reconciliation":60,"mixed-build-harness-source":90,"mixed-cdk-behavior-source":90,"mixed-compiler-build-source":90,"mixed-example-docs-source":90,"mixed-explicit-detection-source":90,"mixed-fixture-build-source":90,"mixed-global-zoneless-source":90,"mixed-peer-async-source":90,"mixed-strict-tests-source":90,"mixed-theming-source":90,"mixed-tree-source":90,"mixed-zone-moves-source":90,"spec-animation-fixture-source":180,"spec-cdk-async-source":60,"spec-date-tooltip-slider-source":60,"spec-final-fixture-source":90,"spec-import-cleanup-source":120,"spec-interaction-async-source":60,"spec-overlay-async-source":60,"spec-stability-source":60,"spec-wide-fixture-adapter":60,"spec-wide-fixture-source":60};
 
 export function historicalConsumerSubject({root=rootDefault,family}={}){
   const version=JSON.parse(readEvidenceMember(root,'projects/ngx-material-legacy/package.json')).version;
@@ -37,6 +38,7 @@ export function historicalConsumerSubject({root=rootDefault,family}={}){
 
 export function runHistoricalConsumerProbe({root=rootDefault,family,originalReportPath,reportPath}={}){
   const {line,subject,catalog_sha256}=historicalConsumerSubject({root,family});
+  const deadline=Date.now()+originalTimeoutSeconds[family]*1000-5000;
   if(originalReportPath)originalReportPath=resolve(originalReportPath);
   if(reportPath)reportPath=resolve(reportPath);
   for(const path of [originalReportPath,reportPath].filter(Boolean))assert.equal(existsSync(path),false,'report destination must be fresh');
@@ -47,7 +49,8 @@ export function runHistoricalConsumerProbe({root=rootDefault,family,originalRepo
   for(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY',
     'GIT_ALTERNATE_OBJECT_DIRECTORIES','RC_CHECK_ID','RC_RUN_ID','RC_INVOCATION_ID','RC_EVIDENCE_BINDING','RC_ASSERTION_OUTPUT_DIR'])delete env[key];
   const child=(command,args,cwd)=>{
-    const result=spawnSync(command,args,{cwd,env,encoding:'utf8',timeout:90000,maxBuffer:4*1024*1024});
+    const remaining=deadline-Date.now();assert.ok(remaining>0,'original wrapper execution budget exhausted');
+    const result=historicalConsumerChild(command,args,{cwd,env,timeout:remaining});
     assert.equal(result.status,0,(result.error?.message??'')+'\n'+result.stderr.slice(-8000));return result.stdout;
   };
   try{

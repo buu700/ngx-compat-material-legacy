@@ -14,7 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SpecStabilitySourceTests(unittest.TestCase):
     def test_complete_originals_observers_fixtures_and_repaired_owned_context(self):
-        result = subprocess.run(['node', 'tests/spec_stability_source_probe.mjs'],
+        # Original snapshot assertions; live contracts run in test_current_inspector_contracts.py.
+        result = subprocess.run(['node', 'scripts/run-historical-consumer-probe.mjs', 'spec-stability-source'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])

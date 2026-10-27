@@ -1,0 +1,673 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "5ad259a25e4b6d6346ee62954fe461f4500c9cee",
+  "subject": "refactor(material/slider): switch tests away from fakeAsync (#32952)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "b2f65e694f52d476e945d3fc82684052f7b2435e",
+      "after_blob": "0b4958fa9b93dc1995766190440c89d4f9922699"
+    },
+    {
+      "path": "src/material/slider/testing/slider-harness.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "535dd49656de286dd8c894071ddacf801a582873",
+      "after_blob": "12ff2eb51062edcbc325f28d2a8c114c310bc50b"
+    }
+  ],
+  "original_files": 2,
+  "original_hunks": 47,
+  "raw_commit_sha256": "77bf0254d393a8f1635e71dec0ef0c544ec7e927f814e58def9f16510a85e2f2",
+  "original_sources": {
+    "path": "compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz",
+    "sha256": "5a06a16f40cb9f2cb7991389972faa5e1a6c03fed62527504238da622e46e790"
+  },
+  "patch_file": "compatibility/rc/spec-date-tooltip-slider-source-5ad259a25e4b6d6346ee62954fe461f4500c9cee.patch",
+  "diff_sha256": "5da01039cdf98b22f163c51ddeb69bed795c9da542451d4e1e2602fc114ae4de",
+  "hunk_reviews": [
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -14,14 +14,7 @@ import {",
+      "sha256": "7f71c407912f139ee26982253585f6a2c0acdde530d4465dd7c5a147f6e52028",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -120,55 +113,54 @@ describe('MatSlider', () => {",
+      "sha256": "0cc0efcac14bab17e456910356dc0a39448f1204fe99e191dc29866260fa70ba",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -195,68 +187,68 @@ describe('MatSlider', () => {",
+      "sha256": "503c95cf5bdfedf71f085392b44e09d3ddae52e171227078180ab66546f178f4",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -327,14 +319,14 @@ describe('MatSlider', () => {",
+      "sha256": "6bd7688b4d8722b70a90fe8cfc3b21922a5731216e3b192d161e967cfe61bbdb",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -387,14 +379,14 @@ describe('MatSlider', () => {",
+      "sha256": "1cfd51d019e356ff3d2c3ef4071b28bcd0f983174c73ed9a514b524e2eb06fce",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -405,16 +397,16 @@ describe('MatSlider', () => {",
+      "sha256": "068a4cbe86ec457e73b82c1a073d2ac5eccfc2b7acfc43431b8eafc94589ac65",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -425,7 +417,7 @@ describe('MatSlider', () => {",
+      "sha256": "bf40a27f22d165396534bf8d5d97a4309f07b5d154b3676d72edf2456f3f129e",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -476,14 +468,14 @@ describe('MatSlider', () => {",
+      "sha256": "fa2706dfae436450b71ed3748dd5449c6c2a8bd4483f02ecdbafea1ad01b1936",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -494,16 +486,16 @@ describe('MatSlider', () => {",
+      "sha256": "f52a85ea8ba322a2f75bf5deef03410eb7bf6a72bf54c469b8a35e4e5ebf0c55",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -514,7 +506,7 @@ describe('MatSlider', () => {",
+      "sha256": "0c5635c34f9dfb740aa66d2cd048e9a3dc47d1c4f0a960ca977f8f31d37d6738",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -544,8 +536,9 @@ describe('MatSlider', () => {",
+      "sha256": "44e14a1ad84473350b4b58cfcb6e08ba5b8b30dd9478a9ae3f7fee9c2665e6a7",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -661,31 +654,29 @@ describe('MatSlider', () => {",
+      "sha256": "2ca46342161cca2e45b015393480b62b12a09533b5a6c3535a021a656609a7b5",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -693,69 +684,61 @@ describe('MatSlider', () => {",
+      "sha256": "5bd734e915885f0fa1d0f31656944f317c818b4c76ebb49fb8dbaca4a8341db4",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -774,10 +757,10 @@ describe('MatSlider', () => {",
+      "sha256": "ae804b50d7b5b421dd5b0f55c2b40acfc7f5a1cad5d6a1938e56a05e25f203e2",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -794,24 +777,24 @@ describe('MatSlider', () => {",
+      "sha256": "b51ce2d835ecc8c2fd4ba069ef5ca633690499c3e58ba24cd70dd1d7d7c3d063",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -827,34 +810,34 @@ describe('MatSlider', () => {",
+      "sha256": "d96d01ce17a660a133195e57d02206fbd8dec546ef22834d56ad44b2d9151829",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -872,56 +855,56 @@ describe('MatSlider', () => {",
+      "sha256": "f4d6373e37cb65f52b84bab264bcbaa9afba3326a9947f0b53ec246ecdd6dc2a",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -932,15 +915,15 @@ describe('MatSlider', () => {",
+      "sha256": "5cba1b1cad3b1c1fbce55330eb662c6a38538990500062a9b5bb6cb00e1106cb",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -951,7 +934,7 @@ describe('MatSlider', () => {",
+      "sha256": "d34a84c820efdda07658bf25205a750314023ba683e9afdeaca76aff7f3ebaab",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -973,25 +956,24 @@ describe('MatSlider', () => {",
+      "sha256": "a1ea3d332371461a35420eac608eb8c3cc384796ed73d128dc11be0cd35ea876",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1020,38 +1002,38 @@ describe('MatSlider', () => {",
+      "sha256": "836cdab78ab9270ec5802785ab01b2f15896781b1e071ca5a28f276147bbdbbb",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1146,10 +1128,10 @@ describe('MatSlider', () => {",
+      "sha256": "aaf1ad94728921797f8f33f27b0e3e6a9bea57abd328474c72ecf29c91dee056",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1174,8 +1156,9 @@ describe('MatSlider', () => {",
+      "sha256": "1a552719f20ed330f2debe2044304543757f42cd54f88edf4dd36143a609a514",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1183,13 +1166,13 @@ describe('MatSlider', () => {",
+      "sha256": "12c5043f0251f3b1dfbe889846cbbc045822c8681b5984e8fa1ce4aa4981c53a",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1205,34 +1188,34 @@ describe('MatSlider', () => {",
+      "sha256": "4bca020af84bedc7d0208c2f41e2dc9d07328300e4fc16096a6a1a156ce1d3f3",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1250,92 +1233,91 @@ describe('MatSlider', () => {",
+      "sha256": "cc0d4d4920d52ac6a70beb942f8a912e914e8256cdc176c4c0c29974fcf6e9dc",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1351,11 +1333,11 @@ describe('MatSlider', () => {",
+      "sha256": "996edc60987843b9f8df006d26a5bb056a904ad135c379fd979c3beb299d57fb",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1375,7 +1357,7 @@ describe('MatSlider', () => {",
+      "sha256": "1b3714bd182b5931e08808cb70ca5420333d6cd7c6c463c5aadf9778c5571731",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1385,7 +1367,7 @@ describe('MatSlider', () => {",
+      "sha256": "3134b5077168072d4e726e78887f85f43c807fb53d06ea0a7a0c850e49a99da7",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1399,7 +1381,7 @@ describe('MatSlider', () => {",
+      "sha256": "7308bd180446e32ae3659a8e8a9de829057faa040fac2c21cde1a878166f3190",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1417,17 +1399,17 @@ describe('MatSlider', () => {",
+      "sha256": "1b02b287b719591d30fcb99405a4b20b8c7494537e66701b327e841f79ce62cb",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1461,7 +1443,7 @@ describe('MatSlider', () => {",
+      "sha256": "d6f4984eeb8426e31d39ddba970de199491e566009d2861c8c4dcd74129420f5",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1471,7 +1453,7 @@ describe('MatSlider', () => {",
+      "sha256": "8f98569fd989e4e2989004ec1981ef2a9ce8c29f01688273013ab95cd194e185",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1485,9 +1467,9 @@ describe('MatSlider', () => {",
+      "sha256": "b63ca291d48e75732e68f5e2cab731a16ac00328ae6e0fd5d5d7c4b287b65507",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1497,7 +1479,7 @@ describe('MatSlider', () => {",
+      "sha256": "de035c157e79851388eb1a973839ce4eb2fc4ffe683b838a39b89d20a583c067",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1511,7 +1493,7 @@ describe('MatSlider', () => {",
+      "sha256": "8337e4de47d41f2daf8cbe6a0e381b50a0ec9faf9caa738d072c62462a893467",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1527,10 +1509,10 @@ describe('MatSlider', () => {",
+      "sha256": "68e27ac7cfbd48fc6da2c63d4df0954ea82bf4847698a04fc3b484a8314d12b5",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1539,7 +1521,7 @@ describe('MatSlider', () => {",
+      "sha256": "dd1a0575e2039c776a66960f8617567fabdaeeeaaccdafe30834d667d2e81ec1",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1557,11 +1539,11 @@ describe('MatSlider', () => {",
+      "sha256": "086dbb347d7ccdaa16401539efd7d549701b49a620790b56a4ba487389febd1b",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1571,13 +1553,13 @@ describe('MatSlider', () => {",
+      "sha256": "d1dfe11ed563dfea6b753d8dce944542c868a8280ddb4ba86890ea30d0afee71",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -1586,7 +1568,7 @@ describe('MatSlider', () => {",
+      "sha256": "c4a84e56c0e98992b30aff41e10261d99640cae738329772123d47dd39c78a24",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -2071,7 +2053,7 @@ class SliderWithFormGroup {",
+      "sha256": "0818647c839a3c1e64ae1761a3c68fd07fbeb7803cf0edfb00f0a2f275d8f2e7",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -2087,11 +2069,11 @@ function setValueByClick(",
+      "sha256": "24b63a9a5d039be94dbb2dc628da05252b9fe4f7c38cc71d4f45be25c6e136df",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "header": "@@ -2103,7 +2085,7 @@ function slideToValue(slider: MatSlider, input: MatSliderThumb, value: number) {",
+      "sha256": "aefbb7c33ed41d81674b55b48f281bcddd6395282a65abb176810288ec543ea8",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/testing/slider-harness.spec.ts",
+      "header": "@@ -7,7 +7,7 @@",
+      "sha256": "a668b2b8609b47c8aacce1023908a6dd36f1ca0fa6cd6da5ea9e9603d07720dc",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/testing/slider-harness.spec.ts",
+      "header": "@@ -140,7 +140,7 @@ describe('MatSliderHarness', () => {",
+      "sha256": "14b0a7bb0069a96b8df6b97688985eeee90e3b26b4b1cc7108f7a4352d601310",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/slider/testing/slider-harness.spec.ts",
+      "header": "@@ -149,7 +149,7 @@ describe('MatSliderHarness', () => {",
+      "sha256": "56fe75267f2632861d0004a14598760be8acbe0d9f649fa21c95baa01d42d9c8",
+      "judgment": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, eight raw-pinned observer/deadline exceptions, two fixture promotions, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "5ad259a25e4b6d6346ee62954fe461f4500c9cee",
+    "complete_original_files": 2,
+    "complete_original_hunks": 47,
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 143,
+    "hooks": 26,
+    "fixture_classes": 25,
+    "template_style_properties": 49
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-date-tooltip-slider-source-review.json.gz",
+    "sha256": "349c89c2f4f0d3d43e047e6592d1718d00e745579f6907d5f2c8a7bc2f878e63"
+  },
+  "decision": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+  "prior_entry": {
+    "sha": "5ad259a25e4b6d6346ee62954fe461f4500c9cee",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(material/slider): switch tests away from fakeAsync (#32952)",
+    "files": [
+      "src/material/slider/slider.spec.ts",
+      "src/material/slider/testing/slider-harness.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-date-tooltip-slider-source-prior.json.gz",
+    "sha256": "13587662bab45f3fd367be44f02b3880dd36bbf48e7119969873a1d84512b563"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "5da01039cdf98b22f163c51ddeb69bed795c9da542451d4e1e2602fc114ae4de",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Decline this private modern slider/harness scheduler migration after individual review of all47 hunks in both complete files. All143 cases and26 hooks pair in full identity/order;69 callbacks retain complete semantics and74 change, while all143 projected predicate sequences and nonboundary operations remain equal. Exactly two fixture bindings move from hook-local const initialization into enclosing let fixture declarations; their initializer/provider operations remain exact. setValueByClick and slideToValue become async and add a zero-ms native wait after their final change dispatch. All six before/after geometry-helper identities are pinned; getCoordsForValue retains its complete raw body, while helper scheduling changes do not prove event/geometry equivalence. The main file retains waitForAsync and its22 hook calls. All25 fixture classes and49 template/style properties remain raw-byte identical. Commented-out page-layout tests remain comments and are not coverage. The add-on does own the historical single-value legacy slider; modern range/harness tests are not an absence-based exclusion and authorize no modern API mirror. Cyph imports legacy slider and uses ngModel,min,max,step,thumbLabel and displayWith markup. Preserve that structure and all owned slider tests/styles. No required consumer CSS/SCSS or TypeScript API change; actual pointer/keyboard/forms/event/geometry, packed/browser and peer-floor gates remain required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-date-tooltip-slider-source-review.mjs",
+        "sha256": "cd01bbfbe2eab5210e869164edf7382fcb47cc8249c9a24f44b51d7828410a72"
+      },
+      {
+        "path": "tests/spec_date_tooltip_slider_source_probe.mjs",
+        "sha256": "e0085698046c9b2d3b6252ad24e3a63cb8c0b5554c91674de259b973b127f757"
+      },
+      {
+        "path": "tests/test_spec_date_tooltip_slider_source.py",
+        "sha256": "d1543145ede99577ea126982073a38ec932d6bb62f1cf42cddc331a4f8086634"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-qualification-inspector.py",
+        "sha256": "fd616bb0e9d9b100830cc42a86c68e0cce3bba40e67d8462406da7357358b1d9"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz",
+        "sha256": "5a06a16f40cb9f2cb7991389972faa5e1a6c03fed62527504238da622e46e790"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-acquisition.json.gz",
+        "sha256": "1d0d216d87f934d88be4154a7ee75a02c86fa723a28ae0ee3de34067006be6b9"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-observation-pins.json",
+        "sha256": "2285c73f7df75fdec78233c659d350f055a5e168db453b9d5a665aee6846f199"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-prior.json.gz",
+        "sha256": "13587662bab45f3fd367be44f02b3880dd36bbf48e7119969873a1d84512b563"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-review.json.gz",
+        "sha256": "349c89c2f4f0d3d43e047e6592d1718d00e745579f6907d5f2c8a7bc2f878e63"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-controls.json",
+        "sha256": "ee2ab010c9ef9ab8a02e10623a8cdccbab1a586681e0c663e8c13fd9aa633f00"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-python.log.gz",
+        "sha256": "9381c76301e7b4cbb999b1cbc7d5638b66717aea8a492ffd2c8c37b734c93e51"
+      },
+      {
+        "path": "compatibility/rc/spec-date-tooltip-slider-source-cyph-sanity.json",
+        "sha256": "55d906eb2c9aa2dcd4ee0c514d262b164a40e27c91698febc1e6e00f325fe5ca"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-checkpoint.json",
+        "sha256": "c273ea431e977a9c608a90e7edc0d1636a469c7949c0181848c563f88d8600cd"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-replay-checkpoint.json",
+        "sha256": "11a2080fc862db278332c54e3fa254a1082b6daf7b78cde4bef05403ebb5b285"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+        "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+        "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+        "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+        "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+      },
+      {
+        "path": "projects/ngx-material-legacy/styles/datepicker/_datepicker-theme.scss",
+        "sha256": "eb040074a9659058b64e4594018400e855a546d0d94ef040fff6e9e8fc77b948"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+      "prior_entry_sha256": "e5aabc716fae7059bbb7b86f35baf8e14d9b67e0941a164b0cba74848e15d1fe",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-5ad259a25e4b6d6346ee62954fe461f4500c9cee.json",
+        "sha256": "b2424f6009f50b1872deddea2b74142cd216c3004850f86c53cfe9ec72f7842e",
+        "bytes": 106736
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+        "bytes": 31558
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-5ad259a25e4b6d6346ee62954fe461f4500c9cee.json",
+        "sha256": "b2424f6009f50b1872deddea2b74142cd216c3004850f86c53cfe9ec72f7842e",
+        "bytes": 106736
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-date-tooltip-slider-source-review.mjs",
+      "sha256": "cd01bbfbe2eab5210e869164edf7382fcb47cc8249c9a24f44b51d7828410a72"
+    },
+    {
+      "path": "tests/spec_date_tooltip_slider_source_probe.mjs",
+      "sha256": "e0085698046c9b2d3b6252ad24e3a63cb8c0b5554c91674de259b973b127f757"
+    },
+    {
+      "path": "tests/test_spec_date_tooltip_slider_source.py",
+      "sha256": "d1543145ede99577ea126982073a38ec932d6bb62f1cf42cddc331a4f8086634"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-qualification-inspector.py",
+      "sha256": "fd616bb0e9d9b100830cc42a86c68e0cce3bba40e67d8462406da7357358b1d9"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-subjects.json.gz",
+      "sha256": "5a06a16f40cb9f2cb7991389972faa5e1a6c03fed62527504238da622e46e790"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-acquisition.json.gz",
+      "sha256": "1d0d216d87f934d88be4154a7ee75a02c86fa723a28ae0ee3de34067006be6b9"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-observation-pins.json",
+      "sha256": "2285c73f7df75fdec78233c659d350f055a5e168db453b9d5a665aee6846f199"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-prior.json.gz",
+      "sha256": "13587662bab45f3fd367be44f02b3880dd36bbf48e7119969873a1d84512b563"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-review.json.gz",
+      "sha256": "349c89c2f4f0d3d43e047e6592d1718d00e745579f6907d5f2c8a7bc2f878e63"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-controls.json",
+      "sha256": "ee2ab010c9ef9ab8a02e10623a8cdccbab1a586681e0c663e8c13fd9aa633f00"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-python.log.gz",
+      "sha256": "9381c76301e7b4cbb999b1cbc7d5638b66717aea8a492ffd2c8c37b734c93e51"
+    },
+    {
+      "path": "compatibility/rc/spec-date-tooltip-slider-source-cyph-sanity.json",
+      "sha256": "55d906eb2c9aa2dcd4ee0c514d262b164a40e27c91698febc1e6e00f325fe5ca"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-checkpoint.json",
+      "sha256": "c273ea431e977a9c608a90e7edc0d1636a469c7949c0181848c563f88d8600cd"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-replay-checkpoint.json",
+      "sha256": "11a2080fc862db278332c54e3fa254a1082b6daf7b78cde4bef05403ebb5b285"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+      "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+      "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-slider/slider.ts",
+      "sha256": "2dd6d9756260ae23ce7fc1dd55fee8d001a678996f80af0bb04eeee766cb274d"
+    },
+    {
+      "path": "projects/ngx-material-legacy/styles/datepicker/_datepicker-theme.scss",
+      "sha256": "eb040074a9659058b64e4594018400e855a546d0d94ef040fff6e9e8fc77b948"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+    "prior_entry_sha256": "e5aabc716fae7059bbb7b86f35baf8e14d9b67e0941a164b0cba74848e15d1fe",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-5ad259a25e4b6d6346ee62954fe461f4500c9cee.json",
+      "sha256": "b2424f6009f50b1872deddea2b74142cd216c3004850f86c53cfe9ec72f7842e",
+      "bytes": 106736
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+      "bytes": 31558
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-date-tooltip-slider-5ad259a25e4b6d6346ee62954fe461f4500c9cee.json",
+      "sha256": "b2424f6009f50b1872deddea2b74142cd216c3004850f86c53cfe9ec72f7842e",
+      "bytes": 106736
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

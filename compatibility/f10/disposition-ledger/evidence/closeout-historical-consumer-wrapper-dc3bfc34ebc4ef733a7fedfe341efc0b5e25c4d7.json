@@ -1,0 +1,516 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7",
+  "subject": "build: enforce that all components are standalone during CI",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "e7604ccd9c0b51c7f12ed82f0556813cd2dd788a",
+      "after_blob": "08b7928386943c8423ccccaf9a1981dfa05623b5"
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a4b39f1a8481f06387b60f0c83e493cab32327ab",
+      "after_blob": "156971b3c5e4fd4304cc20b4124635896dc7a867"
+    }
+  ],
+  "original_files": 2,
+  "original_hunks": 3,
+  "raw_commit_sha256": "42e98bd4855878dcad8651fab88bc425e7ba95d80308822db3535578029bd189",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-fixture-build-source-subjects.json.gz",
+    "sha256": "59ee277e72e713a52a764794acaa182a044e0d33f5128515b962890e1576ce54"
+  },
+  "patch_file": "compatibility/rc/mixed-fixture-build-source-dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7.original.patch",
+  "diff_sha256": "9932ca1885608e8d05e7c0822cf43289c058e324b02a0366043334018b9f51ef",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "header": "@@ -2892,9 +2892,9 @@ class RowContextCdkTableApp {",
+      "sha256": "0d6b14d6730bae9722aca4c7d3a2814197351c29f49f03aa3cb51a8675d04098",
+      "judgment": "WrapperCdkTableApp columnDefs and rowDefs ContentChildren decorators explicitly add descendants:false. All74 complete callbacks remain equal, but query reach is a fixture semantic change; preserve complete class/decorator frames and retain owned legacy table preparation."
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "header": "@@ -95,20 +95,26 @@",
+      "sha256": "e0bbed6bd66901f534b979c568b5e72e9f63d473b362c944ae87260e226f78b7",
+      "judgment": "Moves !standalone into general component property enforcement, splits style/encapsulation rules, excludes specs from OnPush/style requirements and removes the broad spec exemption. Do not inherit upstream standalone policy or convert historical module fixtures."
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "header": "@@ -142,8 +148,7 @@",
+      "sha256": "e1605291bc762ee0c006366ade0fb47f477a096413a1a68e835b71830447dcee",
+      "judgment": "Moves !standalone into general component property enforcement, splits style/encapsulation rules, excludes specs from OnPush/style requirements and removes the broad spec exemption. Do not inherit upstream standalone policy or convert historical module fixtures."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "review": "WrapperCdkTableApp columnDefs and rowDefs ContentChildren decorators explicitly add descendants:false. All74 complete callbacks remain equal, but query reach is a fixture semantic change; preserve complete class/decorator frames and retain owned legacy table preparation."
+    },
+    {
+      "path": "tslint.json",
+      "review": "Moves !standalone into general component property enforcement, splits style/encapsulation rules, excludes specs from OnPush/style requirements and removes the broad spec exemption. Do not inherit upstream standalone policy or convert historical module fixtures."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-fixture-build-source-review.json.gz",
+    "sha256": "6feb7d7b412af3c7f15fb7025565d428e6ca11a25616f6ed55ebc826e0619ec8"
+  },
+  "source_semantics": {
+    "sha": "dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7",
+    "removed_active_source_cases": [],
+    "cases_before": 74,
+    "cases_after": 74,
+    "unchanged_complete_callbacks": 74,
+    "fixture_injector_query_compilation_error_or_lifecycle_equivalence_proved": false,
+    "actual_Angular_native_artifact_browser_SSR_or_floor_qualified": false,
+    "review": "Do not inherit the upstream blanket standalone CI rule or rewrite historical module fixtures. Two WrapperCdkTableApp ContentChildren queries add descendants:false; all 74 case callbacks are equal but query depth is a substantive fixture contract. Lint decorator requirements and spec exemptions also change. The owned legacy table suite retains its module/declarations preparation, compileComponents and finite legacy selectors. These complete source changes do not authorize forcing every fixture/component standalone, changing local query behavior or inferring compiler/peer-floor results."
+  },
+  "decision": "Do not inherit the upstream blanket standalone CI rule or rewrite historical module fixtures. Two WrapperCdkTableApp ContentChildren queries add descendants:false; all 74 case callbacks are equal but query depth is a substantive fixture contract. Lint decorator requirements and spec exemptions also change. The owned legacy table suite retains its module/declarations preparation, compileComponents and finite legacy selectors. These complete source changes do not authorize forcing every fixture/component standalone, changing local query behavior or inferring compiler/peer-floor results. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "owned_context": {
+    "owned_context": [
+      {
+        "path": "toolchain-lock.json",
+        "sha256": "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b"
+      },
+      {
+        "path": ".node-version",
+        "sha256": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f"
+      },
+      {
+        "path": ".npm-version",
+        "sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2"
+      },
+      {
+        "path": "package.json",
+        "sha256": "a3a268beffc3620d3fdeeadc1269c9e9676adbf3e40f55d45cd9683c85e4a060"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "sha256": "95f2b2de22393c4d182972fa13252dfa6b83d66c9a5de94e49c81f5270ae7a58"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      },
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/public-constructor-context.ts",
+        "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/public-constructor-context.ts",
+        "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/internal/table-construction-context.ts",
+        "sha256": "9edd40a3915297b0ad36f6cc812649979c7a00bf8e40eabfc363aecdf6ea6771"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tabs/internal/public-constructor-context.ts",
+        "sha256": "5fb6a70fbcab6e06d16a72d3d888a74b94a56d8620e543666191297569b369ef"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.spec.ts",
+        "sha256": "f61e8eab5779d3e745b075308331394f56b6b75d6cb73a43d14acf0c836dbdad"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      }
+    ],
+    "source_members": 1028,
+    "source_members_sha256": "4eea094fdf39828468fc9dfd4d4ae09009e78c4c6d26ce619d9d8a4b3b4dcbd3",
+    "retained_active_chip_empty_repopulation_regression": {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+      "mode": "it",
+      "suites": [
+        "'MatChipList'"
+      ],
+      "suite_identities": [
+        "7657ebd8bc207f07245c7de61dbb81edd8aac224054f13c01928884600d2a9b9"
+      ],
+      "name": "'should clear a destroyed active chip when the list becomes empty'",
+      "name_identity": "6139190716e4015c39c37551dd0bb971b20bf38c9933f550fc7c5ddf05b4b21a",
+      "key": "[\"projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts\",\"it\",[\"7657ebd8bc207f07245c7de61dbb81edd8aac224054f13c01928884600d2a9b9\"],\"6139190716e4015c39c37551dd0bb971b20bf38c9933f550fc7c5ddf05b4b21a\"]#0",
+      "raw": "it('should clear a destroyed active chip when the list becomes empty', () => {\n    setupStandardList();\n    const keyManager = chipListInstance._keyManager;\n    const removedChip = chips.last;\n\n    removedChip.focus();\n    fixture.detectChanges();\n    expect(keyManager.activeItem).toBe(removedChip);\n\n    testComponent.chips = [];\n    fixture.detectChanges();\n    expect(chips.length).toBe(0);\n    expect(keyManager.activeItemIndex).toBe(-1);\n    expect(keyManager.activeItem).toBeNull();\n\n    testComponent.chips = [10, 11];\n    fixture.detectChanges();\n    expect(keyManager.activeItemIndex).toBe(-1);\n    expect(keyManager.activeItem).toBeNull();\n\n    chips.first.focus();\n    fixture.detectChanges();\n    expect(keyManager.activeItemIndex).toBe(0);\n    expect(keyManager.activeItem).toBe(chips.first);\n    expect(keyManager.activeItem).not.toBe(removedChip);\n  })",
+      "sha256": "82237b7104082d187a1e5ae758990714cb193de0324a1ab5e01c101ce4b70718",
+      "callback_sha256": "1484ce7d142a58e6d053b41c038db9397fb1cd122d46471c534bddd00b0feb1d",
+      "normalized_callback_sha256": "1484ce7d142a58e6d053b41c038db9397fb1cd122d46471c534bddd00b0feb1d",
+      "assertions": [
+        {
+          "sha256": "68c2db17726410be7127cc9398d1e0f89684f7e7325dc56d25c8cd36b6a39128",
+          "text": "expect(keyManager.activeItem).toBe(removedChip);"
+        },
+        {
+          "sha256": "8f5101de573f1ea7d23fca2c06d2c29742bbe726bdf81af1acc081edd4d88711",
+          "text": "expect(chips.length).toBe(0);"
+        },
+        {
+          "sha256": "ba18aa2edd71074c9c770e771d2d734a3464467e62b088e9e89147b279017345",
+          "text": "expect(keyManager.activeItemIndex).toBe(-1);"
+        },
+        {
+          "sha256": "bce0c583ade06b66849d4606f15883d942bca80e9ca25234c8f5cb239d87434c",
+          "text": "expect(keyManager.activeItem).toBeNull();"
+        },
+        {
+          "sha256": "ba18aa2edd71074c9c770e771d2d734a3464467e62b088e9e89147b279017345",
+          "text": "expect(keyManager.activeItemIndex).toBe(-1);"
+        },
+        {
+          "sha256": "bce0c583ade06b66849d4606f15883d942bca80e9ca25234c8f5cb239d87434c",
+          "text": "expect(keyManager.activeItem).toBeNull();"
+        },
+        {
+          "sha256": "90510d4a407ad7722fe99a5ad537edb77b6b82d74ef60f5ffae92d41e96c22e0",
+          "text": "expect(keyManager.activeItemIndex).toBe(0);"
+        },
+        {
+          "sha256": "ff7f6128aeb9b7d89269226f562992130c904f7880d7dd0d61a41a611a7c6a2e",
+          "text": "expect(keyManager.activeItem).toBe(chips.first);"
+        },
+        {
+          "sha256": "fc973cbe85eb0c0764a475766460ab56d577ebe34b57b1c16becb0ec6a6f37cc",
+          "text": "expect(keyManager.activeItem).not.toBe(removedChip);"
+        }
+      ]
+    },
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "actual_Angular_fixture_native_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7",
+    "bucket": "test-only-batch-candidate",
+    "subject": "build: enforce that all components are standalone during CI",
+    "files": [
+      "src/cdk/table/table.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-fixture-build-source-prior.json.gz",
+    "sha256": "698c1545fff5f1b1c3ddd5a1e6e6a5980eeefee839e965b280b589d94bcc17e4"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-fixture-build-source-applicability",
+    "diff_sha256": "9932ca1885608e8d05e7c0822cf43289c058e324b02a0366043334018b9f51ef",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Do not inherit the upstream blanket standalone CI rule or rewrite historical module fixtures. Two WrapperCdkTableApp ContentChildren queries add descendants:false; all 74 case callbacks are equal but query depth is a substantive fixture contract. Lint decorator requirements and spec exemptions also change. The owned legacy table suite retains its module/declarations preparation, compileComponents and finite legacy selectors. These complete source changes do not authorize forcing every fixture/component standalone, changing local query behavior or inferring compiler/peer-floor results. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-fixture-build-source-review.mjs",
+        "sha256": "c97f3adb73def6bb5eeb43d3260cfb3d48350c8ca6cf0ddb6d8628a7fb4274e0"
+      },
+      {
+        "path": "tests/mixed_fixture_build_source_probe.mjs",
+        "sha256": "91d93c2589efa668b80ce3922d80e97dc464ec77b0c5c42438b3d2ba0cc025cb"
+      },
+      {
+        "path": "tests/test_mixed_fixture_build_source.py",
+        "sha256": "59983638b6906bb469261e377e52ec29d84f393b2b2fcd61fc1547d4fa816440"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-qualification-record.py",
+        "sha256": "0abf790ec252f15d414df7c282cf40d06f02d5c63c1bfd8bb5cb5026c36c87b3"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/mixed-zone-moves-source-review.mjs",
+        "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-fixture-build-originals.py",
+        "sha256": "d2daa61695a33a5dffce4475ebf5c7fc8e85d9f34546b750703a0aa5867d483e"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-authenticator.mjs",
+        "sha256": "a51b250960598cec181e87e916ccd313313ba038414ab9b191fccff271a7fcda"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-subjects.json.gz",
+        "sha256": "59ee277e72e713a52a764794acaa182a044e0d33f5128515b962890e1576ce54"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-acquisition.json.gz",
+        "sha256": "4038561b7d292a7cbe28054e667def1c88c09a93538f91cc33002c4afe5e9cd3"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-authentication.json.gz",
+        "sha256": "c0e96c742aa763ea865ec4c92870ce8645f0c70e9852c7f50fab0db33ebe4262"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.json",
+        "sha256": "43a7f1d715250c1aa3144bf2fab977be872985c980f6a235b008d5cadb4c4b65"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.py",
+        "sha256": "08fbd7a8581e6fb0b87370c3175131785896f679e012f999c56ea57c0b5ecd7b"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-acquisition-inspector.mjs",
+        "sha256": "3e647aeae29b650c9b9b3a81320e42ef3a398651d25eedee9aad196f1c6e5277"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-acquisition-checkpoint.json",
+        "sha256": "d220a5c5c1657f7c6d91537197c65c50ec235832a7cd39f75127e18827f1c34f"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-intake.json",
+        "sha256": "938c2be688da15223ba745714d08dfa32410d6e0753ff1a1aa48da7568c3ebe0"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-observation-pins.json.gz",
+        "sha256": "345feb090aac7a4a63a8a8ba7f80c6b138348004a22d028412c130cd14b6b03c"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-prior.json.gz",
+        "sha256": "698c1545fff5f1b1c3ddd5a1e6e6a5980eeefee839e965b280b589d94bcc17e4"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-review.json.gz",
+        "sha256": "6feb7d7b412af3c7f15fb7025565d428e6ca11a25616f6ed55ebc826e0619ec8"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-controls.json",
+        "sha256": "ec16a67b0e0eac1fb14c39f425ecf1715f1ec17739ffdff4cd819b51aac30325"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-python.log.gz",
+        "sha256": "065896e9f8cd0d2ae79ca76f180cc860f295fd22fff8a9ea24fcfe99e2ce9d65"
+      },
+      {
+        "path": "compatibility/rc/mixed-fixture-build-source-cyph-sanity.json",
+        "sha256": "62443ecac62b1bd1ce58ad559886b038ae7b91493e6430f3299c911a4b0caaea"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+      "prior_entry_sha256": "aa9254e6a0c90253602891f7dea5ac47b8b03665cc4ca5fac5fef6126b0c77dd",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7.json",
+        "sha256": "5fbcab7e838f5c463817658f68c3b2b6f57ff24d6c5bd2d5d47bf0e6d01f8f6a",
+        "bytes": 22994
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+        "bytes": 31558
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7.json",
+        "sha256": "5fbcab7e838f5c463817658f68c3b2b6f57ff24d6c5bd2d5d47bf0e6d01f8f6a",
+        "bytes": 22994
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-fixture-build-source-review.mjs",
+      "sha256": "c97f3adb73def6bb5eeb43d3260cfb3d48350c8ca6cf0ddb6d8628a7fb4274e0"
+    },
+    {
+      "path": "tests/mixed_fixture_build_source_probe.mjs",
+      "sha256": "91d93c2589efa668b80ce3922d80e97dc464ec77b0c5c42438b3d2ba0cc025cb"
+    },
+    {
+      "path": "tests/test_mixed_fixture_build_source.py",
+      "sha256": "59983638b6906bb469261e377e52ec29d84f393b2b2fcd61fc1547d4fa816440"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-qualification-record.py",
+      "sha256": "0abf790ec252f15d414df7c282cf40d06f02d5c63c1bfd8bb5cb5026c36c87b3"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/mixed-zone-moves-source-review.mjs",
+      "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-fixture-build-originals.py",
+      "sha256": "d2daa61695a33a5dffce4475ebf5c7fc8e85d9f34546b750703a0aa5867d483e"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-authenticator.mjs",
+      "sha256": "a51b250960598cec181e87e916ccd313313ba038414ab9b191fccff271a7fcda"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-subjects.json.gz",
+      "sha256": "59ee277e72e713a52a764794acaa182a044e0d33f5128515b962890e1576ce54"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-acquisition.json.gz",
+      "sha256": "4038561b7d292a7cbe28054e667def1c88c09a93538f91cc33002c4afe5e9cd3"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-authentication.json.gz",
+      "sha256": "c0e96c742aa763ea865ec4c92870ce8645f0c70e9852c7f50fab0db33ebe4262"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.json",
+      "sha256": "43a7f1d715250c1aa3144bf2fab977be872985c980f6a235b008d5cadb4c4b65"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-acquisition-controls.py",
+      "sha256": "08fbd7a8581e6fb0b87370c3175131785896f679e012f999c56ea57c0b5ecd7b"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-acquisition-inspector.mjs",
+      "sha256": "3e647aeae29b650c9b9b3a81320e42ef3a398651d25eedee9aad196f1c6e5277"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-acquisition-checkpoint.json",
+      "sha256": "d220a5c5c1657f7c6d91537197c65c50ec235832a7cd39f75127e18827f1c34f"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-intake.json",
+      "sha256": "938c2be688da15223ba745714d08dfa32410d6e0753ff1a1aa48da7568c3ebe0"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-observation-pins.json.gz",
+      "sha256": "345feb090aac7a4a63a8a8ba7f80c6b138348004a22d028412c130cd14b6b03c"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-prior.json.gz",
+      "sha256": "698c1545fff5f1b1c3ddd5a1e6e6a5980eeefee839e965b280b589d94bcc17e4"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-review.json.gz",
+      "sha256": "6feb7d7b412af3c7f15fb7025565d428e6ca11a25616f6ed55ebc826e0619ec8"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-controls.json",
+      "sha256": "ec16a67b0e0eac1fb14c39f425ecf1715f1ec17739ffdff4cd819b51aac30325"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-python.log.gz",
+      "sha256": "065896e9f8cd0d2ae79ca76f180cc860f295fd22fff8a9ea24fcfe99e2ce9d65"
+    },
+    {
+      "path": "compatibility/rc/mixed-fixture-build-source-cyph-sanity.json",
+      "sha256": "62443ecac62b1bd1ce58ad559886b038ae7b91493e6430f3299c911a4b0caaea"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+    "prior_entry_sha256": "aa9254e6a0c90253602891f7dea5ac47b8b03665cc4ca5fac5fef6126b0c77dd",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7.json",
+      "sha256": "5fbcab7e838f5c463817658f68c3b2b6f57ff24d6c5bd2d5d47bf0e6d01f8f6a",
+      "bytes": 22994
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+      "bytes": 31558
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mixed-fixture-build-dc3bfc34ebc4ef733a7fedfe341efc0b5e25c4d7.json",
+      "sha256": "5fbcab7e838f5c463817658f68c3b2b6f57ff24d6c5bd2d5d47bf0e6d01f8f6a",
+      "bytes": 22994
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

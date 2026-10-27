@@ -14,7 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class HistoricalRosterReconciliationTests(unittest.TestCase):
     def test_current_writer_validator_and_source_footprint_controls(self):
-        result = subprocess.run(['node', 'tests/historical_roster_reconciliation_probe.mjs'],
+        # Original snapshot assertions; live contracts run in test_current_inspector_contracts.py.
+        result = subprocess.run(['node', 'scripts/run-historical-consumer-probe.mjs', 'historical-roster-reconciliation'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])

@@ -1,0 +1,742 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "df8adda2164bdf5ef10a0d15225d2b22209f3df4",
+  "subject": "test: Extend zoneless lint to cover tests (#29193)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "228b21b6c428aa9317b5ebfbceb04d971468bce5",
+      "after_blob": "d46f649d366ff8a87a0e5b534d0e19cbeb883381"
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.zone.spec.ts",
+      "status": "A",
+      "before_mode": "000000",
+      "after_mode": "100644",
+      "before_blob": "0000000000000000000000000000000000000000",
+      "after_blob": "b50d0a6a50993818cac333b53b418a6c99af92f3"
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "78a87f351dd9f1727a377aabe42d87af50d8b6e3",
+      "after_blob": "1b33803e9c165c93e4784591b51798d6dd009e3f"
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.zone.spec.ts",
+      "status": "A",
+      "before_mode": "000000",
+      "after_mode": "100644",
+      "before_blob": "0000000000000000000000000000000000000000",
+      "after_blob": "ef68ae5de9c58118c08dfdb8319a690050de328c"
+    },
+    {
+      "path": "src/cdk/text-field/autofill.zone.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "5efa4704cca551621a763b8ec6805377e868bcc8",
+      "after_blob": "31a8d5a87b3e39d11148fb48a751f09deffde1fa"
+    },
+    {
+      "path": "src/dev-app/main.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "19e8d61e4d6f22f9bc78407fbe67d768400419ba",
+      "after_blob": "4766971d7769b95abcd944e2c0723e9695b96a96"
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a66e632b9906eae1f6dd19299bf793b7c3b1180e",
+      "after_blob": "070c3edc673dbeb952dd82a41eb563ed63964092"
+    },
+    {
+      "path": "tools/tslint-rules/noZoneDependenciesRule.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a3e888cba2b43b33eab2e5a21a49779f13e05a48",
+      "after_blob": "5f050b9a198c3489703ee1478dbf95cdc06a082c"
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "0bbce003ac8f0c81e2cf39164d0b478120db9f94",
+      "after_blob": "ee66cbd96d369abba6f9dfc92370b6b756a161a9"
+    }
+  ],
+  "original_files": 9,
+  "original_hunks": 23,
+  "raw_commit_sha256": "da57a4eb3cdc683a57a67472b246e447bf2d0d878f17c1b4eda97fe666a921e8",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+    "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+  },
+  "patch_file": "compatibility/rc/mixed-zone-moves-source-df8adda2164bdf5ef10a0d15225d2b22209f3df4.original.patch",
+  "diff_sha256": "9ce83265edc34adbe51f1ce6d1e75c33f34eae738e16c8ceb29188e5ca90e4ae",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.spec.ts",
+      "status": "M",
+      "header": "@@ -71,18 +71,6 @@ describe('ScrollDispatcher', () => {",
+      "sha256": "a3c3a1f54afd3e77ab0fff228bc1e92f0116e4cda8f6b19f072bee196a0bd995",
+      "judgment": "Two outside-zone cases leave the generic suite; remaining callback population and fixture frames are captured. Pair each with its exact new-zone counterpart; do not drop cases when filtering generic specs."
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.zone.spec.ts",
+      "status": "A",
+      "header": "@@ -0,0 +1,52 @@",
+      "sha256": "b4b323a2e6ea758dcb5a510568bc2579e47d3930454845e409ca6897ad2d30ca",
+      "judgment": "New complete zoneful standalone ScrollingComponent fixture and Basic usage setup retain two exact moved outside-zone callbacks under a renamed root suite. Added-file absence and provider/setup/lifetime boundaries are explicit."
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.spec.ts",
+      "status": "M",
+      "header": "@@ -1,13 +1,10 @@",
+      "sha256": "09d708ae3b465a15caf3719b7c95c13101a8aab451580b61408200ab0a460d1d",
+      "judgment": "Two resize/outside-zone cases leave this generic suite, with old NgZone variable/injection removed. No source proof about the supported Angular SSR null-view path or real resize teardown follows."
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.spec.ts",
+      "status": "M",
+      "header": "@@ -24,9 +21,8 @@ describe('ViewportRuler', () => {",
+      "sha256": "10af1498276a8899d8a813598a9a49947cf174d8d302d87fcb0d8f0c57b6d8bb",
+      "judgment": "Two resize/outside-zone cases leave this generic suite, with old NgZone variable/injection removed. No source proof about the supported Angular SSR null-view path or real resize teardown follows."
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.spec.ts",
+      "status": "M",
+      "header": "@@ -133,27 +129,5 @@ describe('ViewportRuler', () => {",
+      "sha256": "23d78215b1169464fa8078282c31217bf6fab45cf96e56c2950984d4d393ed02",
+      "judgment": "Two resize/outside-zone cases leave this generic suite, with old NgZone variable/injection removed. No source proof about the supported Angular SSR null-view path or real resize teardown follows."
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.zone.spec.ts",
+      "status": "A",
+      "header": "@@ -0,0 +1,53 @@",
+      "sha256": "5394d129f42c50ba05b511564ea107a74866bf1a16bf46f22b59a533fce4a536",
+      "judgment": "New complete ViewportRuler/NgZone provider fixture retains two exact moved callbacks. Its local large div/style setup is distinct from the original fixture; do not infer equivalent DOM attachment, lifecycle or delivery from callback equality."
+    },
+    {
+      "path": "src/cdk/text-field/autofill.zone.spec.ts",
+      "status": "M",
+      "header": "@@ -3,7 +3,7 @@ import {ComponentFixture, TestBed, inject} from '@angular/core/testing';",
+      "sha256": "322501d0347da0bb5f7bbf23d09cabb86210f0401c4355b390cc0de2bc4933cf",
+      "judgment": "Root describe changes to AutofillMonitor Zone.js integration; its complete callback is identical. Treat this as an explicit same-file suite relocation and retain the entire fixture/provider frame."
+    },
+    {
+      "path": "src/dev-app/main.ts",
+      "status": "M",
+      "header": "@@ -9,14 +9,15 @@",
+      "sha256": "b9002bdf6b014d8219847f80d0784ba623a6e56b354589435fd6c7c2b873a6e4",
+      "judgment": "Reorders an import and annotates manual zone preparation for lint. Development application configuration is not inherited by the add-on or its legacy runner."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -1,23 +1,17 @@",
+      "sha256": "c03cff5c8a69793df941ad3ab2e958211be80ceb04eb8ae11e8a205e1b2329cb",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -297,12 +291,6 @@ const testCases = [",
+      "sha256": "f824b2f7d007285a96936bcb80c5e6c5206712dc746ec4ed82db6cdcf4cb98e8",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -317,6 +305,7 @@ describe('Material Popover Edit', () => {",
+      "sha256": "35c80201bc010d1c9426822a6e31150217ffad7d8d5ce2399d665ae175d28dac",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -432,6 +421,7 @@ describe('Material Popover Edit', () => {",
+      "sha256": "5b44a5a5e18ad8259e5e76b6a7db2ae786a39031f09343a088e7395c7a90d12f",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -452,6 +442,7 @@ describe('Material Popover Edit', () => {",
+      "sha256": "9e2c264b36be25c4dfacddeff3e9f21d04f51a487c74dd473de70ee6f1a79e53",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -594,6 +585,7 @@ matPopoverEditTabOut`, fakeAsync(() => {",
+      "sha256": "96544ea01167c9595249178ec9ea5ec6a4eeca7dd473a69b6f5ad512f10dd46d",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -610,9 +602,11 @@ matPopoverEditTabOut`, fakeAsync(() => {",
+      "sha256": "3bf844c1d0db648244d7439672681ad62306825f42d81e18e35f814f366d454e",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -620,6 +614,7 @@ matPopoverEditTabOut`, fakeAsync(() => {",
+      "sha256": "495166fc6f2a82c2a0abb1a705a59dcfad74068f0b7547cdeb00588ed3687f71",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -630,6 +625,7 @@ matPopoverEditTabOut`, fakeAsync(() => {",
+      "sha256": "10b36fe5ab485a216ab970d2857fad5c441545966dfc4cafc4b56ae451cdfd73",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -706,6 +702,7 @@ matPopoverEditTabOut`, fakeAsync(() => {",
+      "sha256": "823454fd4c1223242ec45f14d9246ab1c8b2860cf177c6bc69c1b73ebe2203cd",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -713,6 +710,7 @@ matPopoverEditTabOut`, fakeAsync(() => {",
+      "sha256": "3f5fc109478f2d1f7778396c0e07c166c5c962c6b40a56f317f54b36fc53b8d2",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "status": "M",
+      "header": "@@ -733,6 +731,7 @@ matPopoverEditTabOut`, fakeAsync(() => {",
+      "sha256": "e1f305de98f04734a802dd7194c1f079ffd0f27c782f7f270138c6adeb915c8d",
+      "judgment": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "tools/tslint-rules/noZoneDependenciesRule.ts",
+      "status": "M",
+      "header": "@@ -1,6 +1,6 @@",
+      "sha256": "d2339e6e3c398e3f886ecdbbb6cc2cf596afa622274012c2a90f5e98fca3e1ba",
+      "judgment": "Adds visitNamedImports respecting enabled state and checking specifier.name text against provideZoneChangeDetection. Record exact local-name matching; do not call it an exhaustive import-alias or legacy-runtime policy."
+    },
+    {
+      "path": "tools/tslint-rules/noZoneDependenciesRule.ts",
+      "status": "M",
+      "header": "@@ -49,4 +49,16 @@ class Walker extends Lint.RuleWalker {",
+      "sha256": "17a705cc939a603dceffb98c3b0ccac0e78f79dbddbd58b5e8710facd419e866",
+      "judgment": "Adds visitNamedImports respecting enabled state and checking specifier.name text against provideZoneChangeDetection. Record exact local-name matching; do not call it an exhaustive import-alias or legacy-runtime policy."
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "header": "@@ -185,10 +185,12 @@",
+      "sha256": "77586cf3e1540a9b1247e7fc1f7a8911615ffa6855cb6ac6c678665a7f2c703c",
+      "judgment": "Narrows blanket spec zone exemptions to .zone.spec.ts plus explicit path exceptions. Keep the independently owned historical zoneful runner and command sources; do not inherit the upstream lint/test-layout migration."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.spec.ts",
+      "review": "Two outside-zone cases leave the generic suite; remaining callback population and fixture frames are captured. Pair each with its exact new-zone counterpart; do not drop cases when filtering generic specs."
+    },
+    {
+      "path": "src/cdk/scrolling/scroll-dispatcher.zone.spec.ts",
+      "review": "New complete zoneful standalone ScrollingComponent fixture and Basic usage setup retain two exact moved outside-zone callbacks under a renamed root suite. Added-file absence and provider/setup/lifetime boundaries are explicit."
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.spec.ts",
+      "review": "Two resize/outside-zone cases leave this generic suite, with old NgZone variable/injection removed. No source proof about the supported Angular SSR null-view path or real resize teardown follows."
+    },
+    {
+      "path": "src/cdk/scrolling/viewport-ruler.zone.spec.ts",
+      "review": "New complete ViewportRuler/NgZone provider fixture retains two exact moved callbacks. Its local large div/style setup is distinct from the original fixture; do not infer equivalent DOM attachment, lifecycle or delivery from callback equality."
+    },
+    {
+      "path": "src/cdk/text-field/autofill.zone.spec.ts",
+      "review": "Root describe changes to AutofillMonitor Zone.js integration; its complete callback is identical. Treat this as an explicit same-file suite relocation and retain the entire fixture/provider frame."
+    },
+    {
+      "path": "src/dev-app/main.ts",
+      "review": "Reorders an import and annotates manual zone preparation for lint. Development application configuration is not inherited by the add-on or its legacy runner."
+    },
+    {
+      "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+      "review": "Removes global zoneful provider setup, adds detectChanges after tick/openLens and marks for disabled/colspan inputs and state/value cases. Experimental runtime is outside owned product; preserve full changed test frames without claiming scheduling equivalence."
+    },
+    {
+      "path": "tools/tslint-rules/noZoneDependenciesRule.ts",
+      "review": "Adds visitNamedImports respecting enabled state and checking specifier.name text against provideZoneChangeDetection. Record exact local-name matching; do not call it an exhaustive import-alias or legacy-runtime policy."
+    },
+    {
+      "path": "tslint.json",
+      "review": "Narrows blanket spec zone exemptions to .zone.spec.ts plus explicit path exceptions. Keep the independently owned historical zoneful runner and command sources; do not inherit the upstream lint/test-layout migration."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+    "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+  },
+  "source_semantics": {
+    "sha": "df8adda2164bdf5ef10a0d15225d2b22209f3df4",
+    "runtime": [],
+    "lifecycle": [
+      {
+        "path": "src/cdk/scrolling/scroll-dispatcher.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "02516ecf56d4a473591d4b371e5d8d3891ecdf2edb50f19fd0ee6d55a15b7cbf",
+        "after_sha256": "345acda1e58f500d500c52fe1c52a084ff460561867435d2ef491535e32778c9"
+      },
+      {
+        "path": "src/cdk/scrolling/scroll-dispatcher.zone.spec.ts",
+        "status": "A",
+        "before_present": false,
+        "after_present": true,
+        "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_sha256": "42c202a4c18dbca374a60abaa733e74e416fe32e83c714a667d9bb3c50fe718e"
+      },
+      {
+        "path": "src/cdk/scrolling/viewport-ruler.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "a3192714447cf71c5d46321328040b2a54a90aa8db97cd0f9448ab797ddfad9b",
+        "after_sha256": "65fdc6e877df37d18bf898d706d8ec40e2f2390fa0cca77744ade6a00c30a34c"
+      },
+      {
+        "path": "src/cdk/scrolling/viewport-ruler.zone.spec.ts",
+        "status": "A",
+        "before_present": false,
+        "after_present": true,
+        "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_sha256": "4214a46114f92aff2c6dd5fd7e3242b7583ce371ed2317d150c073a2b22079ef"
+      },
+      {
+        "path": "src/cdk/text-field/autofill.zone.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "071a432cd25cbdc7a4f3eaf2561b294802fd322cf698abdab5ae99879c77918a",
+        "after_sha256": "76fbbe6ba28ab9017d3b3d350a472ad5c7a7ef8533ecf82ce41cfbfb9e695a1c"
+      },
+      {
+        "path": "src/dev-app/main.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "a656ff7a5b9c3a86a9106b802a9d87b115bebcf5ae7af8d309b773d65deb2533",
+        "after_sha256": "5f61c93c1a6cd453eef1238a4abf968a78df50d17d4f19aeeba6f68e15ca3221"
+      },
+      {
+        "path": "src/material-experimental/popover-edit/popover-edit.spec.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "404c7df692b363c721c0f437fc4e05d1f086e70a6e12875dea1902e97732e7f9",
+        "after_sha256": "e87a09f14c7b62605ae68aa49c19ee031be98ae2ce2e2dcc392e8f4d96efb234"
+      },
+      {
+        "path": "tools/tslint-rules/noZoneDependenciesRule.ts",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "9afc8aef197fddbb7137a92b94b0fc90312c46f46b8a86028dab96f4710f4704",
+        "after_sha256": "684aaa7f50d2883385e76699818501e636108b4f6588614f8d6655778b268af2"
+      },
+      {
+        "path": "tslint.json",
+        "status": "M",
+        "before_present": true,
+        "after_present": true,
+        "before_sha256": "2c9fbdb9dc76601d6131891aecf9f191231622778ae0f78fbee6a590d5cf930b",
+        "after_sha256": "5e155e740de883a423923f9f30329121292bc05f4c76b5a22e91067b2978cbf6"
+      }
+    ],
+    "cases_before": 64,
+    "cases_after": 64,
+    "unchanged_complete_callbacks": 57,
+    "exact_reviewed_relocations": 5,
+    "fixture_provider_notification_error_or_lifecycle_equivalence_proved": false,
+    "actual_Angular_native_artifact_browser_SSR_or_floor_qualified": false,
+    "review": "Do not impose this upstream zoneless lint/test-layout policy on the owned historical runner. Two scrolling callbacks, two viewport callbacks and the autofill root-suite rename are five exact callback relocations, with 64 cases retained and 57 equal complete callbacks. New zone files introduce distinct standalone fixture/provider/setup scopes; equal callbacks do not prove equal teardown or viewport DOM preparation. The experimental popover fixture adds notification/render steps, and the lint walker examines local named-import identifiers while its allowlist narrows spec exemptions. Dev-app lint annotations and experimental controls are outside the legacy product. Retain owned MockNgZone/zoneful preparation, strict errors/public stability and historical layout; real resize/scroll/keyboard/observer execution, SSR, artifacts and floors stay open."
+  },
+  "decision": "Do not impose this upstream zoneless lint/test-layout policy on the owned historical runner. Two scrolling callbacks, two viewport callbacks and the autofill root-suite rename are five exact callback relocations, with 64 cases retained and 57 equal complete callbacks. New zone files introduce distinct standalone fixture/provider/setup scopes; equal callbacks do not prove equal teardown or viewport DOM preparation. The experimental popover fixture adds notification/render steps, and the lint walker examines local named-import identifiers while its allowlist narrows spec exemptions. Dev-app lint annotations and experimental controls are outside the legacy product. Retain owned MockNgZone/zoneful preparation, strict errors/public stability and historical layout; real resize/scroll/keyboard/observer execution, SSR, artifacts and floors stay open. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "owned_context": {
+    "source_members": 1028,
+    "members_sha256": "4eea094fdf39828468fc9dfd4d4ae09009e78c4c6d26ce619d9d8a4b3b4dcbd3",
+    "owned_context": [
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+      },
+      {
+        "path": "testing/legacy-runner/shims/mock-ng-zone.ts",
+        "sha256": "bf04242c0e44a37b6770f9b718b21ce9320cf5dbbc9e60dc4e30469d1cc5eb56"
+      },
+      {
+        "path": "testing/legacy-runner/shims/cdk-testing-private.ts",
+        "sha256": "a2ab9af08d1e5e1756a92e6dfd193b1fdcf48cb995ad34de3e05383ac6fc116c"
+      },
+      {
+        "path": "projects/ngx-material-legacy/internal/testing/owned-test-events.ts",
+        "sha256": "7c5798340b031d79a5ebe8c94ba266bb137e0babc24f6126d54aced47367f212"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+        "sha256": "9fa9e54e3f7cc9ee9a7a7b236e3b14e28ee1b824312b026361c51fbcb912e1d9"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.spec.ts",
+        "sha256": "20ecc8bb27b6d305f8d51b1b8c7f2f18ddea6c93147c4b1f90c00fbb3e524fc0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-input/input.spec.ts",
+        "sha256": "413601de7ed5123e022613374e79680c492653fe2e2491a4f5b03db40b0d1b2a"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/internal/menu-base.ts",
+        "sha256": "bb843faad6ffcb93ce8f7469bcff85546728a9ae6e3fa48646c558ee661cb945"
+      }
+    ],
+    "retained_deleted_helper_class": {
+      "kind": "ClassDeclaration",
+      "raw": "@Injectable()\nexport class MockNgZone extends NgZone {\n  override readonly onStable = new EventEmitter(false);\n\n  constructor() {\n    super({enableLongStackTrace: false});\n  }\n\n  override run(fn: Function): any {\n    return fn();\n  }\n\n  override runOutsideAngular(fn: Function): any {\n    return fn();\n  }\n\n  simulateZoneExit(): void {\n    this.onStable.emit(null);\n  }\n}",
+      "sha256": "a6a4860f289cd7c067232c3aac65ec6223b5960388f1550233cfdc187f1bb278",
+      "semantic_sha256": "d59f8189b969fb1f0cf660fd6017708c4eb075b4172baa0ae6c48bca4d161adb"
+    },
+    "historical_deleted_class_semantics_equal": true,
+    "current_owned_test_event_mock": {
+      "kind": "ClassDeclaration",
+      "raw": "export class MockNgZone extends NgZone {\n  constructor() {\n    super({enableLongStackTrace: false});\n  }\n\n  override run<T>(fn: (...args: any[]) => T, applyThis?: any, applyArgs?: any[]): T {\n    return fn.apply(applyThis, applyArgs ?? []);\n  }\n\n  override runOutsideAngular<T>(fn: (...args: any[]) => T): T {\n    return fn();\n  }\n\n  simulateZoneExit(): void {\n    (this.onStable as EventEmitter<any>).emit(null);\n  }\n}",
+      "sha256": "19ac1fe5319abb471c73ae63cfa9b6bdad716684dece889e68bd9e04779b9351",
+      "semantic_sha256": "d2a680b25769dab0a8579fccb19dd11c2250b7244268d9df531927d273c3838e"
+    },
+    "explicit_legacy_zoneful_preparation": true,
+    "public_fixture_stability_untouched": true,
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "actual_fixture_Angular_native_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "df8adda2164bdf5ef10a0d15225d2b22209f3df4",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test: Extend zoneless lint to cover tests (#29193)",
+    "files": [
+      "src/cdk/scrolling/scroll-dispatcher.spec.ts",
+      "src/cdk/scrolling/scroll-dispatcher.zone.spec.ts",
+      "src/cdk/scrolling/viewport-ruler.spec.ts",
+      "src/cdk/scrolling/viewport-ruler.zone.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+    "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-zone-moves-source-applicability",
+    "diff_sha256": "9ce83265edc34adbe51f1ce6d1e75c33f34eae738e16c8ceb29188e5ca90e4ae",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Do not impose this upstream zoneless lint/test-layout policy on the owned historical runner. Two scrolling callbacks, two viewport callbacks and the autofill root-suite rename are five exact callback relocations, with 64 cases retained and 57 equal complete callbacks. New zone files introduce distinct standalone fixture/provider/setup scopes; equal callbacks do not prove equal teardown or viewport DOM preparation. The experimental popover fixture adds notification/render steps, and the lint walker examines local named-import identifiers while its allowlist narrows spec exemptions. Dev-app lint annotations and experimental controls are outside the legacy product. Retain owned MockNgZone/zoneful preparation, strict errors/public stability and historical layout; real resize/scroll/keyboard/observer execution, SSR, artifacts and floors stay open. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-zone-moves-source-review.mjs",
+        "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+      },
+      {
+        "path": "tests/mixed_zone_moves_source_probe.mjs",
+        "sha256": "a66dbd79a054f104331f6f90623b5765fcf9f2bd5169ca3c9baee10f79e8ce43"
+      },
+      {
+        "path": "tests/test_mixed_zone_moves_source.py",
+        "sha256": "1b29da7179887edb87453e40af10f29fb6051b53dde497fe7fe4b3e5bbf88e30"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-qualification-record.py",
+        "sha256": "887a2e0e4c2134dba3f40b91176f101508b08d6c22ca39c65f62c0ae57c95a3c"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-zone-moves-originals.py",
+        "sha256": "7311cfad4c39b221a8732e01e2f610f4618d4f581bb08d699c44172ff7c061e0"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-authenticator.mjs",
+        "sha256": "ce87034b912c50de87ff80bc68311cf828d2cbbedbd63caf4428d50cbe081133"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+        "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-acquisition.json.gz",
+        "sha256": "28706738deb8f0fe4ff5cdef88e9fcbd2edd5f3d6ddce1acac8d6473b970a2e6"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-authentication.json.gz",
+        "sha256": "0e8eb4b5dcc112b69024aee0ac27b773b22fe47a3866f2f05ce038f6f1633482"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-control-results.json",
+        "sha256": "de72e2b55dfa66c024df9b4c70095477ff378c61ce1cfdd6f16d7a63e8cf7273"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-controls.mjs",
+        "sha256": "ff02fb991b245999d15cb6621d6e58bb2bd401fbeabdb05e5fcb4aa0de5e274a"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-acquisition-checkpoint.json",
+        "sha256": "0f56870a585f667d203423172085e4df9875835f097a995c29f3b0aa4bf96984"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-intake.json",
+        "sha256": "63b375cdb296d8bcb733a8c5504c92ae56fe68becaf7954292ab6ba422e0e6fc"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-observation-pins.json.gz",
+        "sha256": "233903018312f589237200e66edb578a68de745b5c671e345ece1dcda6e5a0b7"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+        "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+        "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-controls.json",
+        "sha256": "de3ca290a067ec4a1be217f8c2206a23439c8752c60f2ba1ef878eb8e52ce2ac"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-python.log.gz",
+        "sha256": "aeb250f884e1a593b218d1839d39ceb7e6fed9ac7972862237dfac0faf03cdae"
+      },
+      {
+        "path": "compatibility/rc/mixed-zone-moves-source-cyph-sanity.json",
+        "sha256": "603c0efe729c92c643cc449d783030e2bb3caaae35262a0f5dbb153b7f20dae4"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+      "prior_entry_sha256": "1093d93aa2cb72ff74b7b31f60c54a9954fdeb8e0a8e2a0772be6c54218a9e8f",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/mixed-zone-moves-df8adda2164bdf5ef10a0d15225d2b22209f3df4.json",
+        "sha256": "b17ffc3afab0787a61e2bbddf6b12e73ffc305748bff33ec13b9bd53388879b6",
+        "bytes": 37769
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+        "bytes": 31558
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/mixed-zone-moves-df8adda2164bdf5ef10a0d15225d2b22209f3df4.json",
+        "sha256": "b17ffc3afab0787a61e2bbddf6b12e73ffc305748bff33ec13b9bd53388879b6",
+        "bytes": 37769
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-zone-moves-source-review.mjs",
+      "sha256": "893b3dca39e0d4283553651c4977cba0aaba787ecc831ddf4b83269d1741b30c"
+    },
+    {
+      "path": "tests/mixed_zone_moves_source_probe.mjs",
+      "sha256": "a66dbd79a054f104331f6f90623b5765fcf9f2bd5169ca3c9baee10f79e8ce43"
+    },
+    {
+      "path": "tests/test_mixed_zone_moves_source.py",
+      "sha256": "1b29da7179887edb87453e40af10f29fb6051b53dde497fe7fe4b3e5bbf88e30"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-qualification-record.py",
+      "sha256": "887a2e0e4c2134dba3f40b91176f101508b08d6c22ca39c65f62c0ae57c95a3c"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-zone-moves-originals.py",
+      "sha256": "7311cfad4c39b221a8732e01e2f610f4618d4f581bb08d699c44172ff7c061e0"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-authenticator.mjs",
+      "sha256": "ce87034b912c50de87ff80bc68311cf828d2cbbedbd63caf4428d50cbe081133"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-subjects.json.gz",
+      "sha256": "07a790d6ef56fab3d67e0ed751ef7b57ffa0c093475fd4340a111fdaf65e3dbd"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-acquisition.json.gz",
+      "sha256": "28706738deb8f0fe4ff5cdef88e9fcbd2edd5f3d6ddce1acac8d6473b970a2e6"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-authentication.json.gz",
+      "sha256": "0e8eb4b5dcc112b69024aee0ac27b773b22fe47a3866f2f05ce038f6f1633482"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-control-results.json",
+      "sha256": "de72e2b55dfa66c024df9b4c70095477ff378c61ce1cfdd6f16d7a63e8cf7273"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-lifecycle-controls.mjs",
+      "sha256": "ff02fb991b245999d15cb6621d6e58bb2bd401fbeabdb05e5fcb4aa0de5e274a"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-acquisition-checkpoint.json",
+      "sha256": "0f56870a585f667d203423172085e4df9875835f097a995c29f3b0aa4bf96984"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-intake.json",
+      "sha256": "63b375cdb296d8bcb733a8c5504c92ae56fe68becaf7954292ab6ba422e0e6fc"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-observation-pins.json.gz",
+      "sha256": "233903018312f589237200e66edb578a68de745b5c671e345ece1dcda6e5a0b7"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-prior.json.gz",
+      "sha256": "b07c3a53099fff3f5448db4f60bf03b8f03bf4093abc06631df8e200510b53c9"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-review.json.gz",
+      "sha256": "5118be529c4336cda53a0441c390b11dbbed97e0ccb4e0aec6e20e31e501c641"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-controls.json",
+      "sha256": "de3ca290a067ec4a1be217f8c2206a23439c8752c60f2ba1ef878eb8e52ce2ac"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-python.log.gz",
+      "sha256": "aeb250f884e1a593b218d1839d39ceb7e6fed9ac7972862237dfac0faf03cdae"
+    },
+    {
+      "path": "compatibility/rc/mixed-zone-moves-source-cyph-sanity.json",
+      "sha256": "603c0efe729c92c643cc449d783030e2bb3caaae35262a0f5dbb153b7f20dae4"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+    "prior_entry_sha256": "1093d93aa2cb72ff74b7b31f60c54a9954fdeb8e0a8e2a0772be6c54218a9e8f",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mixed-zone-moves-df8adda2164bdf5ef10a0d15225d2b22209f3df4.json",
+      "sha256": "b17ffc3afab0787a61e2bbddf6b12e73ffc305748bff33ec13b9bd53388879b6",
+      "bytes": 37769
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+      "bytes": 31558
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mixed-zone-moves-df8adda2164bdf5ef10a0d15225d2b22209f3df4.json",
+      "sha256": "b17ffc3afab0787a61e2bbddf6b12e73ffc305748bff33ec13b9bd53388879b6",
+      "bytes": 37769
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

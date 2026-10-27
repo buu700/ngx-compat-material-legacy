@@ -1,0 +1,1595 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7",
+  "subject": "refactor(material/dialog): switch tests away from fakeAsync (#32914)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "23b687650a0eee9d9dbb2722f669a700fb9236b2",
+      "after_blob": "5aeb7b9e8ba446cb8f1cc5884d855ee31cbab6f4"
+    },
+    {
+      "path": "src/material/dialog/dialog.zone.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "70c290fd6bcbf0402af92686feaa0ad1cef06b07",
+      "after_blob": "1ba0de5639c337902d48e757d9877cc25e0e554e"
+    },
+    {
+      "path": "src/material/dialog/testing/dialog-opener.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "c4c6a6bcada3b490daf93a617fd6d68df390382f",
+      "after_blob": "2d2011cab3227e190071003914597bf6902cde0d"
+    }
+  ],
+  "original_files": 3,
+  "original_hunks": 108,
+  "raw_commit_sha256": "ddd057350395af9bf4aa45127b976a23f4c6da120d2e616f12c9a26c3bbb4884",
+  "original_sources": {
+    "path": "compatibility/rc/spec-overlay-async-source-subjects.json.gz",
+    "sha256": "ac596dc588cccf6e6ec6cd4b9cfdf248bf7d870d293fe258b210884e8c4f1e3e"
+  },
+  "patch_file": "compatibility/rc/spec-overlay-async-source-42eb7044ca2f27fe81b9b402a6ae3baae73662f7.patch",
+  "diff_sha256": "bccd4c6b6eb6c8a09d64090156c56362787f4844d1da6a09ceb60d9077fc8603",
+  "hunk_reviews": [
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -29,14 +29,7 @@ import {",
+      "sha256": "fc24e35054c3f99fa59f704fd5e0eaa41c7c374f59bb2165edf35893f9e6d82a",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -64,7 +57,7 @@ describe('MatDialog', () => {",
+      "sha256": "3adc9f73e99229f039da1bdf9e7175fa9cd4fbe38b2c8fc4e23b65469dd1a834",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -87,7 +80,7 @@ describe('MatDialog', () => {",
+      "sha256": "fad9c28a48924e6fc88477acdb3ee5f67bee89f2ed28c2b369e15ac6230000b3",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -139,7 +132,7 @@ describe('MatDialog', () => {",
+      "sha256": "528b6b33ddb142f96cb5da22bbd6a72779b06a69177f47d013bef93712700704",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -150,9 +143,9 @@ describe('MatDialog', () => {",
+      "sha256": "02335f9a48ba77a9e65b2fe2e8c003f36f19a32e7f9a07109513ee30ca6d63e6",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -202,31 +195,31 @@ describe('MatDialog', () => {",
+      "sha256": "f578f0b8dc0c88833820b26d825bafd0f870362eab2e3dcac7da61fffa5089f1",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -239,16 +232,16 @@ describe('MatDialog', () => {",
+      "sha256": "627cf5b8c757f68bb2de6b7d979d7841f4e79b06539a214d9516dac6bfda0340",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -261,36 +254,36 @@ describe('MatDialog', () => {",
+      "sha256": "491a788984de59ebc51a7636676e7fd2cffab6b9e726b310dd7d1378aa03688c",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -299,25 +292,25 @@ describe('MatDialog', () => {",
+      "sha256": "556646829cd5ad581fa4105abe6de0f4cfe473b6599312f3dbd5bdce55f922d8",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -326,12 +319,12 @@ describe('MatDialog', () => {",
+      "sha256": "d2e6a3b6cf3432163aff42e1ae0ca4cb19d5bfbc50cb6d2a7add4803ce829cc7",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -345,21 +338,21 @@ describe('MatDialog', () => {",
+      "sha256": "2aac88856060d171d31d4d0b343b683c4cfbf35adb45f0cb5c99804c78214428",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -368,7 +361,7 @@ describe('MatDialog', () => {",
+      "sha256": "f550ba12240e6be7ce397e7eb13ab0ffffad6c322fef01e5e5e8396687e49cb3",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -376,7 +369,7 @@ describe('MatDialog', () => {",
+      "sha256": "6b110a7e2aadbc9211ea01af6b37f2d6324776b0506d814683aeee626ac05e3d",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -385,15 +378,15 @@ describe('MatDialog', () => {",
+      "sha256": "8e424b891df603369a8c46ff662dc8b7cc5b0e666fd75abf0a947a3a7ff0efa5",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -433,7 +426,7 @@ describe('MatDialog', () => {",
+      "sha256": "ece0fda86ed7a6e18a04ee3a9afc6953f5c896e27e8838d55043982e25cc9070",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -443,18 +436,18 @@ describe('MatDialog', () => {",
+      "sha256": "1318711b876779cd274f642509b73526983bffe43273f75813f845e74e214eaa",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -591,22 +584,22 @@ describe('MatDialog', () => {",
+      "sha256": "3cc27c4b9fa7372bbc903a8d4858479c49a9d51db3e00675c10de018d0a19121",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -615,12 +608,12 @@ describe('MatDialog', () => {",
+      "sha256": "ff09f6e932c986263fe6f88c35d92a930ebcdd3c44bc6de700ee62c6414bca83",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -628,12 +621,12 @@ describe('MatDialog', () => {",
+      "sha256": "35434053e18497b817c27b0b477e97591012195e808f6ac1275703ae78fbd5df",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -641,12 +634,12 @@ describe('MatDialog', () => {",
+      "sha256": "90d6e36729e3c68c7d3589507488a199484b1c36785f9e1c47eb1e29c12ddf8b",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -655,12 +648,12 @@ describe('MatDialog', () => {",
+      "sha256": "0731113fe9575f30a23c8278f1bf3a592401f82f32d63ec39f98042063ce1ccf",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -675,9 +668,9 @@ describe('MatDialog', () => {",
+      "sha256": "ced43d5e4c9770a65178a8baba20e87a1a8142f62b4a7faf379d9364a6bdf2df",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -685,18 +678,18 @@ describe('MatDialog', () => {",
+      "sha256": "c3eab45265de8d506beb51c95af35e7b4d493ab54ab6ef4888caba04bf4ba5b5",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -707,15 +700,15 @@ describe('MatDialog', () => {",
+      "sha256": "e7f6783355ac34555fef83442ab8a3f18600f86562e8f07ff53cbaf8bb864f22",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -723,9 +716,9 @@ describe('MatDialog', () => {",
+      "sha256": "6866af8657ad5078ba6618b94026c46fa48cf64199a27609cd77a013fb350ef0",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -745,29 +738,29 @@ describe('MatDialog', () => {",
+      "sha256": "df6956083a4da9b78c1b11e621119882820094c9755c930b592a0efd3343e736",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -784,13 +777,14 @@ describe('MatDialog', () => {",
+      "sha256": "78f26a9ba4c09aca844a2d17dd9412d6a7655036d9d40d08c42eddd5dcac9330",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -801,15 +795,15 @@ describe('MatDialog', () => {",
+      "sha256": "add91e0301dfc172b16ec5a46cfa96b654a4e92a72970340d34b3c941fc3456e",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -817,7 +811,7 @@ describe('MatDialog', () => {",
+      "sha256": "1ec024959f0571a6411a62282b2b5e472202fbbd01474a779e7ded4c94abb6c0",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -825,15 +819,15 @@ describe('MatDialog', () => {",
+      "sha256": "1aa83c060cc57f1ecc0a17f3ca28aa8df116fd18e337dddc3f72e9cf01db2204",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -841,13 +835,13 @@ describe('MatDialog', () => {",
+      "sha256": "e0da960785a9908143d5c682c1d6f48edd9f3a2210ab2e15c0fab7a9e33025a7",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -869,7 +863,7 @@ describe('MatDialog', () => {",
+      "sha256": "ec17f6f780395103ed2399552474f7343abbf98b2c8f41ae76423069f2ee0ce3",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -877,23 +871,23 @@ describe('MatDialog', () => {",
+      "sha256": "99e689be8242a2ec014881d0860f60739af93b3a735ae5059d850aca81b23c2e",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -909,18 +903,18 @@ describe('MatDialog', () => {",
+      "sha256": "6df0db3b91f89ce4aa0d3568896569fc2d733ddb1a950aa4407b472dc503b67a",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -932,26 +926,26 @@ describe('MatDialog', () => {",
+      "sha256": "a7235cbab25cbbb7642c54e09c95638e5f0cf57a3fcaa9c0f5c69bdb58fdf688",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -965,18 +959,18 @@ describe('MatDialog', () => {",
+      "sha256": "02ba4d9d3ec5710c8eb8cdbf74068a00fdef6e0549cf02bed0819ca39c594fe6",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -984,7 +978,7 @@ describe('MatDialog', () => {",
+      "sha256": "94c5d3966b8680fe17f8a379de6ead64bbfca7713ced47c532bc3b0d02d185c2",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1001,12 +995,12 @@ describe('MatDialog', () => {",
+      "sha256": "3523362af36083db4a2ef5b6adcca833ed4fdd0c28ff747d87b00633812439dc",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1015,7 +1009,7 @@ describe('MatDialog', () => {",
+      "sha256": "3a56a74ef983b766cb983ac20449edbfc0d35a4842852ffc093bafe7c8f91d80",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1031,7 +1025,7 @@ describe('MatDialog', () => {",
+      "sha256": "e585acb92239562a86dc10fd1582848b24978db73c1a1956b1786453702fb7d4",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1039,13 +1033,13 @@ describe('MatDialog', () => {",
+      "sha256": "1fd2847a3684f0adc7b3a41697eac715a5a832b25ad6b58d7e0f8e75da2c8ca2",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1060,7 +1054,7 @@ describe('MatDialog', () => {",
+      "sha256": "0dffd60575892fa1723e3ff8412bf1168efd45b4e6f3d29b6b2f2c5700d7fc23",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1068,13 +1062,13 @@ describe('MatDialog', () => {",
+      "sha256": "76deed47f76d4c8e7e9d30bd291946209e66d62be51d9edd02b19ffb365c19b5",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1089,7 +1083,7 @@ describe('MatDialog', () => {",
+      "sha256": "2488ea3b047c3f139e24c03e644fa8ccb469e0b84f8ed194e2b3721fd5145e0d",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1097,14 +1091,14 @@ describe('MatDialog', () => {",
+      "sha256": "11e22ecf50cae17fc1d2a5cf3c259a6566e22f3c38845aa280d6268791937fc1",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1121,7 +1115,7 @@ describe('MatDialog', () => {",
+      "sha256": "f3f4a7632be4bd459bee6d100295d364f292489d4885fdb4cd47af63afe3608c",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1130,16 +1124,16 @@ describe('MatDialog', () => {",
+      "sha256": "020446c576a7fff7a7fff0e2b3189f9b38cc0ab36b8472b1b96cf661cbc4e732",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1149,9 +1143,9 @@ describe('MatDialog', () => {",
+      "sha256": "70ced90fb9573beffd5ccf079b9e115e32512f90d8e4288b773a074c943f363c",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1165,27 +1159,27 @@ describe('MatDialog', () => {",
+      "sha256": "f2516f4ceea67517f75890e372d903a85172462851f391b0152484a48e2d1414",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1200,25 +1194,25 @@ describe('MatDialog', () => {",
+      "sha256": "03ac183bcb80a59f48149241a7aec9c9f9774156ad17abfe01191694d597762c",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1233,12 +1227,12 @@ describe('MatDialog', () => {",
+      "sha256": "dae041b2143345a1b4758e5ca84a12f1945c5e61c76ae21c075d3ced5d6f2a82",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1306,27 +1300,40 @@ describe('MatDialog', () => {",
+      "sha256": "c959ea48a6b2f069298efbe4e830a1f043f00aaf5934a11cb2671d31284ac18b",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1336,15 +1343,15 @@ describe('MatDialog', () => {",
+      "sha256": "5dd27a70ac2134021278cbdef4de19f6e5669db794aadde2b4835a89ebd45789",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1354,16 +1361,16 @@ describe('MatDialog', () => {",
+      "sha256": "08fbe3a6a904a5fb777139ed3ac6b35d5bb6ca216b87346824b0f1857013bf65",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1373,23 +1380,23 @@ describe('MatDialog', () => {",
+      "sha256": "a2b41eafcce900e99bc300f9654756c3db453caef865d749d71407295cd6f82d",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1398,7 +1405,7 @@ describe('MatDialog', () => {",
+      "sha256": "28cf5a1c2ccc073e4fd8fd2c0f93d35e555673e2bb92663332cbc34005f43466",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1407,22 +1414,17 @@ describe('MatDialog', () => {",
+      "sha256": "6fddfb6bd018c171113241c0b667b526e538b0f28986f0b3adc86d2d8de06941",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1430,24 +1432,24 @@ describe('MatDialog', () => {",
+      "sha256": "61e3f7a19ba58db80c977b7b7ad744781938a5591cef80596e3bf39798e5b03d",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1463,16 +1465,16 @@ describe('MatDialog', () => {",
+      "sha256": "403549620b9a4081254586bae892cbd33632040d30203e4c3e94d5fb2d3563f1",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1480,9 +1482,9 @@ describe('MatDialog', () => {",
+      "sha256": "997fd76924be251284fc3bf7d508cc7b43638e44efcac0c7125c17fc7420926f",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1498,9 +1500,9 @@ describe('MatDialog', () => {",
+      "sha256": "9cc23338decb68b17e8ed6e1d56fef064629269f9090efd1cb7a4ac39fd3d20f",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1509,7 +1511,7 @@ describe('MatDialog', () => {",
+      "sha256": "8b127d377fed497854a3193d5ca5169064bd1131826a10076fa9a1e0cf972793",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1517,9 +1519,9 @@ describe('MatDialog', () => {",
+      "sha256": "892aa3ec37316ae355c0d23f5c915318276741ffd7ff6402a4ed4dda05ce70a5",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1535,9 +1537,9 @@ describe('MatDialog', () => {",
+      "sha256": "e3b3436fed3ae48f74aafaa01c96ebd2822dedf50f382465a52da0db462db140",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1549,7 +1551,7 @@ describe('MatDialog', () => {",
+      "sha256": "599e6ca49dc81eee39c1bf68611a9e685cbfa9b338708933e8c70a35b4ed74cc",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1557,9 +1559,9 @@ describe('MatDialog', () => {",
+      "sha256": "9535c242159fb9ff5d434b12ffef005105ae9adb885349e3e8a792160cc31e84",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1575,9 +1577,9 @@ describe('MatDialog', () => {",
+      "sha256": "ae892cd717018b4ae3c91638ee38052327a64adcedd84bdeb2b469364bba5586",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1590,7 +1592,7 @@ describe('MatDialog', () => {",
+      "sha256": "f4c0a783b9de20355140cc3b764ea3784b1e3772840a2069a53eb7ee266492a9",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1598,9 +1600,9 @@ describe('MatDialog', () => {",
+      "sha256": "98656bd860246043269bae1eaf1321e6271163643dec5765da31c83fa9633d49",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1614,15 +1616,15 @@ describe('MatDialog', () => {",
+      "sha256": "7d51ecb7846eb4d2b259c3b6b1e1ea7a57ef355f7dde307509b70e46b58de749",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1630,23 +1632,23 @@ describe('MatDialog', () => {",
+      "sha256": "93f752dc4a782954eb42b8c131479e7b0a7e92fb3c0e06c534af835d2c8888a6",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1658,7 +1660,7 @@ describe('MatDialog', () => {",
+      "sha256": "2640c64c498ab0007c63cd732426cef85bb28177f3be7e4f9138421a423daaa3",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1668,7 +1670,7 @@ describe('MatDialog', () => {",
+      "sha256": "d7514f56eba21392b095ab5400b0eecce6ee7c976137bb9ed9ff7aff69b98ad2",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1676,9 +1678,9 @@ describe('MatDialog', () => {",
+      "sha256": "c6a175bf20e9e0b5900659e946a39fd09bb787f06511aba7f5b405159adcc44d",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1691,7 +1693,7 @@ describe('MatDialog', () => {",
+      "sha256": "472faf6e4c78f90398a0f212efb5ae16e40283f0202a5e18d76faf415ac56094",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1708,7 +1710,7 @@ describe('MatDialog', () => {",
+      "sha256": "d86de6c9197bc14dc5cfe1556fc76603c44c5c09b7a107ec03d2e60e7320cedb",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1716,7 +1718,7 @@ describe('MatDialog', () => {",
+      "sha256": "db599088b69493e0372169bee419af89c3d414acf48eeccab813ac5068986150",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1724,18 +1726,18 @@ describe('MatDialog', () => {",
+      "sha256": "11b2807048a7551c4701c45e2af6c0ccc7f970e707464d4e9ef1784ba6a7583b",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1744,14 +1746,14 @@ describe('MatDialog', () => {",
+      "sha256": "38b8f5c59968faf4e53c6833405b385237933b8e167d753702b109b7913a5262",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1787,7 +1789,7 @@ describe('MatDialog', () => {",
+      "sha256": "c50c9069ad7cca1a75638f9f1eafbdf8747a6749213e672cfba8b4f50a66a254",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1801,25 +1803,25 @@ describe('MatDialog', () => {",
+      "sha256": "ec7338d4e2253420cad43427ebb8e85d2468d8bfbeacdb12a369ec70056e5f30",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1833,10 +1835,10 @@ describe('MatDialog', () => {",
+      "sha256": "1bf35f645e1be26b3e23a92554c269d88d93c41abd3b3c24445fbe14becd2c15",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1850,35 +1852,35 @@ describe('MatDialog', () => {",
+      "sha256": "a7ed2dba27076944437e4688859125ea1f0c8a6ab6fa3f285d6992ded512d4b9",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1888,22 +1890,22 @@ describe('MatDialog', () => {",
+      "sha256": "e04b0386ef0b47e75c156b7d9e4cc1656a7be0756ae7b3a1add05f1adca968db",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1914,11 +1916,11 @@ describe('MatDialog', () => {",
+      "sha256": "27c9680125ff012291170d1fc0665391edde3405b3fa4b496a6915db894d58f1",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1948,39 +1950,39 @@ describe('MatDialog', () => {",
+      "sha256": "b025f3ec0f3336691751aab4b778c9c5e5d9d7584cc71428025d1c9f15ebc3d0",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -1993,24 +1995,24 @@ describe('MatDialog', () => {",
+      "sha256": "adb4daa53ab37edcfb110f21e3be66cfecde99557116666b7bfdf72ab0c0ce48",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2018,10 +2020,10 @@ describe('MatDialog', () => {",
+      "sha256": "99d9ab57c2550be9707d801e64708b80a4db6b72d17cdecce74a77a9630372c4",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2030,7 +2032,7 @@ describe('MatDialog with a parent MatDialog', () => {",
+      "sha256": "bed26f791909e839f97a9d36c82931f69f140f83d9786d66b6ee7c95a2ff6382",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2049,16 +2051,17 @@ describe('MatDialog with a parent MatDialog', () => {",
+      "sha256": "5c9eef9f7ed21a69e161f0df48340b7bb11b6e13aff825f265711f3a4bad1154",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2066,16 +2069,19 @@ describe('MatDialog with a parent MatDialog', () => {",
+      "sha256": "a550421ef0d4bbf24286ab734b8c63a688d368fe9f8163e24ed0b0fe4f50be22",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2083,27 +2089,33 @@ describe('MatDialog with a parent MatDialog', () => {",
+      "sha256": "ad6768ffada4784ef1d88876a454b01cf3b93aed8cfdee8a98d9b338bfb3a50f",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2111,12 +2123,13 @@ describe('MatDialog with a parent MatDialog', () => {",
+      "sha256": "7eea159a556f3480ce252cf0e8d920e8b548f5ba300da638d08ae5e66dc9688b",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2126,7 +2139,7 @@ describe('MatDialog with default options', () => {",
+      "sha256": "265b76c7d7ce4db03e5984f660a4aa4d551a6e53ed44bde72e435fbfaed1294d",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2151,7 +2164,7 @@ describe('MatDialog with default options', () => {",
+      "sha256": "60d6346fd46b45b89aa06a8deb66e254ee9232eed8693fae98aeabea28904cff",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2174,7 +2187,7 @@ describe('MatDialog with default options', () => {",
+      "sha256": "766745473a3b0f689faa976f1f236555e6336c0899086ebf7ee6494d674f76b2",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2182,15 +2195,17 @@ describe('MatDialog with default options', () => {",
+      "sha256": "722c97978efcd80084d23eaaf31eb6851d3bd3b90e36536942518773ea10996e",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2199,14 +2214,14 @@ describe('MatDialog with animations enabled', () => {",
+      "sha256": "de9ac87dad2a81846e5168aaff91fcbcd5a72e15f9ee928166ff451210311435",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2217,13 +2232,12 @@ describe('MatDialog with animations enabled', () => {",
+      "sha256": "7f85d448c8e5ec01348d0ccc1fde0a21559c76805c8c671f6013ffd86797e501",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2235,24 +2249,25 @@ describe('MatDialog with animations enabled', () => {",
+      "sha256": "ec7670809828cae03d13dd23e77ea6da190fb1f7f6cd4c44d5ea8e9faf12b699",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.spec.ts",
+      "header": "@@ -2264,6 +2279,10 @@ describe('MatDialog with explicit injector provided', () => {",
+      "sha256": "0aa64f58d475f9085ff2d19aeb4aa43cf86f06ef8d0eb4ee34817f446b3d94c2",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.zone.spec.ts",
+      "header": "@@ -11,7 +11,7 @@ import {",
+      "sha256": "b068c831f8b4c8680f80d83686a3f51fc98087d3ca5cf29fbc500d6bf9ee1ffa",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.zone.spec.ts",
+      "header": "@@ -24,7 +24,7 @@ describe('MatDialog with Zone', () => {",
+      "sha256": "e1ffc4cbf5c3772f86ba189b7b52104fed7ae541ea7af5cd956b73855ef60ea1",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.zone.spec.ts",
+      "header": "@@ -46,9 +46,9 @@ describe('MatDialog with Zone', () => {",
+      "sha256": "d563b5144240273ce40c50282859e7c1a4992f3f128a187ccdd7684e1c2c48b2",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/dialog.zone.spec.ts",
+      "header": "@@ -58,11 +58,11 @@ describe('MatDialog with Zone', () => {",
+      "sha256": "4b36838ff469be30fd47c4aa543bc3fbd9a8cee087516f0eb8ebbd1eae3ca741",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/testing/dialog-opener.spec.ts",
+      "header": "@@ -1,15 +1,17 @@",
+      "sha256": "03235ccd73660576ceb9a3dbc3155c79fe57945be4c62b21e9f1dcc51fdf48a4",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/testing/dialog-opener.spec.ts",
+      "header": "@@ -27,7 +29,7 @@ describe('MatTestDialogOpener', () => {",
+      "sha256": "746f221752f6b28ad7a28eb60ee4cb31e93e2b6527a7b6833a9c46857fccc959",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    },
+    {
+      "path": "src/material/dialog/testing/dialog-opener.spec.ts",
+      "header": "@@ -35,12 +37,12 @@ describe('MatTestDialogOpener', () => {",
+      "sha256": "ebd4ae4b197b3506874bb01cf72670c441f1fe693bac841e80e63e65f1f5f76b",
+      "review_depth": "individual-compatibility",
+      "decision": "do-not-adopt",
+      "rationale": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+      "complete_file_semantic_model": {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "subject": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7"
+      }
+    }
+  ],
+  "semantics": {
+    "sha": "42eb7044ca2f27fe81b9b402a6ae3baae73662f7",
+    "complete_original_files": 3,
+    "complete_original_hunks": 108,
+    "removed": [],
+    "added": [
+      {
+        "path": "src/material/dialog/dialog.spec.ts",
+        "mode": "it",
+        "suites": [
+          "'MatDialog'",
+          "'focus management'"
+        ],
+        "suite_identities": [
+          "abf73637a925abce3fd3490cc1af1c8f90a22b19232dcba407a8e57742094282",
+          "c44aeff5ccf54b8ee5c62b6d4e4e9ef971b68c78d490906cd442d9dcb973e960"
+        ],
+        "name": "'should focus the first focusable element on open'",
+        "name_identity": "2553a15555749f56f3ad528c33ceedb7f304cc67a8edb8f982768d5607424d1b",
+        "key": "[\"src/material/dialog/dialog.spec.ts\",\"it\",[\"abf73637a925abce3fd3490cc1af1c8f90a22b19232dcba407a8e57742094282\",\"c44aeff5ccf54b8ee5c62b6d4e4e9ef971b68c78d490906cd442d9dcb973e960\"],\"2553a15555749f56f3ad528c33ceedb7f304cc67a8edb8f982768d5607424d1b\"]#0",
+        "raw": "it('should focus the first focusable element on open', async () => {\n      dialog.open(PizzaMsg, {viewContainerRef: testViewContainerRef});\n\n      viewContainerFixture.detectChanges();\n      await wait(0);\n      viewContainerFixture.detectChanges();\n      await viewContainerFixture.whenStable();\n\n      expect(document.activeElement!.tagName)\n        .withContext('Expected input to be focused')\n        .toBe('INPUT');\n    })",
+        "sha256": "ca269755b71e99247c858f9a3348980da9b4d2b4c314966bd21c560534903cf1",
+        "callback_sha256": "8e9d42c4335fbdf2bbe30afb2a3117580d7bb8a471352355bfc176ec54fe8847",
+        "normalized_callback_sha256": "8e9d42c4335fbdf2bbe30afb2a3117580d7bb8a471352355bfc176ec54fe8847",
+        "assertions": [
+          {
+            "sha256": "46d48235f463e97ce3740273d9e4798ba8ce13a97db1f469b6430b599c1e146f",
+            "text": "expect(document.activeElement!.tagName)\n        .withContext('Expected input to be focused')\n        .toBe('INPUT');"
+          }
+        ]
+      }
+    ],
+    "paired_cases": 122,
+    "unchanged_complete_callbacks": 46,
+    "changed_paired_callbacks": 76,
+    "individually_reviewed_nonboundary_exceptions": 1,
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed"
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+    "sha256": "c60b501acdaeb31206e6d9f26108615457b273e35cd2ea1217beb3cf60b107da"
+  },
+  "decision": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+  "prior_entry": {
+    "ledger_path": "compatibility/f10/disposition-ledger/ledger.json",
+    "ledger_commit": "e61c322b400742cdf519f59ab8c90b3a2fc8dfe3",
+    "entry_sha256": "194b9a5fdb89e6b3d8cdbdfc852fd4d0b8229d33bd78e3a91fc8bc1e31ea8fe5"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "bccd4c6b6eb6c8a09d64090156c56362787f4844d1da6a09ceb60d9077fc8603",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Decline this private dialog scheduler migration. Its complete three-file original pairs122 existing cases and11 hooks through one exact state-test label rename and adds one first-input-focus case. The closing/refocus case removes the immediate focus-not-restored assertion and changes observer context text; this does not establish the earlier closing-phase contract. OPEN/CLOSING/CLOSING/CLOSED observations persist, but half-duration plus full-duration native waits replace simulated advance/flush. The opener result observes a native100ms delay. Owned legacy tests already retain default first-tabbable focus, immediate-close focus and all four state observations, including the half-duration closing check. Preserve these behaviors, Cyph close/afterClosed integration and Material16 dialog content/actions styling. No production motion, API, template or consumer stylesheet change is justified; actual lifecycle/rendering/floor execution remains required.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "tests/spec_overlay_async_source_probe.mjs",
+        "sha256": "c2dd8dd8c37a4ad33a81c36ca10dbd70ae2f7d263053c6c2129efdd9a7fddd12"
+      },
+      {
+        "path": "tests/test_spec_overlay_async_source.py",
+        "sha256": "ece4130ce60cfb24c86e6434c4e2c16dbc889bca437b4f563b1b7b1f7a086175"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-subjects.json.gz",
+        "sha256": "ac596dc588cccf6e6ec6cd4b9cfdf248bf7d870d293fe258b210884e8c4f1e3e"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-acquisition.json.gz",
+        "sha256": "8dc9603000933ce03a0b06de22bf87d89a7caeff458873e0288c91f6533daec5"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-observation-pins.json",
+        "sha256": "5b5ba370822ab24025bab59cb727088709af8229b9e1ff2dbcb9cd786331be9a"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-prior.json.gz",
+        "sha256": "fe3680cd71d3dc829dfb15356061696b34de6e9b9791db420c02eb4e96871432"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+        "sha256": "c60b501acdaeb31206e6d9f26108615457b273e35cd2ea1217beb3cf60b107da"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-controls.json",
+        "sha256": "644b0fcdace6c0f4d702b1e9717ed91ba7294b876f6803013694f6f996559b02"
+      },
+      {
+        "path": "compatibility/rc/spec-overlay-async-source-cyph-sanity.json",
+        "sha256": "29337897a9b6d0e91e9276210ec75e41c5e17a63234579896f74cd47c3c2ee44"
+      },
+      {
+        "path": "compatibility/rc/historical-roster-reconciliation-checkpoint.json",
+        "sha256": "97a2132663082d333eb8a66e0ed414db56c941c0f2bf930e024e7c346e64532b"
+      },
+      {
+        "path": "compatibility/rc/historical-roster-reconciliation-replay-checkpoint.json",
+        "sha256": "40ae6bc9fc0f9f05276bf66884639939555197183572f7fd60e1f97b9c1725eb"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+      "prior_entry_sha256": "167b36cc127d95973b444547e2c12dabac0276a34dcf1482792e256cbc2a2e83",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-overlay-async-42eb7044ca2f27fe81b9b402a6ae3baae73662f7.json",
+        "sha256": "e45f32bc192901e974244b7b8547a33499140bae833c4cd456b2929b1def0e8f",
+        "bytes": 171570
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+        "bytes": 31558
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-overlay-async-42eb7044ca2f27fe81b9b402a6ae3baae73662f7.json",
+        "sha256": "e45f32bc192901e974244b7b8547a33499140bae833c4cd456b2929b1def0e8f",
+        "bytes": 171570
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "tests/spec_overlay_async_source_probe.mjs",
+      "sha256": "c2dd8dd8c37a4ad33a81c36ca10dbd70ae2f7d263053c6c2129efdd9a7fddd12"
+    },
+    {
+      "path": "tests/test_spec_overlay_async_source.py",
+      "sha256": "ece4130ce60cfb24c86e6434c4e2c16dbc889bca437b4f563b1b7b1f7a086175"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-subjects.json.gz",
+      "sha256": "ac596dc588cccf6e6ec6cd4b9cfdf248bf7d870d293fe258b210884e8c4f1e3e"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-acquisition.json.gz",
+      "sha256": "8dc9603000933ce03a0b06de22bf87d89a7caeff458873e0288c91f6533daec5"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-observation-pins.json",
+      "sha256": "5b5ba370822ab24025bab59cb727088709af8229b9e1ff2dbcb9cd786331be9a"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-prior.json.gz",
+      "sha256": "fe3680cd71d3dc829dfb15356061696b34de6e9b9791db420c02eb4e96871432"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-review.json.gz",
+      "sha256": "c60b501acdaeb31206e6d9f26108615457b273e35cd2ea1217beb3cf60b107da"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-controls.json",
+      "sha256": "644b0fcdace6c0f4d702b1e9717ed91ba7294b876f6803013694f6f996559b02"
+    },
+    {
+      "path": "compatibility/rc/spec-overlay-async-source-cyph-sanity.json",
+      "sha256": "29337897a9b6d0e91e9276210ec75e41c5e17a63234579896f74cd47c3c2ee44"
+    },
+    {
+      "path": "compatibility/rc/historical-roster-reconciliation-checkpoint.json",
+      "sha256": "97a2132663082d333eb8a66e0ed414db56c941c0f2bf930e024e7c346e64532b"
+    },
+    {
+      "path": "compatibility/rc/historical-roster-reconciliation-replay-checkpoint.json",
+      "sha256": "40ae6bc9fc0f9f05276bf66884639939555197183572f7fd60e1f97b9c1725eb"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+    "prior_entry_sha256": "167b36cc127d95973b444547e2c12dabac0276a34dcf1482792e256cbc2a2e83",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-overlay-async-42eb7044ca2f27fe81b9b402a6ae3baae73662f7.json",
+      "sha256": "e45f32bc192901e974244b7b8547a33499140bae833c4cd456b2929b1def0e8f",
+      "bytes": 171570
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+      "bytes": 31558
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-overlay-async-42eb7044ca2f27fe81b9b402a6ae3baae73662f7.json",
+      "sha256": "e45f32bc192901e974244b7b8547a33499140bae833c4cd456b2929b1def0e8f",
+      "bytes": 171570
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

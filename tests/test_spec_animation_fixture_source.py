@@ -13,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class AnimationFixtureSourceTests(unittest.TestCase):
     def test_complete_originals_predicates_bindings_and_individual_source_changes(self):
-        result = subprocess.run(['node', 'tests/spec_animation_fixture_source_probe.mjs'],
+        # Original snapshot assertions; live contracts run in test_current_inspector_contracts.py.
+        result = subprocess.run(['node', 'scripts/run-historical-consumer-probe.mjs', 'spec-animation-fixture-source'],
                                 cwd=ROOT, capture_output=True, text=True, timeout=180)
         self.assertEqual(result.returncode, 0, (result.stdout + result.stderr)[-8000:])
         report = json.loads(result.stdout.strip().splitlines()[-1])

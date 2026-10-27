@@ -1,0 +1,670 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "0411926e7d8ae06b32236ec1048a888cfad5abf2",
+  "subject": "test(multiple): remove most remaining fakeAsync usages (#33748)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "63a3bf13f5bd5f338de6c2b473af390ffb4770af",
+      "after_blob": "6fdd4ef6f296a6fd2dd1d815ca819e7aa56cae5a"
+    },
+    {
+      "path": "src/material/menu/context-menu-trigger.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "14a7e253fc5fe9e413a301599cda7dd687c55f94",
+      "after_blob": "a97259a53099698714a072a3eb3eb963be34410d"
+    },
+    {
+      "path": "src/material/paginator/paginator.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "4fa53ae27350079b86cab9c959349dc2a4c4daeb",
+      "after_blob": "55506d2da74ec2673dd01bd2969ecdb3704888af"
+    },
+    {
+      "path": "src/material/radio/radio.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "3a3d8a220cbd6541a905d0d25412bd84c28c41f1",
+      "after_blob": "d4a1e796944585663897b1d29a4dbccc54f7e304"
+    },
+    {
+      "path": "src/material/table/table-data-source.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "774d2dd4bafedf4c21862e3f289c173088977ebe",
+      "after_blob": "5be1df436ba42102dd4679abf306a8dd6851f8fb"
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "fe8ba5725eaa15bfdebe2526f1123f30c5dc9214",
+      "after_blob": "b7645c4f23decb8aa485faf7adac06adb9ce61a7"
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "14d35e1128334277162f9522111a9e455c767a2b",
+      "after_blob": "ff2e61183cc005374fd4a18f5174a1290002ef3a"
+    }
+  ],
+  "original_files": 7,
+  "original_hunks": 35,
+  "raw_commit_sha256": "28f0ca5c96b0f88dfc57fa6ae991f72ea7f82cf181ac2e952168a00c2220de66",
+  "original_sources": {
+    "path": "compatibility/rc/spec-interaction-async-source-subjects.json.gz",
+    "sha256": "4b9b1fed1ce167dd470d32b7e462b7a50a2e1b3e91b3057326ad8e3d29d83454"
+  },
+  "patch_file": "compatibility/rc/spec-interaction-async-source-0411926e7d8ae06b32236ec1048a888cfad5abf2.patch",
+  "diff_sha256": "95f58e93b10213653626e668114a05a8aea77113f7b73983ec638a6e4b08ec3a",
+  "hunk_reviews": [
+    {
+      "path": "src/material/list/selection-list.spec.ts",
+      "header": "@@ -1339,6 +1339,7 @@ describe('MatSelectionList with forms', () => {",
+      "sha256": "24ac27d88c351e3e5c9d0b30ded0dae89733b210213eef35f5be92e57a256214",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/menu/context-menu-trigger.spec.ts",
+      "header": "@@ -1,5 +1,6 @@",
+      "sha256": "a6327b1142983cc9cb45adb41dba5196377ac0b58a47dbfd788a41474293335d",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/menu/context-menu-trigger.spec.ts",
+      "header": "@@ -8,6 +9,10 @@ import {dispatchFakeEvent, dispatchMouseEvent} from '@angular/cdk/testing/privat",
+      "sha256": "0bc68e4702e4666f7e741b46169255721676ca2eaf49f3915bd56c7a1d7d8fe9",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/menu/context-menu-trigger.spec.ts",
+      "header": "@@ -21,6 +26,9 @@ describe('context menu trigger', () => {",
+      "sha256": "3d6c4452508b534c8b6c79a52aea37218a94f42a343bc8aa4fb8ee4de1315d3b",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/menu/context-menu-trigger.spec.ts",
+      "header": "@@ -32,16 +40,16 @@ describe('context menu trigger', () => {",
+      "sha256": "58ae2a69aa3bcbf11e9ef2b56ec4891181c1e87e3eafa8d1da09a64e6f7581a3",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/menu/context-menu-trigger.spec.ts",
+      "header": "@@ -57,43 +65,43 @@ describe('context menu trigger', () => {",
+      "sha256": "cf85b7cdd579fd116ed0d4ff90b00efd72b2447b2cfa092f7b4e61688d04b0b5",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/menu/context-menu-trigger.spec.ts",
+      "header": "@@ -124,7 +132,7 @@ describe('context menu trigger', () => {",
+      "sha256": "cf8aaee0d130959405894f770728d579ff4feb992e68233ab849113b555f2174",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/menu/context-menu-trigger.spec.ts",
+      "header": "@@ -136,21 +144,21 @@ describe('context menu trigger', () => {",
+      "sha256": "d0d2d13a0e2349b6ac32c3d4ee020ef3b4d03fbf3a6d1e8f030505b6b14f3d7b",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/paginator/paginator.spec.ts",
+      "header": "@@ -7,7 +7,7 @@ import {",
+      "sha256": "e4a85c9b8a3619788b9c61bd918ba47bd32c16f8dade303a21743ef57a58a43b",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/paginator/paginator.spec.ts",
+      "header": "@@ -205,16 +205,15 @@ describe('MatPaginator', () => {",
+      "sha256": "8cc96e76f6eb0d03011d4b5665781f909f587a0684a198fa7e3cd29f67f03d46",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/radio/radio.spec.ts",
+      "header": "@@ -1,6 +1,6 @@",
+      "sha256": "f5fb29f8d38c377bbb1238683bb9233e1d71c8893136aa7c03ca49a441a2dd29",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/radio/radio.spec.ts",
+      "header": "@@ -442,8 +442,8 @@ describe('MatRadio', () => {",
+      "sha256": "410d5c5a93216e4deb95df7947d36b8b36e8d81941b0c74c3c700c68fb89c91a",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/radio/radio.spec.ts",
+      "header": "@@ -610,17 +610,17 @@ describe('MatRadio', () => {",
+      "sha256": "e364f532371cd5a24911e200c594a5322d78477f1657be5ac034b95c71a047ac",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table-data-source.spec.ts",
+      "header": "@@ -1,11 +1,11 @@",
+      "sha256": "97ddeef82a9be5271cbe45d9864570f280220c81084a8410b3d3a8e85bb182cc",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table-data-source.spec.ts",
+      "header": "@@ -23,7 +23,7 @@ describe('MatTableDataSource', () => {",
+      "sha256": "34e6250bbfea5b287d6317eaf6ed156920f4b89ae09671174517436e0ac708e4",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table-data-source.spec.ts",
+      "header": "@@ -73,45 +73,43 @@ describe('MatTableDataSource', () => {",
+      "sha256": "28ca7f94d9625e6154cc219237ae2e144ca5d1d00116a3a1ec3303d0576c3c85",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "header": "@@ -1,5 +1,5 @@",
+      "sha256": "f426fab7ba1f65dcd09ff27c96f719b565be0848e37f54ae802c55d9d9ee03f4",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "header": "@@ -179,14 +179,13 @@ describe('MatTable', () => {",
+      "sha256": "b2553e8e0ad37784e489b1e4d591a083b12668d4680c7235bc7a8ebd06cdc6fe",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "header": "@@ -259,13 +258,11 @@ describe('MatTable', () => {",
+      "sha256": "afdc4ebcc4420b36782728fca5e61cf092e364454823c104b84d3cdbecc6e6c4",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "header": "@@ -275,20 +272,18 @@ describe('MatTable', () => {",
+      "sha256": "b5a09129a23f4dcaf821d1456af48a9c12329b55e502a2f7e858103c899d0367",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "header": "@@ -302,7 +297,6 @@ describe('MatTable', () => {",
+      "sha256": "24f6a08fcc093e853f40192d938765366934bd677d8cc8302d7ddf68dafc83be",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "header": "@@ -314,7 +308,6 @@ describe('MatTable', () => {",
+      "sha256": "960441941509737bd44ee57fe4bf1e4850dbcaad6a33bb2f9589da3c90b9f7f1",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "header": "@@ -348,7 +341,6 @@ describe('MatTable', () => {",
+      "sha256": "57d185d9d46615b1414fcbd99a4364f49bb9f69ed5a545d01f1c13ec17a19c17",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "header": "@@ -358,26 +350,24 @@ describe('MatTable', () => {",
+      "sha256": "3e000f7e37f50cfe44036bcc36466083c26126a634ab03e21ef12e1a27b5c7e1",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "header": "@@ -510,13 +500,14 @@ describe('MatTable', () => {",
+      "sha256": "632328a82db4bdda591ab7d0c909a43b2eb1e48141cba42253f168c670479446",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/table/table.spec.ts",
+      "header": "@@ -539,7 +530,7 @@ describe('MatTable', () => {",
+      "sha256": "c38c191959ee4a397cc8e07ea10bd6812cd95ce1e17e691770508826cf61952b",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -23,7 +23,7 @@ import {",
+      "sha256": "1d10a751a2d57e4b7987768f29dc50a1ba353487c05f4bdbbc98ed0732cb97c9",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -979,33 +979,6 @@ describe('MatTooltip', () => {",
+      "sha256": "b4cb7681c2000fea3003ee520dbac13de67c49bcaa0310418502dd3f0d7df2af",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1270,25 +1243,26 @@ describe('MatTooltip', () => {",
+      "sha256": "0e503ed724d3fa4066e6e3e3a0b315c42ae5aa0b5e6de02017dcb0754a85bee0",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1298,7 +1272,7 @@ describe('MatTooltip', () => {",
+      "sha256": "9a5969304376e137b1c056788e6ba7c6a17f69113200323b89466335349268f0",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1314,55 +1288,59 @@ describe('MatTooltip', () => {",
+      "sha256": "fb5d80645d1abeb87a40c0ba4f4f513d27dddbd71eb49995991acdcfe6eb790a",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1476,7 +1454,7 @@ describe('MatTooltip', () => {",
+      "sha256": "1d53aaaef3937eceae963eb53ffec6f68fa3e3c00500beb7cb74c6fa56fbebe7",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1488,7 +1466,7 @@ describe('MatTooltip', () => {",
+      "sha256": "c91e15c6a9b634d509b1495669c9095d4e6cce8853ae132aea0ecd25feb264a0",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1502,13 +1480,12 @@ describe('MatTooltip', () => {",
+      "sha256": "3cad28f2c24e6b2e195ec037fda17cec1acdc648df51b3e9c4f1eb584dda9ab2",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "header": "@@ -1522,7 +1499,7 @@ describe('MatTooltip', () => {",
+      "sha256": "923100fabad547ad71a038d2ecb4f42443cc7657fca3131093a644a3b49fdf65",
+      "judgment": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, twelve individually reviewed focus/loop/setup/wrapper/key-spelling/clock case deltas, two removed destruction cases, one provider hook exception, one position-bound cleanup hook, one isolated Array loop action proof, exact import deltas and added/unchanged wait helpers, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "0411926e7d8ae06b32236ec1048a888cfad5abf2",
+    "complete_original_files": 7,
+    "complete_original_hunks": 35,
+    "removed": [
+      {
+        "path": "src/material/tooltip/tooltip.spec.ts",
+        "suites": [
+          "'MatTooltip'",
+          "'basic usage'"
+        ],
+        "name": "'should clear the show timeout on destroy'",
+        "mode": "it",
+        "sha256": "2457d329528f1a600a5b97994b6c21a74dda64a365092f6caf7f54501b4169b9"
+      },
+      {
+        "path": "src/material/tooltip/tooltip.spec.ts",
+        "suites": [
+          "'MatTooltip'",
+          "'basic usage'"
+        ],
+        "name": "'should clear the hide timeout on destroy'",
+        "mode": "it",
+        "sha256": "af237bbe65f10b2748b03e1090ce6e4a1e3c006ddec8c0ccf035221c17f61030"
+      }
+    ],
+    "added_hooks": [
+      {
+        "path": "src/material/tooltip/tooltip.spec.ts",
+        "mode": "afterEach",
+        "suites": [
+          "'MatTooltip'",
+          "'touch gestures'"
+        ],
+        "key": "[\"src/material/tooltip/tooltip.spec.ts\",\"afterEach\",[\"'MatTooltip'\",\"'touch gestures'\"]]#0",
+        "raw": "afterEach(() => {\n      jasmine.clock().uninstall();\n    })",
+        "sha256": "f961be73266d3583206bf9dc3b76b2ffde014be8a7fa19a3f80a0665af61c871"
+      }
+    ],
+    "isolated_chip_iterations": [],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 314,
+    "hooks": 29,
+    "fixture_classes": 61,
+    "template_style_properties": 62
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-interaction-async-source-review.json.gz",
+    "sha256": "287fa9d411e719157416ce1603c09855162f926a15f23d96e0367e604a58fafa"
+  },
+  "decision": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+  "prior_entry": {
+    "sha": "0411926e7d8ae06b32236ec1048a888cfad5abf2",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test(multiple): remove most remaining fakeAsync usages (#33748)",
+    "files": [
+      "src/material/list/selection-list.spec.ts",
+      "src/material/menu/context-menu-trigger.spec.ts",
+      "src/material/paginator/paginator.spec.ts",
+      "src/material/radio/radio.spec.ts",
+      "src/material/table/table-data-source.spec.ts",
+      "src/material/table/table.spec.ts",
+      "src/material/tooltip/tooltip.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-interaction-async-source-prior.json.gz",
+    "sha256": "807d7c7269152aacc476a2a94f401ef854b1217d81a4da73fd97ca2c4399764a"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "95f58e93b10213653626e668114a05a8aea77113f7b73983ec638a6e4b08ec3a",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Decline this remaining Material fixture cleanup after individual review of all 35 hunks in seven complete originals. Account for 316 before/314 after static cases: 314 pair in exact retained order, 292 complete callbacks retain semantics and 22 change. Individually pin two deleted tooltip show/hide-timeout destruction observers; both remain in the owned legacy suite. Two touch cases replace fakeAsync timing with explicit Jasmine clock install/tick/uninstall, retaining their visibility predicates; the one added cleanup hook is bound to its touch-suite scope, full raw body and registration ordinal 63. One context-menu setup adds a fixture-only MATERIAL_ANIMATIONS provider with animationsDisabled=true. Four data-source case differences and two exact global property/type names merely replace quoted prop keys with identifiers, retaining values, filters and warnings; they do not mutate consumer maps. All 61 fixture classes and 62 template/style properties remain raw-byte identical, and three existing wait-helper pairs remain exact. Source comparison proves no clock/provider/cleanup/error/render equivalence. Cyph uses legacy list/radio/paginator/table/tooltip/menu/autocomplete contracts; keep all stronger owned tests and Material 16 HTML/CSS/SCSS. No source port, modern mirror, animation-engine fork, new legacy token alias or required consumer edit. Actual packed/native/browser/mixed peer and supported-floor admission remains open.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-interaction-async-source-review.mjs",
+        "sha256": "c7387cbea5154b700adadc3e89c91674249641238a487bbcd6fba051acb51df9"
+      },
+      {
+        "path": "tests/spec_interaction_async_source_probe.mjs",
+        "sha256": "e445d5ed73b0af2123296d35ba89704b81f2d3eb7932ba9ecacbd40edbd210c1"
+      },
+      {
+        "path": "tests/test_spec_interaction_async_source.py",
+        "sha256": "2f04b1f2647fbaf58851106d236584ba7e2a85aadfc0c7effd1035e55d8cc116"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-qualification-inspector.py",
+        "sha256": "dfd4b6c81cd59c1ecc6b89cda4219e322e3838a7e9d2123e8317ecc93d26ac8a"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-subjects.json.gz",
+        "sha256": "4b9b1fed1ce167dd470d32b7e462b7a50a2e1b3e91b3057326ad8e3d29d83454"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-acquisition.json.gz",
+        "sha256": "9676e789868f511309aebe35ef7d747fea33a9ce2ee75d2dd47c2ac7e547c7ae"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-observation-pins.json",
+        "sha256": "84cbc29345e9f8e313084c47ddd0fd7400c00765b915b82d5af8778cd3b9951d"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-prior.json.gz",
+        "sha256": "807d7c7269152aacc476a2a94f401ef854b1217d81a4da73fd97ca2c4399764a"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-review.json.gz",
+        "sha256": "287fa9d411e719157416ce1603c09855162f926a15f23d96e0367e604a58fafa"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-controls.json",
+        "sha256": "ac0deb0f7642c343639b9dedb4b5e685d96d48d79101e370ee34350f0f25387c"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-python.log.gz",
+        "sha256": "a2a3447819e9fc2809bf929f5ae33df5a9882af24bb605864a8904786e3da78d"
+      },
+      {
+        "path": "compatibility/rc/spec-interaction-async-source-cyph-sanity.json",
+        "sha256": "83ce6682f3e4d21117a8eda2e88b4ef1fd24af21896d69208f60554f5d633291"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-checkpoint.json",
+        "sha256": "b1efc27a393c17af7c913dceb013d921e0b072dd35800fc183ef64dab78b493b"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-replay-checkpoint.json",
+        "sha256": "9302bbed68970a56093da48ce6dd683a7e2672210ed4738bb84df1c74aa7b293"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+        "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+        "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+        "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+      "prior_entry_sha256": "dac49c76556eb863c2773cea05b550c6d53ee3efd794acab3ec34c05d70843a7",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-interaction-async-0411926e7d8ae06b32236ec1048a888cfad5abf2.json",
+        "sha256": "b08f3c3d449559f9ced7fd678746a9492a2651aad5fc750ef12827ac162e8d45",
+        "bytes": 93055
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+        "bytes": 31558
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-interaction-async-0411926e7d8ae06b32236ec1048a888cfad5abf2.json",
+        "sha256": "b08f3c3d449559f9ced7fd678746a9492a2651aad5fc750ef12827ac162e8d45",
+        "bytes": 93055
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-interaction-async-source-review.mjs",
+      "sha256": "c7387cbea5154b700adadc3e89c91674249641238a487bbcd6fba051acb51df9"
+    },
+    {
+      "path": "tests/spec_interaction_async_source_probe.mjs",
+      "sha256": "e445d5ed73b0af2123296d35ba89704b81f2d3eb7932ba9ecacbd40edbd210c1"
+    },
+    {
+      "path": "tests/test_spec_interaction_async_source.py",
+      "sha256": "2f04b1f2647fbaf58851106d236584ba7e2a85aadfc0c7effd1035e55d8cc116"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-qualification-inspector.py",
+      "sha256": "dfd4b6c81cd59c1ecc6b89cda4219e322e3838a7e9d2123e8317ecc93d26ac8a"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-subjects.json.gz",
+      "sha256": "4b9b1fed1ce167dd470d32b7e462b7a50a2e1b3e91b3057326ad8e3d29d83454"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-acquisition.json.gz",
+      "sha256": "9676e789868f511309aebe35ef7d747fea33a9ce2ee75d2dd47c2ac7e547c7ae"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-observation-pins.json",
+      "sha256": "84cbc29345e9f8e313084c47ddd0fd7400c00765b915b82d5af8778cd3b9951d"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-prior.json.gz",
+      "sha256": "807d7c7269152aacc476a2a94f401ef854b1217d81a4da73fd97ca2c4399764a"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-review.json.gz",
+      "sha256": "287fa9d411e719157416ce1603c09855162f926a15f23d96e0367e604a58fafa"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-controls.json",
+      "sha256": "ac0deb0f7642c343639b9dedb4b5e685d96d48d79101e370ee34350f0f25387c"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-python.log.gz",
+      "sha256": "a2a3447819e9fc2809bf929f5ae33df5a9882af24bb605864a8904786e3da78d"
+    },
+    {
+      "path": "compatibility/rc/spec-interaction-async-source-cyph-sanity.json",
+      "sha256": "83ce6682f3e4d21117a8eda2e88b4ef1fd24af21896d69208f60554f5d633291"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-checkpoint.json",
+      "sha256": "b1efc27a393c17af7c913dceb013d921e0b072dd35800fc183ef64dab78b493b"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-replay-checkpoint.json",
+      "sha256": "9302bbed68970a56093da48ce6dd683a7e2672210ed4738bb84df1c74aa7b293"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-chips/chip-list.ts",
+      "sha256": "f8c89ea961ee137e2e0b2a7f9770baff353a5ef84ce156b653915d6b4eb7e063"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+    "prior_entry_sha256": "dac49c76556eb863c2773cea05b550c6d53ee3efd794acab3ec34c05d70843a7",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-interaction-async-0411926e7d8ae06b32236ec1048a888cfad5abf2.json",
+      "sha256": "b08f3c3d449559f9ced7fd678746a9492a2651aad5fc750ef12827ac162e8d45",
+      "bytes": 93055
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+      "bytes": 31558
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-interaction-async-0411926e7d8ae06b32236ec1048a888cfad5abf2.json",
+      "sha256": "b08f3c3d449559f9ced7fd678746a9492a2651aad5fc750ef12827ac162e8d45",
+      "bytes": 93055
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

@@ -1,0 +1,1649 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "2c88e9ba9f9b037683e166ecf0d825ee7e39a79c",
+  "subject": "test: Convert some material tests to zoneless (#29309)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/material/core/ripple/ripple.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "2f910349e81ad6ffd1d3137c75541c3efaa5f138",
+      "after_blob": "96019a45fcd8c70d3c07955a0bf20096bcceb5ab"
+    },
+    {
+      "path": "src/material/core/ripple/ripple.zone.spec.ts",
+      "status": "A",
+      "before_mode": "000000",
+      "after_mode": "100644",
+      "before_blob": "0000000000000000000000000000000000000000",
+      "after_blob": "3ec711a2536aaac38499e174b8d3e8d40b87f18d"
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "495f5f2203f0e5813dd9681199dbcfcd6d892846",
+      "after_blob": "c917f06356b8d60020b195f6d8aa56a0e7e9a4ef"
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "d1a7c2801f265e7cafa9483d0f5d39e0cea1500d",
+      "after_blob": "2d4d9ad28756984c3936c99c76b6cd5be6c8fb98"
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "2b4a26718723a7fdd941cef6bcf9cc1f56b9d421",
+      "after_blob": "546d6e656934d2dc7d1fefd2ad7e2a7cbeca90e6"
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "a700eea4f76546bafa384f9702e934780189af3d",
+      "after_blob": "a722dd24f30dffb4f222c019071dcf1b318a0e41"
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "c9b62f52e4553eb212fe1d6f9aa2dde432ac2af9",
+      "after_blob": "fc9305db414462dea6423d41db7e4ecd6020d62d"
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.zone.spec.ts",
+      "status": "A",
+      "before_mode": "000000",
+      "after_mode": "100644",
+      "before_blob": "0000000000000000000000000000000000000000",
+      "after_blob": "3f26f168f708891ee4234f4c1e9b77bf76168446"
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "008a5406d03ab271239f16164ab3da0ebd9894e0",
+      "after_blob": "ba170e422b9196a523399aa610b13cde5b8cfaad"
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "65be8d7a8a1ee295764655a8e10097d7977d8a11",
+      "after_blob": "b61eb94799820099d385866db57db23bfd874397"
+    },
+    {
+      "path": "src/material/tooltip/tooltip.zone.spec.ts",
+      "status": "A",
+      "before_mode": "000000",
+      "after_mode": "100644",
+      "before_blob": "0000000000000000000000000000000000000000",
+      "after_blob": "bc3b7d0edaca06899cabef2515e69a560e24513e"
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "ee66cbd96d369abba6f9dfc92370b6b756a161a9",
+      "after_blob": "c5eef598c56031695457de0bd5d54b69c1ec6550"
+    }
+  ],
+  "original_files": 12,
+  "original_hunks": 145,
+  "raw_commit_sha256": "95bd6771d03399a9c47bb98661d27ae04e9e27f3ce9a7a72664dd81c474c8f29",
+  "original_sources": {
+    "path": "compatibility/rc/mixed-strict-tests-source-subjects.json.gz",
+    "sha256": "cd909c6b68cee4f940abd9129e2e11698f92efdedd3212f7d7765c811602f7e4"
+  },
+  "patch_file": "compatibility/rc/mixed-strict-tests-source-2c88e9ba9f9b037683e166ecf0d825ee7e39a79c.original.patch",
+  "diff_sha256": "d1429d93d69aad0b5fb39320186a20fb7915afd534dabf0c5581f63cf32cb02f",
+  "hunk_reviews": [
+    {
+      "path": "src/material/core/ripple/ripple.spec.ts",
+      "status": "M",
+      "header": "@@ -286,17 +286,6 @@ describe('MatRipple', () => {",
+      "sha256": "eff318c7bc97c05cec5694f371394a64bdc5180ae90b2c017654c28cd25dc437",
+      "judgment": "Moves exactly one event-zone callback to a new file; removes zoneful provider/import preparation from the generic suite. Preserve full fixture, body-margin cleanup and ripple operations; callback identity does not prove original environment execution."
+    },
+    {
+      "path": "src/material/core/ripple/ripple.zone.spec.ts",
+      "status": "A",
+      "header": "@@ -0,0 +1,60 @@",
+      "sha256": "798d122dd685666a83491db8cab559c97e0d21c39958ead92c8b4142eee5023b",
+      "judgment": "Complete added60-line zone integration file keeps the exact moved callback and standalone BasicRippleContainer, with body margin setup/cleanup. It contains no explicit provideZoneChangeDetection call. The filename and fixture.ngZone assertion do not establish that the new initializer actually supplies zoneful preparation."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -1,39 +1,28 @@",
+      "sha256": "a4200e92c212cc137908bca368d4b018ff4162f82815d90f39f0ca1510e665df",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -267,6 +256,7 @@ describe('MatDrawer', () => {",
+      "sha256": "760389abcab95f332cc09efcfe16bd89878dcacb007d875e6e579103da524527",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -308,6 +298,7 @@ describe('MatDrawer', () => {",
+      "sha256": "e32ea2665be7a266b5c3baff5da109b5bb24338a5b287ccc022551423e82ae0e",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -340,6 +331,7 @@ describe('MatDrawer', () => {",
+      "sha256": "f831a85a38ad3220cef5cb0eda4ee42213d6901c182b108e4520de5e40f6aaba",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -363,6 +355,7 @@ describe('MatDrawer', () => {",
+      "sha256": "225178a9d2860970bcb02cd29c1ad9fdaac4571fa34c545a844e6191218f3d4b",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -389,6 +382,7 @@ describe('MatDrawer', () => {",
+      "sha256": "e5382526a734ec452a20e68102e9dc96d9c23e4cd3310f9899b0d34d84bd0185",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -490,6 +484,7 @@ describe('MatDrawer', () => {",
+      "sha256": "09a84765db3f283dfbb56d0a2f9b7d433ecc9cbc48713b92a9758e438e15c0e9",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -504,6 +499,7 @@ describe('MatDrawer', () => {",
+      "sha256": "89f3d2b0238f48ee464c2eb2b1b3887ad0c62c9e583f3679e4114e009725a4c6",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -537,10 +533,12 @@ describe('MatDrawer', () => {",
+      "sha256": "26ecd59bd13c2b0e20bee86143edc4636254b1b1768f07f5fdfa1ed4af05ee2d",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -570,24 +568,28 @@ describe('MatDrawer', () => {",
+      "sha256": "c5534114f29a8b0091963ea7b0fabd2e96a5b60b349a036849ef3d1cb1a78a32",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -595,18 +597,21 @@ describe('MatDrawer', () => {",
+      "sha256": "3071fd89cb6a8b9a8ee7104412812413e013a527cfe36a0a64d51d9275db8842",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -623,12 +628,14 @@ describe('MatDrawer', () => {",
+      "sha256": "a7ac831c37b7197a8798207f8ac67019c61cfcb47955a11da095073a4259da5a",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -640,12 +647,14 @@ describe('MatDrawer', () => {",
+      "sha256": "39ac4a76e662c615b7a17e28fc66428bf1272143b3f28c5f338061de538c8c86",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -661,6 +670,7 @@ describe('MatDrawer', () => {",
+      "sha256": "1ccde9d6cdc56dbea17c233f0bbe95a5b8559bee51b962c887073d93a1cd13e8",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -668,6 +678,7 @@ describe('MatDrawer', () => {",
+      "sha256": "7bd23b7db8efc302a86e9f0e0f372bdec4eae8b359c536028e709701247d384b",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -680,6 +691,7 @@ describe('MatDrawer', () => {",
+      "sha256": "7760c9c108b14dbd79a6183b66d3de7730ee3507f7dd749014e9daca143b1183",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -695,6 +707,7 @@ describe('MatDrawer', () => {",
+      "sha256": "bf63dc52bb62243abbfa18f01a55bc13067bc3e7627f61f0711b327a639d849e",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -717,6 +730,7 @@ describe('MatDrawer', () => {",
+      "sha256": "bee37d2ee7186f984bededb97793dd71b5c3219feecdaebb131718a87ef0ffea",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -739,6 +753,7 @@ describe('MatDrawer', () => {",
+      "sha256": "4b845d6eb00045f99be05801fe7dcf2c9eaffaec9357360bc8ca95ec05d742f7",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -764,6 +779,7 @@ describe('MatDrawer', () => {",
+      "sha256": "5cb857d68648145eb61102aac8cf67b7b8fcfa5c68223b243c26d2b5d0d602c5",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -784,6 +800,7 @@ describe('MatDrawer', () => {",
+      "sha256": "377d024d0a4172094ed1dc49cfc7772e5a34a80cfaf35d844b3fb06600d65e21",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -792,6 +809,7 @@ describe('MatDrawer', () => {",
+      "sha256": "87c52b6227b2f704748842b1698832e4e0bf352cd605737700cd4dca5cf684fe",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -807,6 +825,7 @@ describe('MatDrawer', () => {",
+      "sha256": "113c32ae7da73fb68d2922b8c5964c89c70697b7c3b83e10ddb1f0212ffe48ff",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -827,6 +846,7 @@ describe('MatDrawer', () => {",
+      "sha256": "85cb1d6810f109f390ccee5be51468d573116c7129315c0ef7a5ffeeeaee5256",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -836,6 +856,7 @@ describe('MatDrawer', () => {",
+      "sha256": "167a7217320ca31d48f289f4a99737b494654bfb2dd9008f2791e5b62718ada6",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -853,11 +874,6 @@ describe('MatDrawer', () => {",
+      "sha256": "960d19af3b016deb6a6febb40d7fbd9b871d6ac4d050d4aa8ad5a2212f1aa12f",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -910,6 +926,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "93f20e205499cf0e60fb74f18168fabfaafb0482e18ff22dd3393202158e7441",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -935,6 +952,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "534b833a94ffff4890d99b5b0704bdf7c13d85b1dc8069ad8805783263be7b06",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -956,6 +974,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "811e3aa734161bb04a7b75dfcf1b4c58fd64c494c9ff0cb3f958416e46abc5c2",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -976,6 +995,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "a320d9a4265efe56a436640cb87e8f00012dec976a0a63dd4c9ea8338dec25b0",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -1016,6 +1036,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "aee1dce4965472d87551f3da37d97b51135d3ff566923c4eab3a1217eef0f3f0",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -1061,6 +1082,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "c3700fbf670e1899d7fab2a5cdb3101b4b9fa14a08fbc469c05f01c69378936c",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -1072,6 +1094,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "94bab3949ee8129c64991d66cb16e1e973544389d6cde80ab4c448e7d10048a5",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "status": "M",
+      "header": "@@ -1083,6 +1106,7 @@ describe('MatDrawerContainer', () => {",
+      "sha256": "b37b4d4a444ede9501e1ae9ed55d7ef34c864536b892ab898bd57330fd6410a8",
+      "judgment": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "status": "M",
+      "header": "@@ -1,16 +1,11 @@",
+      "sha256": "1ec87aa917ef8d42c92202f8492c6430b39f58b9a69520ae4cdee3d0b3c49d54",
+      "judgment": "Removes zoneful provider/import and adds marks in two fixed-position fixture cases. The historical owned module-era suite remains zoneful; no legacy component or consumer style/structure change follows."
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "status": "M",
+      "header": "@@ -34,6 +29,7 @@ describe('MatSidenav', () => {",
+      "sha256": "05dde7cc7047b8ed3d2023684447f6e8a1721e1d3efb13389a94a2bad6680094",
+      "judgment": "Removes zoneful provider/import and adds marks in two fixed-position fixture cases. The historical owned module-era suite remains zoneful; no legacy component or consumer style/structure change follows."
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "status": "M",
+      "header": "@@ -48,6 +44,7 @@ describe('MatSidenav', () => {",
+      "sha256": "77df2a1eb1215c5b6eac91b1d72c4b6f566873619bceb2a64f5b51cb87487115",
+      "judgment": "Removes zoneful provider/import and adds marks in two fixed-position fixture cases. The historical owned module-era suite remains zoneful; no legacy component or consumer style/structure change follows."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -1,27 +1,22 @@",
+      "sha256": "984246f562c10e29e26878f006d961a3d38bddccc7e4ddb8c83b4dbd8219cf78",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -71,11 +66,13 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "a086c0826fafb5ee7149d48669edaec128a7d52ae0193f085bdbf970d05d220f",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -85,6 +82,7 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "4c55aa9493e85f24dcdc0548921ee376b24dc1342860482a42a0d2b98fa5ed27",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -95,6 +93,7 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "8bacddb1c29289bd63f5279eedb0a4ee8a9680aaced3a108fa708dd7a6ad0912",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -147,6 +146,7 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "dd115d0149ff86d9be29283f96e49de0a60e275a3bc3003220834a448b4d313f",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -157,18 +157,21 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "ff9c36d94b881fbf19d5431f4aaade4889a722ee3bd6215f3ed25766dec494f5",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -181,6 +184,7 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "8cc0922cdbe9ebe049e522c6bd8f36c378026f64dfc8c64e68252839ea370a88",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -188,16 +192,19 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "f1f40034b8ff231be48230cb82c18bd59a87a3726d90897d73caac54dc8d89c2",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -205,11 +212,13 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "8bac888eb62a52f04737930f3131fcc326df1a3c6dabd1df9b75e70ab750188d",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -217,11 +226,13 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "3c248a07ea10342e89227baf9248f36257f8bfeaf51ac06c45097f6ac5d08138",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -232,11 +243,13 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "ffb2721a6317753754328c5a86190028207c97499d92e595dc35500f4c605d50",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -273,11 +286,13 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "051cbe3e7b562e4a6896a11c95328cad8b50c031883fbcf1bb96cc75f55b0757",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -315,6 +330,7 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "71c57851649c941da9da21c4530479b91ae14e3319f627cc9c91b22ca28114f3",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -337,6 +353,7 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "3ee31b8114346d65d7f5c0e4c5ccd14fa438cac356e7a5014308d0d25c76f801",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -357,6 +374,7 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "e564887a64b078bf977bbd7fa6a9391e9dcd8b17389780c27c3dd893114a018d",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -368,6 +386,7 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "b183381429fecc9071576dd5fe064a4f996c40b02ed0c3b7db791c0e7b22dcdd",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -415,6 +434,7 @@ describe('MDC-based MatSlideToggle without forms', () => {",
+      "sha256": "cc91a8510c646d9916bcf823daaae78d128abf862e21bee526ba088eefe2769d",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -539,6 +559,7 @@ describe('MDC-based MatSlideToggle with forms', () => {",
+      "sha256": "4498b25f269262339230a6a2a94bb8812bfc15723f5e557810bf392b3e663bfa",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -585,6 +606,7 @@ describe('MDC-based MatSlideToggle with forms', () => {",
+      "sha256": "1f3d595de43fc7ae8aa6cdbbbc5649d5386d7fab34219abe36bb4a2a42ec8a30",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -596,6 +618,7 @@ describe('MDC-based MatSlideToggle with forms', () => {",
+      "sha256": "3c9008ee0250f2ac561201ba523ef2b124925658ac469748db1efb3b58fcd097",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -616,6 +639,7 @@ describe('MDC-based MatSlideToggle with forms', () => {",
+      "sha256": "14a863f844a31dbb5bc47eddc57404916976ae19d4bdac0f42a47024b4043598",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -636,6 +660,7 @@ describe('MDC-based MatSlideToggle with forms', () => {",
+      "sha256": "ee8f5fb95c7a9d7a3e8c79a9f18c184b33bde84aca5904281d6ea6099ae8427f",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -662,6 +687,7 @@ describe('MDC-based MatSlideToggle with forms', () => {",
+      "sha256": "c1835fe7fed8bf67cebf0e593bf72d3295ad207c09a6ec317dc0c9ef72b7b0c8",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "status": "M",
+      "header": "@@ -745,6 +771,7 @@ describe('MDC-based MatSlideToggle with forms', () => {",
+      "sha256": "0007aae543782b273145595afda111c98b1b27cce73bf63f1b2cc7d33afaa448",
+      "judgment": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -9,31 +9,23 @@",
+      "sha256": "a7406523c1560faa2999e11c2be327fbfadd9f9d6563c170e97dc0c59e558e6d",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -41,11 +33,6 @@ interface Point {",
+      "sha256": "b92ca8ebf5c6c197eddf48bc8059a16626f47626d488270c65688dcc071a8968",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -292,18 +279,21 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "df984cefb174a32c24acf3423de8e8f8b62e258e110bada218ff9b6905d27a77",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -311,18 +301,21 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "016474e36ef06a71e291009ca58f9a07a033b3b07048dfd79b8dd20bb3bf728f",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -330,6 +323,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "7686a2092a7541fc673ad374d69d0eb7d93a1ad41b613f9f5b55b4e3f2cdd3cc",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -338,6 +332,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "bf7d3455ec68eaa0f95221e8fff48a5d5a57641754f3344767072ff9b4e47924",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -369,6 +364,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "b2b366b1f0132090db6fd12de5973eede420b003a02038ce891d91f901a80350",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -377,6 +373,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "96503fc0148c04890a0b932a6dc7e47044fb71b77241c916703322bc36bc1009",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -385,6 +382,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "88e239f18a30058e7c960b3f490662289da2191fb5187a3d616ff2bdb44f1f56",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -393,6 +391,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "a1ee16c4148497d19c9aaf78ca1605d35fd8b232c5568135a07781bb47e128bc",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -402,6 +401,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "32988860c13608b3bcecd2a6b6a8854527ff86b3d56a79bde16f9daec820f6ca",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -411,6 +411,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "059963eb9791f7432a6f304bf5d83a459fd701b350af31b225f6c8f7be2c9d04",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -420,6 +421,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "93af42c565cf29b1514690d1bd7732ba1a9c741a7c44949aaea32b0943be574a",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -428,6 +430,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "e661625827b0af837552f22130a3a04d960d692e9f37cfa6aba154c5aa51d832",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -436,6 +439,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "3c3b832943bf9775e26425343e272cf105a6ec37646971e930215b6cb9370835",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -449,6 +453,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "ebfc61ecae10cb29b67f1479f930ac477e59deefd6e7cf08d6e51396df89bc1c",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -457,6 +462,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "d40517906558e5e7a772705bfa5c5b5dc56a385209588373ab14365cf7fba08e",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -465,6 +471,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "35789dfab9fbaa7f7b8c68fe41c6e3363dd0985b6a82548c8c8ca99c629718bb",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -473,6 +480,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "bb2bfb882640e63fc2a714e3d80c07c6344ca4f4a67d4fcd6d8f978ce111765e",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -482,6 +490,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "619e622fdde06b3233a610904044b0dc449cde46ebe097925679955f3eef296f",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -491,6 +500,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "e7c0e969c838fdbcbc992a764d471272c28c87153cda7f77c32dfad660e89578",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -500,6 +510,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "2e872dd299a0e60aeeec079b5c277faa7850612e760e583a305da0c5f0f89921",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -508,6 +519,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "b34f637e19db4f53b83c4a92dfbd8388202e48cfbfe5a4582f632b1d59564de8",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -516,6 +528,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "ab2c330a95fd173c65224e6634ad211b8709c8595ff43c12a3b472bda330743c",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -806,6 +819,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "7471522b5b563477f4c61ed43251588d72b4e882ceb5011451435290cce2eeb8",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -813,6 +827,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "6a927f9adbcf904453b349575daed8d87e22e611f1c25ac4c94f9b94bc967262",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -821,6 +836,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "0cf37a8aa082767a51c860e5f17eb876a8430e1834de85cc52e67521185afffa",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -853,6 +869,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "ee4a9a43f6631abdb998332696ab0a88319998ba35f6bd2104c892124a4cd99a",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -860,6 +877,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "e3d4c1dbf55d1664f2b841974e23a7ed0987bef07c119e5eae50d4cede1ceedd",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -867,6 +885,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "27e3736051c3ce09b73879040497e7dd145db470d90fd4194cbd6b4a9070c9a2",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -874,6 +893,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "a49220f47a23871f089e2c0f24344a04b67fcf3049aba932b1eb9038e0fec28f",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -882,6 +902,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "17abe9fda73d3ded15cc14c652327f2d83633ef8ac819dec28c3be4eb1d60f9f",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -891,6 +912,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "9030ee44e70a575764aaff2c912125c4865ceeb877aa343d50015034b3751065",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -899,6 +921,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "30be8753fe4bd7ce1230894e33e15f33670907d18f0b4f4e2c9cb4aeafe494b1",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -908,6 +931,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "00144db4647fd7f7428f8449a57138c5b7d44fda858edd91f5a83fa648b0a584",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1029,6 +1053,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "4409449efe04e7e6ba790458d29c1c24fbf5e4b7057a48d01d6e808c585a68d7",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1050,12 +1075,14 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "9896199ed96b077c883cd7c65dd42fe0b9409f4f9cc2d12785f35a7cef49ad64",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1066,6 +1093,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "27b268ed5f2435bf19043dc183c6c284b4d9bc2ca5bf482358c53fb7b0f5aa32",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1079,6 +1107,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "e5b75e36f46cd653d7344e661283960522bcb6d4e9ca8cec55b07e46ce06a399",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1160,6 +1189,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "1eb9b01f1f3dec48158b5c70cb8b9538449fbf09832fa4e7654029e978479580",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1167,11 +1197,13 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "7ff0d1b201f3385b9c69e00124c477b5b094bb4cf91bd2c308b741d040b1bbf6",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1207,11 +1239,13 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "5542255772f3d1a67bb45eb75d2a249dd14e916d144601d9da977190c550340d",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1219,11 +1253,13 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "6da8500d867009b6de3264a3700fc038004e6c8fbb9db017cbe8642e114eaef2",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1231,11 +1267,13 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "389d04bed42a3418596910ccfec304ed649e0e1c45ee8449a19cecac0ad9d66b",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1453,6 +1491,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "b358c5b2773accbe087e8c2f7d64e477a344064ac597b5b0d026b82b9d1357b9",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1484,6 +1523,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "4aa29d5cafe2518ee74f6b71865562380eb1d66cfe483d83ec696a64f03688cb",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "status": "M",
+      "header": "@@ -1498,6 +1538,7 @@ describe('MDC-based MatSlider', () => {",
+      "sha256": "bce16bc6b879a0ddd5da4f1f6be4a1b39337a43ff7cd00945973d3c22ca3d886",
+      "judgment": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "status": "M",
+      "header": "@@ -1,5 +1,6 @@",
+      "sha256": "cc957ffa0d4123e2fd9b4444dcb525675c75830c3c7b3eebeaeb8690e3d0f794",
+      "judgment": "Moves exactly two dismiss-timeout callbacks into the added zone fixture, adds renders after dismissWithAction in three cases and marks template-local value mutations. Provider/fixture/hook and timeout/stability preparation remain source facts requiring runtime validation."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "status": "M",
+      "header": "@@ -8,29 +9,22 @@ import {",
+      "sha256": "a37ed46019aa6498803b4d13615db20fabdf2cd02a931a0dff840bee2b421802",
+      "judgment": "Moves exactly two dismiss-timeout callbacks into the added zone fixture, adds renders after dismissWithAction in three cases and marks template-local value mutations. Provider/fixture/hook and timeout/stability preparation remain source facts requiring runtime validation."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "status": "M",
+      "header": "@@ -517,6 +511,7 @@ describe('MatSnackBar', () => {",
+      "sha256": "885c619212c99439e1ec84516f55b79337f8543a009f292ee10e292c58e87566",
+      "judgment": "Moves exactly two dismiss-timeout callbacks into the added zone fixture, adds renders after dismissWithAction in three cases and marks template-local value mutations. Provider/fixture/hook and timeout/stability preparation remain source facts requiring runtime validation."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "status": "M",
+      "header": "@@ -530,6 +525,7 @@ describe('MatSnackBar', () => {",
+      "sha256": "b5caa36cd864b3ea8d7c9676908fce4b6205aa46ad1a455739fc1a82a7d6a65b",
+      "judgment": "Moves exactly two dismiss-timeout callbacks into the added zone fixture, adds renders after dismissWithAction in three cases and marks template-local value mutations. Provider/fixture/hook and timeout/stability preparation remain source facts requiring runtime validation."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "status": "M",
+      "header": "@@ -565,33 +561,6 @@ describe('MatSnackBar', () => {",
+      "sha256": "77b5c33c6ebdb171c1d4943231c41dadf21cf24eedc826d3689d42bd916bd76f",
+      "judgment": "Moves exactly two dismiss-timeout callbacks into the added zone fixture, adds renders after dismissWithAction in three cases and marks template-local value mutations. Provider/fixture/hook and timeout/stability preparation remain source facts requiring runtime validation."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "status": "M",
+      "header": "@@ -724,6 +693,7 @@ describe('MatSnackBar', () => {",
+      "sha256": "4f1978d1ce8ccba26b45183189b4457a4793fa55f2b1d0faad428932d52f7fc3",
+      "judgment": "Moves exactly two dismiss-timeout callbacks into the added zone fixture, adds renders after dismissWithAction in three cases and marks template-local value mutations. Provider/fixture/hook and timeout/stability preparation remain source facts requiring runtime validation."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "status": "M",
+      "header": "@@ -741,6 +711,7 @@ describe('MatSnackBar', () => {",
+      "sha256": "a90605781d13136aff3da8151a7da91dfa36564b5c511d1af24b9eecc9109e64",
+      "judgment": "Moves exactly two dismiss-timeout callbacks into the added zone fixture, adds renders after dismissWithAction in three cases and marks template-local value mutations. Provider/fixture/hook and timeout/stability preparation remain source facts requiring runtime validation."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "status": "M",
+      "header": "@@ -750,6 +721,7 @@ describe('MatSnackBar', () => {",
+      "sha256": "be5d6f19539fc69ce7d85d97bad35bceecb748b5ceb572e69030a4c736311a19",
+      "judgment": "Moves exactly two dismiss-timeout callbacks into the added zone fixture, adds renders after dismissWithAction in three cases and marks template-local value mutations. Provider/fixture/hook and timeout/stability preparation remain source facts requiring runtime validation."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.zone.spec.ts",
+      "status": "A",
+      "header": "@@ -0,0 +1,94 @@",
+      "sha256": "5c970400b2135ee02e7b48b3e4462b50b37b883f98688eb2547384dad19b3323",
+      "judgment": "Complete added94-line file explicitly provides zone change detection and NoopAnimationsModule, retains standalone signal/@if child-container fixture and directive, and relocates exactly two byte-semantically equal timeout/isStable callbacks. Equal callbacks do not prove fixture/provider/lifetime equivalence."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -6,13 +6,13 @@ import {",
+      "sha256": "e31ce2772a4c58ff40b8f99d2f11c56e168d704bcf1707877448e1348a4ca7bc",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -29,11 +29,6 @@ import {",
+      "sha256": "7945df175b2873200d5406f7f31b0414f1f054c116793a96baff8c0c6457acde",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -200,6 +195,7 @@ describe('MatSort', () => {",
+      "sha256": "8f431b13c912092eab405ab8a35d84c228951129fdd07c6e11b1e7937c5e41c3",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -209,6 +205,7 @@ describe('MatSort', () => {",
+      "sha256": "8f282f67a467736d50bbbdd09b684206fe940c9bb05f1f2a80155f531093796b",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -220,20 +217,24 @@ describe('MatSort', () => {",
+      "sha256": "fe49d80d4743dc742ed23f759b53ad994df042b5d3710ebd731582dfb4d42cee",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -246,6 +247,7 @@ describe('MatSort', () => {",
+      "sha256": "79808cb06d4b538b404e17f5a78f90c5f1257013a5a70a8af53d69b3e3ed55f4",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -263,6 +265,7 @@ describe('MatSort', () => {",
+      "sha256": "2a8dc9413a77043d928275e80446a46abbc9232db21bcfa313f2b57a49795a20",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -396,6 +399,7 @@ describe('MatSort', () => {",
+      "sha256": "5b475e8bf868ebd294f80f41cbcb1924c045b12d8b1b033b8e2ccdcb3440b8b8",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -408,6 +412,7 @@ describe('MatSort', () => {",
+      "sha256": "757fdb3dbbed4b4bfc60d7e00e1ccf6e6e247c991ff114ce1e3b46a0c11d49a8",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -444,6 +449,7 @@ describe('MatSort', () => {",
+      "sha256": "1ced6fb57553948dc539a52da3d13c2e723db4124c3916984e7e8c183d3116ee",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "status": "M",
+      "header": "@@ -501,6 +507,7 @@ describe('MatSort', () => {",
+      "sha256": "174eaef43d87e75669d854718a2849cc07227a174765409c73e31aebf7ce3278",
+      "judgment": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -18,20 +18,19 @@ import {",
+      "sha256": "fa977cc60c3a9f981ec7e2ecd779c84a50785e688aedff2bcf1f4cd52688a345",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -41,7 +40,6 @@ import {",
+      "sha256": "9d0c68e464a0642401217eb03c1067207296d9c4e4793f74ef5547d236d0aab3",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -50,11 +48,6 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "e659b38f97737833f8237fdb3f156b2bf6f85681e226f838aad2dc5c8ce9d5a6",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -180,7 +173,6 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "4b9a91cea9e308446cb05a16a8dfece36c3dafb59a48619e9bde659c2a690cf7",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -218,7 +210,6 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "0cdbdf882008972e16c0177a4de813fc12b10bfd7c5c993e21295bed1e21844e",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -360,6 +351,7 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "c8e284eef07f9c1aab78d7fedef79dcbaa44f7a0cb4002ceaf87acd6936104fd",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -368,6 +360,7 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "7fe43bf61858ab18730bfe7dcf9f1878599526f58d2f19f5dff6c9b928a6b21a",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -541,6 +534,7 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "d320bf287adbc6de399b940f81d6c58501f650f4ba3ee731240a8e5326cfac7d",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -666,6 +660,7 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "d9388b74d3ad485999f68a51fb12442646bdbeca20d2fb528493cedb24719667",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -723,6 +718,7 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "4409ea2b15494b66bea40736cdcafc64ab1e027505b95585fe9f38ca03cb515f",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -896,6 +892,7 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "78d5fa5ed68fea338d8cd675f3a78b4202b55665e4feef2d8983bd62c3858540",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -932,10 +929,12 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "2f5194ff9dfbe2126a247d54bd89784ea881fc0fcbfbd285c3b33779bc82e425",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "status": "M",
+      "header": "@@ -1184,25 +1183,6 @@ describe('MDC-based MatTooltip', () => {",
+      "sha256": "f0889e77f82ce5db69df290c3b9029259819ed701e206ebe624d4676ea0df88b",
+      "judgment": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.zone.spec.ts",
+      "status": "A",
+      "header": "@@ -0,0 +1,98 @@",
+      "sha256": "fb27fabd56ee4e39df1da0e9721670d407f81d856263315db837715f1ad9072d",
+      "judgment": "Complete added98-line file explicitly provides zone change detection and Directionality factory, imports OverlayModule and keeps ScrollableTooltipDemo. The exact moved show/hide/scroll/NgZone callback is retained with its full provider/fixture scope, not treated as independent execution evidence."
+    },
+    {
+      "path": "tslint.json",
+      "status": "M",
+      "header": "@@ -188,9 +188,11 @@",
+      "sha256": "c4a137d61bacd347800e70d2cfd7fd5c895f69dddcb8ad9f6bb12473d1b7ec25",
+      "judgment": "Drops the focus-trap exemption and narrows the broad Material spec allowlist to select/stepper/tabs and tooltip harness. This obsolete lint policy does not authorize fixture filtering or current runner exception changes."
+    }
+  ],
+  "per_file_reviews": [
+    {
+      "path": "src/material/core/ripple/ripple.spec.ts",
+      "review": "Moves exactly one event-zone callback to a new file; removes zoneful provider/import preparation from the generic suite. Preserve full fixture, body-margin cleanup and ripple operations; callback identity does not prove original environment execution."
+    },
+    {
+      "path": "src/material/core/ripple/ripple.zone.spec.ts",
+      "review": "Complete added60-line zone integration file keeps the exact moved callback and standalone BasicRippleContainer, with body margin setup/cleanup. It contains no explicit provideZoneChangeDetection call. The filename and fixture.ngZone assertion do not establish that the new initializer actually supplies zoneful preparation."
+    },
+    {
+      "path": "src/material/sidenav/drawer.spec.ts",
+      "review": "Removes zoneful provider/import and adds explicit marks/renders for disabled/direction/mode/position/filler/backdrop state and focus/restoration cases after tick/flush. Full callback/hook/class context retained; do not infer unchanged notification or destruction behavior."
+    },
+    {
+      "path": "src/material/sidenav/sidenav.spec.ts",
+      "review": "Removes zoneful provider/import and adds marks in two fixed-position fixture cases. The historical owned module-era suite remains zoneful; no legacy component or consumer style/structure change follows."
+    },
+    {
+      "path": "src/material/slide-toggle/slide-toggle.spec.ts",
+      "review": "Removes zoneful provider/import and adds marks around plain field, form model, disabled/color/label/tabindex/required/ripple/icon/checked mutations. This modern MDC fixture migration does not authorize legacy API/HTML/CSS/SCSS changes."
+    },
+    {
+      "path": "src/material/slider/slider.spec.ts",
+      "review": "Removes zoneful provider/import and explicitly marks min/max/step/value/range-thumb/form-model mutations. Full callbacks remain pinned as changed where applicable; do not adopt modern slider thumb API or structure into legacy slider."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.spec.ts",
+      "review": "Moves exactly two dismiss-timeout callbacks into the added zone fixture, adds renders after dismissWithAction in three cases and marks template-local value mutations. Provider/fixture/hook and timeout/stability preparation remain source facts requiring runtime validation."
+    },
+    {
+      "path": "src/material/snack-bar/snack-bar.zone.spec.ts",
+      "review": "Complete added94-line file explicitly provides zone change detection and NoopAnimationsModule, retains standalone signal/@if child-container fixture and directive, and relocates exactly two byte-semantically equal timeout/isStable callbacks. Equal callbacks do not prove fixture/provider/lifetime equivalence."
+    },
+    {
+      "path": "src/material/sort/sort.spec.ts",
+      "review": "Removes zoneful provider/import and adds marks in pinned-column sort, disabled/start/direction/description and arrow-position fixtures. Retain whole source and owned historical setup; no legacy styling or consumer API alteration."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.spec.ts",
+      "review": "Removes root and two reset-config zoneful providers, adds marks for disabled/message/ngClass/position-error/scroll-position mutations, and moves exactly one NgZone scroll-hide callback. Preserve error, timing, scroll and destruction context without claiming execution."
+    },
+    {
+      "path": "src/material/tooltip/tooltip.zone.spec.ts",
+      "review": "Complete added98-line file explicitly provides zone change detection and Directionality factory, imports OverlayModule and keeps ScrollableTooltipDemo. The exact moved show/hide/scroll/NgZone callback is retained with its full provider/fixture scope, not treated as independent execution evidence."
+    },
+    {
+      "path": "tslint.json",
+      "review": "Drops the focus-trap exemption and narrows the broad Material spec allowlist to select/stepper/tabs and tooltip harness. This obsolete lint policy does not authorize fixture filtering or current runner exception changes."
+    }
+  ],
+  "whole_original_frames": {
+    "path": "compatibility/rc/mixed-strict-tests-source-review.json.gz",
+    "sha256": "5babb2c8cb7472968664d1bf35497338d49dceb7ecf53ad485af75f2c436b6c3"
+  },
+  "source_semantics": {
+    "sha": "2c88e9ba9f9b037683e166ecf0d825ee7e39a79c",
+    "check_no_changes_configurations": [],
+    "added_zone_fixture_preparation": [
+      {
+        "path": "src/material/core/ripple/ripple.zone.spec.ts",
+        "explicit_zone_change_detection_provider_calls": [],
+        "filename_alone_proves_zoneful_preparation": false
+      },
+      {
+        "path": "src/material/snack-bar/snack-bar.zone.spec.ts",
+        "explicit_zone_change_detection_provider_calls": [
+          {
+            "kind": "CallExpression",
+            "raw": "provideZoneChangeDetection()",
+            "sha256": "37bf7d1205a2266deecfe34c25bd54896fa9c941feca2ef7c21e717d8453b00f",
+            "semantic_sha256": "6982e90515551a1d17804dac041b4f8c7137724a3b1e4d0b580a885dd0f13180"
+          }
+        ],
+        "filename_alone_proves_zoneful_preparation": false
+      },
+      {
+        "path": "src/material/tooltip/tooltip.zone.spec.ts",
+        "explicit_zone_change_detection_provider_calls": [
+          {
+            "kind": "CallExpression",
+            "raw": "provideZoneChangeDetection()",
+            "sha256": "37bf7d1205a2266deecfe34c25bd54896fa9c941feca2ef7c21e717d8453b00f",
+            "semantic_sha256": "6982e90515551a1d17804dac041b4f8c7137724a3b1e4d0b580a885dd0f13180"
+          }
+        ],
+        "filename_alone_proves_zoneful_preparation": false
+      }
+    ],
+    "cases_before": 420,
+    "cases_after": 420,
+    "unchanged_complete_callbacks": 300,
+    "exact_reviewed_case_relocations": 4,
+    "fixture_provider_notification_error_lifetime_or_emitted_metadata_equivalence_proved": false,
+    "actual_Angular_compiler_native_artifact_browser_SSR_or_floor_qualified": false,
+    "review": "Do not adopt this newer Material zoneless test migration into the owned historical module-era zoneful runner. All420 source cases remain:296 same-key callbacks and four exact moved callbacks remain equal, while120 callback bodies change through explicit rendering/notification preparation. Three new zone files retain complete fixture/hook/provider source; snack-bar and tooltip explicitly provide zone change detection, but ripple does not. A zone filename alone proves no zoneful execution. Preserve legacy HTML/CSS/SCSS and callback roster; these modern slider/slide-toggle and fixture API changes do not authorize a legacy component fork, altered structure or a false fixture-stability shortcut. Source equality of moved callbacks does not prove provider, event, timeout, renderer, error or destruction equivalence. Native Angular fixture, artifact and exact-floor execution remain open."
+  },
+  "source_projection_summary": [],
+  "decision": "Do not adopt this newer Material zoneless test migration into the owned historical module-era zoneful runner. All420 source cases remain:296 same-key callbacks and four exact moved callbacks remain equal, while120 callback bodies change through explicit rendering/notification preparation. Three new zone files retain complete fixture/hook/provider source; snack-bar and tooltip explicitly provide zone change detection, but ripple does not. A zone filename alone proves no zoneful execution. Preserve legacy HTML/CSS/SCSS and callback roster; these modern slider/slide-toggle and fixture API changes do not authorize a legacy component fork, altered structure or a false fixture-stability shortcut. Source equality of moved callbacks does not prove provider, event, timeout, renderer, error or destruction equivalence. Native Angular fixture, artifact and exact-floor execution remain open. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+  "owned_context": {
+    "owned_context": [
+      {
+        "path": "toolchain-lock.json",
+        "sha256": "5e20f11d3a06b03fb5194af421e4ba11aafa2609fa4d0a34793b39097b65278b"
+      },
+      {
+        "path": ".node-version",
+        "sha256": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f"
+      },
+      {
+        "path": ".npm-version",
+        "sha256": "005206ab803f8881d8227540b7980b37e723b69a8849edb31734a90b7e7964e2"
+      },
+      {
+        "path": "package.json",
+        "sha256": "a3a268beffc3620d3fdeeadc1269c9e9676adbf3e40f55d45cd9683c85e4a060"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "sha256": "95f2b2de22393c4d182972fa13252dfa6b83d66c9a5de94e49c81f5270ae7a58"
+      },
+      {
+        "path": "projects/ngx-material-legacy/package.json",
+        "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d"
+      },
+      {
+        "path": "tsconfig.json",
+        "sha256": "bce3ae1393dfd7d51a9b2b9e411e9cad0d48238ca1e54161216fbfb0f5030aa4"
+      },
+      {
+        "path": "projects/ngx-material-legacy/tsconfig.lib.json",
+        "sha256": "14d0d2ebb8c3f78a04b1c93becd6ce4b79400381af97d0ccfe7df93cfc228030"
+      },
+      {
+        "path": "testing/legacy-runner/init-test-env.ts",
+        "sha256": "c74c044e7869eb96e8a704b62e36e4c27a2115cb3e0b4815ebb634035f4de15c"
+      },
+      {
+        "path": "testing/legacy-runner/karma.conf.cjs",
+        "sha256": "de03225410a36621af1e4da81af14e6054a4b414187283a3aab031f8d24e3da9"
+      },
+      {
+        "path": "testing/legacy-runner/karma-legacy-json-reporter.cjs",
+        "sha256": "6dfe9b3efbb04993748bb2cea215cc2870fecce7325328b6755b979a93843426"
+      },
+      {
+        "path": "scripts/run-legacy-artifact-suite.mjs",
+        "sha256": "c1953fa7e9bcf7f93516a68ad40c6bfac2bd35403c239018f6e826fa0cf97b08"
+      },
+      {
+        "path": ".github/workflows/ci.yml",
+        "sha256": "3a652799a93090b29e24705fd275657b66fae04a6505f60ccbaf365438ff5bea"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.spec.ts",
+        "sha256": "509a20c7a7600499b105c308bcd23c4dd8785b6ced438d97abcde9f246223757"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-snack-bar/snack-bar.spec.ts",
+        "sha256": "15708b86b3aae3773bb5f0bfad8e6f952dce281e6722e7b5a2f6f06fcd105fd3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slide-toggle/slide-toggle.spec.ts",
+        "sha256": "8d4e12acb4e0a65ea96ec687dfa78c703af3b6790c400649b4d5358aa08cc5d7"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-slider/slider.spec.ts",
+        "sha256": "034c2e3ec36a20574137ddc379bb22a8318739b1474c6ccc581d11473bf02407"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/select.spec.ts",
+        "sha256": "d45d31bba50e87a53d614ef018e5105efac589c45e98b70bbceb9f269228b483"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-menu/menu.spec.ts",
+        "sha256": "38b0486a0bc5053bda428540bd9059858ca50d4549bc277c698d42dc1cc0e7e6"
+      }
+    ],
+    "source_members": 1028,
+    "source_members_sha256": "4eea094fdf39828468fc9dfd4d4ae09009e78c4c6d26ce619d9d8a4b3b4dcbd3",
+    "explicit_owned_zoneful_preparation": true,
+    "public_fixture_stability_untouched": true,
+    "upstream_exhaustive_false_exceptions_adopted": 0,
+    "required_consumer_HTML_CSS_SCSS_changes": 0,
+    "actual_framework_error_lifecycle_or_floor_executed": false
+  },
+  "prior_entry": {
+    "sha": "2c88e9ba9f9b037683e166ecf0d825ee7e39a79c",
+    "bucket": "test-only-batch-candidate",
+    "subject": "test: Convert some material tests to zoneless (#29309)",
+    "files": [
+      "src/material/core/ripple/ripple.spec.ts",
+      "src/material/core/ripple/ripple.zone.spec.ts",
+      "src/material/sidenav/drawer.spec.ts",
+      "src/material/sidenav/sidenav.spec.ts",
+      "src/material/slide-toggle/slide-toggle.spec.ts",
+      "src/material/slider/slider.spec.ts",
+      "src/material/snack-bar/snack-bar.spec.ts",
+      "src/material/snack-bar/snack-bar.zone.spec.ts",
+      "src/material/sort/sort.spec.ts",
+      "src/material/tooltip/tooltip.spec.ts",
+      "src/material/tooltip/tooltip.zone.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/mixed-strict-tests-source-prior.json.gz",
+    "sha256": "5f193b4b9fe5b18c0db964eaac97838ac43958bd095c0d13e86792882536db20"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-strict-tests-source-applicability",
+    "diff_sha256": "d1429d93d69aad0b5fb39320186a20fb7915afd534dabf0c5581f63cf32cb02f",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Do not adopt this newer Material zoneless test migration into the owned historical module-era zoneful runner. All420 source cases remain:296 same-key callbacks and four exact moved callbacks remain equal, while120 callback bodies change through explicit rendering/notification preparation. Three new zone files retain complete fixture/hook/provider source; snack-bar and tooltip explicitly provide zone change detection, but ripple does not. A zone filename alone proves no zoneful execution. Preserve legacy HTML/CSS/SCSS and callback roster; these modern slider/slide-toggle and fixture API changes do not authorize a legacy component fork, altered structure or a false fixture-stability shortcut. Source equality of moved callbacks does not prove provider, event, timeout, renderer, error or destruction equivalence. Native Angular fixture, artifact and exact-floor execution remain open. Exact compiler/Node/RxJS/peer floors, consumer/SSR/browser gates, private command-source reconciliation and independent audit remain separate. No publication.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/mixed-strict-tests-source-review.mjs",
+        "sha256": "2cf33a88880ea4cf9c8a3b3dc774b4d241e8fd3c560bfa54f47b9c71ef0347ff"
+      },
+      {
+        "path": "tests/mixed_strict_tests_source_probe.mjs",
+        "sha256": "9cb8643abf2f3a9a43935531bc378648d0fcbb6cd9371ba0afed0897fb8eea21"
+      },
+      {
+        "path": "tests/test_mixed_strict_tests_source.py",
+        "sha256": "e08367d183637c3e37e87bce86c7ded5cfc0c4ee428417abff7657cd237b12d4"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-qualification-record.py",
+        "sha256": "6d38a15b4602648658b9fa212ff1ab764b502aa72ff26f1bccb9e9c558a4332a"
+      },
+      {
+        "path": "scripts/spec-test-environment-source-review.mjs",
+        "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "scripts/upstream-candidate-source-evidence.mjs",
+        "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+      },
+      {
+        "path": "scripts/historical-case-roster.mjs",
+        "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+      },
+      {
+        "path": "scripts/acquire-mixed-strict-tests-originals.py",
+        "sha256": "2be0f03ce0bed7b8359e49893b26f38fe24ccac1764703c16567e220a0f71aa1"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-authenticator.mjs",
+        "sha256": "e4c0e8ae16d1f814c920fc86b9d5980ff1ae8fec3a9e69abfe055510b862c60d"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-subjects.json.gz",
+        "sha256": "cd909c6b68cee4f940abd9129e2e11698f92efdedd3212f7d7765c811602f7e4"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-acquisition.json.gz",
+        "sha256": "1474eda333850316506165a065dd975515f7528ada313e14b94228bb435ca689"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-authentication.json.gz",
+        "sha256": "972c996f946d0917b6a90e79ed887305083e95421f2f974c7c0ba6ba07793dbf"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-acquisition-controls.json",
+        "sha256": "14e80378bfad8b1e7cc92f9bff6dafb8227aeb22b3aadc28c16944f84bb35f6f"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-acquisition-controls.py",
+        "sha256": "8e8c25e34e0007aae62314aae607ac37e0573fd1c118f69db4fffe91d68c9906"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-acquisition-inspector.mjs",
+        "sha256": "08e59e5e1633d984ebf7f9a561d46eae2dc97f3f2b985f4ae2bef95612ea49f2"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-lifecycle-control-results.json",
+        "sha256": "d4ff1bc03a0906194b3df1957f8d644b99c6445b71fe06d79da9531d1c80cdff"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-lifecycle-controls.mjs",
+        "sha256": "bea19276ef10b0503f76ec72aad6861f9cc16ccafe389e22f02e5a0f30ead658"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-acquisition-checkpoint.json",
+        "sha256": "62b3bebd65ad5c2ce3984de087b27b36467a9bf901add03ddeb2db1b6887392d"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-intake.json",
+        "sha256": "785a568503ad8d773a49aeed2c06e3879d4e9e25a1f9105d88fa161c538bfe3a"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-observation-pins.json.gz",
+        "sha256": "c4f4b0d00326a347dafad26107751f4e978e97ac730096f23f6a0911ca57f70a"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-prior.json.gz",
+        "sha256": "5f193b4b9fe5b18c0db964eaac97838ac43958bd095c0d13e86792882536db20"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-review.json.gz",
+        "sha256": "5babb2c8cb7472968664d1bf35497338d49dceb7ecf53ad485af75f2c436b6c3"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-controls.json",
+        "sha256": "72e0fae37fe722c4d31f32f145ae9e97cf9ef3039cbab4297d63f74f39a9965a"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-python.log.gz",
+        "sha256": "2c33c1a7ba668f744bead8981fd598199cbd179b1744b004d6985136bcd3ef69"
+      },
+      {
+        "path": "compatibility/rc/mixed-strict-tests-source-cyph-sanity.json",
+        "sha256": "060ced1c25d2be7293a310019d55e54ff354480739c4629b0ff7218fba1a30f4"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+      "prior_entry_sha256": "dc6a2a30ce9f303b240824de831353e1f15423cc7a28fa9d2544772218df0610",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/mixed-strict-tests-2c88e9ba9f9b037683e166ecf0d825ee7e39a79c.json",
+        "sha256": "bd6e242a3f322f6bd65e4f70514c22ba9dddc785eff4f4a5baee8c1b0489dd83",
+        "bytes": 103339
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+        "bytes": 31558
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/mixed-strict-tests-2c88e9ba9f9b037683e166ecf0d825ee7e39a79c.json",
+        "sha256": "bd6e242a3f322f6bd65e4f70514c22ba9dddc785eff4f4a5baee8c1b0489dd83",
+        "bytes": 103339
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/mixed-strict-tests-source-review.mjs",
+      "sha256": "2cf33a88880ea4cf9c8a3b3dc774b4d241e8fd3c560bfa54f47b9c71ef0347ff"
+    },
+    {
+      "path": "tests/mixed_strict_tests_source_probe.mjs",
+      "sha256": "9cb8643abf2f3a9a43935531bc378648d0fcbb6cd9371ba0afed0897fb8eea21"
+    },
+    {
+      "path": "tests/test_mixed_strict_tests_source.py",
+      "sha256": "e08367d183637c3e37e87bce86c7ded5cfc0c4ee428417abff7657cd237b12d4"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-qualification-record.py",
+      "sha256": "6d38a15b4602648658b9fa212ff1ab764b502aa72ff26f1bccb9e9c558a4332a"
+    },
+    {
+      "path": "scripts/spec-test-environment-source-review.mjs",
+      "sha256": "372019625c8c3a2a48c1af3a12b1f4016528750835be96e3fb169e18d48aaadd"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "scripts/upstream-candidate-source-evidence.mjs",
+      "sha256": "f4d6d33f1e45416ccaacb96a51035e8a701eae74a3b79c56d4379f04b45d320f"
+    },
+    {
+      "path": "scripts/historical-case-roster.mjs",
+      "sha256": "a20e6f09c20ee9d8eb0f90a01623be445974a5471179c9693dc94075ee89442e"
+    },
+    {
+      "path": "scripts/acquire-mixed-strict-tests-originals.py",
+      "sha256": "2be0f03ce0bed7b8359e49893b26f38fe24ccac1764703c16567e220a0f71aa1"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-authenticator.mjs",
+      "sha256": "e4c0e8ae16d1f814c920fc86b9d5980ff1ae8fec3a9e69abfe055510b862c60d"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-subjects.json.gz",
+      "sha256": "cd909c6b68cee4f940abd9129e2e11698f92efdedd3212f7d7765c811602f7e4"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-acquisition.json.gz",
+      "sha256": "1474eda333850316506165a065dd975515f7528ada313e14b94228bb435ca689"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-authentication.json.gz",
+      "sha256": "972c996f946d0917b6a90e79ed887305083e95421f2f974c7c0ba6ba07793dbf"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-acquisition-controls.json",
+      "sha256": "14e80378bfad8b1e7cc92f9bff6dafb8227aeb22b3aadc28c16944f84bb35f6f"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-acquisition-controls.py",
+      "sha256": "8e8c25e34e0007aae62314aae607ac37e0573fd1c118f69db4fffe91d68c9906"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-acquisition-inspector.mjs",
+      "sha256": "08e59e5e1633d984ebf7f9a561d46eae2dc97f3f2b985f4ae2bef95612ea49f2"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-lifecycle-control-results.json",
+      "sha256": "d4ff1bc03a0906194b3df1957f8d644b99c6445b71fe06d79da9531d1c80cdff"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-lifecycle-controls.mjs",
+      "sha256": "bea19276ef10b0503f76ec72aad6861f9cc16ccafe389e22f02e5a0f30ead658"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-acquisition-checkpoint.json",
+      "sha256": "62b3bebd65ad5c2ce3984de087b27b36467a9bf901add03ddeb2db1b6887392d"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-intake.json",
+      "sha256": "785a568503ad8d773a49aeed2c06e3879d4e9e25a1f9105d88fa161c538bfe3a"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-observation-pins.json.gz",
+      "sha256": "c4f4b0d00326a347dafad26107751f4e978e97ac730096f23f6a0911ca57f70a"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-prior.json.gz",
+      "sha256": "5f193b4b9fe5b18c0db964eaac97838ac43958bd095c0d13e86792882536db20"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-review.json.gz",
+      "sha256": "5babb2c8cb7472968664d1bf35497338d49dceb7ecf53ad485af75f2c436b6c3"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-controls.json",
+      "sha256": "72e0fae37fe722c4d31f32f145ae9e97cf9ef3039cbab4297d63f74f39a9965a"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-python.log.gz",
+      "sha256": "2c33c1a7ba668f744bead8981fd598199cbd179b1744b004d6985136bcd3ef69"
+    },
+    {
+      "path": "compatibility/rc/mixed-strict-tests-source-cyph-sanity.json",
+      "sha256": "060ced1c25d2be7293a310019d55e54ff354480739c4629b0ff7218fba1a30f4"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+    "prior_entry_sha256": "dc6a2a30ce9f303b240824de831353e1f15423cc7a28fa9d2544772218df0610",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mixed-strict-tests-2c88e9ba9f9b037683e166ecf0d825ee7e39a79c.json",
+      "sha256": "bd6e242a3f322f6bd65e4f70514c22ba9dddc785eff4f4a5baee8c1b0489dd83",
+      "bytes": 103339
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+      "bytes": 31558
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/mixed-strict-tests-2c88e9ba9f9b037683e166ecf0d825ee7e39a79c.json",
+      "sha256": "bd6e242a3f322f6bd65e4f70514c22ba9dddc785eff4f4a5baee8c1b0489dd83",
+      "bytes": 103339
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}

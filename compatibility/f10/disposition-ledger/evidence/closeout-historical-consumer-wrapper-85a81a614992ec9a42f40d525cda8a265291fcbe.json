@@ -1,0 +1,587 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "sha": "85a81a614992ec9a42f40d525cda8a265291fcbe",
+  "subject": "refactor(cdk/table): switch tests away from fakeAsync (#33456)",
+  "status": "reviewed",
+  "final_disposition": "do-not-adopt",
+  "review_depth": "individual-compatibility",
+  "source_conclusion_only": true,
+  "complete_changed_files": [
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "status": "M",
+      "before_mode": "100644",
+      "after_mode": "100644",
+      "before_blob": "359ac3e3a8eeaa97a114c468c6592fff402867a9",
+      "after_blob": "d618b79523e6fe0a26e26e1c69e7887557fb8254"
+    }
+  ],
+  "original_files": 1,
+  "original_hunks": 27,
+  "raw_commit_sha256": "dad7d0592467f645839173cbb4a618ff2ec30f43043be445792f3367a56e6da2",
+  "original_sources": {
+    "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+    "sha256": "d89ef4b2626885738d37947abf700452837255da40cbb9eccd861220e2bba82d"
+  },
+  "patch_file": "compatibility/rc/spec-cdk-async-source-85a81a614992ec9a42f40d525cda8a265291fcbe.patch",
+  "diff_sha256": "3a5333c81f17b4203c2c62650290cbf6b2f86b3b66bdcb66f83a39df851bc216",
+  "hunk_reviews": [
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -16,14 +16,7 @@ import {",
+      "sha256": "c7402dca87a750428e3f2674edaf7373deae3a9d662f97a7f642cb5d7ab4fe09",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -331,7 +324,7 @@ describe('CdkTable', () => {",
+      "sha256": "3ba8f3d1346edcf47cd53a0417623e5c71db1341e1175edfda8c219ab62c3d44",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -339,7 +332,7 @@ describe('CdkTable', () => {",
+      "sha256": "3554d4ca701619f77f37d0906493726f715a3b2a0613575a87a9810622b78230",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -353,7 +346,7 @@ describe('CdkTable', () => {",
+      "sha256": "d137efe58ba03fc2e25233e25dd427cc081660e2390adde9b5552a2c0586e284",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -361,9 +354,9 @@ describe('CdkTable', () => {",
+      "sha256": "6ed7029157fd31e717213138364ad2f969f1235e44b133a2b1c72409e17531c4",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -373,7 +366,7 @@ describe('CdkTable', () => {",
+      "sha256": "34400d19105b48f37f9f3a17910040f71426f069dba2666e69f8b77f4d341781",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -820,13 +813,12 @@ describe('CdkTable', () => {",
+      "sha256": "d7d4a0cdd74498249f0a77d126b8f4b74824c5bb5a0538d637dd483a2b9a81be",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -991,7 +983,7 @@ describe('CdkTable', () => {",
+      "sha256": "c525e2528832b4cc35d63dc8dc6ab851816acabe00ced3caec45df67c59d2ff5",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1038,9 +1030,9 @@ describe('CdkTable', () => {",
+      "sha256": "c86b131e3aaf1275d31dd4b34cd2fa365f76ec3d1de41c8c9e9f6a08edd1ec6a",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1087,9 +1079,9 @@ describe('CdkTable', () => {",
+      "sha256": "5cdce32ee4f876c8a5fa53c9c6408baea76f845d654b3a76670b694fa38a2a29",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1098,9 +1090,9 @@ describe('CdkTable', () => {",
+      "sha256": "3d3f583805df743482294a4dc36de69baf49aeb8ca2cbb4bd2d3da29ff399d9a",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1168,9 +1160,9 @@ describe('CdkTable', () => {",
+      "sha256": "997e7b9e5b9251b1838b13c9dccd999e42bd011d2af8e7bf081050a795d49975",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1238,9 +1230,9 @@ describe('CdkTable', () => {",
+      "sha256": "320f1d7261c8e3f7a409605f6bd74897f47d719ac30a64b4ecd23bffd6d191fa",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1282,9 +1274,9 @@ describe('CdkTable', () => {",
+      "sha256": "d1e984818d1a73fdff0a579756ae96b199d60e021a0fd405fa106d8460bfaeec",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1363,7 +1355,7 @@ describe('CdkTable', () => {",
+      "sha256": "6d02836a724cdcf30ace28428ef79bb7110981f2ae3daea0d08bafa326d9099e",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1379,7 +1371,7 @@ describe('CdkTable', () => {",
+      "sha256": "904bbb01c714024a9578b596677f311ed40ac70dd8bfa541bb9dda4b445dc670",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1431,9 +1423,9 @@ describe('CdkTable', () => {",
+      "sha256": "9f43cf9a4804020bf997938fce4402cc5f0b0f54eb7f85597549a97fb7be5cab",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1485,9 +1477,9 @@ describe('CdkTable', () => {",
+      "sha256": "c396e9839b134350552a3e741a0e7afb1a66914261646ecee8d486bcdcd6a82a",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1507,9 +1499,9 @@ describe('CdkTable', () => {",
+      "sha256": "e1057fd1c3e8c9776cb2e11d7c51072a20be4c1abf9719618591153afe4984bb",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1577,9 +1569,9 @@ describe('CdkTable', () => {",
+      "sha256": "fdf80bc24336f7dd54b03c4111b61307417af108a3585f155f4c8a71ebf3027a",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1647,9 +1639,9 @@ describe('CdkTable', () => {",
+      "sha256": "af8cf553ed123a5b5e06e9ef4684d96927eaf6f51b46da1aaa22064f30668ce5",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -1738,7 +1730,7 @@ describe('CdkTable', () => {",
+      "sha256": "d77220b7dc2b8fa6ace23e4ce1fca30af1b1d7151d73dd51043b46206a35a1e4",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -2006,19 +1998,20 @@ describe('CdkTable', () => {",
+      "sha256": "f97f9dd14f7c22da8a7dbcbe11d007e4bd7060fc7d1129e9120a8a7678f93c67",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -2027,38 +2020,38 @@ describe('CdkTable', () => {",
+      "sha256": "d25342e94fd0dd2524d7bbabe6671938fb6437c5c13fc64df08d4e1a39ed7a68",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -2075,7 +2068,7 @@ describe('CdkTable', () => {",
+      "sha256": "a8e49eb587215983fbca1358f6a9b3bb071048654c05da4cf9eb0ebdf8c4cf69",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -2093,22 +2086,22 @@ describe('CdkTable', () => {",
+      "sha256": "f63582a05de1dbfd920e0a18d997244189414e888f9d832fe4dddf655b9da3de",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    },
+    {
+      "path": "src/cdk/table/table.spec.ts",
+      "header": "@@ -2116,15 +2109,15 @@ describe('CdkTable', () => {",
+      "sha256": "543f663244261f1afa6e2e05e46d6b6d2ae5ac13f9fc0e6c49bfb695b5667aec",
+      "judgment": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+      "review_basis": "Complete authenticated program; all ordered cases/hooks, finite boundary/await statements, four raw-pinned error/deadline/cache exceptions, one finite label mapping, three removed timer/disposal cases, twelve helper bodies, one added20ms constant, two exact removed scheduler flushes, one local Promise result wrapper andfinite retained import ordering, exact imports, complete globals/helpers/classes/templates. No runtime equivalence."
+    }
+  ],
+  "semantics": {
+    "sha": "85a81a614992ec9a42f40d525cda8a265291fcbe",
+    "complete_original_files": 1,
+    "complete_original_hunks": 27,
+    "removed": [],
+    "helpers": [
+      {
+        "path": "src/cdk/table/table.spec.ts",
+        "side": "before",
+        "scopes": [
+          "'CdkTable'",
+          "'virtual scrolling'"
+        ],
+        "name": "createVirtualScroll",
+        "raw": "function createVirtualScroll<T>(component: Type<T>): {\n      fixture: ComponentFixture<T>;\n      table: HTMLTableElement;\n    } {\n      const fixture = TestBed.createComponent(component);\n\n      // Init logic copied from the virtual scroll tests.\n      fixture.detectChanges();\n      flush();\n      fixture.detectChanges();\n      flush();\n      tick(16);\n      flush();\n      fixture.detectChanges();\n\n      return {\n        fixture,\n        table: fixture.nativeElement.querySelector('table'),\n      };\n    }",
+        "sha256": "722eb577cc3f784caf2e4bbee8facbb8ae2bd09beb7c56e3905b113b82b25802"
+      },
+      {
+        "path": "src/cdk/table/table.spec.ts",
+        "side": "before",
+        "scopes": [
+          "'CdkTable'",
+          "'virtual scrolling'"
+        ],
+        "name": "triggerScroll",
+        "raw": "function triggerScroll(\n      fixture: ComponentFixture<{viewport: CdkVirtualScrollViewport}>,\n      offset: number,\n    ) {\n      const viewport = fixture.componentInstance.viewport;\n      viewport.scrollToOffset(offset);\n      dispatchFakeEvent(viewport.scrollable!.getElementRef().nativeElement, 'scroll');\n      tick(16);\n    }",
+        "sha256": "ee43d9f771251036a8b8952a74e808945d89b84fb3e4496de9054ae8782dc322"
+      },
+      {
+        "path": "src/cdk/table/table.spec.ts",
+        "side": "after",
+        "scopes": [
+          "'CdkTable'",
+          "'virtual scrolling'"
+        ],
+        "name": "createVirtualScroll",
+        "raw": "async function createVirtualScroll<T>(component: Type<T>): Promise<{\n      fixture: ComponentFixture<T>;\n      table: HTMLTableElement;\n    }> {\n      const fixture = TestBed.createComponent(component);\n\n      // Init logic copied from the virtual scroll tests.\n      fixture.detectChanges();\n      await fixture.whenStable();\n      fixture.detectChanges();\n      await fixture.whenStable();\n\n      await new Promise(resolve => requestAnimationFrame(resolve));\n      await fixture.whenStable();\n      fixture.detectChanges();\n\n      return {\n        fixture,\n        table: fixture.nativeElement.querySelector('table'),\n      };\n    }",
+        "sha256": "e8393f2974d4111e8d4dbc9215d726b88750a05cb01e223db35e67a214e32035"
+      },
+      {
+        "path": "src/cdk/table/table.spec.ts",
+        "side": "after",
+        "scopes": [
+          "'CdkTable'",
+          "'virtual scrolling'"
+        ],
+        "name": "triggerScroll",
+        "raw": "async function triggerScroll(\n      fixture: ComponentFixture<{viewport: CdkVirtualScrollViewport}>,\n      offset: number,\n    ) {\n      const viewport = fixture.componentInstance.viewport;\n      viewport.scrollToOffset(offset);\n      dispatchFakeEvent(viewport.scrollable!.getElementRef().nativeElement, 'scroll');\n      await new Promise(resolve => setTimeout(resolve, 50));\n    }",
+        "sha256": "317c5b54643d2904f03db977b811742d4531c5d403c46cc268c2604f0e807eb1"
+      }
+    ],
+    "actual_Angular_native_artifact_or_floor_qualified": false,
+    "g11_claim": "not-passed",
+    "paired_cases": 80,
+    "hooks": 4,
+    "fixture_classes": 40,
+    "template_style_properties": 40
+  },
+  "whole_program_review": {
+    "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+    "sha256": "65ac92b4f85f55d6576821ef397f272d6e3551acc0debe37e51930f084c2c731"
+  },
+  "decision": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+  "prior_entry": {
+    "sha": "85a81a614992ec9a42f40d525cda8a265291fcbe",
+    "bucket": "test-only-batch-candidate",
+    "subject": "refactor(cdk/table): switch tests away from fakeAsync (#33456)",
+    "files": [
+      "src/cdk/table/table.spec.ts"
+    ],
+    "final_disposition": "needs-individual-review",
+    "reason": "Canonical research population imported without final dispositions. 21.x ownership, installed-floor behavior, original hunk context and contract applicability require branch-native individual or justified full-membership batch review.",
+    "read_note_disposition": "unreviewed-on-21.x",
+    "affected_branches": [
+      "21.x"
+    ],
+    "g11_claim": "not-passed",
+    "source_inventory": "compatibility/inventories/upstream-delta-inventory-16.2.14-to-v22.2.0.json",
+    "evidence_report": null
+  },
+  "prior_snapshot": {
+    "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+    "sha256": "01a60ef4b45609ee8ed40d19a1cfb7dc32d90d5ea5eb0934fa6f828a4d878b31"
+  },
+  "individual_proof": {
+    "proof_kind": "individual-complete-spec-source-applicability",
+    "diff_sha256": "3a5333c81f17b4203c2c62650290cbf6b2f86b3b66bdcb66f83a39df851bc216",
+    "review_depth": "individual-compatibility",
+    "affected_branches": [
+      "21.x"
+    ],
+    "decision": "Decline this private CDK table scheduler migration after individual review of all 27 hunks in the complete original. All 80 static cases and four hooks retain identity/order;57 complete callbacks remain semantically identical and 23 change. One virtual-scroll error case switches a synchronous throw observer to awaited Promise rejection; the multiple-default-row case retains its synchronous matcher after a nested flush removal. Four exact before/after local helper bodies account for createVirtualScroll and triggerScroll gaining animation-frame/50 ms native waits and the former gaining a Promise-wrapped object result type. All 40 fixture classes and 40 template/style properties remain raw-byte identical. fakeAsync/flush are retained and the finite Core-testing import reordering preserves the four explicit retained bindings. These source facts prove no error timing, rendering, sticky/virtual geometry or lifetime equivalence. The owned legacy table directly extends public CdkTable and Cyph renders that legacy table; this is not absence or inheritance admission. Preserve existing strong table/data-source tests and Material 16 row/cell/classes/styles. No CDK/table fork, modern feature mirror or consumer CSS/SCSS/TS API edit is justified. Actual packed/table/scroll/error/mixed peer and floor gates remain pending.",
+    "source_conclusion_only": true,
+    "source_evidence": [
+      {
+        "path": "scripts/spec-cdk-async-source-review.mjs",
+        "sha256": "982719c6e0b660c03dbf682dbcd213821401846ef0353a5bc1bd801462ebd13c"
+      },
+      {
+        "path": "tests/spec_cdk_async_source_probe.mjs",
+        "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9"
+      },
+      {
+        "path": "tests/test_spec_cdk_async_source.py",
+        "sha256": "de8ee5c55766edeea84f529ce790ef51bc81fe149aef80d5084141750c32b642"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-qualification-inspector.py",
+        "sha256": "ca63e1d8fbeb973a805e3822dd623e6a13b3c423d2ed33d8af2dbf8cda1c0328"
+      },
+      {
+        "path": "scripts/spec-overlay-async-source-review.mjs",
+        "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+      },
+      {
+        "path": "scripts/authenticated-single-spec-review.mjs",
+        "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+      },
+      {
+        "path": "scripts/acquire-upstream-spec-originals.py",
+        "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+      },
+      {
+        "path": "scripts/spec-stability-chip-repair.mjs",
+        "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+        "sha256": "d89ef4b2626885738d37947abf700452837255da40cbb9eccd861220e2bba82d"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-acquisition.json.gz",
+        "sha256": "5da144f4f1c0e49bdf0acb1b73b6e3061009352a271a6f04eb58b59dbd8a55a6"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-observation-pins.json",
+        "sha256": "90d5226c7425d697d525b923dc66d5f9aa1e8b79341f97c5b2e2534d8fe390de"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+        "sha256": "01a60ef4b45609ee8ed40d19a1cfb7dc32d90d5ea5eb0934fa6f828a4d878b31"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+        "sha256": "65ac92b4f85f55d6576821ef397f272d6e3551acc0debe37e51930f084c2c731"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-controls.json",
+        "sha256": "178f7478335597c02ec4a72a8a2a16b0b7771900ecc0a5d2d3e8cd0b868dcf29"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-python.log.gz",
+        "sha256": "c6401e6b7d5e83c04841744eb33b8b2a6d9ae7e230a063fdcbb092722faf8fc9"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-cyph-sanity.json",
+        "sha256": "7b77525aec1d056d1dbcfe6d067dda706cd03a63557b239b5701352e1c2ecda6"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-probe.mjs",
+        "sha256": "f7ebe44564f0d6da673e5e3023ae97b2944a36e646cd253d4fb32f52f4907ee3"
+      },
+      {
+        "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+        "sha256": "84ad6569fddf6674ca61db313d1feb8c41ae556ef0ee11469a91864ca971e650"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-checkpoint.json",
+        "sha256": "1474de3013f2be900dc6fc4041f29834eb0b4baebb24b25999bb2693ba96e62c"
+      },
+      {
+        "path": "compatibility/rc/spec-navigation-async-source-replay-checkpoint.json",
+        "sha256": "80889905dfa795fca67ba034e66fdc4b65923715cbf3a64fa13959a9fadfcaf3"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+        "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+        "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+        "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+        "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+      },
+      {
+        "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+        "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+      }
+    ],
+    "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+    "historical_consumer_wrapper_successor": {
+      "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+      "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+      "prior_entry_sha256": "194caea98517e67bfe8fb87a63506ee2c5d765e08bb8d9fb08ca6de96f346d6d",
+      "prior_review": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-85a81a614992ec9a42f40d525cda8a265291fcbe.json",
+        "sha256": "6508dac8061373a7f828f12898173219a99b243b0829f4034ce7bd2addc5b918",
+        "bytes": 72376
+      },
+      "wrapper_transport": {
+        "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+        "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+        "bytes": 111193
+      },
+      "transport_qualification": {
+        "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+        "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+        "bytes": 31558
+      },
+      "pre_transport_current_contract_qualification": {
+        "path": "compatibility/rc/current-inspector-contract-qualification.json",
+        "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+        "bytes": 16866
+      },
+      "original_hunk_review_subject": {
+        "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-85a81a614992ec9a42f40d525cda8a265291fcbe.json",
+        "sha256": "6508dac8061373a7f828f12898173219a99b243b0829f4034ce7bd2addc5b918",
+        "bytes": 72376
+      },
+      "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  },
+  "independent_source_evidence": [
+    {
+      "path": "scripts/spec-cdk-async-source-review.mjs",
+      "sha256": "982719c6e0b660c03dbf682dbcd213821401846ef0353a5bc1bd801462ebd13c"
+    },
+    {
+      "path": "tests/spec_cdk_async_source_probe.mjs",
+      "sha256": "cd47052a80ef9ca9422625f5c8e30292c2b4531819c1f33b085612e32eb03ba9"
+    },
+    {
+      "path": "tests/test_spec_cdk_async_source.py",
+      "sha256": "de8ee5c55766edeea84f529ce790ef51bc81fe149aef80d5084141750c32b642"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-qualification-inspector.py",
+      "sha256": "ca63e1d8fbeb973a805e3822dd623e6a13b3c423d2ed33d8af2dbf8cda1c0328"
+    },
+    {
+      "path": "scripts/spec-overlay-async-source-review.mjs",
+      "sha256": "aac40828833dd41be945ecb74a88c012b27f2b5f2020f1e4725314a74f3bc723"
+    },
+    {
+      "path": "scripts/authenticated-single-spec-review.mjs",
+      "sha256": "001ff69797a4c85027cec3b2ee06fac31e8eb64e59dcf4b41872631b1e09421c"
+    },
+    {
+      "path": "scripts/acquire-upstream-spec-originals.py",
+      "sha256": "f3aaeddf694d07b9fc9f96615d6d46e1ae56e29b5b6a4f2e44d11a0ed2d9dac4"
+    },
+    {
+      "path": "scripts/spec-stability-chip-repair.mjs",
+      "sha256": "f5f44a7225d5d2b5706aee56b039e4d886a13a06a697c604a6c51fd4127ff1a9"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-subjects.json.gz",
+      "sha256": "d89ef4b2626885738d37947abf700452837255da40cbb9eccd861220e2bba82d"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-acquisition.json.gz",
+      "sha256": "5da144f4f1c0e49bdf0acb1b73b6e3061009352a271a6f04eb58b59dbd8a55a6"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-observation-pins.json",
+      "sha256": "90d5226c7425d697d525b923dc66d5f9aa1e8b79341f97c5b2e2534d8fe390de"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-prior.json.gz",
+      "sha256": "01a60ef4b45609ee8ed40d19a1cfb7dc32d90d5ea5eb0934fa6f828a4d878b31"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-review.json.gz",
+      "sha256": "65ac92b4f85f55d6576821ef397f272d6e3551acc0debe37e51930f084c2c731"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-controls.json",
+      "sha256": "178f7478335597c02ec4a72a8a2a16b0b7771900ecc0a5d2d3e8cd0b868dcf29"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-python.log.gz",
+      "sha256": "c6401e6b7d5e83c04841744eb33b8b2a6d9ae7e230a063fdcbb092722faf8fc9"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-cyph-sanity.json",
+      "sha256": "7b77525aec1d056d1dbcfe6d067dda706cd03a63557b239b5701352e1c2ecda6"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-probe.mjs",
+      "sha256": "f7ebe44564f0d6da673e5e3023ae97b2944a36e646cd253d4fb32f52f4907ee3"
+    },
+    {
+      "path": "compatibility/rc/spec-cdk-async-source-viewport-nonbrowser-observation.json",
+      "sha256": "84ad6569fddf6674ca61db313d1feb8c41ae556ef0ee11469a91864ca971e650"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-checkpoint.json",
+      "sha256": "1474de3013f2be900dc6fc4041f29834eb0b4baebb24b25999bb2693ba96e62c"
+    },
+    {
+      "path": "compatibility/rc/spec-navigation-async-source-replay-checkpoint.json",
+      "sha256": "80889905dfa795fca67ba034e66fdc4b65923715cbf3a64fa13959a9fadfcaf3"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-tooltip/tooltip.ts",
+      "sha256": "81924ceadf634a458ec950c217ed10cb0e8d0cb2cbfe3617aaf8a79b61393b29"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-table/table.ts",
+      "sha256": "d77414235c1e07af3b210b8cce6dc1e0cae39d0fe749720f9ba37d982df90a4f"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-core/internal/legacy-viewport.ts",
+      "sha256": "522d8dfc0362b7ed01b6dc9155a10d7f36f67aef4152249f56db1f631ad935b0"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1"
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-select/internal/select-base.ts",
+      "sha256": "901810bb9f5b187c261d3d3268343dc85a2f1b0dbfdad0a6a9dba6a33e6deb91"
+    }
+  ],
+  "actual_upstream_test_Angular_native_packed_or_floor_qualified": false,
+  "g11_claim": "not-passed",
+  "historical_consumer_wrapper_successor": {
+    "role": "Exact historical wrapper reference metadata; inherited source fields retain their recorded original epoch.",
+    "source_parent": "0b04eb7edafa94c1545d419a2b5455f5a95030c7",
+    "prior_entry_sha256": "194caea98517e67bfe8fb87a63506ee2c5d765e08bb8d9fb08ca6de96f346d6d",
+    "prior_review": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-85a81a614992ec9a42f40d525cda8a265291fcbe.json",
+      "sha256": "6508dac8061373a7f828f12898173219a99b243b0829f4034ce7bd2addc5b918",
+      "bytes": 72376
+    },
+    "wrapper_transport": {
+      "path": "compatibility/rc/historical-consumer-wrapper-successor.json",
+      "sha256": "fa2aa9675b856020dd4e24791d74684ce47513bfd248d81b21e1d61775200502",
+      "bytes": 111193
+    },
+    "transport_qualification": {
+      "path": "compatibility/rc/historical-consumer-wrapper-transport-qualification.json",
+      "sha256": "405b8edc1ff512d8bc5457316015d77cd5d0e55703d68d18fa5423b5b242f2a0",
+      "bytes": 31558
+    },
+    "pre_transport_current_contract_qualification": {
+      "path": "compatibility/rc/current-inspector-contract-qualification.json",
+      "sha256": "50298acf953181543e895eed86c7710ee829c95488983cd6c008e29585ec8a98",
+      "bytes": 16866
+    },
+    "original_hunk_review_subject": {
+      "path": "compatibility/f10/disposition-ledger/evidence/spec-cdk-async-85a81a614992ec9a42f40d525cda8a265291fcbe.json",
+      "sha256": "6508dac8061373a7f828f12898173219a99b243b0829f4034ce7bd2addc5b918",
+      "bytes": 72376
+    },
+    "original_hunk_judgments_dispositions_and_native_requirements_preserved": true,
+    "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+    "g11_claim": "not-passed"
+  }
+}
