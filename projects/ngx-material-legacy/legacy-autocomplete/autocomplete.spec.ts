@@ -740,6 +740,21 @@ describe('MatAutocomplete', () => {
       fixture.componentInstance.trigger.openPanel();
       fixture.detectChanges();
       zone.simulateZoneExit();
+      const selectedElement = overlayContainerElement.querySelectorAll(
+        'mat-option',
+      )[1] as HTMLElement;
+      expect(selectedElement).toBeTruthy();
+      selectedElement.click();
+      fixture.detectChanges();
+      tick();
+      fixture.componentInstance.filteredStates = fixture.componentInstance.states;
+      fixture.detectChanges();
+      fixture.componentInstance.trigger.openPanel();
+      fixture.detectChanges();
+      zone.simulateZoneExit();
+      expect(
+        fixture.componentInstance.options.find(option => option.value === selected)?.selected,
+      ).toBe(true);
       return selected;
     }
 
@@ -754,6 +769,9 @@ describe('MatAutocomplete', () => {
       expect(input.value).toBe('Cali');
       expect(fixture.componentInstance.stateCtrl.value).toBe(selected);
       expect(changes).not.toHaveBeenCalled();
+      expect(
+        fixture.componentInstance.options.find(option => option.value === selected)?.selected,
+      ).toBe(true);
       subscription.unsubscribe();
     }));
 
@@ -797,6 +815,39 @@ describe('MatAutocomplete', () => {
       expect(input.value).toBe('');
       expect(fixture.componentInstance.trigger.panelOpen).toBe(false);
       subscription.unsubscribe();
+
+      const filteredSelected = prepareRequiredSelection();
+      const filteredChanges = jasmine.createSpy('filtered required selection model changes');
+      const filteredSubscription =
+        fixture.componentInstance.stateCtrl.valueChanges.subscribe(filteredChanges);
+      input.value = 'Cali';
+      dispatchFakeEvent(input, 'input');
+      fixture.detectChanges();
+      tick();
+      expect(filteredChanges).not.toHaveBeenCalled();
+      fixture.componentInstance.filteredStates = [];
+      fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.trigger.panelOpen).toBe(false);
+      expect(fixture.componentInstance.stateCtrl.value).toBe(filteredSelected);
+      fixture.componentInstance.filteredStates = [fixture.componentInstance.states[1]];
+      fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.options.length).toBe(1);
+      expect(fixture.componentInstance.trigger.panelOpen).toBe(true);
+      expect(input.value).toBe('Cali');
+      expect(filteredChanges).not.toHaveBeenCalled();
+      dispatchFakeEvent(document, 'click');
+      fixture.detectChanges();
+      tick();
+      expect(fixture.componentInstance.stateCtrl.value).toBeNull();
+      expect(input.value).toBe('');
+      expect(filteredChanges).toHaveBeenCalledTimes(1);
+      expect(filteredChanges).toHaveBeenCalledWith(null);
+      expect(fixture.componentInstance.trigger.panelOpen).toBe(false);
+      filteredSubscription.unsubscribe();
     }));
 
     it('should update control value when autofilling', () => {
@@ -847,6 +898,41 @@ describe('MatAutocomplete', () => {
       expect(fixture.componentInstance.stateCtrl.value)
         .withContext('Expected control value to revert back to string.')
         .toEqual('Californi');
+
+      const component = fixture.componentInstance;
+      const display = spyOn(component, 'displayFn').and.callThrough();
+      component.filteredStates = component.states;
+      fixture.detectChanges();
+      component.trigger.openPanel();
+      fixture.detectChanges();
+      zone.simulateZoneExit();
+      const selectedOption = component.options.toArray()[1];
+      (overlayContainerElement.querySelectorAll('mat-option')[1] as HTMLElement).click();
+      fixture.detectChanges();
+      tick();
+      component.filteredStates = component.states;
+      fixture.detectChanges();
+      component.trigger.openPanel();
+      fixture.detectChanges();
+      zone.simulateZoneExit();
+      expect(selectedOption.selected).toBe(true);
+      const selectionEvents = jasmine.createSpy('optional typing selection events');
+      const selectionSubscription = component.trigger.optionSelections.subscribe(selectionEvents);
+      const modelChanges = jasmine.createSpy('optional typing model changes');
+      const modelSubscription = component.stateCtrl.valueChanges.subscribe(modelChanges);
+      display.calls.reset();
+      input.value = 'Californi';
+      dispatchFakeEvent(input, 'input');
+      expect(display).toHaveBeenCalledWith(selectedOption.value);
+      expect(selectedOption.selected).toBe(false);
+      fixture.detectChanges();
+      tick();
+      expect(component.stateCtrl.value).toBe('Californi');
+      expect(modelChanges).toHaveBeenCalledTimes(1);
+      expect(modelChanges).toHaveBeenCalledWith('Californi');
+      expect(selectionEvents).not.toHaveBeenCalled();
+      selectionSubscription.unsubscribe();
+      modelSubscription.unsubscribe();
     }));
 
     it('should fill the text field with display value when an option is selected', fakeAsync(() => {
@@ -908,6 +994,33 @@ describe('MatAutocomplete', () => {
       tick();
 
       expect(input.value).withContext(`Expected input value to be empty after reset.`).toEqual('');
+
+      const component = fixture.componentInstance;
+      component.trigger.openPanel();
+      fixture.detectChanges();
+      zone.simulateZoneExit();
+      const selectedOption = component.options.first;
+      (overlayContainerElement.querySelector('mat-option') as HTMLElement).click();
+      fixture.detectChanges();
+      tick();
+      expect(selectedOption.selected).toBe(true);
+      expect(component.stateCtrl.value).toBe(component.states[0]);
+      const selections = jasmine.createSpy('programmatic reset selection events');
+      const selectionSubscription = component.trigger.optionSelections.subscribe(selections);
+      const resets = jasmine.createSpy('programmatic reset model changes');
+      const valueSubscription = component.stateCtrl.valueChanges.subscribe(resets);
+      component.stateCtrl.reset();
+      fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
+      expect(component.stateCtrl.value).toBeNull();
+      expect(input.value).toBe('');
+      expect(selectedOption.selected).toBe(false);
+      expect(selections).not.toHaveBeenCalled();
+      expect(resets).toHaveBeenCalledTimes(1);
+      expect(resets).toHaveBeenCalledWith(null);
+      selectionSubscription.unsubscribe();
+      valueSubscription.unsubscribe();
     }));
 
     it('should disable input in view when disabled programmatically', () => {

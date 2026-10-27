@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Five additive Angular test extensions; every original byte remains in order",
+  "source_parent": "c0c75460214cc7e52d263edf28883fa0c6a8d5c5",
+  "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+  "before": {
+    "sha256": "09a96761ccbb96309989dfc13517170c3600fb2bd57b3fb7e9c9cb02f788d423",
+    "bytes": 147026
+  },
+  "after": {
+    "sha256": "2610d311569c9a6fdb063dc0652b423414622cf1370b2434f13ba86070293236",
+    "bytes": 152212
+  },
+  "insertions": [
+    {
+      "target": "prepareRequiredSelection",
+      "byte_offset": 26053,
+      "text": "const selectedElement = overlayContainerElement.querySelectorAll(\n        'mat-option',\n      )[1] as HTMLElement;\n      expect(selectedElement).toBeTruthy();\n      selectedElement.click();\n      fixture.detectChanges();\n      tick();\n      fixture.componentInstance.filteredStates = fixture.componentInstance.states;\n      fixture.detectChanges();\n      fixture.componentInstance.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      expect(\n        fixture.componentInstance.options.find(option => option.value === selected)?.selected,\n      ).toBe(true);\n      "
+    },
+    {
+      "target": "should retain the selected model while typing when selection is required",
+      "byte_offset": 26680,
+      "text": "expect(\n        fixture.componentInstance.options.find(option => option.value === selected)?.selected,\n      ).toBe(true);\n      "
+    },
+    {
+      "target": "should reset unmatched required-selection text once on outside click",
+      "byte_offset": 28617,
+      "text": "\n\n      const filteredSelected = prepareRequiredSelection();\n      const filteredChanges = jasmine.createSpy('filtered required selection model changes');\n      const filteredSubscription =\n        fixture.componentInstance.stateCtrl.valueChanges.subscribe(filteredChanges);\n      input.value = 'Cali';\n      dispatchFakeEvent(input, 'input');\n      fixture.detectChanges();\n      tick();\n      expect(filteredChanges).not.toHaveBeenCalled();\n      fixture.componentInstance.filteredStates = [];\n      fixture.detectChanges();\n      tick();\n      fixture.detectChanges();\n      expect(fixture.componentInstance.trigger.panelOpen).toBe(false);\n      expect(fixture.componentInstance.stateCtrl.value).toBe(filteredSelected);\n      fixture.componentInstance.filteredStates = [fixture.componentInstance.states[1]];\n      fixture.detectChanges();\n      tick();\n      fixture.detectChanges();\n      expect(fixture.componentInstance.options.length).toBe(1);\n      expect(fixture.componentInstance.trigger.panelOpen).toBe(true);\n      expect(input.value).toBe('Cali');\n      expect(filteredChanges).not.toHaveBeenCalled();\n      dispatchFakeEvent(document, 'click');\n      fixture.detectChanges();\n      tick();\n      expect(fixture.componentInstance.stateCtrl.value).toBeNull();\n      expect(input.value).toBe('');\n      expect(filteredChanges).toHaveBeenCalledTimes(1);\n      expect(filteredChanges).toHaveBeenCalledWith(null);\n      expect(fixture.componentInstance.trigger.panelOpen).toBe(false);\n      filteredSubscription.unsubscribe();"
+    },
+    {
+      "target": "should update the control back to a string if user types after an option is selected",
+      "byte_offset": 30477,
+      "text": "\n\n      const component = fixture.componentInstance;\n      const display = spyOn(component, 'displayFn').and.callThrough();\n      component.filteredStates = component.states;\n      fixture.detectChanges();\n      component.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      const selectedOption = component.options.toArray()[1];\n      (overlayContainerElement.querySelectorAll('mat-option')[1] as HTMLElement).click();\n      fixture.detectChanges();\n      tick();\n      component.filteredStates = component.states;\n      fixture.detectChanges();\n      component.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      expect(selectedOption.selected).toBe(true);\n      const selectionEvents = jasmine.createSpy('optional typing selection events');\n      const selectionSubscription = component.trigger.optionSelections.subscribe(selectionEvents);\n      const modelChanges = jasmine.createSpy('optional typing model changes');\n      const modelSubscription = component.stateCtrl.valueChanges.subscribe(modelChanges);\n      display.calls.reset();\n      input.value = 'Californi';\n      dispatchFakeEvent(input, 'input');\n      expect(display).toHaveBeenCalledWith(selectedOption.value);\n      expect(selectedOption.selected).toBe(false);\n      fixture.detectChanges();\n      tick();\n      expect(component.stateCtrl.value).toBe('Californi');\n      expect(modelChanges).toHaveBeenCalledTimes(1);\n      expect(modelChanges).toHaveBeenCalledWith('Californi');\n      expect(selectionEvents).not.toHaveBeenCalled();\n      selectionSubscription.unsubscribe();\n      modelSubscription.unsubscribe();"
+    },
+    {
+      "target": "should clear the text field if value is reset programmatically",
+      "byte_offset": 32531,
+      "text": "\n\n      const component = fixture.componentInstance;\n      component.trigger.openPanel();\n      fixture.detectChanges();\n      zone.simulateZoneExit();\n      const selectedOption = component.options.first;\n      (overlayContainerElement.querySelector('mat-option') as HTMLElement).click();\n      fixture.detectChanges();\n      tick();\n      expect(selectedOption.selected).toBe(true);\n      expect(component.stateCtrl.value).toBe(component.states[0]);\n      const selections = jasmine.createSpy('programmatic reset selection events');\n      const selectionSubscription = component.trigger.optionSelections.subscribe(selections);\n      const resets = jasmine.createSpy('programmatic reset model changes');\n      const valueSubscription = component.stateCtrl.valueChanges.subscribe(resets);\n      component.stateCtrl.reset();\n      fixture.detectChanges();\n      tick();\n      fixture.detectChanges();\n      expect(component.stateCtrl.value).toBeNull();\n      expect(input.value).toBe('');\n      expect(selectedOption.selected).toBe(false);\n      expect(selections).not.toHaveBeenCalled();\n      expect(resets).toHaveBeenCalledTimes(1);\n      expect(resets).toHaveBeenCalledWith(null);\n      selectionSubscription.unsubscribe();\n      valueSubscription.unsubscribe();"
+    }
+  ],
+  "original_tokens_or_assertions_removed": 0,
+  "new_or_renamed_case_ids": 0,
+  "complete_historical_cases": 2236,
+  "global_case_identity_sha256": "5f7d646cb50bd6cf11f8b202b929f0b6b7b64be84ed46537bc42fb44119e7259",
+  "source_syntax_transpile_diagnostics": 0,
+  "semantic_typecheck_executed": false,
+  "actual_Angular_native_browser_or_artifact_execution": false,
+  "g11_claim": "not-passed"
+}

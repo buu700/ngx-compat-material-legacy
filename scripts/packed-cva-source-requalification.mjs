@@ -14,6 +14,7 @@ import {createRequire} from 'node:module';
 import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {qualifyPackedProductSourceRepairs} from './packed-product-source-recovery.mjs';
+import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';
 import {sourceRole} from './dialog-caller-config-source-rebinding.mjs';
 import {scanValueAccessorTokenUses} from './value-accessor-token-source-review.mjs';
 import {authoredUseReviewEvidence} from './authored-use-inventory.mjs';
@@ -163,6 +164,7 @@ export function preparePackedCvaSourceRequalification({root = process.cwd(), rea
   const inputBytes = read(PACKED_CVA_ROLE_INPUTS), inputs = JSON.parse(inputBytes), line = inputs.line;
   assert.equal(hash(inputBytes), pins[line], 'changed packed role inputs');
   packedCvaMetadataToolingEpoch({root, read});
+  const nativeSpec = autocompleteSelectionReaderSubject({root, read, line});
   assert.equal(inputs.selected.length, 241); assert.equal(inputs.accessor_roles.length, 6);
   const cache = new Map(), current = path => {
     if (!cache.has(path)) cache.set(path, read(path)); return cache.get(path);
@@ -174,7 +176,10 @@ export function preparePackedCvaSourceRequalification({root = process.cwd(), rea
     before.set(member.path, value);
     if (inputs.prior_reviews.includes(member)) assert.equal(hash(current(member.path)), member.sha256, 'changed original review');
   }
-  for (const member of inputs.bound_inputs) assert.equal(hash(current(member.path)), member.sha256, 'changed bound source input ' + member.path);
+  for (const member of inputs.bound_inputs) {
+    const actual = nativeSpec.qualify(member) ?? member;
+    assert.equal(hash(current(member.path)), actual.sha256, 'changed bound source input ' + member.path);
+  }
   const productInputs = JSON.parse(current('compatibility/rc/snack-dom-source-context-product-inputs.json'));
   const sourceInputs = JSON.parse(current('compatibility/rc/snack-dom-source-context-inputs.json'));
   const history = JSON.parse(gunzipSync(current(sourceInputs.history_product.path)));
@@ -223,7 +228,7 @@ export function preparePackedCvaSourceRequalification({root = process.cwd(), rea
     product_changes: 4, tooling_changes: 12, complete_case_roster: 106,
     packed_source: packed.source, packed_artifact: packed.artifact,
     paired_qualification: productInputs.packed_repairs.qualification,
-    producer: ref('scripts/packed-cva-source-requalification.mjs', current('scripts/packed-cva-source-requalification.mjs')),
+    producer: nativeSpec.historicalMetadataReference('scripts/packed-cva-source-requalification.mjs'),
     source_scope_only: true, current_coordinator_native_or_floor_qualified: false, g11_claim: 'not-passed'}));
   const proofRef = ref(proofPath, writes.get(proofPath)), cases = [];
   const deltas = new Map([...productInputs.packed_repairs.targets, ...productInputs.packed_repairs.tooling].map(m => [m.path, m]));
@@ -298,7 +303,9 @@ export function preparePackedCvaSourceRequalification({root = process.cwd(), rea
     const changed=actual.symbol_uses.find((row,index)=>JSON.stringify(row)!==JSON.stringify(expected.symbol_uses[index]));
     assert.ok(accepted, 'unrelated live canonical metadata edit ' + path + (changed ? ' first changed use ' + key(changed) : ' envelope'));
   }
+  nativeSpec.assertCurrent();
   return {line, inputs, writes, before, product_preimages: packed.preimages,
+    assertCurrentNativeSpec: nativeSpec.assertCurrent,
     roles: {changed: 68, detectors: 2, accessor: 6}, admission,
     source_scope_only: true, current_coordinator_native_or_floor_qualified: false};
 }
@@ -322,5 +329,6 @@ export function packedCvaRoleHistoricalReader({root = process.cwd(), read = disk
 }
 
 export function assertPackedCvaApplied(prepared, read) {
+  prepared.assertCurrentNativeSpec();
   for (const [path, expected] of prepared.writes) assert.equal(hash(read(path)), hash(expected), 'changed current packed source review ' + path);
 }

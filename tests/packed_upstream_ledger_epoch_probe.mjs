@@ -192,6 +192,31 @@ const liveLandscapeReview=packedUpstreamLedgerEpoch({root,read:path=>lateLandsca
 lateLandscapeReview=true;assert.throws(()=>liveLandscapeReview.read(ledgerPath));rejected.push('late-landscape-source-review-change');
 cases.push('one-complete-landscape-source-decision-and-ten-exact-registry-digests-are-qualified');
 
+assert.equal(epoch.native_spec_source_digests_applied,3);assert.equal(epoch.native_spec_review_pointers_applied,2);
+assert.equal(prepared.native_spec_metadata_stage.before.equals(prepared.autocomplete_landscape_stage.after),true);
+const nativeSpecPacket='compatibility/rc/autocomplete-selection-spec-successor.json';
+rejects('changed-five-addition-native-spec-packet',path=>path===nativeSpecPacket?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+const nativeReaders='compatibility/rc/autocomplete-selection-source-reader-successors.json';
+rejects('changed-native-spec-source-reader-capsule',path=>path===nativeReaders?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+const nativeLedgerPacket='compatibility/rc/autocomplete-selection-spec-ledger-successor.json';
+rejects('changed-native-spec-ledger-successor',path=>path===nativeLedgerPacket?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+const nativeSpec='projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts';
+rejects('unrelated-native-spec-change',path=>path===nativeSpec?Buffer.concat([read(path),Buffer.from('\n// changed\n')]):read(path));
+const nativeCode='scripts/upstream-rules-js-build-admission.mjs';
+rejects('unrelated-native-source-reader-change',path=>path===nativeCode?Buffer.concat([read(path),Buffer.from('\n// changed\n')]):read(path));
+const partialSpec=JSON.parse(prepared.canonical_after),oneSpec=partialSpec.entries.find(row=>row.sha==='db06fa8d8939d793f598bc3dbedc96a5a71c0db0');
+oneSpec.individual_proof.historical_behavior.source_members.find(ref=>ref.path===nativeSpec).sha256='09a96761ccbb96309989dfc13517170c3600fb2bd57b3fb7e9c9cb02f788d423';
+rejects('partial-native-spec-proof-digests',path=>path===ledgerPath?bytes(partialSpec):read(path));
+const partialReview=JSON.parse(prepared.canonical_after),oldReviewEntry=JSON.parse(prepared.native_spec_metadata_stage.before).entries.find(row=>row.sha==='008212a9807fd01fd32fe136a075763b7b2c854d');
+partialReview.entries.find(row=>row.sha===oldReviewEntry.sha).evidence_report=oldReviewEntry.evidence_report;
+rejects('partial-native-spec-review-pointer',path=>path===ledgerPath?bytes(partialReview):read(path));
+const currentSpecReview='compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-landscape-selection-spec-source-judgment.json';
+let lateSpecReview=false;const liveSpecReview=packedUpstreamLedgerEpoch({root,read:path=>lateSpecReview&&path===currentSpecReview?Buffer.concat([read(path),Buffer.from(' ')]):read(path)});
+lateSpecReview=true;assert.throws(()=>liveSpecReview.read(ledgerPath));rejected.push('late-native-spec-current-review-change');
+prepared.native_spec_source.bound.length=0;prepared.native_spec_source.spec.after.sha256='0'.repeat(64);
+assert.equal(packedUpstreamLedgerEpoch({root,read}).read(nativeSpec).equals(read(nativeSpec)),true);
+cases.push('native-spec-source-additions-and-five-metadata-scalars-preserve-all-decisions-and-current-code');
+
 console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   canonical_entries: 1697, qualified_source_entries: 85, changed_scalar_tokens: 179,
   source_context_members: 20, packed_epoch_members: 16, original_dispositions_changed: epoch.individual_decisions_applied,

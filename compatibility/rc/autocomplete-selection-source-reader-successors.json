@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Exact source-reader hooks for the one additive native spec; current product bytes are never projected",
+  "source_parent": "c0c75460214cc7e52d263edf28883fa0c6a8d5c5",
+  "code_subjects": [
+    {
+      "path": "scripts/upstream-rules-js-build-admission.mjs",
+      "before": {
+        "sha256": "2375ac3f345fd4303ce21e7107c2e6dd23a0ac7c222a1d3530dc4c42f22d6e37",
+        "bytes": 8450
+      },
+      "after": {
+        "sha256": "45a308f40bc92cf2072799c538d9b4c202709b74dd8ce3551808017bc58ce0c0",
+        "bytes": 9409
+      },
+      "literal_edits": [
+        {
+          "before": "import {gunzipSync} from 'node:zlib';",
+          "after": "import {gunzipSync} from 'node:zlib';\nimport {isDeepStrictEqual} from 'node:util';\nimport {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';"
+        },
+        {
+          "before": " const refs=[{path:proposalPath,sha256:proposals[line]},proposal.subjects,proposal.inspector,\n  ...proposal.candidate_context.files,...proposal.candidate_context.product_members];\n for(const ref of refs)member(read,ref);",
+          "after": " const spec=autocompleteSelectionSpecSubject({root,read,line});\n const recordedRefs=[{path:proposalPath,sha256:proposals[line]},proposal.subjects,proposal.inspector,\n  ...proposal.candidate_context.files,...proposal.candidate_context.product_members];\n const refs=recordedRefs.map(ref=>{\n  if(ref.path!==spec.path)return ref;\n  assert.equal(ref.sha256,spec.before.sha256);assert.equal(ref.bytes,spec.before.bytes);\n  return {...ref,...spec.after};\n });\n for(const ref of spec.bound)if(!refs.some(row=>row.path===ref.path))refs.push(ref);\n for(const ref of refs)member(read,ref);"
+        },
+        {
+          "before": " const assertExternal=()=>{for(const ref of external){assert.equal(realpathSync(ref.absolute),ref.resolved);assert.equal(hash(readFileSync(ref.absolute)),ref.sha256);}};",
+          "after": " const assertExternal=()=>{spec.assertCurrent();for(const ref of external){assert.equal(realpathSync(ref.absolute),ref.resolved);assert.equal(hash(readFileSync(ref.absolute)),ref.sha256);}};"
+        },
+        {
+          "before": "   const code='import json,pathlib,sys;sys.path.insert(0,str(pathlib.Path(sys.argv[1])/\"scripts\"));from upstream_rules_js_build_scope import verify_review;print(json.dumps({\"ok\":verify_review(pathlib.Path(sys.argv[1]),json.load(sys.stdin)),\"python\":sys.version.split()[0]}))';\n   const child=spawnSync('python3',['-I','-c',code,rootId],{cwd:rootId,input:JSON.stringify(checked.proposal),encoding:'utf8',timeout:20000,maxBuffer:8192});\n   assert.equal(child.status,0,child.stderr);assert.deepEqual(JSON.parse(child.stdout),{ok:true,python:'3.14.7'});",
+          "after": "   const code='import json,pathlib,sys;sys.path.insert(0,str(pathlib.Path(sys.argv[1])/\"scripts\"));from upstream_rules_js_build_scope import review;print(json.dumps({\"body\":review(pathlib.Path(sys.argv[1])),\"python\":sys.version.split()[0]}))';\n   const child=spawnSync('python3',['-I','-c',code,rootId],{cwd:rootId,encoding:'utf8',timeout:20000,maxBuffer:2*1024*1024});\n   assert.equal(child.status,0,child.stderr);const actual=JSON.parse(child.stdout);assert.equal(actual.python,'3.14.7');\n   const spec=autocompleteSelectionSpecSubject({root,read,line}),expected=structuredClone(checked.proposal);\n   const refs=expected.candidate_context.product_members.filter(ref=>ref.path===spec.path);assert.equal(refs.length,1);\n   assert.equal(refs[0].sha256,spec.before.sha256);assert.equal(refs[0].bytes,spec.before.bytes);Object.assign(refs[0],spec.after);\n   assert.equal(isDeepStrictEqual(actual.body,expected),true,'fresh full build-source facts changed beyond the exact additive native spec');"
+        }
+      ]
+    },
+    {
+      "path": "scripts/autocomplete-landscape-source-judgment.mjs",
+      "before": {
+        "sha256": "6b796184a4d83f15177356681eb3fb8fea448fe4dfaaf3a91dfa8a74ad9fb326",
+        "bytes": 11121
+      },
+      "after": {
+        "sha256": "6b3a8bc73f78d8ca8cf79a8d33965ccb9f068cc1048773f4704775873dfe1fb3",
+        "bytes": 11696
+      },
+      "literal_edits": [
+        {
+          "before": "import {historicalBehaviorRequirements,HISTORICAL_BEHAVIOR_KIND} from './upstream-historical-behavior-evidence.mjs';",
+          "after": "import {historicalBehaviorRequirements,HISTORICAL_BEHAVIOR_KIND} from './upstream-historical-behavior-evidence.mjs';\nimport {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';"
+        },
+        {
+          "before": "export const AUTOCOMPLETE_LANDSCAPE_REVIEW='compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-landscape-individual-source-judgment.json';",
+          "after": "export const AUTOCOMPLETE_LANDSCAPE_REVIEW='compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-landscape-selection-spec-source-judgment.json';"
+        },
+        {
+          "before": "  for(const row of checkpoint.current_sources){const raw=member(row.path,row.sha256);assert.equal(raw.length,row.bytes);}",
+          "after": "  const specSource=autocompleteSelectionSpecSubject({root,read,line});\n  const currentOwnedSources=checkpoint.current_sources.map(row=>{\n    const current=row.path===specSource.path?{...row,...specSource.after}:row;\n    if(row.path===specSource.path){assert.equal(row.sha256,specSource.before.sha256);assert.equal(row.bytes,specSource.before.bytes);}\n    const raw=member(current.path,current.sha256);assert.equal(raw.length,current.bytes);return current;\n  });\n  for(const row of specSource.bound)member(row.path,row.sha256);"
+        },
+        {
+          "before": "    current_owned_sources:checkpoint.current_sources,current_public_CDK_minimum:minimum.version,",
+          "after": "    current_owned_sources:currentOwnedSources,current_public_CDK_minimum:minimum.version,\n    native_spec_source_successor:specSource.bound[0],"
+        },
+        {
+          "before": "    for(const row of external)assert.equal(hash(readFileSync(row.path)),row.sha256,'changed installed landscape peer member');};",
+          "after": "    specSource.assertCurrent();for(const row of external)assert.equal(hash(readFileSync(row.path)),row.sha256,'changed installed landscape peer member');};"
+        }
+      ]
+    },
+    {
+      "path": "scripts/upstream-testing-api-21x-admission.mjs",
+      "before": {
+        "sha256": "d6ed1ecfdde9f95630e6b5319221ba3317c592af664c3c0612408f4bcd8b60bc",
+        "bytes": 11123
+      },
+      "after": {
+        "sha256": "6415108225487d444d065d805d3b1dcc9bb804fac5bf61f3874ec7a75cf77bd3",
+        "bytes": 11601
+      },
+      "literal_edits": [
+        {
+          "before": "import {join} from 'node:path';",
+          "after": "import {join,dirname,resolve} from 'node:path';\nimport {fileURLToPath} from 'node:url';\nimport {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';"
+        },
+        {
+          "before": "    for (const member of snapshot.members) {const raw = readMember(read, member); assert.equal(raw.length, member.bytes);}",
+          "after": "    const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),spec=autocompleteSelectionSpecSubject({root,read,line:'21.x'});\n    for (const member of snapshot.members) {\n      let current=member;\n      if(member.path===spec.path){assert.equal(member.sha256,spec.before.sha256);assert.equal(member.bytes,spec.before.bytes);current={...member,...spec.after};}\n      const raw=readMember(read,current);assert.equal(raw.length,current.bytes);\n    }"
+        }
+      ]
+    },
+    {
+      "path": "scripts/packed-product-source-recovery.mjs",
+      "before": {
+        "sha256": "c17e832725b49bbec029a0df6e533501a97f6519d2d71119fa565069580b06bf",
+        "bytes": 12073
+      },
+      "after": {
+        "sha256": "1dc5ad8c196d411f21b7b8efbede7cfd6f0870d58afe52cf52fe03691008f9b8",
+        "bytes": 12722
+      },
+      "literal_edits": [
+        {
+          "before": "import {packedTableOnPushCase} from './table-onpush-packed-contract.mjs';",
+          "after": "import {packedTableOnPushCase} from './table-onpush-packed-contract.mjs';\nimport {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';"
+        },
+        {
+          "before": " for(const member of data.members)assert.equal(hash(read(member.path)),member.sha256,'changed packed repair implementation');",
+          "after": " const nativeSpec=autocompleteSelectionReaderSubject({root,read,line});\n for(const member of data.members){const current=nativeSpec.qualify(member)??member;assert.equal(hash(read(member.path)),current.sha256,'changed packed repair implementation');}"
+        },
+        {
+          "before": " for(const member of history.product_members)assert.equal(hash(read(member.path)),\n  currentTargets.find(t=>t.path===member.path)?.sha256??member.sha256,'changed raw current product/resource '+member.path);",
+          "after": " for(const member of history.product_members){\n  let expected=currentTargets.find(t=>t.path===member.path)?.sha256??member.sha256;\n  if(member.path===nativeSpec.spec.path){assert.equal(member.sha256,nativeSpec.spec.before.sha256);assert.equal(currentTargets.some(t=>t.path===member.path),false);expected=nativeSpec.spec.after.sha256;}\n  assert.equal(hash(read(member.path)),expected,'changed raw current product/resource '+member.path);\n }"
+        },
+        {
+          "before": " const assertCurrent=path=>{if(current.has(path))assert.equal(hash(read(path)),current.get(path),'late current packed repair mutation '+path);};",
+          "after": " const nativeBound=new Map(nativeSpec.bound.map(ref=>[ref.path,ref.sha256]));\n const assertCurrent=path=>{if(current.has(path))assert.equal(hash(read(path)),current.get(path),'late current packed repair mutation '+path);\n  if(nativeBound.has(path))assert.equal(hash(read(path)),nativeBound.get(path),'late current native spec input '+path);};"
+        }
+      ]
+    },
+    {
+      "path": "scripts/packed-cva-source-requalification.mjs",
+      "before": {
+        "sha256": "7ddac291893a4404ba38a46214b49132e3f4006c0f882209c390da780c913351",
+        "bytes": 25332
+      },
+      "after": {
+        "sha256": "201bb30be2d5b0c38bd6d0ba573919040573a5cda2bbc62310a489a9884886af",
+        "bytes": 25670
+      },
+      "literal_edits": [
+        {
+          "before": "import {qualifyPackedProductSourceRepairs} from './packed-product-source-recovery.mjs';",
+          "after": "import {qualifyPackedProductSourceRepairs} from './packed-product-source-recovery.mjs';\nimport {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';"
+        },
+        {
+          "before": "  packedCvaMetadataToolingEpoch({root, read});",
+          "after": "  packedCvaMetadataToolingEpoch({root, read});\n  const nativeSpec = autocompleteSelectionReaderSubject({root, read, line});"
+        },
+        {
+          "before": "  for (const member of inputs.bound_inputs) assert.equal(hash(current(member.path)), member.sha256, 'changed bound source input ' + member.path);",
+          "after": "  for (const member of inputs.bound_inputs) {\n    const actual = nativeSpec.qualify(member) ?? member;\n    assert.equal(hash(current(member.path)), actual.sha256, 'changed bound source input ' + member.path);\n  }"
+        },
+        {
+          "before": "  return {line, inputs, writes, before, product_preimages: packed.preimages,",
+          "after": "  nativeSpec.assertCurrent();\n  return {line, inputs, writes, before, product_preimages: packed.preimages,\n    assertCurrentNativeSpec: nativeSpec.assertCurrent,"
+        },
+        {
+          "before": "export function assertPackedCvaApplied(prepared, read) {",
+          "after": "export function assertPackedCvaApplied(prepared, read) {\n  prepared.assertCurrentNativeSpec();"
+        },
+        {
+          "before": "    producer: ref('scripts/packed-cva-source-requalification.mjs', current('scripts/packed-cva-source-requalification.mjs')),",
+          "after": "    producer: nativeSpec.historicalMetadataReference('scripts/packed-cva-source-requalification.mjs'),"
+        }
+      ]
+    },
+    {
+      "path": "scripts/dialog-portal-failure-recovery.mjs",
+      "before": {
+        "sha256": "127f4d349a2506870810b179f3bc0234cbf581d7c43d4e55f0c3e7d078be744d",
+        "bytes": 11648
+      },
+      "after": {
+        "sha256": "e0f84875c25438c7027960762382e5e8fd8fb5efee5b3b8de744f99953dd5aa2",
+        "bytes": 12162
+      },
+      "literal_edits": [
+        {
+          "before": "import {prepareSnackDomSubjects} from './snack-dom-public-dispatch.mjs';",
+          "after": "import {prepareSnackDomSubjects} from './snack-dom-public-dispatch.mjs';\nimport {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';"
+        },
+        {
+          "before": "const prior=dialogPortalPrior(root,read),actual=read(DIALOG_PORTAL_SOURCE).toString();",
+          "after": "const prior=dialogPortalPrior(root,read),nativeSpec=autocompleteSelectionSpecSubject({root,read,line:prior.line}),actual=read(DIALOG_PORTAL_SOURCE).toString();"
+        },
+        {
+          "before": "for(const m of prior.product_members)if(m.path!==DIALOG_PORTAL_SOURCE)assert.equal(hash(read(m.path)),m.sha256,'unrelated product/resource changed '+m.path);return {line:prior.line,",
+          "after": "for(const m of prior.product_members)if(m.path!==DIALOG_PORTAL_SOURCE){\n const expected=m.path===nativeSpec.path?nativeSpec.after.sha256:m.sha256;\n if(m.path===nativeSpec.path)assert.equal(m.sha256,nativeSpec.before.sha256);\n assert.equal(hash(read(m.path)),expected,'unrelated product/resource changed '+m.path);\n }nativeSpec.assertCurrent();return {line:prior.line,"
+        },
+        {
+          "before": "other_product_resource_members_unchanged:1141,constructors_imports_and_resources_unchanged:true",
+          "after": "other_product_resource_members_unchanged:1140,independently_qualified_native_test_source:{path:nativeSpec.path,before:{...nativeSpec.before},after:{...nativeSpec.after},qualification:{...nativeSpec.bound[0]}},constructors_imports_and_resources_unchanged:true"
+        }
+      ]
+    },
+    {
+      "path": "scripts/snack-dom-source-context.mjs",
+      "before": {
+        "sha256": "df0284175d37579aad1a19f1e17fca556905a061753c24d8a38eea0747e6b976",
+        "bytes": 41238
+      },
+      "after": {
+        "sha256": "90f153554f101c610d1a477b2143f9e26df8d0f1951ac0ee6988a6176146d8a5",
+        "bytes": 42431
+      },
+      "literal_edits": [
+        {
+          "before": "import {packedCvaRoleHistoricalReader,packedCvaMetadataToolingEpoch} from './packed-cva-source-requalification.mjs';",
+          "after": "import {packedCvaRoleHistoricalReader,packedCvaMetadataToolingEpoch} from './packed-cva-source-requalification.mjs';\nimport {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';"
+        },
+        {
+          "before": " const {data,line,ref}=productRegistry(root,read),delta=data.delta;",
+          "after": " const {data,line,ref}=productRegistry(root,read),delta=data.delta,nativeSpec=autocompleteSelectionReaderSubject({root,read,line});"
+        },
+        {
+          "before": "else assert.equal(hash(read(m.path)),m.sha256,'changed snack qualification code '+m.path);",
+          "after": "else assert.equal(hash(read(m.path)),(nativeSpec.qualify(m)??m).sha256,'changed snack qualification code '+m.path);"
+        },
+        {
+          "before": " return {line,delta,dialog,tooltip,menu,owned:",
+          "after": " nativeSpec.assertCurrent();\n return {line,delta,dialog,tooltip,menu,owned:"
+        },
+        {
+          "before": " const {data,line}=productRegistry(root,read),{delta,qualification}=data.dialog;",
+          "after": " const {data,line}=productRegistry(root,read),{delta,qualification}=data.dialog,nativeSpec=autocompleteSelectionReaderSubject({root,read,line});"
+        },
+        {
+          "before": "assert.deepEqual(proof.source,source);",
+          "after": "const {independently_qualified_native_test_source:qualifiedTest,...historicalSource}=source;\n assert.deepEqual(qualifiedTest,{path:nativeSpec.spec.path,before:nativeSpec.spec.before,after:nativeSpec.spec.after,qualification:nativeSpec.spec.bound[0]});\n assert.equal(source.other_product_resource_members_unchanged,1140);\n // Only reconstruct the immutable old report metadata; every source read above was current.\n historicalSource.other_product_resource_members_unchanged=1141;assert.deepEqual(proof.source,historicalSource);"
+        },
+        {
+          "before": " return {line,delta,qualification,source_scope_only:true,actual_native_packed_or_floor_qualified:false};",
+          "after": " nativeSpec.assertCurrent();\n return {line,delta,qualification,native_spec_source_successor:qualifiedTest,source_scope_only:true,actual_native_packed_or_floor_qualified:false};"
+        },
+        {
+          "before": " const rawCurrent=read,upstreamEpoch=",
+          "after": " const rawCurrent=read,nativeSpec=autocompleteSelectionReaderSubject({root,read:rawCurrent}),upstreamEpoch="
+        },
+        {
+          "before": "m.path===MENU_CONTENT_PANEL_SOURCE?qualified.menu.delta.sha256:m.sha256),'changed raw current product/resource '",
+          "after": "m.path===MENU_CONTENT_PANEL_SOURCE?qualified.menu.delta.sha256:(nativeSpec.qualify(m)??m).sha256),'changed raw current product/resource '"
+        },
+        {
+          "before": "const reader=p=>{if(members.has(p)){packed.assertCurrent(p);",
+          "after": "nativeSpec.assertCurrent();const reader=p=>{nativeSpec.assertCurrent();if(members.has(p)){packed.assertCurrent(p);"
+        },
+        {
+          "before": "return {read:reader,raw:rawCurrent,line:prior.line,members:members.size,packed_repair_epoch_members:packed.preimages.size,current_successors:data.writes.length};",
+          "after": "return {read:reader,raw:rawCurrent,line:prior.line,members:members.size,packed_repair_epoch_members:packed.preimages.size,current_successors:data.writes.length,native_spec_source_successor:{path:nativeSpec.spec.path,before:{...nativeSpec.spec.before},after:{...nativeSpec.spec.after},qualification:{...nativeSpec.spec.bound[0]}},native_test_before_image_exposed:false};"
+        }
+      ]
+    }
+  ],
+  "unrelated_code_changes": 0,
+  "original_source_reports_rewritten": 0,
+  "upstream_SHA_dispositions_changed": 0,
+  "native_artifact_or_floor_execution": false,
+  "g11_claim": "not-passed"
+}

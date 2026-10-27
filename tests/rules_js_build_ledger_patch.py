@@ -46,7 +46,9 @@ def parse(pos,path=()):
     return pos
 parse(0)
 for ref in packet['code_subjects']+[packet['review']]:
-    data=(ROOT/ref['path']).read_bytes();assert sha(data)==ref['sha256'] and len(data)==ref['bytes']
+    from autocomplete_selection_source_refs import qualified_reference
+    current_ref=qualified_reference(ROOT,ref)
+    data=(ROOT/ref['path']).read_bytes();assert sha(data)==current_ref['sha256'] and len(data)==current_ref['bytes']
 review=json.loads((ROOT/packet['review']['path']).read_bytes());assert review['line']==line and review['status']=='reviewed'
 by_sha={r['sha']:i for i,r in enumerate(original['entries'])};assert len(by_sha)==1697
 edits=[];changed=[]

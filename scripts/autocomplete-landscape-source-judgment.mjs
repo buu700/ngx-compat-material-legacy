@@ -13,9 +13,10 @@ import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 import {historicalBehaviorRequirements,HISTORICAL_BEHAVIOR_KIND} from './upstream-historical-behavior-evidence.mjs';
+import {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';
 
 export const AUTOCOMPLETE_LANDSCAPE_SHA='008212a9807fd01fd32fe136a075763b7b2c854d';
-export const AUTOCOMPLETE_LANDSCAPE_REVIEW='compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-landscape-individual-source-judgment.json';
+export const AUTOCOMPLETE_LANDSCAPE_REVIEW='compatibility/f10/disposition-ledger/evidence/closeout-autocomplete-landscape-selection-spec-source-judgment.json';
 const prefix='compatibility/rc/autocomplete-landscape-',hash=raw=>createHash('sha256').update(raw).digest('hex');
 const ts=createRequire(import.meta.url)('typescript');
 const objectHash=(kind,text)=>createHash('sha1').update(kind+' '+Buffer.byteLength(text)+'\0').update(text).digest('hex');
@@ -48,7 +49,13 @@ export function autocompleteLandscapeSourceJudgment({root,read=path=>readFileSyn
     const value=original[side];assert.equal(objectHash('blob',value.text),value.git_blob);
     assert.equal(hash(value.text),value.sha256);assert.equal(Buffer.byteLength(value.text),value.bytes);
   }
-  for(const row of checkpoint.current_sources){const raw=member(row.path,row.sha256);assert.equal(raw.length,row.bytes);}
+  const specSource=autocompleteSelectionSpecSubject({root,read,line});
+  const currentOwnedSources=checkpoint.current_sources.map(row=>{
+    const current=row.path===specSource.path?{...row,...specSource.after}:row;
+    if(row.path===specSource.path){assert.equal(row.sha256,specSource.before.sha256);assert.equal(row.bytes,specSource.before.bytes);}
+    const raw=member(current.path,current.sha256);assert.equal(raw.length,current.bytes);return current;
+  });
+  for(const row of specSource.bound)member(row.path,row.sha256);
   const diagnostic=JSON.parse(gunzipSync(member(checkpoint.diagnostic.path,checkpoint.diagnostic.sha256)));
   member(checkpoint.diagnostic_producer.path,checkpoint.diagnostic_producer.sha256);
   assert.equal(diagnostic.source.sha256,checkpoint.current_sources[0].sha256);
@@ -66,7 +73,7 @@ export function autocompleteLandscapeSourceJudgment({root,read=path=>readFileSyn
   assert.equal(JSON.parse(externalManifest).version,minimum.version);
   external.push({path:join(peer,'package.json'),sha256:hash(externalManifest)});
   const assertExternal=()=>{assert.equal(realpathSync(join(root,'node_modules/@angular/cdk')),peer);
-    for(const row of external)assert.equal(hash(readFileSync(row.path)),row.sha256,'changed installed landscape peer member');};
+    specSource.assertCurrent();for(const row of external)assert.equal(hash(readFileSync(row.path)),row.sha256,'changed installed landscape peer member');};
   assertExternal();
   const layout=ts.createSourceFile('layout.d.ts',readFileSync(join(peer,'types/layout.d.ts')).toString(),ts.ScriptTarget.Latest,true);
   const observer=layout.statements.find(node=>ts.isClassDeclaration(node)&&node.name?.text==='BreakpointObserver');assert.ok(observer);
@@ -96,7 +103,8 @@ export function autocompleteLandscapeSourceJudgment({root,read=path=>readFileSyn
     patch_file:patch,diff_sha256:definition.patch,original_files:2,original_hunks:6,
     hunk_reviews:checkpoint.complete_original_hunk_reviews,decision,
     original_source_intake:bound.get(checkpointPath),original_source_intake_role:'Authenticated pre-registration whole-patch inspection; its native-registration gap is closed by the separately required current contract.',
-    current_owned_sources:checkpoint.current_sources,current_public_CDK_minimum:minimum.version,
+    current_owned_sources:currentOwnedSources,current_public_CDK_minimum:minimum.version,
+    native_spec_source_successor:specSource.bound[0],
     private_node:process.version,private_typescript:ts.version,diagnostic:bound.get(checkpoint.diagnostic.path),
     source_diagnostic_cases_per_retained_minimum:7,source_diagnostic_retained_minima:2,source_diagnostic_mutants_rejected:6,
     native_contract_controls:bound.get(controlsPath),required_named_native_cases:definition.cases,complete_historical_case_count:2236,
