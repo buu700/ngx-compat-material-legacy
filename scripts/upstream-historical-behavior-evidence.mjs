@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {createHash} from 'node:crypto';
+import {autocompleteSelectionHistoricalScopes} from './autocomplete-selection-native-scopes.mjs';
 import {isDeepStrictEqual} from 'node:util';
 import {readEvidenceMember, validatePackedConsumerRun} from './upstream-packed-run-evidence.mjs';
 import {CHIP_LIST_SOURCE,CHIP_LIST_REFERENCE,CHIP_LIST_ORIGINALS,inspectChipListFocusContract} from './chip-list-focus-contract.mjs';
@@ -52,6 +53,7 @@ export function historicalRegressionRequirements() {
 // Names are checked in addition to indexed ids: an inserted test cannot silently
 // turn the same numeric id into an unrelated behavior assertion.
 const scopes = new Map([
+  ...autocompleteSelectionHistoricalScopes(commonMembers,nativeCase),
   ...chipLifecycleHistoricalScopes(commonMembers,nativeCase),
   ['e69b2b09efaf577cd5fe92b70808479f975913af', {
     patch: '896c8735f0eb1e9afa6c49c70c84050af0d62d91c0085522eab07e7a6a90ec4b',

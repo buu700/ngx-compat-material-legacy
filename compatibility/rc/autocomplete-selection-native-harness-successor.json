@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "role": "Exact synthetic fixture commit guard for an already activated registry; all writer/native assertions and source bindings retained.",
+  "source_parent": "451a7dada0f82493d11d0cbd4152246e47293d26",
+  "path": "tests/autocomplete_selection_native_contract_probe.mjs",
+  "before": {
+    "sha256": "59af4876199c311227bbebd08c8cc5bb09e4b8e99b1cc2a8bb6ac7c0cc6babb5",
+    "bytes": 19357
+  },
+  "after": {
+    "sha256": "402ff922abb68ac96a1268297abab58e86d25e4ad20a20903522926512b53500",
+    "bytes": 19475
+  },
+  "literal_edits": [
+    {
+      "before": "    git(['add','--',registry]);git(['-c','user.name=Validator fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','Synthetic proposed native registry']);",
+      "after": "    git(['add','--',registry]);\n    const changed=git(['diff','--cached','--name-only']);assert.ok(changed===''||changed===registry);\n    if(changed)git(['-c','user.name=Validator fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','Synthetic proposed native registry']);"
+    }
+  ],
+  "native_validator_or_case_assertions_changed": 0,
+  "actual_native_browser_artifact_or_floor_executed": false,
+  "g11_claim": "not-passed"
+}

@@ -99,7 +99,10 @@ def verify_selection_metadata(expected_before=None, root=ROOT):
     chunks.append(text[end:])
     after = ''.join(chunks).encode()
     assert SHA(after) == packet['after_sha256'] and json.loads(after) == expected
-    assert (root / PATH).read_bytes() == after
+    if (root / PATH).read_bytes() != after:
+        from autocomplete_selection_ledger_patch import verify_native_selection_successor
+        successor = verify_native_selection_successor(expected_before=after, root=root)
+        assert successor['canonical_applied'] is True
     assert expected['g11_claim'] == 'not-passed'
     return dict(line=line, result='pass', individual_SHA_decisions_changed=0, exact_literal_updates=5,
                 native_proof_spec_digests=3, source_review_pointers=2, unrelated_bytes_changed=0,

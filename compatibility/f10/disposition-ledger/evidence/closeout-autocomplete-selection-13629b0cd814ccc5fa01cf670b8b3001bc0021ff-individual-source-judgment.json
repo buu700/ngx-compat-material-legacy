@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "sha": "13629b0cd814ccc5fa01cf670b8b3001bc0021ff",
+  "status": "reviewed",
+  "final_disposition": "already-adapted",
+  "review_depth": "individual-compatibility",
+  "reviewer": "Codex primary implementer; independent complete audit remains separate",
+  "diff": "diff --git a/src/material/autocomplete/autocomplete-trigger.ts b/src/material/autocomplete/autocomplete-trigger.ts\nindex 53e7bab3ac3671a537d555d9d8607012499f9059..e797f9a9f1871c62f817c4a6f4a92cde95756a60 100644\n--- a/src/material/autocomplete/autocomplete-trigger.ts\n+++ b/src/material/autocomplete/autocomplete-trigger.ts\n@@ -600,7 +600,6 @@ export class MatAutocompleteTrigger\n                 //   of the available options,\n                 // - if a valid string is entered after an invalid one.\n                 if (this.panelOpen) {\n-                  this._captureValueOnAttach();\n                   this._emitOpened();\n                 } else {\n                   this.autocomplete.closed.emit();\n@@ -626,11 +625,6 @@ export class MatAutocompleteTrigger\n     this.autocomplete.opened.emit();\n   }\n \n-  /** Intended to be called when the panel is attached. Captures the current value of the input. */\n-  private _captureValueOnAttach() {\n-    this._valueOnAttach = this._element.nativeElement.value;\n-  }\n-\n   /** Destroys the autocomplete suggestion panel. */\n   private _destroyPanel(): void {\n     if (this._overlayRef) {\n@@ -744,6 +738,7 @@ export class MatAutocompleteTrigger\n \n     if (overlayRef && !overlayRef.hasAttached()) {\n       overlayRef.attach(this._portal);\n+      this._valueOnAttach = this._element.nativeElement.value;\n       this._closingActionsSubscription = this._subscribeToClosingActions();\n     }\n \n@@ -753,7 +748,6 @@ export class MatAutocompleteTrigger\n     this.autocomplete._setColor(this._formField?.color);\n     this._updatePanelState();\n     this._applyModalPanelOwnership();\n-    this._captureValueOnAttach();\n \n     // We need to do an extra `panelOpen` check in here, because the\n     // autocomplete won't be shown if there are no options.\ndiff --git a/tools/public_api_guard/material/autocomplete.md b/tools/public_api_guard/material/autocomplete.md\nindex 7d0612a65f2686f86a0f08d021e58240b3956899..16bb9a19fd6f63350653f4ab3be55e6ea5160478 100644\n--- a/tools/public_api_guard/material/autocomplete.md\n+++ b/tools/public_api_guard/material/autocomplete.md\n@@ -190,7 +190,7 @@ export class MatAutocompleteTrigger implements ControlValueAccessor, AfterViewIn\n     // (undocumented)\n     _handleKeydown(event: KeyboardEvent): void;\n     // (undocumented)\n-    static ngAcceptInputType_autocompleteDisabled: unknown /** Handles keyboard events coming from the overlay panel. */;\n+    static ngAcceptInputType_autocompleteDisabled: unknown;\n     // (undocumented)\n     ngAfterViewInit(): void;\n     // (undocumented)\n",
+  "diff_sha256": "425bee27fa61de150f47945e20e09faa7d117b0e61578377edabe7832fd6dd07",
+  "original_files": 2,
+  "original_hunks": 5,
+  "hunk_reviews": [
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -600,7 +600,6 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "ee1ded83e194f399ee28113c411dda03c87a1accdeb82df1dcc7f7e0c131f2f3",
+      "source_judgment": "Removing the capture when filtered options make the panel visible preserves the value from original attachment. The new diagnostic executes the complete closing-stream method with real RxJS option-change scheduling and controlled visibility/render boundaries. It reproduces the pre-fix empty-to-visible recapture and also exercises hide/show; actual Angular option filtering and outside dismissal remain required."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -626,11 +625,6 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "65902a4c4ce1c76ebb57a05c4d3835818eef84c0dcc92085192a196f9446987c",
+      "source_judgment": "The removed helper is private. Current owned and both minimum source implementations use an inline capture, with no call to this helper. Do not restore obsolete private machinery or mirror a modern public component API merely to reproduce the old source layout."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -744,6 +738,7 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "deb2256f85454010cb01b40b0bd29b2caaffa1c53c293862e7f240347aacaa6d",
+      "source_judgment": "The inline capture belongs only to an actual attach() on a detached overlay. The owned caller additionally supplies the pre-input value used by existing required-selection handling. A reused OverlayRef receiver initially has no captured value; repeated opening must not recapture. The real FormControl/closing-stream diagnostic rejects both missing first capture and repeated-attach recapture."
+    },
+    {
+      "path": "src/material/autocomplete/autocomplete-trigger.ts",
+      "header": "@@ -753,7 +748,6 @@ export class MatAutocompleteTrigger",
+      "hunk_sha256": "dc80097b1611984482a04270cb9bdf4dc395b3ae74e31890024d7be9a9d8ae21",
+      "source_judgment": "Removing the unconditional end-of-attach capture prevents repeated typing/open calls from overwriting the comparison value. The complete before/after prototypes reproduce this defect. Preserve the existing no-options capture fix and require real filtered view/CVA dismissal behavior as a separate native observation."
+    },
+    {
+      "path": "tools/public_api_guard/material/autocomplete.md",
+      "header": "@@ -190,7 +190,7 @@ export class MatAutocompleteTrigger implements ControlValueAccessor, AfterViewIn",
+      "hunk_sha256": "de298211a23cbdb338d897c2f5467e33747d7339e50b45e99b8a0c2247cbf3b5",
+      "source_judgment": "The public API guard hunk removes an unrelated keyboard-event doc comment accidentally attached to a static acceptance declaration. It changes no runtime declaration or consumer behavior. No legacy input API change, obsolete static surface dependency or modern API mirror is required."
+    }
+  ],
+  "decision": "The complete two-file/five-hunk attachment change is present in the owned legacy trigger. The four trigger hunks capture the required-selection value only on a genuine overlay attachment, before subsequent input, and preserve it through repeated open calls and option-list hide/reshow. The fifth hunk corrects an API-guard comment and does not change a public signature. Existing named native tests require retained model/selection while typing, one chosen-value publication, one unmatched-text reset after filtering and safe closure with no options. Current whole-method Forms/RxJS diagnostics support this source judgment; actual Angular DI/rendering, packed behavior and runtime/compiler/RxJS/peer floors remain separate mandatory executions.",
+  "original_source_archive": {
+    "path": "compatibility/rc/autocomplete-selection-originals.json.gz",
+    "sha256": "ddb8eeefba441568d46b9107a88889553320ce2e841c3fdc90a29b3f518aeebc",
+    "bytes": 105021
+  },
+  "original_source_proposals": {
+    "path": "compatibility/rc/autocomplete-selection-individual-source-proposals.json",
+    "sha256": "138fa74613e691949cc64da0a45850337716c1911146a33f252982eecf8d0fd1",
+    "bytes": 15067
+  },
+  "current_owned_sources": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/internal/autocomplete-trigger-base.ts",
+      "sha256": "8c69aa2791f76d8298845d0fb99a0b979df559256bc9023ae02342188a75edd1",
+      "bytes": 40967
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete-trigger.ts",
+      "sha256": "6b9c00dbf365e6b6ea9b2b65eb7e67911775322c78848b996d3590f8fded3d58",
+      "bytes": 1975
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "sha256": "2610d311569c9a6fdb063dc0652b423414622cf1370b2434f13ba86070293236",
+      "bytes": 152212
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.html",
+      "sha256": "8fae4afdffea376599d694a16698ee1a9502097cc9819ec2766a4a5d55b418ae",
+      "bytes": 325
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.scss",
+      "sha256": "9fbb5eb60784e41f97296c9fd958871dfa4cee3975f0c4bcd3cfe54f6ec6aae4",
+      "bytes": 1171
+    }
+  ],
+  "native_contract_proposal": {
+    "path": "compatibility/rc/autocomplete-selection-native-contract-proposal.json",
+    "sha256": "f53ca24623f8876b28f6af99a4e2ad80ecc3934073aed5931fb59aa641a7d0e7",
+    "bytes": 9149
+  },
+  "native_contract_controls": {
+    "path": "compatibility/rc/autocomplete-selection-native-contract-controls.json",
+    "sha256": "bd843d0df70036f9cf8670588e6b9e539e565b3ab97e140c5ea3c8ac13289a3d",
+    "bytes": 14759
+  },
+  "diagnostic": {
+    "path": "compatibility/rc/autocomplete-selection-source-diagnostics.json.gz",
+    "sha256": "a78a63d1abf66d23afe1367d9a4130ff04775a7ec137a0a2a31e11cb75fcef4f",
+    "bytes": 3918
+  },
+  "diagnostic_producer": {
+    "path": "tests/autocomplete_selection_state_probe.mjs",
+    "sha256": "a9646b53b47ea4156394a9f55352c01ce9832c020360ee828e3c5e2fa442cd72",
+    "bytes": 18397
+  },
+  "private_node": "v24.21.0",
+  "private_typescript": "6.0.3",
+  "source_protocol_cases_per_source": 14,
+  "source_protocol_retained_minima": 2,
+  "source_protocol_mutants_rejected": 9,
+  "source_protocol_scope": "Complete patched owned, tagged, both retained minimum peer and original before/after prototype methods. Real FormControl value-accessor callbacks and RxJS closing/option-change streams; explicit synthetic panel/option/overlay receivers and controlled render notifications. Visibility, close teardown, focus/open eligibility, sizing, label, modal ownership and key-manager hooks are substituted. Constructors, field initializers, Angular rendering/DI, real DOM outside-click/geometry, packed artifact, runtime/compiler/RxJS/peer-floor execution are excluded.",
+  "original_before_after_observations": [
+    {
+      "side": "before",
+      "source_sha256": "5c999d938c448e7cf1905a85f9251db859db9bdf0115b9df30d3fb92c80114bb",
+      "failed_case_ids": [
+        "non-null-value-retains-selection/zero",
+        "non-null-value-retains-selection/false",
+        "non-null-value-retains-selection/empty-string",
+        "non-null-value-retains-selection/empty-display",
+        "optional-nonempty-typing-clears-selection-quietly",
+        "optional-updated-display-retains-matching-selected-value",
+        "required-original-attachment/repeated-open",
+        "required-original-attachment/empty-to-visible",
+        "required-original-attachment/hide-and-reshow"
+      ]
+    },
+    {
+      "side": "after",
+      "source_sha256": "47435e7a0437861b74b7e0cc1ae1651760b6b01ba3a50fe391d4aebe76aa1801",
+      "failed_case_ids": [
+        "non-null-value-retains-selection/zero",
+        "non-null-value-retains-selection/false",
+        "non-null-value-retains-selection/empty-string",
+        "non-null-value-retains-selection/empty-display",
+        "optional-nonempty-typing-clears-selection-quietly",
+        "optional-updated-display-retains-matching-selected-value"
+      ]
+    }
+  ],
+  "required_named_native_cases": [
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#37",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > forms integration > should retain the selected model while typing when selection is required"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#38",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > forms integration > should publish the chosen option once after required-selection typing"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#39",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > forms integration > should reset unmatched required-selection text once on outside click"
+    },
+    {
+      "case_id": "historical-legacy-artifact/original-and-shared-cases/src/material/legacy-autocomplete/autocomplete.spec.ts#172",
+      "historical_path": "src/material/legacy-autocomplete/autocomplete.spec.ts",
+      "candidate": "projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts",
+      "full_name": "MatAutocomplete > should not throw errors when closing without options"
+    }
+  ],
+  "complete_historical_case_count": 2236,
+  "consumer_TS_HTML_CSS_SCSS_changes_required": false,
+  "actual_native_browser_artifact_or_floor_executed": false,
+  "g11_claim": "not-passed"
+}

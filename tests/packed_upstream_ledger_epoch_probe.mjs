@@ -104,7 +104,7 @@ assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equa
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
 assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
-assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?17:10);
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?20:13);
 assert.equal(epoch.rules_js_decisions_applied,3);
 assert.equal(epoch.summary_scalar_updates_applied,2);
 if(input.line==='21.x'){
@@ -217,9 +217,45 @@ prepared.native_spec_source.bound.length=0;prepared.native_spec_source.spec.afte
 assert.equal(packedUpstreamLedgerEpoch({root,read}).read(nativeSpec).equals(read(nativeSpec)),true);
 cases.push('native-spec-source-additions-and-five-metadata-scalars-preserve-all-decisions-and-current-code');
 
+assert.equal(epoch.selection_native_decisions_applied,3);assert.equal(epoch.selection_native_registry_digests_applied,11);
+assert.equal(prepared.selection_native_stage.before.equals(prepared.native_spec_metadata_stage.after),true);
+const selectionLedgerPacket='compatibility/rc/autocomplete-selection-ledger-successor.json';
+rejects('changed-three-selection-ledger-successor',p=>p===selectionLedgerPacket?Buffer.concat([read(p),Buffer.from(' ')]):read(p));
+const selectionNativePacket='compatibility/rc/autocomplete-selection-native-contract-proposal.json';
+rejects('changed-three-selection-native-proposal',p=>p===selectionNativePacket?Buffer.concat([read(p),Buffer.from(' ')]):read(p));
+const selectionScopeModule='scripts/autocomplete-selection-native-scopes.mjs';
+rejects('changed-three-selection-native-scope-module',p=>p===selectionScopeModule?Buffer.concat([read(p),Buffer.from(' ')]):read(p));
+const selectionPacket=JSON.parse(read(selectionLedgerPacket)),selectionReview=selectionPacket.entries[0].review.path;
+rejects('changed-three-selection-individual-source-report',p=>p===selectionReview?Buffer.concat([read(p),Buffer.from(' ')]):read(p));
+const selectionJudge='scripts/autocomplete-selection-source-judgment.mjs';
+rejects('changed-three-selection-source-producer',p=>p===selectionJudge?Buffer.concat([read(p),Buffer.from(' ')]):read(p));
+const partialSelection=JSON.parse(prepared.canonical_after),beforeSelection=JSON.parse(prepared.selection_native_stage.before);
+const selectionIndex=partialSelection.entries.findIndex(row=>row.sha===selectionPacket.entries[0].sha);
+partialSelection.entries[selectionIndex]=beforeSelection.entries[selectionIndex];
+rejects('partial-three-selection-source-admission',p=>p===ledgerPath?bytes(partialSelection):read(p));
+const partialSelectionDigests=JSON.parse(prepared.canonical_after),digestUpdate=selectionPacket.source_digest_updates[0];
+let digestTarget=partialSelectionDigests.entries.find(row=>row.sha===digestUpdate.sha);
+for(const key of digestUpdate.path.slice(0,-1))digestTarget=digestTarget[key];digestTarget.sha256=digestUpdate.before;
+rejects('partial-eleven-selection-registry-digests',p=>p===ledgerPath?bytes(partialSelectionDigests):read(p));
+const strippedSelection=JSON.parse(prepared.canonical_after);
+delete strippedSelection.entries[selectionIndex].individual_proof.proof_kind;
+rejects('stripped-required-selection-native-marker',p=>p===ledgerPath?bytes(strippedSelection):read(p));
+for(const target of [selectionReview,selectionScopeModule]){
+  let late=false;const live=packedUpstreamLedgerEpoch({root,read:p=>late&&p===target?Buffer.concat([read(p),Buffer.from(' ')]):read(p)});
+  late=true;assert.throws(()=>live.read(ledgerPath));rejected.push('late-three-selection-subject-'+target);
+}
+cases.push('three-complete-selection-source-decisions-and-eleven-exact-registry-digests-are-qualified');
+const previousComplete=packedUpstreamLedgerEpoch({root,read:p=>p===ledgerPath?prepared.selection_native_stage.before:read(p)});
+assert.equal(previousComplete.selection_native_decisions_applied,0);assert.equal(previousComplete.selection_native_registry_digests_applied,0);
+assert.equal(previousComplete.individual_decisions_applied,input.line==='21.x'?17:10);
+assert.equal(previousComplete.native_spec_source_digests_applied,3);
+assert.equal(previousComplete.read(landscapeRegistry).equals(read(landscapeRegistry)),true);
+cases.push('earlier-exact-complete-metadata-state-cannot-claim-new-selection-admissions');
+
 console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   canonical_entries: 1697, qualified_source_entries: 85, changed_scalar_tokens: 179,
   source_context_members: 20, packed_epoch_members: 16, original_dispositions_changed: epoch.individual_decisions_applied,
+  selection_source_decisions:epoch.selection_native_decisions_applied,selection_registry_digest_updates:epoch.selection_native_registry_digests_applied,
   analysis_python_version: prepared.analysis_python_version,
   actual_current_canonical_after_sha256: hash(read(ledgerPath)), historical_before_sha256: hash(prepared.before),
   source_owner_sha256: hash(read(owner)), producer_sha256: hash(read('tests/packed_upstream_ledger_epoch_probe.mjs')),
