@@ -155,6 +155,21 @@ assert.deepEqual(JSON.parse(prepared.canonical_after).entries,JSON.parse(prepare
 assert.equal(prepared.summary_stage.scalar_updates,2);
 cases.push('two-derived-summary-counters-preserve-every-entry');
 
+const landscapeTransition='compatibility/rc/autocomplete-landscape-native-contract-transition.json';
+rejects('changed-landscape-registry-transition',path=>path===landscapeTransition?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+const landscapeRegistry='scripts/upstream-historical-behavior-evidence.mjs';
+rejects('changed-historical-registry-outside-finite-landscape-addition',path=>path===landscapeRegistry?Buffer.concat([read(path),Buffer.from('\n// unrelated\n')]):read(path));
+const landscapePacket=JSON.parse(read(landscapeTransition));
+const priorRegistry=Buffer.from(read(landscapeRegistry).toString().replace(landscapePacket.insertion.text,''));
+rejects('omitted-mandatory-landscape-registration',path=>path===landscapeRegistry?priorRegistry:read(path));
+let lateLandscape=false;
+const liveLandscape=packedUpstreamLedgerEpoch({root,read:path=>lateLandscape&&path===landscapeRegistry?priorRegistry:read(path)});
+lateLandscape=true;assert.throws(()=>liveLandscape.read(ledgerPath));rejected.push('late-landscape-registry-change');
+let lateLandscapePacket=false;
+const liveLandscapePacket=packedUpstreamLedgerEpoch({root,read:path=>lateLandscapePacket&&path===landscapeTransition?Buffer.concat([read(path),Buffer.from(' ')]):read(path)});
+lateLandscapePacket=true;assert.throws(()=>liveLandscapePacket.read(ledgerPath));rejected.push('late-landscape-transition-change');
+cases.push('exact-additive-landscape-contract-keeps-all-canonical-ledger-and-product-bytes-raw');
+
 console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   canonical_entries: 1697, qualified_source_entries: 85, changed_scalar_tokens: 179,
   source_context_members: 20, packed_epoch_members: 16, original_dispositions_changed: epoch.individual_decisions_applied,

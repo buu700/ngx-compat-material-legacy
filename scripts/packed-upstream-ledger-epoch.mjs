@@ -378,6 +378,33 @@ function prepareSummaryStage({root,read,line,before,bound}){
   assert.deepEqual(JSON.parse(after),{...data,...values});return {before,after,scalar_updates:2};
 }
 
+// Only this authenticated additive registry change succeeds the original
+// source receipt. Ledger proofs and actual packed/native admission stay raw.
+const autocompleteRegistryPath='scripts/upstream-historical-behavior-evidence.mjs';
+const autocompleteRegistryTransitions={
+  main:'99e2d8d316f83caf0ece1fe5b990be099db3e5e6495b758af4a89bbb86877192',
+  '21.x':'ee071f30f5c985d15cc33f4decb7fd0a672d48a755d533c8adf6ba8b71c6fa28',
+};
+function qualifyAutocompleteRegistry({root,read,line,ref,bound}){
+  const path='compatibility/rc/autocomplete-landscape-native-contract-transition.json',raw=read(path);
+  assert.equal(hash(raw),autocompleteRegistryTransitions[line]);bound.set(path,hash(raw));
+  const packet=JSON.parse(raw);assert.equal(packet.schema_version,1);assert.equal(packet.line,line);
+  assert.equal(packet.sha,'008212a9807fd01fd32fe136a075763b7b2c854d');
+  assert.equal(packet.canonical_ledger_edits,0);assert.equal(packet.native_browser_artifact_or_floor_execution,false);
+  assert.equal(packet.g11_claim,'not-passed');assert.equal(packet.registry.path,ref.path);
+  const before=gitBytes(root,packet.source_parent,ref.path);assert.equal(hash(before),ref.sha256);
+  assert.equal(hash(before),packet.registry.before_sha256);assert.equal(before.length,packet.registry.before_bytes);
+  const marker=packet.insertion.before_marker,addition=packet.insertion.text,text=before.toString();
+  assert.equal(text.split(marker).length,2);assert.ok(addition.startsWith("  ['008212a9807fd01fd32fe136a075763b7b2c854d', {\n"));
+  const after=Buffer.from(text.replace(marker,addition+marker));assert.equal(hash(after),packet.registry.after_sha256);
+  assert.equal(after.length,packet.registry.after_bytes);assert.equal(hash(read(ref.path)),hash(after));
+  bound.set(ref.path,hash(after));
+  for(const checkpoint of [packet.current_source_inspection,packet.current_source_inspector,packet.complete_originals]){
+    const bytes=read(checkpoint.path);assert.equal(hash(bytes),checkpoint.sha256);assert.equal(bytes.length,checkpoint.bytes);
+    bound.set(checkpoint.path,checkpoint.sha256);
+  }
+}
+
 export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(root)} = {}) {
   read = packedUpstreamLedgerRawRead({root, read});
   const input = read(inputPath), line = Object.keys(subjects).find(name => subjects[name].sha256 === hash(input));
@@ -423,6 +450,8 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
       checker = rulesJsCheckerSuccessor(sassCheckerSuccessor(checker));
       assert.equal(read(ref.path).toString(), checker, 'unqualified finite source-decision checker integration');
       bound.set(ref.path, hash(checker));
+    } else if(ref.path===autocompleteRegistryPath) {
+      qualifyAutocompleteRegistry({root,read,line,ref,bound});
     } else member(ref);
   }
   const reports = new Map(); assert.equal(data.reports.length, 12);
