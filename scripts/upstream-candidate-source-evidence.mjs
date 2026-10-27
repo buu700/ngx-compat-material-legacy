@@ -8,6 +8,7 @@
 import {createHash} from 'node:crypto';
 import {lstatSync, readdirSync} from 'node:fs';
 import {join} from 'node:path';
+import {requiresTestingApi21xProof,testingApi21xSourceEvidenceOk} from './upstream-testing-api-21x-admission.mjs';
 
 const sourceKinds = new Set(['candidate-source-line-match', 'candidate-source-equivalent']);
 const normalize = text => text.replace(/\s/g, '');
@@ -30,6 +31,7 @@ export function candidateProductSourcePaths(root) {
 
 /** Source presence is a bounded proof, never execution or inherited behavior. */
 export function candidateSourceEvidenceOk(proof, readMember, productPaths) {
+  if (requiresTestingApi21xProof(proof, readMember)) return testingApi21xSourceEvidenceOk(proof, readMember, productPaths);
   if (!sourceKinds.has(proof?.proof_kind)) {
     return !['candidate_member', 'added_lines', 'equivalent_candidate_lines', 'absent_in_package']
       .some(key => Object.hasOwn(proof || {}, key));

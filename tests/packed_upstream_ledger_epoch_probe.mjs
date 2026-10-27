@@ -27,13 +27,13 @@ const style = 'projects/ngx-material-legacy/styles/button/_button-theme.scss';
 const input = JSON.parse(read(inputPath)), cases = [], rejected = [];
 const prepared = preparePackedUpstreamLedger({root, read});
 assert.equal(prepared.entries_changed, 85); assert.equal(prepared.scalar_tokens_changed, 179);
-assert.equal(read(ledgerPath).equals(prepared.after), true);
+assert.equal(read(ledgerPath).equals(prepared.canonical_after), true);
 assert.equal(JSON.parse(read(ledgerPath)).entries.length, 1697);
-cases.push('actual-canonical-ledger-is-exact-qualified179-token-after-image');
+cases.push('actual-canonical-ledger-is-exact-qualified-successor-after-image');
 const epoch = packedUpstreamLedgerEpoch({root, read}); assert.equal(epoch.applied, true);
 assert.equal(epoch.raw, read); assert.equal(epoch.read(ledgerPath).equals(prepared.before), true);
 assert.deepEqual(epoch.projected_metadata_paths, [ledgerPath]);
-assert.equal(snackDomRawCurrentRead({root, read: epoch.read})(ledgerPath).equals(prepared.after), true);
+assert.equal(snackDomRawCurrentRead({root, read: epoch.read})(ledgerPath).equals(prepared.canonical_after), true);
 assert.equal(packedUpstreamLedgerEpoch({root, read: epoch.read}).applied, true);
 for (const member of [style, owner, input.reports[0].after.path, 'projects/ngx-material-legacy/legacy-chips/chip.ts'])
   assert.equal(epoch.read(member).equals(read(member)), true);
@@ -99,13 +99,25 @@ for (const [id, path, changed] of [
 const context = snackDomSourceContext({root, read: epoch.read});
 assert.equal(context.members, 20); assert.equal(context.packed_repair_epoch_members, 16);
 assert.equal(context.current_successors, 25);
-assert.equal(context.raw(ledgerPath).equals(prepared.after), true);
-assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equals(prepared.after), true);
+assert.equal(context.raw(ledgerPath).equals(prepared.canonical_after), true);
+assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equals(prepared.canonical_after), true);
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?7:0);
+if(input.line==='21.x'){
+ const nextPath='compatibility/rc/upstream-testing-api-21x-ledger-transition.json.gz';
+ rejects('changed-seven-individual-transition',path=>path===nextPath?Buffer.concat([read(path),Buffer.from(' ')]):read(path));
+ const next=JSON.parse(prepared.canonical_after), prior=JSON.parse(prepared.after);
+ const reviewed=next.entries.find(row=>row.individual_proof?.testing_api_21x);
+ const partial=structuredClone(next);partial.entries[partial.entries.findIndex(row=>row.sha===reviewed.sha)]=prior.entries.find(row=>row.sha===reviewed.sha);
+ rejects('partial-seven-individual-admission',path=>path===ledgerPath?bytes(partial):read(path));
+ const validator='scripts/upstream-testing-api-21x-admission.mjs';
+ rejects('changed-seven-individual-validator',path=>path===validator?Buffer.concat([read(path),Buffer.from('\n// changed\n')]):read(path));
+}
+
 
 console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   canonical_entries: 1697, qualified_source_entries: 85, changed_scalar_tokens: 179,
-  source_context_members: 20, packed_epoch_members: 16, original_dispositions_changed: 0,
+  source_context_members: 20, packed_epoch_members: 16, original_dispositions_changed: epoch.individual_decisions_applied,
   analysis_python_version: prepared.analysis_python_version,
   actual_current_canonical_after_sha256: hash(read(ledgerPath)), historical_before_sha256: hash(prepared.before),
   source_owner_sha256: hash(read(owner)), producer_sha256: hash(read('tests/packed_upstream_ledger_epoch_probe.mjs')),
