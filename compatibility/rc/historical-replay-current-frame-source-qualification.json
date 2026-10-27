@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Actual raw-source owner execution before advancing the coherence frame. No old bytes were substituted as current.",
+  "qualified_source_commit": "3810819b881ed4a334d7f9af0e54d04062583be7",
+  "owner": {
+    "path": "scripts/snack-dom-source-context.mjs",
+    "sha256": "90f153554f101c610d1a477b2143f9e26df8d0f1951ac0ee6988a6176146d8a5"
+  },
+  "coordinator": {
+    "path": "scripts/packed-upstream-ledger-epoch.mjs",
+    "sha256": "9f53c092a4667f90d456cc413b23689f3742287fc553d8a7e6a6a8a90743df7b"
+  },
+  "producer": {
+    "path": "/tmp/ngx-trace-replay-owner.mjs",
+    "sha256": "0ed2b818f0aff4894c21ffdf2c280bfd15a1cc463904747d28745ea471394059",
+    "source": "import {readFileSync,writeFileSync} from 'node:fs';\nimport {join} from 'node:path';\nimport {pathToFileURL} from 'node:url';\nconst root=process.cwd(),seen=new Set(),{snackDomSourceContext}=await import(pathToFileURL(join(root,'scripts/snack-dom-source-context.mjs')));\nconst read=p=>{seen.add(p);return readFileSync(join(root,p));};\nconst q=snackDomSourceContext({root,read});\nif(q.raw!==read)throw new Error('raw current owner changed');\nconst report={line:q.line,raw_current_owner_passed:true,read_paths:[...seen].sort(),historical_subject_used_as_current:false};\nwriteFileSync(process.argv[2],JSON.stringify(report,null,2)+'\\n',{flag:'wx'});\nconsole.log(JSON.stringify({line:q.line,raw_current_owner_passed:true,observed_reads:seen.size}));\n"
+  },
+  "raw_current_source_owner_passed": true,
+  "owner_returned_same_raw_reader": true,
+  "observed_read_paths": 3505,
+  "observed_read_paths_sha256": "a1745a892db197086464fc05d3d396f1d154a47d1c43a0a7044b83dfd8ce9543",
+  "actual_product_members_qualified_by_existing_owner": 1142,
+  "historical_source_supplied_as_current": false,
+  "source_scope_only": true,
+  "actual_native_artifact_browser_floor_or_audit_qualified": false,
+  "g13_claim": "not-passed"
+}
