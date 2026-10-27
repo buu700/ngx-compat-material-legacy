@@ -1160,3 +1160,13 @@ outer-budget addition. This does not make a timed-out original program pass: the
 recorded main dialog configuration timeout remains failed. Full cohorts remain
 pending; one original menu integration replay passed on each line before this
 outer-budget correction.
+
+
+The source-integration policy snapshot (`source-integration-history-controls`)
+executes its complete unchanged original program at the fixed passing checkpoint
+on each branch. Its current counterpart, `test_source_integration_policy_current.py`,
+checks the actual eight-entry policy and raw source through the existing owner.
+The original26 replay entries,23 wrapper records,two successors and six-tool/two-
+progress-path protocol remain unchanged. The original Python90-second budget is
+retained. This policy-control route cannot export an integration original report
+and grants no current native,packed,consumer,floor or audit credit.
