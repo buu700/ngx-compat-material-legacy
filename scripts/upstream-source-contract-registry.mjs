@@ -30,4 +30,8 @@ export const sourceContractDefinitions = [
     scope_key:'theme_token_root_source_scope',module:'upstream-theme-token-root-admission.cjs'},
   {sha:'6cc6cf21f292d78c930cbda79c1f337bd6b82bfe',proof_kind:'individual-historical-token-root-source-exclusion',
     scope_key:'theme_token_root_source_scope',module:'upstream-theme-token-root-admission.cjs'},
+  {sha:'98f610d192015599d8e0ce1a0f2a455c31ced558',proof_kind:'individual-historical-form-field-tokenization-source-review',
+    scope_key:'form_field_tokenization_source_scope',module:'upstream-form-field-tokenization-admission.cjs'},
+  {sha:'c0b3aa524115e9b2b2b5fabd2e7cec44111b8e0e',proof_kind:'individual-historical-form-field-tokenization-source-review',
+    scope_key:'form_field_tokenization_source_scope',module:'upstream-form-field-tokenization-admission.cjs'},
 ];

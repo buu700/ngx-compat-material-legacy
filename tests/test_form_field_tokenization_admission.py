@@ -1,0 +1,62 @@
+# @license
+# Copyright Google LLC All Rights Reserved.
+# Copyright (c) 2026 Ryan Lester.
+# Use of this source code is governed by the MIT license in LICENSE.
+"""Four exact decisions, mandatory source checking and independent mutations."""
+import json
+import os
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class FormFieldTokenizationAdmissionTests(unittest.TestCase):
+    def test_independent_two_entries_and_real_failures(self):
+        from form_field_tokenization_ledger_patch import verify_field_successor, LEDGER, SHAS
+        report = verify_field_successor()
+        self.assertEqual(report['individual_decisions'], 2)
+        self.assertEqual(report['unselected_entry_bytes_preserved'], 1695)
+        self.assertEqual(report['pending_security_reviews'], 1)
+        original = json.loads((ROOT / LEDGER).read_bytes())
+        with tempfile.TemporaryDirectory(prefix='ngx-control-base-independent-') as directory:
+            path = Path(directory) / 'candidate.json'
+            for fault in ['selected', 'unselected', 'header', 'clearance', 'missing-security-row', 'security-status', 'swap-dispositions']:
+                value = json.loads(json.dumps(original))
+                if fault == 'selected': del next(row for row in value['entries'] if row['sha'] in SHAS)['individual_proof']['form_field_tokenization_source_scope']
+                elif fault == 'unselected': next(row for row in value['entries'] if row['sha'] not in SHAS)['reason'] += ' unreviewed'
+                elif fault == 'header': value['open_or_deferred'] += 1
+                elif fault == 'clearance': value['g11_claim'] = 'passed'
+                elif fault == 'missing-security-row': value['entries'] = [row for row in value['entries'] if row['final_disposition'] != 'security-review']
+                elif fault == 'security-status': next(row for row in value['entries'] if row['final_disposition'] == 'security-review')['final_disposition'] = 'do-not-adopt'
+                else:
+                    for row in value['entries']:
+                        if row['sha'] in SHAS: row['final_disposition'] = 'already-adapted' if row['final_disposition'] == 'do-not-adopt' else 'do-not-adopt'
+                path.write_text(json.dumps(value, indent=2) + '\n')
+                with self.subTest(fault=fault), self.assertRaises(AssertionError): verify_field_successor(candidate=path)
+        output = os.environ.get('FIELD_TOKEN_RECONSTRUCTION_REPORT')
+        if output:
+            with Path(output).open('x') as stream: json.dump(report, stream, indent=2); stream.write('\n')
+
+    def test_pure_metadata_fresh_source_exact_owner_and_real_CLI(self):
+        command = ['node', 'tests/form_field_tokenization_admission_probe.mjs']
+        if os.environ.get('FIELD_TOKEN_ADMISSION_REPORT'): command.append(os.environ['FIELD_TOKEN_ADMISSION_REPORT'])
+        child = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=180)
+        self.assertEqual(child.returncode, 0, (child.stdout + child.stderr)[-7000:])
+        report = json.loads(child.stdout)
+        for key, expected in [('current_source_admissions',35),('previous_source_admissions',33),('pure_metadata_cases',2),
+                              ('metadata_rejections',14),('source_rejections',6),('real_root_checker_positive_rows',2),
+                              ('real_root_checker_rejected_rows',5),('rejection_controls',10)]:
+            self.assertEqual(report[key], expected, key)
+        self.assertTrue(report['pure_metadata_without_filesystem_or_compiler_bindings'])
+        self.assertTrue(report['two_final_dispositions_individually_enforced'])
+        self.assertTrue(report['already_adapted_behavior_guard_preserved'])
+        self.assertTrue(report['metadata_valid_source_fault_rejected'])
+        self.assertTrue(report['missing_source_requirement_mutant_detected'])
+        self.assertTrue(report['all_temporary_checker_files_removed'])
+        self.assertFalse(report['actual_native_artifact_browser_floor_or_full_audit_qualified'])
+
+
+if __name__ == '__main__': unittest.main()
