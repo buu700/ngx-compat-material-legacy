@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "One transport correction for a recorded original report format; no original probe/report/expectation or current contract changed.",
+  "runner": "scripts/run-historical-consumer-probe.mjs",
+  "before_sha256": "40154b14e658f2733f672bec581fa2dc1ca4c27a46368bd86c0262b3ed2880f1",
+  "after_sha256": "b42cc9f903506b716d935a7be0d45cb09626422a612c19daf4fd305f71756ad3",
+  "literal_edits": [
+    {
+      "before": "    assert.equal(producer,subject.probe_sha256,'original report producer differs');\n",
+      "after": "    // Some original reports omit this redundant self-reference. The exact\n    // executed probe is authenticated by the Git manifest before and after it.\n    if(producer!==undefined)assert.equal(producer,subject.probe_sha256,'original report producer differs');\n"
+    }
+  ],
+  "reproduced_failure": "compatibility/rc/historical-consumer-final-fixture-development-failure.json",
+  "original_control_report_before_fix": "compatibility/rc/historical-consumer-final-fixture-original-controls.json",
+  "cause": "The unchanged final-fixture report has no producer field. Its probe source is already authenticated by the manifest against the fixed Git object before execution and rehashed after execution.",
+  "prior_six_successful_replays": [
+    {
+      "path": "compatibility/rc/historical-consumer-animation-fixture-replay.json",
+      "sha256": "f0c2ce1e59955bbe2b1056297fb2402676949468b5a55ad467087040b4da2bc8",
+      "bytes": 5010
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-cdk-async-replay.json",
+      "sha256": "eea4ad4d633e150729ad91c8b6f036bbf0620a5e824efbb5637ea17841ac47af",
+      "bytes": 4539
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-date-tooltip-slider-replay.json",
+      "sha256": "b7a9f21fe152b828e417fa48d036b600740fffa4b24fc51b5e4760f6f294d635",
+      "bytes": 4223
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-import-cleanup-replay.json",
+      "sha256": "5deb97e3c80336ba9aba73fae818cb91dc578b758853cf22aed6c1f7f3816f1f",
+      "bytes": 7445
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-interaction-async-replay.json",
+      "sha256": "73e8f23b94877cf66bba72bcfd339364c3e1704259eb6db67bf7f7dd54e891b4",
+      "bytes": 4685
+    },
+    {
+      "path": "compatibility/rc/historical-consumer-overlay-async-replay.json",
+      "sha256": "9dba630fbf89f5a27ce9f63f39448be30a7a276a41327644f8824afb4bd72e3c",
+      "bytes": 4483
+    }
+  ],
+  "all_prior_six_have_expected_producer_field": true,
+  "current_original_producer_fields_still_checked_when_present": true,
+  "all_manifest_pre_and_post_hash_checks_retained": true,
+  "original_Git_source_capsules_probes_expected_results_or_current_contracts_changed": false,
+  "g13_claim": "not-passed"
+}
