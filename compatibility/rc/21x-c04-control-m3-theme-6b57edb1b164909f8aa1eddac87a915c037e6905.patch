@@ -1,0 +1,183 @@
+diff --git a/src/dev-app/theme-token-api.scss b/src/dev-app/theme-token-api.scss
+index f9a676ab180b390723dc1aa2692d4c8ba0d74af5..7265429eba3d446430a706bdd76dbe1b9fce5881 100644
+--- a/src/dev-app/theme-token-api.scss
++++ b/src/dev-app/theme-token-api.scss
+@@ -40,6 +40,7 @@ html {
+   @include mat.card-theme($light-theme);
+   @include mat.tooltip-theme($light-theme);
+   @include mat.toolbar-theme($light-theme);
++  @include mat.snack-bar-theme($light-theme);
+ }
+ 
+ // Emit dark theme styles.
+@@ -52,6 +53,7 @@ html {
+   @include mat.card-color($dark-theme);
+   @include mat.tooltip-color($dark-theme);
+   @include mat.toolbar-color($dark-theme);
++  @include mat.snack-bar-color($dark-theme);
+ }
+ 
+ // Emit density styles for each scale.
+@@ -63,5 +65,6 @@ html {
+     @include mat.card-density($scale-theme);
+     @include mat.tooltip-density($scale-theme);
+     @include mat.toolbar-density($scale-theme);
++    @include mat.snack-bar-density($scale-theme);
+   }
+ }
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index 9c714417d0a247859108ddd290814adb4ea57808..f5703e3d24784b5f17544e8e1c29fe59bd6cd473 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -11,7 +11,7 @@
+   $result: ();
+   @each $prop in (font, line-height, size, tracking, weight) {
+     $result: map.set($result, #{$base-name}-#{$prop},
+-        map.get($systems, md-sys-typescale, #{$typography-level}-#{$prop}));
++      map.get($systems, md-sys-typescale, #{$typography-level}-#{$prop}));
+   }
+   @return $result;
+ }
+@@ -43,3 +43,13 @@
+       )
+   );
+ }
++
++/// Generates custom tokens for the mat-snack-bar.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-snack-bar
++@function snack-bar($systems, $exclude-hardcoded) {
++  @return (
++    button-color: map.get($systems, md-sys-color, inverse-primary),
++  );
++}
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index d5d977936cb51d13fa0715b9d99697ce9875c4d6..9bee6d194a40cdf08d23157b5f0a09abbd0a26ae 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -188,6 +188,11 @@
+           mdc-tokens.md-comp-outlined-card-values($systems, $exclude-hardcoded),
+           $token-slots
+       ),
++      _namespace-tokens(
++            (mdc, snackbar),
++          mdc-tokens.md-comp-snackbar-values($systems, $exclude-hardcoded),
++          $token-slots,
++      ),
+       _namespace-tokens(
+             (mdc, plain-tooltip),
+           mdc-tokens.md-comp-plain-tooltip-values($systems, $exclude-hardcoded),
+@@ -203,8 +208,13 @@
+       _namespace-tokens(
+             (mat, toolbar),
+           custom-tokens.toolbar($systems, $exclude-hardcoded),
+-         $token-slots,
+-      )
++          $token-slots,
++      ),
++      _namespace-tokens(
++            (mat, snack-bar),
++          custom-tokens.snack-bar($systems, $exclude-hardcoded),
++          $token-slots
++      ),
+   );
+ 
+   // Strip out tokens that are systemized by our made up density system.
+diff --git a/src/material/snack-bar/_snack-bar-theme.scss b/src/material/snack-bar/_snack-bar-theme.scss
+index edac05f72484a08bb690a041c55b4c3b6afc2107..61f0c5bb4d11c0f6d46e4dd0831a92b4dc2652ee 100644
+--- a/src/material/snack-bar/_snack-bar-theme.scss
++++ b/src/material/snack-bar/_snack-bar-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '@material/snackbar/snackbar-theme' as mdc-snackbar-theme;
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+@@ -8,25 +9,40 @@
+ @use '../core/tokens/m2/mat/snack-bar' as tokens-mat-snack-bar;
+ 
+ @mixin base($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {
+     // Add default values for tokens not related to color, typography, or density.
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-unthemable-tokens());
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-unthemable-tokens());
++    }
+   }
+ }
+ 
+ @mixin color($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-color-tokens($theme));
+-    @include token-utils.create-token-values(
+-      tokens-mat-snack-bar.$prefix,
+-      tokens-mat-snack-bar.get-color-tokens($theme)
+-    );
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-color-tokens($theme));
++      @include token-utils.create-token-values(
++          tokens-mat-snack-bar.$prefix,
++          tokens-mat-snack-bar.get-color-tokens($theme)
++      );
++    }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-typography-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-snackbar-theme.theme(tokens-mdc-snack-bar.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+@@ -34,16 +50,28 @@
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-snack-bar') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
+-    }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
+ 
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include mdc-snackbar-theme.theme(map.get($tokens, tokens-mdc-snack-bar.$prefix));
++    @include token-utils.create-token-values(
++        tokens-mat-snack-bar.$prefix, map.get($tokens, tokens-mat-snack-bar.$prefix));
++  }
++}

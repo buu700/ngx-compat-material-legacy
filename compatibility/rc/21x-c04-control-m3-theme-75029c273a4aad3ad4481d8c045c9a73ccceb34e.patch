@@ -1,0 +1,367 @@
+diff --git a/src/dev-app/BUILD.bazel b/src/dev-app/BUILD.bazel
+index 0e9ff2d60ee22d4e4cc3cefbfa235eca746c029d..a4356d0a0386b066535361b1976dc7d3d4cabcfb 100644
+--- a/src/dev-app/BUILD.bazel
++++ b/src/dev-app/BUILD.bazel
+@@ -116,8 +116,8 @@ sass_binary(
+ )
+ 
+ sass_binary(
+-    name = "theme_token_api",
+-    src = "theme-token-api.scss",
++    name = "theme_m3",
++    src = "theme-m3.scss",
+     deps = [
+         "//src/material:sass_lib",
+         "//src/material-experimental:sass_lib",
+@@ -142,7 +142,7 @@ filegroup(
+         "favicon.ico",
+         "index.html",
+         ":theme",
+-        ":theme_token_api",
++        ":theme_m3",
+         ":variables",
+         "//src/dev-app/icon:icon_demo_assets",
+         "@npm//:node_modules/moment/min/moment-with-locales.min.js",
+diff --git a/src/dev-app/dev-app/dev-app-layout.html b/src/dev-app/dev-app/dev-app-layout.html
+index 1c31fe64be81a6658cebe70605bec5db38a5feab..b4b7829c0142f580acb769d5ac57963b2cd857df 100644
+--- a/src/dev-app/dev-app/dev-app-layout.html
++++ b/src/dev-app/dev-app/dev-app-layout.html
+@@ -53,8 +53,8 @@
+           </button>
+           <button
+             mat-icon-button
+-            (click)="toggleTokens()"
+-            [matTooltip]="state.tokensEnabled ? 'Disable tokens' : 'Enable tokens'">
++            (click)="toggleM3()"
++            [matTooltip]="state.m3Enabled ? 'Use M2 theme' : 'Use M3 theme'">
+             <mat-icon>brush</mat-icon>
+           </button>
+           <button
+diff --git a/src/dev-app/dev-app/dev-app-layout.ts b/src/dev-app/dev-app/dev-app-layout.ts
+index 73115143c4b6d27984af88912b68b034eacd1cbf..f5017d5a2ba3eb77639357f064fbbd28e3212d80 100644
+--- a/src/dev-app/dev-app/dev-app-layout.ts
++++ b/src/dev-app/dev-app/dev-app-layout.ts
+@@ -162,13 +162,13 @@ export class DevAppLayout {
+     }
+   }
+ 
+-  toggleTokens(value = !this.state.tokensEnabled) {
++  toggleM3(value = !this.state.m3Enabled) {
+     // We need to diff this one since it's a bit more expensive to toggle.
+-    if (value !== this.state.tokensEnabled) {
++    if (value !== this.state.m3Enabled) {
+       (document.getElementById('theme-styles') as HTMLLinkElement).href = value
+-        ? 'theme-token-api.css'
++        ? 'theme-m3.css'
+         : 'theme.css';
+-      this.state.tokensEnabled = value;
++      this.state.m3Enabled = value;
+       setAppState(this.state);
+     }
+   }
+diff --git a/src/dev-app/dev-app/dev-app-state.ts b/src/dev-app/dev-app/dev-app-state.ts
+index 26f2fc85e790109baa8c04eacb345eeb94c99dd9..fac96736cf77a457f7d9b44eb93b59430c450ec7 100644
+--- a/src/dev-app/dev-app/dev-app-state.ts
++++ b/src/dev-app/dev-app/dev-app-state.ts
+@@ -17,7 +17,7 @@ export interface DevAppState {
+   darkTheme: boolean;
+   rippleDisabled: boolean;
+   strongFocusEnabled: boolean;
+-  tokensEnabled: boolean;
++  m3Enabled: boolean;
+   direction: Direction;
+ }
+ 
+@@ -41,7 +41,7 @@ export function getAppState(): DevAppState {
+       darkTheme: false,
+       rippleDisabled: false,
+       strongFocusEnabled: false,
+-      tokensEnabled: false,
++      m3Enabled: false,
+       direction: 'ltr',
+     };
+ 
+diff --git a/src/dev-app/main.ts b/src/dev-app/main.ts
+index d305c120b2cc87381f320c9e7735b113133f7e7a..9faf0112601fac5c28c9aaf0cdd2934692658745 100644
+--- a/src/dev-app/main.ts
++++ b/src/dev-app/main.ts
+@@ -29,7 +29,7 @@ import {getAppState} from './dev-app/dev-app-state';
+ // It uses a different file, instead of toggling a class, to avoid other styles from bleeding in.
+ const cachedAppState = getAppState();
+ const theme = document.createElement('link');
+-theme.href = cachedAppState.tokensEnabled ? 'theme-token-api.css' : 'theme.css';
++theme.href = cachedAppState.m3Enabled ? 'theme-m3.css' : 'theme.css';
+ theme.id = 'theme-styles';
+ theme.rel = 'stylesheet';
+ document.head.appendChild(theme);
+diff --git a/src/dev-app/theme-m3.scss b/src/dev-app/theme-m3.scss
+new file mode 100644
+index 0000000000000000000000000000000000000000..a1183cf286ca87a38bda20036ebf3d1a5b0cb4dd
+--- /dev/null
++++ b/src/dev-app/theme-m3.scss
+@@ -0,0 +1,76 @@
++@use 'sass:map';
++@use '@angular/material' as mat;
++@use '@angular/material-experimental' as matx;
++
++// Add an indicator to make it clear that the app is styled with the experimental M3 theme.
++dev-app {
++  &::before {
++    content: 'Using experimental M3 theme, only components that support M3 will work';
++    display: inline-block;
++    position: fixed;
++    z-index: 100;
++    bottom: 0;
++    left: 50%;
++    transform: translateX(-50%);
++    padding: 8px;
++    background: red;
++    color: white;
++  }
++}
++
++// Emit Angular Material core styles.
++@include mat.core();
++
++// Base theme configuration for our M3 theme.
++$m3-base-config: (
++  color: (
++    primary: matx.$m3-green-palette
++  ),
++);
++
++// Our M3 light theme.
++$light-theme: matx.define-theme($m3-base-config);
++
++// Our M3 dark theme.
++$dark-theme: matx.define-theme(map.set($m3-base-config, color, theme-type, dark));
++
++// Emit default theme styles.
++html {
++  @include mat.checkbox-theme($light-theme);
++  @include mat.card-theme($light-theme);
++  @include mat.tooltip-theme($light-theme);
++  @include mat.toolbar-theme($light-theme);
++  @include mat.slider-theme($light-theme);
++  @include mat.snack-bar-theme($light-theme);
++  @include mat.progress-spinner-theme($light-theme);
++}
++
++// Emit dark theme styles.
++.demo-unicorn-dark-theme {
++  // TODO(mmalerba): choose colors from the theming API.
++  background: black;
++  color: white;
++
++  @include mat.checkbox-color($dark-theme);
++  @include mat.card-color($dark-theme);
++  @include mat.tooltip-color($dark-theme);
++  @include mat.toolbar-color($dark-theme);
++  @include mat.slider-color($dark-theme);
++  @include mat.snack-bar-color($dark-theme);
++  @include mat.progress-spinner-color($dark-theme);
++}
++
++// Emit density styles for each scale.
++@each $scale in (maximum, 0, -1, -2, -3, minimum) {
++  $scale-theme: matx.define-theme(map.set($m3-base-config, density, scale, $scale));
++
++  .demo-density-#{$scale} {
++    @include mat.checkbox-density($scale-theme);
++    @include mat.card-density($scale-theme);
++    @include mat.tooltip-density($scale-theme);
++    @include mat.toolbar-density($scale-theme);
++    @include mat.slider-density($scale-theme);
++    @include mat.snack-bar-density($scale-theme);
++    @include mat.progress-spinner-density($scale-theme);
++  }
++}
+diff --git a/src/dev-app/theme-token-api.scss b/src/dev-app/theme-token-api.scss
+deleted file mode 100644
+index ba43f0b68b93643b6a9daac97a46fad47ad0c8bb..0000000000000000000000000000000000000000
+--- a/src/dev-app/theme-token-api.scss
++++ /dev/null
+@@ -1,73 +0,0 @@
+-@use 'sass:map';
+-@use '@angular/material' as mat;
+-@use '@angular/material-experimental' as matx;
+-
+-// Add an indicator to make it clear that the app is styled with the experimental theming API.
+-dev-app {
+-  &::before {
+-    content: 'Using experimental theming API';
+-    display: inline-block;
+-    position: fixed;
+-    z-index: 100;
+-    bottom: 0;
+-    left: 50%;
+-    transform: translateX(-50%);
+-    padding: 8px;
+-    background: red;
+-    color: white;
+-  }
+-}
+-
+-// Emit Angular Material core styles.
+-@include mat.core();
+-
+-// Base theme configuration for our M3 theme.
+-$m3-base-config: (
+-  color: (
+-    primary: matx.$m3-green-palette
+-  ),
+-);
+-
+-// Our M3 light theme.
+-$light-theme: matx.define-theme($m3-base-config);
+-
+-// Our M3 dark theme.
+-$dark-theme: matx.define-theme(map.set($m3-base-config, color, theme-type, dark));
+-
+-// Emit default theme styles.
+-html {
+-  @include mat.checkbox-theme($light-theme);
+-  @include mat.card-theme($light-theme);
+-  @include mat.tooltip-theme($light-theme);
+-  @include mat.toolbar-theme($light-theme);
+-  @include mat.slider-theme($light-theme);
+-  @include mat.snack-bar-theme($light-theme);
+-}
+-
+-// Emit dark theme styles.
+-.demo-unicorn-dark-theme {
+-  // TODO(mmalerba): choose colors from the theming API.
+-  background: black;
+-  color: white;
+-
+-  @include mat.checkbox-color($dark-theme);
+-  @include mat.card-color($dark-theme);
+-  @include mat.tooltip-color($dark-theme);
+-  @include mat.toolbar-color($dark-theme);
+-  @include mat.slider-color($dark-theme);
+-  @include mat.snack-bar-color($dark-theme);
+-}
+-
+-// Emit density styles for each scale.
+-@each $scale in (maximum, 0, -1, -2, -3, minimum) {
+-  $scale-theme: matx.define-theme(map.set($m3-base-config, density, scale, $scale));
+-
+-  .demo-density-#{$scale} {
+-    @include mat.checkbox-density($scale-theme);
+-    @include mat.card-density($scale-theme);
+-    @include mat.tooltip-density($scale-theme);
+-    @include mat.toolbar-density($scale-theme);
+-    @include mat.slider-density($scale-theme);
+-    @include mat.snack-bar-density($scale-theme);
+-  }
+-}
+diff --git a/src/material-experimental/theming-next/README.md b/src/material-experimental/theming-next/README.md
+index 1e08197908eedb250972a8a32b44ee2adb74fcc9..15aa07c530edb39921e73304f8962f9213ed64ed 100644
+--- a/src/material-experimental/theming-next/README.md
++++ b/src/material-experimental/theming-next/README.md
+@@ -55,4 +55,3 @@ $m2-tokens: mat.m2-tokens-from-theme($my-theme);
+   need to appear differently, say within `.dark-sidebar`, set the token overrides on the
+   `.dark-sidebar` element and they will be inherited down to the checkboxes within, instead of the
+   values from the root element.
+-- For a small example, see this [alternate partial theme](https://github.com/angular/components/blob/main/src/dev-app/theme-token-api.scss) for the dev-app
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index 846fd09949c41c79deb3e499ac96c746393bfc58..34294fd0d461b0a57b0706bf3d601567ea24b6c6 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -203,6 +203,11 @@
+           mdc-tokens.md-comp-plain-tooltip-values($systems, $exclude-hardcoded),
+           $token-slots
+       ),
++      _namespace-tokens(
++            (mdc, circular-progress),
++          mdc-tokens.md-comp-circular-progress-indicator-values($systems, $exclude-hardcoded),
++          $token-slots
++      ),
+       // Choose values for our made up tokens based on MDC system tokens or sensible hardcoded
+       // values.
+       _namespace-tokens(
+diff --git a/src/material/progress-spinner/_progress-spinner-theme.scss b/src/material/progress-spinner/_progress-spinner-theme.scss
+index 71edbce7de68b9bd2cf16120042d668bbb699a0b..333697e9faa4b679320beebe4d778fb522ff4e51 100644
+--- a/src/material/progress-spinner/_progress-spinner-theme.scss
++++ b/src/material/progress-spinner/_progress-spinner-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '../core/style/sass-utils';
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+@@ -5,35 +6,47 @@
+ @use '@material/circular-progress/circular-progress-theme' as mdc-circular-progress-theme;
+ 
+ @mixin base($theme) {
+-  // Add default values for tokens not related to color, typography, or density.
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-circular-progress-theme.theme(
+-      tokens-mdc-circular-progress.get-unthemable-tokens()
+-    );
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {
++    // Add default values for tokens not related to color, typography, or density.
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-circular-progress-theme.theme(
++          tokens-mdc-circular-progress.get-unthemable-tokens()
++      );
++    }
+   }
+ }
+ 
+ @mixin color($theme) {
+-  $mdc-circular-progress-color-tokens: tokens-mdc-circular-progress.get-color-tokens($theme);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {
++    $mdc-circular-progress-color-tokens: tokens-mdc-circular-progress.get-color-tokens($theme);
+ 
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-circular-progress-theme.theme($mdc-circular-progress-color-tokens);
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-circular-progress-theme.theme($mdc-circular-progress-color-tokens);
+ 
+-    .mat-accent {
+-      $color: inspection.get-theme-color($theme, accent);
+-      @include mdc-circular-progress-theme.theme((active-indicator-color: $color));
+-    }
++      .mat-accent {
++        $color: inspection.get-theme-color($theme, accent);
++        @include mdc-circular-progress-theme.theme((active-indicator-color: $color));
++      }
+ 
+-    .mat-warn {
+-      $color: inspection.get-theme-color($theme, warn);
+-      @include mdc-circular-progress-theme.theme((active-indicator-color: $color));
++      .mat-warn {
++        $color: inspection.get-theme-color($theme, warn);
++        @include mdc-circular-progress-theme.theme((active-indicator-color: $color));
++      }
+     }
+   }
+ }
+ 
+-@mixin typography($theme) {}
++@mixin typography($theme) {
++}
+ 
+-@mixin density($theme) {}
++@mixin density($theme) {
++}
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-progress-spinner') {
+@@ -49,3 +62,10 @@
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include mdc-circular-progress-theme.theme(
++        map.get($tokens, tokens-mdc-circular-progress.$prefix));
++  }
++}

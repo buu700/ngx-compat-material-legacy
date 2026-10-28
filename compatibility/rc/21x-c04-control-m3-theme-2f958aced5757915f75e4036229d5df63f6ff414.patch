@@ -1,0 +1,266 @@
+diff --git a/src/dev-app/theme-m3.scss b/src/dev-app/theme-m3.scss
+index a1183cf286ca87a38bda20036ebf3d1a5b0cb4dd..d50cd098d709202d1caadbdad115211465a0e5da 100644
+--- a/src/dev-app/theme-m3.scss
++++ b/src/dev-app/theme-m3.scss
+@@ -43,6 +43,7 @@ html {
+   @include mat.slider-theme($light-theme);
+   @include mat.snack-bar-theme($light-theme);
+   @include mat.progress-spinner-theme($light-theme);
++  @include mat.radio-theme($light-theme);
+ }
+ 
+ // Emit dark theme styles.
+@@ -58,6 +59,7 @@ html {
+   @include mat.slider-color($dark-theme);
+   @include mat.snack-bar-color($dark-theme);
+   @include mat.progress-spinner-color($dark-theme);
++  @include mat.radio-color($dark-theme);
+ }
+ 
+ // Emit density styles for each scale.
+@@ -72,5 +74,6 @@ html {
+     @include mat.slider-density($scale-theme);
+     @include mat.snack-bar-density($scale-theme);
+     @include mat.progress-spinner-density($scale-theme);
++    @include mat.radio-density($scale-theme);
+   }
+ }
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index 47d1007669513ddf36a21426b0b9f1fb96f5e6a1..f87dfae44369bbb9599101532870001156b63ae2 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -63,3 +63,11 @@
+     button-color: map.get($systems, md-sys-color, inverse-primary),
+   );
+ }
++
++@function radio($systems, $exclude-hardcoded) {
++  @return (
++    ripple-color: map.get($systems, md-sys-color, on-surface),
++    checked-ripple-color: map.get($systems, md-sys-color, primary),
++    disabled-label-color: map.get($systems, md-sys-color, on-surface),
++  );
++}
+diff --git a/src/material-experimental/theming/_m3-density.scss b/src/material-experimental/theming/_m3-density.scss
+index 7759ccc413b7139ee409b9d3681171c87c5777bd..bf6fa843ca0222fbe9f4b757035e2fd6ab04d4b4 100644
+--- a/src/material-experimental/theming/_m3-density.scss
++++ b/src/material-experimental/theming/_m3-density.scss
+@@ -15,19 +15,25 @@
+ /// )
+ // TODO(mmalerba): Add density tokens for remaining components.
+ $_density-tokens: (
++  // MDC tokens
+     (mdc, checkbox): (
+     state-layer-size: (40px, 36px, 32px, 28px),
+   ),
+     (mdc, elevated-card): (),
+     (mdc, outlined-card): (),
+     (mdc, slider): (),
+-    (mat, card): (),
+     (mdc, plain-tooltip): (),
++    (mdc, radio): (
++    state-layer-size: (40px, 36px, 32px, 28px),
++  ),
++  // Custom Angular Material tokens
++    (mat, card): (),
+     (mat, toolbar): (
+     standard-height: (64px, 60px, 56px, 52px),
+     mobile-height: (56px, 52px, 48px, 44px),
+   ),
+     (mat, slider): (),
++    (mat, radio): (),
+ );
+ 
+ /// Gets the value for the given density scale from the given set of density values.
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index 34294fd0d461b0a57b0706bf3d601567ea24b6c6..c69b4f3de7ce4598dd41fe5020735c85b5f738fe 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -208,6 +208,11 @@
+           mdc-tokens.md-comp-circular-progress-indicator-values($systems, $exclude-hardcoded),
+           $token-slots
+       ),
++      _namespace-tokens(
++            (mdc, radio),
++          mdc-tokens.md-comp-radio-button-values($systems, $exclude-hardcoded),
++          $token-slots
++      ),
+       // Choose values for our made up tokens based on MDC system tokens or sensible hardcoded
+       // values.
+       _namespace-tokens(
+@@ -230,6 +235,11 @@
+           custom-tokens.snack-bar($systems, $exclude-hardcoded),
+           $token-slots
+       ),
++      _namespace-tokens(
++            (mat, radio),
++          custom-tokens.radio($systems, $exclude-hardcoded),
++          $token-slots
++      ),
+   );
+ 
+   // Strip out tokens that are systemized by our made up density system.
+diff --git a/src/material/radio/_radio-theme.scss b/src/material/radio/_radio-theme.scss
+index 13ff6711f1c97624ef70a4c2554520c8d2609e0f..0289b3e10618114544f7b7b027e39ef9ab9b37cd 100644
+--- a/src/material/radio/_radio-theme.scss
++++ b/src/material/radio/_radio-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '@material/radio/radio-theme' as mdc-radio-theme;
+ @use '@material/form-field' as mdc-form-field;
+ @use '../core/mdc-helpers/mdc-helpers';
+@@ -10,78 +11,111 @@
+ @use '../core/tokens/m2/mat/radio' as tokens-mat-radio;
+ 
+ @mixin base($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-radio-theme.theme(tokens-mdc-radio.get-unthemable-tokens());
+-    @include token-utils.create-token-values(
+-        tokens-mat-radio.$prefix, tokens-mat-radio.get-unthemable-tokens());
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-radio-theme.theme(tokens-mdc-radio.get-unthemable-tokens());
++      @include token-utils.create-token-values(
++          tokens-mat-radio.$prefix, tokens-mat-radio.get-unthemable-tokens());
++    }
+   }
+ }
+ 
+ @mixin color($theme) {
+-  @include mdc-helpers.using-mdc-theme($theme) {
+-    .mat-mdc-radio-button {
+-      @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-theme-styles-query);
+-    }
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
+   }
+-
+-  .mat-mdc-radio-button {
+-    &.mat-primary {
+-      @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme, primary));
+-      @include token-utils.create-token-values(tokens-mat-radio.$prefix,
+-        tokens-mat-radio.get-color-tokens($theme, primary));
++  @else {
++    @include mdc-helpers.using-mdc-theme($theme) {
++      .mat-mdc-radio-button {
++        @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-theme-styles-query);
++      }
+     }
+ 
+-    &.mat-accent {
+-      @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme));
+-      @include token-utils.create-token-values(tokens-mat-radio.$prefix,
+-        tokens-mat-radio.get-color-tokens($theme));
+-    }
++    .mat-mdc-radio-button {
++      &.mat-primary {
++        @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme, primary));
++        @include token-utils.create-token-values(tokens-mat-radio.$prefix,
++          tokens-mat-radio.get-color-tokens($theme, primary));
++      }
+ 
+-    &.mat-warn {
+-      @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme, warn));
+-      @include token-utils.create-token-values(tokens-mat-radio.$prefix,
+-        tokens-mat-radio.get-color-tokens($theme, warn));
++      &.mat-accent {
++        @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme));
++        @include token-utils.create-token-values(tokens-mat-radio.$prefix,
++          tokens-mat-radio.get-color-tokens($theme));
++      }
++
++      &.mat-warn {
++        @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme, warn));
++        @include token-utils.create-token-values(tokens-mat-radio.$prefix,
++          tokens-mat-radio.get-color-tokens($theme, warn));
++      }
+     }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-radio-theme.theme(tokens-mdc-radio.get-typography-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
+   }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-radio-theme.theme(tokens-mdc-radio.get-typography-tokens($theme));
++    }
+ 
+-  .mat-mdc-radio-button {
+-    @include mdc-helpers.using-mdc-typography($theme) {
+-      @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-typography-styles-query);
++    .mat-mdc-radio-button {
++      @include mdc-helpers.using-mdc-typography($theme) {
++        @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-typography-styles-query);
++      }
+     }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  $density-scale: inspection.get-theme-density($theme);
+-
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-radio-theme.theme(tokens-mdc-radio.get-density-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
+   }
++  @else {
++    $density-scale: inspection.get-theme-density($theme);
+ 
+-  @include mdc-helpers.if-touch-targets-unsupported($density-scale) {
+-    .mat-mdc-radio-touch-target {
+-      display: none;
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-radio-theme.theme(tokens-mdc-radio.get-density-tokens($theme));
++    }
++
++    @include mdc-helpers.if-touch-targets-unsupported($density-scale) {
++      .mat-mdc-radio-touch-target {
++        display: none;
++      }
+     }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-radio') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
+-    }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include mdc-radio-theme.theme(map.get($tokens, tokens-mdc-radio.$prefix));
++    @include token-utils.create-token-values(
++        tokens-mat-radio.$prefix, map.get($tokens, tokens-mat-radio.$prefix));
++  }
++}
