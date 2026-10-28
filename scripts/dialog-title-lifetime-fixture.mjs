@@ -11,8 +11,8 @@ class DialogTitleLifetimeState {
   readonly second = signal(true);
 }
 const dialogTitleLifetimeTemplate = \`
-  <h2 mat-dialog-title id="legacy-title-lifetime-first" *ngIf="state.first()" data-lifetime-title="first">First title</h2>
-  <h2 mat-dialog-title *ngIf="state.second()" data-lifetime-title="second">Second title</h2>
+  @if (state.first()) {<h2 mat-dialog-title id="legacy-title-lifetime-first" data-lifetime-title="first">First title</h2>}
+  @if (state.second()) {<h2 mat-dialog-title data-lifetime-title="second">Second title</h2>}
   <p data-lifetime-content>Title lifecycle content</p>
 \`;
 @Component({standalone:false, selector:'lab-dialog-title-body',
