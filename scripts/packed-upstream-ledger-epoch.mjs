@@ -591,7 +591,7 @@ function prepareSelectionSpecMetadata({root,read,line,before,bound,currentSource
   assert.deepEqual(packet.source_spec,spec.bound[0]);
   assert.deepEqual(packet.source_readers,readers.bound.find(ref=>ref.path==='compatibility/rc/autocomplete-selection-source-reader-successors.json'));
   for(const ref of [packet.code_subject,packet.current_review,packet.historical_review]){
-    const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256);assert.equal(bytes.length,ref.bytes);bound.set(ref.path,ref.sha256);
+    selectionMember({root,read,line,ref,bound});
   }
   assert.equal(packet.code_subject.path,'scripts/autocomplete-selection-spec-subject.mjs');
   assert.equal(packet.current_review.path,AUTOCOMPLETE_LANDSCAPE_REVIEW);
@@ -765,7 +765,8 @@ function prepareLegacySassEntrypointStage({root,read,line,before,bound}){
 
 function prepareCheckerReferenceMetadataStage({root,read,line,before,bound}){
   const path='scripts/checker-reference-metadata.mjs',digest='f5284108bffa5b61f0183727f199f87b9a07fc831f8f1f976f99e05fa1ed7448';
-  assert.equal(hash(read(path)),digest,'changed checker reference metadata owner');bound.set(path,digest);
+  const current=selectionReaders(root,read,line).qualify({path,sha256:digest})??{path,sha256:digest};
+  assert.equal(hash(read(path)),current.sha256,'changed checker reference metadata owner');bound.set(path,current.sha256);
   const source=checkerReferenceMetadata({root,read,line});assert.equal(source.before.equals(before),true);
   for(const ref of source.bound)bound.set(ref.path,ref.sha256);
   return source;

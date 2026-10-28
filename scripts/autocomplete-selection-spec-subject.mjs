@@ -10,6 +10,7 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {dialogTitleProductSubject,dialogTitleReaderSubject} from './dialog-title-source-context.mjs';
 
 export const AUTOCOMPLETE_SELECTION_SPEC='projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts';
 export const AUTOCOMPLETE_SELECTION_SPEC_PACKET='compatibility/rc/autocomplete-selection-spec-successor.json';
@@ -71,6 +72,7 @@ export function autocompleteSelectionSpecSubject({root,read=p=>readEvidenceMembe
  * through a current reader, and no historical report is silently rewritten. */
 export function autocompleteSelectionReaderSubject({root,read=p=>readEvidenceMember(root,p),line}={}){
   const spec=autocompleteSelectionSpecSubject({root,read,line});line=spec.line;
+  const title=dialogTitleProductSubject({root,read,line}),titleReaders=dialogTitleReaderSubject({root,read,line});
   readEvidenceMember(root,readersPath);
   const raw=read(readersPath);assert.equal(hash(raw),readerPins[line]);
   const packet=JSON.parse(raw);assert.equal(packet.schema_version,1);assert.equal(packet.line,line);
@@ -81,7 +83,7 @@ export function autocompleteSelectionReaderSubject({root,read=p=>readEvidenceMem
   assert.deepEqual(packet.code_subjects.map(row=>row.path),['scripts/upstream-rules-js-build-admission.mjs','scripts/autocomplete-landscape-source-judgment.mjs','scripts/upstream-testing-api-21x-admission.mjs','scripts/packed-product-source-recovery.mjs','scripts/packed-cva-source-requalification.mjs','scripts/dialog-portal-failure-recovery.mjs','scripts/snack-dom-source-context.mjs']);
   const env={...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'};
   for(const key of ['GIT_DIR','GIT_WORK_TREE','GIT_INDEX_FILE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])delete env[key];
-  const bound=[...spec.bound,{path:readersPath,sha256:hash(raw),bytes:raw.length}];
+  const bound=[...spec.bound,{path:readersPath,sha256:hash(raw),bytes:raw.length},...title.bound,...titleReaders.bound];
   for(const row of packet.code_subjects){
     let text=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0','show',packet.source_parent+':'+row.path],
       {cwd:root,env,maxBuffer:1024*1024}).toString();
@@ -89,23 +91,27 @@ export function autocompleteSelectionReaderSubject({root,read=p=>readEvidenceMem
     for(const edit of row.literal_edits){assert.equal(text.split(edit.before).length,2);text=text.replace(edit.before,edit.after);}
     assert.equal(hash(text),row.after.sha256);assert.equal(Buffer.byteLength(text),row.after.bytes);
     readEvidenceMember(root,row.path);
-    assert.equal(hash(read(row.path)),row.after.sha256,'unqualified native spec source-reader change');
-    bound.push({path:row.path,...row.after});
+    const current=titleReaders.qualify({path:row.path,...row.after})??{path:row.path,...row.after};
+    assert.equal(hash(read(row.path)),current.sha256,'unqualified native spec source-reader change');
+    const existing=bound.find(ref=>ref.path===current.path);if(existing)assert.deepEqual(existing,current);else bound.push(current);
   }
   const qualify=ref=>{
+    const product=title.qualify(ref);if(product)return product;
     if(ref.path===spec.path){
       assert.ok([spec.before.sha256,spec.after.sha256].includes(ref.sha256));
       if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===spec.before.sha256?spec.before.bytes:spec.after.bytes);
       return {path:ref.path,...spec.after};
     }
-    const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return null;
+    const row=packet.code_subjects.find(row=>row.path===ref.path);if(!row)return titleReaders.qualify(ref);
+    const successor=titleReaders.qualify({path:row.path,...row.after});
+    if(successor?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,successor.bytes);return successor;}
     assert.ok([row.before.sha256,row.after.sha256].includes(ref.sha256));
     if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===row.before.sha256?row.before.bytes:row.after.bytes);
-    return {path:ref.path,...row.after};
+    return successor??{path:ref.path,...row.after};
   };
-  const assertCurrent=()=>{spec.assertCurrent();for(const ref of bound){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late native source-reader change');assert.equal(bytes.length,ref.bytes);}};
+  const assertCurrent=()=>{spec.assertCurrent();title.assertCurrent();titleReaders.assertCurrent();for(const ref of bound){const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late native source-reader change');assert.equal(bytes.length,ref.bytes);}};
   const publicSpec={...spec,before:{...spec.before},after:{...spec.after},packet:structuredClone(spec.packet),bound:structuredClone(spec.bound)};
   // Reconstruct immutable prior report metadata only; never return old code bytes.
   const historicalMetadataReference=path=>{assertCurrent();const row=packet.code_subjects.find(row=>row.path===path);assert.ok(row);return {path,sha256:row.before.sha256};};
-  assertCurrent();return {spec:publicSpec,bound:structuredClone(bound),qualify,assertCurrent,historicalMetadataReference,native_or_full_source_admission_credit:false};
+  assertCurrent();return {spec:publicSpec,bound:structuredClone(bound),qualify,assertCurrent,historicalMetadataReference,titleSource:title,titleReaders,native_or_full_source_admission_credit:false};
 }

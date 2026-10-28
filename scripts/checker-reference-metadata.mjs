@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
+import {dialogTitleReaderSubject} from './dialog-title-source-context.mjs';
 import {requiresTestingApi21xEntry} from './upstream-testing-api-21x-admission.mjs';
 import {requiresSassInspectionScope} from './upstream-sass-inspection-admission.mjs';
 import {requiresRulesJsBuild} from './upstream-rules-js-build-admission.mjs';
@@ -57,8 +58,10 @@ export function reconstructReviewedChecker(review){
 }
 export function checkerReferenceMetadata({root,read,line='21.x'}={}){
   assert.equal(line,'21.x');
-  const bound=new Map();
+  const readers=dialogTitleReaderSubject({root,read,line});
+  const bound=new Map(readers.bound.map(ref=>[ref.path,ref]));
   function member(ref){
+    ref=readers.qualify(ref)??ref;
     const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'changed checker metadata input '+ref.path);
     if(ref.bytes!==undefined)assert.equal(raw.length,ref.bytes);bound.set(ref.path,{path:ref.path,sha256:ref.sha256,bytes:raw.length});return raw;
   }
@@ -103,7 +106,7 @@ export function checkerReferenceMetadata({root,read,line='21.x'}={}){
   }
   let after=text;for(const edit of edits.sort((a,b)=>b.start-a.start))after=after.slice(0,edit.start)+edit.text+after.slice(edit.end);
   after=Buffer.from(after);assert.equal(after.length,before.length);assert.equal(hash(after),afterHash);assert.deepEqual(JSON.parse(after),expected);
-  const assertCurrent=()=>{for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late checker metadata input '+ref.path);assert.equal(raw.length,ref.bytes);}};
+  const assertCurrent=()=>{readers.assertCurrent();for(const ref of bound.values()){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256,'late checker metadata input '+ref.path);assert.equal(raw.length,ref.bytes);}};
   assertCurrent();return {line,before,after,bound:structuredClone([...bound.values()]),assertCurrent,
     checker_digest_tokens:14,original_hunk_judgments_changed:0,unselected_entries_preserved:1683,individual_decisions:0};
 }

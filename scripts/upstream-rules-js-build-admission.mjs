@@ -12,6 +12,7 @@ import {spawnSync,execFileSync} from 'node:child_process';
 import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
 import {isDeepStrictEqual} from 'node:util';
+import {dialogTitleProductSubject} from './dialog-title-source-context.mjs';
 import {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';
 
 export const RULES_JS_BUILD_SHAS=Object.freeze(['3b9854e97a6ff942241ef3b233939f7bd1cfd22d',
@@ -66,15 +67,15 @@ export function rulesJsBuildBoundInputs({root,read,line}){
  assert.equal(proposal.line,line);assert.equal(proposal.canonical_ledger_changes,0);
  assert.equal(proposal.current_runtime_or_packed_or_floor_qualified,false);
  assert.equal(proposal.analysis.original_file_occurrences,135);assert.equal(proposal.analysis.original_hunks,195);
- const spec=autocompleteSelectionSpecSubject({root,read,line});
+ const spec=autocompleteSelectionSpecSubject({root,read,line}),title=dialogTitleProductSubject({root,read,line});
  const recordedRefs=[{path:proposalPath,sha256:proposals[line]},proposal.subjects,proposal.inspector,
   ...proposal.candidate_context.files,...proposal.candidate_context.product_members];
  const refs=recordedRefs.map(ref=>{
-  if(ref.path!==spec.path)return ref;
+  if(ref.path!==spec.path)return title.qualify(ref)??ref;
   assert.equal(ref.sha256,spec.before.sha256);assert.equal(ref.bytes,spec.before.bytes);
   return {...ref,...spec.after};
  });
- for(const ref of spec.bound)if(!refs.some(row=>row.path===ref.path))refs.push(ref);
+ for(const ref of [...spec.bound,...title.bound])if(!refs.some(row=>row.path===ref.path))refs.push(ref);
  for(const ref of refs)member(read,ref);
  const population=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','maintenance.auto=0',
   'ls-files','--cached','--others','--exclude-standard','--','projects/ngx-material-legacy'],{cwd:root,encoding:'utf8'}).trim().split('\n').sort();
@@ -83,7 +84,7 @@ export function rulesJsBuildBoundInputs({root,read,line}){
   assert.ok(['node_modules/@angular/cdk/package.json','node_modules/@angular/material/package.json'].includes(ref.path));
   const path=join(root,ref.path),resolved=realpathSync(path);assert.equal(hash(readFileSync(path)),ref.sha256);
   assert.equal(JSON.parse(readFileSync(path)).version,line==='main'?'22.1.7':'21.2.14');return {...ref,absolute:path,resolved};});
- const assertExternal=()=>{spec.assertCurrent();for(const ref of external){assert.equal(realpathSync(ref.absolute),ref.resolved);assert.equal(hash(readFileSync(ref.absolute)),ref.sha256);}};
+ const assertExternal=()=>{spec.assertCurrent();title.assertCurrent();for(const ref of external){assert.equal(realpathSync(ref.absolute),ref.resolved);assert.equal(hash(readFileSync(ref.absolute)),ref.sha256);}};
  assertExternal();return {refs,assertExternal,proposal};
 }
 function validate({root,read,line,entry,body},fresh){
@@ -110,7 +111,9 @@ function validate({root,read,line,entry,body},fresh){
    const spec=autocompleteSelectionSpecSubject({root,read,line}),expected=structuredClone(checked.proposal);
    const refs=expected.candidate_context.product_members.filter(ref=>ref.path===spec.path);assert.equal(refs.length,1);
    assert.equal(refs[0].sha256,spec.before.sha256);assert.equal(refs[0].bytes,spec.before.bytes);Object.assign(refs[0],spec.after);
-   assert.equal(isDeepStrictEqual(actual.body,expected),true,'fresh full build-source facts changed beyond the exact additive native spec');
+   const title=dialogTitleProductSubject({root,read,line});
+   expected.candidate_context.product_members=expected.candidate_context.product_members.map(ref=>title.qualify(ref)??ref);
+   assert.equal(isDeepStrictEqual(actual.body,expected),true,'fresh full build-source facts changed beyond the exact admitted spec and title sources');title.assertCurrent();
    measured.set(read,{root:rootId,line});
   }
   return true;

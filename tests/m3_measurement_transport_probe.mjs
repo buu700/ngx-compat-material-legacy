@@ -5,6 +5,7 @@
  * Use of this source code is governed by the MIT license in LICENSE.
  */
 import assert from 'node:assert/strict';
+import {dialogTitleReaderSubject} from '../scripts/dialog-title-source-context.mjs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {execFileSync} from 'node:child_process';
@@ -31,7 +32,10 @@ assert.equal(git(M3_TRANSPORT_CODE[1].path).toString().replace('measurement-\'+l
 const oldHandler=source(git('scripts/upstream-m3-theme-boundary-admission.cjs').toString()),newHandler=source(read('scripts/upstream-m3-theme-boundary-admission.cjs').toString());
 for(const name of ['boundaryProof','metadataOk','regular'])assert.equal(declaration(oldHandler,name).getText(oldHandler),declaration(newHandler,name).getText(newHandler));
 const oldOwner=git('scripts/packed-upstream-ledger-epoch.mjs').toString(),newOwner=read('scripts/packed-upstream-ledger-epoch.mjs').toString();
-assert.equal(oldOwner.replace('0f849a2c0230e7ebeb496fad34cbd9ecd5c4cb6d15ead8cdbff6181223221e27',hash(read('scripts/upstream-m3-theme-boundary-admission.cjs'))),newOwner);
+const priorOwner=oldOwner.replace('0f849a2c0230e7ebeb496fad34cbd9ecd5c4cb6d15ead8cdbff6181223221e27',hash(read('scripts/upstream-m3-theme-boundary-admission.cjs')));
+const titleReaders=dialogTitleReaderSubject({root,read,line:'21.x'}),ownerRef={path:'scripts/packed-upstream-ledger-epoch.mjs',sha256:hash(newOwner),bytes:Buffer.byteLength(newOwner)};
+assert.deepEqual(titleReaders.historicalReference(ownerRef),{path:ownerRef.path,sha256:hash(priorOwner),bytes:Buffer.byteLength(priorOwner)});
+assert.deepEqual(titleReaders.qualify({path:ownerRef.path,sha256:hash(priorOwner),bytes:Buffer.byteLength(priorOwner)}),ownerRef);titleReaders.assertCurrent();
 for(const path of ['scripts/check-upstream-audit-disposition.mjs','scripts/upstream-source-contract-registry.mjs','scripts/upstream-individual-evidence-scope.mjs','scripts/upstream-registered-source-review.mjs'])assert.equal(read(path).equals(git(path)),true);
 assert.equal(hash(read('compatibility/f10/disposition-ledger/ledger.json')),'22f775835030f175795d8865e9b30920b0b7fea5b908cbd6a9dca7775a71d779');
 const lines=[],temporaryRoots=[];
@@ -69,5 +73,5 @@ const args={root,read:currentRead,body,entry,review:body.reviews[0],proof:entry.
 for(const path of ['scripts/m3-measurement-transport.mjs',...M3_TRANSPORT_CODE.map(ref=>ref.path),...Object.values(M3_PORTABLE_WITNESSES).map(ref=>ref.path)]){late=path;assert.equal(admission.sourceOk(args),false,path);rejected++;}late=null;
 assert.equal(admission.sourceOk(args),true);
 assert.throws(()=>m3MeasurementSourceEpoch({read:path=>path===M3_TRANSPORT_CODE[0].path?git(path):read(path)}));rejected++;
-const report={schema_version:1,line:'21.x',portable_lines:lines,logical_and_historical_programs_each_line:26,metadata_before_images:2,raw_execution_reader_unchanged:true,only_measurement_function_changed:true,only_current_probe_witness_path_changed:true,pure_metadata_and_proof_functions_unchanged:3,owner_changes_one_handler_digest:true,root_checker_registry_and_dispatcher_unchanged:true,canonical_ledger_unchanged:true,rejections:rejected,all_temporary_roots_removed:true,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+const report={schema_version:1,line:'21.x',portable_lines:lines,logical_and_historical_programs_each_line:26,metadata_before_images:2,raw_execution_reader_unchanged:true,only_measurement_function_changed:true,only_current_probe_witness_path_changed:true,pure_metadata_and_proof_functions_unchanged:3,owner_changes_one_handler_digest:true,current_owner_title_transition_authenticated:true,owner_check_basis:'One M3 handler digest in the historical owner, followed by the independently authenticated exact title-reader transition',root_checker_registry_and_dispatcher_unchanged:true,canonical_ledger_unchanged:true,rejections:rejected,all_temporary_roots_removed:true,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));
