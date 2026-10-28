@@ -230,8 +230,8 @@
         "bytes": 42431
       },
       "after": {
-        "sha256": "475ab8864d0d6b0965a9aa397bc525a9b141c4aee979c922f20cba539a5c9466",
-        "bytes": 44131
+        "sha256": "330a20972d42336ee37adca60fb2243310724caf263cb7bfa783b7a7eac934de",
+        "bytes": 44559
       },
       "literal_edits": [
         {
@@ -293,6 +293,79 @@
         {
           "before": "const rawRead=root=>p=>{let path=root;for(const part of p.split('/')){assert.ok(part&&part!=='.'&&part!=='..');path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}assert.ok(lstatSync(path).isFile());return readFileSync(path);};",
           "after": "const rawRead=root=>p=>{\n const parts=p.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));\n const peer=p.match(/^node_modules\\/@angular\\/(material|cdk)\\/(.+)$/);\n let path=peer?realpathSync(join(root,'node_modules/@angular',peer[1])):root;\n const tail=peer?peer[2].split('/'):parts;\n // Only the declared peer package root can be linked. Source paths and every\n // descendant of the resolved peer root keep their original no-link checks.\n for(const part of tail){path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}\n assert.ok(lstatSync(path).isFile());return readFileSync(path);\n};"
+        },
+        {
+          "before": "export function dialogTitlePriorMetadataRead({root=process.cwd(),read=rawRead(root)}={}){",
+          "after": "export function dialogTitlePriorMetadataRead({root=process.cwd(),read=rawRead(root),metadataOverlay}={}){"
+        },
+        {
+          "before": "return before.has(path)?Buffer.from(before.get(path)):metadataRead(path);",
+          "after": "return before.has(path)?Buffer.from(before.get(path)):metadataOverlay?metadataOverlay(path):metadataRead(path);"
+        },
+        {
+          "before": "for(const m of data.owned_contract_review_members){assert.equal(hash(read(m.path)),m.sha256,'changed applied dialog contract review '+m.path);",
+          "after": "for(const m of data.owned_contract_review_members){const current=nativeSpec.qualify(m)??m;assert.equal(hash(read(m.path)),current.sha256,'changed applied dialog contract review '+m.path);"
+        },
+        {
+          "before": " let additionalCount=0;for(const path of ['compatibility/f10/authored-use-reviews/table-coercion-callers.json','compatibility/f10/authored-use-reviews/platform-callers.json','compatibility/f10/authored-use-reviews/core-token-callers.json','compatibility/f10/authored-use-reviews/remaining-core-callers.json','compatibility/f10/authored-use-reviews/material-core-callers.json','compatibility/f10/authored-use-reviews/cdk-module-type-callers.json','compatibility/f10/authored-use-reviews/layout-service-callers.json','compatibility/f10/authored-use-reviews/table-callers.json','compatibility/f10/authored-use-reviews/overlay-callers.json','compatibility/f10/authored-use-reviews/tabs-callers.json','compatibility/f10/authored-use-reviews/form-field-callers.json','compatibility/f10/authored-use-reviews/menu-callers.json','compatibility/f10/authored-use-reviews/a11y-callers.json','compatibility/f10/authored-use-reviews/component-config-callers.json','compatibility/f10/authored-use-reviews/dialog-callers.json','compatibility/f10/authored-use-reviews/material-remaining-callers.json']){const body=JSON.parse(read(path));assert.equal(body.line,data.line);assert.equal(body.status,'reviewed');for(const row of body.reviews){assert.equal(hash((['compatibility/f10/authored-use-reviews/dialog-callers.json','compatibility/f10/authored-use-reviews/material-remaining-callers.json'].includes(path)?read:['compatibility/f10/authored-use-reviews/overlay-callers.json','compatibility/f10/authored-use-reviews/tabs-callers.json','compatibility/f10/authored-use-reviews/form-field-callers.json','compatibility/f10/authored-use-reviews/menu-callers.json','compatibility/f10/authored-use-reviews/a11y-callers.json','compatibility/f10/authored-use-reviews/component-config-callers.json'].includes(path)?configEpoch:callerRead)('projects/ngx-material-legacy/'+row.file)),row.candidate_source_sha256);for(const m of row.independent_evidence)assert.equal(hash(read(m.path)),m.sha256,'changed additional caller dependency '+m.path);additionalCount++;}}assert.equal(additionalCount,336);",
+          "after": " let additionalCount=0;for(const path of ['compatibility/f10/authored-use-reviews/table-coercion-callers.json','compatibility/f10/authored-use-reviews/platform-callers.json','compatibility/f10/authored-use-reviews/core-token-callers.json','compatibility/f10/authored-use-reviews/remaining-core-callers.json','compatibility/f10/authored-use-reviews/material-core-callers.json','compatibility/f10/authored-use-reviews/cdk-module-type-callers.json','compatibility/f10/authored-use-reviews/layout-service-callers.json','compatibility/f10/authored-use-reviews/table-callers.json','compatibility/f10/authored-use-reviews/overlay-callers.json','compatibility/f10/authored-use-reviews/tabs-callers.json','compatibility/f10/authored-use-reviews/form-field-callers.json','compatibility/f10/authored-use-reviews/menu-callers.json','compatibility/f10/authored-use-reviews/a11y-callers.json','compatibility/f10/authored-use-reviews/component-config-callers.json','compatibility/f10/authored-use-reviews/dialog-callers.json','compatibility/f10/authored-use-reviews/material-remaining-callers.json']){const body=JSON.parse(read(path));assert.equal(body.line,data.line);assert.equal(body.status,'reviewed');for(const row of body.reviews){assert.equal(hash((['compatibility/f10/authored-use-reviews/dialog-callers.json','compatibility/f10/authored-use-reviews/material-remaining-callers.json'].includes(path)?read:['compatibility/f10/authored-use-reviews/overlay-callers.json','compatibility/f10/authored-use-reviews/tabs-callers.json','compatibility/f10/authored-use-reviews/form-field-callers.json','compatibility/f10/authored-use-reviews/menu-callers.json','compatibility/f10/authored-use-reviews/a11y-callers.json','compatibility/f10/authored-use-reviews/component-config-callers.json'].includes(path)?configEpoch:callerRead)('projects/ngx-material-legacy/'+row.file)),(['compatibility/f10/authored-use-reviews/dialog-callers.json','compatibility/f10/authored-use-reviews/material-remaining-callers.json'].includes(path)?nativeSpec.titleSource.qualify({path:'projects/ngx-material-legacy/'+row.file,sha256:row.candidate_source_sha256})?.sha256:null)??row.candidate_source_sha256);for(const m of row.independent_evidence){const current=nativeSpec.qualify(m)??m;assert.equal(hash(read(m.path)),current.sha256,'changed additional caller dependency '+m.path);}additionalCount++;}}assert.equal(additionalCount,336);"
+        }
+      ]
+    },
+    {
+      "path": "scripts/packed-cva-source-requalification.mjs",
+      "before": {
+        "sha256": "201bb30be2d5b0c38bd6d0ba573919040573a5cda2bbc62310a489a9884886af",
+        "bytes": 25670
+      },
+      "after": {
+        "sha256": "0028bd78cbdda3237c3866baf62cc4c0f4fcbea1b67691d0425072facf77ed5c",
+        "bytes": 27199
+      },
+      "literal_edits": [
+        {
+          "before": "import {qualifyPackedProductSourceRepairs}",
+          "after": "import {dialogTitleReaderSubject} from './dialog-title-source-context.mjs';\nimport {dialogTitlePriorMetadataRead} from './snack-dom-source-context.mjs';\nimport {qualifyPackedProductSourceRepairs}"
+        },
+        {
+          "before": "export function preparePackedCvaSourceRequalification({root = process.cwd(), read = disk(root)} = {}) {",
+          "after": "export function preparePackedCvaSourceRequalification({root = process.cwd(), read = disk(root), historicalTitleMetadata = false} = {}) {"
+        },
+        {
+          "before": "  const cache = new Map(), current = path => {",
+          "after": "  const cache = new Map();let current = path => {"
+        },
+        {
+          "before": "  const oldRead = path => before.get(path) ?? packed.read(path);",
+          "after": "  const actualCurrent=current;let priorRead=packed.read;\n  if(historicalTitleMetadata){\n    // Reconstruct this producer's original source-review epoch only. Raw title\n    // admission above and the returned reader's product reads remain current.\n    const titleCurrent=dialogTitlePriorMetadataRead({root,read});\n    const titlePrior=dialogTitlePriorMetadataRead({root,read:packed.read});\n    const currentTools=dialogTitleReaderSubject({root,read:titleCurrent,line});\n    const priorTools=dialogTitleReaderSubject({root,read:titlePrior,line});\n    const metadataCurrent=currentTools.withHistoricalToolMetadata(metadata=>metadata);\n    priorRead=priorTools.withHistoricalToolMetadata(metadata=>metadata);\n    const historicalCache=new Map();current=path=>{\n      if(!historicalCache.has(path))historicalCache.set(path,metadataCurrent(path));return historicalCache.get(path);\n    };\n  }\n  const oldRead = path => before.get(path) ?? priorRead(path);"
+        },
+        {
+          "before": "    const accepted=current(path).equals(before.get(path)) || current(path).equals(writes.get(path));\n    const actual=JSON.parse(current(path)),expected=JSON.parse(writes.get(path));",
+          "after": "    const accepted=actualCurrent(path).equals(before.get(path)) || actualCurrent(path).equals(writes.get(path));\n    const actual=JSON.parse(actualCurrent(path)),expected=JSON.parse(writes.get(path));"
+        },
+        {
+          "before": "  return {line, inputs, writes, before, product_preimages: packed.preimages,",
+          "after": "  return {line, inputs, writes, before, product_preimages: packed.preimages,\n    reconstruction_context:historicalTitleMetadata?'authenticated-before-title-source-and-tool-metadata':'current-source',\n    current_title_or_native_admission:!historicalTitleMetadata&&false,"
+        },
+        {
+          "before": "  const prepared = preparePackedCvaSourceRequalification({root, read});",
+          "after": "  const prepared = preparePackedCvaSourceRequalification({root, read, historicalTitleMetadata:true});"
+        },
+        {
+          "before": "  const inputBytes = read(PACKED_CVA_ROLE_INPUTS), inputs = JSON.parse(inputBytes), line = inputs.line;",
+          "after": "  assert.equal(typeof historicalTitleMetadata,'boolean');\n  const inputBytes = read(PACKED_CVA_ROLE_INPUTS), inputs = JSON.parse(inputBytes), line = inputs.line;"
+        },
+        {
+          "before": "    const historicalCache=new Map();current=path=>{\n      if(!historicalCache.has(path))historicalCache.set(path,metadataCurrent(path));return historicalCache.get(path);\n    };",
+          "after": "    const historicalCache=new Map();current=dialogTitlePriorMetadataRead({root,read,metadataOverlay:path=>{\n      if(!historicalCache.has(path))historicalCache.set(path,metadataCurrent(path));return historicalCache.get(path);\n    }});"
+        },
+        {
+          "before": "  const proposed = path => writes.get(path) ?? current(path);",
+          "after": "  const proposedBase=path=>writes.get(path)??current(path);\n  const proposed=historicalTitleMetadata?dialogTitlePriorMetadataRead({root,read,metadataOverlay:proposedBase}):proposedBase;"
+        },
+        {
+          "before": "current_title_or_native_admission:!historicalTitleMetadata&&false,",
+          "after": "current_title_or_native_admission:false,"
         }
       ]
     }

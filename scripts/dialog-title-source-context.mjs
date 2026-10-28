@@ -61,8 +61,8 @@ export function dialogTitleProductSubject({root=process.cwd(),read=path=>readFil
 }
 
 const readerPath='compatibility/rc/dialog-title-current-source-reader-successors.json';
-const readerPins={'21.x':'681290a39d9f693de7c522600179d32e18808909760e52db9a991549e707bb10'};
-const readerCode=['scripts/upstream-rules-js-build-admission.mjs','scripts/upstream-testing-api-21x-admission.mjs','scripts/autocomplete-selection-spec-subject.mjs','scripts/packed-upstream-ledger-epoch.mjs','scripts/checker-reference-metadata.mjs','scripts/packed-product-source-recovery.mjs','scripts/dialog-caller-owned-contract-boundary.mjs','scripts/snack-dom-source-context.mjs'];
+const readerPins={'21.x':'c189a19263d4862df74b47f590c1cb21875932406e150b9dc35141c448a86369'};
+const readerCode=['scripts/upstream-rules-js-build-admission.mjs','scripts/upstream-testing-api-21x-admission.mjs','scripts/autocomplete-selection-spec-subject.mjs','scripts/packed-upstream-ledger-epoch.mjs','scripts/checker-reference-metadata.mjs','scripts/packed-product-source-recovery.mjs','scripts/dialog-caller-owned-contract-boundary.mjs','scripts/snack-dom-source-context.mjs','scripts/packed-cva-source-requalification.mjs'];
 /** Tool before-images authenticate literal edits only; they are never executed. */
 export function dialogTitleReaderSubject({root=process.cwd(),read=path=>readFileSync(join(root,path)),line}={}){
  const actual=JSON.parse(read('projects/ngx-material-legacy/package.json')).version.startsWith('21.')?'21.x':'main';line??=actual;assert.equal(line,actual);

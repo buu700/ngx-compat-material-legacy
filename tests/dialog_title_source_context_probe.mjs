@@ -48,7 +48,7 @@ for(const [line,directory]of [['21.x',root],['main',main]]){
 }
 const disk=path=>readFileSync(join(root,path));let late=null;const read=path=>path===late?Buffer.concat([disk(path),Buffer.from('\n')]):disk(path);
 const readers=dialogTitleReaderSubject({root,read,line:'21.x'}),packet=JSON.parse(disk('compatibility/rc/dialog-title-current-source-reader-successors.json'));
-assert.equal(packet.code_subjects.length,8);
+assert.equal(packet.code_subjects.length,9);
 for(const row of packet.code_subjects){
  const before=original(root,packet.source_parent,row.path);assert.equal(hash(before),row.before.sha256);
  assert.deepEqual(readers.qualify({path:row.path,...row.before}),{path:row.path,...row.after});
