@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-28T05:17:28.094789+00:00",
+  "line": "21.x",
+  "status": "pass",
+  "scope": "Implemented and tested title source handler plus separate mandatory native validator; canonical routing/owner activation remains pending",
+  "source_parent": "52f38092873eebcc3d2ed515dab908ae843db3f6",
+  "source_code": [
+    {
+      "path": "scripts/dialog-title-canonical-source.mjs",
+      "sha256": "417e66d4781b25cb143a18ffdd47074f484d3ed00e7fd25c986d837e56c330fe",
+      "bytes": 5579
+    },
+    {
+      "path": "scripts/upstream-dialog-title-admission.cjs",
+      "sha256": "3a7030d3eaab08fb7b39b1efaa735ef4be3ce7bbb19c8532b0a52e9ec807cb82",
+      "bytes": 6528
+    },
+    {
+      "path": "scripts/upstream-dialog-title-native-evidence.mjs",
+      "sha256": "728262b0b862856e265ff04c7a8a86e2836e6f2a2c1ead25f6115a0096598289",
+      "bytes": 3308
+    },
+    {
+      "path": "tests/dialog_title_canonical_admission_probe.mjs",
+      "sha256": "8560638db5eb31fb2a3cdb4e2370b04f764bf54f91d271d5ee3cd66c8041e55f",
+      "bytes": 11060
+    },
+    {
+      "path": "tests/test_dialog_title_canonical_admission.py",
+      "sha256": "c78568d7c3b332288becbdc165365c7d14b588a69efdd13698d908e637e136b3",
+      "bytes": 1763
+    }
+  ],
+  "source_measurement": {
+    "path": "compatibility/rc/21x-c04-dialog-title-replacement-canonical-source-measurement.json",
+    "sha256": "cb2f882e1bbc2cc185766d3953a02bbe592a22c6098d77d66a8053707f11e8fd",
+    "bytes": 76096
+  },
+  "actual_controls": {
+    "path": "compatibility/rc/21x-c04-dialog-title-replacement-canonical-admission-controls.json",
+    "sha256": "f2cec6343ce189d5ad63b65126bdf6c8e262466d689af1e694d1b282db9b0b1b",
+    "bytes": 1917
+  },
+  "actual_test_execution": {
+    "path": "compatibility/rc/21x-c04-dialog-title-replacement-canonical-admission-test-execution.json",
+    "sha256": "a9b7eee0c25f43bbb6b93f9d1a880dbc8ddcd933885a1c3b6b6cb7f735e07cd8",
+    "bytes": 1092
+  },
+  "actual_raw_dialog_graph_matches_existing_owner": 49,
+  "original_patch_replays": 9,
+  "original_hunks": 21,
+  "fresh_lifecycle_executed": true,
+  "original_before_regression_failures": 6,
+  "after_and_tagged_cases_each": 15,
+  "owned_cases": 18,
+  "metadata_faults_rejected": 13,
+  "current_source_faults_rejected": 10,
+  "late_current_source_faults_rejected": 95,
+  "uncached_child_calls_controlled": 2,
+  "native_faults_rejected": 9,
+  "mandatory_native_engine_runtime_cells": 6,
+  "mandatory_rendered_title_rows_per_cell": 42,
+  "real_missing_coordinator_rejected": true,
+  "controlled_native_adapter_is_not_execution_evidence": true,
+  "development_observations": [
+    {
+      "stage": "initial measurement producer",
+      "result": "failed",
+      "actual_graph_members": 200,
+      "expected_dialog_graph_members": 49,
+      "cause": "Used general component capture instead of the existing dialog owner selection. No source report was emitted."
+    },
+    {
+      "stage": "second measurement producer",
+      "result": "failed",
+      "actual_graph_members": 5,
+      "expected_dialog_graph_members": 49,
+      "cause": "Configuration-impact capture also describes a different selection. The actual dialog owner was inspected and its18-row immutable prior was selected; its complete49-member graph is independently compared in the passing test."
+    },
+    {
+      "stage": "initial canonical test",
+      "result": "failed",
+      "actual_assertion": "controlledNative(...).ok was false",
+      "cause": "The controlled VM compared a host array to a VM array with realm-sensitive isDeepStrictEqual. Only the controlled adapter now normalizes realms; the actual validator and real negative coordinator check retain their ordinary comparisons."
+    }
+  ],
+  "unchanged_existing_canonical_contracts": [
+    {
+      "path": "scripts/upstream-source-contract-registry.mjs",
+      "sha256": "2e3be9b4e3f54b5b177ed7b9220d509c69dda3c79ea2ddcf7fb732437259a350",
+      "bytes": 4432
+    },
+    {
+      "path": "scripts/upstream-individual-evidence-scope.mjs",
+      "sha256": "b1aef46eebe456abb7524dd937a853a5b3f373b22722c0958cc3b928509ecab9",
+      "bytes": 4259
+    },
+    {
+      "path": "scripts/check-upstream-audit-disposition.mjs",
+      "sha256": "4a6002153caabe102887bcd8847128818c2f7025a3d1257d97cd446f34fbf106",
+      "bytes": 46960
+    },
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "sha256": "ee74d3c46ae056f4ffd16cc1d38d60820ca449d96158c776319a2bfcbc6fc715",
+      "bytes": 109664
+    },
+    {
+      "path": "scripts/upstream-historical-behavior-evidence.mjs",
+      "sha256": "2e3d0d372775457655239efabd3769ca3b8bd1e0de42333bd48f9926bf1c3044",
+      "bytes": 20121
+    },
+    {
+      "path": "scripts/autocomplete-selection-native-subject.mjs",
+      "sha256": "f92545cb986d9e456491068a1e291e761239e82d0259a0db5eeed681ac2ad440",
+      "bytes": 10883
+    },
+    {
+      "path": "scripts/dialog-title-source-context.mjs",
+      "sha256": "58105df8af23384d4bbf1c7004e53eee0294421c372f546f84ea8a877639fc5d",
+      "bytes": 9624
+    },
+    {
+      "path": "compatibility/f10/disposition-ledger/ledger.json",
+      "sha256": "22f775835030f175795d8865e9b30920b0b7fea5b908cbd6a9dca7775a71d779",
+      "bytes": 4049921
+    }
+  ],
+  "handler_registered": false,
+  "root_native_route_activated": false,
+  "owner_stage_integrated": false,
+  "canonical_decisions_changed": 0,
+  "closed_dispositions": 376,
+  "pending_dispositions": 1321,
+  "pending_security_review_population": 1,
+  "product_TS_or_HTML_CSS_SCSS_changed": false,
+  "complete_49_member_semantic_program_executed": false,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "g13_claim": "not-passed",
+  "remaining": "Register the tested handler, activate its mandatory native validator through an explicit authenticated registry successor, and compose the canonical owner/title-reader transition before applying the single source disposition. Actual full native/packed/floor execution and all remaining C04/C05/A/R/G work remain required."
+}
