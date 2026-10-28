@@ -72,7 +72,7 @@ class ButtonTokenRepairsAdmissionTests(unittest.TestCase):
         self.assertEqual(report['source_rejections'], 26)
         self.assertEqual(report['registered_source_contracts'], 35)
         self.assertEqual(report['prior_registry_records_preserved'], 33)
-        self.assertEqual(report['current_registry_tool_bindings'], 63)
+        self.assertEqual(report['current_registry_tool_bindings'], 65)
         self.assertTrue(report['late_original_patch_in_tool_role_rejected'])
         self.assertTrue(report['canonical_whole_body_fresh_source_checked'])
         self.assertEqual(report['canonical_bound_members'], 633)

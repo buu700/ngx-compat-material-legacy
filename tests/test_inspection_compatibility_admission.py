@@ -72,7 +72,7 @@ class InspectionCompatibilityAdmissionTests(unittest.TestCase):
         self.assertEqual(report['source_rejections'], 32)
         self.assertEqual(report['registered_source_contracts'], 35)
         self.assertEqual(report['prior_registry_records_preserved'], 22)
-        self.assertEqual(report['current_registry_tool_bindings'], 63)
+        self.assertEqual(report['current_registry_tool_bindings'], 65)
         self.assertTrue(report['late_original_patch_in_tool_role_rejected'])
         self.assertEqual(report['real_root_positive_rows'], 4)
         self.assertEqual(report['real_root_rejected_rows'], 16)

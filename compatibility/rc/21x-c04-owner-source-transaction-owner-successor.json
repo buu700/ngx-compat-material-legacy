@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Exact owned-tool edit transport for retained reference tests; no tagged golden or admission waiver",
+  "path": "scripts/packed-upstream-ledger-epoch.mjs",
+  "source_parent": "934db28dd4ac9030e54c665bc494f557018b55ec",
+  "before": {
+    "sha256": "4f93d241fee195be6c9d052473af37f1e19ba9394c8de444a9dd154452f14ebc",
+    "bytes": 33317
+  },
+  "after": {
+    "sha256": "c12cac183553984c007b5c8f8c48ad39fc2ef16960845221660b03ad1ee65750",
+    "bytes": 34928
+  },
+  "literal_edits": [
+    {
+      "before": "import {applyButtonTokenRepairsCanonicalStage,buttonTokenRepairsRegistrySuccessor} from './button-token-repairs-canonical-stage.mjs';",
+      "after": "import {applyButtonTokenRepairsCanonicalStage,buttonTokenRepairsRegistrySuccessor} from './button-token-repairs-canonical-stage.mjs';\nimport {inspectCanonicalSourceTransaction,canonicalSourceTransactionReference} from './canonical-source-transaction.mjs';"
+    },
+    {
+      "before": "const AFTER='80123c4e8c4f7f43330553ffca84e51fea98e70f545234cf5359c11128e548d7';",
+      "after": "const SOURCE_TRANSACTION='compatibility/rc/21x-c04-owner-source-transaction-inputs.json';\nconst SOURCE_TRANSACTION_HASH='96f4322243e31e55558ea0a36c363c883086b618e5f0049c4c48ad7fd7dea887';\nconst AFTER='80123c4e8c4f7f43330553ffca84e51fea98e70f545234cf5359c11128e548d7';"
+    },
+    {
+      "before": "function buttonTokenRepairsTools(root,read){",
+      "after": "function sourceTransactionTools(root,read){\n const raw=read(SOURCE_TRANSACTION);assert.equal(hash(raw),SOURCE_TRANSACTION_HASH,'changed canonical source transaction packet');const packet=JSON.parse(raw);\n assert.equal(packet.line,'21.x');assert.equal(packet.schema_version,1);assert.equal(packet.canonical_dispositions_changed,0);assert.equal(packet.source_admissions,56);\n assert.deepEqual(packet.families,{theming:2,inspection:4,'selector-density':2,'button-tokenization':5});assert.equal(packet.individual_metadata_rows_preserved,13);\n assert.equal(packet.root_per_SHA_source_dispatch_unchanged,true);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');\n assert.deepEqual(packet.before_owner,{path:OWNER,sha256:'4f93d241fee195be6c9d052473af37f1e19ba9394c8de444a9dd154452f14ebc',bytes:33317});\n assert.deepEqual(packet.helper,canonicalSourceTransactionReference());\n const bound=[{path:SOURCE_TRANSACTION,sha256:SOURCE_TRANSACTION_HASH,bytes:raw.length},packet.helper,packet.byte_preserved_base,packet.byte_preserved_root_checker];\n const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed source transaction tool '+ref.path);assert.equal(value.length,ref.bytes);}};\n assertCurrent();return {bound,assertCurrent};\n}\nfunction buttonTokenRepairsTools(root,read){"
+    },
+    {
+      "before": " assert.equal(resolve(root),ROOT,'wrong21.x canonical owner checkout');\n const tools=themingTools(root,read);",
+      "after": " assert.equal(resolve(root),ROOT,'wrong21.x canonical owner checkout');\n const transaction=sourceTransactionTools(root,read);\n const tools=themingTools(root,read);"
+    },
+    {
+      "before": "...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound].map(ref=>[ref.path,ref])).values()];",
+      "after": "...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound].map(ref=>[ref.path,ref])).values()];"
+    },
+    {
+      "before": " for(const entry of themingStage.entries)assert.equal(theming.sourceOk({root,read,entry,body:tools.body,review:tools.body.reviews.find(row=>row.sha===entry.sha),proof:entry.individual_proof}),true,'fresh theming source admission failed');\n const themingSource=reviewThemingInspectionSource({root,read});",
+      "after": " const themingSource=inspectCanonicalSourceTransaction({root,read,family:'theming',entries:themingStage.entries,body:tools.body});\n assert.equal(themingSource.individual_metadata_cases,themingStage.entries.length,'every individual source row must be verified');"
+    },
+    {
+      "before": " for(const entry of inspectionStage.entries)assert.equal(inspection.sourceOk({root,read,entry,body:tools.successor.body,review:tools.successor.body.reviews.find(row=>row.sha===entry.sha),proof:entry.individual_proof}),true,'fresh inspection source admission failed');\n const inspectionSource=reviewInspectionCompatibilitySource({root,read});",
+      "after": " const inspectionSource=inspectCanonicalSourceTransaction({root,read,family:'inspection',entries:inspectionStage.entries,body:tools.successor.body});\n assert.equal(inspectionSource.individual_metadata_cases,inspectionStage.entries.length,'every individual source row must be verified');"
+    },
+    {
+      "before": " for(const entry of selectorDensityStage.entries)assert.equal(selectorDensity.sourceOk({root,read,entry,body:tools.successor.successor.body,review:tools.successor.successor.body.reviews.find(row=>row.sha===entry.sha),proof:entry.individual_proof}),true,'fresh selector/density source admission failed');\n const selectorDensitySource=reviewSelectorDensitySource({root,read});",
+      "after": " const selectorDensitySource=inspectCanonicalSourceTransaction({root,read,family:'selector-density',entries:selectorDensityStage.entries,body:tools.successor.successor.body});\n assert.equal(selectorDensitySource.individual_metadata_cases,selectorDensityStage.entries.length,'every individual source row must be verified');"
+    },
+    {
+      "before": " for(const entry of buttonTokenizationStage.entries)assert.equal(buttonTokenization.sourceOk({root,read,entry,body:tools.successor.successor.successor.body,review:tools.successor.successor.successor.body.reviews.find(row=>row.sha===entry.sha),proof:entry.individual_proof}),true,'fresh button tokenization source admission failed');\n const buttonTokenizationSource=reviewButtonTokenizationSource({root,read});",
+      "after": " const buttonTokenizationSource=inspectCanonicalSourceTransaction({root,read,family:'button-tokenization',entries:buttonTokenizationStage.entries,body:tools.successor.successor.successor.body});\n assert.equal(buttonTokenizationSource.individual_metadata_cases,buttonTokenizationStage.entries.length,'every individual source row must be verified');"
+    },
+    {
+      "before": " const tools=themingTools(root,read);\n const before=prior.path===THEMING_REGISTRY?",
+      "after": " const transaction=sourceTransactionTools(root,read);\n const tools=themingTools(root,read);\n const before=prior.path===THEMING_REGISTRY?"
+    },
+    {
+      "before": "...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound].map(ref=>[ref.path,ref])).values()].map(member=>",
+      "after": "...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound].map(ref=>[ref.path,ref])).values()].map(member=>"
+    }
+  ],
+  "tool_inputs": {
+    "path": "compatibility/rc/21x-c04-owner-source-transaction-inputs.json",
+    "sha256": "96f4322243e31e55558ea0a36c363c883086b618e5f0049c4c48ad7fd7dea887",
+    "bytes": 1753
+  },
+  "source_transaction_helper": {
+    "path": "scripts/canonical-source-transaction.mjs",
+    "sha256": "3a81b475ba433a7b9e9a2dd4e662bae176f36a0fdfd24ef0379b92d6c8155e00",
+    "bytes": 4428
+  },
+  "current_owner_execution": {
+    "path": "compatibility/rc/21x-c04-owner-source-transaction-profile-after.json",
+    "sha256": "9d5b8c57625c2a844622b5fedad79865ef96a6062c2a9f8c88426ef1010a2fa2",
+    "bytes": 455780
+  },
+  "source_transaction_controls": {
+    "path": "compatibility/rc/21x-c04-owner-source-transaction-controls.json",
+    "sha256": "b56eac9c0100a144a7ccd949191e35ce6e2fe0df39d7dde7d7d1c0ba16765bbb",
+    "bytes": 7921
+  },
+  "canonical_dispositions_changed": 0,
+  "tagged_golden_changes": 0,
+  "original_assertions_or_rejection_controls_dropped": 0,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

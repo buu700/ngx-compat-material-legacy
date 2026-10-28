@@ -105,6 +105,17 @@ export function retainedTitleOwnerReference({root,read}){
  assert.equal(repairSmoke.candidate_view_only,true);assert.equal(repairSmoke.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
  for(const edit of repair.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
  assert.deepEqual(repair.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ const transactionRaw=read('compatibility/rc/21x-c04-owner-source-transaction-owner-successor.json');
+ assert.equal(hash(transactionRaw),'0ced376e7962a47cf107639b8e88ae98763cb16a66a895e46034ee3e567c4dfd');
+ const transaction=JSON.parse(transactionRaw);assert.equal(transaction.path,path);assert.equal(transaction.line,'21.x');
+ assert.deepEqual(transaction.before,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ assert.equal(transaction.literal_edits.length,11);assert.equal(transaction.canonical_dispositions_changed,0);assert.equal(transaction.tagged_golden_changes,0);assert.equal(transaction.original_assertions_or_rejection_controls_dropped,0);
+ for(const ref of [transaction.tool_inputs,transaction.source_transaction_helper,transaction.current_owner_execution,transaction.source_transaction_controls]){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}
+ const transactionExecution=JSON.parse(read(transaction.current_owner_execution.path));assert.equal(transactionExecution.result,'pass');assert.equal(transactionExecution.current_source_admissions,56);assert.equal(transactionExecution.canonical_ledger_unchanged,true);assert.equal(transactionExecution.source_registry_unchanged,true);
+ assert.equal(transactionExecution.subjects.find(ref=>ref.path===path).sha256,transaction.after.sha256);
+ const transactionControls=JSON.parse(read(transaction.source_transaction_controls.path));assert.equal(transactionControls.result,'pass');assert.equal(transactionControls.rejected.length,100);assert.equal(transactionControls.individual_metadata_rows,13);assert.equal(transactionControls.fresh_whole_body_reviews,4);assert.equal(transactionControls.compiler_cases,34);
+ for(const edit of transaction.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
+ assert.deepEqual(transaction.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
  const expected=Buffer.from(current);assert.equal(read(path).equals(expected),true,'unreviewed owner change outside exact retained-verifier successor');
  return {path,sha256:hash(expected),bytes:expected.length};
 }

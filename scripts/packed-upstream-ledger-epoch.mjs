@@ -29,6 +29,7 @@ import {applyButtonTokenizationCanonicalStage,buttonTokenizationRegistrySuccesso
 import {reviewButtonTokenizationSource} from './upstream-button-tokenization-source-review.mjs';
 import buttonTokenRepairs from './upstream-button-token-repairs-admission.cjs';
 import {applyButtonTokenRepairsCanonicalStage,buttonTokenRepairsRegistrySuccessor} from './button-token-repairs-canonical-stage.mjs';
+import {inspectCanonicalSourceTransaction,canonicalSourceTransactionReference} from './canonical-source-transaction.mjs';
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
 const OWNER='scripts/packed-upstream-ledger-epoch.mjs',BASE='scripts/packed-upstream-ledger-base.mjs';
 const LEDGER='compatibility/f10/disposition-ledger/ledger.json';
@@ -46,6 +47,8 @@ const BUTTON_TOKENIZATION_PACKET='compatibility/rc/21x-c04-button-tokenization-c
 const BUTTON_TOKENIZATION_PACKET_HASH='8f9a3016332c8448db94dfea173d023640db1984f7a499c49c0f6b79030c3853';
 const BUTTON_TOKEN_REPAIRS_PACKET='compatibility/rc/21x-c04-button-token-repairs-canonical-transition.json';
 const BUTTON_TOKEN_REPAIRS_PACKET_HASH='34aa5b3bb4ada73ff77f58d3e692af1bfcd88bd92586de313867fcf7f243a201';
+const SOURCE_TRANSACTION='compatibility/rc/21x-c04-owner-source-transaction-inputs.json';
+const SOURCE_TRANSACTION_HASH='96f4322243e31e55558ea0a36c363c883086b618e5f0049c4c48ad7fd7dea887';
 const AFTER='80123c4e8c4f7f43330553ffca84e51fea98e70f545234cf5359c11128e548d7';
 const AUTHORITY='33e11b2965c9ff559865bc81298e6766653672be';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
@@ -74,6 +77,17 @@ function foreign(root,read,allowMissing=false){
  assert.ok(version.startsWith('22.'),'unsupported canonical owner line');
  const path=resolve(root,OWNER);assert.notEqual(path,resolve(ROOT,OWNER),'foreign line supplied to21.x owner');
  const module=require(path);assert.equal(typeof module.packedUpstreamLedgerEpoch,'function');return module;
+}
+function sourceTransactionTools(root,read){
+ const raw=read(SOURCE_TRANSACTION);assert.equal(hash(raw),SOURCE_TRANSACTION_HASH,'changed canonical source transaction packet');const packet=JSON.parse(raw);
+ assert.equal(packet.line,'21.x');assert.equal(packet.schema_version,1);assert.equal(packet.canonical_dispositions_changed,0);assert.equal(packet.source_admissions,56);
+ assert.deepEqual(packet.families,{theming:2,inspection:4,'selector-density':2,'button-tokenization':5});assert.equal(packet.individual_metadata_rows_preserved,13);
+ assert.equal(packet.root_per_SHA_source_dispatch_unchanged,true);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
+ assert.deepEqual(packet.before_owner,{path:OWNER,sha256:'4f93d241fee195be6c9d052473af37f1e19ba9394c8de444a9dd154452f14ebc',bytes:33317});
+ assert.deepEqual(packet.helper,canonicalSourceTransactionReference());
+ const bound=[{path:SOURCE_TRANSACTION,sha256:SOURCE_TRANSACTION_HASH,bytes:raw.length},packet.helper,packet.byte_preserved_base,packet.byte_preserved_root_checker];
+ const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed source transaction tool '+ref.path);assert.equal(value.length,ref.bytes);}};
+ assertCurrent();return {bound,assertCurrent};
 }
 function buttonTokenRepairsTools(root,read){
  const raw=read(BUTTON_TOKEN_REPAIRS_PACKET);assert.equal(hash(raw),BUTTON_TOKEN_REPAIRS_PACKET_HASH,'changed button token repairs canonical packet');const packet=JSON.parse(raw);
@@ -156,6 +170,7 @@ function themingTools(root,read){
 }
 function context(root,read){
  assert.equal(resolve(root),ROOT,'wrong21.x canonical owner checkout');
+ const transaction=sourceTransactionTools(root,read);
  const tools=themingTools(root,read);
  const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');
  const frames=JSON.parse(frameRaw);assert.equal(frames.schema_version,1);assert.equal(frames.line,'21.x');
@@ -200,7 +215,7 @@ function context(root,read){
  const buttonTokenRepairsStage=applyButtonTokenRepairsCanonicalStage({before:buttonTokenizationStage.after,body:tools.successor.successor.successor.successor.body});
  assert.deepEqual(tools.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(buttonTokenRepairsStage.after),bytes:buttonTokenRepairsStage.after.length});
  const own={path:OWNER,sha256:hash(image),bytes:image.length};
- const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound].map(ref=>[ref.path,ref])).values()];
+ const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound].map(ref=>[ref.path,ref])).values()];
  const assertTools=()=>{
   for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed title owner binding '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}
  };
@@ -221,14 +236,14 @@ function context(root,read){
  };
  const source=title.inspectTitleSource({root,read});
  assert.equal(title.sourceOk({root,read,entry:stage.entry,body,review:body.reviews[0],proof:stage.entry.individual_proof}),true,'fresh title source admission failed');
- for(const entry of themingStage.entries)assert.equal(theming.sourceOk({root,read,entry,body:tools.body,review:tools.body.reviews.find(row=>row.sha===entry.sha),proof:entry.individual_proof}),true,'fresh theming source admission failed');
- const themingSource=reviewThemingInspectionSource({root,read});
- for(const entry of inspectionStage.entries)assert.equal(inspection.sourceOk({root,read,entry,body:tools.successor.body,review:tools.successor.body.reviews.find(row=>row.sha===entry.sha),proof:entry.individual_proof}),true,'fresh inspection source admission failed');
- const inspectionSource=reviewInspectionCompatibilitySource({root,read});
- for(const entry of selectorDensityStage.entries)assert.equal(selectorDensity.sourceOk({root,read,entry,body:tools.successor.successor.body,review:tools.successor.successor.body.reviews.find(row=>row.sha===entry.sha),proof:entry.individual_proof}),true,'fresh selector/density source admission failed');
- const selectorDensitySource=reviewSelectorDensitySource({root,read});
- for(const entry of buttonTokenizationStage.entries)assert.equal(buttonTokenization.sourceOk({root,read,entry,body:tools.successor.successor.successor.body,review:tools.successor.successor.successor.body.reviews.find(row=>row.sha===entry.sha),proof:entry.individual_proof}),true,'fresh button tokenization source admission failed');
- const buttonTokenizationSource=reviewButtonTokenizationSource({root,read});
+ const themingSource=inspectCanonicalSourceTransaction({root,read,family:'theming',entries:themingStage.entries,body:tools.body});
+ assert.equal(themingSource.individual_metadata_cases,themingStage.entries.length,'every individual source row must be verified');
+ const inspectionSource=inspectCanonicalSourceTransaction({root,read,family:'inspection',entries:inspectionStage.entries,body:tools.successor.body});
+ assert.equal(inspectionSource.individual_metadata_cases,inspectionStage.entries.length,'every individual source row must be verified');
+ const selectorDensitySource=inspectCanonicalSourceTransaction({root,read,family:'selector-density',entries:selectorDensityStage.entries,body:tools.successor.successor.body});
+ assert.equal(selectorDensitySource.individual_metadata_cases,selectorDensityStage.entries.length,'every individual source row must be verified');
+ const buttonTokenizationSource=inspectCanonicalSourceTransaction({root,read,family:'button-tokenization',entries:buttonTokenizationStage.entries,body:tools.successor.successor.successor.body});
+ assert.equal(buttonTokenizationSource.individual_metadata_cases,buttonTokenizationStage.entries.length,'every individual source row must be verified');
  const buttonTokenRepairsSource=buttonTokenRepairs.inspectCanonicalSource({root,read,entries:buttonTokenRepairsStage.entries,body:tools.successor.successor.successor.successor.body});
  const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();buttonTokenizationSource.assertCurrent();buttonTokenRepairsSource.assertCurrent();};
  assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,buttonTokenizationStage,buttonTokenRepairsStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound,...buttonTokenizationSource.bound,...buttonTokenRepairsSource.bound],
@@ -280,12 +295,13 @@ export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root
  assert.equal(resolve(root),ROOT);assert.ok([OWNER,TITLE_NATIVE_REGISTRY,'scripts/autocomplete-selection-native-subject.mjs',THEMING_REGISTRY].includes(prior?.path));
  let role;try{role=read(METADATA_ROLE);}catch{/* A physical current reader has no private metadata capability. */}
  if(role===metadataToken){assert.equal(hash(read(prior.path)),prior.sha256);return null;}
+ const transaction=sourceTransactionTools(root,read);
  const tools=themingTools(root,read);
  const before=prior.path===THEMING_REGISTRY?[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.registryBefore].find(raw=>hash(raw)===prior.sha256):original(root,prior.path);assert.ok(before,'unqualified canonical registry prior');assert.equal(hash(before),prior.sha256,'unqualified canonical tool prior');
  if(prior.bytes!==undefined)assert.equal(before.length,prior.bytes);
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH);const packet=JSON.parse(raw);
  const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');
- const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound].map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));
+ const bound=[...new Map([{path:OWNER,sha256:hash(image),bytes:image.length},{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound].map(ref=>[ref.path,ref])).values()].map(member=>({...member,bytes:member.bytes??read(member.path).length}));
  const assertCurrent=()=>{for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed current canonical tool '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}};
  assertCurrent();const value=read(prior.path),reference={path:prior.path,sha256:hash(value),bytes:value.length};
  return {reference,bound:structuredClone(bound),assertCurrent,individual_source_decisions:1,metadata_tokens:14,old_tool_bytes_exposed:false,current_native_or_packed_qualified:false};
