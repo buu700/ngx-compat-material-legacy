@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {legacyDialogTitleLifetimeNativeOkay} from './dialog-title-lifetime-fixture.mjs';
 import {tabPaginationNativeOkay} from './tab-pagination-native-contract.mjs';
 import {componentHighContrastOkay} from './component-high-contrast-contract.mjs';
 import {peerIconTtOkay} from './peer-icon-tt-admission.mjs';
@@ -79,6 +80,7 @@ const scenarios = [
     ],
     detail: 'compatibility/rc/reports/browser-dialog-escape.json',
     require: report => report.opened && report.closed_by_escape
+      && legacyDialogTitleLifetimeNativeOkay(report.dialog_title_lifetime)
       && report.focus_restored_to_open_button
       && report.select_panel_opened && report.select_panel_closed_by_escape
       && report.dialog_transition_on_container
@@ -94,6 +96,7 @@ const scenarios = [
     credit_as: 'reduced-motion-overlay',
     detail: 'compatibility/rc/reports/browser-dialog-reduced-motion.json',
     require: report => report.opened && report.closed_by_escape
+      && legacyDialogTitleLifetimeNativeOkay(report.dialog_title_lifetime)
       && report.dialog_noop_under_reduced_motion === true
       && !report.error,
   },
@@ -107,6 +110,7 @@ const scenarios = [
     ],
     detail: 'compatibility/rc/reports/browser-dialog-zoneless.json',
     require: report => report.opened && report.closed_by_escape
+      && legacyDialogTitleLifetimeNativeOkay(report.dialog_title_lifetime)
       && report.bundle_has_zone === false
       && (report.zone_global === false || report.zone_global === 'undefined' || report.zone_global == null)
       && !report.error,

@@ -372,7 +372,19 @@
     if (family === 'dialog') {
       const opener = query('#p-dialog-open');
       if (opener) opener.click();
-      waitFor(() => query('mat-dialog-container #dialog-body'), 1500, node => finish(!!node, 'mat-dialog-container'));
+      waitFor(() => query('mat-dialog-container #dialog-body'), 1500, node => {
+        if (!node) {finish(false, 'mat-dialog-container missing'); return;}
+        if (typeof lab.runDialogTitleLifetime !== 'function') {finish(false, 'dialog title fixture API missing'); return;}
+        const request = window.__status;
+        lab.closeTransient();
+        waitFor(() => !query('mat-dialog-container'), 1500, closed => {
+          if (!closed) {finish(false, 'initial dialog did not close before title observation'); return;}
+          Promise.resolve().then(() => lab.runDialogTitleLifetime()).then(observation => {
+            if (window.__status === request) finish(legacyDialogTitleLifetimeNativeOkay(observation),
+              'mat-dialog-container; rendered component/template OnPush title lifetimes ' + JSON.stringify(observation));
+          }, error => {if (window.__status === request) finish(false, String(error));});
+        });
+      });
       return;
     }
     if (family === 'menu') {
