@@ -38,7 +38,13 @@ def verify_theming_registry_successor(root=ROOT):
                         "    scope_key:'theming_inspection_source_scope',module:'upstream-theming-inspection-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'bdb3e27464f61f790f1428dca1e1bd3476acdda6c24bf0301929b059686084be'
-    assert (root / REGISTRY).read_bytes() == after
+    current = (root / REGISTRY).read_bytes()
+    if current != after:
+        from inspection_compatibility_canonical_ledger_patch import verify_inspection_registry_successor
+        successor_before, successor_after = verify_inspection_registry_successor(root)
+        assert successor_before == after and current == successor_after
+    else:
+        assert current == after
     return before, after
 
 
@@ -115,7 +121,13 @@ def derive_theming_successor(root=ROOT):
 
 def verify_theming_successor(candidate, root=ROOT):
     before, after = derive_theming_successor(root)
-    assert Path(candidate).read_bytes() == after, 'unqualified theming canonical successor'
+    observed = Path(candidate).read_bytes()
+    if digest(observed) == '84ea529d6f2f72925507300e88f9f825d48ae83ea1733191136663d1c8034c17':
+        from inspection_compatibility_canonical_ledger_patch import derive_inspection_successor
+        inspection_before, inspection_after = derive_inspection_successor(root)
+        assert observed == inspection_after and inspection_before == after
+        observed = inspection_before
+    assert observed == after, 'unqualified theming canonical successor'
     return {'before_sha256': digest(before), 'after_sha256': digest(after), 'individual_decisions': 2,
             'summary_scalar_tokens': 2, 'unselected_entry_bytes_preserved': 1695,
             'security_reviews_unchanged': 1, 'canonical_entries': 1697, 'actual_native_artifact_browser_floor_or_full_audit_qualified': False}

@@ -50,4 +50,12 @@ export const sourceContractDefinitions = [
     scope_key:'theming_inspection_source_scope',module:'upstream-theming-inspection-admission.cjs'},
   {sha:'b6e50c631b8f8131f494d57b0b806777da8d4efd',proof_kind:'individual-historical-theming-inspection-source-exclusion',
     scope_key:'theming_inspection_source_scope',module:'upstream-theming-inspection-admission.cjs'},
+  {sha:'eeb0cf2666a2346ee99bb023c833da7255720654',proof_kind:'individual-historical-inspection-compatibility-source-review',
+    scope_key:'inspection_compatibility_source_scope',module:'upstream-inspection-compatibility-admission.cjs'},
+  {sha:'5d65f1dc4a719fd673b4d77f2f5bdba61d7ac523',proof_kind:'individual-historical-inspection-compatibility-source-review',
+    scope_key:'inspection_compatibility_source_scope',module:'upstream-inspection-compatibility-admission.cjs'},
+  {sha:'f6949e3e57fe25406968eeaea90ba662343c3e79',proof_kind:'individual-historical-inspection-compatibility-source-review',
+    scope_key:'inspection_compatibility_source_scope',module:'upstream-inspection-compatibility-admission.cjs'},
+  {sha:'456741a61a8e85e597e82503941ccab97777bc97',proof_kind:'individual-historical-inspection-compatibility-source-review',
+    scope_key:'inspection_compatibility_source_scope',module:'upstream-inspection-compatibility-admission.cjs'},
 ];

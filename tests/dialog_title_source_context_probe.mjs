@@ -50,6 +50,15 @@ for(const [line,directory]of [['21.x',root],['main',main]]){
 const disk=path=>readFileSync(join(root,path));let late=null;const read=path=>path===late?Buffer.concat([disk(path),Buffer.from('\n')]):disk(path);
 const readers=dialogTitleReaderSubject({root,read,line:'21.x'}),packet=JSON.parse(disk('compatibility/rc/dialog-title-current-source-reader-successors.json'));
 const currentOwner=retainedTitleOwnerReference({root,read});
+// The finite four-decision successor adds eleven continuously bound inputs.
+// Preserve the prior 32-reader-member and 108-rejection baseline explicitly.
+const inspectionPacketPath='compatibility/rc/21x-c04-inspection-compatibility-canonical-transition.json';
+const inspectionPacket=JSON.parse(disk(inspectionPacketPath)),inspectionBody=JSON.parse(disk(inspectionPacket.review.path));
+const addedToolPaths=[inspectionPacketPath,...inspectionPacket.source_members.map(ref=>ref.path),inspectionPacket.review.path,...inspectionBody.reviews.map(row=>row.patch_file)];
+assert.equal(new Set(addedToolPaths).size,11);assert.equal(readers.bound.length,32+11);
+assert.ok(addedToolPaths.every(path=>readers.bound.some(ref=>ref.path===path)));
+assert.equal(readers.bound.filter(ref=>!addedToolPaths.includes(ref.path)).length,32);
+
 const currentReaderRef=row=>row.path===currentOwner.path?currentOwner:{path:row.path,...row.after};
 assert.equal(packet.code_subjects.length,9);
 for(const row of packet.code_subjects){
@@ -116,6 +125,7 @@ const testing=ledger.entries.find(row=>row.sha===testingBody.reviews[0].sha);ass
 const productPaths=()=>JSON.parse(disk('compatibility/rc/packed-upstream-source-build.json')).candidate_context.product_members.map(ref=>ref.path).filter(path=>/\.(ts|scss|css|html)$/.test(path));
 assert.equal(testingApi21xEntryEvidenceOk({entry:testing,body:testingBody,read,productPaths,line:'21.x'}),true);
 late=DIALOG_TITLE_SOURCE_IMAGES[1].path;assert.equal(testingApi21xEntryEvidenceOk({entry:testing,body:testingBody,read,productPaths,line:'21.x'}),false);late=null;
-assert.equal(hash(disk('compatibility/f10/disposition-ledger/ledger.json')),'9810524e12e3096e7d971ea80a1424614dedecc4818f80c8e31adf86f2aeec37');
-const report={schema_version:1,product_lines:lines,source_reader_line:'21.x',main_source_reader_port_qualified:true,metadata_cases:metadataCases,rejections,actual_fresh_build_source_positive:true,actual_testing_source_positive:true,both_real_source_checkers_reject_post_success_product_faults:true,raw_current_readers_expose_old_product_or_tool_bytes:false,historical_tool_metadata_images:packet.code_subjects.length,historical_tool_metadata_faults_rejected:historicalToolFaults,declared_peer_link_reads:peerPositive,source_traversal_or_nested_or_other_peer_links_rejected:peerRejected,canonical_ledger_unchanged:true,reader_hooks:packet.code_subjects.length,general_source_qualification_passed_21x:true,current_raw_dialog_graph_members:49,historical_title_metadata_unwrapped_for_current_admission:true,fake_current_before_frames_rejected:fakeBeforeRejected,general_source_product_faults_rejected:generalSourceFaults,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+assert.equal(hash(disk('compatibility/f10/disposition-ledger/ledger.json')),'84ea529d6f2f72925507300e88f9f825d48ae83ea1733191136663d1c8034c17');
+assert.equal(rejections,108+2*addedToolPaths.length);assert.equal(historicalToolFaults,32+addedToolPaths.length);
+const report={schema_version:1,prior_reader_members_preserved:32,prior_rejection_baseline:108,additional_bound_tool_paths:addedToolPaths,additional_rejection_checks:2*addedToolPaths.length,product_lines:lines,source_reader_line:'21.x',main_source_reader_port_qualified:true,metadata_cases:metadataCases,rejections,actual_fresh_build_source_positive:true,actual_testing_source_positive:true,both_real_source_checkers_reject_post_success_product_faults:true,raw_current_readers_expose_old_product_or_tool_bytes:false,historical_tool_metadata_images:packet.code_subjects.length,historical_tool_metadata_faults_rejected:historicalToolFaults,declared_peer_link_reads:peerPositive,source_traversal_or_nested_or_other_peer_links_rejected:peerRejected,canonical_ledger_unchanged:true,reader_hooks:packet.code_subjects.length,general_source_qualification_passed_21x:true,current_raw_dialog_graph_members:49,historical_title_metadata_unwrapped_for_current_admission:true,fake_current_before_frames_rejected:fakeBeforeRejected,general_source_product_faults_rejected:generalSourceFaults,actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));

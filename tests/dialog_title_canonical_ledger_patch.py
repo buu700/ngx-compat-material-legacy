@@ -99,7 +99,12 @@ def derive_title_successor(root=ROOT):
         if member['path'] == 'scripts/upstream-source-contract-registry.mjs' and HASH(value) != member['sha256']:
             from theming_inspection_canonical_ledger_patch import verify_theming_registry_successor
             registry_before, registry_after = verify_theming_registry_successor(root)
-            assert value == registry_after
+            if value != registry_after:
+                from inspection_compatibility_canonical_ledger_patch import verify_inspection_registry_successor
+                inspection_before, inspection_after = verify_inspection_registry_successor(root)
+                assert registry_after == inspection_before and value == inspection_after
+            else:
+                assert value == registry_after
             value = registry_before  # Exact historical metadata after authenticating current bytes.
         assert HASH(value) == member['sha256']
         if 'bytes' in member: assert len(value) == member['bytes']
@@ -111,6 +116,12 @@ def derive_title_successor(root=ROOT):
 def verify_title_successor(root=ROOT, candidate=None):
     before, after = derive_title_successor(root)
     observed = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    inspection_applied = False
+    if HASH(observed) == '84ea529d6f2f72925507300e88f9f825d48ae83ea1733191136663d1c8034c17':
+        from inspection_compatibility_canonical_ledger_patch import derive_inspection_successor
+        inspection_before, inspection_after = derive_inspection_successor(root)
+        assert observed == inspection_after
+        observed, inspection_applied = inspection_before, True
     theming_applied = False
     if HASH(observed) == '9810524e12e3096e7d971ea80a1424614dedecc4818f80c8e31adf86f2aeec37':
         from theming_inspection_canonical_ledger_patch import derive_theming_successor
@@ -121,5 +132,5 @@ def verify_title_successor(root=ROOT, candidate=None):
     return dict(individual_decisions=1, metadata_tokens=14, summary_scalar_tokens=2,
         unselected_entry_bytes_preserved=1682, population=1697, closed_dispositions=377,
         pending_dispositions=1320, pending_security_reviews=1, before_sha256=HASH(before),
-        after_sha256=HASH(after), exact_theming_successor_verified=theming_applied,
+        after_sha256=HASH(after), exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied,
         actual_native_artifact_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed')

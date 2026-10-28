@@ -65,6 +65,12 @@ def derive_boundary_successor(root=ROOT, expected_before=None):
 def verify_boundary_successor(root=ROOT, expected_before=None, candidate=None):
     before, after = derive_boundary_successor(root=root, expected_before=expected_before)
     observed = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    inspection_applied = False
+    if HASH(observed) == '84ea529d6f2f72925507300e88f9f825d48ae83ea1733191136663d1c8034c17':
+        from inspection_compatibility_canonical_ledger_patch import derive_inspection_successor
+        inspection_before, inspection_after = derive_inspection_successor(root)
+        assert observed == inspection_after
+        observed, inspection_applied = inspection_before, True
     title_applied = theming_applied = False
     if HASH(observed) == '9810524e12e3096e7d971ea80a1424614dedecc4818f80c8e31adf86f2aeec37':
         from theming_inspection_canonical_ledger_patch import derive_theming_successor
@@ -77,7 +83,7 @@ def verify_boundary_successor(root=ROOT, expected_before=None, candidate=None):
         assert observed == title_after and title_before == after
         observed, title_applied = title_before, True
     assert observed == after
-    return dict(line='21.x', exact_title_successor_verified=title_applied, exact_theming_successor_verified=theming_applied, individual_decisions=5, unselected_entry_bytes_preserved=1692,
+    return dict(line='21.x', exact_title_successor_verified=title_applied, exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, individual_decisions=5, unselected_entry_bytes_preserved=1692,
         before_sha256=HASH(before), after_sha256=HASH(after), after_bytes=len(after),
         closed_dispositions=376, pending_dispositions=1321, pending_security_reviews=1,
         actual_native_artifact_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed', g13_claim='not-passed')

@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Four individual historical inspection-compatibility and unused-variable source decisions",
+  "status": "reviewed",
+  "source_review_complete": true,
+  "reviews": [
+    {
+      "sha": "eeb0cf2666a2346ee99bb023c833da7255720654",
+      "diff_sha256": "e576846f91a8e961418aa17089ac1f82e3c8d956fadde7bf71d883cc33ee4208",
+      "complete_original_paths": [
+        "src/material/_index.scss",
+        "src/material/core/theming/_m2-inspection.scss",
+        "src/material/core/theming/_theming.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "frozen_seed_paths": [
+        "src/material/core/theming/_m2-inspection.scss",
+        "src/material/core/theming/_theming.scss",
+        "src/material/core/theming/tests/theming-inspection-api.spec.ts"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/_index.scss",
+          "index": 0,
+          "header": "@@ -2,7 +2,7 @@",
+          "sha256": "f69050e759d202e92919b1a8e22423a1bc3e2bdd97e6d63325550c7bb093946f",
+          "technical_judgment": "Exports a new legacy-inspection compatibility flag. This is a post16 inspection API configuration surface, absent from the tagged facade. Keep the owned historical namespace/export map and do not require consumers to set a new flag."
+        },
+        {
+          "path": "src/material/core/theming/_m2-inspection.scss",
+          "index": 0,
+          "header": "@@ -5,10 +5,17 @@",
+          "sha256": "76ca36e95ea63b211e6e093ef0bd1529e8adeb7450a11cea8494ffed07dddcfc",
+          "technical_judgment": "Adds private extraction of a nested m2-config and uses it for theme type. The add-on owns the tagged M2 map shape and does not call this post16 inspection module; current peer use is limited to authenticated public override mixins."
+        },
+        {
+          "path": "src/material/core/theming/_m2-inspection.scss",
+          "index": 1,
+          "header": "@@ -26,6 +33,7 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "sha256": "35fb12efe66e1da2d521e10a6d1afdcafaeb5ec840520f3a9ac8e39995b92cdb",
+          "technical_judgment": "Unwraps nested m2-config before color inspection. The owned legacy palette/config getters operate on the historical maps directly and make no current private inspection calls; retain that independently owned contract."
+        },
+        {
+          "path": "src/material/core/theming/_m2-inspection.scss",
+          "index": 2,
+          "header": "@@ -44,6 +52,7 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "sha256": "c868c43f8cac431abf67ad5818e556bb1edce6459523ab20084f52c68d59c00e",
+          "technical_judgment": "Unwraps nested m2-config before typography inspection. The owned historical typography model and namespace bindings remain separate; do not introduce a private peer configuration carrier."
+        },
+        {
+          "path": "src/material/core/theming/_m2-inspection.scss",
+          "index": 3,
+          "header": "@@ -79,6 +88,7 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "sha256": "191a9a44791f0a806cb0891be3ffbcf666df2c64ba7c58713994dc88ae5c117a",
+          "technical_judgment": "Unwraps nested m2-config before density inspection. The legacy density caller and exact tagged paginator variables/theme remain present; no new inspection flag or private getter is needed."
+        },
+        {
+          "path": "src/material/core/theming/_m2-inspection.scss",
+          "index": 4,
+          "header": "@@ -86,7 +96,12 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "sha256": "dafde4b3dcdd79b1f3e5afbb025fc316ade0f29302d1b4d25dcb2b95c017d627",
+          "technical_judgment": "Changes theme-has to unwrap the new carrier and adds documentation. The owned facade does not export/call post16 theme-has; the existing finite25-function compiler surface and four public override boundaries remain unchanged."
+        },
+        {
+          "path": "src/material/core/theming/_theming.scss",
+          "index": 0,
+          "header": "@@ -5,6 +5,8 @@",
+          "sha256": "8e73084177c47704d72751c3559652001817930231f0d4a596adc4c7120c9df0",
+          "technical_judgment": "Adds a public default-true compatibility switch. Material16 does not expose that switch; adding it would expand the legacy facade and permit a mode that intentionally disables historical getter access."
+        },
+        {
+          "path": "src/material/core/theming/_theming.scss",
+          "index": 1,
+          "header": "@@ -544,7 +546,14 @@ $_internals: _mat-theming-internals-do-not-access;",
+          "sha256": "32b2c991d9556e56a7e760c8348905a1ae1534355af0e42b3832dc58612d92c5",
+          "technical_judgment": "Replaces the backwards-compatible color-map merge with version0/m2-config internals, conditionally copying legacy keys. The owned helper is byte-identical to the tagged Material16 function and keeps direct map access. Do not alter consumer map shape or import the compatibility-only peer model."
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "index": 0,
+          "header": "@@ -25,6 +25,7 @@ const mdcSassImporter = {",
+          "sha256": "a32ad94855f9674277c6c238d453dcfb606dc014492ce1a50dabf3f246fb81af",
+          "technical_judgment": "Adds sass:map to the upstream test harness for new flag tests. This changes no owned production source; the original test harness is retained as data and is not executed or inherited by the add-on."
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "index": 1,
+          "header": "@@ -131,76 +132,112 @@ describe('theming inspection api', () => {",
+          "sha256": "f403d528d65b38aee3d70062f2b46b5e968186fd76e8dc2cd091373069d5d947",
+          "technical_judgment": "Reindents existing density/theme-has assertions and adds flag-disabled tests, including intentional failure of old getters. Those tests describe the new private inspection contract, not the historical facade; preserve legacy getter and map behavior."
+        },
+        {
+          "path": "src/material/core/theming/tests/theming-inspection-api.spec.ts",
+          "index": 2,
+          "header": "@@ -311,121 +348,121 @@ describe('theming inspection api', () => {",
+          "sha256": "cda17d57ac31b35abb6b7c47a86ad5003cc9183ae4d46d3b2c4c3f51ebaeebd3",
+          "technical_judgment": "Nests/reindents the existing M3 assertion block under its M3 describe group without changing its expected values. No new owned runtime behavior is supplied by this test organization; complete original hunks are retained rather than classifying from the title."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt the post-Material16 inspection compatibility flag or nested private m2-config carrier. All four original files and eleven hunks were reviewed, including the public export and inspection tests omitted by the frozen seed. The owned facade preserves the tagged backwards-compatible M2 color-map merge and its finite historical function surface; adding a switch that disables legacy getters would change the accepted consumer map contract. Current peer Sass use remains limited to four public override boundaries. Preserve existing consumer namespaces, maps and legacy geometry.",
+      "patch_file": "compatibility/rc/21x-c04-inspection-compatibility-eeb0cf2666a2346ee99bb023c833da7255720654.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "sha": "5d65f1dc4a719fd673b4d77f2f5bdba61d7ac523",
+      "diff_sha256": "7425e82ef12006a04904dbbfa8a36d793d4e3b89980c89ab19818c400a1a4374",
+      "complete_original_paths": [
+        "src/material/core/theming/_inspection.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/core/theming/_inspection.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/core/theming/_inspection.scss",
+          "index": 0,
+          "header": "@@ -224,7 +224,8 @@ $_typography-properties: (font, font-family, line-height, font-size, letter-spac",
+          "sha256": "8ba60a7807b77f1c106a0dd0f0ade27f28abbab918841ca88db8e6dfe9f7f1a7",
+          "technical_judgment": "Moves a closing brace onto its own line after the same error statement. The exact before-to-after literal replacement proves this is whitespace-only in an unowned post16 inspection module. No inherited behavior fix or owned source change is claimed."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "not-applicable",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Not applicable to the owned historical model: the complete one-file, one-hunk fixup moves a closing brace after the same error statement onto a new line in the post16 inspection module. Exact literal before-to-after replay proves the whitespace-only change. That module and its flag-based contract are absent from the add-on; no runtime defect repair or inherited behavioral qualification is claimed. Keep the owned tagged M2 helpers and existing public override boundary unchanged.",
+      "patch_file": "compatibility/rc/21x-c04-inspection-compatibility-5d65f1dc4a719fd673b4d77f2f5bdba61d7ac523.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "sha": "f6949e3e57fe25406968eeaea90ba662343c3e79",
+      "diff_sha256": "d791af4c9299cba50bd3c02eab558a4372f358ab6c883fc019a0d829f42c079e",
+      "complete_original_paths": [
+        "src/material/paginator/_paginator-variables.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/paginator/_paginator-variables.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/paginator/_paginator-variables.scss",
+          "index": 0,
+          "header": "@@ -1,15 +0,0 @@",
+          "sha256": "dc2af87f4c54282c7388ab7d1b33421113d76f58eae4305f68c796367aa930ae",
+          "technical_judgment": "Deletes the MDC-path compatibility file, whose before-image exactly matches the tagged Material16 MDC file. That path is absent from the owned package; the distinct tagged legacy paginator variables and real density caller remain byte-identical. Do not translate this deletion into removing the live legacy density contract."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "not-applicable",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Not applicable to the owned legacy paginator: the complete deletion removes the distinct MDC-path paginator variable file, with its before-image authenticated against the untouched Material16 tag. The owned package has no corresponding modern module or export. Both owned legacy variable copies and the real legacy density caller remain, including the tagged min-height behavior; the top-level theme differs only by four exact module-source URL reroutes. Preserve those consumer namespaces, density variables, mixins, selectors and legacy geometry.",
+      "patch_file": "compatibility/rc/21x-c04-inspection-compatibility-f6949e3e57fe25406968eeaea90ba662343c3e79.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "sha": "456741a61a8e85e597e82503941ccab97777bc97",
+      "diff_sha256": "93fbaf24ad1a15053e4e168bcef18c0071c709e6482699d468d3fcc9db0944d8",
+      "complete_original_paths": [
+        "src/material/button-toggle/_button-toggle-variables.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/button-toggle/_button-toggle-variables.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/button-toggle/_button-toggle-variables.scss",
+          "index": 0,
+          "header": "@@ -1,16 +0,0 @@",
+          "sha256": "41a804b8d1732a9156217c0f3ecd82f5edfab03305c12dfaa01799777dd3ec3b",
+          "technical_judgment": "Deletes an unused MDC-path variable file whose before-image exactly matches the tagged file. The owned button-toggle theme uses independent token density data and no import of this file; the package declares no modern variable-module export. Keep its existing token defaults and legacy geometry unchanged."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "not-applicable",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Not applicable to the owned legacy button toggle: the complete deletion removes the distinct MDC-path variable module whose before-image matches the untouched Material16 tag. The add-on declares no modern module export and its owned theme uses independent token density defaults of 48px at zero and 24px at minus four. No import of the deleted module is required. Preserve the historical theme and token behavior rather than translating the upstream deletion into removing a live legacy contract.",
+      "patch_file": "compatibility/rc/21x-c04-inspection-compatibility-456741a61a8e85e597e82503941ccab97777bc97.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  ],
+  "original_file_occurrences": 7,
+  "original_hunks": 14,
+  "source_qualification": {
+    "path": "compatibility/rc/21x-c04-inspection-compatibility-source-qualification.json",
+    "sha256": "a37c92ec2df52921ec4aa9f237d0f90494d2ca7f6728a2a1782d59bb54727e52",
+    "bytes": 2992
+  },
+  "source_review": {
+    "path": "compatibility/rc/21x-c04-inspection-compatibility-source-review.json",
+    "sha256": "852cf937178ada91b0c604d349cf214cd810266af6118122c19e0dd534c55118",
+    "bytes": 135386
+  },
+  "fresh_compiler_execution_this_review": false,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}
