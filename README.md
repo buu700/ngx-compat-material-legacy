@@ -41,6 +41,8 @@ MatLegacyMenuItem preserves the original one-argument and five-argument manual c
 
 MatLegacyRipple and MatLegacyRippleModule retain the shared public Material identities. Construct MatLegacyRipple with no arguments through Angular DI; the original five manual dependency arguments no longer supply its services. Angular 21 still declares ignored rest arguments, while Angular 22 declares no arguments. Existing ripple inputs and templates remain supported. The owned theme binds the public ripple color token to the historical foreground and opacity at the existing theme scope, requiring no consumer stylesheet edits.
 
+Dialog containers support content attachment during their lifetime. Calling `dispose()` or `ngOnDestroy()` ends that lifetime; attaching content afterward is unsupported. This includes direct typed portal methods that could bypass the generic disposal guard in the historical implementation.
+
 Support only version combinations published in the tested matrix once that matrix exists. Build success alone is not visual parity. Contributions require preserved tests, provenance and explicit API/CSS exception review. No guaranteed response time or enterprise support is implied. See `CONTRIBUTING.md`, `SECURITY.md`, and `AGENTS.md`.
 
 ## Origin and license
