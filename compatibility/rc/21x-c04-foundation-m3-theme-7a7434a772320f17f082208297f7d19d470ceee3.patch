@@ -1,0 +1,415 @@
+diff --git a/src/dev-app/theme-m3.scss b/src/dev-app/theme-m3.scss
+index 11d050ebc65a0c9cb1c194fc187b0e5095b60deb..15b72a49231c63f405c354b9586f13c6c55707ae 100644
+--- a/src/dev-app/theme-m3.scss
++++ b/src/dev-app/theme-m3.scss
+@@ -38,6 +38,8 @@ $dark-theme: matx.define-theme(map.set($m3-base-config, color, theme-type, dark)
+ html {
+   @include mat.card-theme($light-theme);
+   @include mat.checkbox-theme($light-theme);
++  @include mat.form-field-theme($light-theme);
++  @include mat.input-theme($light-theme);
+   @include mat.progress-bar-theme($light-theme);
+   @include mat.progress-spinner-theme($light-theme);
+   @include mat.radio-theme($light-theme);
+@@ -62,6 +64,8 @@ html {
+ 
+   @include mat.card-color($dark-theme);
+   @include mat.checkbox-color($dark-theme);
++  @include mat.form-field-color($dark-theme);
++  @include mat.input-color($dark-theme);
+   @include mat.progress-bar-color($dark-theme);
+   @include mat.progress-spinner-color($dark-theme);
+   @include mat.radio-color($dark-theme);
+@@ -85,6 +89,8 @@ html {
+   .demo-density-#{$scale} {
+     @include mat.card-density($scale-theme);
+     @include mat.checkbox-density($scale-theme);
++    @include mat.form-field-density($scale-theme);
++    @include mat.input-density($scale-theme);
+     @include mat.progress-bar-density($scale-theme);
+     @include mat.progress-spinner-density($scale-theme);
+     @include mat.radio-density($scale-theme);
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index 5e43081ae40f806c06366612858698bd50e6b1c7..15566ea32c5cc2424d51345a9353946df0ac5600 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -35,6 +35,33 @@
+   );
+ }
+ 
++/// Generates custom tokens for the mat-form-field.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-form-field
++@function form-field($systems, $exclude-hardcoded) {
++  @return mat.private-merge-all(
++    _generate-typography-tokens($systems, container-text, body-large),
++    _generate-typography-tokens($systems, subscript-text, body-small),
++    (
++      disabled-input-text-placeholder-color: mat.private-safe-color-change(
++          map.get($systems, md-sys-color, on-surface), $alpha: 0.38),
++      state-layer-color: map.get($systems, md-sys-color, on-surface),
++      error-text-color: map.get($systems, md-sys-color, error),
++      select-option-text-color: map.get($systems, md-ref-palette, neutral10),
++      select-disabled-option-text-color: mat.private-safe-color-change(
++          map.get($systems, md-ref-palette, neutral10), $alpha: 0.38),
++      enabled-select-arrow-color: map.get($systems, md-sys-color, on-surface-variant),
++      disabled-select-arrow-color: mat.private-safe-color-change(
++          map.get($systems, md-sys-color, on-surface), $alpha: 0.38),
++      hover-state-layer-opacity: map.get($systems, md-sys-state, hover-state-layer-opacity),
++      focus-state-layer-opacity: _hardcode(0, $exclude-hardcoded),
++      focus-select-arrow-color: map.get($systems, md-sys-color, primary),
++      outlined-label-text-populated-size: map.get($systems, md-sys-typeface, body-large-size),
++    )
++  );
++}
++
+ /// Generates custom tokens for the mat-toolbar.
+ /// @param {Map} $systems The MDC system tokens
+ /// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
+diff --git a/src/material-experimental/theming/_m3-density.scss b/src/material-experimental/theming/_m3-density.scss
+index ef0a2bcf5e4e3e8dc2147ac36868d7243ef350fd..8a3be6a1623a61ab8b63d7d0b945fcff7e96652c 100644
+--- a/src/material-experimental/theming/_m3-density.scss
++++ b/src/material-experimental/theming/_m3-density.scss
+@@ -20,7 +20,9 @@ $_density-tokens: (
+     state-layer-size: (40px, 36px, 32px, 28px),
+   ),
+   (mdc, elevated-card): (),
++  (mdc, filled-text-field): (),
+   (mdc, outlined-card): (),
++  (mdc, outlined-text-field): (),
+   (mdc, slider): (),
+   (mdc, snackbar): (),
+   (mdc, plain-tooltip): (),
+@@ -37,6 +39,7 @@ $_density-tokens: (
+ 
+   // Custom Angular Material tokens
+   (mat, card): (),
++  (mat, form-fild): (),
+   (mat, toolbar): (
+     standard-height: (64px, 60px, 56px, 52px),
+     mobile-height: (56px, 52px, 48px, 44px),
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index 4302f51c559d52c3b7d247a87ac86523f01c1e48..1dd47ddf9403bdd04e4efcd140d69145b6ca0467 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -183,11 +183,21 @@
+       mdc-tokens.md-comp-elevated-card-values($systems, $exclude-hardcoded),
+       $token-slots
+     ),
++    _namespace-tokens(
++      (mdc, filled-text-field),
++      mdc-tokens.md-comp-filled-text-field-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
+     _namespace-tokens(
+       (mdc, outlined-card),
+       mdc-tokens.md-comp-outlined-card-values($systems, $exclude-hardcoded),
+       $token-slots
+     ),
++    _namespace-tokens(
++      (mdc, outlined-text-field),
++      mdc-tokens.md-comp-outlined-text-field-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
+     _namespace-tokens(
+       (mdc, slider),
+       mdc-tokens.md-comp-slider-values($systems, $exclude-hardcoded),
+@@ -240,6 +250,11 @@
+       custom-tokens.card($systems, $exclude-hardcoded),
+       $token-slots
+     ),
++    _namespace-tokens(
++      (mat, form-field),
++      custom-tokens.form-field($systems, $exclude-hardcoded),
++      $token-slots
++    ),
+     _namespace-tokens(
+       (mat, toolbar),
+       custom-tokens.toolbar($systems, $exclude-hardcoded),
+diff --git a/src/material/core/tokens/m2/_index.scss b/src/material/core/tokens/m2/_index.scss
+index 5a3825d963d1145dc649229297b27c0c07767321..0b8a09421c5adaf53bcc88f12cf5b4ddd8750a51 100644
+--- a/src/material/core/tokens/m2/_index.scss
++++ b/src/material/core/tokens/m2/_index.scss
+@@ -2,6 +2,7 @@
+ @use 'sass:meta';
+ @use '../../style/sass-utils';
+ @use './mat/card' as tokens-mat-card;
++@use './mat/form-field' as tokens-mat-form-field;
+ @use './mat/radio' as tokens-mat-radio;
+ @use './mat/ripple' as tokens-mat-ripple;
+ @use './mat/slide-toggle' as tokens-mat-slide-toggle;
+@@ -18,10 +19,12 @@
+ @use './mdc/circular-progress' as tokens-mdc-circular-progress;
+ @use './mdc/dialog' as tokens-mdc-dialog;
+ @use './mdc/elevated-card' as tokens-mdc-elevated-card;
++@use './mdc/filled-text-field' as tokens-mdc-filled-text-field;
+ @use './mdc/icon-button' as tokens-mdc-icon-button;
+ @use './mdc/linear-progress' as tokens-mdc-linear-progress;
+ @use './mdc/list' as tokens-mdc-list;
+ @use './mdc/outlined-card' as tokens-mdc-outlined-card;
++@use './mdc/outlined-text-field' as tokens-mdc-outlined-text-field;
+ @use './mdc/plain-tooltip' as tokens-mdc-plain-tooltip;
+ @use './mdc/radio' as tokens-mdc-radio;
+ @use './mdc/slider' as tokens-mdc-slider;
+@@ -74,6 +77,7 @@
+ @function m2-tokens-from-theme($theme) {
+   @return sass-utils.deep-merge-all(
+       _get-tokens-for-module($theme, tokens-mat-card),
++      _get-tokens-for-module($theme, tokens-mat-form-field),
+       _get-tokens-for-module($theme, tokens-mat-radio),
+       _get-tokens-for-module($theme, tokens-mat-ripple),
+       _get-tokens-for-module($theme, tokens-mat-slide-toggle),
+@@ -90,10 +94,12 @@
+       _get-tokens-for-module($theme, tokens-mdc-circular-progress),
+       _get-tokens-for-module($theme, tokens-mdc-dialog),
+       _get-tokens-for-module($theme, tokens-mdc-elevated-card),
++      _get-tokens-for-module($theme, tokens-mdc-filled-text-field),
+       _get-tokens-for-module($theme, tokens-mdc-icon-button),
+       _get-tokens-for-module($theme, tokens-mdc-linear-progress),
+       _get-tokens-for-module($theme, tokens-mdc-list),
+       _get-tokens-for-module($theme, tokens-mdc-outlined-card),
++      _get-tokens-for-module($theme, tokens-mdc-outlined-text-field),
+       _get-tokens-for-module($theme, tokens-mdc-plain-tooltip),
+       _get-tokens-for-module($theme, tokens-mdc-radio),
+       _get-tokens-for-module($theme, tokens-mdc-slider),
+diff --git a/src/material/form-field/_form-field-theme.scss b/src/material/form-field/_form-field-theme.scss
+index 38312361346c4d8e6f9ed436ecdb963c39b20f17..026d3f2f6b67db939622c0b5225dee0ea0f57930 100644
+--- a/src/material/form-field/_form-field-theme.scss
++++ b/src/material/form-field/_form-field-theme.scss
+@@ -1,6 +1,6 @@
++@use 'sass:map';
+ @use '@material/textfield/filled-text-field-theme' as mdc-filled-text-field-theme;
+ @use '@material/textfield/outlined-text-field-theme' as mdc-outlined-text-field-theme;
+-
+ @use '../core/tokens/m2/mdc/filled-text-field' as tokens-mdc-filled-text-field;
+ @use '../core/tokens/m2/mdc/outlined-text-field' as tokens-mdc-outlined-text-field;
+ @use '../core/tokens/m2/mat/form-field' as tokens-mat-form-field;
+@@ -12,74 +12,110 @@
+ @use './form-field-density';
+ 
+ @mixin base($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(
+-        tokens-mdc-filled-text-field.$prefix,
+-        tokens-mdc-filled-text-field.get-unthemable-tokens());
+-    @include token-utils.create-token-values(
+-        tokens-mdc-outlined-text-field.$prefix,
+-        tokens-mdc-outlined-text-field.get-unthemable-tokens());
+-    @include token-utils.create-token-values(
+-        tokens-mat-form-field.$prefix,
+-        tokens-mat-form-field.get-unthemable-tokens());
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(
++          tokens-mdc-filled-text-field.$prefix,
++          tokens-mdc-filled-text-field.get-unthemable-tokens());
++      @include token-utils.create-token-values(
++          tokens-mdc-outlined-text-field.$prefix,
++          tokens-mdc-outlined-text-field.get-unthemable-tokens());
++      @include token-utils.create-token-values(
++          tokens-mat-form-field.$prefix,
++          tokens-mat-form-field.get-unthemable-tokens());
++    }
+   }
+ }
+ 
+ @mixin color($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-filled-text-field-theme.theme(
+-      tokens-mdc-filled-text-field.get-color-tokens($theme));
+-    @include mdc-outlined-text-field-theme.theme(
+-      tokens-mdc-outlined-text-field.get-color-tokens($theme));
+-    @include token-utils.create-token-values(tokens-mat-form-field.$prefix,
+-      tokens-mat-form-field.get-color-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
+   }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-filled-text-field-theme.theme(
++          tokens-mdc-filled-text-field.get-color-tokens($theme));
++      @include mdc-outlined-text-field-theme.theme(
++          tokens-mdc-outlined-text-field.get-color-tokens($theme));
++      @include token-utils.create-token-values(tokens-mat-form-field.$prefix,
++        tokens-mat-form-field.get-color-tokens($theme));
++    }
+ 
+-  .mat-mdc-form-field.mat-accent {
+-    @include mdc-filled-text-field-theme.theme(
+-      tokens-mdc-filled-text-field.private-get-color-palette-color-tokens($theme, accent));
+-    @include mdc-outlined-text-field-theme.theme(
+-      tokens-mdc-outlined-text-field.private-get-color-palette-color-tokens($theme, accent));
+-    @include token-utils.create-token-values(tokens-mat-form-field.$prefix,
+-      tokens-mat-form-field.private-get-color-palette-color-tokens($theme, accent));
+-  }
++    .mat-mdc-form-field.mat-accent {
++      @include mdc-filled-text-field-theme.theme(
++          tokens-mdc-filled-text-field.private-get-color-palette-color-tokens($theme, accent));
++      @include mdc-outlined-text-field-theme.theme(
++          tokens-mdc-outlined-text-field.private-get-color-palette-color-tokens($theme, accent));
++      @include token-utils.create-token-values(tokens-mat-form-field.$prefix,
++        tokens-mat-form-field.private-get-color-palette-color-tokens($theme, accent));
++    }
+ 
+-  .mat-mdc-form-field.mat-warn {
+-    @include mdc-filled-text-field-theme.theme(
+-      tokens-mdc-filled-text-field.private-get-color-palette-color-tokens($theme, warn));
+-    @include mdc-outlined-text-field-theme.theme(
+-      tokens-mdc-outlined-text-field.private-get-color-palette-color-tokens($theme, warn));
+-    @include token-utils.create-token-values(tokens-mat-form-field.$prefix,
+-      tokens-mat-form-field.private-get-color-palette-color-tokens($theme, warn));
++    .mat-mdc-form-field.mat-warn {
++      @include mdc-filled-text-field-theme.theme(
++          tokens-mdc-filled-text-field.private-get-color-palette-color-tokens($theme, warn));
++      @include mdc-outlined-text-field-theme.theme(
++          tokens-mdc-outlined-text-field.private-get-color-palette-color-tokens($theme, warn));
++      @include token-utils.create-token-values(tokens-mat-form-field.$prefix,
++        tokens-mat-form-field.private-get-color-palette-color-tokens($theme, warn));
++    }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-filled-text-field-theme.theme(
+-      tokens-mdc-filled-text-field.get-typography-tokens($theme));
+-    @include mdc-outlined-text-field-theme.theme(
+-      tokens-mdc-outlined-text-field.get-typography-tokens($theme));
+-    @include token-utils.create-token-values(tokens-mat-form-field.$prefix,
+-      tokens-mat-form-field.get-typography-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-filled-text-field-theme.theme(
++          tokens-mdc-filled-text-field.get-typography-tokens($theme));
++      @include mdc-outlined-text-field-theme.theme(
++          tokens-mdc-outlined-text-field.get-typography-tokens($theme));
++      @include token-utils.create-token-values(tokens-mat-form-field.$prefix,
++        tokens-mat-form-field.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  @include form-field-density.private-form-field-density($theme);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {
++    @include form-field-density.private-form-field-density($theme);
++  }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-form-field') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
+-    }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include mdc-filled-text-field-theme.theme(
++        map.get($tokens, tokens-mdc-filled-text-field.$prefix));
++    @include mdc-outlined-text-field-theme.theme(
++        map.get($tokens, tokens-mdc-outlined-text-field.$prefix));
++    @include token-utils.create-token-values(
++        tokens-mat-form-field.$prefix, map.get($tokens, tokens-mat-form-field.$prefix));
++  }
++}
+diff --git a/src/material/input/_input-theme.scss b/src/material/input/_input-theme.scss
+index 610732bff77ba51236351c187be0c7892ac25d17..15801cb9e0e92d395e2c4fe50f886f1bd7021a56 100644
+--- a/src/material/input/_input-theme.scss
++++ b/src/material/input/_input-theme.scss
+@@ -2,25 +2,52 @@
+ @use '../core/theming/inspection';
+ @use '../core/typography/typography';
+ 
+-@mixin base($theme) {}
++@mixin base($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {}
++}
+ 
+-@mixin color($theme) {}
++@mixin color($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {}
++}
+ 
+-@mixin typography($theme) {}
++@mixin typography($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {}
++}
+ 
+-@mixin density($theme) {}
++@mixin density($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {}
++}
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-input') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
+-    }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {}

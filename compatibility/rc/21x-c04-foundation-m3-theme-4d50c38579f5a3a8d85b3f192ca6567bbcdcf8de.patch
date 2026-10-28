@@ -1,0 +1,206 @@
+diff --git a/src/dev-app/theme-m3.scss b/src/dev-app/theme-m3.scss
+index 6ed630f6eef0e847b012894cb290de3299eadc64..53a4d40bfa62c29ece321a14d5c014cf079a9ca9 100644
+--- a/src/dev-app/theme-m3.scss
++++ b/src/dev-app/theme-m3.scss
+@@ -40,6 +40,7 @@ html {
+   @include mat.checkbox-theme($light-theme);
+   @include mat.form-field-theme($light-theme);
+   @include mat.grid-list-theme($light-theme);
++  @include mat.icon-theme($light-theme);
+   @include mat.input-theme($light-theme);
+   @include mat.list-theme($light-theme);
+   @include mat.progress-bar-theme($light-theme);
+@@ -68,6 +69,7 @@ html {
+   @include mat.checkbox-color($dark-theme);
+   @include mat.form-field-color($dark-theme);
+   @include mat.grid-list-color($dark-theme);
++  @include mat.icon-color($dark-theme);
+   @include mat.input-color($dark-theme);
+   @include mat.list-color($dark-theme);
+   @include mat.progress-bar-color($dark-theme);
+@@ -95,6 +97,7 @@ html {
+     @include mat.checkbox-density($scale-theme);
+     @include mat.form-field-density($scale-theme);
+     @include mat.grid-list-density($scale-theme);
++    @include mat.icon-density($scale-theme);
+     @include mat.input-density($scale-theme);
+     @include mat.list-density($scale-theme);
+     @include mat.progress-bar-density($scale-theme);
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index c8f8d51ed10f29573bc151522952ef97ac3143d1..67b7e4bf2ca1faa99d90b611b7188eea87a9514a 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -75,6 +75,16 @@
+   );
+ }
+ 
++/// Generates custom tokens for the mat-icon.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-icon
++@function icon($systems, $exclude-hardcoded) {
++  @return (
++    color: _hardcode(inherit, $exclude-hardcoded),
++  );
++}
++
+ /// Generates custom tokens for the mat-toolbar.
+ /// @param {Map} $systems The MDC system tokens
+ /// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
+diff --git a/src/material-experimental/theming/_m3-density.scss b/src/material-experimental/theming/_m3-density.scss
+index e7c632056c1fd21431d41a0d59ddfdc466055b45..3db2ed68c968dbf09def59fcde1cf30403b7754a 100644
+--- a/src/material-experimental/theming/_m3-density.scss
++++ b/src/material-experimental/theming/_m3-density.scss
+@@ -46,6 +46,7 @@ $_density-tokens: (
+   (mat, card): (),
+   (mat, form-fild): (),
+   (mat, grid-list): (),
++  (mat, icon): (),
+   (mat, toolbar): (
+     standard-height: (64px, 60px, 56px, 52px),
+     mobile-height: (56px, 52px, 48px, 44px),
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index d7db2eff6fa3b31eb88f53b15f87972cf8964879..efcdd5781f659bf12b26b698267218f94eb58187 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -264,6 +264,11 @@
+       custom-tokens.grid-list($systems, $exclude-hardcoded),
+       $token-slots
+     ),
++    _namespace-tokens(
++      (mat, icon),
++      custom-tokens.icon($systems, $exclude-hardcoded),
++      $token-slots
++    ),
+     _namespace-tokens(
+       (mat, toolbar),
+       custom-tokens.toolbar($systems, $exclude-hardcoded),
+diff --git a/src/material/core/tokens/m2/_index.scss b/src/material/core/tokens/m2/_index.scss
+index 81c0a42364e3cfcbf83c142bfb8b3c306a517770..f54bc8597ed32d1a993e39976381c4175adf5278 100644
+--- a/src/material/core/tokens/m2/_index.scss
++++ b/src/material/core/tokens/m2/_index.scss
+@@ -4,6 +4,7 @@
+ @use './mat/card' as tokens-mat-card;
+ @use './mat/form-field' as tokens-mat-form-field;
+ @use './mat/grid-list' as tokens-mat-grid-list;
++@use './mat/icon' as tokens-mat-icon;
+ @use './mat/radio' as tokens-mat-radio;
+ @use './mat/ripple' as tokens-mat-ripple;
+ @use './mat/slide-toggle' as tokens-mat-slide-toggle;
+@@ -80,6 +81,7 @@
+       _get-tokens-for-module($theme, tokens-mat-card),
+       _get-tokens-for-module($theme, tokens-mat-form-field),
+       _get-tokens-for-module($theme, tokens-mat-grid-list),
++      _get-tokens-for-module($theme, tokens-mat-icon),
+       _get-tokens-for-module($theme, tokens-mat-radio),
+       _get-tokens-for-module($theme, tokens-mat-ripple),
+       _get-tokens-for-module($theme, tokens-mat-slide-toggle),
+diff --git a/src/material/icon/_icon-theme.scss b/src/material/icon/_icon-theme.scss
+index a7b9a3750a2b7d8544169b6d71326f7bc91eb3fa..f239c29ef34672eba153b13a468f478156a3264a 100644
+--- a/src/material/icon/_icon-theme.scss
++++ b/src/material/icon/_icon-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+ @use '../core/tokens/m2/mat/icon' as tokens-mat-icon;
+@@ -10,45 +11,76 @@
+   @include token-utils.create-token-values(tokens-mat-icon.$prefix, $tokens);
+ }
+ 
+-@mixin base($theme) {}
++@mixin base($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {}
++}
+ 
+ @mixin color($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-icon.$prefix,
+-      tokens-mat-icon.get-color-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
+   }
+-
+-  .mat-icon {
+-    &.mat-primary {
+-      @include _palette-colors($theme, primary);
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-icon.$prefix,
++        tokens-mat-icon.get-color-tokens($theme));
+     }
+ 
+-    &.mat-accent {
+-      @include _palette-colors($theme, accent);
+-    }
++    .mat-icon {
++      &.mat-primary {
++        @include _palette-colors($theme, primary);
++      }
++
++      &.mat-accent {
++        @include _palette-colors($theme, accent);
++      }
+ 
+-    &.mat-warn {
+-      @include _palette-colors($theme, warn);
++      &.mat-warn {
++        @include _palette-colors($theme, warn);
++      }
+     }
+   }
+ }
+ 
+-@mixin typography($theme) {}
++@mixin typography($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {}
++}
+ 
+-@mixin density($theme) {}
++@mixin density($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {}
++}
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-icon') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
+-    }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
+ 
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include token-utils.create-token-values(
++        tokens-mat-icon.$prefix, map.get($tokens, tokens-mat-icon.$prefix));
++  }
++}

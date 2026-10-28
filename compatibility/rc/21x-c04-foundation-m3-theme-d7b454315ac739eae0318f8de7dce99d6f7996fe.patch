@@ -1,0 +1,319 @@
+diff --git a/src/dev-app/theme-m3.scss b/src/dev-app/theme-m3.scss
+index 15b72a49231c63f405c354b9586f13c6c55707ae..be4c5c3b9b4c2a1088f8694af2e6d421d8df050f 100644
+--- a/src/dev-app/theme-m3.scss
++++ b/src/dev-app/theme-m3.scss
+@@ -40,6 +40,7 @@ html {
+   @include mat.checkbox-theme($light-theme);
+   @include mat.form-field-theme($light-theme);
+   @include mat.input-theme($light-theme);
++  @include mat.list-theme($light-theme);
+   @include mat.progress-bar-theme($light-theme);
+   @include mat.progress-spinner-theme($light-theme);
+   @include mat.radio-theme($light-theme);
+@@ -66,6 +67,7 @@ html {
+   @include mat.checkbox-color($dark-theme);
+   @include mat.form-field-color($dark-theme);
+   @include mat.input-color($dark-theme);
++  @include mat.list-color($dark-theme);
+   @include mat.progress-bar-color($dark-theme);
+   @include mat.progress-spinner-color($dark-theme);
+   @include mat.radio-color($dark-theme);
+@@ -91,6 +93,7 @@ html {
+     @include mat.checkbox-density($scale-theme);
+     @include mat.form-field-density($scale-theme);
+     @include mat.input-density($scale-theme);
++    @include mat.list-density($scale-theme);
+     @include mat.progress-bar-density($scale-theme);
+     @include mat.progress-spinner-density($scale-theme);
+     @include mat.radio-density($scale-theme);
+diff --git a/src/material-experimental/theming/_m3-density.scss b/src/material-experimental/theming/_m3-density.scss
+index 8a3be6a1623a61ab8b63d7d0b945fcff7e96652c..7646858494beaab3f55b367b21f692c01fb56d65 100644
+--- a/src/material-experimental/theming/_m3-density.scss
++++ b/src/material-experimental/theming/_m3-density.scss
+@@ -31,6 +31,11 @@ $_density-tokens: (
+     state-layer-size: (40px, 36px, 32px, 28px),
+   ),
+   (mdc, linear-progress): (),
++  (mdc, list): (
++    list-item-one-line-container-height: (48px, 44px, 40px, 36px, 32px, 24px),
++    list-item-two-line-container-height: (64px, 60px, 56px, 52px, 48px, 48px),
++    list-item-three-line-container-height: (88px, 84px, 80px, 76px, 72px, 56px),
++  ),
+   (mdc, switch): (),
+   (mdc, tab): (
+     container-height: (48px, 44px, 40px, 36px, 32px)
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index e3566f7f9ab0e954629c7ff3bc9bf280d178d630..2d51ed1dd2fc6adaed80f9f49bf34d940b73df99 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -187,6 +187,11 @@
+       mdc-tokens.md-comp-filled-text-field-values($systems, $exclude-hardcoded),
+       $token-slots
+     ),
++    _namespace-tokens(
++      (mdc, list),
++      mdc-tokens.md-comp-list-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
+     _namespace-tokens(
+       (mdc, outlined-card),
+       mdc-tokens.md-comp-outlined-card-values($systems, $exclude-hardcoded),
+diff --git a/src/material/list/_list-theme.scss b/src/material/list/_list-theme.scss
+index 74561701b4ae8f6398851e2112c71c177e8501a5..94bb05c1c7b4b102bfd82f20bc5eb080e2fce4da 100644
+--- a/src/material/list/_list-theme.scss
++++ b/src/material/list/_list-theme.scss
+@@ -14,139 +14,171 @@
+ 
+ @mixin base($theme) {
+   // Add default values for tokens not related to color, typography, or density.
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-list-theme.theme(tokens-mdc-list.get-unthemable-tokens());
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-list-theme.theme(tokens-mdc-list.get-unthemable-tokens());
++    }
+   }
+ }
+ 
+ @mixin color($theme) {
+-  $mdc-list-color-tokens: tokens-mdc-list.get-color-tokens($theme);
+-
+-  // Add values for MDC list tokens.
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-list-theme.theme($mdc-list-color-tokens);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
+   }
++  @else {
++    $mdc-list-color-tokens: tokens-mdc-list.get-color-tokens($theme);
+ 
+-  .mdc-list-item__start,
+-  .mdc-list-item__end {
+-    @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme, primary));
+-  }
++    // Add values for MDC list tokens.
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-list-theme.theme($mdc-list-color-tokens);
++    }
+ 
+-  .mat-accent {
+     .mdc-list-item__start,
+     .mdc-list-item__end {
+-      @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme, accent));
++      @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme, primary));
+     }
+-  }
+ 
+-  .mat-warn {
+-    .mdc-list-item__start,
+-    .mdc-list-item__end {
+-      @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme, warn));
++    .mat-accent {
++      .mdc-list-item__start,
++      .mdc-list-item__end {
++        @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme, accent));
++      }
+     }
+-  }
+ 
+-  .mat-mdc-list-option {
+-    @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($theme, primary));
+-  }
+-  .mat-mdc-list-option.mat-accent {
+-    @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($theme, accent));
+-  }
+-  .mat-mdc-list-option.mat-warn {
+-    @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($theme, warn));
+-  }
++    .mat-warn {
++      .mdc-list-item__start,
++      .mdc-list-item__end {
++        @include mdc-radio-theme.theme(tokens-mdc-radio.get-color-tokens($theme, warn));
++      }
++    }
+ 
+-  // There is no token for activated color on nav list.
+-  // TODO(mmalerba): Add a token to MDC or make a custom one.
+-  .mat-mdc-list-base.mat-mdc-list-base {
+-    @include evolution-mixins.list-selected-ink-color(inspection.get-theme-color($theme, primary));
+-  }
++    .mat-mdc-list-option {
++      @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($theme, primary));
++    }
++    .mat-mdc-list-option.mat-accent {
++      @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($theme, accent));
++    }
++    .mat-mdc-list-option.mat-warn {
++      @include mdc-checkbox-theme.theme(tokens-mdc-checkbox.get-color-tokens($theme, warn));
++    }
+ 
+-  // TODO(mmalerba): Leaking styles from the old MDC list mixins used in other components can cause
+-  //  opacity issues, so we need this override for now. We can remove it when all Angular Material
+-  //  components stop using the old MDC mixins.
+-  .mat-mdc-list-base .mdc-list-item--disabled {
+-    .mdc-list-item__start,
+-    .mdc-list-item__content,
+-    .mdc-list-item__end {
+-      opacity: 1;
++    // There is no token for activated color on nav list.
++    // TODO(mmalerba): Add a token to MDC or make a custom one.
++    .mat-mdc-list-base.mat-mdc-list-base {
++      @include evolution-mixins.list-selected-ink-color(
++          inspection.get-theme-color($theme, primary));
++    }
++
++    // TODO(mmalerba): Leaking styles from the old MDC list mixins used in other components can
++    //  cause opacity issues, so we need this override for now. We can remove it when all
++    //  Angular Material components stop using the old MDC mixins.
++    .mat-mdc-list-base .mdc-list-item--disabled {
++      .mdc-list-item__start,
++      .mdc-list-item__content,
++      .mdc-list-item__end {
++        opacity: 1;
++      }
+     }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  $density-scale: inspection.get-theme-density($theme);
+-  $mdc-list-density-tokens: tokens-mdc-list.get-density-tokens($theme);
+-
+-  // Add values for MDC list tokens.
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-list-theme.theme($mdc-list-density-tokens);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
+   }
++  @else {
++    $density-scale: inspection.get-theme-density($theme);
++    $mdc-list-density-tokens: tokens-mdc-list.get-density-tokens($theme);
+ 
+-  .mdc-list-item__start,
+-  .mdc-list-item__end {
+-    @include mdc-radio-theme.theme(tokens-mdc-radio.get-density-tokens($theme));
+-  }
++    // Add values for MDC list tokens.
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-list-theme.theme($mdc-list-density-tokens);
++    }
+ 
+-  // TODO(mmalerba): This is added to maintain the same style MDC used prior to the token-based API,
+-  //  to avoid screenshot diffs. We should remove it in favor of following MDC's current style, or
+-  //  add custom tokens for it.
+-  .mat-mdc-list-item {
+-    &.mdc-list-item--with-leading-avatar,
+-    &.mdc-list-item--with-leading-checkbox,
+-    &.mdc-list-item--with-leading-icon {
+-      &.mdc-list-item--with-one-line {
+-        height: map.get((
++    .mdc-list-item__start,
++    .mdc-list-item__end {
++      @include mdc-radio-theme.theme(tokens-mdc-radio.get-density-tokens($theme));
++    }
++
++    // TODO(mmalerba): This is added to maintain the same style MDC used prior to the token-based
++    //  API, to avoid screenshot diffs. We should remove it in favor of following MDC's current
++    //  style, or add custom tokens for it.
++    .mat-mdc-list-item {
++      &.mdc-list-item--with-leading-avatar,
++      &.mdc-list-item--with-leading-checkbox,
++      &.mdc-list-item--with-leading-icon {
++        &.mdc-list-item--with-one-line {
++          height: map.get((
+             0: 56px,
+             -1: 52px,
+             -2: 48px,
+             -3: 44px,
+             -4: 40px,
+             -5: 40px,
+-        ), $density-scale);
+-      }
++          ), $density-scale);
++        }
+ 
+-      &.mdc-list-item--with-two-lines {
+-        height: map.get((
++        &.mdc-list-item--with-two-lines {
++          height: map.get((
+             0: 72px,
+             -1: 68px,
+             -2: 64px,
+             -3: 60px,
+             -4: 56px,
+             -5: 56px,
+-        ), $density-scale);
++          ), $density-scale);
++        }
+       }
+     }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  $mdc-list-typography-tokens: tokens-mdc-list.get-typography-tokens($theme);
+-
+-  // Add values for MDC list tokens.
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-list-theme.theme($mdc-list-typography-tokens);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
+   }
++  @else {
++    $mdc-list-typography-tokens: tokens-mdc-list.get-typography-tokens($theme);
+ 
+-  // MDC does not have tokens for the subheader.
+-  // TODO(mmalerba): Discuss with MDC about adding them, or create custom tokens.
+-  .mdc-list-group__subheader {
+-    font: inspection.get-theme-typography($theme, subtitle-1, font);
+-    letter-spacing: inspection.get-theme-typography($theme, subtitle-1, letter-spacing);
++    // Add values for MDC list tokens.
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-list-theme.theme($mdc-list-typography-tokens);
++    }
++
++    // MDC does not have tokens for the subheader.
++    // TODO(mmalerba): Discuss with MDC about adding them, or create custom tokens.
++    .mdc-list-group__subheader {
++      font: inspection.get-theme-typography($theme, subtitle-1, font);
++      letter-spacing: inspection.get-theme-typography($theme, subtitle-1, letter-spacing);
++    }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-list') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
+-    }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include mdc-list-theme.theme(map.get($tokens, tokens-mdc-list.$prefix));
++  }
++}

@@ -1,0 +1,1340 @@
+diff --git a/src/dev-app/theme-m3.scss b/src/dev-app/theme-m3.scss
+index 3466d66368a52b421710e91269e23aecbafc52c3..11d050ebc65a0c9cb1c194fc187b0e5095b60deb 100644
+--- a/src/dev-app/theme-m3.scss
++++ b/src/dev-app/theme-m3.scss
+@@ -41,11 +41,17 @@ html {
+   @include mat.progress-bar-theme($light-theme);
+   @include mat.progress-spinner-theme($light-theme);
+   @include mat.radio-theme($light-theme);
++  @include mat.ripple-theme($light-theme);
+   @include mat.slide-toggle-theme($light-theme);
+   @include mat.slider-theme($light-theme);
+   @include mat.snack-bar-theme($light-theme);
++  @include mat.sort-theme($light-theme);
++  @include mat.stepper-theme($light-theme);
++  @include mat.table-theme($light-theme);
++  @include mat.tabs-theme($light-theme);
+   @include mat.toolbar-theme($light-theme);
+   @include mat.tooltip-theme($light-theme);
++  @include mat.tree-theme($light-theme);
+ }
+ 
+ // Emit dark theme styles.
+@@ -59,11 +65,17 @@ html {
+   @include mat.progress-bar-color($dark-theme);
+   @include mat.progress-spinner-color($dark-theme);
+   @include mat.radio-color($dark-theme);
++  @include mat.ripple-color($dark-theme);
+   @include mat.slide-toggle-color($dark-theme);
+   @include mat.slider-color($dark-theme);
+   @include mat.snack-bar-color($dark-theme);
++  @include mat.sort-color($dark-theme);
++  @include mat.stepper-color($dark-theme);
++  @include mat.table-color($dark-theme);
++  @include mat.tabs-color($dark-theme);
+   @include mat.toolbar-color($dark-theme);
+   @include mat.tooltip-color($dark-theme);
++  @include mat.tree-color($dark-theme);
+ }
+ 
+ // Emit density styles for each scale.
+@@ -79,7 +91,12 @@ html {
+     @include mat.slide-toggle-density($scale-theme);
+     @include mat.slider-density($scale-theme);
+     @include mat.snack-bar-density($scale-theme);
++    @include mat.sort-density($scale-theme);
++    @include mat.stepper-density($scale-theme);
++    @include mat.table-density($scale-theme);
++    @include mat.tabs-density($scale-theme);
+     @include mat.toolbar-density($scale-theme);
+     @include mat.tooltip-density($scale-theme);
++    @include mat.tree-density($scale-theme);
+   }
+ }
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index 8fff6b3279b3dbb52c1a95cdfb2ccf593d589dec..5e43081ae40f806c06366612858698bd50e6b1c7 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -1,6 +1,11 @@
+ @use 'sass:map';
+ @use '@angular/material' as mat;
+ 
++/// Hardcode the given value, or null if hardcoded values are excluded.
++@function _hardcode($value, $exclude-hardcoded) {
++  @return if($exclude-hardcoded, null, $value);
++}
++
+ /// Sets all of the standard typography tokens for the given token base name to the given typography
+ /// level.
+ /// @param {Map} $systems The MDC system tokens
+@@ -22,11 +27,11 @@
+ /// @return {Map} A set of custom tokens for the mat-card
+ @function card($systems, $exclude-hardcoded) {
+   @return mat.private-merge-all(
+-      _generate-typography-tokens($systems, title-text, title-large),
+-      _generate-typography-tokens($systems, subtitle-text, title-medium),
+-      (
+-        subtitle-text-color: map.get($systems, md-sys-color, on-surface)
+-      )
++    _generate-typography-tokens($systems, title-text, title-large),
++    _generate-typography-tokens($systems, subtitle-text, title-medium),
++    (
++      subtitle-text-color: map.get($systems, md-sys-color, on-surface)
++    )
+   );
+ }
+ 
+@@ -36,11 +41,11 @@
+ /// @return {Map} A set of custom tokens for the mat-toolbar
+ @function toolbar($systems, $exclude-hardcoded) {
+   @return mat.private-merge-all(
+-      _generate-typography-tokens($systems, title-text, title-large),
+-      (
+-        container-background-color: map.get($systems, md-sys-color, surface),
+-        container-text-color: map.get($systems, md-sys-color, on-surface),
+-      )
++    _generate-typography-tokens($systems, title-text, title-large),
++    (
++      container-background-color: map.get($systems, md-sys-color, surface),
++      container-text-color: map.get($systems, md-sys-color, on-surface),
++    )
+   );
+ }
+ 
+@@ -58,7 +63,7 @@
+ /// @return {Map} A set of custom tokens for the mat-slider
+ @function slider($systems, $exclude-hardcoded) {
+   @return (
+-    value-indicator-opacity: 1,
++    value-indicator-opacity: _hardcode(1, $exclude-hardcoded),
+   );
+ }
+ 
+@@ -83,3 +88,131 @@
+     disabled-label-color: map.get($systems, md-sys-color, on-surface),
+   );
+ }
++
++/// Generates custom tokens for the mat-ripple.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-ripple
++@function ripple($systems, $exclude-hardcoded) {
++  @return (
++    color: mat.private-safe-color-change(map.get($systems, md-sys-color, on-surface), $alpha: 0.1),
++  );
++}
++
++/// Generates custom tokens for the mat-sort.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-sort
++@function sort($systems, $exclude-hardcoded) {
++  @return (
++    arrow-color: map.get($systems, md-sys-color, on-surface),
++  );
++}
++
++/// Generates custom tokens for the mat-stepper.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-stepper
++@function stepper($systems, $exclude-hardcoded) {
++  @return mat.private-merge-all(
++    (
++      container-color: map.get($systems, md-sys-color, surface),
++      line-color: map.get($systems, md-sys-color, outline-variant),
++      header-hover-state-layer-color: mat.private-safe-color-change(
++        map.get($systems, md-sys-color, inverse-surface),
++        $alpha: map.get($systems, md-sys-state, hover-state-layer-opacity)
++      ),
++      header-focus-state-layer-color: mat.private-safe-color-change(
++        map.get($systems, md-sys-color, inverse-surface),
++        $alpha: map.get($systems, md-sys-state, focus-state-layer-opacity)
++      ),
++      header-label-text-color: map.get($systems, md-sys-color, on-surface-variant),
++      header-optional-label-text-color: map.get($systems, md-sys-color, on-surface-variant),
++      header-selected-state-label-text-color: map.get($systems, md-sys-color, on-surface),
++      header-icon-background-color: map.get($systems, md-sys-color, inverse-surface),
++      header-icon-foreground-color: map.get($systems, md-sys-color, inverse-on-surface),
++      header-error-state-label-text-color: map.get($systems, md-sys-color, error),
++      header-error-state-icon-foreground-color: map.get($systems, md-sys-color, error),
++      header-error-state-icon-background-color: _hardcode(transparent, $exclude-hardcoded),
++      container-text-font: map.get($systems, md-sys-typescale, body-medium-font),
++      header-label-text-font: map.get($systems, md-sys-typescale, title-small-font),
++      header-label-text-size: map.get($systems, md-sys-typescale, title-small-size),
++      header-label-text-weight: map.get($systems, md-sys-typescale, title-small-weight),
++      header-error-state-label-text-size: map.get($systems, md-sys-typescale, title-small-size),
++      header-selected-state-label-text-size: map.get($systems, md-sys-typescale, title-small-szie),
++      header-selected-state-label-text-weight: map.get(
++          $systems, md-sys-typescale, title-small-weight),
++    ),
++  );
++}
++
++/// Generates custom tokens for the mat-tab-header.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-tab-header
++@function tab-header($systems, $exclude-hardcoded) {
++  @return mat.private-merge-all(
++    _generate-typography-tokens($systems, label-text, title-small),
++    (
++      disabled-ripple-color: blue, // TODO(mmalerba): Figure out correct value.
++      pagination-icon-color: map.get($systems, md-sys-color, on-surface),
++      inactive-label-text-color: map.get($systems, md-sys-color, on-surface),
++      active-label-text-color: map.get($systems, md-sys-color, on-surface),
++      active-ripple-color: map.get($systems, md-sys-color, on-surface),
++      inactive-ripple-color: map.get($systems, md-sys-color, on-surface),
++      inactive-focus-label-text-color: map.get($systems, md-sys-color, on-surface),
++      inactive-hover-label-text-color: map.get($systems, md-sys-color, on-surface),
++      active-focus-label-text-color: map.get($systems, md-sys-color, on-surface),
++      active-hover-label-text-color: map.get($systems, md-sys-color, on-surface),
++      active-focus-indicator-color: map.get($systems, md-sys-color, primary),
++      active-hover-indicator-color: map.get($systems, md-sys-color, primary),
++    ),
++  );
++}
++
++/// Generates custom tokens for the mdc-tab-indicator. (MDC has a tab-indicator component, but they
++/// seem to have made up the tokens rather than using ones generated from the token database,
++/// therefore we need a custom token function for it).
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mdc-tab-indicator
++@function tab-indicator($systems, $exclude-hardcoded) {
++  @return (
++    active-indicator-height: _hardcode(2px, $exclude-hardcoded),
++    active-indicator-shape: _hardcode(0, $exclude-hardcoded),
++    active-indicator-color: map.get($systems, md-sys-color, primary),
++  );
++}
++
++/// Generates custom tokens for the mat-table.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-table
++@function table($systems, $exclude-hardcoded) {
++  @return mat.private-merge-all(
++    _generate-typography-tokens($systems, header-headline, title-small),
++    _generate-typography-tokens($systems, row-item-label-text, body-medium),
++    _generate-typography-tokens($systems, footer-supporting-text, body-medium),
++    (
++      row-item-outline-width: _hardcode(1px, $exclude-hardcoded),
++      background-color: map.get($systems, md-sys-color, surface),
++      header-headline-color: map.get($systems, md-sys-color, on-surface),
++      row-item-label-text-color: map.get($systems, md-sys-color, on-surface),
++      row-item-outline-color: map.get($systems, md-sys-color, outline-variant),
++    ),
++  );
++}
++
++/// Generates custom tokens for the mat-tree.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-tree
++@function tree($systems, $exclude-hardcoded) {
++  @return (
++    container-background-color: map.get($systems, md-sys-color, surface),
++    node-text-color: map.get($systems, md-sys-color, on-surface),
++    node-text-font: map.get($systems, md-sys-typescale, body-large-font),
++    node-text-size: map.get($systems, md-sys-typescale, body-large-size),
++    node-text-weight: map.get($systems, md-sys-typescale, body-large-weight),
++  );
++}
+diff --git a/src/material-experimental/theming/_m3-density.scss b/src/material-experimental/theming/_m3-density.scss
+index e5581ee4316ed3f11ab0574c3272d349de6eaccc..ef0a2bcf5e4e3e8dc2147ac36868d7243ef350fd 100644
+--- a/src/material-experimental/theming/_m3-density.scss
++++ b/src/material-experimental/theming/_m3-density.scss
+@@ -16,30 +16,49 @@
+ // TODO(mmalerba): Add density tokens for remaining components.
+ $_density-tokens: (
+   // MDC tokens
+-    (mdc, checkbox): (
++  (mdc, checkbox): (
+     state-layer-size: (40px, 36px, 32px, 28px),
+   ),
+-    (mdc, elevated-card): (),
+-    (mdc, outlined-card): (),
+-    (mdc, slider): (),
+-    (mdc, snackbar): (),
+-    (mdc, plain-tooltip): (),
+-    (mdc, circular-progress): (),
+-    (mdc, radio): (
++  (mdc, elevated-card): (),
++  (mdc, outlined-card): (),
++  (mdc, slider): (),
++  (mdc, snackbar): (),
++  (mdc, plain-tooltip): (),
++  (mdc, circular-progress): (),
++  (mdc, radio): (
+     state-layer-size: (40px, 36px, 32px, 28px),
+   ),
+-    (mdc, linear-progress): (),
+-    (mdc, switch): (),
++  (mdc, linear-progress): (),
++  (mdc, switch): (),
++  (mdc, tab): (
++    container-height: (48px, 44px, 40px, 36px, 32px)
++  ),
++  (mdc, tab-indicator): (),
++
+   // Custom Angular Material tokens
+-    (mat, card): (),
+-    (mat, toolbar): (
++  (mat, card): (),
++  (mat, toolbar): (
+     standard-height: (64px, 60px, 56px, 52px),
+     mobile-height: (56px, 52px, 48px, 44px),
+   ),
+-    (mat, slider): (),
+-    (mat, snack-bar): (),
+-    (mat, radio): (),
+-    (mat, slide-toggle): (),
++  (mat, slider): (),
++  (mat, snack-bar): (),
++  (mat, radio): (),
++  (mat, ripple): (),
++  (mat, slide-toggle): (),
++  (mat, sort): (),
++  (mat, stepper): (
++    header-height: (72px, 68px, 64px, 60px, 42px),
++  ),
++  (mat, tab-header): (),
++  (mat, table): (
++    header-container-height: (56px, 52px, 48px, 44px, 40px),
++    footer-container-height: (52px, 48px, 44px, 40px, 36px),
++    row-item-container-height: (52px, 48px, 44px, 40px, 36px),
++  ),
++  (mat, tree): (
++    node-min-height: (48px, 44px, 40px, 36px, 28px),
++  ),
+ );
+ 
+ /// Gets the value for the given density scale from the given set of density values.
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index 682a7548d8690cda89ed6bc717a477cf227678ac..4302f51c559d52c3b7d247a87ac86523f01c1e48 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -168,92 +168,133 @@
+   // TODO(mmalerba): Fill in remaining tokens.
+   $result: mat.private-merge-all(
+     // Add the system color & typography tokens (so we can give users access via an API).
+-      (
+-          (mdc, theme): map.get($systems, md-sys-color),
+-          (mdc, typography): map.get($systems, md-sys-typescale),
+-      ),
+-      // Get the official MDC component tokens
+-      _namespace-tokens(
+-            (mdc, checkbox),
+-          _fix-checkbox-tokens(mdc-tokens.md-comp-checkbox-values($systems, $exclude-hardcoded)),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mdc, elevated-card),
+-          mdc-tokens.md-comp-elevated-card-values($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mdc, outlined-card),
+-          mdc-tokens.md-comp-outlined-card-values($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mdc, slider),
+-          mdc-tokens.md-comp-slider-values($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mdc, snackbar),
+-          mdc-tokens.md-comp-snackbar-values($systems, $exclude-hardcoded),
+-          $token-slots,
+-      ),
+-      _namespace-tokens(
+-            (mdc, switch),
+-          mdc-tokens.md-comp-switch-values($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mdc, plain-tooltip),
+-          mdc-tokens.md-comp-plain-tooltip-values($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mdc, circular-progress),
+-          mdc-tokens.md-comp-circular-progress-indicator-values($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mdc, radio),
+-          mdc-tokens.md-comp-radio-button-values($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mdc, linear-progress),
+-          mdc-tokens.md-comp-linear-progress-indicator-values($systems, $exclude-hardcoded),
+-          $token-slots),
+-      // Choose values for our made up tokens based on MDC system tokens or sensible hardcoded
+-      // values.
+-      _namespace-tokens(
+-            (mat, card),
+-          custom-tokens.card($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mat, toolbar),
+-          custom-tokens.toolbar($systems, $exclude-hardcoded),
+-          $token-slots,
+-      ),
+-      _namespace-tokens(
+-            (mat, slide-toggle),
+-          custom-tokens.slide-toggle($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mat, slider),
+-          custom-tokens.slider($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mat, snack-bar),
+-          custom-tokens.snack-bar($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
+-      _namespace-tokens(
+-            (mat, radio),
+-          custom-tokens.radio($systems, $exclude-hardcoded),
+-          $token-slots
+-      ),
++    (
++      (mdc, theme): map.get($systems, md-sys-color),
++      (mdc, typography): map.get($systems, md-sys-typescale),
++    ),
++    // Get the official MDC component tokens
++    _namespace-tokens(
++      (mdc, checkbox),
++      _fix-checkbox-tokens(mdc-tokens.md-comp-checkbox-values($systems, $exclude-hardcoded)),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mdc, elevated-card),
++      mdc-tokens.md-comp-elevated-card-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mdc, outlined-card),
++      mdc-tokens.md-comp-outlined-card-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mdc, slider),
++      mdc-tokens.md-comp-slider-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mdc, snackbar),
++      mdc-tokens.md-comp-snackbar-values($systems, $exclude-hardcoded),
++      $token-slots,
++    ),
++    _namespace-tokens(
++      (mdc, switch),
++      mdc-tokens.md-comp-switch-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mdc, plain-tooltip),
++      mdc-tokens.md-comp-plain-tooltip-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mdc, circular-progress),
++      mdc-tokens.md-comp-circular-progress-indicator-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mdc, radio),
++      mdc-tokens.md-comp-radio-button-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mdc, linear-progress),
++      mdc-tokens.md-comp-linear-progress-indicator-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mdc, tab),
++      mdc-tokens.md-comp-secondary-navigation-tab-values($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    // Choose values for our made up tokens based on MDC system tokens or sensible hardcoded
++    // values.
++    _namespace-tokens(
++      (mdc, tab-indicator),
++      custom-tokens.tab-indicator($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, card),
++      custom-tokens.card($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, toolbar),
++      custom-tokens.toolbar($systems, $exclude-hardcoded),
++      $token-slots,
++    ),
++    _namespace-tokens(
++      (mat, slide-toggle),
++      custom-tokens.slide-toggle($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, slider),
++      custom-tokens.slider($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, snack-bar),
++      custom-tokens.snack-bar($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, radio),
++      custom-tokens.radio($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, ripple),
++      custom-tokens.ripple($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, sort),
++      custom-tokens.sort($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, stepper),
++      custom-tokens.stepper($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, tab-header),
++      custom-tokens.tab-header($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, table),
++      custom-tokens.table($systems, $exclude-hardcoded),
++      $token-slots
++    ),
++    _namespace-tokens(
++      (mat, tree),
++      custom-tokens.tree($systems, $exclude-hardcoded),
++      $token-slots
++    ),
+   );
+ 
+   // Strip out tokens that are systemized by our made up density system.
+@@ -286,6 +327,7 @@
+   @return _generate-tokens((
+     md-sys-color: $sys-color,
+     md-sys-elevation: mdc-tokens.md-sys-elevation-values(),
++    md-sys-state: mdc-tokens.md-sys-state-values(),
+   ));
+ }
+ 
+diff --git a/src/material/core/ripple/_ripple-theme.scss b/src/material/core/ripple/_ripple-theme.scss
+index 86aa6b53f197fe6cfb3f41efeed78624f0f13eeb..c8ebec68547a53b23291a2e84a5d6dc6797b233e 100644
+--- a/src/material/core/ripple/_ripple-theme.scss
++++ b/src/material/core/ripple/_ripple-theme.scss
+@@ -1,44 +1,76 @@
++@use 'sass:map';
+ @use '../tokens/m2/mat/ripple' as tokens-mat-ripple;
+ @use '../tokens/token-utils';
+ @use '../style/sass-utils';
+-
+ @use '../theming/theming';
+ @use '../theming/inspection';
+ 
+-@mixin base($theme) {}
++@mixin base($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {}
++}
+ 
+ @mixin color($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-ripple.$prefix,
+-      tokens-mat-ripple.get-color-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-ripple.$prefix,
++        tokens-mat-ripple.get-color-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-ripple.$prefix,
+-      tokens-mat-ripple.get-typography-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-ripple.$prefix,
++        tokens-mat-ripple.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-ripple.$prefix,
+-      tokens-mat-ripple.get-density-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-ripple.$prefix,
++        tokens-mat-ripple.get-density-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-ripple') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
+-    }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include token-utils.create-token-values(
++        tokens-mat-ripple.$prefix, map.get($tokens, tokens-mat-ripple.$prefix));
++  }
++}
+diff --git a/src/material/core/tokens/m2/_index.scss b/src/material/core/tokens/m2/_index.scss
+index 3ea2cb7cbfa9b8061ef16a687f5a8ada26acf7d7..5a3825d963d1145dc649229297b27c0c07767321 100644
+--- a/src/material/core/tokens/m2/_index.scss
++++ b/src/material/core/tokens/m2/_index.scss
+@@ -1,15 +1,19 @@
+ @use 'sass:map';
+ @use 'sass:meta';
+ @use '../../style/sass-utils';
+-
+ @use './mat/card' as tokens-mat-card;
+-@use './mat/toolbar' as tokens-mat-toolbar;
+ @use './mat/radio' as tokens-mat-radio;
++@use './mat/ripple' as tokens-mat-ripple;
++@use './mat/slide-toggle' as tokens-mat-slide-toggle;
++@use './mat/slider' as tokens-mat-slider;
+ @use './mat/snack-bar' as tokens-mat-snack-bar;
++@use './mat/sort' as tokens-mat-sort;
++@use './mat/stepper' as tokens-mat-stepper;
+ @use './mat/tab-header' as tokens-mat-tab-header;
+ @use './mat/tab-header-with-background' as tokens-mat-tab-header-with-background;
+-@use './mat/slider' as tokens-mat-slider;
+-@use './mat/slide-toggle' as tokens-mat-slide-toggle;
++@use './mat/table' as tokens-mat-table;
++@use './mat/toolbar' as tokens-mat-toolbar;
++@use './mat/tree' as tokens-mat-tree;
+ @use './mdc/checkbox' as tokens-mdc-checkbox;
+ @use './mdc/circular-progress' as tokens-mdc-circular-progress;
+ @use './mdc/dialog' as tokens-mdc-dialog;
+@@ -18,13 +22,13 @@
+ @use './mdc/linear-progress' as tokens-mdc-linear-progress;
+ @use './mdc/list' as tokens-mdc-list;
+ @use './mdc/outlined-card' as tokens-mdc-outlined-card;
++@use './mdc/plain-tooltip' as tokens-mdc-plain-tooltip;
+ @use './mdc/radio' as tokens-mdc-radio;
++@use './mdc/slider' as tokens-mdc-slider;
+ @use './mdc/snack-bar' as tokens-mdc-snack-bar;
++@use './mdc/switch' as tokens-mdc-switch;
+ @use './mdc/tab' as tokens-mdc-tab;
+ @use './mdc/tab-indicator' as tokens-mdc-tab-indicator;
+-@use './mdc/slider' as tokens-mdc-slider;
+-@use './mdc/switch' as tokens-mdc-switch;
+-@use './mdc/plain-tooltip' as tokens-mdc-plain-tooltip;
+ 
+ /// Gets the tokens for the given theme, m2 tokens module, and theming system.
+ /// @param {Map} $theme The Angular Material theme object to generate token values from.
+@@ -71,12 +75,17 @@
+   @return sass-utils.deep-merge-all(
+       _get-tokens-for-module($theme, tokens-mat-card),
+       _get-tokens-for-module($theme, tokens-mat-radio),
++      _get-tokens-for-module($theme, tokens-mat-ripple),
++      _get-tokens-for-module($theme, tokens-mat-slide-toggle),
++      _get-tokens-for-module($theme, tokens-mat-slider),
+       _get-tokens-for-module($theme, tokens-mat-snack-bar),
++      _get-tokens-for-module($theme, tokens-mat-sort),
++      _get-tokens-for-module($theme, tokens-mat-stepper),
+       _get-tokens-for-module($theme, tokens-mat-tab-header),
+       _get-tokens-for-module($theme, tokens-mat-tab-header-with-background),
++      _get-tokens-for-module($theme, tokens-mat-table),
+       _get-tokens-for-module($theme, tokens-mat-toolbar),
+-      _get-tokens-for-module($theme, tokens-mat-slide-toggle),
+-      _get-tokens-for-module($theme, tokens-mat-slider),
++      _get-tokens-for-module($theme, tokens-mat-tree),
+       _get-tokens-for-module($theme, tokens-mdc-checkbox),
+       _get-tokens-for-module($theme, tokens-mdc-circular-progress),
+       _get-tokens-for-module($theme, tokens-mdc-dialog),
+@@ -85,12 +94,12 @@
+       _get-tokens-for-module($theme, tokens-mdc-linear-progress),
+       _get-tokens-for-module($theme, tokens-mdc-list),
+       _get-tokens-for-module($theme, tokens-mdc-outlined-card),
++      _get-tokens-for-module($theme, tokens-mdc-plain-tooltip),
+       _get-tokens-for-module($theme, tokens-mdc-radio),
++      _get-tokens-for-module($theme, tokens-mdc-slider),
+       _get-tokens-for-module($theme, tokens-mdc-snack-bar),
++      _get-tokens-for-module($theme, tokens-mdc-switch),
+       _get-tokens-for-module($theme, tokens-mdc-tab),
+       _get-tokens-for-module($theme, tokens-mdc-tab-indicator),
+-      _get-tokens-for-module($theme, tokens-mdc-slider),
+-      _get-tokens-for-module($theme, tokens-mdc-switch),
+-      _get-tokens-for-module($theme, tokens-mdc-plain-tooltip),
+   );
+ }
+diff --git a/src/material/sort/_sort-theme.scss b/src/material/sort/_sort-theme.scss
+index a1d3116de80c2de57d1b68a94bbf5ba40eb88c77..1fd3dd8228e595df01d944c36941242ba2a752c9 100644
+--- a/src/material/sort/_sort-theme.scss
++++ b/src/material/sort/_sort-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '../core/tokens/m2/mat/sort' as tokens-mat-sort;
+ @use '../core/style/sass-utils';
+ @use '../core/typography/typography';
+@@ -5,42 +6,72 @@
+ @use '../core/theming/inspection';
+ @use '../core/tokens/token-utils';
+ 
+-@mixin base($theme) {}
++@mixin base($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {}
++}
+ 
+ @mixin color($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-sort.$prefix,
+-      tokens-mat-sort.get-color-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-sort.$prefix,
++        tokens-mat-sort.get-color-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-sort.$prefix,
+-      tokens-mat-sort.get-typography-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-sort.$prefix,
++        tokens-mat-sort.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  $density-scale: inspection.get-theme-density($theme);
+-
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-sort.$prefix,
+-      tokens-mat-sort.get-density-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-sort.$prefix,
++        tokens-mat-sort.get-density-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-sort') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
+-    }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include token-utils.create-token-values(
++        tokens-mat-sort.$prefix, map.get($tokens, tokens-mat-sort.$prefix));
++  }
++}
+diff --git a/src/material/stepper/_stepper-theme.scss b/src/material/stepper/_stepper-theme.scss
+index 35fa8fa26d4ee453dc0966995fcd5dfcfff4a301..3a64b47c58b9a5b72338ccb588166cd0e322cddb 100644
+--- a/src/material/stepper/_stepper-theme.scss
++++ b/src/material/stepper/_stepper-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+ @use '../core/typography/typography';
+@@ -5,50 +6,82 @@
+ @use '../core/tokens/token-utils';
+ @use '../core/tokens/m2/mat/stepper' as tokens-mat-stepper;
+ 
+-@mixin base($theme) {}
++@mixin base($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {}
++}
+ 
+ @mixin color($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-stepper.$prefix,
+-      tokens-mat-stepper.get-color-tokens($theme));
+-
+-    .mat-step-header.mat-accent {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
+       @include token-utils.create-token-values(tokens-mat-stepper.$prefix,
+-        tokens-mat-stepper.private-get-color-palette-color-tokens($theme, accent));
+-    }
++        tokens-mat-stepper.get-color-tokens($theme));
+ 
+-    .mat-step-header.mat-warn {
+-      @include token-utils.create-token-values(tokens-mat-stepper.$prefix,
+-        tokens-mat-stepper.private-get-color-palette-color-tokens($theme, warn));
++      .mat-step-header.mat-accent {
++        @include token-utils.create-token-values(tokens-mat-stepper.$prefix,
++          tokens-mat-stepper.private-get-color-palette-color-tokens($theme, accent));
++      }
++
++      .mat-step-header.mat-warn {
++        @include token-utils.create-token-values(tokens-mat-stepper.$prefix,
++          tokens-mat-stepper.private-get-color-palette-color-tokens($theme, warn));
++      }
+     }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-stepper.$prefix,
+-      tokens-mat-stepper.get-typography-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-stepper.$prefix,
++        tokens-mat-stepper.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-stepper.$prefix,
+-      tokens-mat-stepper.get-density-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-stepper.$prefix,
++        tokens-mat-stepper.get-density-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-stepper') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
+-    }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include token-utils.create-token-values(
++        tokens-mat-stepper.$prefix, map.get($tokens, tokens-mat-stepper.$prefix));
++  }
++}
+diff --git a/src/material/table/_table-theme.scss b/src/material/table/_table-theme.scss
+index 961ce45c953dbfc4128dca3afd7e59930d7dac78..643db99f70ee4cc1c8c6e5ca948d1337f2a65766 100644
+--- a/src/material/table/_table-theme.scss
++++ b/src/material/table/_table-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '../core/tokens/m2/mat/table' as tokens-mat-table;
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+@@ -6,44 +7,76 @@
+ @use '../core/style/sass-utils';
+ 
+ @mixin base($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(
+-        tokens-mat-table.$prefix, tokens-mat-table.get-unthemable-tokens());
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(
++          tokens-mat-table.$prefix, tokens-mat-table.get-unthemable-tokens());
++    }
+   }
+ }
+ 
+ @mixin color($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-table.$prefix,
+-      tokens-mat-table.get-color-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-table.$prefix,
++        tokens-mat-table.get-color-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-table.$prefix,
+-      tokens-mat-table.get-typography-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-table.$prefix,
++        tokens-mat-table.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-table.$prefix,
+-      tokens-mat-table.get-density-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-table.$prefix,
++        tokens-mat-table.get-density-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-table') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
+-    }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include token-utils.create-token-values(
++        tokens-mat-table.$prefix, map.get($tokens, tokens-mat-table.$prefix));
++  }
++}
+diff --git a/src/material/tabs/_tabs-theme.scss b/src/material/tabs/_tabs-theme.scss
+index eea4b3414588d138b15d51c1ad963014c58c76dc..0729baf88198004af1506e4ae399863b57d9a2ec 100644
+--- a/src/material/tabs/_tabs-theme.scss
++++ b/src/material/tabs/_tabs-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '@material/tab-indicator/tab-indicator-theme' as mdc-tab-indicator-theme;
+ @use '@material/tab/tab-theme' as mdc-tab-theme;
+ @use '../core/style/sass-utils';
+@@ -11,40 +12,50 @@
+ @use '../core/tokens/token-utils';
+ 
+ @mixin base($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include mdc-tab-indicator-theme.theme(tokens-mdc-tab-indicator.get-unthemable-tokens());
+-    @include mdc-tab-theme.secondary-navigation-tab-theme(tokens-mdc-tab.get-unthemable-tokens());
+-    @include token-utils.create-token-values(
+-        tokens-mat-tab-header.$prefix, tokens-mat-tab-header.get-unthemable-tokens());
+-    @include token-utils.create-token-values(
+-        tokens-mat-tab-header-with-background.$prefix,
+-        tokens-mat-tab-header-with-background.get-unthemable-tokens()
+-    );
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include mdc-tab-indicator-theme.theme(tokens-mdc-tab-indicator.get-unthemable-tokens());
++      @include mdc-tab-theme.secondary-navigation-tab-theme(tokens-mdc-tab.get-unthemable-tokens());
++      @include token-utils.create-token-values(
++          tokens-mat-tab-header.$prefix, tokens-mat-tab-header.get-unthemable-tokens());
++      @include token-utils.create-token-values(
++          tokens-mat-tab-header-with-background.$prefix,
++          tokens-mat-tab-header-with-background.get-unthemable-tokens()
++      );
++    }
+   }
+ }
+ 
+ @mixin color($theme) {
+-  .mat-mdc-tab-group, .mat-mdc-tab-nav-bar {
+-    @include _palette-styles($theme, primary);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {
++    .mat-mdc-tab-group, .mat-mdc-tab-nav-bar {
++      @include _palette-styles($theme, primary);
+ 
+-    &.mat-accent {
+-      @include _palette-styles($theme, accent);
+-    }
++      &.mat-accent {
++        @include _palette-styles($theme, accent);
++      }
+ 
+-    &.mat-warn {
+-      @include _palette-styles($theme, warn);
+-    }
++      &.mat-warn {
++        @include _palette-styles($theme, warn);
++      }
+ 
+-    &.mat-background-primary {
+-      @include _background-styles($theme, primary);
+-    }
++      &.mat-background-primary {
++        @include _background-styles($theme, primary);
++      }
+ 
+-    &.mat-background-accent {
+-      @include _background-styles($theme, accent);
+-    }
++      &.mat-background-accent {
++        @include _background-styles($theme, accent);
++      }
+ 
+-    &.mat-background-warn {
+-      @include _background-styles($theme, warn);
++      &.mat-background-warn {
++        @include _background-styles($theme, warn);
++      }
+     }
+   }
+ }
+@@ -64,43 +75,68 @@
+ }
+ 
+ @mixin typography($theme) {
+-  .mat-mdc-tab-header {
+-    @include mdc-tab-theme.secondary-navigation-tab-theme(
+-      tokens-mdc-tab.get-typography-tokens($theme));
+-    @include mdc-tab-indicator-theme.theme(
+-      tokens-mdc-tab-indicator.get-typography-tokens($theme));
+-    @include token-utils.create-token-values(tokens-mat-tab-header.$prefix,
+-      tokens-mat-tab-header.get-typography-tokens($theme));
+-    @include token-utils.create-token-values(tokens-mat-tab-header-with-background.$prefix,
+-      tokens-mat-tab-header-with-background.get-typography-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    .mat-mdc-tab-header {
++      @include mdc-tab-theme.secondary-navigation-tab-theme(
++          tokens-mdc-tab.get-typography-tokens($theme));
++      @include mdc-tab-indicator-theme.theme(
++          tokens-mdc-tab-indicator.get-typography-tokens($theme));
++      @include token-utils.create-token-values(tokens-mat-tab-header.$prefix,
++        tokens-mat-tab-header.get-typography-tokens($theme));
++      @include token-utils.create-token-values(tokens-mat-tab-header-with-background.$prefix,
++        tokens-mat-tab-header-with-background.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  .mat-mdc-tab-header {
+-    @include mdc-tab-theme.secondary-navigation-tab-theme(
+-      tokens-mdc-tab.get-density-tokens($theme));
+-    @include mdc-tab-indicator-theme.theme(
+-      tokens-mdc-tab-indicator.get-density-tokens($theme));
+-    @include token-utils.create-token-values(tokens-mat-tab-header.$prefix,
+-      tokens-mat-tab-header.get-density-tokens($theme));
+-    @include token-utils.create-token-values(tokens-mat-tab-header-with-background.$prefix,
+-      tokens-mat-tab-header-with-background.get-density-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {
++    .mat-mdc-tab-header {
++      @include mdc-tab-theme.secondary-navigation-tab-theme(
++          tokens-mdc-tab.get-density-tokens($theme));
++      @include mdc-tab-indicator-theme.theme(
++          tokens-mdc-tab-indicator.get-density-tokens($theme));
++      @include token-utils.create-token-values(tokens-mat-tab-header.$prefix,
++        tokens-mat-tab-header.get-density-tokens($theme));
++      @include token-utils.create-token-values(tokens-mat-tab-header-with-background.$prefix,
++        tokens-mat-tab-header-with-background.get-density-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-tabs') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
+-    }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
+ 
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include mdc-tab-theme.secondary-navigation-tab-theme(
++        map.get($tokens, tokens-mdc-tab.$prefix));
++    @include mdc-tab-indicator-theme.theme(
++        map.get($tokens, tokens-mdc-tab-indicator.$prefix));
++    @include token-utils.create-token-values(
++        tokens-mat-tab-header.$prefix, map.get($tokens, tokens-mat-tab-header.$prefix));
++  }
++}
+diff --git a/src/material/tree/_tree-theme.scss b/src/material/tree/_tree-theme.scss
+index 79defedddd43a10117dcce199f805196cad26ac8..715f38b712a1e7f578eb87a25fb488ba4c3141b1 100644
+--- a/src/material/tree/_tree-theme.scss
++++ b/src/material/tree/_tree-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+ @use '../core/typography/typography';
+@@ -5,46 +6,77 @@
+ @use '../core/tokens/token-utils';
+ @use '../core/tokens/m2/mat/tree' as tokens-mat-tree;
+ 
+-@mixin base($theme) {}
++@mixin base($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {}
++}
+ 
+ @mixin color($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-tree.$prefix,
+-      tokens-mat-tree.get-color-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-tree.$prefix,
++        tokens-mat-tree.get-color-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  // TODO(mmalerba): Stop calling this and resolve resulting screen diffs.
+-  $theme: inspection.private-get-typography-back-compat-theme($theme);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    // TODO(mmalerba): Stop calling this and resolve resulting screen diffs.
++    $theme: inspection.private-get-typography-back-compat-theme($theme);
+ 
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-tree.$prefix,
+-      tokens-mat-tree.get-typography-tokens($theme));
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-tree.$prefix,
++        tokens-mat-tree.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  $density-scale: inspection.get-theme-density($theme);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {
++    $density-scale: inspection.get-theme-density($theme);
+ 
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-tree.$prefix,
+-      tokens-mat-tree.get-density-tokens($theme));
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-tree.$prefix,
++        tokens-mat-tree.get-density-tokens($theme));
++    }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-tree') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
+-    }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
+ 
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include token-utils.create-token-values(
++        tokens-mat-tree.$prefix, map.get($tokens, tokens-mat-tree.$prefix));
++  }
++}

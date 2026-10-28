@@ -1,0 +1,187 @@
+diff --git a/src/dev-app/theme-m3.scss b/src/dev-app/theme-m3.scss
+index be4c5c3b9b4c2a1088f8694af2e6d421d8df050f..6ed630f6eef0e847b012894cb290de3299eadc64 100644
+--- a/src/dev-app/theme-m3.scss
++++ b/src/dev-app/theme-m3.scss
+@@ -39,6 +39,7 @@ html {
+   @include mat.card-theme($light-theme);
+   @include mat.checkbox-theme($light-theme);
+   @include mat.form-field-theme($light-theme);
++  @include mat.grid-list-theme($light-theme);
+   @include mat.input-theme($light-theme);
+   @include mat.list-theme($light-theme);
+   @include mat.progress-bar-theme($light-theme);
+@@ -66,6 +67,7 @@ html {
+   @include mat.card-color($dark-theme);
+   @include mat.checkbox-color($dark-theme);
+   @include mat.form-field-color($dark-theme);
++  @include mat.grid-list-color($dark-theme);
+   @include mat.input-color($dark-theme);
+   @include mat.list-color($dark-theme);
+   @include mat.progress-bar-color($dark-theme);
+@@ -92,6 +94,7 @@ html {
+     @include mat.card-density($scale-theme);
+     @include mat.checkbox-density($scale-theme);
+     @include mat.form-field-density($scale-theme);
++    @include mat.grid-list-density($scale-theme);
+     @include mat.input-density($scale-theme);
+     @include mat.list-density($scale-theme);
+     @include mat.progress-bar-density($scale-theme);
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index 15566ea32c5cc2424d51345a9353946df0ac5600..c8f8d51ed10f29573bc151522952ef97ac3143d1 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -62,6 +62,19 @@
+   );
+ }
+ 
++/// Generates custom tokens for the mat-grid-list.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-grid-list
++@function grid-list($systems, $exclude-hardcoded) {
++  @return (
++    tile-header-primary-text-size: map.get($systems, md-sys-typescale, body-large),
++    tile-header-secondary-text-size: map.get($systems, md-sys-typescale, body-medium),
++    tile-footer-primary-text-size: map.get($systems, md-sys-typescale, body-large),
++    tile-footer-secondary-text-size: map.get($systems, md-sys-typescale, body-medium),
++  );
++}
++
+ /// Generates custom tokens for the mat-toolbar.
+ /// @param {Map} $systems The MDC system tokens
+ /// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
+diff --git a/src/material-experimental/theming/_m3-density.scss b/src/material-experimental/theming/_m3-density.scss
+index 7646858494beaab3f55b367b21f692c01fb56d65..e7c632056c1fd21431d41a0d59ddfdc466055b45 100644
+--- a/src/material-experimental/theming/_m3-density.scss
++++ b/src/material-experimental/theming/_m3-density.scss
+@@ -45,6 +45,7 @@ $_density-tokens: (
+   // Custom Angular Material tokens
+   (mat, card): (),
+   (mat, form-fild): (),
++  (mat, grid-list): (),
+   (mat, toolbar): (
+     standard-height: (64px, 60px, 56px, 52px),
+     mobile-height: (56px, 52px, 48px, 44px),
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index 2d51ed1dd2fc6adaed80f9f49bf34d940b73df99..d7db2eff6fa3b31eb88f53b15f87972cf8964879 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -259,6 +259,11 @@
+       custom-tokens.form-field($systems, $exclude-hardcoded),
+       $token-slots
+     ),
++    _namespace-tokens(
++      (mat, grid-list),
++      custom-tokens.grid-list($systems, $exclude-hardcoded),
++      $token-slots
++    ),
+     _namespace-tokens(
+       (mat, toolbar),
+       custom-tokens.toolbar($systems, $exclude-hardcoded),
+diff --git a/src/material/core/tokens/m2/_index.scss b/src/material/core/tokens/m2/_index.scss
+index 0b8a09421c5adaf53bcc88f12cf5b4ddd8750a51..81c0a42364e3cfcbf83c142bfb8b3c306a517770 100644
+--- a/src/material/core/tokens/m2/_index.scss
++++ b/src/material/core/tokens/m2/_index.scss
+@@ -3,6 +3,7 @@
+ @use '../../style/sass-utils';
+ @use './mat/card' as tokens-mat-card;
+ @use './mat/form-field' as tokens-mat-form-field;
++@use './mat/grid-list' as tokens-mat-grid-list;
+ @use './mat/radio' as tokens-mat-radio;
+ @use './mat/ripple' as tokens-mat-ripple;
+ @use './mat/slide-toggle' as tokens-mat-slide-toggle;
+@@ -78,6 +79,7 @@
+   @return sass-utils.deep-merge-all(
+       _get-tokens-for-module($theme, tokens-mat-card),
+       _get-tokens-for-module($theme, tokens-mat-form-field),
++      _get-tokens-for-module($theme, tokens-mat-grid-list),
+       _get-tokens-for-module($theme, tokens-mat-radio),
+       _get-tokens-for-module($theme, tokens-mat-ripple),
+       _get-tokens-for-module($theme, tokens-mat-slide-toggle),
+diff --git a/src/material/grid-list/_grid-list-theme.scss b/src/material/grid-list/_grid-list-theme.scss
+index 3d84bf50edaf61dd6d0c0ac1f6939b2738af338f..00549d8995745d7b764109f9171d5bbfdae484d5 100644
+--- a/src/material/grid-list/_grid-list-theme.scss
++++ b/src/material/grid-list/_grid-list-theme.scss
+@@ -1,3 +1,4 @@
++@use 'sass:map';
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+ @use '../core/typography/typography';
+@@ -5,31 +6,63 @@
+ @use '../core/style/sass-utils';
+ @use '../core/tokens/token-utils';
+ 
+-@mixin base($theme) {}
++@mixin base($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {}
++}
+ 
+ // Include this empty mixin for consistency with the other components.
+-@mixin color($theme) {}
++@mixin color($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {}
++}
+ 
+ @mixin typography($theme) {
+-  @include sass-utils.current-selector-or-root() {
+-    @include token-utils.create-token-values(tokens-mat-grid-list.$prefix,
+-      tokens-mat-grid-list.get-typography-tokens($theme));
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    @include sass-utils.current-selector-or-root() {
++      @include token-utils.create-token-values(tokens-mat-grid-list.$prefix,
++        tokens-mat-grid-list.get-typography-tokens($theme));
++    }
+   }
+ }
+ 
+-@mixin density($theme) {}
++@mixin density($theme) {
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {}
++}
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-grid-list') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
+-    }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include token-utils.create-token-values(
++        tokens-mat-grid-list.$prefix, map.get($tokens, tokens-mat-grid-list.$prefix));
++  }
++}

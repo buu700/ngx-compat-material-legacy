@@ -1,0 +1,341 @@
+diff --git a/src/dev-app/theme-m3.scss b/src/dev-app/theme-m3.scss
+index e4483c913efc20e88eb998ed82001eb4f2d2fcd6..3466d66368a52b421710e91269e23aecbafc52c3 100644
+--- a/src/dev-app/theme-m3.scss
++++ b/src/dev-app/theme-m3.scss
+@@ -36,15 +36,16 @@ $dark-theme: matx.define-theme(map.set($m3-base-config, color, theme-type, dark)
+ 
+ // Emit default theme styles.
+ html {
+-  @include mat.checkbox-theme($light-theme);
+   @include mat.card-theme($light-theme);
+-  @include mat.tooltip-theme($light-theme);
+-  @include mat.toolbar-theme($light-theme);
+-  @include mat.slider-theme($light-theme);
+-  @include mat.snack-bar-theme($light-theme);
++  @include mat.checkbox-theme($light-theme);
++  @include mat.progress-bar-theme($light-theme);
+   @include mat.progress-spinner-theme($light-theme);
+   @include mat.radio-theme($light-theme);
+-  @include mat.progress-bar-theme($light-theme);
++  @include mat.slide-toggle-theme($light-theme);
++  @include mat.slider-theme($light-theme);
++  @include mat.snack-bar-theme($light-theme);
++  @include mat.toolbar-theme($light-theme);
++  @include mat.tooltip-theme($light-theme);
+ }
+ 
+ // Emit dark theme styles.
+@@ -53,16 +54,16 @@ html {
+   background: black;
+   color: white;
+ 
+-  @include mat.checkbox-color($dark-theme);
+   @include mat.card-color($dark-theme);
+-  @include mat.tooltip-color($dark-theme);
+-  @include mat.toolbar-color($dark-theme);
+-  @include mat.slider-color($dark-theme);
+-  @include mat.snack-bar-color($dark-theme);
++  @include mat.checkbox-color($dark-theme);
++  @include mat.progress-bar-color($dark-theme);
+   @include mat.progress-spinner-color($dark-theme);
+   @include mat.radio-color($dark-theme);
+-  @include mat.progress-bar-color($dark-theme);
+-
++  @include mat.slide-toggle-color($dark-theme);
++  @include mat.slider-color($dark-theme);
++  @include mat.snack-bar-color($dark-theme);
++  @include mat.toolbar-color($dark-theme);
++  @include mat.tooltip-color($dark-theme);
+ }
+ 
+ // Emit density styles for each scale.
+@@ -70,14 +71,15 @@ html {
+   $scale-theme: matx.define-theme(map.set($m3-base-config, density, scale, $scale));
+ 
+   .demo-density-#{$scale} {
+-    @include mat.checkbox-density($scale-theme);
+     @include mat.card-density($scale-theme);
+-    @include mat.tooltip-density($scale-theme);
+-    @include mat.toolbar-density($scale-theme);
+-    @include mat.slider-density($scale-theme);
+-    @include mat.snack-bar-density($scale-theme);
++    @include mat.checkbox-density($scale-theme);
++    @include mat.progress-bar-density($scale-theme);
+     @include mat.progress-spinner-density($scale-theme);
+     @include mat.radio-density($scale-theme);
+-    @include mat.progress-bar-density($scale-theme);
++    @include mat.slide-toggle-density($scale-theme);
++    @include mat.slider-density($scale-theme);
++    @include mat.snack-bar-density($scale-theme);
++    @include mat.toolbar-density($scale-theme);
++    @include mat.tooltip-density($scale-theme);
+   }
+ }
+diff --git a/src/material-experimental/theming/_custom-tokens.scss b/src/material-experimental/theming/_custom-tokens.scss
+index 4bc1189aabd08e84d30bf5383e10c67d2fe14be9..8fff6b3279b3dbb52c1a95cdfb2ccf593d589dec 100644
+--- a/src/material-experimental/theming/_custom-tokens.scss
++++ b/src/material-experimental/theming/_custom-tokens.scss
+@@ -44,6 +44,14 @@
+   );
+ }
+ 
++/// Generates custom tokens for the mat-slide-toggle.
++/// @param {Map} $systems The MDC system tokens
++/// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
++/// @return {Map} A set of custom tokens for the mat-slide-toggle
++@function slide-toggle($systems, $exclude-hardcoded) {
++  @return _generate-typography-tokens($systems, label-text, label-large);
++}
++
+ /// Generates custom tokens for the mat-slider.
+ /// @param {Map} $systems The MDC system tokens
+ /// @param {Boolean} $exclude-hardcoded Whether to exclude hardcoded token values
+diff --git a/src/material-experimental/theming/_m3-density.scss b/src/material-experimental/theming/_m3-density.scss
+index a6b12c429b6d67c9dc2ca0901aad673d3a0d1d5e..e5581ee4316ed3f11ab0574c3272d349de6eaccc 100644
+--- a/src/material-experimental/theming/_m3-density.scss
++++ b/src/material-experimental/theming/_m3-density.scss
+@@ -29,6 +29,7 @@ $_density-tokens: (
+     state-layer-size: (40px, 36px, 32px, 28px),
+   ),
+     (mdc, linear-progress): (),
++    (mdc, switch): (),
+   // Custom Angular Material tokens
+     (mat, card): (),
+     (mat, toolbar): (
+@@ -38,6 +39,7 @@ $_density-tokens: (
+     (mat, slider): (),
+     (mat, snack-bar): (),
+     (mat, radio): (),
++    (mat, slide-toggle): (),
+ );
+ 
+ /// Gets the value for the given density scale from the given set of density values.
+diff --git a/src/material-experimental/theming/_m3-tokens.scss b/src/material-experimental/theming/_m3-tokens.scss
+index 4aed9d8175b4976f5d9a3176d899feceffcfd2b3..682a7548d8690cda89ed6bc717a477cf227678ac 100644
+--- a/src/material-experimental/theming/_m3-tokens.scss
++++ b/src/material-experimental/theming/_m3-tokens.scss
+@@ -198,6 +198,11 @@
+           mdc-tokens.md-comp-snackbar-values($systems, $exclude-hardcoded),
+           $token-slots,
+       ),
++      _namespace-tokens(
++            (mdc, switch),
++          mdc-tokens.md-comp-switch-values($systems, $exclude-hardcoded),
++          $token-slots
++      ),
+       _namespace-tokens(
+             (mdc, plain-tooltip),
+           mdc-tokens.md-comp-plain-tooltip-values($systems, $exclude-hardcoded),
+@@ -229,6 +234,11 @@
+           custom-tokens.toolbar($systems, $exclude-hardcoded),
+           $token-slots,
+       ),
++      _namespace-tokens(
++            (mat, slide-toggle),
++          custom-tokens.slide-toggle($systems, $exclude-hardcoded),
++          $token-slots
++      ),
+       _namespace-tokens(
+             (mat, slider),
+           custom-tokens.slider($systems, $exclude-hardcoded),
+diff --git a/src/material/core/tokens/m2/_index.scss b/src/material/core/tokens/m2/_index.scss
+index c7082735822d8dcde18c1a59da0cfbb0f46cd594..3ea2cb7cbfa9b8061ef16a687f5a8ada26acf7d7 100644
+--- a/src/material/core/tokens/m2/_index.scss
++++ b/src/material/core/tokens/m2/_index.scss
+@@ -9,6 +9,7 @@
+ @use './mat/tab-header' as tokens-mat-tab-header;
+ @use './mat/tab-header-with-background' as tokens-mat-tab-header-with-background;
+ @use './mat/slider' as tokens-mat-slider;
++@use './mat/slide-toggle' as tokens-mat-slide-toggle;
+ @use './mdc/checkbox' as tokens-mdc-checkbox;
+ @use './mdc/circular-progress' as tokens-mdc-circular-progress;
+ @use './mdc/dialog' as tokens-mdc-dialog;
+@@ -22,6 +23,7 @@
+ @use './mdc/tab' as tokens-mdc-tab;
+ @use './mdc/tab-indicator' as tokens-mdc-tab-indicator;
+ @use './mdc/slider' as tokens-mdc-slider;
++@use './mdc/switch' as tokens-mdc-switch;
+ @use './mdc/plain-tooltip' as tokens-mdc-plain-tooltip;
+ 
+ /// Gets the tokens for the given theme, m2 tokens module, and theming system.
+@@ -73,6 +75,7 @@
+       _get-tokens-for-module($theme, tokens-mat-tab-header),
+       _get-tokens-for-module($theme, tokens-mat-tab-header-with-background),
+       _get-tokens-for-module($theme, tokens-mat-toolbar),
++      _get-tokens-for-module($theme, tokens-mat-slide-toggle),
+       _get-tokens-for-module($theme, tokens-mat-slider),
+       _get-tokens-for-module($theme, tokens-mdc-checkbox),
+       _get-tokens-for-module($theme, tokens-mdc-circular-progress),
+@@ -87,6 +90,7 @@
+       _get-tokens-for-module($theme, tokens-mdc-tab),
+       _get-tokens-for-module($theme, tokens-mdc-tab-indicator),
+       _get-tokens-for-module($theme, tokens-mdc-slider),
++      _get-tokens-for-module($theme, tokens-mdc-switch),
+       _get-tokens-for-module($theme, tokens-mdc-plain-tooltip),
+   );
+ }
+diff --git a/src/material/slide-toggle/_slide-toggle-theme.scss b/src/material/slide-toggle/_slide-toggle-theme.scss
+index 579954f38420fdd12f583dcd7b9844620a3ad130..3f5add0aaed83cea7ab07c64b115afca2f74272c 100644
+--- a/src/material/slide-toggle/_slide-toggle-theme.scss
++++ b/src/material/slide-toggle/_slide-toggle-theme.scss
+@@ -1,82 +1,116 @@
++@use 'sass:map';
+ @use '@material/switch/switch-theme' as mdc-switch-theme;
+ @use '@material/form-field' as mdc-form-field;
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+ @use '../core/mdc-helpers/mdc-helpers';
+ @use '../core/typography/typography';
+-@use '../core/tokens/m2/mdc/switch' as m2-mdc-switch;
+-@use '../core/tokens/m2/mat/slide-toggle' as m2-mat-slide-toggle;
++@use '../core/tokens/m2/mdc/switch' as tokens-mdc-switch;
++@use '../core/tokens/m2/mat/slide-toggle' as tokens-mat-slide-toggle;
+ @use '../core/tokens/token-utils';
+ 
+ @mixin base($theme) {
+-  .mdc-switch {
+-    @include mdc-switch-theme.theme(m2-mdc-switch.get-unthemable-tokens());
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, base));
++  }
++  @else {
++    .mdc-switch {
++      @include mdc-switch-theme.theme(tokens-mdc-switch.get-unthemable-tokens());
++    }
+   }
+ }
+ 
+ @mixin color($theme) {
+-  $is-dark: inspection.get-theme-type($theme) == dark;
+-  $mdc-switch-color-tokens: m2-mdc-switch.get-color-tokens($theme);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, color));
++  }
++  @else {
++    $is-dark: inspection.get-theme-type($theme) == dark;
++    $mdc-switch-color-tokens: tokens-mdc-switch.get-color-tokens($theme);
+ 
+-  @include mdc-helpers.using-mdc-theme($theme) {
+-    // Add values for MDC slide toggles tokens
+-    .mat-mdc-slide-toggle {
+-      @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-theme-styles-query);
+-      @include mdc-switch-theme.theme($mdc-switch-color-tokens);
++    @include mdc-helpers.using-mdc-theme($theme) {
++      // Add values for MDC slide toggles tokens
++      .mat-mdc-slide-toggle {
++        @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-theme-styles-query);
++        @include mdc-switch-theme.theme($mdc-switch-color-tokens);
+ 
+-      // MDC should set the disabled color on the label, but doesn't, so we do it here instead.
+-      .mdc-switch--disabled + label {
+-        color: inspection.get-theme-color($theme, foreground, disabled-text);
+-      }
++        // MDC should set the disabled color on the label, but doesn't, so we do it here instead.
++        .mdc-switch--disabled + label {
++          color: inspection.get-theme-color($theme, foreground, disabled-text);
++        }
+ 
+-      // Change the color palette related tokens to accent or warn if applicable
+-      &.mat-accent {
+-        @include mdc-switch-theme.theme(
+-            m2-mdc-switch.private-get-color-palette-color-tokens($theme, accent));
+-      }
++        // Change the color palette related tokens to accent or warn if applicable
++        &.mat-accent {
++          @include mdc-switch-theme.theme(
++              tokens-mdc-switch.private-get-color-palette-color-tokens($theme, accent));
++        }
+ 
+-      &.mat-warn {
+-        @include mdc-switch-theme.theme(
+-            m2-mdc-switch.private-get-color-palette-color-tokens($theme, warn));
++        &.mat-warn {
++          @include mdc-switch-theme.theme(
++              tokens-mdc-switch.private-get-color-palette-color-tokens($theme, warn));
++        }
+       }
+     }
+   }
+ }
+ 
+ @mixin typography($theme) {
+-  $mdc-switch-typography-tokens: m2-mdc-switch.get-typography-tokens($theme);
+-  $mat-slide-toggle-typography-tokens: m2-mat-slide-toggle.get-typography-tokens($theme);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, typography));
++  }
++  @else {
++    $mdc-switch-typography-tokens: tokens-mdc-switch.get-typography-tokens($theme);
++    $mat-slide-toggle-typography-tokens: tokens-mat-slide-toggle.get-typography-tokens($theme);
+ 
+-  //Add values for MDC slide toggle tokens
+-  .mat-mdc-slide-toggle {
+-    @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-typography-styles-query);
+-    @include mdc-switch-theme.theme($mdc-switch-typography-tokens);
+-    @include token-utils.create-token-values(
+-      m2-mat-slide-toggle.$prefix,
+-      $mat-slide-toggle-typography-tokens
+-    );
++    //Add values for MDC slide toggle tokens
++    .mat-mdc-slide-toggle {
++      @include mdc-form-field.core-styles($query: mdc-helpers.$mdc-typography-styles-query);
++      @include mdc-switch-theme.theme($mdc-switch-typography-tokens);
++      @include token-utils.create-token-values(
++          tokens-mat-slide-toggle.$prefix,
++          $mat-slide-toggle-typography-tokens
++      );
++    }
+   }
+ }
+ 
+ @mixin density($theme) {
+-  $density-scale: inspection.get-theme-density($theme);
++  @if inspection.get-theme-version($theme) == 1 {
++    @include _theme-from-tokens(inspection.get-theme-tokens($theme, density));
++  }
++  @else {
++    $density-scale: inspection.get-theme-density($theme);
+ 
+-  .mat-mdc-slide-toggle {
+-    @include mdc-switch-theme.theme(mdc-switch-theme.density($density-scale));
++    .mat-mdc-slide-toggle {
++      @include mdc-switch-theme.theme(mdc-switch-theme.density($density-scale));
++    }
+   }
+ }
+ 
+ @mixin theme($theme) {
+   @include theming.private-check-duplicate-theme-styles($theme, 'mat-slide-toggle') {
+-    @include base($theme);
+-    @if inspection.theme-has($theme, color) {
+-      @include color($theme);
+-    }
+-    @if inspection.theme-has($theme, density) {
+-      @include density($theme);
++    @if inspection.get-theme-version($theme) == 1 {
++      @include _theme-from-tokens(inspection.get-theme-tokens($theme));
+     }
+-    @if inspection.theme-has($theme, typography) {
+-      @include typography($theme);
++    @else {
++      @include base($theme);
++      @if inspection.theme-has($theme, color) {
++        @include color($theme);
++      }
++      @if inspection.theme-has($theme, density) {
++        @include density($theme);
++      }
++      @if inspection.theme-has($theme, typography) {
++        @include typography($theme);
++      }
+     }
+   }
+ }
++
++@mixin _theme-from-tokens($tokens) {
++  @if ($tokens != ()) {
++    @include mdc-switch-theme.theme(map.get($tokens, tokens-mdc-switch.$prefix));
++    @include token-utils.create-token-values(
++        tokens-mat-slide-toggle.$prefix, map.get($tokens, tokens-mat-slide-toggle.$prefix));
++  }
++}
