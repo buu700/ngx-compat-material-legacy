@@ -62,9 +62,9 @@ export function qualifyPackedProductSourceRepairs({root,read,line,data,history,r
  const currentTargets=[...data.targets,...registry.owned_contracts.targets,...registry.service_defaults.targets,
   ...registry.dialog_config.targets,registry.delta,registry.dialog.delta,registry.tooltip.delta,registry.menu_type.delta];
  for(const member of history.product_members){
-  let expected=currentTargets.find(t=>t.path===member.path)?.sha256??member.sha256;
-  const qualified=nativeSpec.qualify(member);
-  if(qualified){assert.equal(currentTargets.some(t=>t.path===member.path),false);expected=qualified.sha256;}
+  const target=currentTargets.find(t=>t.path===member.path),qualified=nativeSpec.qualify(target??member);
+  let expected=qualified?.sha256??target?.sha256??member.sha256;
+  if(qualified&&target)assert.ok(nativeSpec.titleSource.qualify(target),'only exact title targets may compose with an earlier product repair');
   assert.equal(hash(read(member.path)),expected,'changed raw current product/resource '+member.path);
  }
 

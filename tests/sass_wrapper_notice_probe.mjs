@@ -10,6 +10,7 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {dialogTitleReaderSubject} from '../scripts/dialog-title-source-context.mjs';
 import {sassWrapperNoticeSubject,SASS_NOTICE_PACKET,SASS_NOTICE_READERS} from '../scripts/sass-wrapper-notice-subject.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=p=>readFileSync(join(root,p));
@@ -18,11 +19,13 @@ const hash=raw=>createHash('sha256').update(raw).digest('hex');
 const notices=JSON.parse(read(SASS_NOTICE_PACKET)),readers=JSON.parse(read(SASS_NOTICE_READERS));
 const rows=[...notices.subjects,...readers.code_subjects],scope=sassWrapperNoticeSubject({root,read});
 assert.equal(scope.exact_silent_prefixes,7);assert.equal(scope.current_reader_hooks,6);
+const title=dialogTitleReaderSubject({root,read,line:'main'});
 const positive=[],rejected=[];
 for(const row of rows){
-  for(const side of ['before','after'])assert.deepEqual(scope.qualify({path:row.path,...row[side]}),{path:row.path,...row.after});
+  const current=title.qualify({path:row.path,...row.after})??{path:row.path,...row.after};
+  for(const side of ['before','after'])assert.deepEqual(scope.qualify({path:row.path,...row[side]}),current);
   assert.deepEqual(scope.historicalReference({path:row.path,...row.after}),{path:row.path,...row.before});
-  assert.equal(hash(read(row.path)),row.after.sha256);positive.push('current-and-authenticated-original-metadata/'+row.path);
+  assert.equal(hash(read(row.path)),current.sha256);positive.push('current-and-authenticated-original-metadata/'+row.path);
   for(const [id,bytes]of [['extra-source-edit',Buffer.concat([read(row.path),Buffer.from('\n// extra\n')])],
     ['reverted-prefix-or-reader',Buffer.from('reverted, not the authenticated after-image')]]){
     assert.throws(()=>sassWrapperNoticeSubject({root,read:p=>p===row.path?bytes:read(p)}));rejected.push(id+'/'+row.path);

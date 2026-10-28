@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import sys
 from autocomplete_selection_source_refs import _git
+from dialog_title_reader_refs import title_prior_tool_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = 'compatibility/f10/disposition-ledger/ledger.json'
@@ -43,7 +44,7 @@ def verify_consumer_wrapper_successor(expected_before=None, root=ROOT, candidate
     assert not packet['actual_native_artifact_floor_or_G11_qualified']
     refs = {ref['path']: ref for ref in packet['qualification_members']}
     for ref in [packet['code_subject'], *packet['qualification_members']]:
-        raw = (root / ref['path']).read_bytes()
+        raw = title_prior_tool_bytes(root, ref['path'])
         assert SHA(raw) == ref['sha256'] and len(raw) == ref['bytes']
     transport_raw = (root / TRANSPORT).read_bytes()
     assert SHA(transport_raw) == transport_pin

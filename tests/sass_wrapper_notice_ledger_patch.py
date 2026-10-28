@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import sys
 from autocomplete_selection_source_refs import _git
+from dialog_title_reader_refs import title_prior_tool_bytes
 from sass_wrapper_notice_refs import qualified_notice_reference
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,7 +39,7 @@ def verify_sass_notice_metadata_successor(expected_before=None, root=ROOT, candi
     if expected_before is not None:
         assert before == expected_before
     for ref in [packet['code_subject']] + packet['qualification_members']:
-        data = (root / ref['path']).read_bytes()
+        data = title_prior_tool_bytes(root, ref['path'])
         assert SHA(data) == ref['sha256'] and len(data) == ref['bytes']
     assert packet['code_subject']['path'] == 'scripts/sass-wrapper-notice-metadata.mjs'
     refs = {ref['path']: ref for ref in packet['qualification_members']}

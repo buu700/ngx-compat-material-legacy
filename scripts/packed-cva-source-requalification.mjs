@@ -13,6 +13,8 @@ import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import {join} from 'node:path';
 import {gunzipSync} from 'node:zlib';
+import {dialogTitleReaderSubject} from './dialog-title-source-context.mjs';
+import {dialogTitlePriorMetadataRead} from './snack-dom-source-context.mjs';
 import {qualifyPackedProductSourceRepairs} from './packed-product-source-recovery.mjs';
 import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';
 import {sourceRole} from './dialog-caller-config-source-rebinding.mjs';
@@ -160,13 +162,14 @@ export function reviewPackedDetectorCalls(root, beforeRead, currentRead) {
 }
 
 /** Build the unique successor without changing a source judgment outside its worksheet. */
-export function preparePackedCvaSourceRequalification({root = process.cwd(), read = disk(root)} = {}) {
+export function preparePackedCvaSourceRequalification({root = process.cwd(), read = disk(root), historicalTitleMetadata = false} = {}) {
+  assert.equal(typeof historicalTitleMetadata,'boolean');
   const inputBytes = read(PACKED_CVA_ROLE_INPUTS), inputs = JSON.parse(inputBytes), line = inputs.line;
   assert.equal(hash(inputBytes), pins[line], 'changed packed role inputs');
   packedCvaMetadataToolingEpoch({root, read});
   const nativeSpec = autocompleteSelectionReaderSubject({root, read, line});
   assert.equal(inputs.selected.length, 241); assert.equal(inputs.accessor_roles.length, 6);
-  const cache = new Map(), current = path => {
+  const cache = new Map();let current = path => {
     if (!cache.has(path)) cache.set(path, read(path)); return cache.get(path);
   };
   const before = new Map();
@@ -186,7 +189,21 @@ export function preparePackedCvaSourceRequalification({root = process.cwd(), rea
   assert.equal(hash(current(sourceInputs.history_product.path)), sourceInputs.history_product.sha256);
   const packed = qualifyPackedProductSourceRepairs({root, read: current, line,
     data: productInputs.packed_repairs, registry: productInputs, history});
-  const oldRead = path => before.get(path) ?? packed.read(path);
+  const actualCurrent=current;let priorRead=packed.read;
+  if(historicalTitleMetadata){
+    // Reconstruct this producer's original source-review epoch only. Raw title
+    // admission above and the returned reader's product reads remain current.
+    const titleCurrent=dialogTitlePriorMetadataRead({root,read});
+    const titlePrior=dialogTitlePriorMetadataRead({root,read:packed.read});
+    const currentTools=dialogTitleReaderSubject({root,read:titleCurrent,line});
+    const priorTools=dialogTitleReaderSubject({root,read:titlePrior,line});
+    const metadataCurrent=currentTools.withHistoricalToolMetadata(metadata=>metadata);
+    priorRead=priorTools.withHistoricalToolMetadata(metadata=>metadata);
+    const historicalCache=new Map();current=dialogTitlePriorMetadataRead({root,read,metadataOverlay:path=>{
+      if(!historicalCache.has(path))historicalCache.set(path,metadataCurrent(path));return historicalCache.get(path);
+    }});
+  }
+  const oldRead = path => before.get(path) ?? priorRead(path);
   const ledgers = new Map(inputs.prior_ledgers.map(m => [m.path, JSON.parse(before.get(m.path))]));
   const frozen = ledgers.get(frozenPath), added = ledgers.get(addedPath);
   assert.equal(frozen.symbol_uses.length, 1736); assert.equal(added.symbol_uses.length, 315);
@@ -291,20 +308,23 @@ export function preparePackedCvaSourceRequalification({root = process.cwd(), rea
     reason: 'Exactly four packed TS repairs; all1963liveuses,313liveadditions and two qualified retired obligations retained.', new_semantic_closures: 0});
   added.current_source_population_sha256 = live.source_population_sha256; added.status = 'closed';
   writes.set(frozenPath, bytes(frozen)); writes.set(addedPath, bytes(added));
-  const proposed = path => writes.get(path) ?? current(path);
+  const proposedBase=path=>writes.get(path)??current(path);
+  const proposed=historicalTitleMetadata?dialogTitlePriorMetadataRead({root,read,metadataOverlay:proposedBase}):proposedBase;
   const reviews = [frozen, added].map(doc => authoredUseReviewEvidence(doc, line, proposed, hash));
   assert.deepEqual(reviews.map(r => [r.reviewed, r.insufficient]), [[1736, 0], [315, 0]]);
   const admission = currentAuthoredUseAdmission({current: live, frozen: frozen.symbol_uses, candidate: added, line, readMember: proposed});
   assert.equal(admission.ready, true, JSON.stringify(admission)); assert.equal(admission.additional_obligations, 315);
   assert.equal(admission.retained_removed_additional_obligations, 2);
   for (const path of [frozenPath, addedPath]) {
-    const accepted=current(path).equals(before.get(path)) || current(path).equals(writes.get(path));
-    const actual=JSON.parse(current(path)),expected=JSON.parse(writes.get(path));
+    const accepted=actualCurrent(path).equals(before.get(path)) || actualCurrent(path).equals(writes.get(path));
+    const actual=JSON.parse(actualCurrent(path)),expected=JSON.parse(writes.get(path));
     const changed=actual.symbol_uses.find((row,index)=>JSON.stringify(row)!==JSON.stringify(expected.symbol_uses[index]));
     assert.ok(accepted, 'unrelated live canonical metadata edit ' + path + (changed ? ' first changed use ' + key(changed) : ' envelope'));
   }
   nativeSpec.assertCurrent();
   return {line, inputs, writes, before, product_preimages: packed.preimages,
+    reconstruction_context:historicalTitleMetadata?'authenticated-before-title-source-and-tool-metadata':'current-source',
+    current_title_or_native_admission:false,
     assertCurrentNativeSpec: nativeSpec.assertCurrent,
     roles: {changed: 68, detectors: 2, accessor: 6}, admission,
     source_scope_only: true, current_coordinator_native_or_floor_qualified: false};
@@ -312,7 +332,7 @@ export function preparePackedCvaSourceRequalification({root = process.cwd(), rea
 
 /** Only exact applied successors may project the two original metadata files. */
 export function packedCvaRoleHistoricalReader({root = process.cwd(), read = disk(root)} = {}) {
-  const prepared = preparePackedCvaSourceRequalification({root, read});
+  const prepared = preparePackedCvaSourceRequalification({root, read, historicalTitleMetadata:true});
   const tooling = packedCvaMetadataToolingEpoch({root, read});
   assert.equal(hash(read(tooling.path)), prepared.inputs.metadata_tooling_delta.sha256,
     'current applied source review requires its reviewed type-proof adapter');

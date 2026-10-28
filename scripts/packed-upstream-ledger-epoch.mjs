@@ -653,7 +653,9 @@ function prepareSassNoticeMetadataStage({root,read,line,before,bound}){
   assert.equal(packet.code_subject.path,'scripts/sass-wrapper-notice-metadata.mjs');
   selectionMember({root,read,line,ref:packet.code_subject,bound});
   const source=sassWrapperNoticeMetadata({root,read});assert.equal(source.before.equals(before),true);
-  assert.deepEqual(packet.qualification_members,source.bound);assert.deepEqual(packet.entries,source.entries);
+  const titleReaders=selectionReaders(root,read,line).titleReaders;
+  const historicalMembers=source.bound.map(ref=>titleReaders.historicalReference(ref)??ref);
+  assert.deepEqual(packet.qualification_members,historicalMembers);assert.deepEqual(packet.entries,source.entries);
   for(const ref of source.bound)selectionMember({root,read,line,ref,bound});
   for(const report of source.reports){
     const bytes=selectionMember({root,read,line,ref:report.ref,bound});assert.equal(bytes.equals(report.raw),true);
@@ -684,7 +686,7 @@ function prepareHistoricalWrapperMetadataStage({root,read,line,before,bound}){
   assert.equal(packet.original_dispositions_or_hunk_judgments_changed,0);assert.equal(packet.unrelated_entry_or_byte_changes,0);
   assert.equal(packet.actual_native_artifact_floor_or_G11_qualified,false);assert.equal(packet.g11_claim,'not-passed');
   assert.equal(packet.code_subject.path,'scripts/historical-chip-wrapper-metadata.mjs');selectionMember({root,read,line,ref:packet.code_subject,bound});
-  const source=historicalChipWrapperMetadata({root,read,line});assert.equal(source.before.equals(before),true);
+  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalChipWrapperMetadata({root,read:metadata,line}));assert.equal(source.before.equals(before),true);
   assert.deepEqual(packet.qualification_members,source.bound);assert.deepEqual(packet.entries,source.entries);
   for(const ref of source.bound)selectionMember({root,read,line,ref,bound});
   for(const report of source.reports)assert.equal(selectionMember({root,read,line,ref:report.ref,bound}).equals(report.raw),true);
@@ -710,7 +712,7 @@ function prepareHistoricalConsumerWrapperMetadataStage({root,read,line,before,bo
   assert.equal(packet.original_dispositions_or_hunk_judgments_changed,0);assert.equal(packet.unrelated_entry_or_byte_changes,0);assert.equal(packet.new_upstream_SHA_decisions,0);
   assert.equal(packet.actual_native_artifact_floor_or_G11_qualified,false);assert.equal(packet.g11_claim,'not-passed');
   assert.equal(packet.code_subject.path,'scripts/historical-consumer-wrapper-metadata.mjs');selectionMember({root,read,line,ref:packet.code_subject,bound});
-  const source=historicalConsumerWrapperMetadata({root,read,line});assert.equal(source.before.equals(before),true);
+  const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalConsumerWrapperMetadata({root,read:metadata,line}));assert.equal(source.before.equals(before),true);
   assert.deepEqual(packet.qualification_members,source.bound);assert.deepEqual(packet.entries,source.entries);
   for(const ref of source.bound)selectionMember({root,read,line,ref,bound});
   for(const report of source.reports)assert.equal(selectionMember({root,read,line,ref:report.ref,bound}).equals(report.raw),true);
@@ -733,7 +735,8 @@ export function preparePackedUpstreamLedger({root = process.cwd(), read = disk(r
   assert.equal(hash(before), data.before_ledger.sha256);
   const bound = new Map([[inputPath, hash(input)]]);
   if(line==='main'){const path='scripts/sass-wrapper-notice-subject.mjs';
-    assert.equal(hash(read(path)),'d3cc81cda9599840bcef5ad019c4aae4d892368474f7767e1ee56c9a7434d4fd','changed finite Sass notice qualifier');bound.set(path,hash(read(path)));}
+    const ref={path,sha256:'d3cc81cda9599840bcef5ad019c4aae4d892368474f7767e1ee56c9a7434d4fd'};
+    selectionMember({root,read,line,ref,bound});}
   // Scope checks bracket the complete preparation instead of rereading every
   // scope member for each unrelated member. Individual reads still check their
   // own digest, and returned epoch readers retain their full late-change gate.

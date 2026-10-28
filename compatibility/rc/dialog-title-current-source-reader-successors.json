@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "line": "main",
+  "source_parent": "db7bafefe20a15bf370a9fe72e283dcbaec8e0dc",
+  "scope": "Exact title source-reader hooks composed with the existing seven Sass notice prefixes; preserves reports, decisions and current raw product reads",
+  "code_subjects": [
+    {
+      "path": "scripts/upstream-testing-api-21x-admission.mjs",
+      "before": {
+        "sha256": "6415108225487d444d065d805d3b1dcc9bb804fac5bf61f3874ec7a75cf77bd3",
+        "bytes": 11601
+      },
+      "after": {
+        "sha256": "c6dacbfc140f1fef7489dd330bc30f099fafa24cf4e851c09bcd070bbf88596c",
+        "bytes": 11785
+      },
+      "literal_edits": [
+        {
+          "before": "import {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';",
+          "after": "import {dialogTitleProductSubject} from './dialog-title-source-context.mjs';\nimport {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';"
+        },
+        {
+          "before": "spec=autocompleteSelectionSpecSubject({root,read,line:'21.x'});",
+          "after": "spec=autocompleteSelectionSpecSubject({root,read,line:'21.x'}),title=dialogTitleProductSubject({root,read,line:'21.x'});"
+        },
+        {
+          "before": "      let current=member;",
+          "after": "      let current=title.qualify(member)??member;"
+        },
+        {
+          "before": "    const sourcePaths = snapshot.members.map",
+          "after": "    title.assertCurrent();\n    const sourcePaths = snapshot.members.map"
+        }
+      ]
+    },
+    {
+      "path": "scripts/autocomplete-selection-spec-subject.mjs",
+      "before": {
+        "sha256": "c57e09c9649666999fa4ee4ff8ae3aa2c6462e450e1d3b0257ccedb5d6b2bded",
+        "bytes": 9965
+      },
+      "after": {
+        "sha256": "4738487c1bfe99e291864f7ffe09e60fea06575fda724bf238f0ba1055117049",
+        "bytes": 10716
+      },
+      "literal_edits": [
+        {
+          "before": "import {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';",
+          "after": "import {sassWrapperNoticeSubject} from './sass-wrapper-notice-subject.mjs';\nimport {dialogTitleProductSubject,dialogTitleReaderSubject} from './dialog-title-source-context.mjs';"
+        },
+        {
+          "before": "  const notices=sassWrapperNoticeSubject({root,read,line});",
+          "after": "  const title=dialogTitleProductSubject({root,read,line}),titleReaders=dialogTitleReaderSubject({root,read,line});\n  const notices=sassWrapperNoticeSubject({root,read,line});"
+        },
+        {
+          "before": "...notices.bound];",
+          "after": "...notices.bound,...title.bound,...titleReaders.bound];"
+        },
+        {
+          "before": "  const qualify=ref=>{\n    if(ref.path===spec.path){",
+          "after": "  const qualify=ref=>{\n    const product=title.qualify(ref);if(product)return product;\n    if(ref.path===spec.path){"
+        },
+        {
+          "before": "if(!row)return notices.qualify(ref);",
+          "after": "if(!row)return titleReaders.qualify(ref)??notices.qualify(ref);"
+        },
+        {
+          "before": "const assertCurrent=()=>{spec.assertCurrent();for(const ref of bound)",
+          "after": "const assertCurrent=()=>{spec.assertCurrent();title.assertCurrent();titleReaders.assertCurrent();notices.assertCurrent();for(const ref of bound)"
+        },
+        {
+          "before": "qualify,assertCurrent,historicalMetadataReference,native_or_full_source_admission_credit:false",
+          "after": "qualify,assertCurrent,historicalMetadataReference,titleSource:title,titleReaders,native_or_full_source_admission_credit:false"
+        },
+        {
+          "before": "const current=notices.qualify({path:row.path,...row.after})??{path:row.path,...row.after};",
+          "after": "const current=notices.qualify({path:row.path,...row.after})??titleReaders.qualify({path:row.path,...row.after})??{path:row.path,...row.after};"
+        },
+        {
+          "before": "if(!row)return titleReaders.qualify(ref)??notices.qualify(ref);",
+          "after": "if(!row)return notices.qualify(ref)??titleReaders.qualify(ref);"
+        },
+        {
+          "before": "const notice=notices.qualify({path:row.path,...row.after});",
+          "after": "const notice=notices.qualify({path:row.path,...row.after})??titleReaders.qualify({path:row.path,...row.after});"
+        },
+        {
+          "before": "    if(notice?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,notice.bytes);return notice;}\n    assert.ok([row.before.sha256,row.after.sha256].includes(ref.sha256));",
+          "after": "    if(notice?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,notice.bytes);return notice;}\n    const beforeTitle=notice&&titleReaders.historicalReference(notice);\n    if(beforeTitle?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,beforeTitle.bytes);return notice;}\n    assert.ok([row.before.sha256,row.after.sha256].includes(ref.sha256));"
+        }
+      ]
+    },
+    {
+      "path": "scripts/packed-upstream-ledger-epoch.mjs",
+      "before": {
+        "sha256": "4c8d1c9fb6c981fca50d2d98d69e62516a9a843a3027054312cfd7fee41bd77a",
+        "bytes": 77111
+      },
+      "after": {
+        "sha256": "c1796a82462b977885659b23e25406861c02c40252477ee17f3b5014747ddcaa",
+        "bytes": 77433
+      },
+      "literal_edits": [
+        {
+          "before": "const source=historicalChipWrapperMetadata({root,read,line});",
+          "after": "const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalChipWrapperMetadata({root,read:metadata,line}));"
+        },
+        {
+          "before": "const source=historicalConsumerWrapperMetadata({root,read,line});",
+          "after": "const source=selectionReaders(root,read,line).titleReaders.withHistoricalToolMetadata(metadata=>historicalConsumerWrapperMetadata({root,read:metadata,line}));"
+        },
+        {
+          "before": "    assert.equal(hash(read(path)),'d3cc81cda9599840bcef5ad019c4aae4d892368474f7767e1ee56c9a7434d4fd','changed finite Sass notice qualifier');bound.set(path,hash(read(path)));}",
+          "after": "    const ref={path,sha256:'d3cc81cda9599840bcef5ad019c4aae4d892368474f7767e1ee56c9a7434d4fd'};\n    selectionMember({root,read,line,ref,bound});}"
+        },
+        {
+          "before": "  const source=sassWrapperNoticeMetadata({root,read});assert.equal(source.before.equals(before),true);\n  assert.deepEqual(packet.qualification_members,source.bound);assert.deepEqual(packet.entries,source.entries);",
+          "after": "  const source=sassWrapperNoticeMetadata({root,read});assert.equal(source.before.equals(before),true);\n  const titleReaders=selectionReaders(root,read,line).titleReaders;\n  const historicalMembers=source.bound.map(ref=>titleReaders.historicalReference(ref)??ref);\n  assert.deepEqual(packet.qualification_members,historicalMembers);assert.deepEqual(packet.entries,source.entries);"
+        }
+      ]
+    },
+    {
+      "path": "scripts/packed-product-source-recovery.mjs",
+      "before": {
+        "sha256": "d1efbd02bed5faf05df137660f361fe7d851709ff1c5e0ea4e6c4bdec7b285ec",
+        "bytes": 12673
+      },
+      "after": {
+        "sha256": "abc3c659e9451d2ccf9ec65bd45ed94672342d2fa42dea0f89b2c561bb72c9d1",
+        "bytes": 12749
+      },
+      "literal_edits": [
+        {
+          "before": "  let expected=currentTargets.find(t=>t.path===member.path)?.sha256??member.sha256;",
+          "after": "  const target=currentTargets.find(t=>t.path===member.path),qualified=nativeSpec.qualify(target??member);\n  let expected=qualified?.sha256??target?.sha256??member.sha256;"
+        },
+        {
+          "before": "  const qualified=nativeSpec.qualify(member);\n  if(qualified){assert.equal(currentTargets.some(t=>t.path===member.path),false);expected=qualified.sha256;}",
+          "after": "  if(qualified&&target)assert.ok(nativeSpec.titleSource.qualify(target),'only exact title targets may compose with an earlier product repair');"
+        }
+      ]
+    },
+    {
+      "path": "scripts/dialog-caller-owned-contract-boundary.mjs",
+      "before": {
+        "sha256": "a3d6f7194c94bf6fcf6ce74c3be18da9fb567245a2f749c52745488d80e8f238",
+        "bytes": 13601
+      },
+      "after": {
+        "sha256": "29d24b5c308b53d3fbad703f0f99159a23b752f21add052d8c99ed87d3fd4b12",
+        "bytes": 14749
+      },
+      "literal_edits": [
+        {
+          "before": "import {inspectDialogServiceDefaults}",
+          "after": "import {DIALOG_TITLE_SOURCE_IMAGES,dialogTitleProductSubject} from './dialog-title-source-context.mjs';\nimport {inspectDialogServiceDefaults}"
+        },
+        {
+          "before": "  assert.ok(line, 'changed owned dialog contract proposal');\n  const proposal",
+          "after": "  assert.ok(line, 'changed owned dialog contract proposal');\n  const actualRead=read,title=dialogTitleProductSubject({root,read:actualRead,line});\n  // Private before-title metadata only. Historical strict/runtime receipts keep\n  // their exact original graphs; current roles and every raw caller use actualRead.\n  const titleMetadata=new Map();\n  for(const image of DIALOG_TITLE_SOURCE_IMAGES){\n    let before=actualRead(image.path).toString();\n    for(const [from,to]of [...image.edits].reverse()){assert.equal(before.split(to).length,2);before=before.replace(to,from);}\n    assert.equal(hash(before),image.before);assert.equal(Buffer.byteLength(before),image.before_bytes);titleMetadata.set(image.path,Buffer.from(before));\n  }\n  read=path=>titleMetadata.has(path)?Buffer.from(titleMetadata.get(path)):actualRead(path);\n  const proposal"
+        },
+        {
+          "before": "  return {line, raw_product_applied: applied, targets: proposal.members.map(member => ({path: member.path,\n    before_sha256: member.before.sha256, sha256: member.after.sha256, bytes: member.after.bytes})), preimages,\n    proposed_sources: graph.sources, routes: graph.routes, edges: graph.edges, defaults, proof, ref, sdkDeclarations,",
+          "after": "  const currentGraph=componentConfigGraph({root,read:actualRead,selected:defaults.configuration.source.prior.selected});\n  assert.deepEqual(snapshot(currentGraph.sources),snapshot(graph.sources).map(member=>title.qualify(member)??member));\n  assert.deepEqual([...currentGraph.routes],[...graph.routes]);\n  const historicalTargets=proposal.members.map(member=>({path:member.path,before_sha256:member.before.sha256,sha256:member.after.sha256,bytes:member.after.bytes}));\n  title.assertCurrent();\n  return {line, raw_product_applied: applied, targets:historicalTargets.map(member=>title.qualify(member)??member),historical_targets:historicalTargets,preimages,\n    proposed_sources:currentGraph.sources,routes:currentGraph.routes,edges:currentGraph.edges,defaults,proof,ref,sdkDeclarations,\n    title_source_requalification:{current_sources:title.bound.filter(member=>member.path.startsWith(prefix)),historical_receipts_remain_before_title:true,current_raw_graph_members:currentGraph.sources.size,current_native_or_packed_or_full_source_qualified:false},\n    defaults_are_historical_for_title_sources:true,"
+        },
+        {
+          "before": "import {DIALOG_TITLE_SOURCE_IMAGES,dialogTitleProductSubject} from './dialog-title-source-context.mjs';",
+          "after": "import {dialogTitleProductSubject} from './dialog-title-source-context.mjs';\nimport {dialogTitlePriorMetadataRead} from './snack-dom-source-context.mjs';"
+        },
+        {
+          "before": "  // Private before-title metadata only. Historical strict/runtime receipts keep\n  // their exact original graphs; current roles and every raw caller use actualRead.\n  const titleMetadata=new Map();\n  for(const image of DIALOG_TITLE_SOURCE_IMAGES){\n    let before=actualRead(image.path).toString();\n    for(const [from,to]of [...image.edits].reverse()){assert.equal(before.split(to).length,2);before=before.replace(to,from);}\n    assert.equal(hash(before),image.before);assert.equal(Buffer.byteLength(before),image.before_bytes);titleMetadata.set(image.path,Buffer.from(before));\n  }\n  read=path=>titleMetadata.has(path)?Buffer.from(titleMetadata.get(path)):actualRead(path);\n",
+          "after": "  // Private historical comparisons remain owned by the canonical source owner.\n  read=dialogTitlePriorMetadataRead({root,read:actualRead});\n"
+        }
+      ]
+    },
+    {
+      "path": "scripts/snack-dom-source-context.mjs",
+      "before": {
+        "sha256": "90961de79aa264ac04fc50afb0525d31026b96cd1683e8b467a34f66892659c7",
+        "bytes": 42560
+      },
+      "after": {
+        "sha256": "6f6bb9ca5fdb1494449be0e74aa2ab62d90c9ec402927b6e46b7a8f36533e189",
+        "bytes": 45576
+      },
+      "literal_edits": [
+        {
+          "before": "assert.deepEqual(data.owned_contracts.targets,owned.targets);",
+          "after": "assert.deepEqual(data.owned_contracts.targets,owned.historical_targets);"
+        },
+        {
+          "before": "assert.deepEqual(focusData.independent_dialog_owned_contract_targets,owned.targets);",
+          "after": "assert.deepEqual(focusData.independent_dialog_owned_contract_targets,owned.historical_targets);"
+        },
+        {
+          "before": "owned:{targets:owned.targets,qualification:owned.ref,source_scope_only:true,",
+          "after": "owned:{targets:owned.targets,historical_targets:owned.historical_targets,title_source_requalification:owned.title_source_requalification,qualification:owned.ref,source_scope_only:true,"
+        },
+        {
+          "before": "import {dialogPortalPrior,",
+          "after": "import {DIALOG_TITLE_SOURCE_IMAGES,dialogTitleProductSubject} from './dialog-title-source-context.mjs';\nimport {dialogPortalPrior,"
+        },
+        {
+          "before": "function currentRaw(root,read){for(;;){read=packedUpstreamLedgerRawRead({root,read});if(!branded.has(read))return read;const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}}",
+          "after": "function currentRaw(root,read){for(;;){read=packedUpstreamLedgerRawRead({root,read});if(!branded.has(read))return read;const previous=branded.get(read);assert.equal(previous.root,root);read=previous.raw;}}\n\n/** Authenticated before-title metadata only; currentRaw unwraps this for raw admission. */\nexport function dialogTitlePriorMetadataRead({root=process.cwd(),read=rawRead(root)}={}){\n read=currentRaw(root,read);const title=dialogTitleProductSubject({root,read}),before=new Map();\n for(const image of DIALOG_TITLE_SOURCE_IMAGES){\n  let text=read(image.path).toString();\n  for(const [from,to]of [...image.edits].reverse()){assert.equal(text.split(to).length,2);text=text.replace(to,from);}\n  assert.equal(hash(text),image.before);assert.equal(Buffer.byteLength(text),image.before_bytes);before.set(image.path,Buffer.from(text));\n }\n const metadata=path=>{title.assertCurrent();return before.has(path)?Buffer.from(before.get(path)):read(path);};\n branded.set(metadata,{root,raw:read});return metadata;\n}\n"
+        },
+        {
+          "before": " const comparison=path=>service.preimages.has(path)?",
+          "after": " const titleMetadata=dialogTitlePriorMetadataRead({root,read:types});\n const comparison=path=>service.preimages.has(path)?"
+        },
+        {
+          "before": "owned.preimages.has(path)?Buffer.from(owned.preimages.get(path)):types(path);",
+          "after": "owned.preimages.has(path)?Buffer.from(owned.preimages.get(path)):titleMetadata(path);"
+        },
+        {
+          "before": "const targets=[...packed.targets,...owned.targets,...service.targets,...config.targets,data.menu_type.delta];",
+          "after": "const targets=[...packed.targets,...owned.targets,...service.targets,...config.targets,data.menu_type.delta,...owned.title_source_requalification.current_sources];"
+        },
+        {
+          "before": "config=service.configuration,packedTypes=packedRepairTypeEvidenceRead({root,read});const reader=",
+          "after": "config=service.configuration,packedTypes=packedRepairTypeEvidenceRead({root,read}),titleMetadata=dialogTitlePriorMetadataRead({root,read:packedTypes});const reader="
+        },
+        {
+          "before": "?Buffer.from(menu.before):packedTypes(p);branded.set(reader,",
+          "after": "?Buffer.from(menu.before):titleMetadata(p);branded.set(reader,"
+        },
+        {
+          "before": " read=currentRaw(root,read);const title=dialogTitleProductSubject({root,read}),before=new Map();",
+          "after": " const metadataRead=read;read=currentRaw(root,read);const title=dialogTitleProductSubject({root,read}),before=new Map();"
+        },
+        {
+          "before": "return before.has(path)?Buffer.from(before.get(path)):read(path);",
+          "after": "return before.has(path)?Buffer.from(before.get(path)):metadataRead(path);"
+        },
+        {
+          "before": "// Only reconstruct the immutable old report metadata; every source read above was current.",
+          "after": "// Reconstruct the original report from explicit historical metadata; raw current title and overlay graphs are qualified separately."
+        },
+        {
+          "before": "import {readFileSync,lstatSync} from 'node:fs';",
+          "after": "import {readFileSync,lstatSync,realpathSync} from 'node:fs';"
+        },
+        {
+          "before": "const rawRead=root=>p=>{let path=root;for(const part of p.split('/')){assert.ok(part&&part!=='.'&&part!=='..');path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}assert.ok(lstatSync(path).isFile());return readFileSync(path);};",
+          "after": "const rawRead=root=>p=>{\n const parts=p.split('/');assert.ok(parts.every(part=>part&&part!=='.'&&part!=='..'));\n const peer=p.match(/^node_modules\\/@angular\\/(material|cdk)\\/(.+)$/);\n let path=peer?realpathSync(join(root,'node_modules/@angular',peer[1])):root;\n const tail=peer?peer[2].split('/'):parts;\n // Only the declared peer package root can be linked. Source paths and every\n // descendant of the resolved peer root keep their original no-link checks.\n for(const part of tail){path=join(path,part);assert.equal(lstatSync(path).isSymbolicLink(),false);}\n assert.ok(lstatSync(path).isFile());return readFileSync(path);\n};"
+        },
+        {
+          "before": "export function dialogTitlePriorMetadataRead({root=process.cwd(),read=rawRead(root)}={}){",
+          "after": "export function dialogTitlePriorMetadataRead({root=process.cwd(),read=rawRead(root),metadataOverlay}={}){"
+        },
+        {
+          "before": "return before.has(path)?Buffer.from(before.get(path)):metadataRead(path);",
+          "after": "return before.has(path)?Buffer.from(before.get(path)):metadataOverlay?metadataOverlay(path):metadataRead(path);"
+        },
+        {
+          "before": "for(const m of data.owned_contract_review_members){assert.equal(hash(read(m.path)),m.sha256,'changed applied dialog contract review '+m.path);",
+          "after": "for(const m of data.owned_contract_review_members){const current=nativeSpec.qualify(m)??m;assert.equal(hash(read(m.path)),current.sha256,'changed applied dialog contract review '+m.path);"
+        },
+        {
+          "before": " let additionalCount=0;for(const path of ['compatibility/f10/authored-use-reviews/table-coercion-callers.json','compatibility/f10/authored-use-reviews/platform-callers.json','compatibility/f10/authored-use-reviews/core-token-callers.json','compatibility/f10/authored-use-reviews/remaining-core-callers.json','compatibility/f10/authored-use-reviews/material-core-callers.json','compatibility/f10/authored-use-reviews/cdk-module-type-callers.json','compatibility/f10/authored-use-reviews/layout-service-callers.json','compatibility/f10/authored-use-reviews/table-callers.json','compatibility/f10/authored-use-reviews/overlay-callers.json','compatibility/f10/authored-use-reviews/tabs-callers.json','compatibility/f10/authored-use-reviews/form-field-callers.json','compatibility/f10/authored-use-reviews/menu-callers.json','compatibility/f10/authored-use-reviews/a11y-callers.json','compatibility/f10/authored-use-reviews/component-config-callers.json','compatibility/f10/authored-use-reviews/dialog-callers.json','compatibility/f10/authored-use-reviews/material-remaining-callers.json']){const body=JSON.parse(read(path));assert.equal(body.line,data.line);assert.equal(body.status,'reviewed');for(const row of body.reviews){assert.equal(hash((['compatibility/f10/authored-use-reviews/dialog-callers.json','compatibility/f10/authored-use-reviews/material-remaining-callers.json'].includes(path)?read:['compatibility/f10/authored-use-reviews/overlay-callers.json','compatibility/f10/authored-use-reviews/tabs-callers.json','compatibility/f10/authored-use-reviews/form-field-callers.json','compatibility/f10/authored-use-reviews/menu-callers.json','compatibility/f10/authored-use-reviews/a11y-callers.json','compatibility/f10/authored-use-reviews/component-config-callers.json'].includes(path)?configEpoch:callerRead)('projects/ngx-material-legacy/'+row.file)),row.candidate_source_sha256);for(const m of row.independent_evidence)assert.equal(hash(read(m.path)),m.sha256,'changed additional caller dependency '+m.path);additionalCount++;}}assert.equal(additionalCount,336);",
+          "after": " let additionalCount=0;for(const path of ['compatibility/f10/authored-use-reviews/table-coercion-callers.json','compatibility/f10/authored-use-reviews/platform-callers.json','compatibility/f10/authored-use-reviews/core-token-callers.json','compatibility/f10/authored-use-reviews/remaining-core-callers.json','compatibility/f10/authored-use-reviews/material-core-callers.json','compatibility/f10/authored-use-reviews/cdk-module-type-callers.json','compatibility/f10/authored-use-reviews/layout-service-callers.json','compatibility/f10/authored-use-reviews/table-callers.json','compatibility/f10/authored-use-reviews/overlay-callers.json','compatibility/f10/authored-use-reviews/tabs-callers.json','compatibility/f10/authored-use-reviews/form-field-callers.json','compatibility/f10/authored-use-reviews/menu-callers.json','compatibility/f10/authored-use-reviews/a11y-callers.json','compatibility/f10/authored-use-reviews/component-config-callers.json','compatibility/f10/authored-use-reviews/dialog-callers.json','compatibility/f10/authored-use-reviews/material-remaining-callers.json']){const body=JSON.parse(read(path));assert.equal(body.line,data.line);assert.equal(body.status,'reviewed');for(const row of body.reviews){assert.equal(hash((['compatibility/f10/authored-use-reviews/dialog-callers.json','compatibility/f10/authored-use-reviews/material-remaining-callers.json'].includes(path)?read:['compatibility/f10/authored-use-reviews/overlay-callers.json','compatibility/f10/authored-use-reviews/tabs-callers.json','compatibility/f10/authored-use-reviews/form-field-callers.json','compatibility/f10/authored-use-reviews/menu-callers.json','compatibility/f10/authored-use-reviews/a11y-callers.json','compatibility/f10/authored-use-reviews/component-config-callers.json'].includes(path)?configEpoch:callerRead)('projects/ngx-material-legacy/'+row.file)),(['compatibility/f10/authored-use-reviews/dialog-callers.json','compatibility/f10/authored-use-reviews/material-remaining-callers.json'].includes(path)?nativeSpec.titleSource.qualify({path:'projects/ngx-material-legacy/'+row.file,sha256:row.candidate_source_sha256})?.sha256:null)??row.candidate_source_sha256);for(const m of row.independent_evidence){const current=nativeSpec.qualify(m)??m;assert.equal(hash(read(m.path)),current.sha256,'changed additional caller dependency '+m.path);}additionalCount++;}}assert.equal(additionalCount,336);"
+        },
+        {
+          "before": "source=reviewDialogPortalSource(root,tooltipPriorCallerRead({root,read}));",
+          "after": "source=reviewDialogPortalSource(root,tooltipPriorCallerRead({root,read}),{currentSourceRead:read});"
+        },
+        {
+          "before": " const peer=p.match(/^node_modules\\/@angular\\/(material|cdk)\\/(.+)$/);\n let path=peer?realpathSync(join(root,'node_modules/@angular',peer[1])):root;\n const tail=peer?peer[2].split('/'):parts;",
+          "after": " const peer=p.match(/^(projects\\/ngx-material-legacy\\/)?node_modules\\/@angular\\/(material|cdk)\\/(.+)$/);\n let path=root;\n if(peer){\n  path=realpathSync(join(root,peer[1]??'','node_modules/@angular',peer[2]));\n  assert.equal(path,realpathSync(join(root,'node_modules/@angular',peer[2])),'workspace peer differs from the declared root peer');\n }\n const tail=peer?peer[3].split('/'):parts;"
+        },
+        {
+          "before": " const peer=p.match(/^(projects\\/ngx-material-legacy\\/)?node_modules\\/@angular\\/(material|cdk)\\/(.+)$/);\n let path=root;\n if(peer){\n  path=realpathSync(join(root,peer[1]??'','node_modules/@angular',peer[2]));\n  assert.equal(path,realpathSync(join(root,'node_modules/@angular',peer[2])),'workspace peer differs from the declared root peer');\n }\n const tail=peer?peer[3].split('/'):parts;",
+          "after": " const peer=p.match(/^(projects\\/ngx-material-legacy\\/)?node_modules\\/@angular\\/(material|cdk)\\/(.+)$/);\n // The source resolver also reads these five workspace peer manifests.\n // This grants no access to their other files or to an alternative package.\n const metadata=p.match(/^projects\\/ngx-material-legacy\\/node_modules\\/(@angular\\/(?:core|common|forms)|rxjs)\\/(package\\.json|operators\\/package\\.json)$/);\n if(metadata)assert.ok(metadata[2]==='package.json'||metadata[1]==='rxjs');\n const packageName=peer?'@angular/'+peer[2]:metadata?.[1];\n let path=root;\n if(packageName){\n  const prefix=peer?peer[1]??'':'projects/ngx-material-legacy/';\n  path=realpathSync(join(root,prefix,'node_modules',packageName));\n  assert.equal(path,realpathSync(join(root,'node_modules',packageName)),'workspace peer differs from the declared root peer');\n  if(metadata)assert.equal(JSON.parse(readFileSync(join(path,'package.json'))).name,packageName,'wrong workspace peer manifest identity');\n }\n const tail=peer?peer[3].split('/'):metadata?metadata[2].split('/'):parts;"
+        }
+      ]
+    },
+    {
+      "path": "scripts/packed-cva-source-requalification.mjs",
+      "before": {
+        "sha256": "201bb30be2d5b0c38bd6d0ba573919040573a5cda2bbc62310a489a9884886af",
+        "bytes": 25670
+      },
+      "after": {
+        "sha256": "0028bd78cbdda3237c3866baf62cc4c0f4fcbea1b67691d0425072facf77ed5c",
+        "bytes": 27199
+      },
+      "literal_edits": [
+        {
+          "before": "import {qualifyPackedProductSourceRepairs}",
+          "after": "import {dialogTitleReaderSubject} from './dialog-title-source-context.mjs';\nimport {dialogTitlePriorMetadataRead} from './snack-dom-source-context.mjs';\nimport {qualifyPackedProductSourceRepairs}"
+        },
+        {
+          "before": "export function preparePackedCvaSourceRequalification({root = process.cwd(), read = disk(root)} = {}) {",
+          "after": "export function preparePackedCvaSourceRequalification({root = process.cwd(), read = disk(root), historicalTitleMetadata = false} = {}) {"
+        },
+        {
+          "before": "  const cache = new Map(), current = path => {",
+          "after": "  const cache = new Map();let current = path => {"
+        },
+        {
+          "before": "  const oldRead = path => before.get(path) ?? packed.read(path);",
+          "after": "  const actualCurrent=current;let priorRead=packed.read;\n  if(historicalTitleMetadata){\n    // Reconstruct this producer's original source-review epoch only. Raw title\n    // admission above and the returned reader's product reads remain current.\n    const titleCurrent=dialogTitlePriorMetadataRead({root,read});\n    const titlePrior=dialogTitlePriorMetadataRead({root,read:packed.read});\n    const currentTools=dialogTitleReaderSubject({root,read:titleCurrent,line});\n    const priorTools=dialogTitleReaderSubject({root,read:titlePrior,line});\n    const metadataCurrent=currentTools.withHistoricalToolMetadata(metadata=>metadata);\n    priorRead=priorTools.withHistoricalToolMetadata(metadata=>metadata);\n    const historicalCache=new Map();current=path=>{\n      if(!historicalCache.has(path))historicalCache.set(path,metadataCurrent(path));return historicalCache.get(path);\n    };\n  }\n  const oldRead = path => before.get(path) ?? priorRead(path);"
+        },
+        {
+          "before": "    const accepted=current(path).equals(before.get(path)) || current(path).equals(writes.get(path));\n    const actual=JSON.parse(current(path)),expected=JSON.parse(writes.get(path));",
+          "after": "    const accepted=actualCurrent(path).equals(before.get(path)) || actualCurrent(path).equals(writes.get(path));\n    const actual=JSON.parse(actualCurrent(path)),expected=JSON.parse(writes.get(path));"
+        },
+        {
+          "before": "  return {line, inputs, writes, before, product_preimages: packed.preimages,",
+          "after": "  return {line, inputs, writes, before, product_preimages: packed.preimages,\n    reconstruction_context:historicalTitleMetadata?'authenticated-before-title-source-and-tool-metadata':'current-source',\n    current_title_or_native_admission:!historicalTitleMetadata&&false,"
+        },
+        {
+          "before": "  const prepared = preparePackedCvaSourceRequalification({root, read});",
+          "after": "  const prepared = preparePackedCvaSourceRequalification({root, read, historicalTitleMetadata:true});"
+        },
+        {
+          "before": "  const inputBytes = read(PACKED_CVA_ROLE_INPUTS), inputs = JSON.parse(inputBytes), line = inputs.line;",
+          "after": "  assert.equal(typeof historicalTitleMetadata,'boolean');\n  const inputBytes = read(PACKED_CVA_ROLE_INPUTS), inputs = JSON.parse(inputBytes), line = inputs.line;"
+        },
+        {
+          "before": "    const historicalCache=new Map();current=path=>{\n      if(!historicalCache.has(path))historicalCache.set(path,metadataCurrent(path));return historicalCache.get(path);\n    };",
+          "after": "    const historicalCache=new Map();current=dialogTitlePriorMetadataRead({root,read,metadataOverlay:path=>{\n      if(!historicalCache.has(path))historicalCache.set(path,metadataCurrent(path));return historicalCache.get(path);\n    }});"
+        },
+        {
+          "before": "  const proposed = path => writes.get(path) ?? current(path);",
+          "after": "  const proposedBase=path=>writes.get(path)??current(path);\n  const proposed=historicalTitleMetadata?dialogTitlePriorMetadataRead({root,read,metadataOverlay:proposedBase}):proposedBase;"
+        },
+        {
+          "before": "current_title_or_native_admission:!historicalTitleMetadata&&false,",
+          "after": "current_title_or_native_admission:false,"
+        }
+      ]
+    },
+    {
+      "path": "scripts/sass-wrapper-notice-subject.mjs",
+      "before": {
+        "sha256": "d3cc81cda9599840bcef5ad019c4aae4d892368474f7767e1ee56c9a7434d4fd",
+        "bytes": 7261
+      },
+      "after": {
+        "sha256": "0316375e213bbbac066bca4e5c644c668b6361a82bdbdd8da2de427661e8c856",
+        "bytes": 7937
+      },
+      "literal_edits": [
+        {
+          "before": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';",
+          "after": "import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';\nimport {dialogTitleReaderSubject} from './dialog-title-source-context.mjs';"
+        },
+        {
+          "before": "  assert.equal(line,'main');\n  const bound=new Map(),rows=new Map();",
+          "after": "  assert.equal(line,'main');\n  const titleReaders=dialogTitleReaderSubject({root,read,line});\n  const bound=new Map(),rows=new Map();"
+        },
+        {
+          "before": "    const raw=read(path);assert.equal(hash(raw),expected.sha256,'unqualified Sass notice subject '+path);\n    if(expected.bytes!==undefined)assert.equal(raw.length,expected.bytes);",
+          "after": "    const current=titleReaders.qualify({path,...expected})??expected;\n    const raw=read(path);assert.equal(hash(raw),current.sha256,'unqualified Sass notice subject '+path);\n    if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);"
+        },
+        {
+          "before": "    assert.equal(member(row.path,row.after).toString(),after,'source hook exceeds its finite delta');rows.set(row.path,structuredClone(row));",
+          "after": "    const current=member(row.path,row.after),historical=titleReaders.historicalReference({path:row.path,sha256:hash(current),bytes:current.length});\n    if(historical)assert.deepEqual(historical,{path:row.path,...row.after});\n    else assert.equal(current.toString(),after,'source hook exceeds its finite delta');\n    rows.set(row.path,structuredClone(row));"
+        },
+        {
+          "before": "  const assertCurrent=()=>{for(const ref of bound.values()){",
+          "after": "  const assertCurrent=()=>{titleReaders.assertCurrent();for(const ref of bound.values()){"
+        },
+        {
+          "before": "    assert.ok([row.before.sha256,row.after.sha256].includes(ref.sha256),'unqualified earlier Sass notice metadata '+ref.path);",
+          "after": "    const successor=titleReaders.qualify({path:row.path,...row.after});\n    if(successor?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,successor.bytes);assertCurrent();return successor;}\n    assert.ok([row.before.sha256,row.after.sha256].includes(ref.sha256),'unqualified earlier Sass notice metadata '+ref.path);"
+        },
+        {
+          "before": "    assertCurrent();return {path:ref.path,...row.after};",
+          "after": "    assertCurrent();return successor??{path:ref.path,...row.after};"
+        }
+      ]
+    },
+    {
+      "path": "scripts/dialog-portal-failure-recovery.mjs",
+      "before": {
+        "sha256": "a23eacb5c90c1e952235cc0a9ba458ce2938ad09c3689126bd9ae35fa15967ba",
+        "bytes": 12177
+      },
+      "after": {
+        "sha256": "78250c763fe00860bf2b8f3f93c13c298b541595e5332efec65fb8b1b1dafd98",
+        "bytes": 13105
+      },
+      "literal_edits": [
+        {
+          "before": "import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';",
+          "after": "import {autocompleteSelectionReaderSubject} from './autocomplete-selection-spec-subject.mjs';\nimport {snackDomRawCurrentRead} from './snack-dom-source-context.mjs';"
+        },
+        {
+          "before": "export function reviewDialogPortalSource(root=process.cwd(),read=p=>readFileSync(join(root,p))){const prior=dialogPortalPrior(root,read),nativeSpec=autocompleteSelectionReaderSubject({root,read,line:prior.line}),actual=",
+          "after": "/** Historical product comparisons require the canonical reader's actual raw source. */\nexport function reviewDialogPortalSource(root=process.cwd(),read=p=>readFileSync(join(root,p)),{currentSourceRead}={}){\n if(currentSourceRead){assert.notEqual(currentSourceRead,read);assert.equal(snackDomRawCurrentRead({root,read}),currentSourceRead,'historical portal metadata requires a canonical current source');}\n const prior=dialogPortalPrior(root,read),nativeSpec=autocompleteSelectionReaderSubject({root,read:currentSourceRead??read,line:prior.line}),actual="
+        },
+        {
+          "before": " const expected=(nativeSpec.qualify(m)??m).sha256;",
+          "after": " const current=nativeSpec.qualify(m)??m;\n const expected=(currentSourceRead?nativeSpec.titleSource.historicalReference(current)??current:current).sha256;"
+        },
+        {
+          "before": "other_product_resource_members_unchanged:prior.line==='main'?1133:1140,",
+          "after": "other_product_resource_members_unchanged:(prior.line==='main'?1133:1140)-(currentSourceRead?0:2),\n ...(currentSourceRead?{}:{independently_qualified_title_source:nativeSpec.titleSource.bound.filter(ref=>ref.path.startsWith('projects/ngx-material-legacy/'))}),"
+        },
+        {
+          "before": " const current=nativeSpec.qualify(m)??m;\n const expected=(currentSourceRead?nativeSpec.titleSource.historicalReference(current)??current:current).sha256;",
+          "after": " // The capsule predates both the owned-state and title repairs. Its exact\n // original two title references are compared only inside this metadata lane.\n const historicalTitle=currentSourceRead&&nativeSpec.titleSource.bound.some(ref=>ref.path===m.path&&ref.path.startsWith('projects/ngx-material-legacy/'));\n const expected=historicalTitle?m.sha256:(nativeSpec.qualify(m)??m).sha256;"
+        }
+      ]
+    }
+  ],
+  "old_product_bytes_exposed": false,
+  "canonical_decisions_changed": 0,
+  "native_or_full_qualification": false
+}

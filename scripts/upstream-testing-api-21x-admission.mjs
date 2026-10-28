@@ -11,6 +11,7 @@ import {createHash} from 'node:crypto';
 import {readFileSync, writeFileSync, mkdtempSync, unlinkSync, rmdirSync} from 'node:fs';
 import {join,dirname,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {dialogTitleProductSubject} from './dialog-title-source-context.mjs';
 import {autocompleteSelectionSpecSubject} from './autocomplete-selection-spec-subject.mjs';
 import {tmpdir} from 'node:os';
 import {spawnSync} from 'node:child_process';
@@ -102,12 +103,13 @@ export function testingApi21xSourceEvidenceOk(proof, read, productPaths) {
     assert.deepEqual(proof, testingApi21xSourceProof(row));
     const snapshot = JSON.parse(gunzipSync(readMember(read, body.current_product)));
     assert.equal(snapshot.line, '21.x'); assert.equal(snapshot.members.length, 1142);
-    const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),spec=autocompleteSelectionSpecSubject({root,read,line:'21.x'});
+    const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),spec=autocompleteSelectionSpecSubject({root,read,line:'21.x'}),title=dialogTitleProductSubject({root,read,line:'21.x'});
     for (const member of snapshot.members) {
-      let current=member;
+      let current=title.qualify(member)??member;
       if(member.path===spec.path){assert.equal(member.sha256,spec.before.sha256);assert.equal(member.bytes,spec.before.bytes);current={...member,...spec.after};}
       const raw=readMember(read,current);assert.equal(raw.length,current.bytes);
     }
+    title.assertCurrent();
     const sourcePaths = snapshot.members.map(member => member.path).filter(path => /\.(ts|scss|css|html)$/.test(path)).sort();
     assert.deepEqual(productPaths().sort(), sourcePaths);
     for (const ref of body.prior_reviews) readMember(read, ref);

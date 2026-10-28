@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import subprocess
 from sass_wrapper_notice_refs import qualified_notice_reference, notice_prior_bytes
+from dialog_title_reader_refs import qualified_title_reader_reference
 
 SPEC = 'projects/ngx-material-legacy/legacy-autocomplete/autocomplete.spec.ts'
 CODE = ('scripts/upstream-rules-js-build-admission.mjs', 'scripts/autocomplete-landscape-source-judgment.mjs',
@@ -61,7 +62,7 @@ def qualified_reference(root, ref):
             assert ref['bytes'] == packet[side]['bytes']
         return dict(ref, **packet['after'])
     if ref['path'] not in CODE:
-        return qualified_notice_reference(root, ref) or ref
+        return qualified_notice_reference(root, ref) or qualified_title_reader_reference(root, ref) or ref
     raw = (root / 'compatibility/rc/autocomplete-selection-source-reader-successors.json').read_bytes()
     line = _line(root)
     assert sha(raw) == {'main': 'bf806c5628500798e6045d40858b0523b6744656cf582ee1d263847d4f1cdcf3',
@@ -78,7 +79,7 @@ def qualified_reference(root, ref):
     assert reduced.encode() == _git(root, packet['source_parent'], ref['path'])
     assert sha(reduced.encode()) == row['before']['sha256']
     if ref['sha256'] not in (row['before']['sha256'], row['after']['sha256']):
-        qualified = qualified_notice_reference(root, dict(path=row['path'], **row['after']))
+        qualified = qualified_notice_reference(root, dict(path=row['path'], **row['after'])) or qualified_title_reader_reference(root, dict(path=row['path'], **row['after']))
         assert qualified is not None and ref['sha256'] == qualified['sha256']
         if 'bytes' in ref:
             assert ref['bytes'] == qualified['bytes']
@@ -88,7 +89,7 @@ def qualified_reference(root, ref):
     if 'bytes' in ref:
         assert ref['bytes'] == row[side]['bytes']
     previous = dict(ref, **row['after'])
-    return qualified_notice_reference(root, previous) or previous
+    return qualified_notice_reference(root, previous) or qualified_title_reader_reference(root, previous) or previous
 
 
 if __name__ == '__main__':

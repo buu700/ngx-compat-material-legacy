@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import subprocess
+from dialog_title_reader_refs import title_prior_tool_bytes, qualified_title_reader_reference
 
 SHA = lambda raw: hashlib.sha256(raw).hexdigest()
 PARENT = '8dccb816e63c1f417ac6f1d5b502b8ea43aae2d0'
@@ -45,7 +46,7 @@ def _rows(root):
 def notice_prior_bytes(root, path):
     """Return an authenticated historical input solely for reverse proof checking."""
     row = next((row for row in _rows(root) if row['path'] == path), None)
-    current = (root / path).read_bytes()
+    current = title_prior_tool_bytes(root, path)
     if row is None:
         return current
     assert SHA(current) == row['after']['sha256'] and len(current) == row['after']['bytes']
@@ -73,11 +74,16 @@ def qualified_notice_reference(root, ref):
     if row is None:
         return None
     notice_prior_bytes(root, ref['path'])
+    successor = qualified_title_reader_reference(root, dict(path=row['path'], **row['after']))
+    if successor and ref['sha256'] == successor['sha256']:
+        if 'bytes' in ref:
+            assert ref['bytes'] == successor['bytes']
+        return dict(ref, **{key: successor[key] for key in ('sha256', 'bytes')})
     assert ref['sha256'] in (row['before']['sha256'], row['after']['sha256'])
     side = 'before' if ref['sha256'] == row['before']['sha256'] else 'after'
     if 'bytes' in ref:
         assert ref['bytes'] == row[side]['bytes']
-    return dict(ref, **row['after'])
+    return dict(ref, **{key: (successor or row['after'])[key] for key in ('sha256', 'bytes')})
 
 
 if __name__ == '__main__':
@@ -85,6 +91,6 @@ if __name__ == '__main__':
     root = Path(__file__).resolve().parents[1]
     rows = _rows(root)
     for row in rows:
-        assert qualified_notice_reference(root, dict(path=row['path'], **row['before'])) == dict(path=row['path'], **row['after'])
+        assert qualified_notice_reference(root, dict(path=row['path'], **row['before'])) == (qualified_title_reader_reference(root, dict(path=row['path'], **row['after'])) or dict(path=row['path'], **row['after']))
     print(json.dumps(dict(independently_reversed_silent_prefixes=7, independently_reversed_reader_hooks=len(CODE),
                           authenticated_originals=len(rows), native_or_G13_qualified=False)))

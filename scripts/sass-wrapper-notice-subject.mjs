@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readEvidenceMember} from './upstream-packed-run-evidence.mjs';
+import {dialogTitleReaderSubject} from './dialog-title-source-context.mjs';
 
 export const SASS_NOTICE_PACKET='compatibility/rc/sass-wrapper-notice-successor.json';
 export const SASS_NOTICE_READERS='compatibility/rc/sass-wrapper-notice-reader-successors.json';
@@ -40,11 +41,13 @@ export function sassWrapperNoticeSubject({root,read=p=>readEvidenceMember(root,p
   if(line==='21.x')return {line,bound:[],qualify:()=>null,historicalReference:ref=>({...ref}),
     qualifySassScope:scope=>structuredClone(scope),assertCurrent:()=>{},native_or_full_gate_credit:false};
   assert.equal(line,'main');
+  const titleReaders=dialogTitleReaderSubject({root,read,line});
   const bound=new Map(),rows=new Map();
   function member(path,expected){
     readEvidenceMember(root,path);
-    const raw=read(path);assert.equal(hash(raw),expected.sha256,'unqualified Sass notice subject '+path);
-    if(expected.bytes!==undefined)assert.equal(raw.length,expected.bytes);
+    const current=titleReaders.qualify({path,...expected})??expected;
+    const raw=read(path);assert.equal(hash(raw),current.sha256,'unqualified Sass notice subject '+path);
+    if(current.bytes!==undefined)assert.equal(raw.length,current.bytes);
     bound.set(path,{path,sha256:hash(raw),bytes:raw.length});return raw;
   }
   const packet=JSON.parse(member(SASS_NOTICE_PACKET,{sha256:pins.get(SASS_NOTICE_PACKET)}));
@@ -70,16 +73,21 @@ export function sassWrapperNoticeSubject({root,read=p=>readEvidenceMember(root,p
     let after=before.toString();assert.ok(row.literal_edits.length>0);
     for(const edit of row.literal_edits){assert.equal(after.split(edit.before).length,2);after=after.replace(edit.before,edit.after);}
     assert.equal(hash(after),row.after.sha256);assert.equal(Buffer.byteLength(after),row.after.bytes);
-    assert.equal(member(row.path,row.after).toString(),after,'source hook exceeds its finite delta');rows.set(row.path,structuredClone(row));
+    const current=member(row.path,row.after),historical=titleReaders.historicalReference({path:row.path,sha256:hash(current),bytes:current.length});
+    if(historical)assert.deepEqual(historical,{path:row.path,...row.after});
+    else assert.equal(current.toString(),after,'source hook exceeds its finite delta');
+    rows.set(row.path,structuredClone(row));
   }
-  const assertCurrent=()=>{for(const ref of bound.values()){
+  const assertCurrent=()=>{titleReaders.assertCurrent();for(const ref of bound.values()){
     const bytes=read(ref.path);assert.equal(hash(bytes),ref.sha256,'late Sass notice subject '+ref.path);assert.equal(bytes.length,ref.bytes);
   }};
   const qualify=ref=>{
     const row=rows.get(ref.path);if(!row)return null;
+    const successor=titleReaders.qualify({path:row.path,...row.after});
+    if(successor?.sha256===ref.sha256){if(ref.bytes!==undefined)assert.equal(ref.bytes,successor.bytes);assertCurrent();return successor;}
     assert.ok([row.before.sha256,row.after.sha256].includes(ref.sha256),'unqualified earlier Sass notice metadata '+ref.path);
     if(ref.bytes!==undefined)assert.equal(ref.bytes,ref.sha256===row.before.sha256?row.before.bytes:row.after.bytes);
-    assertCurrent();return {path:ref.path,...row.after};
+    assertCurrent();return successor??{path:ref.path,...row.after};
   };
   // Old reference metadata only. Source reads always return the real current bytes.
   const historicalReference=ref=>{const row=rows.get(ref.path);if(!row)return {...ref};qualify(ref);

@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import sys
 from autocomplete_selection_source_refs import _git
+from dialog_title_reader_refs import title_prior_tool_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = 'compatibility/f10/disposition-ledger/ledger.json'
@@ -51,7 +52,7 @@ def verify_historical_wrapper_successor(expected_before=None, root=ROOT, candida
     assert SHA(raw) == ref['sha256'] and len(raw) == ref['bytes']
     refs = {ref['path']: ref for ref in packet['qualification_members']}
     for ref in packet['qualification_members']:
-        raw = (root / ref['path']).read_bytes()
+        raw = title_prior_tool_bytes(root, ref['path'])
         assert SHA(raw) == ref['sha256'] and len(raw) == ref['bytes']
         assert raw == _git(root, parent, ref['path'])
     transport_raw = (root / TRANSPORT).read_bytes()
