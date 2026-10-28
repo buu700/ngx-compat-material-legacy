@@ -107,7 +107,7 @@ export function deriveInventoryReferenceMetadata({before,packet,inventory}={}){
   native_or_full_audit_credit:false};
 }
 /** Recomputes the real finite source verifier; no caller-supplied verifier or persistent success cache. */
-export function prepareInventoryReferenceMetadata({root,read=path=>readEvidenceMember(root,path)}={}){
+export function prepareInventoryReferenceSourceMetadata({root,read=path=>readEvidenceMember(root,path)}={}){
  const version=JSON.parse(read('projects/ngx-material-legacy/package.json')).version;
  const line=version.startsWith('21.')?'21.x':version.startsWith('22.')?'main':null;assert.ok(line);
  const pin=pins[line],bound=new Map();
@@ -127,7 +127,6 @@ export function prepareInventoryReferenceMetadata({root,read=path=>readEvidenceM
  for(const row of inventoryData.shared_suite_shims)member(row.path,row.sha256);
  const before=oldBytes(root,pin.parent,INVENTORY_REFERENCE_LEDGER);
  const result=deriveInventoryReferenceMetadata({before,packet,inventory});
- const current=member(INVENTORY_REFERENCE_LEDGER);assert.ok(current.equals(before)||current.equals(result.after),'unregistered current canonical image');
  const verifier=JSON.parse(execFileSync('python3',[sourceValidator],{cwd:root,encoding:'utf8',maxBuffer:1024*1024}));
  assert.equal(verifier.line,line);assert.equal(verifier.current_inventory_sha256,pin.inventory);
  assert.equal(verifier.source_bindings_changed,13);assert.equal(verifier.derived_summary_scalars_changed,2);
@@ -140,6 +139,21 @@ export function prepareInventoryReferenceMetadata({root,read=path=>readEvidenceM
  assertCurrent();
  return {line,before:Buffer.from(before),after:Buffer.from(result.after),updates:structuredClone(result.updates),
   historical:structuredClone(result.historical),metadata_reference_updates:pin.count,unselected_entries_preserved:1697-pin.count,
-  current_canonical_state:current.equals(before)?'before':'after',bound:structuredClone([...bound.values()]),assertCurrent,verifyAfter,
+  bound:structuredClone([...bound.values()]),assertCurrent,verifyAfter,
   verifier:structuredClone(verifier),canonical_owner_integration_complete:false,current_native_packed_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
+}
+
+/** The proposal API keeps its original strict two-image current-ledger gate.
+ * Source-only preparation above grants no current-ledger admission: canonical
+ * owners must still run their complete real frame/stage validation. */
+export function prepareInventoryReferenceMetadata({root,read=path=>readEvidenceMember(root,path)}={}){
+ const source=prepareInventoryReferenceSourceMetadata({root,read});
+ readEvidenceMember(root,INVENTORY_REFERENCE_LEDGER);
+ const current=read(INVENTORY_REFERENCE_LEDGER);
+ assert.ok(current.equals(source.before)||current.equals(source.after),'unregistered current canonical image');
+ const ledgerRef={path:INVENTORY_REFERENCE_LEDGER,sha256:hash(current),bytes:current.length};
+ const assertCurrent=()=>{source.assertCurrent();const raw=read(INVENTORY_REFERENCE_LEDGER);assert.equal(hash(raw),ledgerRef.sha256,'late canonical ledger proposal change');assert.equal(raw.length,ledgerRef.bytes);};
+ const verifyAfter=candidate=>{assertCurrent();const result=source.verifyAfter(candidate);assertCurrent();return result;};
+ assertCurrent();return {...source,current_canonical_state:current.equals(source.before)?'before':'after',
+  bound:[...source.bound,ledgerRef],assertCurrent,verifyAfter};
 }

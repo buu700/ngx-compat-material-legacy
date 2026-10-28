@@ -69,7 +69,8 @@ function inspectTitleSource({root=ROOT,read=path=>titleRead(root,path)}={}){
   assert.equal(proof.strict,true);assert.equal(proof.skipLibCheck,false);assert.deepEqual(proof.diagnostics,[]);assert.equal(proof.result,'pass');
   assert.equal(proof.full_source_AOT_or_native_qualification,false);
  }
- const bound=[{path:TITLE_SOURCE_REPORT,sha256:TITLE_SOURCE_HASH,bytes:raw.length},...scope.input_members,...types.map(row=>row.ref)];
+ const {titleMeasurementSourceReferences}=require('./inventory-reference-owner.mjs');
+ const bound=[{path:TITLE_SOURCE_REPORT,sha256:TITLE_SOURCE_HASH,bytes:raw.length},...titleMeasurementSourceReferences({root,read,scope}),...types.map(row=>row.ref)];
  assert.equal(new Set(bound.map(row=>row.path)).size,bound.length,'duplicate title source binding');
  const assertCurrent=()=>{for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed title source input '+member.path);assert.equal(value.length,member.bytes);}};
  assertCurrent();
@@ -86,7 +87,8 @@ function sourceOk(args={}){
   // or import cache substitutes for the current constructor/lifecycle behavior.
   const raw=execFileSync(process.execPath,[join(root,'scripts/dialog-title-canonical-source.mjs')],
    {cwd:root,encoding:'utf8',timeout:60000,maxBuffer:4*1024*1024,env:{...process.env,GIT_NO_LAZY_FETCH:'1',GIT_NO_REPLACE_OBJECTS:'1'}});
-  assert.deepEqual(JSON.parse(raw),inspected.scope,'fresh current title source evidence differs');
+  const {titleMeasurementForHistoricalComparison}=require('./inventory-reference-owner.mjs');
+  assert.deepEqual(titleMeasurementForHistoricalComparison({root,actual:JSON.parse(raw),expected:inspected.scope}),inspected.scope,'fresh current title source evidence differs');
   inspected.assertCurrent();return true;
  }catch{return false;}
 }

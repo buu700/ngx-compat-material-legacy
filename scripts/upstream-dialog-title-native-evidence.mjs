@@ -34,7 +34,9 @@ export function validateDialogTitleNative({root,entry,proof,request}){
   demand(hash(source)===owner.TITLE_SOURCE_HASH,'changed title native source contract');
   // The source contract binds the fixture, predicates, both run validators and
   // current product graph. The integration stage separately owns routing code.
-  for(const member of JSON.parse(source).input_members.filter(row=>!row.path.startsWith('node_modules/'))){
+  const {titleMeasurementSourceReferences}=require('./inventory-reference-owner.mjs');
+  const members=titleMeasurementSourceReferences({root,read:path=>readEvidenceMember(root,path),scope:JSON.parse(source)});
+  for(const member of members.filter(row=>!row.path.startsWith('node_modules/'))){
    const bytes=readEvidenceMember(root,member.path);demand(bytes.length===member.bytes&&hash(bytes)===member.sha256,'stale title native input');
   }
   const browser=validateBrowserMatrixRun({root,request});demand(browser.ok,browser.detail);

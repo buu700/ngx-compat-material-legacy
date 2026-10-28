@@ -6,6 +6,7 @@
  */
 /** Current canonical owner: preserved prior stages plus one explicit title stage. */
 import assert from 'node:assert/strict';
+import {inventoryReferenceOwnerContext} from './inventory-reference-owner.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
@@ -401,7 +402,7 @@ function actualBound(prior,ctx){
 export function packedUpstreamLedgerRawRead({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read,true);return remote?remote.packedUpstreamLedgerRawRead({root,read}):read;
 }
-export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
+function prepareBeforeInventoryReferenceLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
  const ctx=context(root,read),prior=base.preparePackedUpstreamLedger({root,read:ctx.metadataRead});
  assert.equal(hash(prior.canonical_after),TITLE_LEDGER_BEFORE);
@@ -426,7 +427,7 @@ export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}
   prior_metadata_assert_current:()=>{ctx.assertCurrent();for(const [path,digest]of prior.bound)assert.equal(hash(ctx.metadataRead(path)),digest);},
   assertCurrent:ctx.assertCurrent};
 }
-export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
+function epochBeforeInventoryReferenceLedger({root=process.cwd(),read=disk(root)}={}){
  read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
  const ctx=context(root,read),prior=base.packedUpstreamLedgerEpoch({root,read:ctx.metadataRead});
  const assertCurrent=()=>{ctx.assertCurrent();prior.assertCurrent();ctx.assertCurrent();};
@@ -441,7 +442,7 @@ export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={
 }
 
 /** Authenticate current tool references without exposing a historical reader. */
-export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){
+function qualifyBeforeInventoryReferenceToolReference({root=process.cwd(),read=disk(root),prior}={}){
  assert.equal(resolve(root),ROOT);assert.ok([OWNER,TITLE_NATIVE_REGISTRY,'scripts/autocomplete-selection-native-subject.mjs',THEMING_REGISTRY].includes(prior?.path));
  let role;try{role=read(METADATA_ROLE);}catch{/* A physical current reader has no private metadata capability. */}
  if(role===metadataToken){assert.equal(hash(read(prior.path)),prior.sha256);return null;}
@@ -455,4 +456,40 @@ export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root
  const assertCurrent=()=>{for(const member of bound){const value=read(member.path);assert.equal(hash(value),member.sha256,'changed current canonical tool '+member.path);if(member.bytes!==undefined)assert.equal(value.length,member.bytes);}};
  assertCurrent();const value=read(prior.path),reference={path:prior.path,sha256:hash(value),bytes:value.length};
  return {reference,bound:structuredClone(bound),assertCurrent,individual_source_decisions:1,metadata_tokens:14,old_tool_bytes_exposed:false,current_native_or_packed_qualified:false};
+}
+
+/** Exact terminal inventory metadata successor; all prior source stages still execute. */
+export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.preparePackedUpstreamLedger({root,read});
+ const inventory=inventoryReferenceOwnerContext({root,read});
+ const prior=prepareBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});
+ return inventory.wrapPrepared(prior);
+}
+export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={}){
+ read=unwrap(root,read);const remote=foreign(root,read);if(remote)return remote.packedUpstreamLedgerEpoch({root,read});
+ const inventory=inventoryReferenceOwnerContext({root,read});
+ const prior=epochBeforeInventoryReferenceLedger({root,read:inventory.metadataRead});
+ const assertCurrent=()=>{inventory.assertCurrent();prior.assertCurrent();inventory.assertCurrent();};
+ const historical=path=>{if(path!==LEDGER)return read(path);assertCurrent();const value=prior.read(path);assertCurrent();return value;};
+ readers.set(historical,{root:resolve(root),raw:read});assertCurrent();
+ return {...prior,read:historical,raw:read,assertCurrent,
+  inventory_reference_metadata_applied:inventory.applied,
+  inventory_reference_metadata_entries:inventory.applied?inventory.metadata_entries:0,
+  inventory_reference_metadata_source_references:inventory.applied?inventory.metadata_entries:0,
+  current_native_packed_or_floor_or_g11_credit:false};
+}
+
+/** Public tool references retain current bytes and every preserved binding check. */
+export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root),prior}={}){
+ let role;try{role=read(METADATA_ROLE);}catch{/* Raw readers have no metadata capability. */}
+ if(role===metadataToken)return qualifyBeforeInventoryReferenceToolReference({root,read,prior});
+ const inventory=inventoryReferenceOwnerContext({root,read});
+ const result=qualifyBeforeInventoryReferenceToolReference({root,read:inventory.metadataRead,prior});
+ if(!result)return result;
+ const bound=new Map(result.bound.map(ref=>[ref.path,{...ref}]));
+ for(const ref of inventory.bound)bound.set(ref.path,{...ref});
+ const assertCurrent=()=>{inventory.assertCurrent();result.assertCurrent();inventory.assertCurrent();};
+ const current=read(result.reference.path);
+ const reference={...result.reference,sha256:hash(current),bytes:current.length};
+ assertCurrent();return {...result,reference,bound:[...bound.values()],assertCurrent};
 }

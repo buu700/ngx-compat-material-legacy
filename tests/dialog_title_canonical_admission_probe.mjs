@@ -81,7 +81,13 @@ const lateSubject=owner.inspectTitleSource({root,read:mutable});
 for(const ref of lateSubject.bound){late=ref.path;assert.throws(()=>lateSubject.assertCurrent(),undefined,ref.path);}late=null;lateSubject.assertCurrent();
 
 // Inject only the child transport to show no successful-result cache survives.
-let childCalls=0,childOutput=JSON.stringify(inspected.scope);
+// Controlled transport uses the current inventory identity, while the authentic
+// recorded scope remains unchanged. This fixture grants no execution credit.
+const currentScope=structuredClone(inspected.scope);
+for(const ref of currentScope.input_members)if(['testing/legacy-runner/historical-inventory.json','scripts/upstream-dialog-title-native-evidence.mjs'].includes(ref.path)){
+ const raw=disk(ref.path);ref.sha256=hash(raw);ref.bytes=raw.length;
+}
+let childCalls=0,childOutput=JSON.stringify(currentScope);
 const controlled={exports:{}};
 runInNewContext(readFileSync(join(root,'scripts/upstream-dialog-title-admission.cjs'),'utf8'),{
  module:controlled,__dirname:join(root,'scripts'),require:specifier=>{
@@ -91,7 +97,7 @@ runInNewContext(readFileSync(join(root,'scripts/upstream-dialog-title-admission.
  },Buffer,process,structuredClone,
 });
 assert.equal(controlled.exports.sourceOk({...args,root,read:disk}),true);
-const changed=structuredClone(inspected.scope);changed.lifecycle.observations[3].cases[2].names=['stale-title'];childOutput=JSON.stringify(changed);
+const changed=structuredClone(currentScope);changed.lifecycle.observations[3].cases[2].names=['stale-title'];childOutput=JSON.stringify(changed);
 assert.equal(controlled.exports.sourceOk({...args,root,read:disk}),false);assert.equal(childCalls,2);
 
 const steps=['initial','first-removed','all-removed','second-returned','first-appended','second-removed','empty-again'];
@@ -120,7 +126,7 @@ const request={line:'21.x'};
 assert.equal(validateDialogTitleNative({root,...args,request}).ok,false,'missing real same-run coordinator may not pass');
 const demand=(v,message)=>{if(!v)throw new Error(message);};let prerequisite=true;
 const controlledNative=runInNewContext('('+validateDialogTitleNative.toString()+')',{
- require:()=>owner,hash,demand,isDeepStrictEqual:(a,b)=>isDeepStrictEqual(JSON.parse(JSON.stringify(a)),JSON.parse(JSON.stringify(b))),readEvidenceMember,dialogTitleBrowserObservedOkay,
+ require:specifier=>specifier==='./upstream-dialog-title-admission.cjs'?owner:require(join(root,'scripts',specifier)),hash,demand,isDeepStrictEqual:(a,b)=>isDeepStrictEqual(JSON.parse(JSON.stringify(a)),JSON.parse(JSON.stringify(b))),readEvidenceMember,dialogTitleBrowserObservedOkay,
  validateBrowserMatrixRun:()=>prerequisite?{ok:true,observation,invocation_id:'controlled',output:{},library:{},packed_consumer:{}}:{ok:false,detail:'controlled missing prerequisite'},
 });
 const controlledPass=controlledNative({root,...args,request});assert.equal(controlledPass.ok,true,controlledPass.detail);
