@@ -126,7 +126,7 @@ assert.equal(snackDomRawCurrentRead({root, read: context.read})(ledgerPath).equa
 cases.push('complete-existing-historical-context-and-native-unwrapping-use-correct-ledger-epochs');
 assert.equal(epoch.testing_api_decisions_applied,input.line==='21.x'?7:0);
 assert.equal(epoch.sass_decisions_applied,6);
-assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?56:13);
+assert.equal(epoch.individual_decisions_applied,input.line==='21.x'?65:13);
 if(input.line==='21.x'){
  assert.equal(epoch.title_source_decisions_applied,1);
  assert.equal(epoch.title_native_registry_metadata_tokens_applied,14);
@@ -150,6 +150,12 @@ if(input.line==='21.x'){
  assert.equal(prepared.button_token_repairs_stage.before.equals(prepared.button_tokenization_stage.after),true);
  assert.equal(prepared.button_token_repairs_stage.individual_decisions,2);
  assert.equal(prepared.button_token_repairs_stage.unselected_entries_preserved,1695);
+ for(const [name,previous,count]of [['surface_m3_theme','button_token_repairs',3],['slider_m3_repairs','surface_m3_theme',2],['control_m3_theme','slider_m3_repairs',4]]){
+  assert.equal(epoch[name+'_source_decisions_applied'],count);
+  assert.equal(prepared[name+'_stage'].before.equals(prepared[previous+'_stage'].after),true);
+  assert.equal(prepared[name+'_stage'].individual_decisions,count);
+  assert.equal(prepared[name+'_stage'].unselected_entries_preserved,1697-count);
+ }
 }
 assert.equal(epoch.token_build_decisions_applied,input.line==='21.x'?1:0);
 assert.equal(epoch.unthemable_source_decisions_applied,input.line==='21.x'?5:0);
@@ -320,6 +326,7 @@ console.log(JSON.stringify({line: input.line, result: 'pass', cases, rejected,
   button_token_repairs_source_decisions:epoch.button_token_repairs_source_decisions_applied??0,
   surface_m3_theme_source_decisions:epoch.surface_m3_theme_source_decisions_applied??0,
   slider_m3_repairs_source_decisions:epoch.slider_m3_repairs_source_decisions_applied??0,
+  control_m3_theme_source_decisions:epoch.control_m3_theme_source_decisions_applied??0,
   analysis_python_version: prepared.analysis_python_version,
   actual_current_canonical_after_sha256: hash(read(ledgerPath)), historical_before_sha256: hash(prepared.before),
   source_owner_sha256: hash(read(owner)), producer_sha256: hash(read('tests/packed_upstream_ledger_epoch_probe.mjs')),

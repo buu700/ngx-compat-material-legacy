@@ -39,6 +39,11 @@ def verify_inspection_registry_successor(root=ROOT):
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'c01bd5192355a497485fc9f85cdda04760af0ac0287a4f2d01b93df34ab83ffc'
     current = (root / REGISTRY).read_bytes()
+    if digest(current) == 'ae4d9e85741a782bdd2f9be8e7686bab3b3d4cb0e645224eab8207fb0e376340':
+        from control_m3_theme_canonical_ledger_patch import verify_control_m3_theme_registry_successor
+        control_before, control_after = verify_control_m3_theme_registry_successor(root)
+        assert current == control_after
+        current = control_before
     if digest(current) == '4661b7a4ef78998ba1d9c8e5f199a544524a5873fa6ee4e6824f2e8faed46537':
         from slider_m3_repairs_canonical_ledger_patch import verify_slider_m3_repairs_registry_successor
         slider_before, slider_after = verify_slider_m3_repairs_registry_successor(root)

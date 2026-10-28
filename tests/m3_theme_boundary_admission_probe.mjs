@@ -26,7 +26,8 @@ const before=execFileSync('git',['--no-replace-objects','-c','gc.auto=0','-c','m
 let late=null;const actual=path=>path===late?Buffer.concat([read(path),Buffer.from('\n')]):read(path);
 const current=packedUpstreamLedgerEpoch({root,read:actual}),previous=packedUpstreamLedgerEpoch({root,read:path=>path===ledger?before:read(path)});
 current.assertCurrent();previous.assertCurrent();
-assert.equal(current.individual_decisions_applied,61);
+assert.equal(current.individual_decisions_applied,65);
+assert.equal(current.control_m3_theme_source_decisions_applied,4);
 assert.equal(current.title_source_decisions_applied,1);assert.equal(current.title_native_registry_metadata_tokens_applied,14);
 assert.equal(current.theming_source_decisions_applied,2);assert.equal(previous.theming_source_decisions_applied,0);
 assert.equal(previous.title_source_decisions_applied,0);assert.equal(previous.title_native_registry_metadata_tokens_applied,0);assert.equal(current.unthemable_source_decisions_applied,5);assert.equal(current.registered_checker_metadata_tokens_applied,14);
@@ -110,7 +111,7 @@ try{
 assert.equal(existsSync(mutant),false);assert.equal(existsSync(dir),false);
 const report={schema_version:1,line:'21.x',current_source_admissions:current.individual_decisions_applied,previous_source_admissions:previous.individual_decisions_applied,
  title_source_admissions:current.title_source_decisions_applied,title_native_metadata_tokens:current.title_native_registry_metadata_tokens_applied,
- theming_source_admissions:current.theming_source_decisions_applied,inspection_source_admissions:current.inspection_source_decisions_applied,selector_density_source_admissions:current.selector_density_source_decisions_applied,button_tokenization_source_admissions:current.button_tokenization_source_decisions_applied,button_token_repairs_source_admissions:current.button_token_repairs_source_decisions_applied,surface_m3_theme_source_admissions:current.surface_m3_theme_source_decisions_applied,slider_m3_repairs_source_admissions:current.slider_m3_repairs_source_decisions_applied,
+ theming_source_admissions:current.theming_source_decisions_applied,inspection_source_admissions:current.inspection_source_decisions_applied,selector_density_source_admissions:current.selector_density_source_decisions_applied,button_tokenization_source_admissions:current.button_tokenization_source_decisions_applied,button_token_repairs_source_admissions:current.button_token_repairs_source_decisions_applied,surface_m3_theme_source_admissions:current.surface_m3_theme_source_decisions_applied,slider_m3_repairs_source_admissions:current.slider_m3_repairs_source_decisions_applied,control_m3_theme_source_admissions:current.control_m3_theme_source_decisions_applied,
  pure_metadata_cases:metadataCases,pure_metadata_without_filesystem_or_compiler_bindings:true,metadata_rejections:metadataRejections,source_rejections:sourceRejections,bound_source_members:source.bound.length,
  real_root_checker_positive_rows:positive,real_root_checker_rejected_rows:negative,missing_source_requirement_mutant_detected:mutantCaught,
  rejection_controls:rejected.length,rejected,raw_current_checker_preserved:true,all_temporary_checker_files_removed:true,

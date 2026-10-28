@@ -33,6 +33,8 @@ import surfaceM3Theme from './upstream-surface-m3-theme-admission.cjs';
 import {applySurfaceM3ThemeCanonicalStage,surfaceM3ThemeRegistrySuccessor} from './surface-m3-theme-canonical-stage.mjs';
 import sliderM3Repairs from './upstream-slider-m3-repairs-admission.cjs';
 import {applySliderM3RepairsCanonicalStage,sliderM3RepairsRegistrySuccessor} from './slider-m3-repairs-canonical-stage.mjs';
+import controlM3Theme from './upstream-control-m3-theme-admission.cjs';
+import {applyControlM3ThemeCanonicalStage,controlM3ThemeRegistrySuccessor} from './control-m3-theme-canonical-stage.mjs';
 import {inspectCanonicalSourceTransaction,canonicalSourceTransactionReference} from './canonical-source-transaction.mjs';
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..'),require=createRequire(import.meta.url);
 const OWNER='scripts/packed-upstream-ledger-epoch.mjs',BASE='scripts/packed-upstream-ledger-base.mjs';
@@ -55,6 +57,8 @@ const SURFACE_M3_THEME_PACKET='compatibility/rc/21x-c04-surface-m3-theme-canonic
 const SURFACE_M3_THEME_PACKET_HASH='c4fc827f5fcd6f5494ce34090a8b6d51b34d451ca82bd9db1d2abec3e1c8a6b1';
 const SLIDER_M3_REPAIRS_PACKET='compatibility/rc/21x-c04-slider-m3-repairs-canonical-transition.json';
 const SLIDER_M3_REPAIRS_PACKET_HASH='96196f13ab8386749c10426d16e630908c370426170c934d9c5401e94bb1bd99';
+const CONTROL_M3_THEME_PACKET='compatibility/rc/21x-c04-control-m3-theme-canonical-transition.json';
+const CONTROL_M3_THEME_PACKET_HASH='416ab63c24277f15a91e5885cab327b68e35070efe0623975b62880123e4904f';
 const SOURCE_TRANSACTION='compatibility/rc/21x-c04-owner-source-transaction-inputs.json';
 const SOURCE_TRANSACTION_HASH='96f4322243e31e55558ea0a36c363c883086b618e5f0049c4c48ad7fd7dea887';
 const AFTER='80123c4e8c4f7f43330553ffca84e51fea98e70f545234cf5359c11128e548d7';
@@ -97,7 +101,22 @@ function sourceTransactionTools(root,read){
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed source transaction tool '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {bound,assertCurrent};
 }
+function controlM3ThemeTools(root,read){
+ const raw=read(CONTROL_M3_THEME_PACKET);assert.equal(hash(raw),CONTROL_M3_THEME_PACKET_HASH,'changed control M3 theme canonical packet');const packet=JSON.parse(raw);
+ assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'7131016f8bc8011c3ac27e799d0200a6a708f977');
+ assert.equal(packet.individual_decisions,4);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,4);
+ assert.equal(packet.unselected_entry_bytes_to_preserve,1693);assert.equal(packet.actual_native_artifact_browser_floor_or_full_audit_qualified,false);assert.equal(packet.g11_claim,'not-passed');
+ const registryBefore=original(root,THEMING_REGISTRY,packet.source_parent),registryAfter=controlM3ThemeRegistrySuccessor(registryBefore);
+ assert.deepEqual(packet.registry_before,{path:THEMING_REGISTRY,sha256:hash(registryBefore),bytes:registryBefore.length});
+ assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});
+ const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
+ const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-control-m3-theme-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
+ const bound=[{path:CONTROL_M3_THEME_PACKET,sha256:CONTROL_M3_THEME_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];
+ const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed control M3 theme tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
+ assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};
+}
 function sliderM3RepairsTools(root,read){
+ const successor=controlM3ThemeTools(root,read);
  const raw=read(SLIDER_M3_REPAIRS_PACKET);assert.equal(hash(raw),SLIDER_M3_REPAIRS_PACKET_HASH,'changed slider M3 repairs canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.line,'21.x');assert.equal(packet.source_parent,'30bcfb49fbf185567b4cd8ba3a022bf0c54a5d56');
  assert.equal(packet.individual_decisions,2);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.registry_records_added,2);
@@ -107,9 +126,10 @@ function sliderM3RepairsTools(root,read){
  assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});
  const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
  const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-slider-m3-repairs-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
- const bound=[{path:SLIDER_M3_REPAIRS_PACKET,sha256:SLIDER_M3_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];
+ assert.equal(registryAfter.equals(successor.registryBefore),true,'control M3 theme registry does not succeed exact slider M3 repairs registry');
+ const bound=[{path:SLIDER_M3_REPAIRS_PACKET,sha256:SLIDER_M3_REPAIRS_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed slider M3 repairs tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
- assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body};
+ assertCurrent();return {packet,registryBefore,registryAfter,bound,assertCurrent,body,successor};
 }
 function surfaceM3ThemeTools(root,read){
  const successor=sliderM3RepairsTools(root,read);
@@ -206,7 +226,7 @@ function themingTools(root,read){
  const bound=[{path:THEMING_PACKET,sha256:THEMING_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,...patches,...successor.bound];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed theming tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
  assertCurrent();return {packet,registryBefore,bound,assertCurrent,body,successor,
-  currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.successor.successor.successor.successor.packet.registry_after:ref};
+  currentReference:ref=>ref.path===THEMING_REGISTRY?successor.successor.successor.successor.successor.successor.successor.packet.registry_after:ref};
 }
 function context(root,read){
  assert.equal(resolve(root),ROOT,'wrong21.x canonical owner checkout');
@@ -216,7 +236,7 @@ function context(root,read){
  const frames=JSON.parse(frameRaw);assert.equal(frames.schema_version,1);assert.equal(frames.line,'21.x');
  assert.equal(frames.frames.length,21);assert.equal(new Set(frames.frames.map(frame=>frame.sha256)).size,21);
  const ledgerRaw=read(LEDGER),currentHash=hash(ledgerRaw);
- assert.ok([...frames.frames,tools.packet.after,tools.successor.packet.after,tools.successor.successor.packet.after,tools.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.successor.successor.packet.after].some(frame=>frame.sha256===currentHash&&frame.bytes===ledgerRaw.length),'not an accepted complete ledger frame');
+ assert.ok([...frames.frames,tools.packet.after,tools.successor.packet.after,tools.successor.successor.packet.after,tools.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.successor.successor.packet.after,tools.successor.successor.successor.successor.successor.successor.successor.packet.after].some(frame=>frame.sha256===currentHash&&frame.bytes===ledgerRaw.length),'not an accepted complete ledger frame');
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH,'changed title canonical packet');const packet=JSON.parse(raw);
  assert.equal(packet.source_parent,AUTHORITY);assert.equal(packet.line,'21.x');assert.equal(packet.individual_decisions,1);
  assert.equal(packet.metadata_tokens,14);assert.equal(packet.summary_scalar_tokens,2);assert.equal(packet.unselected_judgments_changed,0);
@@ -260,6 +280,9 @@ function context(root,read){
  assert.deepEqual(tools.successor.successor.successor.successor.successor.successor.packet.before,tools.successor.successor.successor.successor.successor.packet.after);
  const sliderM3RepairsStage=applySliderM3RepairsCanonicalStage({before:surfaceM3ThemeStage.after,body:tools.successor.successor.successor.successor.successor.successor.body});
  assert.deepEqual(tools.successor.successor.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(sliderM3RepairsStage.after),bytes:sliderM3RepairsStage.after.length});
+ assert.deepEqual(tools.successor.successor.successor.successor.successor.successor.successor.packet.before,tools.successor.successor.successor.successor.successor.successor.packet.after);
+ const controlM3ThemeStage=applyControlM3ThemeCanonicalStage({before:sliderM3RepairsStage.after,body:tools.successor.successor.successor.successor.successor.successor.successor.body});
+ assert.deepEqual(tools.successor.successor.successor.successor.successor.successor.successor.packet.after,{path:LEDGER,sha256:hash(controlM3ThemeStage.after),bytes:controlM3ThemeStage.after.length});
  const own={path:OWNER,sha256:hash(image),bytes:image.length};
  const bound=[...new Map([own,{path:PACKET,sha256:PACKET_HASH,bytes:raw.length},{path:FRAMES,sha256:FRAMES_HASH,bytes:frameRaw.length},...packet.source_members.map(tools.currentReference),packet.root_checker,...tools.bound,...transaction.bound].map(ref=>[ref.path,ref])).values()];
  const assertTools=()=>{
@@ -277,7 +300,7 @@ function context(root,read){
   if(path==='scripts/autocomplete-selection-native-subject.mjs'){
    assert.equal(hash(read(path)),bound.find(member=>member.path===path).sha256,'changed current native-subject metadata source');return original(root,path);
   }
-  if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash)){assertTools();return Buffer.from(before);}
+  if(path===LEDGER&&[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash)){assertTools();return Buffer.from(before);}
   return read(path);
  };
  const source=title.inspectTitleSource({root,read});
@@ -293,9 +316,10 @@ function context(root,read){
  const buttonTokenRepairsSource=buttonTokenRepairs.inspectCanonicalSource({root,read,entries:buttonTokenRepairsStage.entries,body:tools.successor.successor.successor.successor.body});
  const surfaceM3ThemeSource=surfaceM3Theme.inspectCanonicalSource({root,read,entries:surfaceM3ThemeStage.entries,body:tools.successor.successor.successor.successor.successor.body});
  const sliderM3RepairsSource=sliderM3Repairs.inspectCanonicalSource({root,read,entries:sliderM3RepairsStage.entries,body:tools.successor.successor.successor.successor.successor.successor.body});
- const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();buttonTokenizationSource.assertCurrent();buttonTokenRepairsSource.assertCurrent();surfaceM3ThemeSource.assertCurrent();sliderM3RepairsSource.assertCurrent();};
- assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,buttonTokenizationStage,buttonTokenRepairsStage,surfaceM3ThemeStage,sliderM3RepairsStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound,...buttonTokenizationSource.bound,...buttonTokenRepairsSource.bound,...surfaceM3ThemeSource.bound,...sliderM3RepairsSource.bound],
-  titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),inspectionApplied:[tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),selectorDensityApplied:[tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenizationApplied:[tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenRepairsApplied:[tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),surfaceM3ThemeApplied:[tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),sliderM3RepairsApplied:currentHash===tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,currentHash};
+ const controlM3ThemeSource=controlM3Theme.inspectCanonicalSource({root,read,entries:controlM3ThemeStage.entries,body:tools.successor.successor.successor.successor.successor.successor.successor.body});
+ const assertCurrent=()=>{assertTools();assertLedger();source.assertCurrent();themingSource.assertCurrent();inspectionSource.assertCurrent();selectorDensitySource.assertCurrent();buttonTokenizationSource.assertCurrent();buttonTokenRepairsSource.assertCurrent();surfaceM3ThemeSource.assertCurrent();sliderM3RepairsSource.assertCurrent();controlM3ThemeSource.assertCurrent();};
+ assertCurrent();return {packet,stage,themingStage,inspectionStage,selectorDensityStage,buttonTokenizationStage,buttonTokenRepairsStage,surfaceM3ThemeStage,sliderM3RepairsStage,controlM3ThemeStage,metadataRead,assertCurrent,bound:[...bound,...source.bound,...themingSource.bound,...inspectionSource.bound,...selectorDensitySource.bound,...buttonTokenizationSource.bound,...buttonTokenRepairsSource.bound,...surfaceM3ThemeSource.bound,...sliderM3RepairsSource.bound,...controlM3ThemeSource.bound],
+  titleApplied:[AFTER,tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),themingApplied:[tools.packet.after.sha256,tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),inspectionApplied:[tools.successor.packet.after.sha256,tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),selectorDensityApplied:[tools.successor.successor.packet.after.sha256,tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenizationApplied:[tools.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),buttonTokenRepairsApplied:[tools.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),surfaceM3ThemeApplied:[tools.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),sliderM3RepairsApplied:[tools.successor.successor.successor.successor.successor.successor.packet.after.sha256,tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256].includes(currentHash),controlM3ThemeApplied:currentHash===tools.successor.successor.successor.successor.successor.successor.successor.packet.after.sha256,currentHash};
 }
 function actualBound(prior,ctx){
  const bound=new Map(prior);
@@ -313,7 +337,7 @@ export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}
  const nativeBound=native.bound.map(member=>({...member,sha256:current.get(member.path)??member.sha256,bytes:read(member.path).length}));
  // The old bound set was measured through private metadata. Its public form
  // records actual current tools; the preserved stage checks remain separate.
- return {...prior,canonical_after:ctx.sliderM3RepairsStage.after,bound:current,
+ return {...prior,canonical_after:ctx.controlM3ThemeStage.after,bound:current,
   native_spec_source:{...native,bound:nativeBound,assertCurrent:()=>{ctx.assertCurrent();native.assertCurrent();ctx.assertCurrent();}},
   title_stage:{...ctx.stage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
   theming_stage:{...ctx.themingStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
@@ -323,6 +347,7 @@ export function preparePackedUpstreamLedger({root=process.cwd(),read=disk(root)}
   button_token_repairs_stage:{...ctx.buttonTokenRepairsStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
   surface_m3_theme_stage:{...ctx.surfaceM3ThemeStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
   slider_m3_repairs_stage:{...ctx.sliderM3RepairsStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
+  control_m3_theme_stage:{...ctx.controlM3ThemeStage,assertCurrent:ctx.assertCurrent,source_scope_only:true,current_native_or_packed_or_floor_qualified:false},
   prior_metadata_assert_current:()=>{ctx.assertCurrent();for(const [path,digest]of prior.bound)assert.equal(hash(ctx.metadataRead(path)),digest);},
   assertCurrent:ctx.assertCurrent};
 }
@@ -333,9 +358,9 @@ export function packedUpstreamLedgerEpoch({root=process.cwd(),read=disk(root)}={
  const historical=path=>{if(path!==LEDGER)return read(path);ctx.assertCurrent();const value=prior.read(path);ctx.assertCurrent();return value;};
  readers.set(historical,{root:resolve(root),raw:read});assertCurrent();
  return {...prior,read:historical,raw:read,assertCurrent,
-  individual_decisions_applied:prior.individual_decisions_applied+(ctx.titleApplied?1:0)+(ctx.themingApplied?2:0)+(ctx.inspectionApplied?4:0)+(ctx.selectorDensityApplied?2:0)+(ctx.buttonTokenizationApplied?5:0)+(ctx.buttonTokenRepairsApplied?2:0)+(ctx.surfaceM3ThemeApplied?3:0)+(ctx.sliderM3RepairsApplied?2:0),
+  individual_decisions_applied:prior.individual_decisions_applied+(ctx.titleApplied?1:0)+(ctx.themingApplied?2:0)+(ctx.inspectionApplied?4:0)+(ctx.selectorDensityApplied?2:0)+(ctx.buttonTokenizationApplied?5:0)+(ctx.buttonTokenRepairsApplied?2:0)+(ctx.surfaceM3ThemeApplied?3:0)+(ctx.sliderM3RepairsApplied?2:0)+(ctx.controlM3ThemeApplied?4:0),
   title_source_decisions_applied:ctx.titleApplied?1:0,title_native_registry_metadata_tokens_applied:ctx.titleApplied?14:0,
-  theming_source_decisions_applied:ctx.themingApplied?2:0,inspection_source_decisions_applied:ctx.inspectionApplied?4:0,selector_density_source_decisions_applied:ctx.selectorDensityApplied?2:0,button_tokenization_source_decisions_applied:ctx.buttonTokenizationApplied?5:0,button_token_repairs_source_decisions_applied:ctx.buttonTokenRepairsApplied?2:0,surface_m3_theme_source_decisions_applied:ctx.surfaceM3ThemeApplied?3:0,slider_m3_repairs_source_decisions_applied:ctx.sliderM3RepairsApplied?2:0,
+  theming_source_decisions_applied:ctx.themingApplied?2:0,inspection_source_decisions_applied:ctx.inspectionApplied?4:0,selector_density_source_decisions_applied:ctx.selectorDensityApplied?2:0,button_tokenization_source_decisions_applied:ctx.buttonTokenizationApplied?5:0,button_token_repairs_source_decisions_applied:ctx.buttonTokenRepairsApplied?2:0,surface_m3_theme_source_decisions_applied:ctx.surfaceM3ThemeApplied?3:0,slider_m3_repairs_source_decisions_applied:ctx.sliderM3RepairsApplied?2:0,control_m3_theme_source_decisions_applied:ctx.controlM3ThemeApplied?4:0,
   current_tool_bytes_exposed_without_projection:true,old_product_bytes_exposed:false,
   current_native_packed_or_floor_or_g11_credit:false};
 }
@@ -347,7 +372,7 @@ export function qualifyCanonicalToolReference({root=process.cwd(),read=disk(root
  if(role===metadataToken){assert.equal(hash(read(prior.path)),prior.sha256);return null;}
  const transaction=sourceTransactionTools(root,read);
  const tools=themingTools(root,read);
- const before=prior.path===THEMING_REGISTRY?[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.registryBefore].find(raw=>hash(raw)===prior.sha256):original(root,prior.path);assert.ok(before,'unqualified canonical registry prior');assert.equal(hash(before),prior.sha256,'unqualified canonical tool prior');
+ const before=prior.path===THEMING_REGISTRY?[tools.registryBefore,tools.successor.registryBefore,tools.successor.successor.registryBefore,tools.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.registryBefore,tools.successor.successor.successor.successor.successor.successor.successor.registryBefore].find(raw=>hash(raw)===prior.sha256):original(root,prior.path);assert.ok(before,'unqualified canonical registry prior');assert.equal(hash(before),prior.sha256,'unqualified canonical tool prior');
  if(prior.bytes!==undefined)assert.equal(before.length,prior.bytes);
  const raw=read(PACKET);assert.equal(hash(raw),PACKET_HASH);const packet=JSON.parse(raw);
  const frameRaw=read(FRAMES);assert.equal(hash(frameRaw),FRAMES_HASH,'changed accepted ledger-frame catalog');

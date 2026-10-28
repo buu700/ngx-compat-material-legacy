@@ -86,4 +86,12 @@ export const sourceContractDefinitions = [
     scope_key:'slider_m3_repairs_source_scope',module:'upstream-slider-m3-repairs-admission.cjs'},
   {sha:'90b37e5652bad1044dff3c4702aa4b73b715117a',proof_kind:'individual-historical-slider-m3-repairs-source-review',
     scope_key:'slider_m3_repairs_source_scope',module:'upstream-slider-m3-repairs-admission.cjs'},
+  {sha:'6b57edb1b164909f8aa1eddac87a915c037e6905',proof_kind:'individual-historical-control-m3-theme-source-review',
+    scope_key:'control_m3_theme_source_scope',module:'upstream-control-m3-theme-admission.cjs'},
+  {sha:'75029c273a4aad3ad4481d8c045c9a73ccceb34e',proof_kind:'individual-historical-control-m3-theme-source-review',
+    scope_key:'control_m3_theme_source_scope',module:'upstream-control-m3-theme-admission.cjs'},
+  {sha:'2f958aced5757915f75e4036229d5df63f6ff414',proof_kind:'individual-historical-control-m3-theme-source-review',
+    scope_key:'control_m3_theme_source_scope',module:'upstream-control-m3-theme-admission.cjs'},
+  {sha:'289ddd348395f0299a6c7cba2cde8662842df06d',proof_kind:'individual-historical-control-m3-theme-source-review',
+    scope_key:'control_m3_theme_source_scope',module:'upstream-control-m3-theme-admission.cjs'},
 ];

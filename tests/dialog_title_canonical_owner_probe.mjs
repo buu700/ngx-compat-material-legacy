@@ -60,7 +60,7 @@ const mainProduct=dialogTitleProductSubject({root:main,read:mainRead}),mainReade
 const entry=JSON.parse(read('compatibility/f10/disposition-ledger/ledger.json')).entries.find(row=>row.sha===title.TITLE_SHA);
 assert.equal(entry.final_disposition,'already-adapted');assert.equal(requiresRegisteredSourceReview(entry),true);
 assert.equal(requiresHistoricalBehavior(entry,undefined),true,'native gate must survive missing proof metadata');
-assert.equal(sourceContractDefinitions.length,40);assert.equal(sourceContractDefinitions.filter(row=>row.sha===entry.sha).length,1);
+assert.equal(sourceContractDefinitions.length,44);assert.equal(sourceContractDefinitions.filter(row=>row.sha===entry.sha).length,1);
 const directory=mkdtempSync(join(tmpdir(),'ngx-title-owner-root-'));let rootCases=0;
 try{
  const seed=join(directory,'seed.json'),candidate=join(directory,'candidate.json'),report=join(directory,'report.json'),missing=join(directory,'missing.json');
@@ -77,7 +77,7 @@ try{
  const stripped=structuredClone(entry);delete stripped.individual_proof.historical_behavior;
  const missingNative=inspect(stripped);assert.ok(missingNative.evidence_failures.length>0);assert.ok(missingNative.insufficient_review_sha_ids.sensitive.includes(entry.sha));
 }finally{rmSync(directory,{recursive:true,force:true});}
-const result={schema_version:1,result:'pass',node:process.version,registered_source_contracts:40,
+const result={schema_version:1,result:'pass',node:process.version,registered_source_contracts:44,
  prior_owner_byte_identical:true,root_checker_byte_identical:true,original_native_scopes_preserved:3,
  current_tool_reference_guards_passed:3,tool_faults_rejected:rejected,unmarked_historical_tool_readers_rejected:6,forged_metadata_capabilities_rejected:2,
  public_metadata_transitions_use_current_hashes:true,main_product_and_reader_source_checks_passed:true,

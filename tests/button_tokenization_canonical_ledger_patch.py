@@ -39,6 +39,11 @@ def verify_button_tokenization_registry_successor(root=ROOT):
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'e2cd8a53b9c35020d1484ac553e7f69917658f55f5ade75dd0c6bf12f2e6634e'
     current = (root / REGISTRY).read_bytes()
+    if digest(current) == 'ae4d9e85741a782bdd2f9be8e7686bab3b3d4cb0e645224eab8207fb0e376340':
+        from control_m3_theme_canonical_ledger_patch import verify_control_m3_theme_registry_successor
+        control_before, control_after = verify_control_m3_theme_registry_successor(root)
+        assert current == control_after
+        current = control_before
     if digest(current) == '4661b7a4ef78998ba1d9c8e5f199a544524a5873fa6ee4e6824f2e8faed46537':
         from slider_m3_repairs_canonical_ledger_patch import verify_slider_m3_repairs_registry_successor
         slider_before, slider_after = verify_slider_m3_repairs_registry_successor(root)
