@@ -81,9 +81,11 @@ export function addLegacyDialogTitle(container: LegacyDialogTitleContainer, id: 
   }
 }
 
-export function removeLegacyDialogTitle(container: LegacyDialogTitleContainer, id: string): void {
+export function removeLegacyDialogTitle(
+  container: LegacyDialogTitleContainer, id: string,
+  queue: string[] | undefined = container._ariaLabelledByQueue,
+): void {
   const state = states.get(container);
-  const queue = container._ariaLabelledByQueue;
   if (!state?.destroyed && queue) {
     const index = queue.indexOf(id);
     if (index > -1) {

@@ -1,0 +1,397 @@
+{
+  "schema_version": 1,
+  "role": "Actual pre-repair runtime comparison; synthetic DOM, not native",
+  "input_members": [
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-content-directives.ts",
+      "sha256": "698b2fea49964c4cea0cfa07b0847ada413130055c032de94d16df3cc4b59ca5",
+      "bytes": 6504
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.ts",
+      "sha256": "0495cc891e7e1578d05d9679fe61acf155c9bdb47b31032d53c324bc201616ac",
+      "bytes": 10351
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-base.ts",
+      "sha256": "fb30039e5c9ed9f906de8a734eeeb27c1e5f2a797ed3663225f6e405f737be04",
+      "bytes": 11196
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-container-state.ts",
+      "sha256": "96606c75b79d2ff8b89d7b725eaa6ab9e6f7a9f95f0421dac76f59886851f16d",
+      "bytes": 3172
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/internal/dialog-initial-focus.ts",
+      "sha256": "994576f436b45a1d3d1f132db793a2b3668e581637f06279e2200065cea319a5",
+      "bytes": 3717
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog-container.html",
+      "sha256": "89aeb28616459a7393902fcbeca143e3ca101baeaafa59054aebc512a5022256",
+      "bytes": 44
+    },
+    {
+      "path": "projects/ngx-material-legacy/legacy-dialog/dialog.scss",
+      "sha256": "c373a78c6c52713ab3673bc581817d39ac900b3ad03b1001a9032c339a1685bd",
+      "bytes": 2601
+    },
+    {
+      "path": "tests/dialog_initial_focus_runtime_probe.mjs",
+      "sha256": "5760c77e0b33f5b22ee00a350838247d3fcc2c0e0b58da425bb105434d890229",
+      "bytes": 23163
+    },
+    {
+      "path": "projects/ngx-material-legacy/package.json",
+      "sha256": "757aa562a156f04ff55ef86bc2d886049a1fc78da2ead2c0f82112ca58d9c43d",
+      "bytes": 1397
+    },
+    {
+      "path": "node_modules/@angular/core/package.json",
+      "sha256": "138e466e558dfb07101223dd71e46db11e5ae49c29a8906bd7dae49b9ce34970",
+      "bytes": 2508
+    },
+    {
+      "path": "node_modules/@angular/cdk/package.json",
+      "sha256": "10c398ae1ae4854e4c98b3715f8e0f225e34b7773fa3c582f11d67852a003ea9",
+      "bytes": 5041
+    },
+    {
+      "path": "node_modules/@angular/material/package.json",
+      "sha256": "26af34e77987b55564689c8eb7b5352db661d6a737fdec2160417ae42114f355",
+      "bytes": 11422
+    },
+    {
+      "path": "node_modules/typescript/package.json",
+      "sha256": "5a0bb7f286c4b3f1413a42c05f902311b161f70e5f52d9da10490443bfd595a3",
+      "bytes": 3620
+    }
+  ],
+  "observations": [
+    {
+      "variant": "tagged16",
+      "title_source_sha256": "8075d80967497330ae3401f03de00ed92f8709aa3e0fd611d88b4aebff1b55b9",
+      "title_program_sha256": "f502c39f7c455ddaa0bb167926391037bdc7b7e36f9e46c0d14b4a3efaa5ab49",
+      "title_metadata": {
+        "selector": "[mat-dialog-title], [matDialogTitle]",
+        "exportAs": "matDialogTitle",
+        "host": {
+          "class": "mat-dialog-title",
+          "[id]": "id"
+        }
+      },
+      "original_constructor_observation": {
+        "source_sha256": "571d6c3017e773229880a6da96b6e5c322c462b20e2c9784c85a291a96d12545",
+        "program_sha256": "1b449e6067cdd353f7cea997e1d3bd747d5202bd064d35f2d059495b4c946c42",
+        "scope": "Complete original label field and constructor only; portal/focus methods not executed"
+      },
+      "actual_owned_full_constructor": false,
+      "actual_owned_helper_namespace_matches_constructor": true,
+      "host_expression": "_config.ariaLabel ? null : _ariaLabelledByQueue[0]",
+      "cases": [
+        {
+          "id": "initial-no-title",
+          "result": "pass",
+          "names": [
+            null
+          ],
+          "marks": 0
+        },
+        {
+          "id": "deferred-first-title",
+          "result": "pass",
+          "names": [
+            null,
+            "first"
+          ],
+          "marks": 0
+        },
+        {
+          "id": "swapped-title",
+          "result": "pass",
+          "names": [
+            "first",
+            "second"
+          ],
+          "marks": 0
+        },
+        {
+          "id": "multiple-titles-remove-first-and-third",
+          "result": "pass",
+          "names": [
+            "first",
+            "second"
+          ],
+          "marks": 0
+        },
+        {
+          "id": "remove-only-title",
+          "result": "pass",
+          "names": [
+            "first",
+            null
+          ],
+          "marks": 0
+        },
+        {
+          "id": "configured-label-priority",
+          "result": "pass",
+          "names": [
+            "configured",
+            "configured"
+          ],
+          "marks": 0
+        },
+        {
+          "id": "explicit-label-suppresses-labelledby",
+          "result": "pass",
+          "names": [
+            null,
+            null
+          ],
+          "marks": 0
+        },
+        {
+          "id": "duplicate-id-removes-one-registration",
+          "result": "pass",
+          "names": [
+            "same",
+            "same",
+            null
+          ],
+          "marks": 0
+        },
+        {
+          "id": "unknown-removal-preserves-existing-title",
+          "result": "pass",
+          "names": [
+            "first"
+          ],
+          "marks": 0
+        },
+        {
+          "id": "init-and-destroy-before-microtask-drain",
+          "result": "pass",
+          "names": [
+            null
+          ],
+          "marks": 0
+        },
+        {
+          "id": "destruction-retains-captured-queue-reference",
+          "result": "pass",
+          "names": [
+            "first"
+          ],
+          "marks": 0
+        },
+        {
+          "id": "historical-generated-id-namespace",
+          "result": "pass",
+          "names": [],
+          "marks": 0
+        },
+        {
+          "id": "template-dialog-fallback-through-nested-parent",
+          "result": "pass",
+          "names": [
+            "template"
+          ],
+          "marks": 0
+        },
+        {
+          "id": "missing-dialog-fallback-is-safe",
+          "result": "pass",
+          "names": [
+            null
+          ],
+          "marks": 0
+        },
+        {
+          "id": "mock-without-container-queue-is-safe",
+          "result": "pass",
+          "names": [],
+          "marks": 0
+        }
+      ],
+      "passed": 15,
+      "failed": [],
+      "synthetic_host_binding_interpreter": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false
+    },
+    {
+      "variant": "owned",
+      "title_source_sha256": "698b2fea49964c4cea0cfa07b0847ada413130055c032de94d16df3cc4b59ca5",
+      "title_program_sha256": "c6c686160b938b11294dbd37c6e687fa78f6f8cc08a93db931df5f2b849dc637",
+      "title_metadata": {
+        "selector": "[mat-dialog-title], [matDialogTitle]",
+        "exportAs": "matDialogTitle",
+        "host": {
+          "class": "mat-dialog-title",
+          "[id]": "id"
+        }
+      },
+      "original_constructor_observation": null,
+      "actual_owned_full_constructor": true,
+      "actual_owned_helper_namespace_matches_constructor": true,
+      "host_expression": "_config.ariaLabel ? null : _ariaLabelledByQueue[0]",
+      "cases": [
+        {
+          "id": "initial-no-title",
+          "result": "pass",
+          "names": [
+            null
+          ],
+          "marks": 0
+        },
+        {
+          "id": "deferred-first-title",
+          "result": "pass",
+          "names": [
+            null,
+            "first"
+          ],
+          "marks": 1
+        },
+        {
+          "id": "swapped-title",
+          "result": "pass",
+          "names": [
+            "first",
+            "second"
+          ],
+          "marks": 3
+        },
+        {
+          "id": "multiple-titles-remove-first-and-third",
+          "result": "pass",
+          "names": [
+            "first",
+            "second"
+          ],
+          "marks": 5
+        },
+        {
+          "id": "remove-only-title",
+          "result": "pass",
+          "names": [
+            "first",
+            null
+          ],
+          "marks": 2
+        },
+        {
+          "id": "configured-label-priority",
+          "result": "pass",
+          "names": [
+            "configured",
+            "configured"
+          ],
+          "marks": 2
+        },
+        {
+          "id": "explicit-label-suppresses-labelledby",
+          "result": "pass",
+          "names": [
+            null,
+            null
+          ],
+          "marks": 2
+        },
+        {
+          "id": "duplicate-id-removes-one-registration",
+          "result": "pass",
+          "names": [
+            "same",
+            "same",
+            null
+          ],
+          "marks": 4
+        },
+        {
+          "id": "unknown-removal-preserves-existing-title",
+          "result": "pass",
+          "names": [
+            "first"
+          ],
+          "marks": 1
+        },
+        {
+          "id": "init-and-destroy-before-microtask-drain",
+          "result": "pass",
+          "names": [
+            null
+          ],
+          "marks": 2
+        },
+        {
+          "id": "destruction-retains-captured-queue-reference",
+          "result": "fail",
+          "names": [],
+          "marks": 2,
+          "failure": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'first'\n+ ]\n- []\n"
+        },
+        {
+          "id": "historical-generated-id-namespace",
+          "result": "pass",
+          "names": [],
+          "marks": 0
+        },
+        {
+          "id": "template-dialog-fallback-through-nested-parent",
+          "result": "pass",
+          "names": [
+            "template"
+          ],
+          "marks": 1
+        },
+        {
+          "id": "missing-dialog-fallback-is-safe",
+          "result": "pass",
+          "names": [
+            null
+          ],
+          "marks": 0
+        },
+        {
+          "id": "mock-without-container-queue-is-safe",
+          "result": "pass",
+          "names": [],
+          "marks": 0
+        },
+        {
+          "id": "onpush-queue-mutations-mark-three-times",
+          "result": "pass",
+          "names": [
+            "second"
+          ],
+          "marks": 3
+        },
+        {
+          "id": "container-destroyed-before-deferred-add",
+          "result": "pass",
+          "names": [
+            "configured"
+          ],
+          "marks": 0
+        },
+        {
+          "id": "container-destroyed-before-deferred-remove",
+          "result": "pass",
+          "names": [
+            "first"
+          ],
+          "marks": 1
+        }
+      ],
+      "passed": 17,
+      "failed": [
+        "destruction-retains-captured-queue-reference"
+      ],
+      "synthetic_host_binding_interpreter": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false
+    }
+  ],
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false
+}

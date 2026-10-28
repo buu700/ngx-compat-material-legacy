@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "status": "reviewed",
+  "source_review_complete": true,
+  "recorded_at_utc": "2026-10-28T00:22:35.384922+00:00",
+  "role": "Complete original source review plus focused synthetic runtime repair; not native/AOT/packed or complete current-context admission",
+  "originals": {
+    "path": "compatibility/rc/21x-c04-dialog-title-replacement-originals.json.gz",
+    "sha256": "8050f240fa4a48d260ef0a69ae9a7c46c3e9bea6cdac12ac44b4b314adc6709f",
+    "bytes": 96915
+  },
+  "offline_replay": {
+    "path": "compatibility/rc/21x-c04-dialog-title-replacement-originals-offline-replay.json.gz",
+    "sha256": "7b02f88868404cb011169ac7e6eee802360f6adb770241fefc2ca75a55acb3f5",
+    "bytes": 96848
+  },
+  "original_file_occurrences": 9,
+  "original_hunks": 21,
+  "present_original_blob_occurrences": 18,
+  "tagged_context_members": 18,
+  "reviews": [
+    {
+      "sha": "642d886ef117721a34c98055391c9055fde29607",
+      "family": "dialog-title-replacement",
+      "line": "21.x",
+      "status": "reviewed",
+      "source_scope_only": true,
+      "proposed_final_disposition": "already-adapted",
+      "diff": "diff --git a/src/cdk/dialog/dialog-container.ts b/src/cdk/dialog/dialog-container.ts\nindex 052a6fc9cd9f48061379c5d09e0913b577db8b5e..b75c091df488bb83f030e0a867d1f138ae0518a3 100644\n--- a/src/cdk/dialog/dialog-container.ts\n+++ b/src/cdk/dialog/dialog-container.ts\n@@ -60,7 +60,7 @@ export function throwDialogContentAlreadyAttachedError() {\n     '[attr.id]': '_config.id || null',\n     '[attr.role]': '_config.role',\n     '[attr.aria-modal]': '_config.ariaModal',\n-    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledBy',\n+    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledByQueue[0]',\n     '[attr.aria-label]': '_config.ariaLabel',\n     '[attr.aria-describedby]': '_config.ariaDescribedBy || null',\n   },\n@@ -87,8 +87,13 @@ export class CdkDialogContainer<C extends DialogConfig = DialogConfig>\n    */\n   _closeInteractionType: FocusOrigin | null = null;\n \n-  /** ID of the element that should be considered as the dialog's label. */\n-  _ariaLabelledBy: string | null;\n+  /**\n+   * Queue of the IDs of the dialog's label element, based on their definition order. The first\n+   * ID will be used as the `aria-labelledby` value. We use a queue here to handle the case\n+   * where there are two or more titles in the DOM at a time and the first one is destroyed while\n+   * the rest are present.\n+   */\n+  _ariaLabelledByQueue: string[] = [];\n \n   constructor(\n     protected _elementRef: ElementRef,\n@@ -101,8 +106,12 @@ export class CdkDialogContainer<C extends DialogConfig = DialogConfig>\n     private _focusMonitor?: FocusMonitor,\n   ) {\n     super();\n-    this._ariaLabelledBy = this._config.ariaLabelledBy || null;\n+\n     this._document = _document;\n+\n+    if (this._config.ariaLabelledBy) {\n+      this._ariaLabelledByQueue.push(this._config.ariaLabelledBy);\n+    }\n   }\n \n   protected _contentAttached() {\ndiff --git a/src/material/dialog/dialog-container.ts b/src/material/dialog/dialog-container.ts\nindex a77a86d0e3d7f5a21111a51dc486c208936b3212..140f558187b8802c1e1ae6474d59885151bbe6c1 100644\n--- a/src/material/dialog/dialog-container.ts\n+++ b/src/material/dialog/dialog-container.ts\n@@ -145,7 +145,7 @@ function parseCssTime(time: string | number | undefined): number | null {\n     '[attr.aria-modal]': '_config.ariaModal',\n     '[id]': '_config.id',\n     '[attr.role]': '_config.role',\n-    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledBy',\n+    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledByQueue[0]',\n     '[attr.aria-label]': '_config.ariaLabel',\n     '[attr.aria-describedby]': '_config.ariaDescribedBy || null',\n     '[class._mat-animation-noopable]': '!_animationsEnabled',\ndiff --git a/src/material/dialog/dialog-content-directives.ts b/src/material/dialog/dialog-content-directives.ts\nindex e3cffcbb230f3772d3a4a28f943c9940cb4282e1..b2a84228f3155cfe59e5057285081a68d02ff395 100644\n--- a/src/material/dialog/dialog-content-directives.ts\n+++ b/src/material/dialog/dialog-content-directives.ts\n@@ -11,6 +11,7 @@ import {\n   ElementRef,\n   Input,\n   OnChanges,\n+  OnDestroy,\n   OnInit,\n   Optional,\n   SimpleChanges,\n@@ -97,7 +98,7 @@ export class MatDialogClose implements OnInit, OnChanges {\n     '[id]': 'id',\n   },\n })\n-export class MatDialogTitle implements OnInit {\n+export class MatDialogTitle implements OnInit, OnDestroy {\n   @Input() id: string = `mat-mdc-dialog-title-${dialogElementUid++}`;\n \n   constructor(\n@@ -115,10 +116,24 @@ export class MatDialogTitle implements OnInit {\n \n     if (this._dialogRef) {\n       Promise.resolve().then(() => {\n-        const container = this._dialogRef._containerInstance;\n+        // Note: we null check the queue, because there are some internal\n+        // tests that are mocking out `MatDialogRef` incorrectly.\n+        this._dialogRef._containerInstance?._ariaLabelledByQueue?.push(this.id);\n+      });\n+    }\n+  }\n+\n+  ngOnDestroy() {\n+    // Note: we null check the queue, because there are some internal\n+    // tests that are mocking out `MatDialogRef` incorrectly.\n+    const queue = this._dialogRef?._containerInstance?._ariaLabelledByQueue;\n+\n+    if (queue) {\n+      Promise.resolve().then(() => {\n+        const index = queue.indexOf(this.id);\n \n-        if (container && !container._ariaLabelledBy) {\n-          container._ariaLabelledBy = this.id;\n+        if (index > -1) {\n+          queue.splice(index, 1);\n         }\n       });\n     }\ndiff --git a/src/material/dialog/dialog.spec.ts b/src/material/dialog/dialog.spec.ts\nindex 538bcd1a65373f7cb4e753679b86c46512a47213..a43f9dc70940c6e37e66b2ecfd42c74005f37023 100644\n--- a/src/material/dialog/dialog.spec.ts\n+++ b/src/material/dialog/dialog.spec.ts\n@@ -1587,12 +1587,14 @@ describe('MDC-based MatDialog', () => {\n \n   describe('dialog content elements', () => {\n     let dialogRef: MatDialogRef<any>;\n+    let hostInstance: ContentElementDialog | ComponentWithContentElementTemplateRef;\n \n     describe('inside component dialog', () => {\n       beforeEach(fakeAsync(() => {\n         dialogRef = dialog.open(ContentElementDialog, {viewContainerRef: testViewContainerRef});\n         viewContainerFixture.detectChanges();\n         flush();\n+        hostInstance = dialogRef.componentInstance;\n       }));\n \n       runContentElementTests();\n@@ -1609,6 +1611,7 @@ describe('MDC-based MatDialog', () => {\n \n         viewContainerFixture.detectChanges();\n         flush();\n+        hostInstance = fixture.componentInstance;\n       }));\n \n       runContentElementTests();\n@@ -1682,6 +1685,49 @@ describe('MDC-based MatDialog', () => {\n           .toBe(title.id);\n       }));\n \n+      it('should update the aria-labelledby attribute if two titles are swapped', fakeAsync(() => {\n+        const container = overlayContainerElement.querySelector('mat-dialog-container')!;\n+        let title = overlayContainerElement.querySelector('[mat-dialog-title]')!;\n+\n+        flush();\n+        viewContainerFixture.detectChanges();\n+\n+        const previousId = title.id;\n+        expect(title.id).toBeTruthy();\n+        expect(container.getAttribute('aria-labelledby')).toBe(title.id);\n+\n+        hostInstance.shownTitle = 'second';\n+        viewContainerFixture.detectChanges();\n+        flush();\n+        viewContainerFixture.detectChanges();\n+        title = overlayContainerElement.querySelector('[mat-dialog-title]')!;\n+\n+        expect(title.id).toBeTruthy();\n+        expect(title.id).not.toBe(previousId);\n+        expect(container.getAttribute('aria-labelledby')).toBe(title.id);\n+      }));\n+\n+      it('should update the aria-labelledby attribute if multiple titles are present and one is removed', fakeAsync(() => {\n+        const container = overlayContainerElement.querySelector('mat-dialog-container')!;\n+\n+        hostInstance.shownTitle = 'all';\n+        viewContainerFixture.detectChanges();\n+        flush();\n+        viewContainerFixture.detectChanges();\n+\n+        const titles = overlayContainerElement.querySelectorAll('[mat-dialog-title]');\n+\n+        expect(titles.length).toBe(3);\n+        expect(container.getAttribute('aria-labelledby')).toBe(titles[0].id);\n+\n+        hostInstance.shownTitle = 'second';\n+        viewContainerFixture.detectChanges();\n+        flush();\n+        viewContainerFixture.detectChanges();\n+\n+        expect(container.getAttribute('aria-labelledby')).toBe(titles[1].id);\n+      }));\n+\n       it('should add correct css class according to given [align] input in [mat-dialog-actions]', () => {\n         let actions = overlayContainerElement.querySelector('mat-dialog-actions')!;\n \n@@ -2116,7 +2162,9 @@ class PizzaMsg {\n \n @Component({\n   template: `\n-    <h1 mat-dialog-title>This is the title</h1>\n+    <h1 mat-dialog-title *ngIf=\"shouldShowTitle('first')\">This is the first title</h1>\n+    <h1 mat-dialog-title *ngIf=\"shouldShowTitle('second')\">This is the second title</h1>\n+    <h1 mat-dialog-title *ngIf=\"shouldShowTitle('third')\">This is the third title</h1>\n     <mat-dialog-content>Lorem ipsum dolor sit amet.</mat-dialog-content>\n     <mat-dialog-actions align=\"end\">\n       <button mat-dialog-close>Close</button>\n@@ -2130,12 +2178,20 @@ class PizzaMsg {\n     </mat-dialog-actions>\n   `,\n })\n-class ContentElementDialog {}\n+class ContentElementDialog {\n+  shownTitle: 'first' | 'second' | 'third' | 'all' = 'first';\n+\n+  shouldShowTitle(name: string) {\n+    return this.shownTitle === 'all' || this.shownTitle === name;\n+  }\n+}\n \n @Component({\n   template: `\n     <ng-template>\n-      <h1 mat-dialog-title>This is the title</h1>\n+      <h1 mat-dialog-title *ngIf=\"shouldShowTitle('first')\">This is the first title</h1>\n+      <h1 mat-dialog-title *ngIf=\"shouldShowTitle('second')\">This is the second title</h1>\n+      <h1 mat-dialog-title *ngIf=\"shouldShowTitle('third')\">This is the third title</h1>\n       <mat-dialog-content>Lorem ipsum dolor sit amet.</mat-dialog-content>\n       <mat-dialog-actions align=\"end\">\n         <button mat-dialog-close>Close</button>\n@@ -2152,6 +2208,12 @@ class ContentElementDialog {}\n })\n class ComponentWithContentElementTemplateRef {\n   @ViewChild(TemplateRef) templateRef: TemplateRef<any>;\n+\n+  shownTitle: 'first' | 'second' | 'third' | 'all' = 'first';\n+\n+  shouldShowTitle(name: string) {\n+    return this.shownTitle === 'all' || this.shownTitle === name;\n+  }\n }\n \n @Component({template: '', providers: [MatDialog]})\ndiff --git a/src/material/legacy-dialog/dialog-container.ts b/src/material/legacy-dialog/dialog-container.ts\nindex 4c6361fcd3c65a007cca22106d74580a21b23500..5267d2ed4595e8650af9b4c7c7d0dc469d7605e5 100644\n--- a/src/material/legacy-dialog/dialog-container.ts\n+++ b/src/material/legacy-dialog/dialog-container.ts\n@@ -46,7 +46,7 @@ import {_MatDialogContainerBase, matDialogAnimations} from '@angular/material/di\n     '[attr.aria-modal]': '_config.ariaModal',\n     '[id]': '_config.id',\n     '[attr.role]': '_config.role',\n-    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledBy',\n+    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledByQueue[0]',\n     '[attr.aria-label]': '_config.ariaLabel',\n     '[attr.aria-describedby]': '_config.ariaDescribedBy || null',\n     '[@dialogContainer]': `_getAnimationState()`,\ndiff --git a/src/material/legacy-dialog/dialog-content-directives.ts b/src/material/legacy-dialog/dialog-content-directives.ts\nindex aea30fe9354191be9e0fd7cf96f42c6acd05e742..f7667d0928d491747c4aacfce5e0d668a7374507 100644\n--- a/src/material/legacy-dialog/dialog-content-directives.ts\n+++ b/src/material/legacy-dialog/dialog-content-directives.ts\n@@ -14,6 +14,7 @@ import {\n   Optional,\n   SimpleChanges,\n   ElementRef,\n+  OnDestroy,\n } from '@angular/core';\n import {MatLegacyDialog} from './dialog';\n import {MatLegacyDialogRef} from './dialog-ref';\n@@ -106,7 +107,7 @@ export class MatLegacyDialogClose implements OnInit, OnChanges {\n     '[id]': 'id',\n   },\n })\n-export class MatLegacyDialogTitle implements OnInit {\n+export class MatLegacyDialogTitle implements OnInit, OnDestroy {\n   /** Unique id for the dialog title. If none is supplied, it will be auto-generated. */\n   @Input() id: string = `mat-dialog-title-${dialogElementUid++}`;\n \n@@ -125,10 +126,24 @@ export class MatLegacyDialogTitle implements OnInit {\n \n     if (this._dialogRef) {\n       Promise.resolve().then(() => {\n-        const container = this._dialogRef._containerInstance;\n+        // Note: we null check the queue, because there are some internal\n+        // tests that are mocking out `MatDialogRef` incorrectly.\n+        this._dialogRef._containerInstance?._ariaLabelledByQueue?.push(this.id);\n+      });\n+    }\n+  }\n+\n+  ngOnDestroy() {\n+    // Note: we null check the queue, because there are some internal\n+    // tests that are mocking out `MatDialogRef` incorrectly.\n+    const queue = this._dialogRef?._containerInstance?._ariaLabelledByQueue;\n+\n+    if (queue) {\n+      Promise.resolve().then(() => {\n+        const index = queue.indexOf(this.id);\n \n-        if (container && !container._ariaLabelledBy) {\n-          container._ariaLabelledBy = this.id;\n+        if (index > -1) {\n+          queue.splice(index, 1);\n         }\n       });\n     }\ndiff --git a/tools/public_api_guard/cdk/dialog.md b/tools/public_api_guard/cdk/dialog.md\nindex eeb636d9a28fd4a0fef7dab471a9d3b5e120a4b5..c0a30602a3d9fce67b03bb97e9aa4f670d0f1829 100644\n--- a/tools/public_api_guard/cdk/dialog.md\n+++ b/tools/public_api_guard/cdk/dialog.md\n@@ -45,7 +45,7 @@ export type AutoFocusTarget = 'dialog' | 'first-tabbable' | 'first-heading';\n // @public\n export class CdkDialogContainer<C extends DialogConfig = DialogConfig> extends BasePortalOutlet implements OnDestroy {\n     constructor(_elementRef: ElementRef, _focusTrapFactory: FocusTrapFactory, _document: any, _config: C, _interactivityChecker: InteractivityChecker, _ngZone: NgZone, _overlayRef: OverlayRef, _focusMonitor?: FocusMonitor | undefined);\n-    _ariaLabelledBy: string | null;\n+    _ariaLabelledByQueue: string[];\n     attachComponentPortal<T>(portal: ComponentPortal<T>): ComponentRef<T>;\n     // @deprecated\n     attachDomPortal: (portal: DomPortal) => void;\ndiff --git a/tools/public_api_guard/material/dialog.md b/tools/public_api_guard/material/dialog.md\nindex 836d8c3e8885509aa8c93d14b1526ac3897603a1..e6900371e87bd27d82478b1e724700cf611af9af 100644\n--- a/tools/public_api_guard/material/dialog.md\n+++ b/tools/public_api_guard/material/dialog.md\n@@ -274,11 +274,13 @@ export const enum MatDialogState {\n }\n \n // @public\n-export class MatDialogTitle implements OnInit {\n+export class MatDialogTitle implements OnInit, OnDestroy {\n     constructor(_dialogRef: MatDialogRef<any>, _elementRef: ElementRef<HTMLElement>, _dialog: MatDialog);\n     // (undocumented)\n     id: string;\n     // (undocumented)\n+    ngOnDestroy(): void;\n+    // (undocumented)\n     ngOnInit(): void;\n     // (undocumented)\n     static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatDialogTitle, \"[mat-dialog-title], [matDialogTitle]\", [\"matDialogTitle\"], { \"id\": { \"alias\": \"id\"; \"required\": false; }; }, {}, never, never, false, never>;\ndiff --git a/tools/public_api_guard/material/legacy-dialog.md b/tools/public_api_guard/material/legacy-dialog.md\nindex e0b370caaa6469c758a9125048baaa6fffb23436..7c7603c36130a0e4576ff2d6a1aaba2d027abeed 100644\n--- a/tools/public_api_guard/material/legacy-dialog.md\n+++ b/tools/public_api_guard/material/legacy-dialog.md\n@@ -31,6 +31,7 @@ import { _MatDialogContainerBase as _MatLegacyDialogContainerBase } from '@angul\n import { MatDialogState as MatLegacyDialogState } from '@angular/material/dialog';\n import { NgZone } from '@angular/core';\n import { OnChanges } from '@angular/core';\n+import { OnDestroy } from '@angular/core';\n import { OnInit } from '@angular/core';\n import { Overlay } from '@angular/cdk/overlay';\n import { OverlayContainer } from '@angular/cdk/overlay';\n@@ -171,10 +172,12 @@ export class MatLegacyDialogRef<T, R = any> extends MatDialogRef<T, R> {\n export { MatLegacyDialogState }\n \n // @public @deprecated\n-export class MatLegacyDialogTitle implements OnInit {\n+export class MatLegacyDialogTitle implements OnInit, OnDestroy {\n     constructor(_dialogRef: MatLegacyDialogRef<any>, _elementRef: ElementRef<HTMLElement>, _dialog: MatLegacyDialog);\n     id: string;\n     // (undocumented)\n+    ngOnDestroy(): void;\n+    // (undocumented)\n     ngOnInit(): void;\n     // (undocumented)\n     static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatLegacyDialogTitle, \"[mat-dialog-title], [matDialogTitle]\", [\"matDialogTitle\"], { \"id\": { \"alias\": \"id\"; \"required\": false; }; }, {}, never, never, false, never>;\n",
+      "diff_sha256": "13c81abcdf9b4b4e80e864db636af1eeb31bb1ca44110d0358e43763e5bce2b6",
+      "complete_original_paths": [
+        "src/cdk/dialog/dialog-container.ts",
+        "src/material/dialog/dialog-container.ts",
+        "src/material/dialog/dialog-content-directives.ts",
+        "src/material/dialog/dialog.spec.ts",
+        "src/material/legacy-dialog/dialog-container.ts",
+        "src/material/legacy-dialog/dialog-content-directives.ts",
+        "tools/public_api_guard/cdk/dialog.md",
+        "tools/public_api_guard/material/dialog.md",
+        "tools/public_api_guard/material/legacy-dialog.md"
+      ],
+      "frozen_seed_paths": [
+        "src/material/dialog/dialog-container.ts",
+        "src/material/dialog/dialog-content-directives.ts",
+        "src/material/dialog/dialog.spec.ts"
+      ],
+      "complete_original_hunk_reviews": [
+        {
+          "path": "src/cdk/dialog/dialog-container.ts",
+          "index": 0,
+          "header": "@@ -60,7 +60,7 @@ export function throwDialogContentAlreadyAttachedError() {",
+          "text": "@@ -60,7 +60,7 @@ export function throwDialogContentAlreadyAttachedError() {\n     '[attr.id]': '_config.id || null',\n     '[attr.role]': '_config.role',\n     '[attr.aria-modal]': '_config.ariaModal',\n-    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledBy',\n+    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledByQueue[0]',\n     '[attr.aria-label]': '_config.ariaLabel',\n     '[attr.aria-describedby]': '_config.ariaDescribedBy || null',\n   },\n",
+          "sha256": "7dfe9a81c27a1b77a59a1560d7be948475f302c907cfa777269d88499d7ef5d1",
+          "technical_judgment": "The accessible-name host binding changes from one scalar to the first queued ID while retaining explicit aria-label priority. The complete after file is identical to16.2.14. Owned legacy host metadata keeps this exact expression; the test interprets its AST and explicitly does not claim Angular rendering."
+        },
+        {
+          "path": "src/cdk/dialog/dialog-container.ts",
+          "index": 1,
+          "header": "@@ -87,8 +87,13 @@ export class CdkDialogContainer<C extends DialogConfig = DialogConfig>",
+          "text": "@@ -87,8 +87,13 @@ export class CdkDialogContainer<C extends DialogConfig = DialogConfig>\n    */\n   _closeInteractionType: FocusOrigin | null = null;\n \n-  /** ID of the element that should be considered as the dialog's label. */\n-  _ariaLabelledBy: string | null;\n+  /**\n+   * Queue of the IDs of the dialog's label element, based on their definition order. The first\n+   * ID will be used as the `aria-labelledby` value. We use a queue here to handle the case\n+   * where there are two or more titles in the DOM at a time and the first one is destroyed while\n+   * the rest are present.\n+   */\n+  _ariaLabelledByQueue: string[] = [];\n \n   constructor(\n     protected _elementRef: ElementRef,\n",
+          "sha256": "d814367e96a6ac010b43c84b88627c0f2529ff7f13d9bd77f0897d0693b01751",
+          "technical_judgment": "Adds the definition-order queue to support replacement and multiple simultaneous titles. The owned base keeps a string-array field; no current CDK private queue is accessed."
+        },
+        {
+          "path": "src/cdk/dialog/dialog-container.ts",
+          "index": 2,
+          "header": "@@ -101,8 +106,12 @@ export class CdkDialogContainer<C extends DialogConfig = DialogConfig>",
+          "text": "@@ -101,8 +106,12 @@ export class CdkDialogContainer<C extends DialogConfig = DialogConfig>\n     private _focusMonitor?: FocusMonitor,\n   ) {\n     super();\n-    this._ariaLabelledBy = this._config.ariaLabelledBy || null;\n+\n     this._document = _document;\n+\n+    if (this._config.ariaLabelledBy) {\n+      this._ariaLabelledByQueue.push(this._config.ariaLabelledBy);\n+    }\n   }\n \n   protected _contentAttached() {\n",
+          "sha256": "64875afae433fcaaaaca57cb552291a7d15085aba89476cec66e9425c14a38d0",
+          "technical_judgment": "Captures the configured ariaLabelledBy as the initial queue entry. Actual original constructor and label-field execution, plus the full owned constructor, preserve config priority. No CDK fork or current private API import is added."
+        },
+        {
+          "path": "src/material/dialog/dialog-container.ts",
+          "index": 0,
+          "header": "@@ -145,7 +145,7 @@ function parseCssTime(time: string | number | undefined): number | null {",
+          "text": "@@ -145,7 +145,7 @@ function parseCssTime(time: string | number | undefined): number | null {\n     '[attr.aria-modal]': '_config.ariaModal',\n     '[id]': '_config.id',\n     '[attr.role]': '_config.role',\n-    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledBy',\n+    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledByQueue[0]',\n     '[attr.aria-label]': '_config.ariaLabel',\n     '[attr.aria-describedby]': '_config.ariaDescribedBy || null',\n     '[class._mat-animation-noopable]': '!_animationsEnabled',\n",
+          "sha256": "aa8ff56b9bc715ef17047d2cb4a8379d3fbac734e614ccb71bdef9ee64545e55",
+          "technical_judgment": "Updates the modern host expression to queue[0]. It is exact tagged16 source; current Material remains the modern component peer. The add-on keeps its owned legacy host and does not fork the modern component."
+        },
+        {
+          "path": "src/material/dialog/dialog-content-directives.ts",
+          "index": 0,
+          "header": "@@ -11,6 +11,7 @@ import {",
+          "text": "@@ -11,6 +11,7 @@ import {\n   ElementRef,\n   Input,\n   OnChanges,\n+  OnDestroy,\n   OnInit,\n   Optional,\n   SimpleChanges,\n",
+          "sha256": "d4300b7dbfb1d077a8c687f31256cc6b1c65a1622ae794725e24746293ef3f7e",
+          "technical_judgment": "Adds the OnDestroy type import used by the new lifecycle. The corresponding tagged16 legacy class already has that lifecycle; actual current public core decorators are used only for diagnostic class execution."
+        },
+        {
+          "path": "src/material/dialog/dialog-content-directives.ts",
+          "index": 1,
+          "header": "@@ -97,7 +98,7 @@ export class MatDialogClose implements OnInit, OnChanges {",
+          "text": "@@ -97,7 +98,7 @@ export class MatDialogClose implements OnInit, OnChanges {\n     '[id]': 'id',\n   },\n })\n-export class MatDialogTitle implements OnInit {\n+export class MatDialogTitle implements OnInit, OnDestroy {\n   @Input() id: string = `mat-mdc-dialog-title-${dialogElementUid++}`;\n \n   constructor(\n",
+          "sha256": "7ea1ccb6507fb9b91220f42368df41181367ede2752eb7aebd6e330ef224b05d",
+          "technical_judgment": "Adds OnDestroy to the title class interface. Frozen legacy public lifecycle and three-argument constructor are preserved; no modern inheritance/API mirror is introduced."
+        },
+        {
+          "path": "src/material/dialog/dialog-content-directives.ts",
+          "index": 2,
+          "header": "@@ -115,10 +116,24 @@ export class MatDialogTitle implements OnInit {",
+          "text": "@@ -115,10 +116,24 @@ export class MatDialogTitle implements OnInit {\n \n     if (this._dialogRef) {\n       Promise.resolve().then(() => {\n-        const container = this._dialogRef._containerInstance;\n+        // Note: we null check the queue, because there are some internal\n+        // tests that are mocking out `MatDialogRef` incorrectly.\n+        this._dialogRef._containerInstance?._ariaLabelledByQueue?.push(this.id);\n+      });\n+    }\n+  }\n+\n+  ngOnDestroy() {\n+    // Note: we null check the queue, because there are some internal\n+    // tests that are mocking out `MatDialogRef` incorrectly.\n+    const queue = this._dialogRef?._containerInstance?._ariaLabelledByQueue;\n+\n+    if (queue) {\n+      Promise.resolve().then(() => {\n+        const index = queue.indexOf(this.id);\n \n-        if (container && !container._ariaLabelledBy) {\n-          container._ariaLabelledBy = this.id;\n+        if (index > -1) {\n+          queue.splice(index, 1);\n         }\n       });\n     }\n",
+          "sha256": "72b788c0fa8ac6b626dc11cefeb3223f911f38145346a73676ce2f03995940c9",
+          "technical_judgment": "Queues title addition and removal, including optional queue handling and a queue reference captured before the destroy microtask. Actual before/after/tag title class execution reproduces the original replacement/removal failures. The owned helper originally looked up the queue later; the new targeted repair passes the captured array as an optional internal helper argument while retaining markForCheck and destroyed-owner guards."
+        },
+        {
+          "path": "src/material/dialog/dialog.spec.ts",
+          "index": 0,
+          "header": "@@ -1587,12 +1587,14 @@ describe('MDC-based MatDialog', () => {",
+          "text": "@@ -1587,12 +1587,14 @@ describe('MDC-based MatDialog', () => {\n \n   describe('dialog content elements', () => {\n     let dialogRef: MatDialogRef<any>;\n+    let hostInstance: ContentElementDialog | ComponentWithContentElementTemplateRef;\n \n     describe('inside component dialog', () => {\n       beforeEach(fakeAsync(() => {\n         dialogRef = dialog.open(ContentElementDialog, {viewContainerRef: testViewContainerRef});\n         viewContainerFixture.detectChanges();\n         flush();\n+        hostInstance = dialogRef.componentInstance;\n       }));\n \n       runContentElementTests();\n",
+          "sha256": "c3d51e1e5af03912d060e4508332e046eba88420018f79d42dff747e88aa8655",
+          "technical_judgment": "The component-dialog setup records the content instance for title visibility changes. This entire post-change spec file is exact tagged16; this source review does not pretend its native tests ran."
+        },
+        {
+          "path": "src/material/dialog/dialog.spec.ts",
+          "index": 1,
+          "header": "@@ -1609,6 +1611,7 @@ describe('MDC-based MatDialog', () => {",
+          "text": "@@ -1609,6 +1611,7 @@ describe('MDC-based MatDialog', () => {\n \n         viewContainerFixture.detectChanges();\n         flush();\n+        hostInstance = fixture.componentInstance;\n       }));\n \n       runContentElementTests();\n",
+          "sha256": "95298615da10ee760b1bcab70be3a03e9a724551629b3f664dfaa1a7863e0e59",
+          "technical_judgment": "The TemplateRef-dialog setup records the template host instance. The diagnostic independently executes the real DOM-ancestor fallback function through a synthetic nested parent; actual template view rendering remains pending."
+        },
+        {
+          "path": "src/material/dialog/dialog.spec.ts",
+          "index": 2,
+          "header": "@@ -1682,6 +1685,49 @@ describe('MDC-based MatDialog', () => {",
+          "text": "@@ -1682,6 +1685,49 @@ describe('MDC-based MatDialog', () => {\n           .toBe(title.id);\n       }));\n \n+      it('should update the aria-labelledby attribute if two titles are swapped', fakeAsync(() => {\n+        const container = overlayContainerElement.querySelector('mat-dialog-container')!;\n+        let title = overlayContainerElement.querySelector('[mat-dialog-title]')!;\n+\n+        flush();\n+        viewContainerFixture.detectChanges();\n+\n+        const previousId = title.id;\n+        expect(title.id).toBeTruthy();\n+        expect(container.getAttribute('aria-labelledby')).toBe(title.id);\n+\n+        hostInstance.shownTitle = 'second';\n+        viewContainerFixture.detectChanges();\n+        flush();\n+        viewContainerFixture.detectChanges();\n+        title = overlayContainerElement.querySelector('[mat-dialog-title]')!;\n+\n+        expect(title.id).toBeTruthy();\n+        expect(title.id).not.toBe(previousId);\n+        expect(container.getAttribute('aria-labelledby')).toBe(title.id);\n+      }));\n+\n+      it('should update the aria-labelledby attribute if multiple titles are present and one is removed', fakeAsync(() => {\n+        const container = overlayContainerElement.querySelector('mat-dialog-container')!;\n+\n+        hostInstance.shownTitle = 'all';\n+        viewContainerFixture.detectChanges();\n+        flush();\n+        viewContainerFixture.detectChanges();\n+\n+        const titles = overlayContainerElement.querySelectorAll('[mat-dialog-title]');\n+\n+        expect(titles.length).toBe(3);\n+        expect(container.getAttribute('aria-labelledby')).toBe(titles[0].id);\n+\n+        hostInstance.shownTitle = 'second';\n+        viewContainerFixture.detectChanges();\n+        flush();\n+        viewContainerFixture.detectChanges();\n+\n+        expect(container.getAttribute('aria-labelledby')).toBe(titles[1].id);\n+      }));\n+\n       it('should add correct css class according to given [align] input in [mat-dialog-actions]', () => {\n         let actions = overlayContainerElement.querySelector('mat-dialog-actions')!;\n \n",
+          "sha256": "51d3909d0fbe146c4f686ab82fdc7e8a3aaea1170eb4623a63c7ae4f63d708af",
+          "technical_judgment": "Adds two native regression behaviors: replacing a title and retaining the next title when other titles are removed. The focused lifecycle diagnostic exercises both with actual classes, while the host expression is an AST interpreter, not a browser assertion."
+        },
+        {
+          "path": "src/material/dialog/dialog.spec.ts",
+          "index": 3,
+          "header": "@@ -2116,7 +2162,9 @@ class PizzaMsg {",
+          "text": "@@ -2116,7 +2162,9 @@ class PizzaMsg {\n \n @Component({\n   template: `\n-    <h1 mat-dialog-title>This is the title</h1>\n+    <h1 mat-dialog-title *ngIf=\"shouldShowTitle('first')\">This is the first title</h1>\n+    <h1 mat-dialog-title *ngIf=\"shouldShowTitle('second')\">This is the second title</h1>\n+    <h1 mat-dialog-title *ngIf=\"shouldShowTitle('third')\">This is the third title</h1>\n     <mat-dialog-content>Lorem ipsum dolor sit amet.</mat-dialog-content>\n     <mat-dialog-actions align=\"end\">\n       <button mat-dialog-close>Close</button>\n",
+          "sha256": "a7b3548bcd61c0523c89462bcdad1d30d21c88361b359c9ea887eddc73daa027",
+          "technical_judgment": "Changes the component fixture to three conditionally rendered title elements. Consumer HTML is not modified; Cyph already has conditional matDialogTitle use."
+        },
+        {
+          "path": "src/material/dialog/dialog.spec.ts",
+          "index": 4,
+          "header": "@@ -2130,12 +2178,20 @@ class PizzaMsg {",
+          "text": "@@ -2130,12 +2178,20 @@ class PizzaMsg {\n     </mat-dialog-actions>\n   `,\n })\n-class ContentElementDialog {}\n+class ContentElementDialog {\n+  shownTitle: 'first' | 'second' | 'third' | 'all' = 'first';\n+\n+  shouldShowTitle(name: string) {\n+    return this.shownTitle === 'all' || this.shownTitle === name;\n+  }\n+}\n \n @Component({\n   template: `\n     <ng-template>\n-      <h1 mat-dialog-title>This is the title</h1>\n+      <h1 mat-dialog-title *ngIf=\"shouldShowTitle('first')\">This is the first title</h1>\n+      <h1 mat-dialog-title *ngIf=\"shouldShowTitle('second')\">This is the second title</h1>\n+      <h1 mat-dialog-title *ngIf=\"shouldShowTitle('third')\">This is the third title</h1>\n       <mat-dialog-content>Lorem ipsum dolor sit amet.</mat-dialog-content>\n       <mat-dialog-actions align=\"end\">\n         <button mat-dialog-close>Close</button>\n",
+          "sha256": "369fcf0b9e53e7934f9755193466198864040f98bd18e891e98ad987d0f6c2c2",
+          "technical_judgment": "Adds the component fixture visibility state and predicate; the diagnostic uses explicit lifecycle transitions rather than executing a copied fake view implementation."
+        },
+        {
+          "path": "src/material/dialog/dialog.spec.ts",
+          "index": 5,
+          "header": "@@ -2152,6 +2208,12 @@ class ContentElementDialog {}",
+          "text": "@@ -2152,6 +2208,12 @@ class ContentElementDialog {}\n })\n class ComponentWithContentElementTemplateRef {\n   @ViewChild(TemplateRef) templateRef: TemplateRef<any>;\n+\n+  shownTitle: 'first' | 'second' | 'third' | 'all' = 'first';\n+\n+  shouldShowTitle(name: string) {\n+    return this.shownTitle === 'all' || this.shownTitle === name;\n+  }\n }\n \n @Component({template: '', providers: [MatDialog]})\n",
+          "sha256": "b0190a85c8bae9613954bfcff9e0fa95ef012096f491ae1ff79ce880db31154c",
+          "technical_judgment": "Adds the same conditional titles and visibility state to the TemplateRef fixture. Native component/TemplateRef and change-detection coverage must be bound to existing dialog browser cells before full qualification."
+        },
+        {
+          "path": "src/material/legacy-dialog/dialog-container.ts",
+          "index": 0,
+          "header": "@@ -46,7 +46,7 @@ import {_MatDialogContainerBase, matDialogAnimations} from '@angular/material/di",
+          "text": "@@ -46,7 +46,7 @@ import {_MatDialogContainerBase, matDialogAnimations} from '@angular/material/di\n     '[attr.aria-modal]': '_config.ariaModal',\n     '[id]': '_config.id',\n     '[attr.role]': '_config.role',\n-    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledBy',\n+    '[attr.aria-labelledby]': '_config.ariaLabel ? null : _ariaLabelledByQueue[0]',\n     '[attr.aria-label]': '_config.ariaLabel',\n     '[attr.aria-describedby]': '_config.ariaDescribedBy || null',\n     '[@dialogContainer]': `_getAnimationState()`,\n",
+          "sha256": "2e466bc535ab3e2696fac49f52701cbd5fe6b8563c9498afb1e883ce8b9aa129",
+          "technical_judgment": "Updates the legacy accessible-name host expression. Owned container selector, CSS class, id binding and label expression are preserved; its CSS/HTML bytes are unchanged by the repair."
+        },
+        {
+          "path": "src/material/legacy-dialog/dialog-content-directives.ts",
+          "index": 0,
+          "header": "@@ -14,6 +14,7 @@ import {",
+          "text": "@@ -14,6 +14,7 @@ import {\n   Optional,\n   SimpleChanges,\n   ElementRef,\n+  OnDestroy,\n } from '@angular/core';\n import {MatLegacyDialog} from './dialog';\n import {MatLegacyDialogRef} from './dialog-ref';\n",
+          "sha256": "c6db29d7d745c4b719898ae198e99554128f4ad49ad224f7a1d6ef21e8eeebc2",
+          "technical_judgment": "Adds the legacy OnDestroy type import; it is already present in tagged16 and in the owned source."
+        },
+        {
+          "path": "src/material/legacy-dialog/dialog-content-directives.ts",
+          "index": 1,
+          "header": "@@ -106,7 +107,7 @@ export class MatLegacyDialogClose implements OnInit, OnChanges {",
+          "text": "@@ -106,7 +107,7 @@ export class MatLegacyDialogClose implements OnInit, OnChanges {\n     '[id]': 'id',\n   },\n })\n-export class MatLegacyDialogTitle implements OnInit {\n+export class MatLegacyDialogTitle implements OnInit, OnDestroy {\n   /** Unique id for the dialog title. If none is supplied, it will be auto-generated. */\n   @Input() id: string = `mat-dialog-title-${dialogElementUid++}`;\n \n",
+          "sha256": "eaad4a16f4daba4086590d887e01a5f9b1c2ac2bc606192414ac96a9cb132381",
+          "technical_judgment": "Declares the legacy title lifecycle. Its public constructor and member signatures stay unchanged through this repair; only an owned helper gains an optional argument."
+        },
+        {
+          "path": "src/material/legacy-dialog/dialog-content-directives.ts",
+          "index": 2,
+          "header": "@@ -125,10 +126,24 @@ export class MatLegacyDialogTitle implements OnInit {",
+          "text": "@@ -125,10 +126,24 @@ export class MatLegacyDialogTitle implements OnInit {\n \n     if (this._dialogRef) {\n       Promise.resolve().then(() => {\n-        const container = this._dialogRef._containerInstance;\n+        // Note: we null check the queue, because there are some internal\n+        // tests that are mocking out `MatDialogRef` incorrectly.\n+        this._dialogRef._containerInstance?._ariaLabelledByQueue?.push(this.id);\n+      });\n+    }\n+  }\n+\n+  ngOnDestroy() {\n+    // Note: we null check the queue, because there are some internal\n+    // tests that are mocking out `MatDialogRef` incorrectly.\n+    const queue = this._dialogRef?._containerInstance?._ariaLabelledByQueue;\n+\n+    if (queue) {\n+      Promise.resolve().then(() => {\n+        const index = queue.indexOf(this.id);\n \n-        if (container && !container._ariaLabelledBy) {\n-          container._ariaLabelledBy = this.id;\n+        if (index > -1) {\n+          queue.splice(index, 1);\n         }\n       });\n     }\n",
+          "sha256": "2f466ac68767e0184c70415b1754900a25aa3c1b717bbaf2d24b67dea47ee25f",
+          "technical_judgment": "Implements deferred legacy title queue registration/removal. The tagged destroy hook captures the queue before scheduling; real pre-repair execution demonstrates that the owned late lookup mutates a replacement queue. The repair preserves the tagged reference and keeps existing OnPush and destroyed-owner behavior."
+        },
+        {
+          "path": "tools/public_api_guard/cdk/dialog.md",
+          "index": 0,
+          "header": "@@ -45,7 +45,7 @@ export type AutoFocusTarget = 'dialog' | 'first-tabbable' | 'first-heading';",
+          "text": "@@ -45,7 +45,7 @@ export type AutoFocusTarget = 'dialog' | 'first-tabbable' | 'first-heading';\n // @public\n export class CdkDialogContainer<C extends DialogConfig = DialogConfig> extends BasePortalOutlet implements OnDestroy {\n     constructor(_elementRef: ElementRef, _focusTrapFactory: FocusTrapFactory, _document: any, _config: C, _interactivityChecker: InteractivityChecker, _ngZone: NgZone, _overlayRef: OverlayRef, _focusMonitor?: FocusMonitor | undefined);\n-    _ariaLabelledBy: string | null;\n+    _ariaLabelledByQueue: string[];\n     attachComponentPortal<T>(portal: ComponentPortal<T>): ComponentRef<T>;\n     // @deprecated\n     attachDomPortal: (portal: DomPortal) => void;\n",
+          "sha256": "38908ab1b8d585bdb49793d066ae173c6697c35271413ddeb8dd2e983466b2e2",
+          "technical_judgment": "Replaces the scalar field declaration with the queue. The modern public CDK DialogContainer protocol used by the add-on has no title queue; the historical queue is locally owned rather than borrowed from a current private implementation."
+        },
+        {
+          "path": "tools/public_api_guard/material/dialog.md",
+          "index": 0,
+          "header": "@@ -274,11 +274,13 @@ export const enum MatDialogState {",
+          "text": "@@ -274,11 +274,13 @@ export const enum MatDialogState {\n }\n \n // @public\n-export class MatDialogTitle implements OnInit {\n+export class MatDialogTitle implements OnInit, OnDestroy {\n     constructor(_dialogRef: MatDialogRef<any>, _elementRef: ElementRef<HTMLElement>, _dialog: MatDialog);\n     // (undocumented)\n     id: string;\n     // (undocumented)\n+    ngOnDestroy(): void;\n+    // (undocumented)\n     ngOnInit(): void;\n     // (undocumented)\n     static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatDialogTitle, \"[mat-dialog-title], [matDialogTitle]\", [\"matDialogTitle\"], { \"id\": { \"alias\": \"id\"; \"required\": false; }; }, {}, never, never, false, never>;\n",
+          "sha256": "17bb3cdc62ee7fac40442a028cf35fc8285cc92b51effc3c1c05878ec9961f91",
+          "technical_judgment": "Adds OnDestroy and ngOnDestroy to the modern title declaration. This declaration is exact tagged16 and supplies historical context; no new modern API is mirrored in the package."
+        },
+        {
+          "path": "tools/public_api_guard/material/legacy-dialog.md",
+          "index": 0,
+          "header": "@@ -31,6 +31,7 @@ import { _MatDialogContainerBase as _MatLegacyDialogContainerBase } from '@angul",
+          "text": "@@ -31,6 +31,7 @@ import { _MatDialogContainerBase as _MatLegacyDialogContainerBase } from '@angul\n import { MatDialogState as MatLegacyDialogState } from '@angular/material/dialog';\n import { NgZone } from '@angular/core';\n import { OnChanges } from '@angular/core';\n+import { OnDestroy } from '@angular/core';\n import { OnInit } from '@angular/core';\n import { Overlay } from '@angular/cdk/overlay';\n import { OverlayContainer } from '@angular/cdk/overlay';\n",
+          "sha256": "fab989cf70781739fb2da98c5fac4a5ff5a2dd7521e86364679fa5ff1b0aa8e2",
+          "technical_judgment": "Adds the public core OnDestroy type import in the generated declaration. No consumer source or style migration is required."
+        },
+        {
+          "path": "tools/public_api_guard/material/legacy-dialog.md",
+          "index": 1,
+          "header": "@@ -171,10 +172,12 @@ export class MatLegacyDialogRef<T, R = any> extends MatDialogRef<T, R> {",
+          "text": "@@ -171,10 +172,12 @@ export class MatLegacyDialogRef<T, R = any> extends MatDialogRef<T, R> {\n export { MatLegacyDialogState }\n \n // @public @deprecated\n-export class MatLegacyDialogTitle implements OnInit {\n+export class MatLegacyDialogTitle implements OnInit, OnDestroy {\n     constructor(_dialogRef: MatLegacyDialogRef<any>, _elementRef: ElementRef<HTMLElement>, _dialog: MatLegacyDialog);\n     id: string;\n     // (undocumented)\n+    ngOnDestroy(): void;\n+    // (undocumented)\n     ngOnInit(): void;\n     // (undocumented)\n     static \u0275dir: i0.\u0275\u0275DirectiveDeclaration<MatLegacyDialogTitle, \"[mat-dialog-title], [matDialogTitle]\", [\"matDialogTitle\"], { \"id\": { \"alias\": \"id\"; \"required\": false; }; }, {}, never, never, false, never>;\n",
+          "sha256": "9bc806a6cee6db2242641f6685944e0bb04e76e54562955ef24c120480912551",
+          "technical_judgment": "Adds the legacy title OnDestroy lifecycle declaration and method. The repair retains this tagged public surface and all selector/id metadata; no extra public class member or constructor parameter is added."
+        }
+      ],
+      "all_nine_original_after_images_identical_to_untouched16": true,
+      "decision": "The complete queue-based title replacement fix is in the untouched16.2.14 release and is retained by the owned legacy implementation. A demonstrated owned lifetime discrepancy has been repaired on both peer lines: ngOnDestroy now removes from the queue captured before its microtask, preserving historical reference semantics while retaining owned markForCheck and destroyed-owner guards. All public constructors, title metadata and consumer HTML/CSS/SCSS are unchanged. Actual15common title/constructor cases match original-after and tagged16;18owned cases pass on both minima. Native rendering, current source-context admission and canonical integration remain separate and unqualified.",
+      "canonical_disposition_applied": false,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed",
+      "g13_claim": "not-passed"
+    }
+  ],
+  "actual_line_scopes": {
+    "21.x": {
+      "path": "compatibility/rc/21x-c04-dialog-title-replacement-measurement-21x.json",
+      "sha256": "1fb3b5b74fa920770ba37cd6b3a047d65de6cf671086b9870ae41167e3be1bdb",
+      "bytes": 20250
+    },
+    "main": {
+      "path": "compatibility/rc/21x-c04-dialog-title-replacement-measurement-main.json",
+      "sha256": "4fb288ae1615ca51f609a2fb1784f248b7a7e5e0db1152f05f18289187fc0f69",
+      "bytes": 20247
+    }
+  },
+  "pre_repair_observation": {
+    "path": "compatibility/rc/21x-c04-dialog-title-replacement-pre-repair-observation.json",
+    "sha256": "f51554810c60c9ea30360097cb707a08359df9f0b75b9b9a4011dea2842cce00",
+    "bytes": 10935
+  },
+  "read_only_Cyph_sanity": {
+    "files": [
+      {
+        "path": "shared/css/cyph.base.scss",
+        "sha256": "44db9a3820a38154df9c2fa68163f5df91510f1f343214703068663eaf003267",
+        "bytes": 11498,
+        "conditional_title": false,
+        "attribute_selector": true
+      },
+      {
+        "path": "shared/js/cyph/components/dialog-alert/dialog-alert.component.html",
+        "sha256": "86653f1a585bb25a1b98cbd300a38a2062f6bad46964bc99d2c19b83d6154309",
+        "bytes": 414,
+        "conditional_title": false,
+        "attribute_selector": false
+      },
+      {
+        "path": "shared/js/cyph/components/dialog-media/dialog-media.component.html",
+        "sha256": "cadc795f05b567ad10cb83061af20b8148dfd71c3ddacc450dc1885e3abe855b",
+        "bytes": 1920,
+        "conditional_title": true,
+        "attribute_selector": false
+      },
+      {
+        "path": "shared/js/cyph/components/dialog-confirm/dialog-confirm.component.html",
+        "sha256": "9912721f0404e55931df76c56192b360e9ba60508588d1077753d30e739d045c",
+        "bytes": 4208,
+        "conditional_title": false,
+        "attribute_selector": false
+      },
+      {
+        "path": "shared/js/cyph/components/account-contacts-search/account-contacts-search.component.html",
+        "sha256": "f07dd9eb1f63714945675c4b476a425e7d354bbb41c189da8b11b1ca631e9375",
+        "bytes": 903,
+        "conditional_title": true,
+        "attribute_selector": false
+      },
+      {
+        "path": "shared/js/cyph/components/link-connection-email/link-connection-email.component.html",
+        "sha256": "222a725e9825d1d081ca9f7c08fcfb21f97a4e88c292a73f56d104b8b72008ec",
+        "bytes": 1226,
+        "conditional_title": false,
+        "attribute_selector": false
+      },
+      {
+        "path": "shared/js/cyph/components/pgp-public-key/pgp-public-key.component.html",
+        "sha256": "e9f207802d5f579ad1664f535bb114e14c34defb399b2e88fae66f0da6a73390",
+        "bytes": 2150,
+        "conditional_title": false,
+        "attribute_selector": false
+      }
+    ],
+    "files_scanned": 7,
+    "conditional_title_files": 2,
+    "consumer_files_written": 0,
+    "consumer_build_or_deployment_executed": false
+  },
+  "canonical_decisions_changed": 0,
+  "canonical_guard_or_owner_stage_integrated": false,
+  "current_context_admission_pending": true,
+  "native_browser_binding_pending": true,
+  "pending_dispositions": 1321,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed",
+  "g13_claim": "not-passed"
+}

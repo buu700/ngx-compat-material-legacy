@@ -139,10 +139,12 @@ export class MatLegacyDialogTitle implements OnInit, OnDestroy {
     // Note: we null check because there are some internal
     // tests that are mocking out `MatDialogRef` incorrectly.
     const instance = this._dialogRef?._containerInstance;
+    // Match the tagged lifetime: remove from the queue captured at destruction.
+    const queue = instance?._ariaLabelledByQueue;
 
-    if (instance) {
+    if (instance && queue) {
       Promise.resolve().then(() => {
-        removeLegacyDialogTitle(instance, this.id);
+        removeLegacyDialogTitle(instance, this.id, queue);
       });
     }
   }
