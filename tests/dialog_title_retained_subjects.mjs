@@ -50,6 +50,13 @@ export function retainedTitleOwnerReference({root,read}){
  assert.equal(smoke.prior_source_admissions_preserved,41);assert.equal(smoke.current_source_admissions,43);
  for(const edit of transport.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
  assert.deepEqual(transport.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ const patchRaw=read('compatibility/rc/21x-c04-theming-inspection-patch-guard-owner-successor.json');
+ assert.equal(hash(patchRaw),'a8869e67a4def40b17991df58a7663b86580861f77ba622c78999c1cd6ebbb9b');
+ const patch=JSON.parse(patchRaw);assert.equal(patch.path,path);assert.equal(patch.line,'21.x');
+ assert.deepEqual(patch.before,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ assert.equal(patch.literal_edits.length,1);assert.equal(patch.tagged_golden_changes,0);assert.equal(patch.original_assertions_or_rejection_controls_dropped,0);
+ for(const edit of patch.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
+ assert.deepEqual(patch.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
  const expected=Buffer.from(current);assert.equal(read(path).equals(expected),true,'unreviewed owner change outside exact retained-verifier successor');
  return {path,sha256:hash(expected),bytes:expected.length};
 }

@@ -27,6 +27,9 @@ const registryBefore=execFileSync('git',['--no-replace-objects','show',packet.so
 assert.equal(read(packet.registry_after.path).equals(themingRegistrySuccessor(registryBefore)),true);assert.equal(sourceContractDefinitions.length,22);
 const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});assert.deepEqual(qualified.reference,packet.registry_after);
 let metadataCases=0,metadataRejections=0,sourceRejections=0;const rejected=[];
+let patchChanged=false;const patchPath=body.reviews[0].patch_file;
+const patchScope=qualifyCanonicalToolReference({root,read:path=>patchChanged&&path===patchPath?Buffer.concat([read(path),Buffer.from('\n')]):read(path),prior:packet.registry_before});
+patchChanged=true;assert.throws(()=>patchScope.assertCurrent());rejected.push('tool-role/late-original-patch-change');
 for(const entry of stage.entries){
  const review=body.reviews.find(row=>row.sha===entry.sha),args={entry,body,review,proof:entry.individual_proof};
  const saved=fs.readFileSync;fs.readFileSync=()=>{throw new Error('metadata must not read files');};syncBuiltinESMExports();
@@ -86,6 +89,7 @@ try{
 }finally{fs.rmSync(mutant,{force:true});fs.rmSync(directory,{recursive:true,force:true});}
 const report={schema_version:1,result:'pass',pure_metadata_cases:metadataCases,metadata_rejections:metadataRejections,source_rejections:sourceRejections,
  registered_source_contracts:22,prior_registry_records_preserved:20,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
+ late_original_patch_in_tool_role_rejected:true,
  after_sha256:hash(stage.after),individual_decisions:2,summary_scalar_tokens:2,unselected_entries_preserved:1695,rejected,canonical_ledger_applied:false,
  actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};
 if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n',{flag:'wx'});

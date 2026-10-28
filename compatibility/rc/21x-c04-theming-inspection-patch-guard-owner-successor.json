@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Exact follow-up owned-tool edit transport: retain original patch bytes in continuous late guards; not a tagged golden",
+  "path": "scripts/packed-upstream-ledger-epoch.mjs",
+  "source_parent": "70754144ffa269d158090cf535fb63819197baa4",
+  "before": {
+    "sha256": "07c3041c56e9ad30d375a13377d72c9150b884542aa3007a11a6577d834b5448",
+    "bytes": 16262
+  },
+  "after": {
+    "sha256": "0b61ba8e7f66e76ca03cf445e37d2fd81ddba0f1d690676dc2d0c2414016ad57",
+    "bytes": 16645
+  },
+  "literal_edits": [
+    {
+      "before": " const registryBefore=original(root,THEMING_REGISTRY,packet.source_parent),registryAfter=themingRegistrySuccessor(registryBefore);\n assert.deepEqual(packet.registry_before,{path:THEMING_REGISTRY,sha256:hash(registryBefore),bytes:registryBefore.length});\n assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});\n const bound=[{path:THEMING_PACKET,sha256:THEMING_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after];\n const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed theming tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};\n assertCurrent();return {packet,registryBefore,bound,assertCurrent,body:JSON.parse(read(packet.review.path)),\n  currentReference:ref=>ref.path===THEMING_REGISTRY?packet.registry_after:ref};\n}\nfunction context(root,read){\n",
+      "after": " const registryBefore=original(root,THEMING_REGISTRY,packet.source_parent),registryAfter=themingRegistrySuccessor(registryBefore);\n assert.deepEqual(packet.registry_before,{path:THEMING_REGISTRY,sha256:hash(registryBefore),bytes:registryBefore.length});\n assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});\n const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);\n const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-theming-inspection-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});\n const bound=[{path:THEMING_PACKET,sha256:THEMING_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];\n const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed theming tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};\n assertCurrent();return {packet,registryBefore,bound,assertCurrent,body,\n  currentReference:ref=>ref.path===THEMING_REGISTRY?packet.registry_after:ref};\n}\nfunction context(root,read){\n"
+    }
+  ],
+  "canonical_transition": {
+    "path": "compatibility/rc/21x-c04-theming-inspection-canonical-transition.json",
+    "sha256": "3f93068912fbfbdc305366cc553d9981c787868d19792359f7cb0b303bc8370d",
+    "bytes": 2516
+  },
+  "canonical_ledger_unchanged": "9810524e12e3096e7d971ea80a1424614dedecc4818f80c8e31adf86f2aeec37",
+  "tagged_golden_changes": 0,
+  "original_assertions_or_rejection_controls_dropped": 0,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

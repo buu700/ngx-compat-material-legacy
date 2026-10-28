@@ -64,9 +64,11 @@ function themingTools(root,read){
  const registryBefore=original(root,THEMING_REGISTRY,packet.source_parent),registryAfter=themingRegistrySuccessor(registryBefore);
  assert.deepEqual(packet.registry_before,{path:THEMING_REGISTRY,sha256:hash(registryBefore),bytes:registryBefore.length});
  assert.deepEqual(packet.registry_after,{path:THEMING_REGISTRY,sha256:hash(registryAfter),bytes:registryAfter.length});
- const bound=[{path:THEMING_PACKET,sha256:THEMING_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after];
+ const bodyRaw=read(packet.review.path);assert.equal(hash(bodyRaw),packet.review.sha256);assert.equal(bodyRaw.length,packet.review.bytes);const body=JSON.parse(bodyRaw);
+ const patches=body.reviews.map(row=>{assert.equal(row.patch_file,'compatibility/rc/21x-c04-theming-inspection-'+row.sha+'.patch');const value=read(row.patch_file);return {path:row.patch_file,sha256:row.diff_sha256,bytes:value.length};});
+ const bound=[{path:THEMING_PACKET,sha256:THEMING_PACKET_HASH,bytes:raw.length},...packet.source_members,packet.review,packet.registry_after,...patches];
  const assertCurrent=()=>{for(const ref of bound){const value=read(ref.path);assert.equal(hash(value),ref.sha256,'changed theming tool/source binding '+ref.path);assert.equal(value.length,ref.bytes);}};
- assertCurrent();return {packet,registryBefore,bound,assertCurrent,body:JSON.parse(read(packet.review.path)),
+ assertCurrent();return {packet,registryBefore,bound,assertCurrent,body,
   currentReference:ref=>ref.path===THEMING_REGISTRY?packet.registry_after:ref};
 }
 function context(root,read){
