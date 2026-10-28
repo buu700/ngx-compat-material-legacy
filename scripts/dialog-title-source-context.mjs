@@ -11,6 +11,7 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {qualifyCanonicalToolReference} from './canonical-tool-source-role.mjs';
 const SOURCE=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const ownPath='scripts/dialog-title-source-context.mjs';
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
@@ -78,8 +79,13 @@ export function dialogTitleReaderSubject({root=process.cwd(),read=path=>readFile
   assert.equal(hash(before),row.before.sha256);assert.equal(before.length,row.before.bytes);beforeCode.set(row.path,Buffer.from(before));
   let expected=before.toString();for(const edit of row.literal_edits){assert.equal(expected.split(edit.before).length,2,'title source-reader hook is not exact');expected=expected.replace(edit.before,edit.after);}
   assert.equal(hash(expected),row.after.sha256);assert.equal(Buffer.byteLength(expected),row.after.bytes);
-  assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);
-  bound.push({path:row.path,...row.after});images.push({path:row.path,before:row.before.sha256,before_bytes:row.before.bytes,after:row.after.sha256,after_bytes:row.after.bytes});
+  let current=row.after;
+  if(row.path==='scripts/packed-upstream-ledger-epoch.mjs'){
+   const successor=qualifyCanonicalToolReference({root,read,prior:{path:row.path,...row.after}});
+   if(successor){current=successor.reference;for(const ref of successor.bound)bound.push(ref);}
+   else assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);
+  }else assert.equal(read(row.path).toString(),expected,'changed current title source-reader '+row.path);
+  bound.push({path:row.path,...current});images.push({path:row.path,before:row.before.sha256,before_bytes:row.before.bytes,after:current.sha256,after_bytes:current.bytes,middle:row.after});
  }
  const assertCurrent=()=>{for(const member of bound){const current=read(member.path);assert.equal(hash(current),member.sha256,'late title reader change '+member.path);assert.equal(current.length,member.bytes);}};
  // Used only to reconstruct authenticated old tool-reference metadata. No tool
@@ -88,6 +94,11 @@ export function dialogTitleReaderSubject({root=process.cwd(),read=path=>readFile
   const metadata=path=>{assertCurrent();return beforeCode.has(path)?Buffer.from(beforeCode.get(path)):read(path);};
   return action(metadata);
  };
- assertCurrent();return {line,bound,assertCurrent,qualify:member=>qualify(images,member,'after'),historicalReference:member=>qualify(images,member,'before'),withHistoricalToolMetadata,
+ const currentReference=(member,side)=>{
+  const image=images.find(row=>row.path===member.path);
+  if(image&&member.sha256===image.middle.sha256){if(member.bytes!==undefined)assert.equal(member.bytes,image.middle.bytes);member={...member,sha256:image.after,...(member.bytes===undefined?{}:{bytes:image.after_bytes})};}
+  return qualify(images,member,side);
+ };
+ assertCurrent();return {line,bound,assertCurrent,qualify:member=>currentReference(member,'after'),historicalReference:member=>currentReference(member,'before'),withHistoricalToolMetadata,
   old_product_bytes_exposed:false,old_tool_bytes_exposed_as_current:false,historical_tool_metadata_only:true,canonical_decisions_changed:0,current_native_or_packed_or_full_source_qualified:false};
 }
