@@ -1,0 +1,508 @@
+{
+  "schema_version": 1,
+  "line": "21.x",
+  "role": "Five individual historical button tokenization/density source decisions",
+  "status": "reviewed",
+  "source_review_complete": true,
+  "reviews": [
+    {
+      "sha": "48a988a448200c9ad4a0099e7879b9eff3da0a41",
+      "diff_sha256": "fc902b3df4880b7ce3e889b964d3c03227e272649d07abb7495eed059848aabe",
+      "complete_original_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/button/button.scss",
+        "src/material/core/tokens/m2/mdc/_button-filled.scss",
+        "src/material/core/tokens/tests/test-validate-tokens.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/button/button.scss",
+        "src/material/core/tokens/m2/mdc/_button-filled.scss",
+        "src/material/core/tokens/tests/test-validate-tokens.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 0,
+          "header": "@@ -11,6 +11,12 @@",
+          "sha256": "f3ce73d03ac89b13e0ab35a61f8c600495ce53faabc7fac4bc331bc3e8d2816c",
+          "technical_judgment": "Adds a post16 filled-button token dependency and contrast helper using private inspection. The owned MDC-era button theme is the tagged16 body with seven module URLs relocated; preserve that real exported historical contract rather than treating this path as absent."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 1,
+          "header": "@@ -18,13 +24,6 @@",
+          "sha256": "e9ed6a96e2325fe7eb4562d92e36a62c53fc3a21912036c13989e05a17df6529",
+          "technical_judgment": "Removes the old unelevated palette-variant mixin. The owned historical mixin remains and supplies container/label colors through its original local MDC model; no consumer helper or palette calls are renamed."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 2,
+          "header": "@@ -79,35 +78,6 @@",
+          "sha256": "fcea9c2c379a0ecdca3b53d8f3dba21eb63b5cdf83ffd75dcfd81228204256e5",
+          "technical_judgment": "Deletes the existing untinted/primary/accent/warn unelevated color and disabled-style block. This is real theming behavior, not a mechanical unused-code removal; tagged/owned color argument cases remain the oracle."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 3,
+          "header": "@@ -180,6 +150,52 @@",
+          "sha256": "71013941fb0e8177136518cb1bd7a3a066d7773e609ce288ffe1495d0a5aa1c2",
+          "technical_judgment": "Rebuilds unelevated colors with inspection-derived palettes, variable-safe black/white contrast, new token maps and disabled overrides. Do not introduce those post16 private dependencies or map rules into the finite tagged facade; both MDC-era and legacy outputs are measured."
+        },
+        {
+          "path": "src/material/button/button.scss",
+          "index": 0,
+          "header": "@@ -6,11 +6,13 @@",
+          "sha256": "e7fdfaad5adc7626d63e10fdb705feb26558c5badb723c7db499fd8fa6b72cdc",
+          "technical_judgment": "Adds MDC custom-property and filled-token imports to the upstream modern component stylesheet. The add-on owns the distinct legacy button resource; keep its tagged source and four authenticated module-source reroutes."
+        },
+        {
+          "path": "src/material/button/button.scss",
+          "index": 1,
+          "header": "@@ -33,13 +35,6 @@",
+          "sha256": "db5e39e8bca19678e7a6c90adfac79a9669cf1be4aea9ce641d016cda4ba122b",
+          "technical_judgment": "Removes modern unelevated structural theme slots and the transparent container override. No corresponding modern component stylesheet is owned or exported by this add-on; do not turn it into a component fork."
+        },
+        {
+          "path": "src/material/button/button.scss",
+          "index": 2,
+          "header": "@@ -53,6 +48,20 @@",
+          "sha256": "1f7b1ed78cb2648ae35065e665814b91840cfb6991c99f0597399cd107583fc1",
+          "technical_judgment": "Declares modern unelevated CSS-variable slots and untintable defaults with fallback emission disabled. That requires the new structural producer and token model together; it is not an authorized legacy stylesheet or facade-map update."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-filled.scss",
+          "index": 0,
+          "header": "@@ -0,0 +1,92 @@",
+          "sha256": "067977c7d954ff8d39c92845dc7a1e9418531986e459352430c6355afca136c5",
+          "technical_judgment": "Adds the complete92-line filled-button token model: default36px height/4px shape, explicit null slots, inspection colors, primary state-layer colors and empty typography/density functions. The owned module is absent; preserve the original live MDC density/color implementation instead of adding compatibility-only inspection or empty replacement mixins."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 0,
+          "header": "@@ -104,7 +104,7 @@",
+          "sha256": "316a0b1c7459df39bdfa1eff22d36ba6fe928acbb69c0268a88e8b612b7f1659",
+          "technical_judgment": "Removes a trailing comma in an existing switch validation call; this hunk adds no owned style behavior or validation coverage."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 1,
+          "header": "@@ -156,3 +156,8 @@",
+          "sha256": "3fdce868f924709620a34091c6f157e74fecba632a91e27400777086335b26ca",
+          "technical_judgment": "Adds a filled-button validation row that actually calls extended-fab tokens and its extended light-theme reference. The complete patch contains this wrong-component assertion; a later selected patch corrects it. Do not inherit it as proof of filled-button token validity."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt the filled-button token rewrite. All four original files and ten hunks were individually reviewed, including palette/disabled-style removal, inspection-derived contrast and token emission, the added token module and the initially mispaired extended-fab validation. The owned facade exports the real tagged MDC-era button Sass, whose body remains unchanged after seven module-source reroutes; it is not excluded by a modern path name. Preserve tagged palette, disabled, selector and namespace behavior, the distinct legacy resource and the independently owned M2 model. Fourteen bounded tagged/owned CSS cases match exactly; no post16 private token model or modern structural component is introduced. No full consumer, native or packed qualification is claimed.",
+      "patch_file": "compatibility/rc/21x-c04-button-tokenization-48a988a448200c9ad4a0099e7879b9eff3da0a41.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "sha": "f2b4a04d5b6d91e2af81610fb5c95945759ad390",
+      "diff_sha256": "f740abe765835606847e8e9f32023790c1b28a8d356ef11b2699489af727a26a",
+      "complete_original_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/button/button.scss",
+        "src/material/core/tokens/m2/mdc/_button-filled.scss",
+        "src/material/core/tokens/m2/mdc/_button-protected.scss",
+        "src/material/core/tokens/tests/test-validate-tokens.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/button/button.scss",
+        "src/material/core/tokens/m2/mdc/_button-filled.scss",
+        "src/material/core/tokens/m2/mdc/_button-protected.scss",
+        "src/material/core/tokens/tests/test-validate-tokens.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 0,
+          "header": "@@ -5,6 +5,7 @@",
+          "sha256": "67d7ed7914685647247a7b74a4db8d12d393c368163d44187eeb4abdfef01097",
+          "technical_judgment": "Adds the original MDC elevation-theme import for a later raised-button workaround. It is upstream historical research data, not authorization to import a current private peer or widen owned runtime dependencies."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 1,
+          "header": "@@ -12,8 +13,9 @@",
+          "sha256": "7107798b97cd0a21554795d5a6e45b9cdfcf1f7df552e225a328fe2e963f82fb",
+          "technical_judgment": "Adds protected-button token use and renames the new contrast helper private. The existing owned16 theme has neither token dependency nor that new helper; consumer namespace/helper calls remain unchanged."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 2,
+          "header": "@@ -24,13 +26,6 @@",
+          "sha256": "9aa6f365eda0e474c456393316960575f7983634f1f28311261b891b58812764",
+          "technical_judgment": "Removes the old raised palette-variant mixin. Preserve the independently owned historical variant and its complete configurable-color behavior."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 3,
+          "header": "@@ -78,36 +73,6 @@",
+          "sha256": "87d03a5ed066267b3a7536b79011caae6df4e53c8f4e2aa030200b96d60bf464",
+          "technical_judgment": "Deletes the existing raised palette/disabled color block. This affects actual exported MDC-era Sass and cannot be classified as irrelevant from its modern component name."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 4,
+          "header": "@@ -151,17 +116,17 @@",
+          "sha256": "32f16d0629618ac6f1d89ca7f83f8e742c31b2b630a74fa16bd0c3023bbd92ee",
+          "technical_judgment": "Lifts inspected palette and contrast values outside the unelevated block so the new filled and raised implementations share them. The owned M2 map/getter model remains separate and tagged."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 5,
+          "header": "@@ -182,12 +147,66 @@",
+          "sha256": "464200d27301851a704e86c9af08b224c16376e7dec08766c2b71d1786b0a20c",
+          "technical_judgment": "Adds protected/default and filled/palette token calls for raised buttons, manual2/4/8 elevation states, disabled0 elevation and reorganized disabled blocks. Retain the tagged color/elevation selectors and APIs rather than porting this private-token rewrite or its temporary workaround."
+        },
+        {
+          "path": "src/material/button/button.scss",
+          "index": 0,
+          "header": "@@ -13,6 +13,7 @@",
+          "sha256": "2586b4ddd2bb1d0326dbd0d1c0a96b4871ef76f0235186293ec38ac2052264d2",
+          "technical_judgment": "Imports protected-button tokens into the upstream modern structural stylesheet; that component source is not part of the owned legacy add-on."
+        },
+        {
+          "path": "src/material/button/button.scss",
+          "index": 1,
+          "header": "@@ -35,13 +36,6 @@",
+          "sha256": "4d7b9ebc5fcb48fee6cd17f5e8d120c74f2fc624a75c88a51b190c905220ceb6",
+          "technical_judgment": "Removes the original raised structural theme slot generation and transparent-container override. Preserve the legacy resource and the existing historical Sass model."
+        },
+        {
+          "path": "src/material/button/button.scss",
+          "index": 2,
+          "header": "@@ -60,6 +54,18 @@",
+          "sha256": "938fa22bde4e522fac3a8fb1b5b56937449d4d4615a3041de972a43958363bbc",
+          "technical_judgment": "Introduces raised token slots/defaults in the modern CSS producer. This is coupled with the new token module and does not justify adding modern structural CSS to the legacy package."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-filled.scss",
+          "index": 0,
+          "header": "@@ -44,7 +44,7 @@ $prefix: (mdc, button-filled);",
+          "sha256": "921ab1024002b7339fdfab5fb2855c8e7747ddb7222c2a246e2d5e638a12175b",
+          "technical_judgment": "Renames the new token contrast function private. This is not an owned legacy helper migration, and no public helper spelling is changed in the facade."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-filled.scss",
+          "index": 1,
+          "header": "@@ -56,8 +56,8 @@ $prefix: (mdc, button-filled);",
+          "sha256": "a043ff4c9bda2d2304b524e6453e7848011bec9f9354be5a956d53a9239f9659",
+          "technical_judgment": "Updates both calls to that renamed helper. The absent new token module supplies no existing owned behavior to repair."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-protected.scss",
+          "index": 0,
+          "header": "@@ -0,0 +1,94 @@",
+          "sha256": "7f219be4afbaaa76e420599372e3c4b8c1550477a1a2d3de117adc4bab5bc749",
+          "technical_judgment": "Adds the complete94-line protected token module with36px/4px defaults, null elevation slots, inspection-derived palette colors and its own disabled-label opacity. Preserve tagged raised/disabled output and the finite model; do not introduce post16 inspection or structural token dependencies."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 0,
+          "header": "@@ -1,6 +1,7 @@",
+          "sha256": "29c4a55fed6717013a921937b4777c104e9b08fe6d4ec55deb3560400c65aca8",
+          "technical_judgment": "Adds the protected MDC reference-theme import to the upstream test roster, not to an owned product or test execution graph."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 1,
+          "header": "@@ -23,6 +24,7 @@",
+          "sha256": "038836cc3d374a9791fcdfc5e0babd7f5be57d820f380efbac14d8f7c6bccfa5",
+          "technical_judgment": "Adds the new protected token-module import. The data is reviewed without executing upstream test automation."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 2,
+          "header": "@@ -161,3 +163,8 @@",
+          "sha256": "363ccbb4cd70f209b10a3298c99ada70237f73c96edbc41ed66925eb2e58562c",
+          "technical_judgment": "Adds a correctly paired protected-token/light-theme slot check. It covers the new upstream model; it is not a tagged oracle or a substitute for the owned button CSS comparisons."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt the protected/raised-button token rewrite or its manual elevation workaround. All five original files and fifteen hunks were individually reviewed: live raised palette and disabled styles are replaced by inspected token colors, temporary2/4/8 elevation states and disabled0 elevation, while modern structural slots and a94-line token module change together. Preserve the tagged raised/elevation/disabled selectors and configurable Sass API actually exported by the facade. The private contrast rename belongs to new upstream token internals, not an owned helper migration. The correctly paired protected-token test is reviewed as data, without executing upstream automation. Fourteen exact tagged/owned CSS comparisons support retaining the existing model and separate legacy resource; full product and consumer-floor gates remain open.",
+      "patch_file": "compatibility/rc/21x-c04-button-tokenization-f2b4a04d5b6d91e2af81610fb5c95945759ad390.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "sha": "823c40192915f805132272e15a27230b621c1b77",
+      "diff_sha256": "fbb8ba4f94fe0101c7cdc80ce54b3beaf33fc34d73f9651076a87d6fdc7d9f99",
+      "complete_original_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/core/tokens/m2/mdc/_button-protected.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/core/tokens/m2/mdc/_button-protected.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 0,
+          "header": "@@ -226,8 +226,13 @@",
+          "sha256": "7b929b2363c1c1c7a9b77e8382f76ccbcbb3a4b3d19bf940df0489b1b4491d15",
+          "technical_judgment": "Splits raised buttons from the four-variant density block, emits token density at the raised selector and retains touch-target handling. The original shared base-class specificity and MDC density mixin are live in the owned16 source and must remain; raw and full-theme density cases cover them."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-protected.scss",
+          "index": 0,
+          "header": "@@ -1,7 +1,9 @@",
+          "sha256": "44cced0cfc2cda2baacbd364426b90369947387387f0e7eff23b09190eeb818d",
+          "technical_judgment": "Adds sass:map and theming imports for the new token density table; this is not an owned module-source migration."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-protected.scss",
+          "index": 1,
+          "header": "@@ -15,7 +17,6 @@ $prefix: (mdc, button-protected);",
+          "sha256": "9f5cc3eb3228774e7d7e69e72d719bb3d4b6f43ac62e86fc018f0dc578fb80c8",
+          "technical_judgment": "Removes the fixed36px height from untintable tokens so density will provide it. Preserve the historical default/explicit density contract instead of removing a live default."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-protected.scss",
+          "index": 2,
+          "header": "@@ -79,7 +80,19 @@ $prefix: (mdc, button-protected);",
+          "sha256": "c6840982644255dd9dc988cae1d9fd10270f0015cb9c48125fdad3ffe365e398",
+          "technical_judgment": "Adds a36/32/28/24px table with scale clamped at minus3 through post16 inspection. The owned historical density implementation and touch-target rules remain, without adding a token API or new selector specificity."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt protected-button token density. Both original files and four hunks were individually reviewed: raised buttons leave the common four-variant density block, a new clamped36/32/28/24px token table supplies the height and the previous fixed36px token default is removed. The independently owned historical density mixin, shared base-class specificity and touch-target rules remain live in the exported MDC-era Sass. Preserve raw-config/full-theme density and tagged output, supported by the bounded fourteen-case comparison, without adding post16 inspection, token APIs or new selector specificity. The absence of the new token module alone is not the decision rationale; native/full Sass/floor qualification remains unpassed.",
+      "patch_file": "compatibility/rc/21x-c04-button-tokenization-823c40192915f805132272e15a27230b621c1b77.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "sha": "5c822977dbe77b7db92233a877e26ae7c1bdeaad",
+      "diff_sha256": "4c8c00cf669c5e9d0c80ef2108bda29b1b075f2ed31182ba0ac877eed35973d5",
+      "complete_original_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/core/tokens/m2/mdc/_button-filled.scss",
+        "src/material/core/tokens/tests/test-validate-tokens.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/core/tokens/m2/mdc/_button-filled.scss",
+        "src/material/core/tokens/tests/test-validate-tokens.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 0,
+          "header": "@@ -236,8 +236,13 @@",
+          "sha256": "ce36643a460517b3003d6091471dcf3b72de1d60ca61913410e30d859effce75",
+          "technical_judgment": "Splits unelevated buttons from the common density block into token emission and separate touch-target handling. Keep the tagged four-variant/base-class density selector and compiler-proved output."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-filled.scss",
+          "index": 0,
+          "header": "@@ -1,7 +1,9 @@",
+          "sha256": "3af86a4cca40d0461667201164d39b2fd5fd0bbcdf0641f6e0f87c7b4b977046",
+          "technical_judgment": "Imports map and theming into the new filled-token module; no corresponding owned token module or inspection dependency is introduced."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-filled.scss",
+          "index": 1,
+          "header": "@@ -14,15 +16,16 @@ $prefix: (mdc, button-filled);",
+          "sha256": "1707a139fbcbbea2b4581240671999d4ecd1514faa6447d5d39588674db1ee8e",
+          "technical_judgment": "Moves container height out of untintable defaults, reorders elevation defaults and adds null focus-ring slots. Do not broaden the historical accepted token/model surface or change legacy geometry."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_button-filled.scss",
+          "index": 2,
+          "header": "@@ -77,7 +80,20 @@ $prefix: (mdc, button-filled);",
+          "sha256": "bf5d8377bf8a30879e9ffedd397ac1e3969592bcc5cc8c38ece02c01807302b7",
+          "technical_judgment": "Adds the same36/32/28/24px clamped density table for filled buttons. The original owned density mixin already remains the authoritative behavior; preserve its complete CSS and raw-config call support."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 0,
+          "header": "@@ -2,6 +2,7 @@",
+          "sha256": "80f411f36dc06f6b845116126e1e705eefe988cc72c9970e4cde36edb86e1006",
+          "technical_judgment": "Imports the actual filled-button MDC reference theme in the upstream slot tests."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 1,
+          "header": "@@ -25,6 +26,7 @@",
+          "sha256": "89278c2db4bcbdf3f7eb686750a67cda2bd69eb5f4932d58efb6cb75ab825536",
+          "technical_judgment": "Imports the matching filled-token module in that test roster."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 2,
+          "header": "@@ -160,8 +162,8 @@",
+          "sha256": "8753ccd971a27dd1e23716a7d0d02fe738c386a641569442523a3194c5282ae9",
+          "technical_judgment": "Corrects the earlier wrong filled-button row from extended-fab tokens/reference to filled-button tokens/light theme. This is an actual upstream test repair, not evidence that an owned legacy regression exists or a reason to inherit the post16 token model."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt the filled-button density token conversion or import its upstream test machinery. All three original files and seven hunks were individually reviewed, including token-based height, the36/32/28/24px clamped table, retained touch-target handling and correction of the earlier extended-fab validation to the actual filled-token/light-theme pair. Preserve the owned historical density mixin, original selector scope, configurable call support and exact tagged output. The validation repair is real but applies to the new upstream token model, without reproducing an owned legacy defect. Fourteen bounded tagged/owned comparisons pass; no tagged golden, product Sass or consumer namespace changes are authorized by this source decision.",
+      "patch_file": "compatibility/rc/21x-c04-button-tokenization-5c822977dbe77b7db92233a877e26ae7c1bdeaad.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    },
+    {
+      "sha": "592307261faf09f9603310a9fb97d1d18bc40f6e",
+      "diff_sha256": "6fd643b7b34c41a3181c7f1bdc12d9e85d4faf2de5f41cf8f70fae1afe801f9c",
+      "complete_original_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/button/button.scss",
+        "src/material/core/tokens/m2/mdc/_text-button.scss",
+        "src/material/core/tokens/tests/test-validate-tokens.scss"
+      ],
+      "frozen_seed_paths": [
+        "src/material/button/_button-theme.scss",
+        "src/material/button/button.scss",
+        "src/material/core/tokens/m2/mdc/_text-button.scss",
+        "src/material/core/tokens/tests/test-validate-tokens.scss"
+      ],
+      "whole_original_hunk_reviews": [
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 0,
+          "header": "@@ -14,18 +14,13 @@",
+          "sha256": "a2f8ab685ff47e0b8e2acbec7d2649efe6181cec292115c37e14d635ab851492",
+          "technical_judgment": "Imports the text-token module and removes the historical text palette-variant helper. The patch already assumes intervening filled/protected token renames; each original parent is authenticated separately, without inventing a contiguous five-patch chain."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 1,
+          "header": "@@ -40,42 +35,10 @@",
+          "sha256": "2c6fc9095fbaf25112e74412b6804114b6ed807a34bb1e37be87dd07a5587797",
+          "technical_judgment": "Deletes the old MDC text palette/disabled block and now-unused common variables. The owned exported16 theme still provides this behavior; preserve the existing palette and disabled selectors."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 2,
+          "header": "@@ -130,6 +93,25 @@",
+          "sha256": "cc988da8ea204bf50cd1012f79ed66aa45dcdc4867fa5fb47343824d0f343d6d",
+          "technical_judgment": "Adds text color/default/palette emission through inspection and a new private palette-color token helper. The owned flat M2 maps and finite historical APIs do not call those post16 surfaces."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 3,
+          "header": "@@ -201,6 +183,17 @@",
+          "sha256": "160ca7c79b79dec5e79f47a2aec0862325f03d8b370f919396bd00feb647894d",
+          "technical_judgment": "Re-adds text disabled styles outside the old shared wrapper and notes their excessive specificity. Do not transplant this transitional selector/specificity behavior into the historical facade."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 4,
+          "header": "@@ -234,6 +227,22 @@",
+          "sha256": "463b79a42115fb2d1f43bcc600c61954feae6dd57f2260b2e878eee049c95c1e",
+          "technical_judgment": "Moves text density to tokens and explicitly preserves negative-density zero margins that the old MDC density mixin emitted. The owned historical mixin retains those margins and touch-target behavior; do not drop them or add a new token producer."
+        },
+        {
+          "path": "src/material/button/_button-theme.scss",
+          "index": 5,
+          "header": "@@ -246,7 +255,6 @@",
+          "sha256": "ad3cac3bbf5e2940bb0ac327918cce6dbe41e68673eb8293151b6ab191263ca3",
+          "technical_judgment": "Removes text buttons from the old common density block, leaving outlined buttons there. Preserve the original four-variant/base-class scoped output instead."
+        },
+        {
+          "path": "src/material/button/button.scss",
+          "index": 0,
+          "header": "@@ -14,35 +14,34 @@",
+          "sha256": "ceaf53f224845b6fe7d96932d0c7c2b19e28162e394892571b9ed90ac2e2d126",
+          "technical_judgment": "Adds text tokens, confines the remaining override-key map to outlined buttons and emits text CSS-variable slots/defaults without fallbacks. This changes the modern structural producer; no modern component source is forked and the separate tagged legacy resource stays unchanged."
+        },
+        {
+          "path": "src/material/core/tokens/m2/mdc/_text-button.scss",
+          "index": 0,
+          "header": "@@ -0,0 +1,103 @@",
+          "sha256": "c40428ec302a7c82a685786105af41538c1cc5f808ddcc4f7a7e1ec06e64790f",
+          "technical_judgment": "Adds the complete103-line text token model, including fallback36px height,4px shape, null typography/state-layer/icon slots, light/dark label colors, palette inspection and clamped density. These new internals are absent from the owned model; preserve original namespace, map and CSS contracts."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 0,
+          "header": "@@ -3,6 +3,7 @@",
+          "sha256": "68edac78b1ba85ac7fc09ef1c9b376c2fae17574d84b0e2210d424d31c228385",
+          "technical_judgment": "Imports the text-button MDC reference theme into the upstream test module."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 1,
+          "header": "@@ -27,6 +28,7 @@",
+          "sha256": "10678da38b22069ea6e012974e7f95f99cc8b4fd55cc9164090249485b05864c",
+          "technical_judgment": "Imports the matching text-token module in that roster."
+        },
+        {
+          "path": "src/material/core/tokens/tests/test-validate-tokens.scss",
+          "index": 2,
+          "header": "@@ -170,3 +172,8 @@",
+          "sha256": "84b46066ef8e66f9118551049e1ba74a0b3cf78058b92e140a84fd3bcd19b89c",
+          "technical_judgment": "Adds a text token-slot/light-theme validation case. It belongs to the new upstream model and is not executed or used as an owned expectation; unchanged tagged outputs remain the oracle."
+        }
+      ],
+      "source_review_complete": true,
+      "proposed_final_disposition": "do-not-adopt",
+      "affected_branches": [
+        "21.x"
+      ],
+      "review_depth": "individual-compatibility",
+      "canonical_disposition_applied": false,
+      "status": "reviewed",
+      "decision": "Do not adopt text-button tokenization. All four original files and eleven hunks were individually reviewed from their actual authenticated parent, which already includes intervening token-file renames; these five commits are not asserted to be a contiguous chain. The patch removes live text palette/disabled/density blocks, adds private inspection-derived colors and a103-line token model, changes modern structural slots and reorganizes disabled specificity. Preserve the tagged M2 maps, palette helpers, original disabled selectors, negative-density zero margins and touch-target behavior in the owned exported Sass, with the separate legacy structural resource intact. All fourteen scoped tagged/owned CSS comparisons match. No modern component fork, token API, native or full consumer qualification is introduced.",
+      "patch_file": "compatibility/rc/21x-c04-button-tokenization-592307261faf09f9603310a9fb97d1d18bc40f6e.patch",
+      "source_scope_only": true,
+      "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+      "g11_claim": "not-passed"
+    }
+  ],
+  "original_file_occurrences": 18,
+  "original_hunks": 47,
+  "source_qualification": {
+    "path": "compatibility/rc/21x-c04-button-tokenization-source-qualification.json",
+    "sha256": "e2b342e2169aadd31b0cc722f4591028fab6f2aec486ba13d34084115ad42521",
+    "bytes": 4062
+  },
+  "source_review": {
+    "path": "compatibility/rc/21x-c04-button-tokenization-source-review.json",
+    "sha256": "4fa19472ae965a5fbc097b51ab60f344acd7791909d97221a954a25f89e9463a",
+    "bytes": 870169
+  },
+  "fresh_bounded_sass_compiler_execution": true,
+  "tagged_reference_sass_executed": true,
+  "upstream_post16_sass_or_typescript_tests_or_workflows_executed": false,
+  "package_install_or_javascript_runtime_execution": false,
+  "full_sass_gate_executed": false,
+  "actual_native_artifact_browser_floor_or_full_audit_qualified": false,
+  "g11_claim": "not-passed"
+}

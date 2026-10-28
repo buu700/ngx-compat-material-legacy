@@ -81,6 +81,18 @@ export function retainedTitleOwnerReference({root,read}){
  assert.equal(selectorSmoke.candidate_view_only,true);assert.equal(selectorSmoke.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
  for(const edit of selector.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
  assert.deepEqual(selector.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ const buttonRaw=read('compatibility/rc/21x-c04-button-tokenization-owner-successor.json');
+ assert.equal(hash(buttonRaw),'501e0f60f461ac9bf22e19b91e84fbb3c5c59c9e3d4ea27a6fa60fed69cc8d6a');
+ const button=JSON.parse(buttonRaw);assert.equal(button.path,path);assert.equal(button.line,'21.x');
+ assert.equal(button.source_parent,'878b00dacaca2a8417dd0aebefc8adce6a8a9277');
+ assert.deepEqual(button.before,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ assert.equal(button.literal_edits.length,15);assert.equal(button.tagged_golden_changes,0);assert.equal(button.original_assertions_or_rejection_controls_dropped,0);
+ for(const ref of [button.canonical_transition,button.candidate_owner_execution,button.source_handler_controls]){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}
+ const buttonSmoke=JSON.parse(read(button.candidate_owner_execution.path));assert.equal(buttonSmoke.result,'pass');
+ assert.equal(buttonSmoke.prior_source_admissions_preserved,49);assert.equal(buttonSmoke.current_source_admissions,54);assert.equal(buttonSmoke.button_tokenization_source_decisions,5);
+ assert.equal(buttonSmoke.candidate_view_only,true);assert.equal(buttonSmoke.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
+ for(const edit of button.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
+ assert.deepEqual(button.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
  const expected=Buffer.from(current);assert.equal(read(path).equals(expected),true,'unreviewed owner change outside exact retained-verifier successor');
  return {path,sha256:hash(expected),bytes:expected.length};
 }

@@ -38,7 +38,13 @@ def verify_selector_density_registry_successor(root=ROOT):
                         "    scope_key:'selector_density_source_scope',module:'upstream-selector-density-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'c441c65203b4ee240f1c259bc7460a9eb51ef395f619fe3cc5234305120fff38'
-    assert (root / REGISTRY).read_bytes() == after
+    current = (root / REGISTRY).read_bytes()
+    if digest(current) == 'e2cd8a53b9c35020d1484ac553e7f69917658f55f5ade75dd0c6bf12f2e6634e':
+        from button_tokenization_canonical_ledger_patch import verify_button_tokenization_registry_successor
+        button_before, button_after = verify_button_tokenization_registry_successor(root)
+        assert current == button_after
+        current = button_before
+    assert current == after
     return before, after
 
 
@@ -118,7 +124,14 @@ def derive_selector_density_successor(root=ROOT):
 
 def verify_selector_density_successor(candidate, root=ROOT):
     before, after = derive_selector_density_successor(root)
-    assert Path(candidate).read_bytes() == after, 'unqualified theming canonical successor'
+    observed = Path(candidate).read_bytes()
+    button_tokenization_applied = False
+    if digest(observed) == '485ff845dec1d5e57e16a26cc064b4070ea3e5fe020e9858fab02120fadcb6f7':
+        from button_tokenization_canonical_ledger_patch import derive_button_tokenization_successor
+        button_before, button_after = derive_button_tokenization_successor(root)
+        assert observed == button_after
+        observed, button_tokenization_applied = button_before, True
+    assert observed == after, 'unqualified selector/density canonical successor'
     return {'before_sha256': digest(before), 'after_sha256': digest(after), 'individual_decisions': 2,
             'summary_scalar_tokens': 2, 'unselected_entry_bytes_preserved': 1695,
             'security_reviews_unchanged': 1, 'canonical_entries': 1697, 'actual_native_artifact_browser_floor_or_full_audit_qualified': False}

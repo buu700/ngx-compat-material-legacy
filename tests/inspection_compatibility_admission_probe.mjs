@@ -14,6 +14,7 @@ import {tmpdir} from 'node:os';
 import admission from '../scripts/upstream-inspection-compatibility-admission.cjs';
 import {applyInspectionCompatibilityCanonicalStage,inspectionRegistrySuccessor} from '../scripts/inspection-compatibility-canonical-stage.mjs';
 import {selectorDensityRegistrySuccessor} from '../scripts/selector-density-canonical-stage.mjs';
+import {buttonTokenizationRegistrySuccessor} from '../scripts/button-tokenization-canonical-stage.mjs';
 import {qualifyCanonicalToolReference} from '../scripts/packed-upstream-ledger-epoch.mjs';
 import {requiresRegisteredSourceReview} from '../scripts/upstream-registered-source-review.mjs';
 import {sourceContractDefinitions} from '../scripts/upstream-source-contract-registry.mjs';
@@ -25,9 +26,9 @@ for(const key of Object.keys(env))if(key.startsWith('RC_')||['GIT_DIR','GIT_WORK
 const before=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+ledger],{cwd:root,env,maxBuffer:8*1024*1024});
 const stage=applyInspectionCompatibilityCanonicalStage({before,body});assert.equal(hash(stage.after),packet.after.sha256);
 const registryBefore=execFileSync('git',['--no-replace-objects','show',packet.source_parent+':'+packet.registry_before.path],{cwd:root,env});
-assert.equal(read(packet.registry_after.path).equals(selectorDensityRegistrySuccessor(inspectionRegistrySuccessor(registryBefore))),true);assert.equal(sourceContractDefinitions.length,28);
+assert.equal(read(packet.registry_after.path).equals(buttonTokenizationRegistrySuccessor(selectorDensityRegistrySuccessor(inspectionRegistrySuccessor(registryBefore)))),true);assert.equal(sourceContractDefinitions.length,33);
 assert.equal(sourceContractDefinitions.slice(0,22).every(row=>!admission.INSPECTION_SHAS.includes(row.sha)),true);
-const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});assert.deepEqual(qualified.reference,JSON.parse(read('compatibility/rc/21x-c04-selector-density-canonical-transition.json')).registry_after);
+const qualified=qualifyCanonicalToolReference({root,read,prior:packet.registry_before});assert.deepEqual(qualified.reference,JSON.parse(read('compatibility/rc/21x-c04-button-tokenization-canonical-transition.json')).registry_after);
 let metadataCases=0,metadataRejections=0,sourceRejections=0;const rejected=[];
 for(const row of body.reviews){
  let patchChanged=false;const patchPath=row.patch_file;
@@ -92,7 +93,7 @@ try{
  const bypass=inspect(stage.entries,{inject:true,checker:'scripts/'+basename(mutant)});assert.equal(bypass.evidence_failures.length,0);assert.deepEqual(bypass.insufficient_review_sha_ids.sensitive,[]);mutantDetected=true;rejected.push('root/missing-source-requirement-mutant');
 }finally{fs.rmSync(mutant,{force:true});fs.rmSync(directory,{recursive:true,force:true});}
 const report={schema_version:1,result:'pass',pure_metadata_cases:metadataCases,metadata_rejections:metadataRejections,source_rejections:sourceRejections,
- registered_source_contracts:28,prior_registry_records_preserved:22,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
+ registered_source_contracts:33,prior_registry_records_preserved:22,current_registry_tool_bindings:qualified.bound.length,real_root_positive_rows:rootPositive,real_root_rejected_rows:rootNegative,missing_source_requirement_mutant_detected:mutantDetected,
  late_original_patch_in_tool_role_rejected:true,
  after_sha256:hash(stage.after),individual_decisions:4,summary_scalar_tokens:2,unselected_entries_preserved:1693,rejected,canonical_ledger_applied:false,
  actual_native_artifact_browser_floor_or_full_audit_qualified:false,g11_claim:'not-passed'};

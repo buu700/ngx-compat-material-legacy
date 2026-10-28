@@ -65,6 +65,12 @@ def derive_boundary_successor(root=ROOT, expected_before=None):
 def verify_boundary_successor(root=ROOT, expected_before=None, candidate=None):
     before, after = derive_boundary_successor(root=root, expected_before=expected_before)
     observed = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    button_tokenization_applied = False
+    if HASH(observed) == '485ff845dec1d5e57e16a26cc064b4070ea3e5fe020e9858fab02120fadcb6f7':
+        from button_tokenization_canonical_ledger_patch import derive_button_tokenization_successor
+        button_before, button_after = derive_button_tokenization_successor(root)
+        assert observed == button_after
+        observed, button_tokenization_applied = button_before, True
     selector_density_applied = False
     if HASH(observed) == 'ce4735ac290b280cb23c5a96b9d5b7d057afd7540505bc73ca6c80eae21694a2':
         from selector_density_canonical_ledger_patch import derive_selector_density_successor
@@ -89,7 +95,7 @@ def verify_boundary_successor(root=ROOT, expected_before=None, candidate=None):
         assert observed == title_after and title_before == after
         observed, title_applied = title_before, True
     assert observed == after
-    return dict(line='21.x', exact_title_successor_verified=title_applied, exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, exact_selector_density_successor_verified=selector_density_applied, individual_decisions=5, unselected_entry_bytes_preserved=1692,
+    return dict(line='21.x', exact_title_successor_verified=title_applied, exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, exact_selector_density_successor_verified=selector_density_applied, exact_button_tokenization_successor_verified=button_tokenization_applied, individual_decisions=5, unselected_entry_bytes_preserved=1692,
         before_sha256=HASH(before), after_sha256=HASH(after), after_bytes=len(after),
         closed_dispositions=376, pending_dispositions=1321, pending_security_reviews=1,
         actual_native_artifact_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed', g13_claim='not-passed')

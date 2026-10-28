@@ -1,0 +1,293 @@
+diff --git a/src/material/button/_button-theme.scss b/src/material/button/_button-theme.scss
+index f3385a051e92a2235b0fedcad73bdb3a74da60de..663fb39e7dc17715ab5251cf915ba2f9cbe597bc 100644
+--- a/src/material/button/_button-theme.scss
++++ b/src/material/button/_button-theme.scss
+@@ -11,6 +11,12 @@
+ @use '../core/theming/theming';
+ @use '../core/theming/inspection';
+ @use '../core/typography/typography';
++@use '../core/tokens/m2/mdc/button-filled' as tokens-mdc-button-filled;
++
++@function on-color($theme, $palette) {
++  $is-dark: inspection.get-theme-type($theme) == dark;
++  @return if(mdc-helpers.variable-safe-contrast-tone($palette, $is-dark) == 'dark', #000, #fff);
++}
+ 
+ @mixin _button-variant($color) {
+   @include mdc-button-text-theme.theme((
+@@ -18,13 +24,6 @@
+   ));
+ }
+ 
+-@mixin _unelevated-button-variant($foreground, $background) {
+-  @include mdc-button-filled-theme.theme((
+-    container-color: $background,
+-    label-text-color: $foreground,
+-  ));
+-}
+-
+ @mixin _raised-button-variant($foreground, $background) {
+   @include mdc-button-protected-theme.theme((
+     container-color: $background,
+@@ -79,35 +78,6 @@
+       }
+     }
+ 
+-    .mat-mdc-unelevated-button {
+-      &.mat-unthemed {
+-        @include _unelevated-button-variant($on-surface, $surface);
+-      }
+-
+-      &.mat-primary {
+-        @include _unelevated-button-variant($on-primary, $primary);
+-      }
+-
+-      &.mat-accent {
+-        @include _unelevated-button-variant($on-secondary, $secondary);
+-      }
+-
+-      &.mat-warn {
+-        @include _unelevated-button-variant($on-error, $error);
+-      }
+-
+-      @include button-theme-private.apply-disabled-style() {
+-        @include mdc-button-filled-theme.theme((
+-          // We need to pass both the disabled and enabled values, because the enabled
+-          // ones apply to anchors while the disabled ones are for buttons.
+-          disabled-container-color: $disabled-container-color,
+-          disabled-label-text-color: $disabled-ink-color,
+-          container-color: $disabled-container-color,
+-          label-text-color: $disabled-ink-color,
+-        ));
+-      }
+-    }
+-
+     .mat-mdc-raised-button {
+       &.mat-unthemed {
+         @include _raised-button-variant($on-surface, $surface);
+@@ -180,6 +150,52 @@
+       @include button-theme-private.ripple-theme-styles($theme, true);
+     }
+   }
++
++  .mat-mdc-unelevated-button {
++    $surface: inspection.get-theme-color($theme, background, card);
++    $primary: inspection.get-theme-color($theme, primary);
++    $accent: inspection.get-theme-color($theme, accent);
++    $error: inspection.get-theme-color($theme, warn);
++
++    $on-surface: on-color($theme, $surface);
++    $on-primary: on-color($theme, $primary);
++    $on-accent: on-color($theme, $accent);
++    $on-error: on-color($theme, $error);
++
++    $default-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $surface, $on-surface);
++    $primary-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $primary, $on-primary);
++    $accent-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $accent, $on-accent);
++    $warn-color-tokens: tokens-mdc-button-filled.get-color-tokens($theme, $error, $on-error);
++
++    &.mat-unthemed {
++      @include mdc-button-filled-theme.theme($default-color-tokens);
++    }
++
++    &.mat-primary {
++      @include mdc-button-filled-theme.theme($primary-color-tokens);
++    }
++
++    &.mat-accent {
++      @include mdc-button-filled-theme.theme($accent-color-tokens);
++    }
++
++    &.mat-warn {
++      @include mdc-button-filled-theme.theme($warn-color-tokens);
++    }
++
++    @include button-theme-private.apply-disabled-style() {
++      $is-dark: inspection.get-theme-type($theme) == dark;
++      $disabled-ink-color: rgba($on-surface, if($is-dark, 0.5, 0.38));
++      $disabled-container-color: rgba($on-surface, 0.12);
++
++      @include mdc-button-filled-theme.theme((
++        disabled-container-color: $disabled-container-color,
++        disabled-label-text-color: $disabled-ink-color,
++        container-color: $disabled-container-color,
++        label-text-color: $disabled-ink-color,
++      ));
++    }
++  }
+ }
+ 
+ @mixin typography($theme) {
+diff --git a/src/material/button/button.scss b/src/material/button/button.scss
+index b8e6dd6609b4825627a7a165de0ab9be0ec0e452..78ae4355f19a25f42a99f86d97ce693015a39f5c 100644
+--- a/src/material/button/button.scss
++++ b/src/material/button/button.scss
+@@ -6,11 +6,13 @@
+ @use '@material/button/button-filled-theme' as mdc-button-filled-theme;
+ @use '@material/button/button-protected-theme' as mdc-button-protected-theme;
+ @use '@material/button/button-outlined-theme' as mdc-button-outlined-theme;
++@use '@material/theme/custom-properties' as mdc-custom-properties;
+ 
+ @use './button-base';
+ @use '../core/mdc-helpers/mdc-helpers';
+ @use '../core/style/private' as style-private;
+ @use '../core/focus-indicators/private' as focus-indicators-private;
++@use '../core/tokens/m2/mdc/button-filled' as tokens-mdc-button-filled;
+ 
+ @include mdc-helpers.disable-mdc-fallback-declarations {
+   @include mdc-button.static-styles-without-ripple($query: mdc-helpers.$mdc-base-styles-query);
+@@ -33,13 +35,6 @@
+       map.merge(mdc-button-text-theme.$light-theme, $override-keys));
+   }
+ 
+-  .mat-mdc-unelevated-button {
+-    @include mdc-button-filled-theme.theme-styles(
+-      map.merge(map.merge(mdc-button-filled-theme.$light-theme, $override-keys), (
+-        container-color: transparent,
+-      )));
+-  }
+-
+   .mat-mdc-raised-button {
+     @include mdc-button-protected-theme.theme-styles(
+       map.merge(map.merge(mdc-button-protected-theme.$light-theme, $override-keys), (
+@@ -53,6 +48,20 @@
+   }
+ }
+ 
++@include mdc-custom-properties.configure($emit-fallback-values: false, $emit-fallback-vars: false) {
++  // Note that we don't include a feature query, because this mixins declare
++  // all the "slots" for CSS variables that will be defined in the theme.
++  .mat-mdc-unelevated-button {
++    $mdc-button-filled-slots: tokens-mdc-button-filled.get-token-slots();
++
++    // Add the slots for MDC text button.
++    @include mdc-button-filled-theme.theme-styles($mdc-button-filled-slots);
++
++    // Add default values for MDC text button tokens that aren't outputted by the theming API.
++    @include mdc-button-filled-theme.theme(tokens-mdc-button-filled.get-unthemable-tokens());
++  }
++}
++
+ .mat-mdc-button,
+ .mat-mdc-unelevated-button,
+ .mat-mdc-raised-button,
+diff --git a/src/material/core/tokens/m2/mdc/_button-filled.scss b/src/material/core/tokens/m2/mdc/_button-filled.scss
+new file mode 100644
+index 0000000000000000000000000000000000000000..3a9994384bda2ee11b057c2dcfdff17340b30331
+--- /dev/null
++++ b/src/material/core/tokens/m2/mdc/_button-filled.scss
+@@ -0,0 +1,92 @@
++@use '../../token-utils';
++@use '../../../mdc-helpers/mdc-helpers';
++@use '../../../style/sass-utils';
++@use '../../../theming/inspection';
++
++// The prefix used to generate the fully qualified name for tokens in this file.
++$prefix: (mdc, button-filled);
++
++// Tokens that can't be configured through Angular Material's current theming API,
++// but may be in a future version of the theming API.
++//
++// Tokens that are available in MDC, but not used in Angular Material should be mapped to `null`.
++// `null` indicates that we are intentionally choosing not to emit a slot or value for the token in
++// our CSS.
++@function get-unthemable-tokens() {
++  @return (
++    container-elevation: 0,
++    container-height: 36px,
++    container-shape: 4px,
++    disabled-container-elevation: 0,
++    focus-container-elevation: 0,
++    hover-container-elevation: 0,
++    keep-touch-target: false,
++    pressed-container-elevation: 0,
++
++    focus-state-layer-opacity: null,
++    hover-state-layer-opacity: null,
++    pressed-state-layer-opacity: null,
++    container-shadow-color: null,
++    focus-label-text-color: null,
++    hover-label-text-color: null,
++    label-text-font: null,
++    label-text-size: null,
++    label-text-tracking: null,
++    label-text-transform: null,
++    label-text-weight: null,
++    pressed-label-text-color: null,
++    with-icon-disabled-icon-color: null,
++    with-icon-focus-icon-color: null,
++    with-icon-hover-icon-color: null,
++    with-icon-icon-color: null,
++    with-icon-icon-size: null,
++    with-icon-pressed-icon-color: null
++  );
++}
++
++@function on-color($theme, $palette) {
++  @if ($palette) {
++    $is-dark: inspection.get-theme-type($theme) == dark;
++    @return if(mdc-helpers.variable-safe-contrast-tone($palette, $is-dark) == 'dark', #000, #fff);
++  }
++}
++
++// Tokens that can be configured through Angular Material's color theming API.
++@function get-color-tokens($theme, $color: null, $on-color: null) {
++  $is-dark: inspection.get-theme-type($theme) == dark;
++  $primary: inspection.get-theme-color($theme, primary);
++  $surface: inspection.get-theme-color($theme, background, card);
++  $on-primary: on-color($theme, $primary);
++  $on-surface: on-color($theme, $surface);
++
++  @return (
++    container-color: if($color, $color, transparent),
++    disabled-container-color: rgba($on-surface, 0.12),
++    disabled-label-text-color: rgba($on-surface, if($is-dark, 0.5, 0.38)),
++    focus-state-layer-color: $on-primary,
++    hover-state-layer-color: $on-primary,
++    label-text-color: if($on-color, $on-color, inherit),
++    pressed-state-layer-color: $on-primary
++  );
++}
++
++// Tokens that can be configured through Angular Material's typography theming API.
++@function get-typography-tokens($theme) {
++  @return ();
++}
++
++// Tokens that can be configured through Angular Material's density theming API.
++@function get-density-tokens($theme) {
++  @return ();
++}
++
++// Combines the tokens generated by the above functions into a single map with placeholder values.
++// This is used to create token slots.
++@function get-token-slots() {
++  @return sass-utils.deep-merge-all(
++    get-unthemable-tokens(),
++    get-color-tokens(token-utils.$placeholder-color-config),
++    get-typography-tokens(token-utils.$placeholder-typography-config),
++    get-density-tokens(token-utils.$placeholder-density-config)
++  );
++}
+diff --git a/src/material/core/tokens/tests/test-validate-tokens.scss b/src/material/core/tokens/tests/test-validate-tokens.scss
+index 32e85bbaaa4dd8c0714dc884620b6524e5296a06..15213bbd842620c81796e49d076d50779afb49c0 100644
+--- a/src/material/core/tokens/tests/test-validate-tokens.scss
++++ b/src/material/core/tokens/tests/test-validate-tokens.scss
+@@ -104,7 +104,7 @@
+ @include validate-slots(
+   $component: 'm2.mdc.switch',
+   $slots: tokens-mdc-switch.get-token-slots(),
+-  $reference: mdc-switch-theme.$light-theme,
++  $reference: mdc-switch-theme.$light-theme
+ );
+ @include validate-slots(
+   $component: 'm2.mdc.tab-indicator',
+@@ -156,3 +156,8 @@
+   $slots: tokens-mdc-outlined-text-field.get-token-slots(),
+   $reference: mdc-outlined-text-field-theme.$light-theme
+ );
++@include validate-slots(
++  $component: 'm2.mdc.button-filled',
++  $slots: tokens-mdc-extended-fab.get-token-slots(),
++  $reference: mdc-extended-fab-theme.$extended-light-theme
++);
