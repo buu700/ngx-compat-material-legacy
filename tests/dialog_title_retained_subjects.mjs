@@ -168,6 +168,16 @@ export function retainedTitleOwnerReference({root,read}){
  const coreControls=JSON.parse(read(core.source_handler_controls.path));assert.equal(coreControls.result,'pass');assert.equal(coreControls.rejected.length,162);assert.equal(coreControls.pure_metadata_cases,3);assert.equal(coreControls.real_root_positive_rows,3);assert.equal(coreControls.real_root_rejected_rows,12);assert.equal(coreControls.missing_source_requirement_mutant_detected,true);assert.equal(coreControls.canonical_late_metadata_mutants_rejected,2);assert.equal(coreControls.metadata_after_source_mutants_rejected,1);
  for(const edit of core.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
  assert.deepEqual(core.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ const remainingRaw=read('compatibility/rc/21x-c04-remaining-unthemable-owner-successor.json');
+ assert.equal(hash(remainingRaw),'511b8c8dab3c5bf9285311e9e11ac3e8cdd4b335036c92b04bef20a2f58ffc6d');
+ const remaining=JSON.parse(remainingRaw);assert.equal(remaining.path,path);assert.equal(remaining.line,'21.x');assert.equal(remaining.source_parent,'692c2e3200935e2ff23b201888903b02675e1571');
+ assert.deepEqual(remaining.before,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ assert.equal(remaining.literal_edits.length,15);assert.equal(remaining.tagged_golden_changes,0);assert.equal(remaining.original_assertions_or_rejection_controls_dropped,0);assert.equal(remaining.new_individual_decisions,14);assert.equal(remaining.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
+ for(const ref of [remaining.canonical_transition,remaining.candidate_owner_execution,remaining.source_handler_controls]){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}
+ const remainingSmoke=JSON.parse(read(remaining.candidate_owner_execution.path));assert.equal(remainingSmoke.result,'pass');assert.equal(remainingSmoke.prior_source_admissions_preserved,74);assert.equal(remainingSmoke.current_source_admissions,88);assert.equal(remainingSmoke.remaining_unthemable_source_decisions,14);assert.equal(remainingSmoke.owner.sha256,remaining.after.sha256);assert.equal(remainingSmoke.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
+ const remainingControls=JSON.parse(read(remaining.source_handler_controls.path));assert.equal(remainingControls.result,'pass');assert.equal(remainingControls.rejected.length,626);assert.equal(remainingControls.pure_metadata_cases,14);assert.equal(remainingControls.real_root_positive_rows,14);assert.equal(remainingControls.real_root_rejected_rows,56);assert.equal(remainingControls.missing_source_requirement_mutant_detected,true);assert.equal(remainingControls.canonical_late_metadata_mutants_rejected,2);assert.equal(remainingControls.metadata_after_source_mutants_rejected,1);
+ for(const edit of remaining.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
+ assert.deepEqual(remaining.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
  const expected=Buffer.from(current);assert.equal(read(path).equals(expected),true,'unreviewed owner change outside exact retained-verifier successor');
  return {path,sha256:hash(expected),bytes:expected.length};
 }

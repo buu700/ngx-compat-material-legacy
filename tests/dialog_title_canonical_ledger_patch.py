@@ -96,6 +96,11 @@ def derive_title_successor(root=ROOT):
             assert before_text[slice(*before_ranges[i])] == after_text[slice(*after_ranges[i])]
     for member in packet['source_members'] + [packet['root_checker']]:
         value = (root / member['path']).read_bytes()
+        if member['path'] == 'scripts/upstream-source-contract-registry.mjs' and HASH(value) == '03a18cd09e4183f4307f1ec2c17d0797eea72db0440e23530e4d015ea0dae6a8':
+            from remaining_unthemable_canonical_ledger_patch import verify_remaining_unthemable_registry_successor
+            remaining_before, remaining_after = verify_remaining_unthemable_registry_successor(root)
+            assert value == remaining_after
+            value = remaining_before
         if member['path'] == 'scripts/upstream-source-contract-registry.mjs' and HASH(value) == 'c1d47c7662500e98aa34b37e964227961796ff16f500289019b221b4edacc841':
             from core_tokenization_canonical_ledger_patch import verify_core_tokenization_registry_successor
             core_before, core_after = verify_core_tokenization_registry_successor(root)
@@ -157,6 +162,12 @@ def derive_title_successor(root=ROOT):
 def verify_title_successor(root=ROOT, candidate=None):
     before, after = derive_title_successor(root)
     observed = Path(candidate).read_bytes() if candidate else (root / LEDGER).read_bytes()
+    remaining_unthemable_applied = False
+    if HASH(observed) == 'cc74f78b748c9b1226338b96a979558510ab72e50fea4c223cae45a76f4980a1':
+        from remaining_unthemable_canonical_ledger_patch import derive_remaining_unthemable_successor
+        remaining_before, remaining_after = derive_remaining_unthemable_successor(root)
+        assert observed == remaining_after
+        observed, remaining_unthemable_applied = remaining_before, True
     core_tokenization_applied = False
     if HASH(observed) == '2eadcd59193c5cde7a6dcb9f6c469adca84f46688162d1866ad579c58743bc13':
         from core_tokenization_canonical_ledger_patch import derive_core_tokenization_successor
@@ -221,5 +232,5 @@ def verify_title_successor(root=ROOT, candidate=None):
     return dict(individual_decisions=1, metadata_tokens=14, summary_scalar_tokens=2,
         unselected_entry_bytes_preserved=1682, population=1697, closed_dispositions=377,
         pending_dispositions=1320, pending_security_reviews=1, before_sha256=HASH(before),
-        after_sha256=HASH(after), exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, exact_selector_density_successor_verified=selector_density_applied, exact_button_tokenization_successor_verified=button_tokenization_applied, exact_button_token_repairs_successor_verified=button_token_repairs_applied, exact_surface_m3_theme_successor_verified=surface_m3_theme_applied, exact_slider_m3_repairs_successor_verified=slider_m3_repairs_applied, exact_control_m3_theme_successor_verified=control_m3_theme_applied, exact_foundation_m3_theme_successor_verified=foundation_m3_theme_applied, exact_core_tokenization_successor_verified=core_tokenization_applied,
+        after_sha256=HASH(after), exact_theming_successor_verified=theming_applied, exact_inspection_successor_verified=inspection_applied, exact_selector_density_successor_verified=selector_density_applied, exact_button_tokenization_successor_verified=button_tokenization_applied, exact_button_token_repairs_successor_verified=button_token_repairs_applied, exact_surface_m3_theme_successor_verified=surface_m3_theme_applied, exact_slider_m3_repairs_successor_verified=slider_m3_repairs_applied, exact_control_m3_theme_successor_verified=control_m3_theme_applied, exact_foundation_m3_theme_successor_verified=foundation_m3_theme_applied, exact_core_tokenization_successor_verified=core_tokenization_applied, exact_remaining_unthemable_successor_verified=remaining_unthemable_applied,
         actual_native_artifact_browser_floor_or_full_audit_qualified=False, g11_claim='not-passed')

@@ -40,6 +40,11 @@ def verify_control_m3_theme_registry_successor(root=ROOT):
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'ae4d9e85741a782bdd2f9be8e7686bab3b3d4cb0e645224eab8207fb0e376340'
     current = (root / REGISTRY).read_bytes()
+    if digest(current) == '03a18cd09e4183f4307f1ec2c17d0797eea72db0440e23530e4d015ea0dae6a8':
+        from remaining_unthemable_canonical_ledger_patch import verify_remaining_unthemable_registry_successor
+        remaining_before, remaining_after = verify_remaining_unthemable_registry_successor(root)
+        assert current == remaining_after
+        current = remaining_before
     if digest(current) == 'c1d47c7662500e98aa34b37e964227961796ff16f500289019b221b4edacc841':
         from core_tokenization_canonical_ledger_patch import verify_core_tokenization_registry_successor
         core_before, core_after = verify_core_tokenization_registry_successor(root)

@@ -68,6 +68,7 @@ class PackedUpstreamLedgerEpochTests(unittest.TestCase):
             self.assertEqual(report['control_m3_theme_source_decisions'],4)
             self.assertEqual(report['foundation_m3_theme_source_decisions'],6)
             self.assertEqual(report['core_tokenization_source_decisions'],3)
+            self.assertEqual(report['remaining_unthemable_source_decisions'],14)
         self.assertEqual(report['canonical_entries'], 1697)
         self.assertEqual(report['changed_scalar_tokens'], 179)
         self.assertFalse(report['current_native_packed_or_floor_or_g11_credit'])
