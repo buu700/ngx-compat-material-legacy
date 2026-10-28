@@ -40,6 +40,11 @@ def verify_control_m3_theme_registry_successor(root=ROOT):
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'ae4d9e85741a782bdd2f9be8e7686bab3b3d4cb0e645224eab8207fb0e376340'
     current = (root / REGISTRY).read_bytes()
+    if digest(current) == 'c1d47c7662500e98aa34b37e964227961796ff16f500289019b221b4edacc841':
+        from core_tokenization_canonical_ledger_patch import verify_core_tokenization_registry_successor
+        core_before, core_after = verify_core_tokenization_registry_successor(root)
+        assert current == core_after
+        current = core_before
     if digest(current) == '99236700a066edfa8ab5dd2fbc08c92de86334839bad161467e246e4a91a3895':
         from foundation_m3_theme_canonical_ledger_patch import verify_foundation_m3_theme_registry_successor
         foundation_before, foundation_after = verify_foundation_m3_theme_registry_successor(root)

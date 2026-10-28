@@ -39,6 +39,11 @@ def verify_selector_density_registry_successor(root=ROOT):
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == 'c441c65203b4ee240f1c259bc7460a9eb51ef395f619fe3cc5234305120fff38'
     current = (root / REGISTRY).read_bytes()
+    if digest(current) == 'c1d47c7662500e98aa34b37e964227961796ff16f500289019b221b4edacc841':
+        from core_tokenization_canonical_ledger_patch import verify_core_tokenization_registry_successor
+        core_before, core_after = verify_core_tokenization_registry_successor(root)
+        assert current == core_after
+        current = core_before
     if digest(current) == '99236700a066edfa8ab5dd2fbc08c92de86334839bad161467e246e4a91a3895':
         from foundation_m3_theme_canonical_ledger_patch import verify_foundation_m3_theme_registry_successor
         foundation_before, foundation_after = verify_foundation_m3_theme_registry_successor(root)

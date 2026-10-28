@@ -39,7 +39,13 @@ def verify_foundation_m3_theme_registry_successor(root=ROOT):
                         "    scope_key:'foundation_m3_theme_source_scope',module:'upstream-foundation-m3-theme-admission.cjs'},\n" for sha in SHAS)
     after = text.replace('];\n', additions + '];\n').encode()
     assert digest(after) == '99236700a066edfa8ab5dd2fbc08c92de86334839bad161467e246e4a91a3895'
-    assert (root / REGISTRY).read_bytes() == after
+    current = (root / REGISTRY).read_bytes()
+    if digest(current) == 'c1d47c7662500e98aa34b37e964227961796ff16f500289019b221b4edacc841':
+        from core_tokenization_canonical_ledger_patch import verify_core_tokenization_registry_successor
+        core_before, core_after = verify_core_tokenization_registry_successor(root)
+        assert current == core_after
+        current = core_before
+    assert current == after
     return before, after
 
 

@@ -106,4 +106,10 @@ export const sourceContractDefinitions = [
     scope_key:'foundation_m3_theme_source_scope',module:'upstream-foundation-m3-theme-admission.cjs'},
   {sha:'4d50c38579f5a3a8d85b3f192ca6567bbcdcf8de',proof_kind:'individual-historical-foundation-m3-theme-source-review',
     scope_key:'foundation_m3_theme_source_scope',module:'upstream-foundation-m3-theme-admission.cjs'},
+  {sha:'f2ad33442e5cba6084438278a7bafca3814ed897',proof_kind:'individual-historical-core-tokenization-source-review',
+    scope_key:'core_tokenization_source_scope',module:'upstream-core-tokenization-admission.cjs'},
+  {sha:'92c701ffef53c39860f0ec0765c967d5ad6030f0',proof_kind:'individual-historical-core-tokenization-source-review',
+    scope_key:'core_tokenization_source_scope',module:'upstream-core-tokenization-admission.cjs'},
+  {sha:'47341ac0d6a56c7adb6dca5f89ba2d6fcfb7d572',proof_kind:'individual-historical-core-tokenization-source-review',
+    scope_key:'core_tokenization_source_scope',module:'upstream-core-tokenization-admission.cjs'},
 ];

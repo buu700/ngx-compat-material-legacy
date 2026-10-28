@@ -32,7 +32,7 @@ class CanonicalSourceTransactionTests(unittest.TestCase):
         self.assertTrue(report['no_prior_result_or_caller_compiler_hook'])
         self.assertTrue(report['late_entry_body_and_source_mutations_rejected'])
         self.assertEqual(report['canonical_dispositions_changed'], 0)
-        self.assertEqual(report['source_admissions'], 71)
+        self.assertEqual(report['source_admissions'], 74)
         self.assertFalse(report['actual_native_artifact_browser_floor_or_full_audit_qualified'])
         self.assertEqual(report['g11_claim'], 'not-passed')
 

@@ -158,6 +158,16 @@ export function retainedTitleOwnerReference({root,read}){
  const foundationControls=JSON.parse(read(foundation.source_handler_controls.path));assert.equal(foundationControls.result,'pass');assert.equal(foundationControls.rejected.length,245);assert.equal(foundationControls.pure_metadata_cases,6);assert.equal(foundationControls.real_root_positive_rows,6);assert.equal(foundationControls.real_root_rejected_rows,24);assert.equal(foundationControls.missing_source_requirement_mutant_detected,true);assert.equal(foundationControls.canonical_late_metadata_mutants_rejected,2);assert.equal(foundationControls.metadata_after_source_mutants_rejected,1);
  for(const edit of foundation.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
  assert.deepEqual(foundation.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ const coreRaw=read('compatibility/rc/21x-c04-core-tokenization-owner-successor.json');
+ assert.equal(hash(coreRaw),'0fb99f026221cb98853b332e62b3488790562f84d720e4e0dbf37e7ace5e319a');
+ const core=JSON.parse(coreRaw);assert.equal(core.path,path);assert.equal(core.line,'21.x');assert.equal(core.source_parent,'fab613002c9bb6c6235e2157dadeb0b4d982179f');
+ assert.deepEqual(core.before,{sha256:hash(current),bytes:Buffer.byteLength(current)});
+ assert.equal(core.literal_edits.length,15);assert.equal(core.tagged_golden_changes,0);assert.equal(core.original_assertions_or_rejection_controls_dropped,0);assert.equal(core.new_individual_decisions,3);assert.equal(core.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
+ for(const ref of [core.canonical_transition,core.candidate_owner_execution,core.source_handler_controls]){const raw=read(ref.path);assert.equal(hash(raw),ref.sha256);assert.equal(raw.length,ref.bytes);}
+ const coreSmoke=JSON.parse(read(core.candidate_owner_execution.path));assert.equal(coreSmoke.result,'pass');assert.equal(coreSmoke.prior_source_admissions_preserved,71);assert.equal(coreSmoke.current_source_admissions,74);assert.equal(coreSmoke.core_tokenization_source_decisions,3);assert.equal(coreSmoke.owner.sha256,core.after.sha256);assert.equal(coreSmoke.actual_native_artifact_browser_floor_or_full_audit_qualified,false);
+ const coreControls=JSON.parse(read(core.source_handler_controls.path));assert.equal(coreControls.result,'pass');assert.equal(coreControls.rejected.length,162);assert.equal(coreControls.pure_metadata_cases,3);assert.equal(coreControls.real_root_positive_rows,3);assert.equal(coreControls.real_root_rejected_rows,12);assert.equal(coreControls.missing_source_requirement_mutant_detected,true);assert.equal(coreControls.canonical_late_metadata_mutants_rejected,2);assert.equal(coreControls.metadata_after_source_mutants_rejected,1);
+ for(const edit of core.literal_edits){assert.equal(current.split(edit.before).length,2);current=current.replace(edit.before,edit.after);}
+ assert.deepEqual(core.after,{sha256:hash(current),bytes:Buffer.byteLength(current)});
  const expected=Buffer.from(current);assert.equal(read(path).equals(expected),true,'unreviewed owner change outside exact retained-verifier successor');
  return {path,sha256:hash(expected),bytes:expected.length};
 }
