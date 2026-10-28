@@ -60,6 +60,52 @@ def verify_phase_reports(catalogue,reports):
     assert len(rejected)==len(set(rejected))==(62 if LINE=='21.x' else 56)
 
 
+def verify_retained_population(report, expected):
+    self=unittest.TestCase()
+    self.assertEqual(report['original_dispositions_changed'],expected)
+    self.assertEqual(report['selection_source_decisions'],3)
+    self.assertEqual(report['selection_registry_digest_updates'],11)
+    if report['line'] == '21.x':
+        self.assertEqual(report['title_source_decisions'],1)
+        self.assertEqual(report['title_registry_metadata_tokens'],14)
+        self.assertEqual(report['theming_source_decisions'],2)
+        self.assertEqual(report['inspection_source_decisions'],4)
+        self.assertEqual(report['selector_density_source_decisions'],2)
+        self.assertEqual(report['button_tokenization_source_decisions'],5)
+        self.assertEqual(report['button_token_repairs_source_decisions'],2)
+        self.assertEqual(report['surface_m3_theme_source_decisions'],3)
+        self.assertEqual(report['slider_m3_repairs_source_decisions'],2)
+        self.assertEqual(report['control_m3_theme_source_decisions'],4)
+        self.assertEqual(report['foundation_m3_theme_source_decisions'],6)
+        self.assertEqual(report['core_tokenization_source_decisions'],3)
+        self.assertEqual(report['remaining_unthemable_source_decisions'],14)
+    self.assertEqual(report['canonical_entries'], 1697)
+    self.assertEqual(report['changed_scalar_tokens'], 179)
+    self.assertFalse(report['current_native_packed_or_floor_or_g11_credit'])
+
+
+def verify_ci_phase_contract(report, catalogue):
+    # This validates one actual phase. It never grants complete-roster credit.
+    self=unittest.TestCase()
+    phase=next(p for p in catalogue['phases'] if p['id']==report['phase'])
+    self.assertEqual(report['result'],'pass')
+    self.assertEqual(report['line'],LINE)
+    self.assertEqual(report['cases'],phase['cases'])
+    self.assertEqual(report['rejected'],phase['rejected'])
+    self.assertEqual(report['subjects'],catalogue['subjects'])
+    for flag in ['full_retained_roster_executed','actual_native_artifact_browser_floor_or_full_audit_qualified','current_native_packed_or_floor_or_g11_credit']:
+        self.assertIs(report[flag],False)
+    if report['phase']=='canonical' and LINE=='21.x':
+        self.assertEqual(report['facts']['canonical']['complete_ledger_frames'],21)
+    if report['phase']=='stage-population':
+        expected=13
+        if LINE=='21.x':
+            roster=json.loads((ROOT/'compatibility/rc/21x-remaining-disposition-worksheet.json').read_bytes())
+            self.assertEqual(roster['ledger_subject']['sha256'],digest((ROOT/'compatibility/f10/disposition-ledger/ledger.json').read_bytes()))
+            expected=roster['individual_source_reviews_with_retained_evidence']
+        verify_retained_population(report['summary'],expected)
+
+
 class PackedUpstreamLedgerEpochTests(unittest.TestCase):
     def test_current_metadata_population_is_exact(self):
         raw=(ROOT/'compatibility/f10/disposition-ledger/ledger.json').read_bytes()
@@ -186,6 +232,7 @@ console.log(JSON.stringify({result:'pass',actual_phase_scope_checked:true,missin
             child=subprocess.run(['node',PROBE,phase['id']],cwd=ROOT,capture_output=True,text=True,timeout=RETAINED_LEDGER_PHASE_TIMEOUT_SECONDS)
             self.assertEqual(child.returncode,0,phase['id']+'\n'+(child.stdout+child.stderr)[-7000:])
             report=json.loads(child.stdout);report['elapsed_seconds']=round(time.monotonic()-start,3)
+            verify_ci_phase_contract(report,catalogue)
             reports.append(report)
             print('retained phase '+phase['id']+': pass ('+str(report['elapsed_seconds'])+'s)',flush=True)
             if destination:
@@ -206,27 +253,9 @@ console.log(JSON.stringify({result:'pass',actual_phase_scope_checked:true,missin
             report['complete_ledger_frames']=canonical['facts']['canonical']['complete_ledger_frames']
         self.assertEqual(len(report['cases']),14 if LINE=='21.x' else 13)
         self.assertEqual(len(report['rejected']),62 if LINE=='21.x' else 56)
-        self.assertEqual(report['original_dispositions_changed'],expected)
-        self.assertEqual(report['selection_source_decisions'],3)
-        self.assertEqual(report['selection_registry_digest_updates'],11)
-        if report['line'] == '21.x':
+        if report['line']=='21.x':
             self.assertEqual(report['complete_ledger_frames'],21)
-            self.assertEqual(report['title_source_decisions'],1)
-            self.assertEqual(report['title_registry_metadata_tokens'],14)
-            self.assertEqual(report['theming_source_decisions'],2)
-            self.assertEqual(report['inspection_source_decisions'],4)
-            self.assertEqual(report['selector_density_source_decisions'],2)
-            self.assertEqual(report['button_tokenization_source_decisions'],5)
-            self.assertEqual(report['button_token_repairs_source_decisions'],2)
-            self.assertEqual(report['surface_m3_theme_source_decisions'],3)
-            self.assertEqual(report['slider_m3_repairs_source_decisions'],2)
-            self.assertEqual(report['control_m3_theme_source_decisions'],4)
-            self.assertEqual(report['foundation_m3_theme_source_decisions'],6)
-            self.assertEqual(report['core_tokenization_source_decisions'],3)
-            self.assertEqual(report['remaining_unthemable_source_decisions'],14)
-        self.assertEqual(report['canonical_entries'], 1697)
-        self.assertEqual(report['changed_scalar_tokens'], 179)
-        self.assertFalse(report['current_native_packed_or_floor_or_g11_credit'])
+        verify_retained_population(report,expected)
 
         aggregate={**report,'schema_version':1,'result':'pass','role':'Complete retained test roster;no native or final product gate qualification','phase_results':[{'phase':r['phase'],'elapsed_seconds':r['elapsed_seconds']}for r in reports],'subjects':catalogue['subjects'],'full_retained_roster_executed':True,'actual_native_artifact_browser_floor_or_full_audit_qualified':False,'g11_claim':'not-passed'}
         if destination:

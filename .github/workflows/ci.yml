@@ -14,10 +14,15 @@ permissions:
   contents: read
 
 jobs:
-  helper-checks:
-    name: Chainman helper tests and static checks
+  helper-plan:
+    name: Complete helper coverage plan
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    outputs:
+      plan_digest: ${{ steps.plan.outputs.plan_digest }}
+      source_commit: ${{ steps.plan.outputs.source_commit }}
+      test_matrix: ${{ steps.plan.outputs.test_matrix }}
+      phase_matrix: ${{ steps.plan.outputs.phase_matrix }}
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -36,8 +41,168 @@ jobs:
           sudo mv /tmp/just /usr/local/bin/just
           just --version
 
-      - name: Helper checks with pinned workspace dependencies
-        run: just chainman run helper-checks
+      - name: Set up pinned workspace dependencies
+        run: just chainman setup javascript
+
+      - name: Discover complete helper and retained-phase membership
+        id: plan
+        run: just chainman exec -- python3 scripts/helper_ci.py plan --out artifacts/helper-ci/plan.json --github-output "$GITHUB_OUTPUT"
+
+      - name: Upload helper evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: helper-plan-${{ github.sha }}
+          path: artifacts/helper-ci
+          if-no-files-found: error
+          retention-days: 14
+
+  helper-static:
+    name: Branch-owned static and coherence checks
+    needs: helper-plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      EXPECTED_HELPER_PLAN: ${{ needs.helper-plan.outputs.plan_digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Install pinned Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+
+      - name: Install pinned just 1.46.0
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/just.tar.gz https://github.com/casey/just/releases/download/1.46.0/just-1.46.0-x86_64-unknown-linux-musl.tar.gz
+          echo "79966e6e353f535ee7d1c6221641bcc8e3381c55b0d0a6dc6e54b34f9db36eaa  /tmp/just.tar.gz" | sha256sum -c
+          tar -xzf /tmp/just.tar.gz -C /tmp just
+          sudo mv /tmp/just /usr/local/bin/just
+          just --version
+
+      - name: Set up pinned workspace dependencies
+        run: just chainman setup javascript
+
+      - name: Execute every branch-owned non-unit helper check
+        run: just chainman exec -- python3 scripts/helper_ci.py static --expected-plan "$EXPECTED_HELPER_PLAN" --report artifacts/helper-ci/static.json
+
+      - name: Upload helper evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: helper-static-${{ github.sha }}
+          path: artifacts/helper-ci
+          if-no-files-found: error
+          retention-days: 14
+
+  helper-unit-tests:
+    name: Helper unit tests (${{ matrix.group }})
+    needs: helper-plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.helper-plan.outputs.test_matrix) }}
+    env:
+      HELPER_GROUP: ${{ matrix.group }}
+      EXPECTED_HELPER_PLAN: ${{ needs.helper-plan.outputs.plan_digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Install pinned Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+
+      - name: Install pinned just 1.46.0
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/just.tar.gz https://github.com/casey/just/releases/download/1.46.0/just-1.46.0-x86_64-unknown-linux-musl.tar.gz
+          echo "79966e6e353f535ee7d1c6221641bcc8e3381c55b0d0a6dc6e54b34f9db36eaa  /tmp/just.tar.gz" | sha256sum -c
+          tar -xzf /tmp/just.tar.gz -C /tmp just
+          sudo mv /tmp/just /usr/local/bin/just
+          just --version
+
+      - name: Set up pinned workspace dependencies
+        run: just chainman setup javascript
+
+      - name: Execute the exact planned test group
+        run: just chainman exec -- python3 scripts/helper_ci.py unit --expected-plan "$EXPECTED_HELPER_PLAN" --group "$HELPER_GROUP" --report "artifacts/helper-ci/unit-${HELPER_GROUP}.json"
+
+      - name: Upload helper evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: helper-unit-${{ matrix.group }}-${{ github.sha }}
+          path: artifacts/helper-ci
+          if-no-files-found: error
+          retention-days: 14
+
+  helper-retained-phases:
+    name: Retained ledger phase (${{ matrix.phase }})
+    needs: helper-plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.helper-plan.outputs.phase_matrix) }}
+    env:
+      HELPER_PHASE: ${{ matrix.phase }}
+      EXPECTED_HELPER_PLAN: ${{ needs.helper-plan.outputs.plan_digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Install pinned Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+
+      - name: Install pinned just 1.46.0
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/just.tar.gz https://github.com/casey/just/releases/download/1.46.0/just-1.46.0-x86_64-unknown-linux-musl.tar.gz
+          echo "79966e6e353f535ee7d1c6221641bcc8e3381c55b0d0a6dc6e54b34f9db36eaa  /tmp/just.tar.gz" | sha256sum -c
+          tar -xzf /tmp/just.tar.gz -C /tmp just
+          sudo mv /tmp/just /usr/local/bin/just
+          just --version
+
+      - name: Set up pinned workspace dependencies
+        run: just chainman setup javascript
+
+      - name: Execute the actual retained phase with exact source and control checks
+        run: just chainman exec -- python3 scripts/helper_ci.py phase --expected-plan "$EXPECTED_HELPER_PLAN" --phase "$HELPER_PHASE" --report "artifacts/helper-ci/phase-${HELPER_PHASE}.json"
+
+      - name: Upload helper evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: helper-retained-${{ matrix.phase }}-${{ github.sha }}
+          path: artifacts/helper-ci
+          if-no-files-found: error
+          retention-days: 14
+
+  helper-checks:
+    name: Chainman helper tests and static checks
+    if: always()
+    needs: [helper-plan, helper-static, helper-unit-tests, helper-retained-phases]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Require success from every planned helper job
+        env:
+          HELPER_NEEDS: ${{ toJSON(needs) }}
+        run: python3 scripts/helper_ci.py gate
 
   packed-consumer-aot:
     name: Packed-consumer AOT and harness
